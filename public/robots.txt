@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Server function endpoints — no SEO value
+Disallow: /_serverFn/
+Disallow: /_build/
+
+# Replace the host below at deploy time (or set TanStack Start sitemap.host).
+# Sitemap: https://your-domain.com/sitemap.xml

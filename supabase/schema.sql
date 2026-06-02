@@ -1,0 +1,361 @@
+-- The Royal Passage — complete Supabase schema in one file (PostgreSQL)
+-- Includes: extensions, tables, triggers, RLS policies, seed data.
+-- Paste into: Supabase Dashboard → SQL Editor → New query → Run
+-- Safe to re-run: uses IF NOT EXISTS / ON CONFLICT where applicable
+-- Seed UUIDs must be valid hex (0-9, a-f only); prefixes like "s1..." are invalid.
+--
+-- RLS: broad read access for `anon` + `authenticated` so SELECT returns rows in the
+-- Data API. Writes are not granted to anonymous clients (no INSERT/UPDATE/DELETE policies).
+-- The app backend uses the service role key, which bypasses RLS.
+
+-- ---------------------------------------------------------------------------
+-- Extensions
+-- ---------------------------------------------------------------------------
+create extension if not exists pgcrypto;
+
+-- ---------------------------------------------------------------------------
+-- Updated-at trigger
+-- ---------------------------------------------------------------------------
+create or replace function public.set_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
+-- Hosts (providers). Seeded without auth so the schema is self-contained.
+-- ---------------------------------------------------------------------------
+create table if not exists public.hosts (
+  id uuid primary key default gen_random_uuid(),
+  display_name text not null,
+  email text,
+  phone text,
+  bio text,
+  verified boolean not null default false,
+  approval_status text not null default 'pending'
+    check (approval_status in ('pending', 'approved', 'rejected', 'suspended')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+drop trigger if exists trg_hosts_updated on public.hosts;
+create trigger trg_hosts_updated
+  before update on public.hosts
+  for each row execute procedure public.set_updated_at();
+
+-- ---------------------------------------------------------------------------
+-- Category reference (for filters and consistency)
+-- ---------------------------------------------------------------------------
+create table if not exists public.experience_categories (
+  slug text primary key,
+  label text not null,
+  sort_order int not null default 0
+);
+
+-- ---------------------------------------------------------------------------
+-- Experiences (listings). Capacity for booking is enforced per slot, not here.
+-- ---------------------------------------------------------------------------
+create table if not exists public.experiences (
+  id uuid primary key default gen_random_uuid(),
+  host_id uuid not null references public.hosts (id) on delete restrict,
+  slug text not null unique,
+  title text not null,
+  tagline text,
+  description text,
+  category_slug text not null references public.experience_categories (slug),
+  city text not null,
+  region text,
+  address text,
+  duration_minutes int not null check (duration_minutes > 0),
+  experience_format text not null default 'slot_based'
+    check (experience_format in ('fixed', 'slot_based', 'on_demand')),
+  pricing_model text not null default 'per_person'
+    check (pricing_model in ('per_person', 'per_group', 'both')),
+  price_per_person_minor int not null check (price_per_person_minor >= 0),
+  price_per_group_minor int,
+  status text not null default 'draft'
+    check (status in ('draft', 'pending_review', 'published', 'rejected', 'archived')),
+  hero_image_url text,
+  gallery_urls text[] not null default '{}',
+  inclusions text[] not null default '{}',
+  exclusions text[] not null default '{}',
+  cancellation_policy text,
+  average_rating numeric(3, 2) not null default 0
+    check (average_rating >= 0 and average_rating <= 5),
+  review_count int not null default 0
+    check (review_count >= 0),
+  currency_code text not null default 'INR',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_experiences_host on public.experiences (host_id);
+create index if not exists idx_experiences_city on public.experiences (city);
+create index if not exists idx_experiences_category on public.experiences (category_slug);
+create index if not exists idx_experiences_status on public.experiences (status);
+
+drop trigger if exists trg_experiences_updated on public.experiences;
+create trigger trg_experiences_updated
+  before update on public.experiences
+  for each row execute procedure public.set_updated_at();
+
+-- ---------------------------------------------------------------------------
+-- Slots: capacity and sold seats (overbooking prevention at application level)
+-- ---------------------------------------------------------------------------
+create table if not exists public.experience_slots (
+  id uuid primary key default gen_random_uuid(),
+  experience_id uuid not null references public.experiences (id) on delete cascade,
+  slot_date date not null,
+  start_time time not null,
+  end_time time not null,
+  capacity int not null check (capacity > 0),
+  seats_sold int not null default 0 check (seats_sold >= 0),
+  is_blocked boolean not null default false,
+  created_at timestamptz not null default now(),
+  constraint chk_seats check (seats_sold <= capacity)
+);
+
+create index if not exists idx_slots_experience_date on public.experience_slots (experience_id, slot_date);
+
+-- ---------------------------------------------------------------------------
+-- Bookings
+-- ---------------------------------------------------------------------------
+create table if not exists public.bookings (
+  id uuid primary key default gen_random_uuid(),
+  slot_id uuid not null references public.experience_slots (id) on delete restrict,
+  guest_email text not null,
+  guest_name text not null,
+  guest_phone text,
+  customer_user_id uuid,
+  guest_count int not null check (guest_count > 0),
+  status text not null default 'pending_payment'
+    check (status in (
+      'pending_payment', 'confirmed', 'cancelled_by_guest', 'cancelled_by_host',
+      'completed', 'refunded', 'no_show'
+    )),
+  subtotal_minor int not null check (subtotal_minor >= 0),
+  platform_fee_minor int not null default 0 check (platform_fee_minor >= 0),
+  host_payout_minor int not null default 0 check (host_payout_minor >= 0),
+  currency_code text not null default 'INR',
+  payment_reference text,
+  hold_expires_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_bookings_slot on public.bookings (slot_id);
+
+drop trigger if exists trg_bookings_updated on public.bookings;
+create trigger trg_bookings_updated
+  before update on public.bookings
+  for each row execute procedure public.set_updated_at();
+
+-- ---------------------------------------------------------------------------
+-- Reviews
+-- ---------------------------------------------------------------------------
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  experience_id uuid not null references public.experiences (id) on delete cascade,
+  booking_id uuid references public.bookings (id) on delete set null,
+  rating int not null check (rating between 1 and 5),
+  comment text,
+  reviewer_display_name text,
+  created_at timestamptz not null default now(),
+  constraint uq_review_booking unique (booking_id)
+);
+
+create index if not exists idx_reviews_experience on public.reviews (experience_id);
+
+-- ---------------------------------------------------------------------------
+-- Platform settings (e.g. commission)
+-- ---------------------------------------------------------------------------
+create table if not exists public.platform_settings (
+  key text primary key,
+  value jsonb not null
+);
+
+-- ---------------------------------------------------------------------------
+-- Row Level Security — enable on all public tables
+-- ---------------------------------------------------------------------------
+alter table public.hosts enable row level security;
+alter table public.experience_categories enable row level security;
+alter table public.experiences enable row level security;
+alter table public.experience_slots enable row level security;
+alter table public.bookings enable row level security;
+alter table public.reviews enable row level security;
+alter table public.platform_settings enable row level security;
+
+-- Drop existing policies if re-running in dev (names are stable)
+drop policy if exists "hosts_select_all" on public.hosts;
+drop policy if exists "categories_select_all" on public.experience_categories;
+drop policy if exists "experiences_select_all" on public.experiences;
+drop policy if exists "slots_select_all" on public.experience_slots;
+drop policy if exists "bookings_select_all" on public.bookings;
+drop policy if exists "reviews_select_all" on public.reviews;
+drop policy if exists "platform_settings_select_all" on public.platform_settings;
+
+create policy "hosts_select_all"
+  on public.hosts for select to anon, authenticated
+  using (true);
+
+create policy "categories_select_all"
+  on public.experience_categories for select to anon, authenticated
+  using (true);
+
+create policy "experiences_select_all"
+  on public.experiences for select to anon, authenticated
+  using (true);
+
+create policy "slots_select_all"
+  on public.experience_slots for select to anon, authenticated
+  using (true);
+
+create policy "bookings_select_all"
+  on public.bookings for select to anon, authenticated
+  using (true);
+
+create policy "reviews_select_all"
+  on public.reviews for select to anon, authenticated
+  using (true);
+
+create policy "platform_settings_select_all"
+  on public.platform_settings for select to anon, authenticated
+  using (true);
+
+-- ---------------------------------------------------------------------------
+-- Seed data (deterministic UUIDs for idempotent re-runs)
+-- ---------------------------------------------------------------------------
+insert into public.experience_categories (slug, label, sort_order) values
+  ('art_craft', 'Art & Craft', 10),
+  ('outdoor_nature', 'Outdoor & Nature', 20),
+  ('culinary', 'Culinary & Food', 30),
+  ('wellness', 'Wellness & Healing', 40),
+  ('digital_detox', 'Digital Detox & Slow Living', 50),
+  ('rural_farm', 'Rural & Farm', 60),
+  ('cultural_heritage', 'Cultural & Heritage', 70),
+  ('premium_luxury', 'Premium / Luxury', 80)
+on conflict (slug) do nothing;
+
+insert into public.platform_settings (key, value) values
+  ('commission_percent', '12.5'::jsonb),
+  ('default_currency', '"INR"'::jsonb)
+on conflict (key) do nothing;
+
+insert into public.hosts (id, display_name, email, bio, verified, approval_status) values
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Heritage Clay Studio — Mysuru', 'studio@example.com',
+   'Third-generation potters hosting intimate wheel and hand-building sessions.', true, 'approved'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Devaraja Organic Farm', 'farm@example.com',
+   'Family-run farm experiences minutes from the city.', true, 'approved'),
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Silver Oak Sound Sanctuary', 'sound@example.com',
+   'Sound therapy and restorative sessions led by certified practitioners.', true, 'approved')
+on conflict (id) do nothing;
+
+insert into public.experiences (
+  id, host_id, slug, title, tagline, description, category_slug, city, region, address,
+  duration_minutes, experience_format, pricing_model, price_per_person_minor, price_per_group_minor,
+  status, hero_image_url, inclusions, exclusions, cancellation_policy, average_rating, review_count, currency_code
+) values
+  (
+    'e0000001-0000-0000-0000-000000000001',
+    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    'mysuru-wheel-and-clay',
+    'Wheel & Clay at Heritage Studio',
+    'A morning at the wheel with master potters',
+    'Learn throwing and hand-building in a sunlit studio. Take home two pieces, fired and glazed by the studio.',
+    'art_craft', 'Mysuru', 'Karnataka', 'Gokulam, Mysuru', 180, 'slot_based', 'per_person', 240000, null,
+    'published',
+    'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&q=80',
+    array['Materials', 'Two finished pieces', 'Refreshments'],
+    array['Transport'],
+    'Full refund if cancelled more than 24 hours before the slot. 50% refund within 24 hours.',
+    4.95, 48, 'INR'
+  ),
+  (
+    'e0000002-0000-0000-0000-000000000002',
+    'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    'farm-walk-and-breakfast',
+    'Sunrise Farm Walk & Breakfast',
+    'Fields, filter coffee, and a slow Karnataka breakfast',
+    'Walk the rows before heat sets in, then share a traditional breakfast under a neem tree.',
+    'rural_farm', 'Mysuru', 'Karnataka', 'Hunsur Road outskirts', 150, 'slot_based', 'per_person', 185000, null,
+    'published',
+    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80',
+    array['Guided walk', 'Breakfast', 'Farm tour'],
+    array[]::text[],
+    'Full refund up to 24 hours before. Weather cancellations fully refunded.',
+    4.88, 112, 'INR'
+  ),
+  (
+    'e0000003-0000-0000-0000-000000000003',
+    'cccccccc-cccc-cccc-cccc-cccccccccccc',
+    'sound-bowl-evening',
+    'Sound Bowl Evening Reset',
+    'Ninety minutes of resonance and stillness',
+    'Group sound journey with Himalayan bowls, followed by herbal tea in the garden.',
+    'wellness', 'Mysuru', 'Karnataka', 'Chamundi Hill foothills', 90, 'slot_based', 'per_person', 165000, null,
+    'published',
+    'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&q=80',
+    array['Mats', 'Blankets', 'Tea'],
+    array['Private transport'],
+    'Full refund up to 24 hours before.',
+    4.91, 64, 'INR'
+  ),
+  (
+    'e0000004-0000-0000-0000-000000000004',
+    'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    'estate-coffee-cupping',
+    'Estate-Style Coffee Cupping',
+    'From cherry to cup — a sensory workshop',
+    'Roast sample beans, learn grind theory, and cup three estate lots side by side.',
+    'culinary', 'Nanjangud', 'Karnataka', 'Coffee Collective Nanjangud', 120, 'slot_based', 'per_person', 145000, null,
+    'published',
+    'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=80',
+    array['Cupping sets', 'Take-home sample bag'],
+    array[]::text[],
+    'Full refund up to 24 hours before.',
+    4.82, 37, 'INR'
+  ),
+  (
+    'e0000005-0000-0000-0000-000000000005',
+    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    'palace-stories-walk',
+    'Palace Stories Walk',
+    'Heritage narrative walk — experience format, not a generic tour',
+    'Small groups only. Story-led paths with archival imagery and live narration.',
+    'cultural_heritage', 'Mysuru', 'Karnataka', 'Old city core', 105, 'slot_based', 'per_person', 95000, null,
+    'published',
+    'https://images.unsplash.com/photo-1524492412937-b280c272500d?w=1200&q=80',
+    array['Guided walk', 'Printed route map'],
+    array['Monument entry tickets'],
+    'Full refund up to 24 hours before.',
+    4.79, 201, 'INR'
+  )
+on conflict (id) do nothing;
+
+-- Slots: relative dates so listings stay “current” after seed
+insert into public.experience_slots (id, experience_id, slot_date, start_time, end_time, capacity, seats_sold, is_blocked)
+values
+  ('50000001-0000-4000-8000-000000000001', 'e0000001-0000-0000-0000-000000000001', (current_date + 2), '09:30', '12:30', 8, 3, false),
+  ('50000002-0000-4000-8000-000000000002', 'e0000001-0000-0000-0000-000000000001', (current_date + 5), '09:30', '12:30', 8, 0, false),
+  ('50000003-0000-4000-8000-000000000003', 'e0000002-0000-0000-0000-000000000002', (current_date + 1), '06:30', '09:00', 12, 5, false),
+  ('50000004-0000-4000-8000-000000000004', 'e0000002-0000-0000-0000-000000000002', (current_date + 4), '06:30', '09:00', 12, 12, false),
+  ('50000005-0000-4000-8000-000000000005', 'e0000003-0000-0000-0000-000000000003', (current_date + 2), '18:00', '19:30', 10, 2, false),
+  ('50000006-0000-4000-8000-000000000006', 'e0000004-0000-0000-0000-000000000004', (current_date + 3), '10:00', '12:00', 14, 6, false),
+  ('50000007-0000-4000-8000-000000000007', 'e0000005-0000-0000-0000-000000000005', (current_date + 1), '17:00', '18:45', 15, 4, false)
+on conflict (id) do nothing;
+
+insert into public.reviews (id, experience_id, rating, comment, reviewer_display_name) values
+  ('60000001-0000-4000-8000-000000000001', 'e0000001-0000-0000-0000-000000000001', 5, 'Calm, skilled instructors — the wheel finally made sense.', 'Aditi'),
+  ('60000002-0000-4000-8000-000000000002', 'e0000002-0000-0000-0000-000000000002', 5, 'Breakfast under the neem tree was unforgettable.', 'Rahul')
+on conflict (id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- Sanity checks (optional — comment out if your SQL client dislikes multiple statements)
+-- ---------------------------------------------------------------------------
+-- select 'hosts', count(*) from public.hosts
+-- union all select 'experiences', count(*) from public.experiences
+-- union all select 'slots', count(*) from public.experience_slots;

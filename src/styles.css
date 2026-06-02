@@ -1,0 +1,280 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-display: "Cinzel", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 16px;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-cream: var(--cream);
+  --color-ember: var(--ember);
+  --color-ember-soft: var(--ember-soft);
+  --color-gold: var(--gold);
+  --color-gold-dim: var(--gold-dim);
+  --color-burgundy: var(--burgundy);
+
+  --shadow-soft: 0 1px 0 oklch(0.78 0.09 78 / 0.14), 0 10px 36px -8px oklch(0.08 0.04 22 / 0.65);
+  --shadow-lift:
+    0 1px 0 oklch(0.82 0.1 78 / 0.18), 0 22px 48px -14px oklch(0.06 0.03 22 / 0.55),
+    0 0 48px -16px oklch(0.72 0.12 78 / 0.22);
+  --shadow-gold:
+    0 0 42px -10px oklch(0.72 0.14 78 / 0.55), inset 0 1px 0 oklch(0.92 0.06 82 / 0.25);
+}
+
+:root {
+  --radius: 6px;
+  /* Header is shorter on mobile so the fixed bar doesn't eat the viewport. */
+  --header-height: 4.5rem;
+
+  --burgundy: oklch(0.21 0.1 22);
+  --burgundy-deep: oklch(0.15 0.08 20);
+
+  --background: oklch(0.19 0.09 22);
+  --foreground: oklch(0.96 0.012 85);
+  --ink: oklch(0.97 0.01 88);
+  --ink-soft: oklch(0.74 0.04 78);
+
+  --gold: oklch(0.76 0.11 78);
+  --gold-dim: oklch(0.58 0.09 72);
+  --ember: var(--gold);
+  --ember-soft: oklch(0.42 0.07 72 / 0.35);
+  --cream: oklch(0.55 0.1 75 / 0.12);
+
+  --card: oklch(0.26 0.09 24 / 0.42);
+  --card-foreground: var(--ink);
+  --popover: oklch(0.17 0.07 22 / 0.94);
+  --popover-foreground: var(--ink);
+
+  --primary: oklch(0.76 0.11 78);
+  --primary-foreground: oklch(0.14 0.06 22);
+  --secondary: oklch(0.28 0.08 24 / 0.55);
+  --secondary-foreground: var(--ink);
+  --muted: oklch(0.3 0.07 24 / 0.45);
+  --muted-foreground: oklch(0.68 0.04 78);
+  --accent: oklch(0.68 0.1 76);
+  --accent-foreground: oklch(0.14 0.06 22);
+  --destructive: oklch(0.52 0.18 25);
+  --destructive-foreground: oklch(0.98 0.01 90);
+
+  --border: oklch(0.72 0.1 78 / 0.28);
+  --input: oklch(0.72 0.09 78 / 0.22);
+  --ring: oklch(0.76 0.11 78);
+
+  --sidebar: oklch(0.17 0.08 22);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  --chart-1: oklch(0.76 0.11 78);
+  --chart-2: oklch(0.62 0.08 72);
+  --chart-3: oklch(0.55 0.06 220);
+  --chart-4: oklch(0.7 0.1 80);
+  --chart-5: oklch(0.45 0.04 300);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --header-height: 5.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-height: 6.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-height: 7.5rem;
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  body {
+    color: var(--color-foreground);
+    font-feature-settings: "ss01", "cv11";
+    background-color: var(--color-background);
+    background-image:
+      radial-gradient(ellipse 90% 55% at 50% -18%, oklch(0.42 0.12 78 / 0.22), transparent 58%),
+      radial-gradient(ellipse 55% 45% at 100% 15%, oklch(0.35 0.1 75 / 0.14), transparent 52%),
+      radial-gradient(ellipse 45% 40% at 0% 85%, oklch(0.28 0.12 22 / 0.35), transparent 48%),
+      linear-gradient(180deg, oklch(0.2 0.09 22) 0%, oklch(0.14 0.07 20) 100%);
+    background-attachment: fixed;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  ::selection {
+    background-color: oklch(0.62 0.1 78 / 0.45);
+    color: var(--color-foreground);
+  }
+}
+
+@utility container-page {
+  margin-inline: auto;
+  max-width: 1280px;
+  padding-inline: 1.5rem;
+  @media (min-width: 768px) {
+    padding-inline: 2.5rem;
+  }
+}
+
+@utility eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--color-muted-foreground);
+}
+
+/* Header — SSR-safe (no Framer Motion inline styles, no hydration mismatch) */
+.site-header {
+  background-color: oklch(0.15 0.07 22 / 0.45);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border-bottom: 1px solid oklch(0.72 0.09 78 / 0.14);
+  box-shadow: 0 0 0 transparent;
+}
+.site-header[data-elevated="true"] {
+  background-color: oklch(0.17 0.08 22 / 0.92);
+  backdrop-filter: blur(22px) saturate(1.35);
+  -webkit-backdrop-filter: blur(22px) saturate(1.35);
+  border-bottom-color: oklch(0.76 0.1 78 / 0.38);
+  box-shadow:
+    0 1px 0 oklch(0.78 0.1 78 / 0.18),
+    inset 0 1px 0 oklch(0.92 0.05 82 / 0.08),
+    0 20px 50px -24px oklch(0.05 0.04 18 / 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Breathing gold halo for the footer brand mark.
+   Synchronised scale + drop-shadow gives the logo a soft "alive" feel
+   without distracting from the surrounding content. */
+@keyframes logo-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 18px oklch(0.78 0.13 86 / 0.35))
+      drop-shadow(0 0 40px oklch(0.72 0.14 78 / 0.18));
+  }
+  50% {
+    transform: scale(1.035);
+    filter: drop-shadow(0 0 32px oklch(0.82 0.14 86 / 0.6))
+      drop-shadow(0 0 72px oklch(0.76 0.16 78 / 0.4));
+  }
+}
+
+.logo-breathe {
+  transform-origin: center;
+  animation: logo-breathe 4.8s ease-in-out infinite;
+  will-change: transform, filter;
+}
+
+@utility hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, oklch(0.72 0.1 78 / 0.45), transparent);
+}
+
+@utility glass {
+  background: linear-gradient(
+    155deg,
+    oklch(0.32 0.1 24 / 0.38) 0%,
+    oklch(0.18 0.06 22 / 0.42) 100%
+  );
+  border: 1px solid oklch(0.78 0.1 78 / 0.22);
+  box-shadow:
+    inset 0 1px 0 0 oklch(0.9 0.06 82 / 0.12),
+    0 10px 40px -12px oklch(0.05 0.03 18 / 0.65),
+    0 0 0 1px oklch(0.08 0.04 22 / 0.45);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+@utility glass-strong {
+  background: linear-gradient(165deg, oklch(0.36 0.1 25 / 0.48) 0%, oklch(0.2 0.07 22 / 0.45) 100%);
+  border: 1px solid oklch(0.8 0.11 78 / 0.32);
+  box-shadow:
+    inset 0 1px 0 0 oklch(0.92 0.05 85 / 0.14),
+    0 14px 44px -14px oklch(0.06 0.04 20 / 0.6),
+    0 0 72px -20px oklch(0.7 0.12 78 / 0.18);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+@utility glass-hover {
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    background 0.35s ease;
+}
+@utility glass-hover-active {
+  &:hover {
+    border-color: oklch(0.84 0.12 78 / 0.48);
+    box-shadow:
+      inset 0 1px 0 0 oklch(0.96 0.04 85 / 0.18),
+      0 18px 52px -14px oklch(0.12 0.05 22 / 0.55),
+      0 0 56px -14px oklch(0.76 0.14 78 / 0.35);
+  }
+}
