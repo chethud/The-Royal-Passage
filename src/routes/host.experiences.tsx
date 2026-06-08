@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { HostExperienceTable } from "@/components/experience/HostExperienceTable";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
-import { listHostExperiences, type HostExperienceSummary } from "@/lib/host-experience-fns";
+import { fetchHostExperiences, type HostExperienceSummary } from "@/lib/api/host-experiences";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/experiences")({
@@ -23,10 +24,13 @@ function HostExperiencesPage() {
     setPageLoading(true);
     setPageError(null);
     try {
-      const rows = await listHostExperiences({ data: { accessToken } });
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
+      const rows = await fetchHostExperiences(accessToken);
       setExperiences(rows);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to load experiences.");
+      setPageError(toErrorMessage(err, "Failed to load experiences."));
     } finally {
       setPageLoading(false);
     }

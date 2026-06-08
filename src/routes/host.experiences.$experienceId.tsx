@@ -4,18 +4,20 @@ import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusB
 import { HostExperienceForm } from "@/components/experience/HostExperienceForm";
 import { SlotManager } from "@/components/experience/SlotManager";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
-import { listCities, type CitySummary } from "@/lib/city-fns";
+import type { CitySummary } from "@/lib/cities";
+import { fetchCities } from "@/lib/api/cities";
 import {
-  createHostSlotFn,
-  deleteHostExperienceFn,
-  deleteHostSlotFn,
-  getHostCategories,
-  getHostExperienceDetail,
-  updateHostExperienceFn,
-  updateHostSlotFn,
+  createHostSlot,
+  deleteHostExperience,
+  deleteHostSlot,
+  fetchHostCategories,
+  fetchHostExperience,
+  updateHostExperience,
+  updateHostSlot,
   type CategoryOption,
   type HostExperienceDetail,
-} from "@/lib/host-experience-fns";
+} from "@/lib/api/host-experiences";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/experiences/$experienceId")({
@@ -41,16 +43,19 @@ function HostExperienceDetailPage() {
     setPageLoading(true);
     setPageError(null);
     try {
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
       const [detail, cats, cityRows] = await Promise.all([
-        getHostExperienceDetail({ data: { accessToken, experienceId } }),
-        getHostCategories({ data: { accessToken } }),
-        listCities(),
+        fetchHostExperience(accessToken, experienceId),
+        fetchHostCategories(accessToken),
+        fetchCities(),
       ]);
       setExperience(detail);
       setCategories(cats);
       setCities(cityRows);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to load experience.");
+      setPageError(toErrorMessage(err, "Failed to load experience."));
     } finally {
       setPageLoading(false);
     }
@@ -68,12 +73,10 @@ function HostExperienceDetailPage() {
     setSaving(true);
     setPageError(null);
     try {
-      const updated = await updateHostExperienceFn({
-        data: { accessToken, experienceId, ...payload },
-      });
+      const updated = await updateHostExperience(accessToken, experienceId, payload);
       setExperience(updated);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to save experience.");
+      setPageError(toErrorMessage(err, "Failed to save experience."));
     } finally {
       setSaving(false);
     }
@@ -84,10 +87,10 @@ function HostExperienceDetailPage() {
     if (!window.confirm("Archive or delete this experience?")) return;
     setSaving(true);
     try {
-      await deleteHostExperienceFn({ data: { accessToken, experienceId } });
+      await deleteHostExperience(accessToken, experienceId);
       window.location.href = "/host/experiences";
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to delete experience.");
+      setPageError(toErrorMessage(err, "Failed to delete experience."));
       setSaving(false);
     }
   };
@@ -106,12 +109,10 @@ function HostExperienceDetailPage() {
     setSlotBusy(true);
     setPageError(null);
     try {
-      const updated = await createHostSlotFn({
-        data: { accessToken, experienceId, ...payload },
-      });
+      const updated = await createHostSlot(accessToken, experienceId, payload);
       refreshExperience(updated);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to add slot.");
+      setPageError(toErrorMessage(err, "Failed to add slot."));
     } finally {
       setSlotBusy(false);
     }
@@ -121,12 +122,10 @@ function HostExperienceDetailPage() {
     if (!accessToken) return;
     setSlotBusy(true);
     try {
-      const updated = await updateHostSlotFn({
-        data: { accessToken, experienceId, slotId, isBlocked },
-      });
+      const updated = await updateHostSlot(accessToken, experienceId, slotId, { isBlocked });
       refreshExperience(updated);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to update slot.");
+      setPageError(toErrorMessage(err, "Failed to update slot."));
     } finally {
       setSlotBusy(false);
     }
@@ -136,12 +135,10 @@ function HostExperienceDetailPage() {
     if (!accessToken) return;
     setSlotBusy(true);
     try {
-      const updated = await deleteHostSlotFn({
-        data: { accessToken, experienceId, slotId },
-      });
+      const updated = await deleteHostSlot(accessToken, experienceId, slotId);
       refreshExperience(updated);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to delete slot.");
+      setPageError(toErrorMessage(err, "Failed to delete slot."));
     } finally {
       setSlotBusy(false);
     }

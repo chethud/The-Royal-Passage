@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { StarRating } from "@/components/reviews/StarRating";
 import type { HostReviewSummary } from "@/lib/api/host";
-import { replyToReview } from "@/lib/review-fns";
+import { hostReplyReview } from "@/lib/api/reviews";
+import { toErrorMessage } from "@/lib/api/client";
 import { formatDateLong } from "@/lib/date-format";
 
 type HostReviewsListProps = {
@@ -21,14 +22,12 @@ export function HostReviewsList({ reviews, accessToken, onUpdated }: HostReviews
     setBusyId(reviewId);
     setError(null);
     try {
-      await replyToReview({
-        data: { accessToken, reviewId, reply: replyText.trim() },
-      });
+      await hostReplyReview(accessToken, reviewId, replyText.trim());
       setReplyingId(null);
       setReplyText("");
       onUpdated?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to post reply.");
+      setError(toErrorMessage(err, "Failed to post reply."));
     } finally {
       setBusyId(null);
     }

@@ -5,14 +5,15 @@ import { PayAtVenueBadge } from "@/components/booking/PayAtVenueBadge";
 import { HostBookingActions } from "@/components/host/HostBookingActions";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import { formatDateLong, formatDateWeekdayShort } from "@/lib/date-format";
+import type { BookingSummary } from "@/lib/api/bookings";
 import {
-  getHostBookingDetail,
-  hostCompleteBooking,
-  hostConfirmBooking,
-  hostMarkBookingPaid,
-  hostRejectBooking,
-  type BookingSummary,
-} from "@/lib/host-fns";
+  completeHostBooking,
+  confirmHostBooking,
+  fetchHostBooking,
+  markHostBookingPaid,
+  rejectHostBooking,
+} from "@/lib/api/host";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { formatMoney } from "@/lib/money";
 import { useHostAccess } from "@/lib/use-host-access";
 
@@ -36,10 +37,13 @@ function HostBookingDetailPage() {
     setPageLoading(true);
     setPageError(null);
     try {
-      const row = await getHostBookingDetail({ data: { accessToken, bookingId } });
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
+      const row = await fetchHostBooking(accessToken, bookingId);
       setBooking(row);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to load booking.");
+      setPageError(toErrorMessage(err, "Failed to load booking."));
     } finally {
       setPageLoading(false);
     }
@@ -51,18 +55,16 @@ function HostBookingDetailPage() {
   }, [loadBooking, ready]);
 
   const runAction = async (
-    action: (input: {
-      data: { accessToken: string; bookingId: string };
-    }) => Promise<BookingSummary>,
+    action: (token: string, id: string) => Promise<BookingSummary>,
   ) => {
     if (!accessToken) return;
     setBusy(true);
     setPageError(null);
     try {
-      const updated = await action({ data: { accessToken, bookingId } });
+      const updated = await action(accessToken, bookingId);
       setBooking(updated);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Action failed.");
+      setPageError(toErrorMessage(err, "Action failed."));
     } finally {
       setBusy(false);
     }
@@ -160,10 +162,10 @@ function HostBookingDetailPage() {
             booking={booking}
             busy={busy}
             layout="stack"
-            onConfirm={() => void runAction(hostConfirmBooking)}
-            onReject={() => void runAction(hostRejectBooking)}
-            onMarkPaid={() => void runAction(hostMarkBookingPaid)}
-            onComplete={() => void runAction(hostCompleteBooking)}
+            onConfirm={() => void runAction(confirmHostBooking)}
+            onReject={() => void runAction(rejectHostBooking)}
+            onMarkPaid={() => void runAction(markHostBookingPaid)}
+            onComplete={() => void runAction(completeHostBooking)}
           />
           <Link
             to="/host/bookings"

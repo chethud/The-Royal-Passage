@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import { HostReviewsList } from "@/components/host/HostReviewsList";
-import { listHostReviews, type HostReviewSummary } from "@/lib/host-fns";
+import { fetchHostReviews, type HostReviewSummary } from "@/lib/api/host";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/reviews")({
@@ -26,10 +27,13 @@ function HostReviewsPage() {
     setPageLoading(true);
     setPageError(null);
     try {
-      const rows = await listHostReviews({ data: { accessToken } });
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
+      const rows = await fetchHostReviews(accessToken);
       setReviews(rows);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to load reviews.");
+      setPageError(toErrorMessage(err, "Failed to load reviews."));
     } finally {
       setPageLoading(false);
     }

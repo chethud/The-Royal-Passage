@@ -2,12 +2,14 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { HostExperienceForm } from "@/components/experience/HostExperienceForm";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
-import { listCities, type CitySummary } from "@/lib/city-fns";
+import type { CitySummary } from "@/lib/cities";
+import { fetchCities } from "@/lib/api/cities";
 import {
-  createHostExperienceFn,
-  getHostCategories,
+  createHostExperience,
+  fetchHostCategories,
   type CategoryOption,
-} from "@/lib/host-experience-fns";
+} from "@/lib/api/host-experiences";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/experiences/new")({
@@ -30,14 +32,17 @@ function HostNewExperiencePage() {
     if (!accessToken) return;
     setPageLoading(true);
     try {
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
       const [rows, cityRows] = await Promise.all([
-        getHostCategories({ data: { accessToken } }),
-        listCities(),
+        fetchHostCategories(accessToken),
+        fetchCities(),
       ]);
       setCategories(rows);
       setCities(cityRows);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to load categories.");
+      setPageError(toErrorMessage(err, "Failed to load categories."));
     } finally {
       setPageLoading(false);
     }
@@ -55,15 +60,13 @@ function HostNewExperiencePage() {
     setSaving(true);
     setPageError(null);
     try {
-      const created = await createHostExperienceFn({
-        data: { accessToken, ...payload },
-      });
+      const created = await createHostExperience(accessToken, payload);
       void navigate({
         to: "/host/experiences/$experienceId",
         params: { experienceId: created.id },
       });
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to create experience.");
+      setPageError(toErrorMessage(err, "Failed to create experience."));
     } finally {
       setSaving(false);
     }

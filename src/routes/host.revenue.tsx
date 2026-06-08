@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import { RevenueChart } from "@/components/host/RevenueChart";
-import { getHostRevenue, type HostRevenueSummary } from "@/lib/host-fns";
+import { fetchHostRevenue, type HostRevenueSummary } from "@/lib/api/host";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { formatMoney } from "@/lib/money";
 import { useHostAccess } from "@/lib/use-host-access";
 
@@ -27,10 +28,13 @@ function HostRevenuePage() {
     setPageLoading(true);
     setPageError(null);
     try {
-      const summary = await getHostRevenue({ data: { accessToken } });
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
+      const summary = await fetchHostRevenue(accessToken);
       setRevenue(summary);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to load revenue.");
+      setPageError(toErrorMessage(err, "Failed to load revenue."));
     } finally {
       setPageLoading(false);
     }

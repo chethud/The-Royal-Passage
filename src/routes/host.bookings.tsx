@@ -2,14 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { HostBookingTable } from "@/components/host/HostBookingTable";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
+import type { BookingSummary } from "@/lib/api/bookings";
 import {
-  hostCompleteBooking,
-  hostConfirmBooking,
-  hostMarkBookingPaid,
-  hostRejectBooking,
-  listHostBookings,
-  type BookingSummary,
-} from "@/lib/host-fns";
+  completeHostBooking,
+  confirmHostBooking,
+  fetchHostBookings,
+  markHostBookingPaid,
+  rejectHostBooking,
+} from "@/lib/api/host";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/bookings")({
@@ -34,10 +35,13 @@ function HostBookingsPage() {
     setPageLoading(true);
     setPageError(null);
     try {
-      const rows = await listHostBookings({ data: { accessToken } });
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
+      const rows = await fetchHostBookings(accessToken);
       setBookings(rows);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to load bookings.");
+      setPageError(toErrorMessage(err, "Failed to load bookings."));
     } finally {
       setPageLoading(false);
     }
@@ -50,19 +54,17 @@ function HostBookingsPage() {
 
   const runAction = async (
     bookingId: string,
-    action: (input: {
-      data: { accessToken: string; bookingId: string };
-    }) => Promise<BookingSummary>,
+    action: (token: string, id: string) => Promise<BookingSummary>,
   ) => {
     if (!accessToken) return;
     setBusyId(bookingId);
     setPageError(null);
     try {
-      const updated = await action({ data: { accessToken, bookingId } });
+      const updated = await action(accessToken, bookingId);
       setBookings((rows) => rows.map((row) => (row.id === bookingId ? updated : row)));
       await loadPage();
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Action failed.");
+      setPageError(toErrorMessage(err, "Action failed."));
     } finally {
       setBusyId(null);
     }
@@ -87,10 +89,10 @@ function HostBookingsPage() {
         <HostBookingTable
           bookings={bookings}
           busyId={busyId}
-          onConfirm={(id) => void runAction(id, hostConfirmBooking)}
-          onReject={(id) => void runAction(id, hostRejectBooking)}
-          onMarkPaid={(id) => void runAction(id, hostMarkBookingPaid)}
-          onComplete={(id) => void runAction(id, hostCompleteBooking)}
+          onConfirm={(id) => void runAction(id, confirmHostBooking)}
+          onReject={(id) => void runAction(id, rejectHostBooking)}
+          onMarkPaid={(id) => void runAction(id, markHostBookingPaid)}
+          onComplete={(id) => void runAction(id, completeHostBooking)}
         />
       )}
     </HostDashboardShell>

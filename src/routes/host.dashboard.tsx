@@ -3,12 +3,13 @@ import { useCallback, useEffect, useState } from "react";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import { HostStatsGrid } from "@/components/host/HostStatsGrid";
 import { HostTodayBookings } from "@/components/host/HostTodayBookings";
+import type { BookingSummary } from "@/lib/api/bookings";
 import {
-  getHostDashboard,
-  listHostBookings,
-  type BookingSummary,
+  fetchHostBookings,
+  fetchHostDashboard,
   type HostDashboardStats,
-} from "@/lib/host-fns";
+} from "@/lib/api/host";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/dashboard")({
@@ -37,16 +38,19 @@ function HostOverviewPage() {
     setPageLoading(true);
     setPageError(null);
     try {
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
       const [dashboard, today, pending] = await Promise.all([
-        getHostDashboard({ data: { accessToken } }),
-        listHostBookings({ data: { accessToken, status: "today" } }),
-        listHostBookings({ data: { accessToken, status: "pending" } }),
+        fetchHostDashboard(accessToken),
+        fetchHostBookings(accessToken, "today"),
+        fetchHostBookings(accessToken, "pending"),
       ]);
       setStats(dashboard);
       setTodayBookings(today);
       setPendingBookings(pending);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to load host dashboard.");
+      setPageError(toErrorMessage(err, "Failed to load host dashboard."));
     } finally {
       setPageLoading(false);
     }
