@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { CreateExperienceCta } from "@/components/host/CreateExperienceCta";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import { HostStatsGrid } from "@/components/host/HostStatsGrid";
 import { HostTodayBookings } from "@/components/host/HostTodayBookings";
@@ -79,6 +80,10 @@ function HostOverviewPage() {
       ) : (
         <div className="space-y-10">
           {stats ? <HostStatsGrid stats={stats} /> : null}
+
+          {stats && stats.publishedExperiences === 0 ? (
+            <CreateExperienceCta />
+          ) : null}
 
           <section>
             <div className="flex flex-wrap items-end justify-between gap-3">

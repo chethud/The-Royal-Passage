@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { HostExperienceTable } from "@/components/experience/HostExperienceTable";
+import { CreateExperienceCta } from "@/components/host/CreateExperienceCta";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import { fetchHostExperiences, type HostExperienceSummary } from "@/lib/api/host-experiences";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
@@ -50,13 +51,11 @@ function HostExperiencesPage() {
       title="My experiences"
       subtitle="Create listings, manage slots, and submit for admin review."
     >
-      <div className="mb-6 flex justify-end">
-        <Link
-          to="/host/experiences/new"
-          className="rounded-sm bg-ember px-4 py-2 text-sm font-medium text-primary-foreground shadow-[var(--shadow-gold)]"
-        >
-          New experience
-        </Link>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">
+          Draft listings, add slots, and submit for Royal Passage review.
+        </p>
+        <CreateExperienceCta variant="inline" />
       </div>
 
       {pageLoading ? (
@@ -66,9 +65,7 @@ function HostExperiencesPage() {
           {pageError}
         </p>
       ) : experiences.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No experiences yet. Create your first listing to start accepting bookings.
-        </p>
+        <CreateExperienceCta />
       ) : (
         <HostExperienceTable experiences={experiences} />
       )}

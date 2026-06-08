@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { HostExperienceForm } from "@/components/experience/HostExperienceForm";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
-import type { CitySummary } from "@/lib/cities";
+import { FALLBACK_CITIES, type CitySummary } from "@/lib/cities";
 import { fetchCities } from "@/lib/api/cities";
 import {
   createHostExperience,
@@ -37,10 +37,10 @@ function HostNewExperiencePage() {
       }
       const [rows, cityRows] = await Promise.all([
         fetchHostCategories(accessToken),
-        fetchCities(),
+        fetchCities().catch(() => FALLBACK_CITIES),
       ]);
       setCategories(rows);
-      setCities(cityRows);
+      setCities(cityRows.length > 0 ? cityRows : FALLBACK_CITIES);
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to load categories."));
     } finally {
@@ -88,13 +88,17 @@ function HostNewExperiencePage() {
           {pageError}
         </p>
       ) : null}
-      {categories.length > 0 && cities.length > 0 ? (
+      {categories.length > 0 ? (
         <HostExperienceForm
           categories={categories}
-          cities={cities}
+          cities={cities.length > 0 ? cities : FALLBACK_CITIES}
           saving={saving}
           onSubmit={(payload) => void handleSubmit(payload)}
         />
+      ) : !pageLoading && !pageError ? (
+        <p className="text-sm text-muted-foreground">
+          Could not load experience categories. Refresh the page or contact support.
+        </p>
       ) : null}
     </HostDashboardShell>
   );
