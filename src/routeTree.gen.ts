@@ -13,8 +13,11 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as HostsRouteImport } from './routes/hosts'
 import { Route as ExperiencesRouteImport } from './routes/experiences'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HostDashboardRouteImport } from './routes/host.dashboard'
 import { Route as ExperiencesSlugRouteImport } from './routes/experiences.$slug'
 
 const SignInRoute = SignInRouteImport.update({
@@ -37,14 +40,29 @@ const ExperiencesRoute = ExperiencesRouteImport.update({
   path: '/experiences',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HostDashboardRoute = HostDashboardRouteImport.update({
+  id: '/host/dashboard',
+  path: '/host/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExperiencesSlugRoute = ExperiencesSlugRouteImport.update({
@@ -55,69 +73,90 @@ const ExperiencesSlugRoute = ExperiencesSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
   '/experiences/$slug': typeof ExperiencesSlugRoute
+  '/host/dashboard': typeof HostDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
   '/experiences/$slug': typeof ExperiencesSlugRoute
+  '/host/dashboard': typeof HostDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
   '/experiences/$slug': typeof ExperiencesSlugRoute
+  '/host/dashboard': typeof HostDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/contact'
+    | '/dashboard'
     | '/experiences'
     | '/hosts'
     | '/journal'
     | '/sign-in'
     | '/experiences/$slug'
+    | '/host/dashboard'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/contact'
+    | '/dashboard'
     | '/experiences'
     | '/hosts'
     | '/journal'
     | '/sign-in'
     | '/experiences/$slug'
+    | '/host/dashboard'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/contact'
+    | '/dashboard'
     | '/experiences'
     | '/hosts'
     | '/journal'
     | '/sign-in'
     | '/experiences/$slug'
+    | '/host/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   ContactRoute: typeof ContactRoute
+  DashboardRoute: typeof DashboardRoute
   ExperiencesRoute: typeof ExperiencesRouteWithChildren
   HostsRoute: typeof HostsRoute
   JournalRoute: typeof JournalRoute
   SignInRoute: typeof SignInRoute
+  HostDashboardRoute: typeof HostDashboardRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -150,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExperiencesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -157,11 +203,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/host/dashboard': {
+      id: '/host/dashboard'
+      path: '/host/dashboard'
+      fullPath: '/host/dashboard'
+      preLoaderRoute: typeof HostDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/experiences/$slug': {
@@ -188,11 +248,14 @@ const ExperiencesRouteWithChildren = ExperiencesRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   ContactRoute: ContactRoute,
+  DashboardRoute: DashboardRoute,
   ExperiencesRoute: ExperiencesRouteWithChildren,
   HostsRoute: HostsRoute,
   JournalRoute: JournalRoute,
   SignInRoute: SignInRoute,
+  HostDashboardRoute: HostDashboardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

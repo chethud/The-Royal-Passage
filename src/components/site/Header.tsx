@@ -19,6 +19,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useAuthUser } from "@/lib/auth-user";
+import { dashboardPathForRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 type NavItem = { label: string; to: string };
@@ -34,7 +35,8 @@ const navItems: NavItem[] = [
 
 export function Header() {
   const [elevated, setElevated] = useState(false);
-  const { displayName, user } = useAuthUser();
+  const { displayName, user, role } = useAuthUser();
+  const dashboardPath = role ? dashboardPathForRole(role) : "/sign-in";
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
 
@@ -112,9 +114,14 @@ export function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem asChild>
-                  <Link to="/sign-in" className="cursor-pointer">
+                  <Link to={dashboardPath} className="cursor-pointer">
                     <UserRound className="h-4 w-4" />
-                    {displayName ?? "Profile"}
+                    {displayName ?? "Dashboard"}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/sign-in" className="cursor-pointer">
+                    Account settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -186,14 +193,26 @@ export function Header() {
                     {loggingOut ? "Logging out..." : "Logout"}
                   </button>
                 ) : (
-                  <SheetClose asChild>
-                    <Link
-                      to="/sign-in"
-                      className="mt-2 rounded-sm px-3 py-2.5 text-sm text-ink/80 hover:bg-white/5 hover:text-ember"
-                    >
-                      Sign in
-                    </Link>
-                  </SheetClose>
+                  <>
+                    <SheetClose asChild>
+                      <Link
+                        to="/sign-in"
+                        search={{ role: "guest" }}
+                        className="mt-2 rounded-sm px-3 py-2.5 text-sm text-ink/80 hover:bg-white/5 hover:text-ember"
+                      >
+                        Sign in as guest
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
+                        to="/sign-in"
+                        search={{ role: "host" }}
+                        className="rounded-sm px-3 py-2.5 text-sm text-ink/80 hover:bg-white/5 hover:text-ember"
+                      >
+                        Sign in as host
+                      </Link>
+                    </SheetClose>
+                  </>
                 )}
               </div>
             </SheetContent>

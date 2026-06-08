@@ -27,10 +27,31 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
+-- User profiles (guest / host / admin). Linked to Supabase Auth.
+-- Experience providers use the **host** role and optional hosts.host_id link.
+-- ---------------------------------------------------------------------------
+create table if not exists public.profiles (
+  id uuid primary key references auth.users (id) on delete cascade,
+  full_name text,
+  phone text,
+  role text not null default 'guest'
+    check (role in ('guest', 'host', 'admin')),
+  host_id uuid,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+drop trigger if exists trg_profiles_updated on public.profiles;
+create trigger trg_profiles_updated
+  before update on public.profiles
+  for each row execute procedure public.set_updated_at();
+
+-- ---------------------------------------------------------------------------
 -- Hosts (providers). Seeded without auth so the schema is self-contained.
 -- ---------------------------------------------------------------------------
 create table if not exists public.hosts (
   id uuid primary key default gen_random_uuid(),
+  auth_user_id uuid unique references auth.users (id) on delete set null,
   display_name text not null,
   email text,
   phone text,
@@ -41,6 +62,12 @@ create table if not exists public.hosts (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.profiles
+  drop constraint if exists profiles_host_id_fkey;
+alter table public.profiles
+  add constraint profiles_host_id_fkey
+  foreign key (host_id) references public.hosts (id) on delete set null;
 
 drop trigger if exists trg_hosts_updated on public.hosts;
 create trigger trg_hosts_updated
@@ -181,6 +208,7 @@ create table if not exists public.platform_settings (
 -- ---------------------------------------------------------------------------
 -- Row Level Security — enable on all public tables
 -- ---------------------------------------------------------------------------
+alter table public.profiles enable row level security;
 alter table public.hosts enable row level security;
 alter table public.experience_categories enable row level security;
 alter table public.experiences enable row level security;
@@ -190,6 +218,9 @@ alter table public.reviews enable row level security;
 alter table public.platform_settings enable row level security;
 
 -- Drop existing policies if re-running in dev (names are stable)
+drop policy if exists "profiles_select_own" on public.profiles;
+drop policy if exists "profiles_insert_own" on public.profiles;
+drop policy if exists "profiles_update_own" on public.profiles;
 drop policy if exists "hosts_select_all" on public.hosts;
 drop policy if exists "categories_select_all" on public.experience_categories;
 drop policy if exists "experiences_select_all" on public.experiences;
@@ -197,6 +228,19 @@ drop policy if exists "slots_select_all" on public.experience_slots;
 drop policy if exists "bookings_select_all" on public.bookings;
 drop policy if exists "reviews_select_all" on public.reviews;
 drop policy if exists "platform_settings_select_all" on public.platform_settings;
+
+create policy "profiles_select_own"
+  on public.profiles for select to authenticated
+  using (auth.uid() = id);
+
+create policy "profiles_insert_own"
+  on public.profiles for insert to authenticated
+  with check (auth.uid() = id and role in ('guest', 'host'));
+
+create policy "profiles_update_own"
+  on public.profiles for update to authenticated
+  using (auth.uid() = id)
+  with check (auth.uid() = id and role in ('guest', 'host'));
 
 create policy "hosts_select_all"
   on public.hosts for select to anon, authenticated
@@ -225,6 +269,41 @@ create policy "reviews_select_all"
 create policy "platform_settings_select_all"
   on public.platform_settings for select to anon, authenticated
   using (true);
+
+-- Auto-create profile on sign-up (guest or host from user metadata)
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  intended text;
+  assigned_role text;
+begin
+  intended := coalesce(new.raw_user_meta_data->>'intended_role', 'guest');
+  assigned_role := case
+    when intended = 'host' then 'host'
+    else 'guest'
+  end;
+
+  insert into public.profiles (id, full_name, phone, role)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'),
+    new.raw_user_meta_data->>'phone',
+    assigned_role
+  )
+  on conflict (id) do nothing;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
 
 -- ---------------------------------------------------------------------------
 -- Seed data (deterministic UUIDs for idempotent re-runs)

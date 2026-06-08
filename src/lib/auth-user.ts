@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { ensureUserProfile, fetchUserProfile, type UserProfile } from "@/lib/profiles";
+import { readIntendedRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
 const USER_CACHE_KEY = "rp_auth_user_v1";
@@ -9,6 +11,7 @@ type CachedUser = {
   email?: string;
   fullName?: string;
   phone?: string;
+  role?: UserRole;
 };
 
 function readCachedUser(): CachedUser | null {
@@ -22,7 +25,7 @@ function readCachedUser(): CachedUser | null {
   }
 }
 
-function writeCachedUser(user: User | null) {
+function writeCachedUser(user: User | null, role?: UserRole | null) {
   if (typeof window === "undefined") return;
   if (!user) {
     window.localStorage.removeItem(USER_CACHE_KEY);
@@ -34,11 +37,13 @@ function writeCachedUser(user: User | null) {
     email: user.email,
     fullName: (meta.full_name as string | undefined) ?? (meta.name as string | undefined),
     phone: (meta.phone as string | undefined) ?? user.phone ?? undefined,
+    role: role ?? undefined,
   };
   window.localStorage.setItem(USER_CACHE_KEY, JSON.stringify(payload));
 }
 
-function userDisplayName(user: User | null, cachedUser: CachedUser | null): string | null {
+function userDisplayName(user: User | null, profile: UserProfile | null, cachedUser: CachedUser | null): string | null {
+  if (profile?.fullName?.trim()) return profile.fullName.trim();
   if (user) {
     const meta = user.user_metadata ?? {};
     const fullName = (meta.full_name as string | undefined) ?? (meta.name as string | undefined);
@@ -50,9 +55,27 @@ function userDisplayName(user: User | null, cachedUser: CachedUser | null): stri
   return null;
 }
 
+async function loadProfileForUser(user: User): Promise<UserProfile | null> {
+  const supabase = getSupabaseBrowser();
+  const meta = user.user_metadata ?? {};
+  const fullName = (meta.full_name as string | undefined) ?? (meta.name as string | undefined);
+  const phone = (meta.phone as string | undefined) ?? user.phone ?? undefined;
+
+  const profile =
+    (await fetchUserProfile(supabase, user.id)) ??
+    (await ensureUserProfile(supabase, user.id, {
+      intendedRole: readIntendedRole(),
+      fullName,
+      phone,
+    }));
+
+  return profile;
+}
+
 export function useAuthUser() {
   const configured = isSupabaseBrowserConfigured();
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(configured);
   const [cachedUser, setCachedUser] = useState<CachedUser | null>(() => readCachedUser());
 
@@ -64,23 +87,34 @@ export function useAuthUser() {
     const supabase = getSupabaseBrowser();
     let mounted = true;
 
-    void supabase.auth.getSession().then(({ data }) => {
+    const syncUser = async (nextUser: User | null) => {
       if (!mounted) return;
-      const nextUser = data.session?.user ?? null;
       setUser(nextUser);
-      writeCachedUser(nextUser);
+
+      if (!nextUser) {
+        setProfile(null);
+        writeCachedUser(null);
+        setCachedUser(readCachedUser());
+        setLoading(false);
+        return;
+      }
+
+      const nextProfile = await loadProfileForUser(nextUser);
+      if (!mounted) return;
+      setProfile(nextProfile);
+      writeCachedUser(nextUser, nextProfile?.role);
       setCachedUser(readCachedUser());
       setLoading(false);
+    };
+
+    void supabase.auth.getSession().then(({ data }) => {
+      void syncUser(data.session?.user ?? null);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      const nextUser = session?.user ?? null;
-      setUser(nextUser);
-      writeCachedUser(nextUser);
-      setCachedUser(readCachedUser());
-      setLoading(false);
+      void syncUser(session?.user ?? null);
     });
 
     return () => {
@@ -89,7 +123,12 @@ export function useAuthUser() {
     };
   }, [configured]);
 
-  const displayName = useMemo(() => userDisplayName(user, cachedUser), [cachedUser, user]);
+  const displayName = useMemo(
+    () => userDisplayName(user, profile, cachedUser),
+    [cachedUser, profile, user],
+  );
 
-  return { user, loading, configured, displayName };
+  const role = profile?.role ?? cachedUser?.role ?? null;
+
+  return { user, profile, role, loading, configured, displayName };
 }
