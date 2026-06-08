@@ -66,12 +66,12 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
           className="absolute top-3 right-3 z-30"
         />
       </div>
-      <Link
-        to="/experiences/$slug"
-        params={{ slug: exp.slug }}
-        className="flex justify-between gap-4 pt-4 focus:outline-none"
-      >
-        <div className="min-w-0">
+      <div className="flex justify-between gap-4 pt-4">
+        <Link
+          to="/experiences/$slug"
+          params={{ slug: exp.slug }}
+          className="min-w-0 flex-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ember"
+        >
           <div className="text-xs text-muted-foreground">{exp.city}</div>
           <h3 className="mt-0.5 truncate font-display text-xl leading-tight">{exp.title}</h3>
           <div className="mt-1 text-sm text-ink-soft">
@@ -79,7 +79,7 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
               ? `${nextSlot.available} seats · ${formatDateShort(nextSlot.date)}`
               : "Sold out"}
           </div>
-        </div>
+        </Link>
         <div className="shrink-0 text-right">
           <div className="text-[0.65rem] uppercase tracking-wider text-muted-foreground">From</div>
           <div className="font-display text-lg">
@@ -87,8 +87,18 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
             {exp.pricePerPerson}
           </div>
           <div className="mt-1 text-xs text-ember">★ {exp.rating}</div>
+          {nextSlot ? (
+            <Link
+              to="/experiences/$slug"
+              params={{ slug: exp.slug }}
+              hash="book"
+              className="mt-3 inline-flex rounded-sm bg-ember px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110"
+            >
+              Book
+            </Link>
+          ) : null}
         </div>
-      </Link>
+      </div>
     </div>
   );
 

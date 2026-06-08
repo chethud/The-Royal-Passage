@@ -1,12 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
-import { PayAtVenueBadge } from "@/components/booking/PayAtVenueBadge";
+import { useEffect, useState } from "react";
+import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPanel";
 import { ExperienceReviewsSection } from "@/components/reviews/ExperienceReviewsSection";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import type { Slot } from "@/data/experiences";
-import { formatDateLong } from "@/lib/date-format";
+import { useAuthUser } from "@/lib/auth-user";
+import { guestBookingLimits } from "@/lib/booking-url";
 import { getExperienceForDetail } from "@/lib/marketplace-fns";
 import { getExperienceReviews } from "@/lib/review-fns";
 import { buildExperienceJsonLd, SITE_URL } from "@/lib/seo";
@@ -68,13 +69,22 @@ export const Route = createFileRoute("/experiences/$slug")({
 
 function ExperienceDetail() {
   const { exp, reviews } = Route.useLoaderData();
+  const { user, role } = useAuthUser();
   const sym = exp.currencySymbol ?? "€";
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(
-    exp.slots.find((s) => s.available > 0) ?? null,
-  );
-  const [guests, setGuests] = useState(2);
+  const firstAvailable = exp.slots.find((s) => s.available > 0) ?? null;
+  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(firstAvailable);
+  const [guests, setGuests] = useState(() => {
+    if (!firstAvailable) return 1;
+    const { min } = guestBookingLimits(exp, firstAvailable.available);
+    return Math.max(min, Math.min(2, firstAvailable.available));
+  });
 
-  const total = selectedSlot ? exp.pricePerPerson * guests : 0;
+  useEffect(() => {
+    if (!selectedSlot) return;
+    const { min, max } = guestBookingLimits(exp, selectedSlot.available);
+    setGuests((g) => Math.min(Math.max(min, g), max));
+  }, [exp, selectedSlot]);
+
   const ldJson = buildExperienceJsonLd(exp, reviews);
 
   return (
@@ -213,118 +223,16 @@ function ExperienceDetail() {
           </div>
 
           <div className="md:col-span-7">
-            <div className="glass rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] p-6 md:p-8">
-              <div className="eyebrow mb-3">Available slots</div>
-              <div className="space-y-2">
-                {exp.slots.map((s) => {
-                  const sold = s.available === 0;
-                  const active = selectedSlot?.id === s.id;
-                  return (
-                    <button
-                      key={s.id}
-                      type="button"
-                      disabled={sold}
-                      aria-pressed={active}
-                      onClick={() => setSelectedSlot(s)}
-                      className={`flex w-full items-center justify-between border p-4 text-left transition-all ${
-                        active
-                          ? "border-ember bg-ember/15 text-foreground shadow-[var(--shadow-gold)]"
-                          : sold
-                            ? "cursor-not-allowed border-[oklch(0.72_0.09_78_/_0.12)] opacity-40"
-                            : "border-[oklch(0.72_0.09_78_/_0.22)] hover:border-ember/45"
-                      }`}
-                    >
-                      <div>
-                        <div className="font-display text-lg">{formatDateLong(s.date)}</div>
-                        <div className="text-xs opacity-70 mt-0.5">
-                          {s.start}–{s.end}
-                        </div>
-                      </div>
-                      <div className="text-right text-xs">
-                        {sold ? (
-                          <span className="eyebrow">Sold out</span>
-                        ) : (
-                          <>
-                            <div className="eyebrow opacity-70">Seats</div>
-                            <div className="font-display text-lg">
-                              {s.available}/{s.capacity}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="hairline my-6" />
-
-              <div className="flex items-center justify-between">
-                <div className="eyebrow">Guests</div>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    aria-label="Decrease guest count"
-                    onClick={() => setGuests((g) => Math.max(1, g - 1))}
-                    className="h-9 w-9 border border-[oklch(0.88_0.08_86_/_0.2)] transition-colors hover:border-ember/50"
-                  >
-                    −
-                  </button>
-                  <span className="font-display text-xl w-6 text-center">{guests}</span>
-                  <button
-                    type="button"
-                    aria-label="Increase guest count"
-                    onClick={() =>
-                      setGuests((g) => Math.min(selectedSlot?.available ?? 1, g + 1))
-                    }
-                    className="h-9 w-9 border border-[oklch(0.88_0.08_86_/_0.2)] transition-colors hover:border-ember/50"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              <div className="hairline my-6" />
-
-              <div className="flex items-baseline justify-between mb-5">
-                <div>
-                  <div className="eyebrow text-muted-foreground">Estimated total</div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {sym}
-                    {exp.pricePerPerson} × {guests} guest{guests > 1 ? "s" : ""}
-                  </div>
-                </div>
-                <div className="font-display text-3xl">
-                  {sym}
-                  {total}
-                </div>
-              </div>
-
-              <div className="mb-5">
-                <PayAtVenueBadge />
-              </div>
-
-              {selectedSlot ? (
-                <Link
-                  to="/experiences/$slug/book"
-                  params={{ slug: exp.slug }}
-                  search={{
-                    slotId: selectedSlot.id,
-                    guests,
-                  }}
-                  className="flex w-full items-center justify-center rounded-sm bg-ember py-4 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110"
-                >
-                  Continue to book
-                </Link>
-              ) : (
-                <span className="flex w-full cursor-not-allowed items-center justify-center rounded-sm bg-ember/50 py-4 text-sm font-medium text-primary-foreground opacity-60">
-                  Select a slot
-                </span>
-              )}
-              <p className="text-[0.65rem] text-muted-foreground text-center mt-3">
-                Sign in required · Pay at venue on arrival · Host confirms your booking
-              </p>
-            </div>
+            <ExperienceBookingPanel
+              exp={exp}
+              selectedSlot={selectedSlot}
+              onSelectSlot={setSelectedSlot}
+              guests={guests}
+              onGuestsChange={setGuests}
+              variant="select"
+              signedIn={Boolean(user)}
+              userRole={role}
+            />
           </div>
         </div>
       </section>

@@ -38,6 +38,8 @@ export type Experience = {
   slots: Slot[];
   /** UI price prefix — demo uses €, Supabase listings use ₹ */
   currencySymbol?: string;
+  minGuestsPerBooking?: number;
+  maxGuestsPerBooking?: number;
 };
 
 const today = new Date();

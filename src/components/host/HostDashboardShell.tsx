@@ -4,6 +4,7 @@ import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { RoleBadge } from "@/components/auth/RoleBadge";
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
+import { isHostNavItemActive } from "@/lib/host-nav-active";
 import { ROLE_DESCRIPTIONS, ROLE_LABELS } from "@/lib/roles";
 
 type HostDashboardShellProps = {
@@ -30,7 +31,7 @@ export function HostDashboardShell({ title, subtitle, children }: HostDashboardS
         <div className="mt-10 flex flex-col gap-10 lg:flex-row">
           <nav className="flex shrink-0 flex-row flex-wrap gap-2 lg:w-52 lg:flex-col">
             {HOST_NAV_ITEMS.map((item) => {
-              const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
+              const active = isHostNavItemActive(pathname, item.to);
               return (
                 <Link
                   key={item.to}

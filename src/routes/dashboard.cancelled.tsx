@@ -4,7 +4,8 @@ import { Ban } from "lucide-react";
 import { GuestBookingsList } from "@/components/guest/GuestBookingsList";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { GuestEmptyState } from "@/components/guest/GuestEmptyState";
-import { listMyBookings, type BookingSummary } from "@/lib/booking-fns";
+import { fetchMyBookings, type BookingSummary } from "@/lib/api/bookings";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useGuestAccess } from "@/lib/use-guest-access";
 
 export const Route = createFileRoute("/dashboard/cancelled")({
@@ -25,10 +26,13 @@ function GuestCancelledPage() {
     setPageLoading(true);
     setPageError(null);
     try {
-      const rows = await listMyBookings({ data: { accessToken, status: "cancelled" } });
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
+      const rows = await fetchMyBookings(accessToken, "cancelled");
       setBookings(rows);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to load bookings.");
+      setPageError(toErrorMessage(err, "Failed to load bookings."));
     } finally {
       setPageLoading(false);
     }

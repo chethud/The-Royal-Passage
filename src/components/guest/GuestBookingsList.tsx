@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { BookingCard } from "@/components/booking/BookingCard";
 import type { BookingSummary } from "@/lib/api/bookings";
-import { cancelMyBooking } from "@/lib/booking-fns";
+import { cancelBooking } from "@/lib/api/bookings";
+import { toErrorMessage } from "@/lib/api/client";
 
 type GuestBookingsListProps = {
   bookings: BookingSummary[];
@@ -23,10 +24,10 @@ export function GuestBookingsList({
     setCancellingId(bookingId);
     setError(null);
     try {
-      await cancelMyBooking({ data: { accessToken, bookingId } });
+      await cancelBooking(accessToken, bookingId);
       onUpdated?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to cancel booking.");
+      setError(toErrorMessage(err, "Failed to cancel booking."));
     } finally {
       setCancellingId(null);
     }

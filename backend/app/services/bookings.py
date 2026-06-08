@@ -87,7 +87,10 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
 
     slot_result = (
         supabase.table("experience_slots")
-        .select("*, experiences ( id, title, host_id, price_per_person_minor, currency_code, status )")
+        .select(
+            "*, experiences ( id, title, host_id, price_per_person_minor, currency_code, status, "
+            "min_guests_per_booking, max_guests_per_booking )"
+        )
         .eq("id", payload.slotId)
         .maybe_single()
         .execute()
@@ -101,6 +104,13 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
     experience = slot.get("experiences")
     if not experience or experience.get("status") != "published":
         raise ValueError("Experience is not available for booking.")
+
+    min_guests = int(experience.get("min_guests_per_booking") or 1)
+    max_guests = int(experience.get("max_guests_per_booking") or 10)
+    if payload.guestCount < min_guests:
+        raise ValueError(f"At least {min_guests} guest(s) required for this experience.")
+    if payload.guestCount > max_guests:
+        raise ValueError(f"This experience allows at most {max_guests} guest(s) per booking.")
 
     if not _reserve_seats(supabase, payload.slotId, payload.guestCount):
         raise ValueError("Not enough seats left for this slot.")

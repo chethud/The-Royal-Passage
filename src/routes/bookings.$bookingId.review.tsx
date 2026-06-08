@@ -4,7 +4,8 @@ import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { useAuthUser } from "@/lib/auth-user";
-import { getBookingDetail, type BookingSummary } from "@/lib/booking-fns";
+import { fetchBookingById, type BookingSummary } from "@/lib/api/bookings";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { createReview } from "@/lib/review-fns";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
@@ -37,13 +38,16 @@ function BookingReviewPage() {
         const token = sessionData.session?.access_token;
         if (!token) throw new Error("Please sign in again.");
 
-        const row = await getBookingDetail({ data: { accessToken: token, bookingId } });
+        if (!isApiConfigured()) {
+          throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+        }
+        const row = await fetchBookingById(token, bookingId);
         if (row.bookingStatus !== "completed") {
           throw new Error("Only completed bookings can be reviewed.");
         }
         setBooking(row);
       } catch (err) {
-        setLoadError(err instanceof Error ? err.message : "Failed to load booking.");
+        setLoadError(toErrorMessage(err, "Failed to load booking."));
       }
     })();
   }, [bookingId, loading, navigate, user]);

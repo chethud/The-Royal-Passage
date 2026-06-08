@@ -43,6 +43,8 @@ class Experience(BaseModel):
     cancellation: str
     slots: list[Slot]
     currencySymbol: str | None = "₹"
+    minGuestsPerBooking: int = 1
+    maxGuestsPerBooking: int = 10
 
 
 class CatalogResponse(BaseModel):

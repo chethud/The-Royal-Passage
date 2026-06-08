@@ -58,4 +58,6 @@ def map_row_to_experience(row: dict, slots: list[dict]) -> Experience:
         cancellation=row.get("cancellation_policy") or "",
         slots=ui_slots,
         currencySymbol=_currency_symbol(row.get("currency_code") or "INR"),
+        minGuestsPerBooking=int(row.get("min_guests_per_booking") or 1),
+        maxGuestsPerBooking=int(row.get("max_guests_per_booking") or 10),
     )

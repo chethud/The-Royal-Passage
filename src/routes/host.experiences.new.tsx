@@ -1,15 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { HostExperienceForm } from "@/components/experience/HostExperienceForm";
+import { CreateExperienceWizard } from "@/components/experience/CreateExperienceWizard";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import { FALLBACK_CITIES, type CitySummary } from "@/lib/cities";
 import { fetchCities } from "@/lib/api/cities";
 import {
   createHostExperience,
+  createHostSlot,
   fetchHostCategories,
   type CategoryOption,
 } from "@/lib/api/host-experiences";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
+import { FALLBACK_CATEGORIES } from "@/lib/experience-categories";
 import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/experiences/new")({
@@ -28,21 +30,21 @@ function HostNewExperiencePage() {
   const [pageLoading, setPageLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const loadCategories = useCallback(async () => {
+  const loadFormData = useCallback(async () => {
     if (!accessToken) return;
     setPageLoading(true);
     try {
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
-      const [rows, cityRows] = await Promise.all([
-        fetchHostCategories(accessToken),
+      const [categoryRows, cityRows] = await Promise.all([
+        fetchHostCategories(accessToken).catch(() => FALLBACK_CATEGORIES),
         fetchCities().catch(() => FALLBACK_CITIES),
       ]);
-      setCategories(rows);
+      setCategories(categoryRows.length > 0 ? categoryRows : FALLBACK_CATEGORIES);
       setCities(cityRows.length > 0 ? cityRows : FALLBACK_CITIES);
     } catch (err) {
-      setPageError(toErrorMessage(err, "Failed to load categories."));
+      setPageError(toErrorMessage(err, "Failed to load form data."));
     } finally {
       setPageLoading(false);
     }
@@ -50,17 +52,21 @@ function HostNewExperiencePage() {
 
   useEffect(() => {
     if (!ready) return;
-    void loadCategories();
-  }, [loadCategories, ready]);
+    void loadFormData();
+  }, [loadFormData, ready]);
 
-  const handleSubmit = async (payload: Parameters<
-    React.ComponentProps<typeof HostExperienceForm>["onSubmit"]
-  >[0]) => {
+  const handleSubmit = async ({
+    experience,
+    slots,
+  }: Parameters<React.ComponentProps<typeof CreateExperienceWizard>["onSubmit"]>[0]) => {
     if (!accessToken) return;
     setSaving(true);
     setPageError(null);
     try {
-      const created = await createHostExperience(accessToken, payload);
+      const created = await createHostExperience(accessToken, experience);
+      for (const slot of slots) {
+        await createHostSlot(accessToken, created.id, slot);
+      }
       void navigate({
         to: "/host/experiences/$experienceId",
         params: { experienceId: created.id },
@@ -79,7 +85,7 @@ function HostNewExperiencePage() {
   return (
     <HostDashboardShell
       title="New experience"
-      subtitle="Draft your listing, add slots on the next screen, then submit for review."
+      subtitle="Step through basics, pricing, photos, bookable slots, and submit for Royal Passage review."
     >
       {pageLoading ? (
         <p className="text-sm text-muted-foreground">Loading form…</p>
@@ -88,8 +94,8 @@ function HostNewExperiencePage() {
           {pageError}
         </p>
       ) : null}
-      {categories.length > 0 ? (
-        <HostExperienceForm
+      {!pageLoading && categories.length > 0 ? (
+        <CreateExperienceWizard
           categories={categories}
           cities={cities.length > 0 ? cities : FALLBACK_CITIES}
           saving={saving}
