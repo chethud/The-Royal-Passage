@@ -14,6 +14,34 @@ export function isApiConfigured(): boolean {
   return Boolean(readApiBaseUrl());
 }
 
+function formatApiDetail(detail: unknown): string | null {
+  if (detail == null) return null;
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    const messages = detail
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (item && typeof item === "object" && "msg" in item) {
+          return String((item as { msg?: unknown }).msg ?? "");
+        }
+        return "";
+      })
+      .filter(Boolean);
+    return messages.length > 0 ? messages.join("; ") : null;
+  }
+  if (typeof detail === "object") {
+    if ("message" in detail && typeof (detail as { message?: unknown }).message === "string") {
+      return (detail as { message: string }).message;
+    }
+    try {
+      return JSON.stringify(detail);
+    } catch {
+      return null;
+    }
+  }
+  return String(detail);
+}
+
 export async function apiFetch<T>(
   path: string,
   options: RequestInit & { accessToken?: string } = {},
@@ -39,8 +67,11 @@ export async function apiFetch<T>(
   if (!response.ok) {
     let detail = response.statusText;
     try {
-      const json = (await response.json()) as { detail?: string };
-      if (json.detail) detail = json.detail;
+      const json = (await response.json()) as { detail?: unknown; message?: unknown };
+      detail =
+        formatApiDetail(json.detail) ??
+        formatApiDetail(json.message) ??
+        detail;
     } catch {
       // ignore parse errors
     }

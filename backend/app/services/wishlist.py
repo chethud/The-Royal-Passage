@@ -115,10 +115,10 @@ def add_to_wishlist(auth: dict, experience_id: str) -> WishlistItem:
         supabase.table("wishlist")
         .insert({"guest_id": user_id, "experience_id": experience_id})
         .select(WISHLIST_SELECT)
-        .single()
         .execute()
     )
-    row = insert_result.data
+    insert_rows = insert_result.data or []
+    row = insert_rows[0] if insert_rows else None
     if not row:
         raise ValueError("Failed to save experience.")
 

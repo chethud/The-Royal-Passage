@@ -144,8 +144,9 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         "notes": payload.notes,
     }
 
-    booking_result = supabase.table("bookings").insert(booking_row).select("id").single().execute()
-    booking = booking_result.data
+    booking_result = supabase.table("bookings").insert(booking_row).select("id").execute()
+    booking_rows = booking_result.data or []
+    booking = booking_rows[0] if booking_rows else None
     if not booking:
         _release_seats(supabase, payload.slotId, payload.guestCount)
         raise ValueError("Failed to create booking.")

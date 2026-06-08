@@ -253,8 +253,9 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
         "currency_code": "INR",
     }
 
-    result = supabase.table("experiences").insert(insert_row).select("id").single().execute()
-    row = result.data
+    result = supabase.table("experiences").insert(insert_row).select("id").execute()
+    rows = result.data or []
+    row = rows[0] if rows else None
     if not row:
         raise ValueError("Failed to create experience.")
 

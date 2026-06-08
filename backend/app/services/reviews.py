@@ -95,10 +95,10 @@ def create_review(auth: dict, payload: CreateReviewRequest) -> ReviewSummary:
             }
         )
         .select("*")
-        .single()
         .execute()
     )
-    row = insert_result.data
+    insert_rows = insert_result.data or []
+    row = insert_rows[0] if insert_rows else None
     if not row:
         raise ValueError("Failed to create review.")
 
