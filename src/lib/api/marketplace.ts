@@ -6,6 +6,7 @@ export type CatalogPayload = {
   experiences: Experience[];
   categories: string[];
   cities: string[];
+  citySlugs?: string[];
 };
 
 export type ExperienceDetailPayload = {
@@ -13,31 +14,12 @@ export type ExperienceDetailPayload = {
   source: "live" | "static";
 };
 
-export function fetchCatalog() {
-  return apiFetch<CatalogPayload>("/api/v1/catalog");
+export function fetchCatalog(citySlug?: string) {
+  const query = citySlug ? `?city=${encodeURIComponent(citySlug)}` : "";
+  return apiFetch<CatalogPayload>(`/api/v1/catalog${query}`);
 }
 
 export function fetchExperienceBySlug(slug: string) {
   return apiFetch<ExperienceDetailPayload>(`/api/v1/experiences/${encodeURIComponent(slug)}`);
 }
 
-export type CreateBookingPayload = {
-  slotId: string;
-  guestCount: number;
-  guestName: string;
-  guestEmail: string;
-  guestPhone?: string;
-};
-
-export type CreateBookingResult = {
-  bookingId: string;
-  subtotalMinor: number;
-  status: string;
-};
-
-export function createBooking(payload: CreateBookingPayload) {
-  return apiFetch<CreateBookingResult>("/api/v1/bookings", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-}

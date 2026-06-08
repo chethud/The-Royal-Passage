@@ -10,7 +10,14 @@ import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/
 const inputClass =
   "w-full rounded-sm border border-input bg-background/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
 
+type SignInSearch = {
+  redirect?: string;
+};
+
 export const Route = createFileRoute("/sign-in")({
+  validateSearch: (s: Record<string, unknown>): SignInSearch => ({
+    redirect: typeof s.redirect === "string" ? s.redirect : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Sign in — The Royal Passage" },
@@ -22,6 +29,7 @@ export const Route = createFileRoute("/sign-in")({
 
 function SignInPage() {
   const navigate = Route.useNavigate();
+  const { redirect } = Route.useSearch();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,8 +57,12 @@ function SignInPage() {
 
   useEffect(() => {
     if (loading || !user || !role) return;
+    if (redirect && role === "guest" && redirect.startsWith("/")) {
+      window.location.href = redirect;
+      return;
+    }
     void navigate({ to: dashboardPathForRole(role) });
-  }, [loading, navigate, role, user]);
+  }, [loading, navigate, redirect, role, user]);
 
   const isEmailNotConfirmedError = (message: string) =>
     /email not confirmed/i.test(message);

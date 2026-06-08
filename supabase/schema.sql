@@ -1,7 +1,8 @@
--- The Royal Passage — complete Supabase schema in one file (PostgreSQL)
--- Includes: extensions, tables, triggers, RLS policies, seed data.
+-- The Royal Passage — FULL project schema (PostgreSQL)
+-- Includes: profiles, hosts, experiences, COD bookings, wishlist, reviews, notifications, audit_logs, RLS, seed data.
 -- Paste into: Supabase Dashboard → SQL Editor → New query → Run
--- Safe to re-run: uses IF NOT EXISTS / ON CONFLICT where applicable
+-- Safe to re-run: uses IF NOT EXISTS / ON CONFLICT / DROP POLICY IF EXISTS
+-- Payment: Pay-at-venue (COD) only — no online payment gateway
 -- Seed UUIDs must be valid hex (0-9, a-f only); prefixes like "s1..." are invalid.
 --
 -- RLS: broad read access for `anon` + `authenticated` so SELECT returns rows in the
@@ -75,6 +76,22 @@ create trigger trg_hosts_updated
   for each row execute procedure public.set_updated_at();
 
 -- ---------------------------------------------------------------------------
+-- Cities (multi-city scale: Mysuru → Karnataka → India)
+-- ---------------------------------------------------------------------------
+create table if not exists public.cities (
+  slug text primary key,
+  name text not null,
+  region text,
+  state text not null default 'Karnataka',
+  country_code text not null default 'IN',
+  tagline text,
+  description text,
+  is_active boolean not null default true,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+-- ---------------------------------------------------------------------------
 -- Category reference (for filters and consistency)
 -- ---------------------------------------------------------------------------
 create table if not exists public.experience_categories (
@@ -94,6 +111,7 @@ create table if not exists public.experiences (
   tagline text,
   description text,
   category_slug text not null references public.experience_categories (slug),
+  city_slug text references public.cities (slug),
   city text not null,
   region text,
   address text,
@@ -110,6 +128,9 @@ create table if not exists public.experiences (
   gallery_urls text[] not null default '{}',
   inclusions text[] not null default '{}',
   exclusions text[] not null default '{}',
+  requirements text[] not null default '{}',
+  min_guests_per_booking int not null default 1 check (min_guests_per_booking >= 1),
+  max_guests_per_booking int not null default 10 check (max_guests_per_booking >= 1),
   cancellation_policy text,
   average_rating numeric(3, 2) not null default 0
     check (average_rating >= 0 and average_rating <= 5),
@@ -122,6 +143,7 @@ create table if not exists public.experiences (
 
 create index if not exists idx_experiences_host on public.experiences (host_id);
 create index if not exists idx_experiences_city on public.experiences (city);
+create index if not exists idx_experiences_city_slug on public.experiences (city_slug);
 create index if not exists idx_experiences_category on public.experiences (category_slug);
 create index if not exists idx_experiences_status on public.experiences (status);
 
@@ -129,6 +151,11 @@ drop trigger if exists trg_experiences_updated on public.experiences;
 create trigger trg_experiences_updated
   before update on public.experiences
   for each row execute procedure public.set_updated_at();
+
+alter table public.experiences
+  add column if not exists requirements text[] default '{}',
+  add column if not exists min_guests_per_booking int default 1,
+  add column if not exists max_guests_per_booking int default 10;
 
 -- ---------------------------------------------------------------------------
 -- Slots: capacity and sold seats (overbooking prevention at application level)
@@ -149,37 +176,125 @@ create table if not exists public.experience_slots (
 create index if not exists idx_slots_experience_date on public.experience_slots (experience_id, slot_date);
 
 -- ---------------------------------------------------------------------------
--- Bookings
+-- Bookings (Pay-at-venue / COD model)
 -- ---------------------------------------------------------------------------
 create table if not exists public.bookings (
   id uuid primary key default gen_random_uuid(),
   slot_id uuid not null references public.experience_slots (id) on delete restrict,
+  experience_id uuid references public.experiences (id) on delete restrict,
+  guest_id uuid references public.profiles (id) on delete set null,
   guest_email text not null,
   guest_name text not null,
   guest_phone text,
   customer_user_id uuid,
   guest_count int not null check (guest_count > 0),
+  participant_count int,
+  -- Legacy status (kept for compatibility)
   status text not null default 'pending_payment'
     check (status in (
       'pending_payment', 'confirmed', 'cancelled_by_guest', 'cancelled_by_host',
       'completed', 'refunded', 'no_show'
     )),
+  -- COD booking lifecycle
+  booking_status text not null default 'pending'
+    check (booking_status in ('pending', 'confirmed', 'completed', 'cancelled')),
+  payment_method text not null default 'cod' check (payment_method in ('cod')),
+  payment_status text not null default 'pending' check (payment_status in ('pending', 'paid')),
   subtotal_minor int not null check (subtotal_minor >= 0),
+  total_amount int,
   platform_fee_minor int not null default 0 check (platform_fee_minor >= 0),
   host_payout_minor int not null default 0 check (host_payout_minor >= 0),
   currency_code text not null default 'INR',
   payment_reference text,
   hold_expires_at timestamptz,
+  notes text,
+  confirmed_at timestamptz,
+  completed_at timestamptz,
+  cancelled_at timestamptz,
+  cancelled_by text check (cancelled_by is null or cancelled_by in ('guest', 'host', 'admin')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 create index if not exists idx_bookings_slot on public.bookings (slot_id);
+create index if not exists idx_bookings_guest on public.bookings (guest_id);
+create index if not exists idx_bookings_experience on public.bookings (experience_id);
+create index if not exists idx_bookings_booking_status on public.bookings (booking_status);
+create index if not exists idx_bookings_payment_status on public.bookings (payment_status);
 
 drop trigger if exists trg_bookings_updated on public.bookings;
 create trigger trg_bookings_updated
   before update on public.bookings
   for each row execute procedure public.set_updated_at();
+
+-- ---------------------------------------------------------------------------
+-- Upgrade existing bookings table (safe if columns already exist)
+-- ---------------------------------------------------------------------------
+alter table public.bookings
+  add column if not exists experience_id uuid references public.experiences (id) on delete restrict,
+  add column if not exists guest_id uuid references public.profiles (id) on delete set null,
+  add column if not exists participant_count int,
+  add column if not exists total_amount int,
+  add column if not exists payment_method text default 'cod',
+  add column if not exists payment_status text default 'pending',
+  add column if not exists booking_status text default 'pending',
+  add column if not exists notes text,
+  add column if not exists confirmed_at timestamptz,
+  add column if not exists completed_at timestamptz,
+  add column if not exists cancelled_at timestamptz,
+  add column if not exists cancelled_by text;
+
+-- ---------------------------------------------------------------------------
+-- Atomic seat reservation (prevents overbooking)
+-- ---------------------------------------------------------------------------
+create or replace function public.reserve_booking_seats(
+  p_slot_id uuid,
+  p_guest_count int
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_available int;
+begin
+  if p_guest_count < 1 then
+    return false;
+  end if;
+
+  select capacity - seats_sold into v_available
+  from public.experience_slots
+  where id = p_slot_id and not is_blocked
+  for update;
+
+  if v_available is null or v_available < p_guest_count then
+    return false;
+  end if;
+
+  update public.experience_slots
+  set seats_sold = seats_sold + p_guest_count
+  where id = p_slot_id;
+
+  return true;
+end;
+$$;
+
+create or replace function public.release_booking_seats(
+  p_slot_id uuid,
+  p_guest_count int
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.experience_slots
+  set seats_sold = greatest(0, seats_sold - p_guest_count)
+  where id = p_slot_id;
+end;
+$$;
 
 -- ---------------------------------------------------------------------------
 -- Reviews
@@ -188,14 +303,108 @@ create table if not exists public.reviews (
   id uuid primary key default gen_random_uuid(),
   experience_id uuid not null references public.experiences (id) on delete cascade,
   booking_id uuid references public.bookings (id) on delete set null,
+  guest_id uuid references public.profiles (id) on delete set null,
   rating int not null check (rating between 1 and 5),
   comment text,
   reviewer_display_name text,
+  host_reply text,
+  host_replied_at timestamptz,
+  is_verified boolean not null default false,
+  status text not null default 'published'
+    check (status in ('published', 'hidden', 'flagged')),
   created_at timestamptz not null default now(),
   constraint uq_review_booking unique (booking_id)
 );
 
 create index if not exists idx_reviews_experience on public.reviews (experience_id);
+create index if not exists idx_reviews_guest on public.reviews (guest_id);
+create index if not exists idx_reviews_status on public.reviews (status);
+
+alter table public.reviews
+  add column if not exists guest_id uuid references public.profiles (id) on delete set null,
+  add column if not exists host_reply text,
+  add column if not exists host_replied_at timestamptz,
+  add column if not exists is_verified boolean default false,
+  add column if not exists status text default 'published';
+
+-- Keep experience ratings in sync with published reviews
+create or replace function public.refresh_experience_rating()
+returns trigger
+language plpgsql
+as $$
+declare
+  v_exp_id uuid;
+begin
+  v_exp_id := coalesce(new.experience_id, old.experience_id);
+  update public.experiences e
+  set
+    average_rating = coalesce((
+      select round(avg(r.rating)::numeric, 2)
+      from public.reviews r
+      where r.experience_id = v_exp_id and r.status = 'published'
+    ), 0),
+    review_count = (
+      select count(*)::int
+      from public.reviews r
+      where r.experience_id = v_exp_id and r.status = 'published'
+    )
+  where e.id = v_exp_id;
+  return coalesce(new, old);
+end;
+$$;
+
+drop trigger if exists trg_reviews_rating on public.reviews;
+create trigger trg_reviews_rating
+  after insert or update or delete on public.reviews
+  for each row execute procedure public.refresh_experience_rating();
+
+-- ---------------------------------------------------------------------------
+-- In-app notifications
+-- ---------------------------------------------------------------------------
+create table if not exists public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles (id) on delete cascade,
+  type text not null check (type in (
+    'booking_created', 'booking_confirmed', 'booking_cancelled',
+    'booking_reminder', 'review_request', 'host_approved', 'review_received'
+  )),
+  title text not null,
+  body text not null,
+  metadata jsonb not null default '{}',
+  read_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_notifications_user on public.notifications (user_id, created_at desc);
+
+-- ---------------------------------------------------------------------------
+-- Audit logs (admin ops visibility)
+-- ---------------------------------------------------------------------------
+create table if not exists public.audit_logs (
+  id uuid primary key default gen_random_uuid(),
+  actor_id uuid references public.profiles (id) on delete set null,
+  action text not null,
+  entity_type text not null,
+  entity_id uuid,
+  metadata jsonb not null default '{}',
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_audit_created on public.audit_logs (created_at desc);
+
+-- ---------------------------------------------------------------------------
+-- Wishlist (guest saved experiences)
+-- ---------------------------------------------------------------------------
+create table if not exists public.wishlist (
+  id uuid primary key default gen_random_uuid(),
+  guest_id uuid not null references public.profiles (id) on delete cascade,
+  experience_id uuid not null references public.experiences (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  constraint uq_wishlist_guest_experience unique (guest_id, experience_id)
+);
+
+create index if not exists idx_wishlist_guest on public.wishlist (guest_id);
+create index if not exists idx_wishlist_experience on public.wishlist (experience_id);
 
 -- ---------------------------------------------------------------------------
 -- Platform settings (e.g. commission)
@@ -210,11 +419,15 @@ create table if not exists public.platform_settings (
 -- ---------------------------------------------------------------------------
 alter table public.profiles enable row level security;
 alter table public.hosts enable row level security;
+alter table public.cities enable row level security;
 alter table public.experience_categories enable row level security;
 alter table public.experiences enable row level security;
 alter table public.experience_slots enable row level security;
 alter table public.bookings enable row level security;
 alter table public.reviews enable row level security;
+alter table public.wishlist enable row level security;
+alter table public.notifications enable row level security;
+alter table public.audit_logs enable row level security;
 alter table public.platform_settings enable row level security;
 
 -- Drop existing policies if re-running in dev (names are stable)
@@ -222,11 +435,16 @@ drop policy if exists "profiles_select_own" on public.profiles;
 drop policy if exists "profiles_insert_own" on public.profiles;
 drop policy if exists "profiles_update_own" on public.profiles;
 drop policy if exists "hosts_select_all" on public.hosts;
+drop policy if exists "cities_select_active" on public.cities;
 drop policy if exists "categories_select_all" on public.experience_categories;
 drop policy if exists "experiences_select_all" on public.experiences;
 drop policy if exists "slots_select_all" on public.experience_slots;
 drop policy if exists "bookings_select_all" on public.bookings;
+drop policy if exists "bookings_select_own" on public.bookings;
+drop policy if exists "bookings_select_host" on public.bookings;
 drop policy if exists "reviews_select_all" on public.reviews;
+drop policy if exists "wishlist_own" on public.wishlist;
+drop policy if exists "notifications_own" on public.notifications;
 drop policy if exists "platform_settings_select_all" on public.platform_settings;
 
 create policy "profiles_select_own"
@@ -246,6 +464,10 @@ create policy "hosts_select_all"
   on public.hosts for select to anon, authenticated
   using (true);
 
+create policy "cities_select_active"
+  on public.cities for select to anon, authenticated
+  using (is_active = true);
+
 create policy "categories_select_all"
   on public.experience_categories for select to anon, authenticated
   using (true);
@@ -258,19 +480,41 @@ create policy "slots_select_all"
   on public.experience_slots for select to anon, authenticated
   using (true);
 
-create policy "bookings_select_all"
-  on public.bookings for select to anon, authenticated
-  using (true);
+create policy "bookings_select_own"
+  on public.bookings for select to authenticated
+  using (guest_id = auth.uid());
+
+create policy "bookings_select_host"
+  on public.bookings for select to authenticated
+  using (
+    exists (
+      select 1
+      from public.profiles p
+      join public.experiences e on e.host_id = p.host_id
+      where p.id = auth.uid()
+        and p.role = 'host'
+        and e.id = bookings.experience_id
+    )
+  );
 
 create policy "reviews_select_all"
   on public.reviews for select to anon, authenticated
   using (true);
 
+create policy "wishlist_own"
+  on public.wishlist for all to authenticated
+  using (guest_id = auth.uid())
+  with check (guest_id = auth.uid());
+
+create policy "notifications_own"
+  on public.notifications for select to authenticated
+  using (user_id = auth.uid());
+
 create policy "platform_settings_select_all"
   on public.platform_settings for select to anon, authenticated
   using (true);
 
--- Auto-create profile on sign-up (guest or host from user metadata)
+-- Auto-create profile on sign-up (guests only — hosts/admins created by admin)
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -299,6 +543,27 @@ create trigger on_auth_user_created
 -- ---------------------------------------------------------------------------
 -- Seed data (deterministic UUIDs for idempotent re-runs)
 -- ---------------------------------------------------------------------------
+insert into public.cities (slug, name, region, state, tagline, description, sort_order) values
+  ('mysuru', 'Mysuru', 'Southern Karnataka', 'Karnataka',
+   'Palaces, pottery, and slow living',
+   'The Royal Passage home base — heritage walks, artisan studios, farm mornings, and culinary immersions.', 10),
+  ('bengaluru', 'Bengaluru', 'Urban Karnataka', 'Karnataka',
+   'Creative city escapes',
+   'Weekend workshops, farm-to-table sessions, and curated urban experiences beyond the traffic.', 20),
+  ('coorg', 'Coorg', 'Western Ghats', 'Karnataka',
+   'Coffee country rituals',
+   'Plantation walks, Kodava cuisine, and misty valley experiences in the Scotland of India.', 30),
+  ('chikmagalur', 'Chikmagalur', 'Malnad hills', 'Karnataka',
+   'Coffee trails and cloud forests',
+   'Bean-to-cup journeys, waterfall hikes, and homestay-hosted cultural evenings.', 40),
+  ('hampi', 'Hampi', 'Vijayanagara heritage', 'Karnataka',
+   'Ruins at golden hour',
+   'Archaeological walks, boulder sunsets, and riverside storytelling with local historians.', 50),
+  ('ooty', 'Ooty', 'Nilgiri hills', 'Tamil Nadu',
+   'Mist, tea, and mountain calm',
+   'Tea estate visits, botanical walks, and slow Nilgiri experiences for mindful travellers.', 60)
+on conflict (slug) do nothing;
+
 insert into public.experience_categories (slug, label, sort_order) values
   ('art_craft', 'Art & Craft', 10),
   ('outdoor_nature', 'Outdoor & Nature', 20),
@@ -325,7 +590,7 @@ insert into public.hosts (id, display_name, email, bio, verified, approval_statu
 on conflict (id) do nothing;
 
 insert into public.experiences (
-  id, host_id, slug, title, tagline, description, category_slug, city, region, address,
+  id, host_id, slug, title, tagline, description, category_slug, city_slug, city, region, address,
   duration_minutes, experience_format, pricing_model, price_per_person_minor, price_per_group_minor,
   status, hero_image_url, inclusions, exclusions, cancellation_policy, average_rating, review_count, currency_code
 ) values
@@ -336,7 +601,7 @@ insert into public.experiences (
     'Wheel & Clay at Heritage Studio',
     'A morning at the wheel with master potters',
     'Learn throwing and hand-building in a sunlit studio. Take home two pieces, fired and glazed by the studio.',
-    'art_craft', 'Mysuru', 'Karnataka', 'Gokulam, Mysuru', 180, 'slot_based', 'per_person', 240000, null,
+    'art_craft', 'mysuru', 'Mysuru', 'Karnataka', 'Gokulam, Mysuru', 180, 'slot_based', 'per_person', 240000, null,
     'published',
     'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&q=80',
     array['Materials', 'Two finished pieces', 'Refreshments'],
@@ -351,7 +616,7 @@ insert into public.experiences (
     'Sunrise Farm Walk & Breakfast',
     'Fields, filter coffee, and a slow Karnataka breakfast',
     'Walk the rows before heat sets in, then share a traditional breakfast under a neem tree.',
-    'rural_farm', 'Mysuru', 'Karnataka', 'Hunsur Road outskirts', 150, 'slot_based', 'per_person', 185000, null,
+    'rural_farm', 'mysuru', 'Mysuru', 'Karnataka', 'Hunsur Road outskirts', 150, 'slot_based', 'per_person', 185000, null,
     'published',
     'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80',
     array['Guided walk', 'Breakfast', 'Farm tour'],
@@ -366,7 +631,7 @@ insert into public.experiences (
     'Sound Bowl Evening Reset',
     'Ninety minutes of resonance and stillness',
     'Group sound journey with Himalayan bowls, followed by herbal tea in the garden.',
-    'wellness', 'Mysuru', 'Karnataka', 'Chamundi Hill foothills', 90, 'slot_based', 'per_person', 165000, null,
+    'wellness', 'mysuru', 'Mysuru', 'Karnataka', 'Chamundi Hill foothills', 90, 'slot_based', 'per_person', 165000, null,
     'published',
     'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&q=80',
     array['Mats', 'Blankets', 'Tea'],
@@ -381,7 +646,7 @@ insert into public.experiences (
     'Estate-Style Coffee Cupping',
     'From cherry to cup — a sensory workshop',
     'Roast sample beans, learn grind theory, and cup three estate lots side by side.',
-    'culinary', 'Nanjangud', 'Karnataka', 'Coffee Collective Nanjangud', 120, 'slot_based', 'per_person', 145000, null,
+    'culinary', 'mysuru', 'Nanjangud', 'Karnataka', 'Coffee Collective Nanjangud', 120, 'slot_based', 'per_person', 145000, null,
     'published',
     'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=80',
     array['Cupping sets', 'Take-home sample bag'],
@@ -396,7 +661,7 @@ insert into public.experiences (
     'Palace Stories Walk',
     'Heritage narrative walk — experience format, not a generic tour',
     'Small groups only. Story-led paths with archival imagery and live narration.',
-    'cultural_heritage', 'Mysuru', 'Karnataka', 'Old city core', 105, 'slot_based', 'per_person', 95000, null,
+    'cultural_heritage', 'mysuru', 'Mysuru', 'Karnataka', 'Old city core', 105, 'slot_based', 'per_person', 95000, null,
     'published',
     'https://images.unsplash.com/photo-1524492412937-b280c272500d?w=1200&q=80',
     array['Guided walk', 'Printed route map'],

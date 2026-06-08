@@ -15,10 +15,26 @@ import { Route as HostsRouteImport } from './routes/hosts'
 import { Route as ExperiencesRouteImport } from './routes/experiences'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CitiesRouteImport } from './routes/cities'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HostReviewsRouteImport } from './routes/host.reviews'
+import { Route as HostRevenueRouteImport } from './routes/host.revenue'
+import { Route as HostExperiencesRouteImport } from './routes/host.experiences'
 import { Route as HostDashboardRouteImport } from './routes/host.dashboard'
+import { Route as HostBookingsRouteImport } from './routes/host.bookings'
 import { Route as ExperiencesSlugRouteImport } from './routes/experiences.$slug'
+import { Route as DashboardWishlistRouteImport } from './routes/dashboard.wishlist'
+import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
+import { Route as DashboardPastRouteImport } from './routes/dashboard.past'
+import { Route as DashboardCancelledRouteImport } from './routes/dashboard.cancelled'
+import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
+import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookingId'
+import { Route as HostExperiencesNewRouteImport } from './routes/host.experiences.new'
+import { Route as HostExperiencesExperienceIdRouteImport } from './routes/host.experiences.$experienceId'
+import { Route as HostBookingsBookingIdRouteImport } from './routes/host.bookings.$bookingId'
+import { Route as ExperiencesSlugBookRouteImport } from './routes/experiences.$slug.book'
+import { Route as BookingsBookingIdReviewRouteImport } from './routes/bookings.$bookingId.review'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
@@ -50,6 +66,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CitiesRoute = CitiesRouteImport.update({
+  id: '/cities',
+  path: '/cities',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -60,9 +81,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HostReviewsRoute = HostReviewsRouteImport.update({
+  id: '/host/reviews',
+  path: '/host/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HostRevenueRoute = HostRevenueRouteImport.update({
+  id: '/host/revenue',
+  path: '/host/revenue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HostExperiencesRoute = HostExperiencesRouteImport.update({
+  id: '/host/experiences',
+  path: '/host/experiences',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HostDashboardRoute = HostDashboardRouteImport.update({
   id: '/host/dashboard',
   path: '/host/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HostBookingsRoute = HostBookingsRouteImport.update({
+  id: '/host/bookings',
+  path: '/host/bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExperiencesSlugRoute = ExperiencesSlugRouteImport.update({
@@ -70,93 +111,251 @@ const ExperiencesSlugRoute = ExperiencesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ExperiencesRoute,
 } as any)
+const DashboardWishlistRoute = DashboardWishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardProfileRoute = DashboardProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPastRoute = DashboardPastRouteImport.update({
+  id: '/past',
+  path: '/past',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCancelledRoute = DashboardCancelledRouteImport.update({
+  id: '/cancelled',
+  path: '/cancelled',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const CitiesSlugRoute = CitiesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CitiesRoute,
+} as any)
+const BookingsBookingIdRoute = BookingsBookingIdRouteImport.update({
+  id: '/bookings/$bookingId',
+  path: '/bookings/$bookingId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HostExperiencesNewRoute = HostExperiencesNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => HostExperiencesRoute,
+} as any)
+const HostExperiencesExperienceIdRoute =
+  HostExperiencesExperienceIdRouteImport.update({
+    id: '/$experienceId',
+    path: '/$experienceId',
+    getParentRoute: () => HostExperiencesRoute,
+  } as any)
+const HostBookingsBookingIdRoute = HostBookingsBookingIdRouteImport.update({
+  id: '/$bookingId',
+  path: '/$bookingId',
+  getParentRoute: () => HostBookingsRoute,
+} as any)
+const ExperiencesSlugBookRoute = ExperiencesSlugBookRouteImport.update({
+  id: '/book',
+  path: '/book',
+  getParentRoute: () => ExperiencesSlugRoute,
+} as any)
+const BookingsBookingIdReviewRoute = BookingsBookingIdReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
+  getParentRoute: () => BookingsBookingIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/cities': typeof CitiesRouteWithChildren
   '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/experiences': typeof ExperiencesRouteWithChildren
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
-  '/experiences/$slug': typeof ExperiencesSlugRoute
+  '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
+  '/cities/$slug': typeof CitiesSlugRoute
+  '/dashboard/cancelled': typeof DashboardCancelledRoute
+  '/dashboard/past': typeof DashboardPastRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/wishlist': typeof DashboardWishlistRoute
+  '/experiences/$slug': typeof ExperiencesSlugRouteWithChildren
+  '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
+  '/host/experiences': typeof HostExperiencesRouteWithChildren
+  '/host/revenue': typeof HostRevenueRoute
+  '/host/reviews': typeof HostReviewsRoute
+  '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
+  '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
+  '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
+  '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
+  '/host/experiences/new': typeof HostExperiencesNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/cities': typeof CitiesRouteWithChildren
   '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/experiences': typeof ExperiencesRouteWithChildren
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
-  '/experiences/$slug': typeof ExperiencesSlugRoute
+  '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
+  '/cities/$slug': typeof CitiesSlugRoute
+  '/dashboard/cancelled': typeof DashboardCancelledRoute
+  '/dashboard/past': typeof DashboardPastRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/wishlist': typeof DashboardWishlistRoute
+  '/experiences/$slug': typeof ExperiencesSlugRouteWithChildren
+  '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
+  '/host/experiences': typeof HostExperiencesRouteWithChildren
+  '/host/revenue': typeof HostRevenueRoute
+  '/host/reviews': typeof HostReviewsRoute
+  '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
+  '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
+  '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
+  '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
+  '/host/experiences/new': typeof HostExperiencesNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/cities': typeof CitiesRouteWithChildren
   '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/experiences': typeof ExperiencesRouteWithChildren
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
-  '/experiences/$slug': typeof ExperiencesSlugRoute
+  '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
+  '/cities/$slug': typeof CitiesSlugRoute
+  '/dashboard/cancelled': typeof DashboardCancelledRoute
+  '/dashboard/past': typeof DashboardPastRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/wishlist': typeof DashboardWishlistRoute
+  '/experiences/$slug': typeof ExperiencesSlugRouteWithChildren
+  '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
+  '/host/experiences': typeof HostExperiencesRouteWithChildren
+  '/host/revenue': typeof HostRevenueRoute
+  '/host/reviews': typeof HostReviewsRoute
+  '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
+  '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
+  '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
+  '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
+  '/host/experiences/new': typeof HostExperiencesNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin'
+    | '/cities'
     | '/contact'
     | '/dashboard'
     | '/experiences'
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/bookings/$bookingId'
+    | '/cities/$slug'
+    | '/dashboard/cancelled'
+    | '/dashboard/past'
+    | '/dashboard/profile'
+    | '/dashboard/wishlist'
     | '/experiences/$slug'
+    | '/host/bookings'
     | '/host/dashboard'
+    | '/host/experiences'
+    | '/host/revenue'
+    | '/host/reviews'
+    | '/bookings/$bookingId/review'
+    | '/experiences/$slug/book'
+    | '/host/bookings/$bookingId'
+    | '/host/experiences/$experienceId'
+    | '/host/experiences/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/cities'
     | '/contact'
     | '/dashboard'
     | '/experiences'
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/bookings/$bookingId'
+    | '/cities/$slug'
+    | '/dashboard/cancelled'
+    | '/dashboard/past'
+    | '/dashboard/profile'
+    | '/dashboard/wishlist'
     | '/experiences/$slug'
+    | '/host/bookings'
     | '/host/dashboard'
+    | '/host/experiences'
+    | '/host/revenue'
+    | '/host/reviews'
+    | '/bookings/$bookingId/review'
+    | '/experiences/$slug/book'
+    | '/host/bookings/$bookingId'
+    | '/host/experiences/$experienceId'
+    | '/host/experiences/new'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/cities'
     | '/contact'
     | '/dashboard'
     | '/experiences'
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/bookings/$bookingId'
+    | '/cities/$slug'
+    | '/dashboard/cancelled'
+    | '/dashboard/past'
+    | '/dashboard/profile'
+    | '/dashboard/wishlist'
     | '/experiences/$slug'
+    | '/host/bookings'
     | '/host/dashboard'
+    | '/host/experiences'
+    | '/host/revenue'
+    | '/host/reviews'
+    | '/bookings/$bookingId/review'
+    | '/experiences/$slug/book'
+    | '/host/bookings/$bookingId'
+    | '/host/experiences/$experienceId'
+    | '/host/experiences/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  CitiesRoute: typeof CitiesRouteWithChildren
   ContactRoute: typeof ContactRoute
-  DashboardRoute: typeof DashboardRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   ExperiencesRoute: typeof ExperiencesRouteWithChildren
   HostsRoute: typeof HostsRoute
   JournalRoute: typeof JournalRoute
   SignInRoute: typeof SignInRoute
+  BookingsBookingIdRoute: typeof BookingsBookingIdRouteWithChildren
+  HostBookingsRoute: typeof HostBookingsRouteWithChildren
   HostDashboardRoute: typeof HostDashboardRoute
+  HostExperiencesRoute: typeof HostExperiencesRouteWithChildren
+  HostRevenueRoute: typeof HostRevenueRoute
+  HostReviewsRoute: typeof HostReviewsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -203,6 +402,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cities': {
+      id: '/cities'
+      path: '/cities'
+      fullPath: '/cities'
+      preLoaderRoute: typeof CitiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -217,11 +423,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/host/reviews': {
+      id: '/host/reviews'
+      path: '/host/reviews'
+      fullPath: '/host/reviews'
+      preLoaderRoute: typeof HostReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/host/revenue': {
+      id: '/host/revenue'
+      path: '/host/revenue'
+      fullPath: '/host/revenue'
+      preLoaderRoute: typeof HostRevenueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/host/experiences': {
+      id: '/host/experiences'
+      path: '/host/experiences'
+      fullPath: '/host/experiences'
+      preLoaderRoute: typeof HostExperiencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/host/dashboard': {
       id: '/host/dashboard'
       path: '/host/dashboard'
       fullPath: '/host/dashboard'
       preLoaderRoute: typeof HostDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/host/bookings': {
+      id: '/host/bookings'
+      path: '/host/bookings'
+      fullPath: '/host/bookings'
+      preLoaderRoute: typeof HostBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/experiences/$slug': {
@@ -231,31 +465,192 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExperiencesSlugRouteImport
       parentRoute: typeof ExperiencesRoute
     }
+    '/dashboard/wishlist': {
+      id: '/dashboard/wishlist'
+      path: '/wishlist'
+      fullPath: '/dashboard/wishlist'
+      preLoaderRoute: typeof DashboardWishlistRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/profile': {
+      id: '/dashboard/profile'
+      path: '/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof DashboardProfileRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/past': {
+      id: '/dashboard/past'
+      path: '/past'
+      fullPath: '/dashboard/past'
+      preLoaderRoute: typeof DashboardPastRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/cancelled': {
+      id: '/dashboard/cancelled'
+      path: '/cancelled'
+      fullPath: '/dashboard/cancelled'
+      preLoaderRoute: typeof DashboardCancelledRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/cities/$slug': {
+      id: '/cities/$slug'
+      path: '/$slug'
+      fullPath: '/cities/$slug'
+      preLoaderRoute: typeof CitiesSlugRouteImport
+      parentRoute: typeof CitiesRoute
+    }
+    '/bookings/$bookingId': {
+      id: '/bookings/$bookingId'
+      path: '/bookings/$bookingId'
+      fullPath: '/bookings/$bookingId'
+      preLoaderRoute: typeof BookingsBookingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/host/experiences/new': {
+      id: '/host/experiences/new'
+      path: '/new'
+      fullPath: '/host/experiences/new'
+      preLoaderRoute: typeof HostExperiencesNewRouteImport
+      parentRoute: typeof HostExperiencesRoute
+    }
+    '/host/experiences/$experienceId': {
+      id: '/host/experiences/$experienceId'
+      path: '/$experienceId'
+      fullPath: '/host/experiences/$experienceId'
+      preLoaderRoute: typeof HostExperiencesExperienceIdRouteImport
+      parentRoute: typeof HostExperiencesRoute
+    }
+    '/host/bookings/$bookingId': {
+      id: '/host/bookings/$bookingId'
+      path: '/$bookingId'
+      fullPath: '/host/bookings/$bookingId'
+      preLoaderRoute: typeof HostBookingsBookingIdRouteImport
+      parentRoute: typeof HostBookingsRoute
+    }
+    '/experiences/$slug/book': {
+      id: '/experiences/$slug/book'
+      path: '/book'
+      fullPath: '/experiences/$slug/book'
+      preLoaderRoute: typeof ExperiencesSlugBookRouteImport
+      parentRoute: typeof ExperiencesSlugRoute
+    }
+    '/bookings/$bookingId/review': {
+      id: '/bookings/$bookingId/review'
+      path: '/review'
+      fullPath: '/bookings/$bookingId/review'
+      preLoaderRoute: typeof BookingsBookingIdReviewRouteImport
+      parentRoute: typeof BookingsBookingIdRoute
+    }
   }
 }
 
+interface CitiesRouteChildren {
+  CitiesSlugRoute: typeof CitiesSlugRoute
+}
+
+const CitiesRouteChildren: CitiesRouteChildren = {
+  CitiesSlugRoute: CitiesSlugRoute,
+}
+
+const CitiesRouteWithChildren =
+  CitiesRoute._addFileChildren(CitiesRouteChildren)
+
+interface DashboardRouteChildren {
+  DashboardCancelledRoute: typeof DashboardCancelledRoute
+  DashboardPastRoute: typeof DashboardPastRoute
+  DashboardProfileRoute: typeof DashboardProfileRoute
+  DashboardWishlistRoute: typeof DashboardWishlistRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardCancelledRoute: DashboardCancelledRoute,
+  DashboardPastRoute: DashboardPastRoute,
+  DashboardProfileRoute: DashboardProfileRoute,
+  DashboardWishlistRoute: DashboardWishlistRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
+interface ExperiencesSlugRouteChildren {
+  ExperiencesSlugBookRoute: typeof ExperiencesSlugBookRoute
+}
+
+const ExperiencesSlugRouteChildren: ExperiencesSlugRouteChildren = {
+  ExperiencesSlugBookRoute: ExperiencesSlugBookRoute,
+}
+
+const ExperiencesSlugRouteWithChildren = ExperiencesSlugRoute._addFileChildren(
+  ExperiencesSlugRouteChildren,
+)
+
 interface ExperiencesRouteChildren {
-  ExperiencesSlugRoute: typeof ExperiencesSlugRoute
+  ExperiencesSlugRoute: typeof ExperiencesSlugRouteWithChildren
 }
 
 const ExperiencesRouteChildren: ExperiencesRouteChildren = {
-  ExperiencesSlugRoute: ExperiencesSlugRoute,
+  ExperiencesSlugRoute: ExperiencesSlugRouteWithChildren,
 }
 
 const ExperiencesRouteWithChildren = ExperiencesRoute._addFileChildren(
   ExperiencesRouteChildren,
 )
 
+interface BookingsBookingIdRouteChildren {
+  BookingsBookingIdReviewRoute: typeof BookingsBookingIdReviewRoute
+}
+
+const BookingsBookingIdRouteChildren: BookingsBookingIdRouteChildren = {
+  BookingsBookingIdReviewRoute: BookingsBookingIdReviewRoute,
+}
+
+const BookingsBookingIdRouteWithChildren =
+  BookingsBookingIdRoute._addFileChildren(BookingsBookingIdRouteChildren)
+
+interface HostBookingsRouteChildren {
+  HostBookingsBookingIdRoute: typeof HostBookingsBookingIdRoute
+}
+
+const HostBookingsRouteChildren: HostBookingsRouteChildren = {
+  HostBookingsBookingIdRoute: HostBookingsBookingIdRoute,
+}
+
+const HostBookingsRouteWithChildren = HostBookingsRoute._addFileChildren(
+  HostBookingsRouteChildren,
+)
+
+interface HostExperiencesRouteChildren {
+  HostExperiencesExperienceIdRoute: typeof HostExperiencesExperienceIdRoute
+  HostExperiencesNewRoute: typeof HostExperiencesNewRoute
+}
+
+const HostExperiencesRouteChildren: HostExperiencesRouteChildren = {
+  HostExperiencesExperienceIdRoute: HostExperiencesExperienceIdRoute,
+  HostExperiencesNewRoute: HostExperiencesNewRoute,
+}
+
+const HostExperiencesRouteWithChildren = HostExperiencesRoute._addFileChildren(
+  HostExperiencesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  CitiesRoute: CitiesRouteWithChildren,
   ContactRoute: ContactRoute,
-  DashboardRoute: DashboardRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   ExperiencesRoute: ExperiencesRouteWithChildren,
   HostsRoute: HostsRoute,
   JournalRoute: JournalRoute,
   SignInRoute: SignInRoute,
+  BookingsBookingIdRoute: BookingsBookingIdRouteWithChildren,
+  HostBookingsRoute: HostBookingsRouteWithChildren,
   HostDashboardRoute: HostDashboardRoute,
+  HostExperiencesRoute: HostExperiencesRouteWithChildren,
+  HostRevenueRoute: HostRevenueRoute,
+  HostReviewsRoute: HostReviewsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

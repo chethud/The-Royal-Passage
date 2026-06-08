@@ -1,6 +1,18 @@
 import type { Experience } from "@/data/experiences";
+import type { CitySummary } from "@/lib/cities";
+import type { ReviewSummary } from "@/lib/api/reviews";
 
-export const SITE_URL = "https://theroyalpassage.com";
+export function resolveSiteUrl(): string {
+  if (typeof process !== "undefined" && process.env.SITE_URL) {
+    return process.env.SITE_URL.replace(/\/$/, "");
+  }
+  if (typeof process !== "undefined" && process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "https://the-royal-passage.vercel.app";
+}
+
+export const SITE_URL = resolveSiteUrl();
 export const SITE_NAME = "The Royal Passage";
 export const CONTACT_EMAIL = "prajwalbp500@gmail.com";
 export const CONTACT_PHONE = "+91 729588826";
@@ -23,6 +35,100 @@ const categories = [
   "Heritage Walks",
   "Curated Expeditions",
 ];
+
+export function buildExperienceJsonLd(exp: Experience, reviews: ReviewSummary[] = []) {
+  const pageUrl = `${SITE_URL}/experiences/${exp.slug}`;
+  const priceCurrency = exp.currencySymbol === "₹" ? "INR" : "EUR";
+
+  const reviewNodes = reviews.slice(0, 10).map((review) => ({
+    "@type": "Review",
+    author: { "@type": "Person", name: review.reviewerDisplayName ?? "Guest" },
+    datePublished: review.createdAt,
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: review.rating,
+      bestRating: 5,
+    },
+    reviewBody: review.comment ?? undefined,
+  }));
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "TouristTrip",
+    name: exp.title,
+    description: exp.description,
+    image: exp.image ? [exp.image] : undefined,
+    url: pageUrl,
+    touristType: "Cultural traveller",
+    provider: {
+      "@type": "Person",
+      name: exp.hostName,
+    },
+    offers: {
+      "@type": "Offer",
+      price: exp.pricePerPerson,
+      priceCurrency,
+      availability: exp.slots.some((slot) => slot.available > 0)
+        ? "https://schema.org/InStock"
+        : "https://schema.org/SoldOut",
+      url: pageUrl,
+    },
+    aggregateRating:
+      exp.reviewsCount > 0
+        ? {
+            "@type": "AggregateRating",
+            ratingValue: exp.rating,
+            reviewCount: exp.reviewsCount,
+          }
+        : undefined,
+    review: reviewNodes.length > 0 ? reviewNodes : undefined,
+    location: {
+      "@type": "Place",
+      name: exp.address || exp.city,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: exp.city,
+        addressCountry: "IN",
+      },
+    },
+  };
+}
+
+export function buildCityJsonLd(city: CitySummary) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: `${city.name} experiences — ${SITE_NAME}`,
+        url: `${SITE_URL}/cities/${city.slug}`,
+        description: city.description ?? city.tagline ?? undefined,
+        about: {
+          "@type": "City",
+          name: city.name,
+          address: {
+            "@type": "PostalAddress",
+            addressRegion: city.state,
+            addressCountry: city.state === "Tamil Nadu" ? "IN" : "IN",
+          },
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+          { "@type": "ListItem", position: 2, name: "Cities", item: `${SITE_URL}/cities` },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: city.name,
+            item: `${SITE_URL}/cities/${city.slug}`,
+          },
+        ],
+      },
+    ],
+  };
+}
 
 export function buildHomeJsonLd(experiences: Experience[]) {
   const organizationId = `${SITE_URL}/#organization`;
@@ -75,7 +181,6 @@ export function buildHomeJsonLd(experiences: Experience[]) {
         url: SITE_URL,
         isPartOf: { "@id": websiteId },
         about: { "@id": organizationId },
-        primaryImageOfPage: `${SITE_URL}/og-image.jpg`,
         description:
           "Curated Mysuru experiences including heritage walks, culinary journeys, pottery, nature trails and bespoke royal expeditions.",
       },

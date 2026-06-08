@@ -44,6 +44,7 @@ def map_row_to_experience(row: dict, slots: list[dict]) -> Experience:
         description=row.get("description") or "",
         category=category,
         city=row["city"],
+        citySlug=row.get("city_slug"),
         address=row.get("address") or "",
         durationHours=row["duration_minutes"] / 60,
         hostName=host.get("display_name") or "Host",

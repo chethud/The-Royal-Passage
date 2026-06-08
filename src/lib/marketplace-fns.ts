@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 import { isApiConfigured } from "@/lib/api/client";
-import { fetchCatalog, fetchExperienceBySlug, createBooking as apiCreateBooking } from "@/lib/api/marketplace";
+import { fetchCatalog, fetchExperienceBySlug } from "@/lib/api/marketplace";
 import type { Experience } from "@/data/experiences";
 import {
   getExperience as getStaticExperience,
@@ -154,106 +153,6 @@ export const getExperienceForDetail = createServerFn({ method: "GET" })
     if (stat) return { exp: stat, source: "static" };
     return null;
   });
-
-const bookingInput = z.object({
-  slotId: z.string().uuid(),
-  guestCount: z.number().int().min(1).max(50),
-  guestName: z.string().min(1).max(200),
-  guestEmail: z.string().email(),
-  guestPhone: z.string().max(30).optional(),
-});
-
-/**
- * Creates a pending booking after a server-side capacity check.
- * Does not increment seats_sold (confirm that in a payment webhook + transaction in production).
- */
-export const createPendingBooking = createServerFn({ method: "POST" })
-  .inputValidator((raw: unknown) => bookingInput.parse(raw))
-  .handler(
-    async ({ data }): Promise<{ bookingId: string; subtotalMinor: number; status: string }> => {
-      if (isApiConfigured()) {
-        return apiCreateBooking(data);
-      }
-
-      if (!isSupabaseConfigured()) {
-        throw new Error("Supabase is not configured on the server.");
-      }
-      const supabase = getSupabaseAdmin();
-      type SlotJoin = SlotRow & {
-        experiences: {
-          id: string;
-          price_per_person_minor: number;
-          currency_code: string;
-        } | null;
-      };
-
-      const { data: slot, error: sErr } = await supabase
-        .from("experience_slots")
-        .select("*, experiences ( id, price_per_person_minor, currency_code )")
-        .eq("id", data.slotId)
-        .maybeSingle();
-
-      if (sErr) throw new Error(sErr.message);
-      if (!slot) throw new Error("Slot not found.");
-      const slotRow = slot as SlotJoin;
-      if (slotRow.is_blocked) throw new Error("This slot is not available.");
-
-      const available = Math.max(0, slotRow.capacity - slotRow.seats_sold);
-      if (data.guestCount > available) {
-        throw new Error("Not enough seats left for this slot.");
-      }
-
-      const exp = slotRow.experiences;
-      if (!exp) throw new Error("Experience not found for this slot.");
-
-      const { data: feeRow } = await supabase
-        .from("platform_settings")
-        .select("value")
-        .eq("key", "commission_percent")
-        .maybeSingle();
-      const rawFee = feeRow?.value;
-      const commissionPercent =
-        typeof rawFee === "number"
-          ? rawFee
-          : typeof rawFee === "string"
-            ? Number.parseFloat(rawFee)
-            : Number(rawFee ?? 12.5);
-
-      const subtotalMinor = exp.price_per_person_minor * data.guestCount;
-      const platformFeeMinor = Math.round((subtotalMinor * commissionPercent) / 100);
-      const hostPayoutMinor = subtotalMinor - platformFeeMinor;
-
-      const holdMins = 15;
-      const holdExpires = new Date(Date.now() + holdMins * 60 * 1000).toISOString();
-
-      const { data: booking, error: bErr } = await supabase
-        .from("bookings")
-        .insert({
-          slot_id: data.slotId,
-          guest_email: data.guestEmail,
-          guest_name: data.guestName,
-          guest_phone: data.guestPhone ?? null,
-          guest_count: data.guestCount,
-          status: "pending_payment",
-          subtotal_minor: subtotalMinor,
-          platform_fee_minor: platformFeeMinor,
-          host_payout_minor: hostPayoutMinor,
-          currency_code: exp.currency_code,
-          hold_expires_at: holdExpires,
-        })
-        .select("id")
-        .single();
-
-      if (bErr) throw new Error(bErr.message);
-      if (!booking) throw new Error("Failed to create booking.");
-
-      return {
-        bookingId: booking.id,
-        subtotalMinor,
-        status: "pending_payment",
-      };
-    },
-  );
 
 /**
  * Returns every row from main tables — useful in SQL Editor / admin debugging.

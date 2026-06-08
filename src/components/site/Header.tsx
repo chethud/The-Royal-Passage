@@ -18,6 +18,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useAuthUser } from "@/lib/auth-user";
 import { dashboardPathForRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
@@ -26,6 +27,7 @@ type NavItem = { label: string; to: string };
 
 const navItems: NavItem[] = [
   { label: "Experiences", to: "/experiences" },
+  { label: "Cities", to: "/cities" },
   { label: "Curated Journeys", to: "/experiences" },
   { label: "About Us", to: "/hosts" },
   { label: "Journal", to: "/journal" },
@@ -107,7 +109,9 @@ export function Header() {
               Sign in
             </Link>
           ) : (
-            <DropdownMenu>
+            <>
+              <NotificationBell />
+              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button type="button" className={navLinkClass}>
                   {displayName ?? "Account"}
@@ -138,6 +142,7 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </>
           )}
         </nav>
 

@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import type { MouseEvent } from "react";
 import type { Experience } from "@/data/experiences";
+import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { formatDateShort } from "@/lib/date-format";
 
@@ -27,26 +28,28 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
   };
 
   const card = (
-    <Link
-      to="/experiences/$slug"
-      params={{ slug: exp.slug }}
-      className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-ember focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-    >
-      <div
-        className="relative aspect-[4/5] overflow-hidden rounded-md bg-muted/40 shadow-soft ring-1 ring-[oklch(0.88_0.08_86_/_0.22)] transition-shadow duration-500 group-hover:shadow-[var(--shadow-lift)]"
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/40 via-transparent to-amber-100/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-        <img
-          src={exp.image}
-          alt={exp.title}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
-        />
-        <div
-          className="absolute top-3 left-3 z-20 flex gap-2"
-          style={{ transform: "translateZ(24px)" }}
+    <div className="group block">
+      <div className="relative">
+        <Link
+          to="/experiences/$slug"
+          params={{ slug: exp.slug }}
+          className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ember focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
+          <div
+            className="relative aspect-[4/5] overflow-hidden rounded-md bg-muted/40 shadow-soft ring-1 ring-[oklch(0.88_0.08_86_/_0.22)] transition-shadow duration-500 group-hover:shadow-[var(--shadow-lift)]"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/40 via-transparent to-amber-100/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <img
+              src={exp.image}
+              alt={exp.title}
+              loading="lazy"
+              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+            />
+            <div
+              className="absolute top-3 left-3 z-20 flex gap-2"
+              style={{ transform: "translateZ(24px)" }}
+            >
           <span className="border border-[oklch(0.88_0.08_86_/_0.25)] bg-background/75 px-2.5 py-1 text-[0.65rem] uppercase tracking-wider text-foreground shadow-soft backdrop-blur-md">
             {exp.category}
           </span>
@@ -55,9 +58,19 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
               Verified
             </span>
           )}
-        </div>
+            </div>
+          </div>
+        </Link>
+        <WishlistButton
+          experienceId={exp.id}
+          className="absolute top-3 right-3 z-30"
+        />
       </div>
-      <div className="flex justify-between gap-4 pt-4">
+      <Link
+        to="/experiences/$slug"
+        params={{ slug: exp.slug }}
+        className="flex justify-between gap-4 pt-4 focus:outline-none"
+      >
         <div className="min-w-0">
           <div className="text-xs text-muted-foreground">{exp.city}</div>
           <h3 className="mt-0.5 truncate font-display text-xl leading-tight">{exp.title}</h3>
@@ -75,8 +88,8 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
           </div>
           <div className="mt-1 text-xs text-ember">★ {exp.rating}</div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 
   if (reduceMotion) return card;

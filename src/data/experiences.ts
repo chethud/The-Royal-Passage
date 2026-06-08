@@ -23,6 +23,7 @@ export type Experience = {
   /** Display label (static demo or DB category label) */
   category: string;
   city: string;
+  citySlug?: string;
   address: string;
   durationHours: number;
   hostName: string;
@@ -47,7 +48,7 @@ const dayOffset = (n: number) => {
 };
 
 export const categories = ["Dining", "Voyage", "Craft", "Wellness", "Drive", "Tasting"] as const;
-export const cities = ["Lisbon", "Kyoto", "Reykjavík", "Marrakech", "Florence", "Aspen"] as const;
+export const cities = ["Mysuru", "Bengaluru", "Coorg", "Chikmagalur", "Hampi", "Ooty"] as const;
 
 export const experiences: Experience[] = [
   {

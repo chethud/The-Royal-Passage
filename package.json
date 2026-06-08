@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "setup:admin": "node --env-file=.env.local scripts/create-admin.mjs",
+    "setup:admin": "node --env-file=.env scripts/create-admin.mjs",
     "api:dev": "cd backend && python -m uvicorn app.main:app --reload --port 8000"
   },
   "dependencies": {

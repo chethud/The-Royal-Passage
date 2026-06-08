@@ -9,14 +9,16 @@ experience_categories ( label )
 """
 
 
-def load_published_experiences() -> list[Experience]:
+def load_published_experiences(city_slug: str | None = None) -> list[Experience]:
     supabase = get_supabase_admin()
-    result = (
+    query = (
         supabase.table("experiences")
         .select(EXPERIENCE_SELECT)
         .eq("status", "published")
-        .execute()
     )
+    if city_slug:
+        query = query.eq("city_slug", city_slug)
+    result = query.execute()
     rows = result.data or []
     approved = [r for r in rows if (r.get("hosts") or {}).get("approval_status") == "approved"]
     if not approved:
@@ -64,13 +66,14 @@ def load_experience_by_slug(slug: str) -> Experience | None:
     return map_row_to_experience(row, slots_result.data or [])
 
 
-def get_catalog() -> CatalogResponse:
-    experiences = load_published_experiences()
+def get_catalog(city_slug: str | None = None) -> CatalogResponse:
+    experiences = load_published_experiences(city_slug=city_slug)
     return CatalogResponse(
         mode="live",
         experiences=experiences,
         categories=sorted({e.category for e in experiences}),
         cities=sorted({e.city for e in experiences}),
+        citySlugs=sorted({e.citySlug for e in experiences if e.citySlug}),
     )
 
 

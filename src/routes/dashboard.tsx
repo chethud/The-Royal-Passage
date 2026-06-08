@@ -1,67 +1,90 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { CalendarDays, Compass } from "lucide-react";
-import { DashboardShell } from "@/components/auth/DashboardShell";
-import { useAuthUser } from "@/lib/auth-user";
-import { dashboardPathForRole } from "@/lib/roles";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
+import { Compass } from "lucide-react";
+import { GuestBookingsList } from "@/components/guest/GuestBookingsList";
+import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
+import { GuestEmptyState } from "@/components/guest/GuestEmptyState";
+import { listMyBookings, type BookingSummary } from "@/lib/booking-fns";
+import { useGuestAccess } from "@/lib/use-guest-access";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Guest dashboard — The Royal Passage" },
-      { name: "description", content: "View your bookings and saved experiences." },
+      { title: "Upcoming bookings — The Royal Passage" },
+      { name: "description", content: "View your upcoming experiences in Mysuru." },
     ],
   }),
-  component: GuestDashboardPage,
+  component: GuestUpcomingPage,
 });
 
-function GuestDashboardPage() {
-  const navigate = useNavigate();
-  const { user, role, loading } = useAuthUser();
+function GuestUpcomingPage() {
+  const { accessToken, ready, loading } = useGuestAccess();
+  const [bookings, setBookings] = useState<BookingSummary[]>([]);
+  const [pageError, setPageError] = useState<string | null>(null);
+  const [pageLoading, setPageLoading] = useState(true);
+
+  const loadBookings = useCallback(async () => {
+    if (!accessToken) return;
+    setPageLoading(true);
+    setPageError(null);
+    try {
+      const rows = await listMyBookings({ data: { accessToken, status: "upcoming" } });
+      setBookings(rows);
+    } catch (err) {
+      setPageError(err instanceof Error ? err.message : "Failed to load bookings.");
+    } finally {
+      setPageLoading(false);
+    }
+  }, [accessToken]);
 
   useEffect(() => {
-    if (loading) return;
-    if (!user) {
-      void navigate({ to: "/sign-in" });
-      return;
-    }
-    if (role && role !== "guest") {
-      void navigate({ to: dashboardPathForRole(role) });
-    }
-  }, [loading, navigate, role, user]);
+    if (!ready) return;
+    void loadBookings();
+  }, [loadBookings, ready]);
 
-  if (loading || !user || role !== "guest") {
+  if (loading || !ready || !accessToken) {
     return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
   }
 
   return (
-    <DashboardShell
-      role="guest"
-      title="Your journeys"
-      subtitle="Book experiences, track confirmations, and revisit the moments you have planned in Mysuru."
+    <GuestDashboardShell
+      title="Upcoming"
+      subtitle="Confirmed and pending journeys ahead. Pay at the venue when you arrive."
     >
-      <div className="grid gap-4 sm:grid-cols-2">
-        <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6">
-          <CalendarDays className="h-5 w-5 text-ember" />
-          <h2 className="mt-4 font-display text-2xl">Upcoming bookings</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Your confirmed experiences will appear here once you book while signed in.
-          </p>
-        </article>
-        <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6">
-          <Compass className="h-5 w-5 text-ember" />
-          <h2 className="mt-4 font-display text-2xl">Discover more</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Browse pottery, farm walks, palace stories, and other curated experiences.
+      <div className="space-y-6">
+        <div className="flex items-end justify-between gap-4">
+          <p className="text-sm text-muted-foreground">
+            Your host will confirm each request before the session.
           </p>
           <Link
             to="/experiences"
-            className="mt-5 inline-flex rounded-sm bg-ember px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.16em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110"
+            className="hidden sm:inline-flex rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] hover:border-ember/50"
           >
-            Explore experiences
+            Browse
           </Link>
-        </article>
+        </div>
+
+        {pageLoading ? (
+          <p className="text-sm text-muted-foreground">Loading bookings…</p>
+        ) : pageError ? (
+          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {pageError}
+          </p>
+        ) : bookings.length === 0 ? (
+          <GuestEmptyState
+            icon={<Compass className="h-8 w-8" />}
+            title="No upcoming journeys"
+            description="Explore pottery workshops, farm walks, and palace stories across Mysuru."
+          />
+        ) : (
+          <GuestBookingsList
+            bookings={bookings}
+            accessToken={accessToken}
+            allowCancel
+            onUpdated={() => void loadBookings()}
+          />
+        )}
       </div>
-    </DashboardShell>
+    </GuestDashboardShell>
   );
 }

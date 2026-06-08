@@ -1,0 +1,242 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
+import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusBadge";
+import { HostExperienceForm } from "@/components/experience/HostExperienceForm";
+import { SlotManager } from "@/components/experience/SlotManager";
+import { HostDashboardShell } from "@/components/host/HostDashboardShell";
+import { listCities, type CitySummary } from "@/lib/city-fns";
+import {
+  createHostSlotFn,
+  deleteHostExperienceFn,
+  deleteHostSlotFn,
+  getHostCategories,
+  getHostExperienceDetail,
+  updateHostExperienceFn,
+  updateHostSlotFn,
+  type CategoryOption,
+  type HostExperienceDetail,
+} from "@/lib/host-experience-fns";
+import { useHostAccess } from "@/lib/use-host-access";
+
+export const Route = createFileRoute("/host/experiences/$experienceId")({
+  head: () => ({
+    meta: [{ title: "Manage experience — The Royal Passage" }],
+  }),
+  component: HostExperienceDetailPage,
+});
+
+function HostExperienceDetailPage() {
+  const { experienceId } = Route.useParams();
+  const { accessToken, ready, loading } = useHostAccess();
+  const [experience, setExperience] = useState<HostExperienceDetail | null>(null);
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
+  const [cities, setCities] = useState<CitySummary[]>([]);
+  const [pageError, setPageError] = useState<string | null>(null);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [slotBusy, setSlotBusy] = useState(false);
+
+  const loadPage = useCallback(async () => {
+    if (!accessToken) return;
+    setPageLoading(true);
+    setPageError(null);
+    try {
+      const [detail, cats, cityRows] = await Promise.all([
+        getHostExperienceDetail({ data: { accessToken, experienceId } }),
+        getHostCategories({ data: { accessToken } }),
+        listCities(),
+      ]);
+      setExperience(detail);
+      setCategories(cats);
+      setCities(cityRows);
+    } catch (err) {
+      setPageError(err instanceof Error ? err.message : "Failed to load experience.");
+    } finally {
+      setPageLoading(false);
+    }
+  }, [accessToken, experienceId]);
+
+  useEffect(() => {
+    if (!ready) return;
+    void loadPage();
+  }, [loadPage, ready]);
+
+  const handleSave = async (
+    payload: Parameters<React.ComponentProps<typeof HostExperienceForm>["onSubmit"]>[0],
+  ) => {
+    if (!accessToken) return;
+    setSaving(true);
+    setPageError(null);
+    try {
+      const updated = await updateHostExperienceFn({
+        data: { accessToken, experienceId, ...payload },
+      });
+      setExperience(updated);
+    } catch (err) {
+      setPageError(err instanceof Error ? err.message : "Failed to save experience.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!accessToken || !experience) return;
+    if (!window.confirm("Archive or delete this experience?")) return;
+    setSaving(true);
+    try {
+      await deleteHostExperienceFn({ data: { accessToken, experienceId } });
+      window.location.href = "/host/experiences";
+    } catch (err) {
+      setPageError(err instanceof Error ? err.message : "Failed to delete experience.");
+      setSaving(false);
+    }
+  };
+
+  const refreshExperience = (updated: HostExperienceDetail) => {
+    setExperience(updated);
+  };
+
+  const handleAddSlot = async (payload: {
+    slotDate: string;
+    startTime: string;
+    endTime: string;
+    capacity: number;
+  }) => {
+    if (!accessToken) return;
+    setSlotBusy(true);
+    setPageError(null);
+    try {
+      const updated = await createHostSlotFn({
+        data: { accessToken, experienceId, ...payload },
+      });
+      refreshExperience(updated);
+    } catch (err) {
+      setPageError(err instanceof Error ? err.message : "Failed to add slot.");
+    } finally {
+      setSlotBusy(false);
+    }
+  };
+
+  const handleToggleBlock = async (slotId: string, isBlocked: boolean) => {
+    if (!accessToken) return;
+    setSlotBusy(true);
+    try {
+      const updated = await updateHostSlotFn({
+        data: { accessToken, experienceId, slotId, isBlocked },
+      });
+      refreshExperience(updated);
+    } catch (err) {
+      setPageError(err instanceof Error ? err.message : "Failed to update slot.");
+    } finally {
+      setSlotBusy(false);
+    }
+  };
+
+  const handleDeleteSlot = async (slotId: string) => {
+    if (!accessToken) return;
+    setSlotBusy(true);
+    try {
+      const updated = await deleteHostSlotFn({
+        data: { accessToken, experienceId, slotId },
+      });
+      refreshExperience(updated);
+    } catch (err) {
+      setPageError(err instanceof Error ? err.message : "Failed to delete slot.");
+    } finally {
+      setSlotBusy(false);
+    }
+  };
+
+  if (loading || !ready || !accessToken || pageLoading) {
+    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+  }
+
+  if (!experience) {
+    return (
+      <HostDashboardShell title="Experience" subtitle="">
+        <p className="text-destructive">{pageError ?? "Experience not found."}</p>
+        <Link to="/host/experiences" className="mt-4 inline-block text-ember hover:underline">
+          Back to experiences
+        </Link>
+      </HostDashboardShell>
+    );
+  }
+
+  const readOnly =
+    experience.status === "published" || experience.status === "pending_review";
+
+  return (
+    <HostDashboardShell
+      title={experience.title}
+      subtitle="Edit listing details and manage bookable slots."
+    >
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <ExperienceStatusBadge status={experience.status} />
+        <div className="flex gap-3">
+          <Link
+            to="/host/experiences"
+            className="rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-2 text-sm hover:border-ember/50"
+          >
+            Back
+          </Link>
+          {experience.status === "published" ? (
+            <Link
+              to="/experiences/$slug"
+              params={{ slug: experience.slug }}
+              className="rounded-sm border border-ember/40 px-4 py-2 text-sm text-ember hover:bg-ember/10"
+            >
+              View live page
+            </Link>
+          ) : null}
+          <button
+            type="button"
+            disabled={saving}
+            onClick={() => void handleDelete()}
+            className="rounded-sm border border-destructive/40 px-4 py-2 text-sm text-destructive disabled:opacity-50"
+          >
+            Delete / archive
+          </button>
+        </div>
+      </div>
+
+      {pageError ? (
+        <p className="mb-6 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {pageError}
+        </p>
+      ) : null}
+
+      {readOnly ? (
+        <p className="mb-6 text-sm text-muted-foreground">
+          {experience.status === "pending_review"
+            ? "This listing is awaiting admin review. You can still manage slots below."
+            : "Published listings cannot be edited here. Contact admin for content changes."}
+        </p>
+      ) : (
+        <HostExperienceForm
+          categories={categories}
+          cities={cities}
+          initial={experience}
+          readOnly={false}
+          saving={saving}
+          onSubmit={(payload) => void handleSave(payload)}
+        />
+      )}
+
+      <section className="mt-12">
+        <h2 className="font-display text-2xl">Slots</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Add session dates guests can book. Block slots instead of deleting when bookings exist.
+        </p>
+        <div className="mt-6">
+          <SlotManager
+            slots={experience.slots}
+            busy={slotBusy}
+            onAdd={(payload) => void handleAddSlot(payload)}
+            onToggleBlock={(slotId, isBlocked) => void handleToggleBlock(slotId, isBlocked)}
+            onDelete={(slotId) => void handleDeleteSlot(slotId)}
+          />
+        </div>
+      </section>
+    </HostDashboardShell>
+  );
+}

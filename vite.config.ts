@@ -14,15 +14,19 @@ import { loadEnv } from "vite";
 // (`dist/server/index.js`) that we can host on Vercel via a serverless function in `/api`.
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
+  // Vercel/CI inject vars into process.env — loadEnv alone only reads .env files.
+  const viteSupabaseUrl = env.VITE_SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "";
+  const viteSupabaseAnon = env.VITE_SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY ?? "";
+  const viteApiBaseUrl = env.VITE_API_BASE_URL ?? process.env.VITE_API_BASE_URL ?? "";
 
   return {
     cloudflare: false,
     vite: {
       envDir: process.cwd(),
       define: {
-        "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(env.VITE_SUPABASE_URL ?? ""),
-        "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(env.VITE_SUPABASE_ANON_KEY ?? ""),
-        "import.meta.env.VITE_API_BASE_URL": JSON.stringify(env.VITE_API_BASE_URL ?? ""),
+        "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(viteSupabaseUrl),
+        "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(viteSupabaseAnon),
+        "import.meta.env.VITE_API_BASE_URL": JSON.stringify(viteApiBaseUrl),
       },
       server: {
         port: 5173,

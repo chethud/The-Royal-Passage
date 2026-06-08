@@ -20,6 +20,7 @@ export type ExperienceRow = {
   description: string | null;
   category_slug: string;
   city: string;
+  city_slug: string | null;
   region: string | null;
   address: string | null;
   duration_minutes: number;
@@ -86,6 +87,7 @@ export function mapRowToExperience(exp: ExperienceRow, slots: SlotRow[]): Experi
     description: exp.description ?? "",
     category: categoryLabel,
     city: exp.city,
+    citySlug: exp.city_slug ?? undefined,
     address: exp.address ?? "",
     durationHours: exp.duration_minutes / 60,
     hostName: host?.display_name ?? "Host",

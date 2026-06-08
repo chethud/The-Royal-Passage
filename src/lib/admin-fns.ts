@@ -1,11 +1,31 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { isApiConfigured } from "@/lib/api/client";
-import { createHost, fetchManagedUsers, type ManagedUser } from "@/lib/api/admin";
+import {
+  createHost,
+  fetchManagedUsers,
+  fetchPendingExperiences,
+  publishExperience,
+  rejectExperience,
+  fetchAdminActivity,
+  fetchAdminBookings,
+  fetchAdminStats,
+  type AdminBookingRow,
+  type AdminExperienceSummary,
+  type AdminStats,
+  type AuditLogEntry,
+  type ManagedUser,
+} from "@/lib/api/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { UserRole } from "@/lib/roles";
 
-export type { ManagedUser };
+export type {
+  AdminBookingRow,
+  AdminExperienceSummary,
+  AdminStats,
+  AuditLogEntry,
+  ManagedUser,
+};
 
 async function requireAdmin(accessToken: string) {
   const supabase = getSupabaseAdmin();
@@ -148,4 +168,50 @@ export const createHostAccount = createServerFn({ method: "POST" })
       displayName: data.displayName,
       hostId: hostRow.id,
     };
+  });
+
+export const listPendingExperiences = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ accessToken: z.string().min(1) }))
+  .handler(async ({ data }): Promise<AdminExperienceSummary[]> => {
+    if (!isApiConfigured()) throw new Error("API is not configured.");
+    return fetchPendingExperiences(data.accessToken);
+  });
+
+export const approveExperience = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({ accessToken: z.string().min(1), experienceId: z.string().min(1) }),
+  )
+  .handler(async ({ data }): Promise<AdminExperienceSummary> => {
+    if (!isApiConfigured()) throw new Error("API is not configured.");
+    return publishExperience(data.accessToken, data.experienceId);
+  });
+
+export const getAdminStats = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ accessToken: z.string().min(1) }))
+  .handler(async ({ data }): Promise<AdminStats> => {
+    if (!isApiConfigured()) throw new Error("API is not configured.");
+    return fetchAdminStats(data.accessToken);
+  });
+
+export const listAdminBookings = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ accessToken: z.string().min(1) }))
+  .handler(async ({ data }): Promise<AdminBookingRow[]> => {
+    if (!isApiConfigured()) throw new Error("API is not configured.");
+    return fetchAdminBookings(data.accessToken);
+  });
+
+export const listAdminActivity = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ accessToken: z.string().min(1) }))
+  .handler(async ({ data }): Promise<AuditLogEntry[]> => {
+    if (!isApiConfigured()) throw new Error("API is not configured.");
+    return fetchAdminActivity(data.accessToken);
+  });
+
+export const rejectExperienceFn = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({ accessToken: z.string().min(1), experienceId: z.string().min(1) }),
+  )
+  .handler(async ({ data }): Promise<AdminExperienceSummary> => {
+    if (!isApiConfigured()) throw new Error("API is not configured.");
+    return rejectExperience(data.accessToken, data.experienceId);
   });

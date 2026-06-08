@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     supabase_url: str = ""
     supabase_service_role_key: str = ""
     cors_origins: str = "http://localhost:5173,http://localhost:8080,http://localhost:8081"
+    rate_limit_per_minute: int = 120
+    enable_api_docs: bool = False
 
     @property
     def supabase_configured(self) -> bool:

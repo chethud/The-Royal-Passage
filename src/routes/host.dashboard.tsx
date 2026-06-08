@@ -1,71 +1,126 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { ClipboardList, Sparkles } from "lucide-react";
-import { DashboardShell } from "@/components/auth/DashboardShell";
-import { useAuthUser } from "@/lib/auth-user";
-import { dashboardPathForRole } from "@/lib/roles";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
+import { HostDashboardShell } from "@/components/host/HostDashboardShell";
+import { HostStatsGrid } from "@/components/host/HostStatsGrid";
+import { HostTodayBookings } from "@/components/host/HostTodayBookings";
+import {
+  getHostDashboard,
+  listHostBookings,
+  type BookingSummary,
+  type HostDashboardStats,
+} from "@/lib/host-fns";
+import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/dashboard")({
   head: () => ({
     meta: [
-      { title: "Host dashboard — The Royal Passage" },
+      { title: "Host overview — The Royal Passage" },
       {
         name: "description",
-        content: "Manage the experiences you host — pottery, culinary, farm, and heritage sessions.",
+        content: "Today's sessions, pending confirmations, and revenue at a glance.",
       },
     ],
   }),
-  component: HostDashboardPage,
+  component: HostOverviewPage,
 });
 
-function HostDashboardPage() {
-  const navigate = useNavigate();
-  const { user, role, loading } = useAuthUser();
+function HostOverviewPage() {
+  const { accessToken, ready, loading } = useHostAccess();
+  const [stats, setStats] = useState<HostDashboardStats | null>(null);
+  const [todayBookings, setTodayBookings] = useState<BookingSummary[]>([]);
+  const [pendingBookings, setPendingBookings] = useState<BookingSummary[]>([]);
+  const [pageError, setPageError] = useState<string | null>(null);
+  const [pageLoading, setPageLoading] = useState(true);
+
+  const loadPage = useCallback(async () => {
+    if (!accessToken) return;
+    setPageLoading(true);
+    setPageError(null);
+    try {
+      const [dashboard, today, pending] = await Promise.all([
+        getHostDashboard({ data: { accessToken } }),
+        listHostBookings({ data: { accessToken, status: "today" } }),
+        listHostBookings({ data: { accessToken, status: "pending" } }),
+      ]);
+      setStats(dashboard);
+      setTodayBookings(today);
+      setPendingBookings(pending);
+    } catch (err) {
+      setPageError(err instanceof Error ? err.message : "Failed to load host dashboard.");
+    } finally {
+      setPageLoading(false);
+    }
+  }, [accessToken]);
 
   useEffect(() => {
-    if (loading) return;
-    if (!user) {
-      void navigate({ to: "/sign-in" });
-      return;
-    }
-    if (role && role !== "host") {
-      void navigate({ to: dashboardPathForRole(role) });
-    }
-  }, [loading, navigate, role, user]);
+    if (!ready) return;
+    void loadPage();
+  }, [loadPage, ready]);
 
-  if (loading || !user || role !== "host") {
+  if (loading || !ready) {
     return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
   }
 
   return (
-    <DashboardShell
-      role="host"
-      title="Host studio"
-      subtitle="You are a host — the local expert who offers experiences like pottery workshops, farm breakfasts, or palace walks."
+    <HostDashboardShell
+      title="Overview"
+      subtitle="Today's sessions, pending confirmations, and your week ahead."
     >
-      <div className="grid gap-4 sm:grid-cols-2">
-        <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6">
-          <Sparkles className="h-5 w-5 text-ember" />
-          <h2 className="mt-4 font-display text-2xl">Your experiences</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Draft, submit, and publish the sessions you host. Each listing is reviewed before it
-            goes live.
-          </p>
-        </article>
-        <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6">
-          <ClipboardList className="h-5 w-5 text-ember" />
-          <h2 className="mt-4 font-display text-2xl">Bookings & slots</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            See upcoming guest bookings and manage availability for your experiences.
-          </p>
-          <Link
-            to="/hosts"
-            className="mt-5 inline-flex rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.16em] text-foreground transition-colors hover:border-ember/60 hover:text-ember"
-          >
-            Host guidelines
-          </Link>
-        </article>
-      </div>
-    </DashboardShell>
+      {pageLoading ? (
+        <p className="text-sm text-muted-foreground">Loading overview…</p>
+      ) : pageError ? (
+        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {pageError}
+        </p>
+      ) : (
+        <div className="space-y-10">
+          {stats ? <HostStatsGrid stats={stats} /> : null}
+
+          <section>
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="font-display text-2xl">Today&apos;s sessions</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Confirmed and pending bookings happening today.
+                </p>
+              </div>
+              <Link
+                to="/host/bookings"
+                className="text-sm text-ember hover:underline"
+              >
+                View all bookings
+              </Link>
+            </div>
+            <div className="mt-6">
+              <HostTodayBookings bookings={todayBookings} />
+            </div>
+          </section>
+
+          <section>
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="font-display text-2xl">Pending confirmations</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Guest requests waiting for your response.
+                </p>
+              </div>
+              <Link
+                to="/host/bookings"
+                className="text-sm text-ember hover:underline"
+              >
+                Manage bookings
+              </Link>
+            </div>
+            <div className="mt-6">
+              {pendingBookings.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No pending requests right now.</p>
+              ) : (
+                <HostTodayBookings bookings={pendingBookings.slice(0, 5)} />
+              )}
+            </div>
+          </section>
+        </div>
+      )}
+    </HostDashboardShell>
   );
 }

@@ -21,7 +21,7 @@ async def get_current_user(
 
     profile = (
         supabase.table("profiles")
-        .select("role, full_name, phone, host_id")
+        .select("role, full_name, phone, host_id, created_at")
         .eq("id", user.id)
         .maybe_single()
         .execute()
@@ -31,10 +31,22 @@ async def get_current_user(
     if not row:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Profile not found.")
 
-    return {"user": user, "profile": row}
+    return {"user": user, "profile": row, "token": credentials.credentials}
 
 
 async def require_admin(auth=Depends(get_current_user)):
     if auth["profile"].get("role") != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required.")
+    return auth
+
+
+async def require_guest(auth=Depends(get_current_user)):
+    if auth["profile"].get("role") != "guest":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Guest access required.")
+    return auth
+
+
+async def require_host(auth=Depends(get_current_user)):
+    if auth["profile"].get("role") != "host":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Host access required.")
     return auth
