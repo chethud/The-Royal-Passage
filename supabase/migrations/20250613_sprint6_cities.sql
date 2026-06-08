@@ -1,4 +1,5 @@
 -- Sprint 6: Multi-city reference table + experience city_slug link
+-- Safe to re-run on existing databases.
 
 create table if not exists public.cities (
   slug text primary key,
@@ -14,7 +15,21 @@ create table if not exists public.cities (
 );
 
 alter table public.experiences
-  add column if not exists city_slug text references public.cities (slug);
+  add column if not exists city_slug text;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'experiences_city_slug_fkey'
+      and conrelid = 'public.experiences'::regclass
+  ) then
+    alter table public.experiences
+      add constraint experiences_city_slug_fkey
+      foreign key (city_slug) references public.cities (slug);
+  end if;
+end $$;
 
 create index if not exists idx_experiences_city_slug on public.experiences (city_slug);
 
@@ -84,7 +99,7 @@ on conflict (slug) do update set
 update public.experiences
 set city_slug = 'mysuru'
 where city_slug is null
-  and lower(city) in ('mysuru', 'mysore');
+  and lower(city) in ('mysuru', 'mysore', 'nanjangud');
 
 alter table public.cities enable row level security;
 

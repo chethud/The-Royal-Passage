@@ -1,7 +1,8 @@
 -- The Royal Passage — FULL project schema (PostgreSQL)
 -- Includes: profiles, hosts, experiences, COD bookings, wishlist, reviews, notifications, audit_logs, RLS, seed data.
 -- Paste into: Supabase Dashboard → SQL Editor → New query → Run
--- Safe to re-run: uses IF NOT EXISTS / ON CONFLICT / DROP POLICY IF EXISTS
+-- Safe to re-run on EXISTING databases: uses IF NOT EXISTS, ADD COLUMN IF NOT EXISTS,
+-- idempotent FK blocks, ON CONFLICT, and DROP POLICY IF EXISTS (upgrades old tables in place).
 -- Payment: Pay-at-venue (COD) only — no online payment gateway
 -- Seed UUIDs must be valid hex (0-9, a-f only); prefixes like "s1..." are invalid.
 --
@@ -143,7 +144,6 @@ create table if not exists public.experiences (
 
 create index if not exists idx_experiences_host on public.experiences (host_id);
 create index if not exists idx_experiences_city on public.experiences (city);
-create index if not exists idx_experiences_city_slug on public.experiences (city_slug);
 create index if not exists idx_experiences_category on public.experiences (category_slug);
 create index if not exists idx_experiences_status on public.experiences (status);
 
@@ -152,10 +152,29 @@ create trigger trg_experiences_updated
   before update on public.experiences
   for each row execute procedure public.set_updated_at();
 
+-- Upgrade existing experiences table (CREATE TABLE IF NOT EXISTS skips new columns on old DBs)
 alter table public.experiences
+  add column if not exists city_slug text,
   add column if not exists requirements text[] default '{}',
   add column if not exists min_guests_per_booking int default 1,
   add column if not exists max_guests_per_booking int default 10;
+
+-- FK for city_slug (idempotent)
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'experiences_city_slug_fkey'
+      and conrelid = 'public.experiences'::regclass
+  ) then
+    alter table public.experiences
+      add constraint experiences_city_slug_fkey
+      foreign key (city_slug) references public.cities (slug);
+  end if;
+end $$;
+
+create index if not exists idx_experiences_city_slug on public.experiences (city_slug);
 
 -- ---------------------------------------------------------------------------
 -- Slots: capacity and sold seats (overbooking prevention at application level)
@@ -216,23 +235,10 @@ create table if not exists public.bookings (
   updated_at timestamptz not null default now()
 );
 
-create index if not exists idx_bookings_slot on public.bookings (slot_id);
-create index if not exists idx_bookings_guest on public.bookings (guest_id);
-create index if not exists idx_bookings_experience on public.bookings (experience_id);
-create index if not exists idx_bookings_booking_status on public.bookings (booking_status);
-create index if not exists idx_bookings_payment_status on public.bookings (payment_status);
-
-drop trigger if exists trg_bookings_updated on public.bookings;
-create trigger trg_bookings_updated
-  before update on public.bookings
-  for each row execute procedure public.set_updated_at();
-
--- ---------------------------------------------------------------------------
--- Upgrade existing bookings table (safe if columns already exist)
--- ---------------------------------------------------------------------------
+-- Upgrade existing bookings table (CREATE TABLE IF NOT EXISTS skips new columns on old DBs)
 alter table public.bookings
-  add column if not exists experience_id uuid references public.experiences (id) on delete restrict,
-  add column if not exists guest_id uuid references public.profiles (id) on delete set null,
+  add column if not exists experience_id uuid,
+  add column if not exists guest_id uuid,
   add column if not exists participant_count int,
   add column if not exists total_amount int,
   add column if not exists payment_method text default 'cod',
@@ -243,6 +249,63 @@ alter table public.bookings
   add column if not exists completed_at timestamptz,
   add column if not exists cancelled_at timestamptz,
   add column if not exists cancelled_by text;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'bookings_experience_id_fkey'
+      and conrelid = 'public.bookings'::regclass
+  ) then
+    alter table public.bookings
+      add constraint bookings_experience_id_fkey
+      foreign key (experience_id) references public.experiences (id) on delete restrict;
+  end if;
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'bookings_guest_id_fkey'
+      and conrelid = 'public.bookings'::regclass
+  ) then
+    alter table public.bookings
+      add constraint bookings_guest_id_fkey
+      foreign key (guest_id) references public.profiles (id) on delete set null;
+  end if;
+end $$;
+
+-- Backfill COD columns from legacy bookings data
+update public.bookings
+set
+  participant_count = coalesce(participant_count, guest_count),
+  total_amount = coalesce(total_amount, subtotal_minor),
+  guest_id = coalesce(guest_id, customer_user_id),
+  experience_id = coalesce(
+    experience_id,
+    (select es.experience_id from public.experience_slots es where es.id = bookings.slot_id)
+  )
+where participant_count is null
+   or total_amount is null
+   or experience_id is null
+   or guest_id is null;
+
+update public.bookings
+set booking_status = case
+  when status in ('confirmed') then 'confirmed'
+  when status in ('completed') then 'completed'
+  when status like 'cancelled%' then 'cancelled'
+  else 'pending'
+end
+where booking_status = 'pending' and status is not null and status <> 'pending_payment';
+
+create index if not exists idx_bookings_slot on public.bookings (slot_id);
+create index if not exists idx_bookings_guest on public.bookings (guest_id);
+create index if not exists idx_bookings_experience on public.bookings (experience_id);
+create index if not exists idx_bookings_booking_status on public.bookings (booking_status);
+create index if not exists idx_bookings_payment_status on public.bookings (payment_status);
+
+drop trigger if exists trg_bookings_updated on public.bookings;
+create trigger trg_bookings_updated
+  before update on public.bookings
+  for each row execute procedure public.set_updated_at();
 
 -- ---------------------------------------------------------------------------
 -- Atomic seat reservation (prevents overbooking)
@@ -316,16 +379,52 @@ create table if not exists public.reviews (
   constraint uq_review_booking unique (booking_id)
 );
 
-create index if not exists idx_reviews_experience on public.reviews (experience_id);
-create index if not exists idx_reviews_guest on public.reviews (guest_id);
-create index if not exists idx_reviews_status on public.reviews (status);
-
+-- Upgrade existing reviews table (CREATE TABLE IF NOT EXISTS skips new columns on old DBs)
 alter table public.reviews
-  add column if not exists guest_id uuid references public.profiles (id) on delete set null,
+  add column if not exists booking_id uuid,
+  add column if not exists guest_id uuid,
   add column if not exists host_reply text,
   add column if not exists host_replied_at timestamptz,
   add column if not exists is_verified boolean default false,
   add column if not exists status text default 'published';
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'reviews_booking_id_fkey'
+      and conrelid = 'public.reviews'::regclass
+  ) then
+    alter table public.reviews
+      add constraint reviews_booking_id_fkey
+      foreign key (booking_id) references public.bookings (id) on delete set null;
+  end if;
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'reviews_guest_id_fkey'
+      and conrelid = 'public.reviews'::regclass
+  ) then
+    alter table public.reviews
+      add constraint reviews_guest_id_fkey
+      foreign key (guest_id) references public.profiles (id) on delete set null;
+  end if;
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'uq_review_booking'
+      and conrelid = 'public.reviews'::regclass
+  ) then
+    alter table public.reviews
+      add constraint uq_review_booking unique (booking_id);
+  end if;
+end $$;
+
+update public.reviews
+set status = 'published'
+where status is null;
+
+create index if not exists idx_reviews_experience on public.reviews (experience_id);
+create index if not exists idx_reviews_guest on public.reviews (guest_id);
+create index if not exists idx_reviews_status on public.reviews (status);
 
 -- Keep experience ratings in sync with published reviews
 create or replace function public.refresh_experience_rating()
@@ -563,6 +662,12 @@ insert into public.cities (slug, name, region, state, tagline, description, sort
    'Mist, tea, and mountain calm',
    'Tea estate visits, botanical walks, and slow Nilgiri experiences for mindful travellers.', 60)
 on conflict (slug) do nothing;
+
+-- Backfill city_slug on experiences created before Sprint 6
+update public.experiences
+set city_slug = 'mysuru'
+where city_slug is null
+  and lower(city) in ('mysuru', 'mysore', 'nanjangud');
 
 insert into public.experience_categories (slug, label, sort_order) values
   ('art_craft', 'Art & Craft', 10),

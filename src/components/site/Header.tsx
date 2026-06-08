@@ -2,6 +2,9 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { LogOut, Menu, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
+import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav";
+import { GUEST_NAV_ITEMS } from "@/components/guest/guest-nav";
+import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,12 +23,12 @@ import {
 } from "@/components/ui/sheet";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useAuthUser } from "@/lib/auth-user";
-import { dashboardPathForRole } from "@/lib/roles";
+import { dashboardPathForRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 type NavItem = { label: string; to: string };
 
-const navItems: NavItem[] = [
+const publicNavItems: NavItem[] = [
   { label: "Experiences", to: "/experiences" },
   { label: "Cities", to: "/cities" },
   { label: "Curated Journeys", to: "/experiences" },
@@ -34,6 +37,17 @@ const navItems: NavItem[] = [
   { label: "Gallery", to: "/experiences" },
   { label: "Contact", to: "/contact" },
 ];
+
+function navItemsForUser(role: UserRole | null | undefined, signedIn: boolean): NavItem[] {
+  if (!signedIn || !role) return publicNavItems;
+  if (role === "admin") {
+    return ADMIN_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
+  }
+  if (role === "host") {
+    return HOST_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
+  }
+  return GUEST_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
+}
 
 const navLinkClass =
   "rounded-sm px-1 py-1 text-ink/80 transition-colors hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60";
@@ -47,6 +61,8 @@ export function Header() {
   const dashboardPath = role ? dashboardPathForRole(role) : "/sign-in";
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
+  const navItems = navItemsForUser(role, Boolean(user));
+  const showPublicExtras = !user;
 
   useEffect(() => {
     const onScroll = () => setElevated(window.scrollY > 20);
@@ -73,9 +89,9 @@ export function Header() {
     >
       <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-3 sm:gap-6">
         <Link
-          to="/"
+          to={user ? dashboardPath : "/"}
           className="flex shrink-0 items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember/60"
-          aria-label="The Royal Passage — Home"
+          aria-label={user ? "Go to dashboard" : "The Royal Passage — Home"}
         >
           <img
             src={logoUrl}
@@ -91,7 +107,7 @@ export function Header() {
         <nav className="hidden items-center gap-5 text-[0.72rem] font-medium uppercase tracking-[0.14em] md:flex lg:gap-7 lg:text-[0.76rem] lg:tracking-[0.16em]">
           {navItems.map((item) => (
             <Link
-              key={item.label}
+              key={`${item.to}-${item.label}`}
               to={item.to as "/experiences"}
               className={navLinkClass}
               activeProps={{ className: "text-ember" }}
@@ -100,48 +116,55 @@ export function Header() {
             </Link>
           ))}
 
-          <Link to="/experiences" className={navLinkClass} activeProps={{ className: "text-ember" }}>
-            Book an Experience
-          </Link>
-
-          {!user ? (
-            <Link to="/sign-in" className={navLinkClass} activeProps={{ className: "text-ember" }}>
-              Sign in
-            </Link>
+          {showPublicExtras ? (
+            <>
+              <Link
+                to="/experiences"
+                className={navLinkClass}
+                activeProps={{ className: "text-ember" }}
+              >
+                Book an Experience
+              </Link>
+              <Link to="/sign-in" className={navLinkClass} activeProps={{ className: "text-ember" }}>
+                Sign in
+              </Link>
+            </>
           ) : (
             <>
               <NotificationBell />
               <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button type="button" className={navLinkClass}>
-                  {displayName ?? "Account"}
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem asChild>
-                  <Link to={dashboardPath} className="cursor-pointer">
-                    <UserRound className="h-4 w-4" />
-                    Dashboard
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/sign-in" className="cursor-pointer">
-                    Account settings
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={() => {
-                    void handleLogout();
-                  }}
-                  disabled={loggingOut}
-                  className="cursor-pointer text-destructive focus:text-destructive"
-                >
-                  <LogOut className="h-4 w-4" />
-                  {loggingOut ? "Logging out..." : "Logout"}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button type="button" className={navLinkClass}>
+                    {displayName ?? "Account"}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem asChild>
+                    <Link to={dashboardPath} className="cursor-pointer">
+                      <UserRound className="h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  {role === "guest" ? (
+                    <DropdownMenuItem asChild>
+                      <Link to="/experiences" className="cursor-pointer">
+                        Browse experiences
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : null}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      void handleLogout();
+                    }}
+                    disabled={loggingOut}
+                    className="cursor-pointer text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    {loggingOut ? "Logging out..." : "Logout"}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           )}
         </nav>
@@ -166,26 +189,40 @@ export function Header() {
             </SheetHeader>
             <div className="mt-8 flex flex-col gap-1">
               {navItems.map((item) => (
-                <SheetClose asChild key={item.label}>
+                <SheetClose asChild key={`${item.to}-${item.label}`}>
                   <Link to={item.to as "/experiences"} className={sheetLinkClass}>
                     {item.label}
                   </Link>
                 </SheetClose>
               ))}
 
-              <SheetClose asChild>
-                <Link to="/experiences" className={sheetLinkClass}>
-                  Book an Experience
-                </Link>
-              </SheetClose>
-
-              {user ? (
+              {showPublicExtras ? (
+                <>
+                  <SheetClose asChild>
+                    <Link to="/experiences" className={sheetLinkClass}>
+                      Book an Experience
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link to="/sign-in" className={sheetLinkClass}>
+                      Sign in
+                    </Link>
+                  </SheetClose>
+                </>
+              ) : (
                 <>
                   <SheetClose asChild>
                     <Link to={dashboardPath} className={sheetLinkClass}>
                       {displayName ?? "Account"}
                     </Link>
                   </SheetClose>
+                  {role === "guest" ? (
+                    <SheetClose asChild>
+                      <Link to="/experiences" className={sheetLinkClass}>
+                        Browse experiences
+                      </Link>
+                    </SheetClose>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => {
@@ -198,12 +235,6 @@ export function Header() {
                     {loggingOut ? "Logging out..." : "Logout"}
                   </button>
                 </>
-              ) : (
-                <SheetClose asChild>
-                  <Link to="/sign-in" className={sheetLinkClass}>
-                    Sign in
-                  </Link>
-                </SheetClose>
               )}
             </div>
           </SheetContent>
