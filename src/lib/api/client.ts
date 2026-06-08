@@ -1,13 +1,37 @@
-function readApiBaseUrl(): string {
-  const fromImport = import.meta.env.VITE_API_BASE_URL as string | undefined;
-  if (fromImport?.trim()) return fromImport.trim().replace(/\/$/, "");
+const PRODUCTION_API_BASE_URL = "https://the-royal-passage.onrender.com";
 
-  if (typeof process !== "undefined") {
-    const fromProcess = process.env.VITE_API_BASE_URL;
-    if (fromProcess?.trim()) return fromProcess.trim().replace(/\/$/, "");
+function isLocalHostname(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
+}
+
+function resolveApiBaseUrl(raw: string | undefined): string {
+  if (!raw?.trim()) return "";
+  return raw.trim().replace(/\/$/, "");
+}
+
+function productionFallback(): string {
+  if (typeof window === "undefined") return "";
+  if (isLocalHostname(window.location.hostname)) return "";
+  return PRODUCTION_API_BASE_URL;
+}
+
+function readApiBaseUrl(): string {
+  const fromImport = resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL as string | undefined);
+  if (fromImport) {
+    if (typeof window !== "undefined" && fromImport.includes("localhost")) {
+      if (!isLocalHostname(window.location.hostname)) {
+        return productionFallback() || fromImport;
+      }
+    }
+    return fromImport;
   }
 
-  return "";
+  if (typeof process !== "undefined") {
+    const fromProcess = resolveApiBaseUrl(process.env.VITE_API_BASE_URL);
+    if (fromProcess) return fromProcess;
+  }
+
+  return productionFallback();
 }
 
 export function isApiConfigured(): boolean {
@@ -73,10 +97,20 @@ export async function apiFetch<T>(
     headers.set("Authorization", `Bearer ${options.accessToken}`);
   }
 
-  const response = await fetch(`${base}${path}`, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${base}${path}`, {
+      ...options,
+      headers,
+    });
+  } catch (err) {
+    if (err instanceof TypeError && err.message === "Failed to fetch") {
+      throw new Error(
+        `Cannot reach the API at ${base}. Set VITE_API_BASE_URL=https://the-royal-passage.onrender.com on Vercel and confirm the Render backend is running.`,
+      );
+    }
+    throw err;
+  }
 
   if (!response.ok) {
     let detail = response.statusText;
