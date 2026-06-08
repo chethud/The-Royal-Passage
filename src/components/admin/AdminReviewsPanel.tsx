@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { StarRating } from "@/components/reviews/StarRating";
-import { hideReview, listAdminReviews, type ReviewSummary } from "@/lib/review-fns";
+import { fetchAdminReviews, hideAdminReview, type ReviewSummary } from "@/lib/api/reviews";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 
 type AdminReviewsPanelProps = {
   accessToken: string;
@@ -16,10 +17,13 @@ export function AdminReviewsPanel({ accessToken }: AdminReviewsPanelProps) {
     setLoading(true);
     setError(null);
     try {
-      const rows = await listAdminReviews({ data: { accessToken } });
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
+      const rows = await fetchAdminReviews(accessToken);
       setReviews(rows);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load reviews.");
+      setError(toErrorMessage(err, "Failed to load reviews."));
     } finally {
       setLoading(false);
     }
@@ -32,10 +36,10 @@ export function AdminReviewsPanel({ accessToken }: AdminReviewsPanelProps) {
   const handleHide = async (reviewId: string) => {
     setBusyId(reviewId);
     try {
-      await hideReview({ data: { accessToken, reviewId } });
+      await hideAdminReview(accessToken, reviewId);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to hide review.");
+      setError(toErrorMessage(err, "Failed to hide review."));
     } finally {
       setBusyId(null);
     }

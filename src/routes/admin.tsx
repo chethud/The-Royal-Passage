@@ -10,13 +10,14 @@ import { ManagedUsersPanel } from "@/components/admin/ManagedUsersPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import {
-  getAdminStats,
-  listAdminActivity,
-  listAdminBookings,
+  fetchAdminActivity,
+  fetchAdminBookings,
+  fetchAdminStats,
   type AdminBookingRow,
   type AdminStats,
   type AuditLogEntry,
-} from "@/lib/admin-fns";
+} from "@/lib/api/admin";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { dashboardPathForRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { NOINDEX_META } from "@/lib/seo-helpers";
@@ -68,16 +69,19 @@ function AdminDashboardPage() {
     setAnalyticsLoading(true);
     setAnalyticsError(null);
     try {
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
       const [statsRow, bookingRows, activityRows] = await Promise.all([
-        getAdminStats({ data: { accessToken } }),
-        listAdminBookings({ data: { accessToken } }),
-        listAdminActivity({ data: { accessToken } }),
+        fetchAdminStats(accessToken),
+        fetchAdminBookings(accessToken),
+        fetchAdminActivity(accessToken),
       ]);
       setStats(statsRow);
       setBookings(bookingRows);
       setActivity(activityRows);
     } catch (err) {
-      setAnalyticsError(err instanceof Error ? err.message : "Failed to load analytics.");
+      setAnalyticsError(toErrorMessage(err, "Failed to load analytics."));
     } finally {
       setAnalyticsLoading(false);
     }

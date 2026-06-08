@@ -27,9 +27,10 @@ async function getRedis<T>(key: string): Promise<T | null> {
   const url = `${base}/get/${encodeURIComponent(key)}`;
   const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
   if (!res.ok) return null;
-  const body = (await res.json()) as { result?: string | null };
-  if (!body.result) return null;
-  return JSON.parse(body.result) as T;
+  const body = (await res.json()) as { result?: string | Record<string, unknown> | null };
+  if (body.result == null) return null;
+  if (typeof body.result === "string") return JSON.parse(body.result) as T;
+  return body.result as T;
 }
 
 async function setRedis<T>(key: string, value: T, ttlSeconds: number): Promise<void> {

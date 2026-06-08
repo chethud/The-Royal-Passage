@@ -14,6 +14,20 @@ export function isApiConfigured(): boolean {
   return Boolean(readApiBaseUrl());
 }
 
+export function toErrorMessage(err: unknown, fallback = "Request failed."): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === "string" && err.trim()) return err.trim();
+  if (err && typeof err === "object" && "message" in err) {
+    const message = (err as { message?: unknown }).message;
+    if (typeof message === "string" && message.trim()) return message.trim();
+  }
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return fallback;
+  }
+}
+
 function formatApiDetail(detail: unknown): string | null {
   if (detail == null) return null;
   if (typeof detail === "string") return detail;

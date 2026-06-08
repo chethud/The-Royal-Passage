@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusBadge";
 import {
-  approveExperience,
-  listPendingExperiences,
-  rejectExperienceFn,
+  fetchPendingExperiences,
+  publishExperience,
+  rejectExperience,
   type AdminExperienceSummary,
-} from "@/lib/admin-fns";
+} from "@/lib/api/admin";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { formatDateLong } from "@/lib/date-format";
 
 type AdminExperienceQueueProps = {
@@ -23,10 +24,13 @@ export function AdminExperienceQueue({ accessToken, refreshKey = 0 }: AdminExper
     setLoading(true);
     setError(null);
     try {
-      const data = await listPendingExperiences({ data: { accessToken } });
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
+      const data = await fetchPendingExperiences(accessToken);
       setRows(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load pending experiences.");
+      setError(toErrorMessage(err, "Failed to load pending experiences."));
     } finally {
       setLoading(false);
     }
@@ -38,17 +42,15 @@ export function AdminExperienceQueue({ accessToken, refreshKey = 0 }: AdminExper
 
   const runAction = async (
     experienceId: string,
-    action: (input: {
-      data: { accessToken: string; experienceId: string };
-    }) => Promise<AdminExperienceSummary>,
+    action: (token: string, id: string) => Promise<AdminExperienceSummary>,
   ) => {
     setBusyId(experienceId);
     setError(null);
     try {
-      await action({ data: { accessToken, experienceId } });
+      await action(accessToken, experienceId);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Action failed.");
+      setError(toErrorMessage(err, "Action failed."));
     } finally {
       setBusyId(null);
     }
@@ -91,7 +93,7 @@ export function AdminExperienceQueue({ accessToken, refreshKey = 0 }: AdminExper
                   type="button"
                   disabled={busyId === row.id}
                   className={btn}
-                  onClick={() => void runAction(row.id, approveExperience)}
+                  onClick={() => void runAction(row.id, publishExperience)}
                 >
                   Publish
                 </button>
@@ -99,7 +101,7 @@ export function AdminExperienceQueue({ accessToken, refreshKey = 0 }: AdminExper
                   type="button"
                   disabled={busyId === row.id}
                   className={`${btn} border-destructive/40 text-destructive`}
-                  onClick={() => void runAction(row.id, rejectExperienceFn)}
+                  onClick={() => void runAction(row.id, rejectExperience)}
                 >
                   Reject
                 </button>

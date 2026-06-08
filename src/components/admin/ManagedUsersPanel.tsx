@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { RoleBadge } from "@/components/auth/RoleBadge";
-import { listManagedUsers, type ManagedUser } from "@/lib/admin-fns";
+import { fetchManagedUsers, type ManagedUser } from "@/lib/api/admin";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { ROLE_LABELS } from "@/lib/roles";
 
 type ManagedUsersPanelProps = {
@@ -18,10 +19,13 @@ export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanel
     setLoading(true);
     setError(null);
     try {
-      const rows = await listManagedUsers({ data: { accessToken } });
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
+      const rows = await fetchManagedUsers(accessToken);
       setUsers(rows);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load users.");
+      setError(toErrorMessage(err, "Failed to load users."));
     } finally {
       setLoading(false);
     }

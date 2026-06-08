@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { createHostAccount } from "@/lib/admin-fns";
+import { createHost } from "@/lib/api/admin";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 
 const inputClass =
   "w-full rounded-sm border border-input bg-background/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
@@ -26,15 +27,15 @@ export function CreateHostForm({ accessToken, onCreated }: CreateHostFormProps) 
     setNotice(null);
 
     try {
-      await createHostAccount({
-        data: {
-          accessToken,
-          displayName: displayName.trim(),
-          email: email.trim(),
-          password,
-          phone: phone.trim() || undefined,
-          bio: bio.trim() || undefined,
-        },
+      if (!isApiConfigured()) {
+        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+      }
+      await createHost(accessToken, {
+        displayName: displayName.trim(),
+        email: email.trim(),
+        password,
+        phone: phone.trim() || undefined,
+        bio: bio.trim() || undefined,
       });
       setNotice(`Host login created for ${email.trim()}. Share these credentials with the provider.`);
       setDisplayName("");
@@ -44,7 +45,7 @@ export function CreateHostForm({ accessToken, onCreated }: CreateHostFormProps) 
       setBio("");
       onCreated();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create host account.");
+      setError(toErrorMessage(err, "Failed to create host account."));
     } finally {
       setBusy(false);
     }
