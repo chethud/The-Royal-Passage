@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { lazy, Suspense, useState } from "react";
+import { useState } from "react";
 import { ArrowRight, Play } from "lucide-react";
 import heroPalaceImg from "@/assets/hero-image.png";
 import heroDinnerImg from "@/assets/hero.jpg";
@@ -9,8 +9,6 @@ import expCraftImg from "@/assets/exp-craft.jpg";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { HeroSlideshow } from "@/components/site/HeroSlideshow";
 import { ClocheIcon, CrownIcon, LotusBudIcon, LotusIcon } from "@/components/site/PillarIcons";
-
-const RippleGrid = lazy(() => import("@/components/effects/RippleGrid"));
 
 const softEase = [0.22, 1, 0.36, 1] as const;
 
@@ -61,27 +59,6 @@ export function HomeHero() {
           aria-hidden
         />
       </div>
-
-      {!reduceMotion && (
-        <div className="pointer-events-none absolute inset-0 z-[1] opacity-50">
-          <Suspense fallback={null}>
-            <RippleGrid
-              enableRainbow={false}
-              gridColor="#d4af37"
-              rippleIntensity={0.04}
-              gridSize={8.5}
-              gridThickness={11}
-              fadeDistance={1.4}
-              vignetteStrength={2.4}
-              glowIntensity={0.1}
-              opacity={0.28}
-              gridRotation={6}
-              mouseInteraction
-              mouseInteractionRadius={1.1}
-            />
-          </Suspense>
-        </div>
-      )}
 
       {/* CONTENT */}
       <div className="container-page relative z-10 flex min-h-[max(640px,100dvh)] flex-col justify-center pt-[var(--header-height)]">
