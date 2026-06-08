@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { User } from "@supabase/supabase-js";
-import { ensureUserProfile, fetchUserProfile, type UserProfile } from "@/lib/profiles";
-import { readIntendedRole, type UserRole } from "@/lib/roles";
+import { ensureGuestProfile, fetchUserProfile, type UserProfile } from "@/lib/profiles";
+import type { UserRole } from "@/lib/roles";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
 const USER_CACHE_KEY = "rp_auth_user_v1";
@@ -63,11 +63,7 @@ async function loadProfileForUser(user: User): Promise<UserProfile | null> {
 
   const profile =
     (await fetchUserProfile(supabase, user.id)) ??
-    (await ensureUserProfile(supabase, user.id, {
-      intendedRole: readIntendedRole(),
-      fullName,
-      phone,
-    }));
+    (await ensureGuestProfile(supabase, user.id, { fullName, phone }));
 
   return profile;
 }

@@ -235,12 +235,12 @@ create policy "profiles_select_own"
 
 create policy "profiles_insert_own"
   on public.profiles for insert to authenticated
-  with check (auth.uid() = id and role in ('guest', 'host'));
+  with check (auth.uid() = id and role = 'guest');
 
 create policy "profiles_update_own"
   on public.profiles for update to authenticated
-  using (auth.uid() = id)
-  with check (auth.uid() = id and role in ('guest', 'host'));
+  using (auth.uid() = id and role = 'guest')
+  with check (auth.uid() = id and role = 'guest');
 
 create policy "hosts_select_all"
   on public.hosts for select to anon, authenticated
@@ -277,22 +277,13 @@ language plpgsql
 security definer
 set search_path = public
 as $$
-declare
-  intended text;
-  assigned_role text;
 begin
-  intended := coalesce(new.raw_user_meta_data->>'intended_role', 'guest');
-  assigned_role := case
-    when intended = 'host' then 'host'
-    else 'guest'
-  end;
-
   insert into public.profiles (id, full_name, phone, role)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'),
     new.raw_user_meta_data->>'phone',
-    assigned_role
+    'guest'
   )
   on conflict (id) do nothing;
 

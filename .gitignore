@@ -26,6 +26,11 @@ dist-ssr
 # Vercel
 .vercel
 
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
 
 # Editor directories and files
 .vscode/*

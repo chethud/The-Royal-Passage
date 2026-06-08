@@ -33,6 +33,12 @@ const navItems: NavItem[] = [
   { label: "Contact", to: "/contact" },
 ];
 
+const navLinkClass =
+  "rounded-sm px-1 py-1 text-ink/80 transition-colors hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60";
+
+const sheetLinkClass =
+  "rounded-sm px-3 py-2.5 text-sm uppercase tracking-[0.16em] text-ink/85 hover:bg-white/5 hover:text-ember";
+
 export function Header() {
   const [elevated, setElevated] = useState(false);
   const { displayName, user, role } = useAuthUser();
@@ -85,38 +91,33 @@ export function Header() {
             <Link
               key={item.label}
               to={item.to as "/experiences"}
-              className="rounded-sm px-1 py-1 text-ink/80 transition-colors hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60"
+              className={navLinkClass}
               activeProps={{ className: "text-ember" }}
             >
               {item.label}
             </Link>
           ))}
-        </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Link
-            to="/experiences"
-            className="hidden items-center rounded-sm bg-ember px-3.5 py-2 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:inline-flex md:px-4 md:py-2.5 md:text-[0.66rem] lg:px-5 lg:text-[0.7rem] lg:tracking-[0.18em]"
-          >
+          <Link to="/experiences" className={navLinkClass} activeProps={{ className: "text-ember" }}>
             Book an Experience
           </Link>
 
-          {user ? (
+          {!user ? (
+            <Link to="/sign-in" className={navLinkClass} activeProps={{ className: "text-ember" }}>
+              Sign in
+            </Link>
+          ) : (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  aria-label={displayName ? `Account menu for ${displayName}` : "Account menu"}
-                  className="hidden h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] text-ink transition-colors hover:border-ember/60 hover:text-ember sm:inline-flex"
-                >
-                  <UserRound className="h-4 w-4" />
+                <button type="button" className={navLinkClass}>
+                  {displayName ?? "Account"}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem asChild>
                   <Link to={dashboardPath} className="cursor-pointer">
                     <UserRound className="h-4 w-4" />
-                    {displayName ?? "Dashboard"}
+                    Dashboard
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -137,87 +138,71 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : null}
+          )}
+        </nav>
 
-          <Sheet>
-            <SheetTrigger asChild>
-              <button
-                type="button"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.32)] text-ink transition-colors hover:border-ember/60 hover:text-ember"
-                aria-label="Open menu"
-              >
-                <Menu className="h-5 w-5" />
-              </button>
-            </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="w-[88vw] border-[oklch(0.72_0.09_78_/_0.22)] bg-[oklch(0.14_0.05_22)] text-foreground sm:max-w-md"
+        <Sheet>
+          <SheetTrigger asChild>
+            <button
+              type="button"
+              className={`${navLinkClass} inline-flex md:hidden`}
+              aria-label="Open menu"
             >
-              <SheetHeader>
-                <SheetTitle className="font-display text-xl">The Royal Passage</SheetTitle>
-                <SheetDescription className="sr-only">Site navigation menu</SheetDescription>
-              </SheetHeader>
-              <div className="mt-8 flex flex-col gap-1">
-                {navItems.map((item) => (
-                  <SheetClose asChild key={item.label}>
-                    <Link
-                      to={item.to as "/experiences"}
-                      className="rounded-sm px-3 py-2.5 text-sm uppercase tracking-[0.16em] text-ink/85 hover:bg-white/5 hover:text-ember"
-                    >
-                      {item.label}
-                    </Link>
-                  </SheetClose>
-                ))}
-
-                <div className="my-4 h-px bg-border/60" />
-
-                <SheetClose asChild>
-                  <Link
-                    to="/experiences"
-                    className="inline-flex items-center justify-center rounded-sm bg-ember px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground shadow-[var(--shadow-gold)]"
-                  >
-                    Book an Experience
+              <Menu className="h-5 w-5" />
+            </button>
+          </SheetTrigger>
+          <SheetContent
+            side="right"
+            className="w-[88vw] border-[oklch(0.72_0.09_78_/_0.22)] bg-[oklch(0.14_0.05_22)] text-foreground sm:max-w-md"
+          >
+            <SheetHeader>
+              <SheetTitle className="font-display text-xl">The Royal Passage</SheetTitle>
+              <SheetDescription className="sr-only">Site navigation menu</SheetDescription>
+            </SheetHeader>
+            <div className="mt-8 flex flex-col gap-1">
+              {navItems.map((item) => (
+                <SheetClose asChild key={item.label}>
+                  <Link to={item.to as "/experiences"} className={sheetLinkClass}>
+                    {item.label}
                   </Link>
                 </SheetClose>
+              ))}
 
-                {user ? (
+              <SheetClose asChild>
+                <Link to="/experiences" className={sheetLinkClass}>
+                  Book an Experience
+                </Link>
+              </SheetClose>
+
+              {user ? (
+                <>
+                  <SheetClose asChild>
+                    <Link to={dashboardPath} className={sheetLinkClass}>
+                      {displayName ?? "Account"}
+                    </Link>
+                  </SheetClose>
                   <button
                     type="button"
                     onClick={() => {
                       void handleLogout();
                     }}
                     disabled={loggingOut}
-                    className="mt-2 inline-flex items-center gap-2 rounded-sm px-3 py-2.5 text-left text-sm text-destructive hover:bg-white/5 disabled:opacity-70"
+                    className="inline-flex items-center gap-2 rounded-sm px-3 py-2.5 text-left text-sm text-destructive hover:bg-white/5 disabled:opacity-70"
                   >
                     <LogOut className="h-4 w-4" />
                     {loggingOut ? "Logging out..." : "Logout"}
                   </button>
-                ) : (
-                  <>
-                    <SheetClose asChild>
-                      <Link
-                        to="/sign-in"
-                        search={{ role: "guest" }}
-                        className="mt-2 rounded-sm px-3 py-2.5 text-sm text-ink/80 hover:bg-white/5 hover:text-ember"
-                      >
-                        Sign in as guest
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        to="/sign-in"
-                        search={{ role: "host" }}
-                        className="rounded-sm px-3 py-2.5 text-sm text-ink/80 hover:bg-white/5 hover:text-ember"
-                      >
-                        Sign in as host
-                      </Link>
-                    </SheetClose>
-                  </>
-                )}
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
+                </>
+              ) : (
+                <SheetClose asChild>
+                  <Link to="/sign-in" className={sheetLinkClass}>
+                    Sign in
+                  </Link>
+                </SheetClose>
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );

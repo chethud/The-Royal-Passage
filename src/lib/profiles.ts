@@ -41,16 +41,14 @@ export async function fetchUserProfile(
   return mapProfile(data as ProfileRow);
 }
 
-/** Creates a profile row when the Supabase trigger has not run yet (e.g. fresh local DB). */
-export async function ensureUserProfile(
+/** Self-registration always creates a guest profile. Host/admin accounts are created by admin. */
+export async function ensureGuestProfile(
   supabase: SupabaseClient,
   userId: string,
-  options: { intendedRole: UserRole; fullName?: string; phone?: string },
+  options: { fullName?: string; phone?: string },
 ): Promise<UserProfile | null> {
   const existing = await fetchUserProfile(supabase, userId);
   if (existing) return existing;
-
-  const role = options.intendedRole === "admin" ? "guest" : options.intendedRole;
 
   const { data, error } = await supabase
     .from("profiles")
@@ -58,7 +56,7 @@ export async function ensureUserProfile(
       id: userId,
       full_name: options.fullName?.trim() || null,
       phone: options.phone?.trim() || null,
-      role,
+      role: "guest",
     })
     .select("id, full_name, phone, role, host_id")
     .single();

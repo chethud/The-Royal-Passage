@@ -25,7 +25,7 @@ function HostDashboardPage() {
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      void navigate({ to: "/sign-in", search: { role: "host" } });
+      void navigate({ to: "/sign-in" });
       return;
     }
     if (role && role !== "host") {

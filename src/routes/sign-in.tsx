@@ -1,32 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { RoleBadge } from "@/components/auth/RoleBadge";
-import { RoleSelector } from "@/components/auth/RoleSelector";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useAuthUser } from "@/lib/auth-user";
-import {
-  dashboardPathForRole,
-  isUserRole,
-  readIntendedRole,
-  ROLE_LABELS,
-  writeIntendedRole,
-  type UserRole,
-} from "@/lib/roles";
+import { dashboardPathForRole, ROLE_LABELS } from "@/lib/roles";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
-type Search = {
-  role?: UserRole;
-};
+const inputClass =
+  "w-full rounded-sm border border-input bg-background/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
 
 export const Route = createFileRoute("/sign-in")({
-  validateSearch: (s: Record<string, unknown>): Search => ({
-    role: isUserRole(s.role) ? s.role : undefined,
-  }),
   head: () => ({
     meta: [
       { title: "Sign in — The Royal Passage" },
-      { name: "description", content: "Sign in as a guest, host, or admin." },
+      { name: "description", content: "Sign in with your email and password. Your role is assigned automatically." },
     ],
   }),
   component: SignInPage,
@@ -34,55 +22,23 @@ export const Route = createFileRoute("/sign-in")({
 
 function SignInPage() {
   const navigate = Route.useNavigate();
-  const { role: roleFromSearch } = Route.useSearch();
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
-  const [busy, setBusy] = useState<null | "otp" | "google">(null);
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [resendingConfirmation, setResendingConfirmation] = useState(false);
+  const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [intendedRole, setIntendedRole] = useState<UserRole>(
-    () => roleFromSearch ?? readIntendedRole(),
-  );
   const browserConfigured = isSupabaseBrowserConfigured();
   const { user, displayName, role, loading } = useAuthUser();
   const supabase = useMemo(() => {
     if (!browserConfigured) return null;
     return getSupabaseBrowser();
   }, [browserConfigured]);
-
-  useEffect(() => {
-    if (roleFromSearch) {
-      setIntendedRole(roleFromSearch);
-      writeIntendedRole(roleFromSearch);
-    }
-  }, [roleFromSearch]);
-
-  useEffect(() => {
-    writeIntendedRole(intendedRole);
-    void navigate({
-      to: "/sign-in",
-      search: { role: intendedRole },
-      replace: true,
-    });
-  }, [intendedRole, navigate]);
-
-  useEffect(() => {
-    if (!supabase) return;
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        setNotice("Signed in successfully.");
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase]);
 
   useEffect(() => {
     if (!user) return;
@@ -96,67 +52,109 @@ function SignInPage() {
     void navigate({ to: dashboardPathForRole(role) });
   }, [loading, navigate, role, user]);
 
-  const authOptions = useMemo(
-    () => ({
-      emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/sign-in?role=${intendedRole}`,
-      data: { intended_role: intendedRole },
-    }),
-    [intendedRole],
-  );
+  const isEmailNotConfirmedError = (message: string) =>
+    /email not confirmed/i.test(message);
 
-  const sendOtp = async (e: FormEvent) => {
+  const signIn = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setNotice(null);
+    setEmailNotConfirmed(false);
+
+    if (!supabase) {
+      setError("Supabase browser auth is not configured.");
+      return;
+    }
+
+    try {
+      setBusy(true);
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (signInError) throw signInError;
+      setNotice("Signed in successfully.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to sign in.";
+      if (isEmailNotConfirmedError(message)) {
+        setEmailNotConfirmed(true);
+        setError(
+          "Your email is not confirmed yet. Open the confirmation link from Supabase, or resend it below.",
+        );
+      } else {
+        setError(message);
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const resendConfirmation = async () => {
+    setError(null);
+    setNotice(null);
+
+    if (!supabase) {
+      setError("Supabase browser auth is not configured.");
+      return;
+    }
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError("Enter your email address first.");
+      return;
+    }
+
+    try {
+      setResendingConfirmation(true);
+      const { error: resendError } = await supabase.auth.resend({
+        type: "signup",
+        email: trimmedEmail,
+      });
+      if (resendError) throw resendError;
+      setNotice(`Confirmation email sent to ${trimmedEmail}. Check your inbox and spam folder.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to resend confirmation email.");
+    } finally {
+      setResendingConfirmation(false);
+    }
+  };
+
+  const signUpGuest = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     setNotice(null);
 
     if (!supabase) {
-      setError(
-        "Supabase browser auth is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.",
-      );
-      return;
-    }
-
-    try {
-      setBusy("otp");
-      const { error: otpErr } = await supabase.auth.signInWithOtp({
-        email,
-        options: authOptions,
-      });
-      if (otpErr) throw otpErr;
-      setNotice("Check your email for the magic link.");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to send OTP.";
-      setError(msg);
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const signInGoogle = async () => {
-    setError(null);
-    setNotice(null);
-    if (!supabase) {
       setError("Supabase browser auth is not configured.");
       return;
     }
+
     try {
-      setBusy("google");
-      await supabase.auth.signOut({ scope: "local" });
-      const { error: oauthErr } = await supabase.auth.signInWithOAuth({
-        provider: "google",
+      setBusy(true);
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
         options: {
-          redirectTo: authOptions.emailRedirectTo,
-          queryParams: {
-            prompt: "select_account",
+          data: {
+            full_name: fullName.trim(),
+            phone: phone.trim() || null,
           },
-          data: authOptions.data,
         },
       });
-      if (oauthErr) throw oauthErr;
+      if (signUpError) throw signUpError;
+      if (data.session) {
+        setNotice("Account created. You are signed in.");
+      } else {
+        setNotice(
+          "Account created. Check your email for a confirmation link, then sign in with your password.",
+        );
+      }
+      setMode("signin");
+      setPassword("");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to start Google sign-in.";
-      setError(msg);
-      setBusy(null);
+      setError(err instanceof Error ? err.message : "Failed to create account.");
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -189,7 +187,7 @@ function SignInPage() {
     if (!supabase) return;
     await supabase.auth.signOut();
     setNotice("Signed out.");
-    void navigate({ to: "/sign-in", search: { role: intendedRole } });
+    void navigate({ to: "/sign-in" });
   };
 
   return (
@@ -204,11 +202,11 @@ function SignInPage() {
                 {role ? <RoleBadge role={role} /> : null}
               </div>
               <h1 className="font-display text-3xl tracking-tight md:text-4xl">
-                Welcome, {displayName ?? ROLE_LABELS[intendedRole]}
+                Welcome, {displayName ?? "Member"}
               </h1>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Manage your profile details below. You will be redirected to your{" "}
-                {role ? ROLE_LABELS[role].toLowerCase() : "role"} dashboard.
+                Your access level is set automatically. You will be redirected to your{" "}
+                {role ? ROLE_LABELS[role].toLowerCase() : "account"} dashboard.
               </p>
               <form className="mt-8 space-y-4" onSubmit={updateProfile}>
                 <div>
@@ -223,7 +221,7 @@ function SignInPage() {
                     placeholder="Your name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full rounded-sm border border-input bg-background/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30"
+                    className={inputClass}
                   />
                 </div>
                 <div>
@@ -250,7 +248,7 @@ function SignInPage() {
                     placeholder="+91 98XXXXXXX"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full rounded-sm border border-input bg-background/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30"
+                    className={inputClass}
                   />
                 </div>
                 <button
@@ -277,40 +275,16 @@ function SignInPage() {
                 </button>
               </form>
             </>
-          ) : (
+          ) : mode === "signin" ? (
             <>
-              <RoleSelector value={intendedRole} onChange={setIntendedRole} className="mb-6" />
-
-              <h1 className="font-display text-3xl tracking-tight md:text-4xl">
-                Sign in as {ROLE_LABELS[intendedRole]}
-              </h1>
+              <div className="eyebrow mb-3 text-ember/90">Member access</div>
+              <h1 className="font-display text-3xl tracking-tight md:text-4xl">Sign in</h1>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {intendedRole === "guest" &&
-                  "Create a guest account to book pottery, farm walks, and other experiences."}
-                {intendedRole === "host" &&
-                  "Hosts are the local experts who offer experiences — artisans, chefs, guides, and makers."}
-                {intendedRole === "admin" &&
-                  "Admin access is granted by the platform team. Sign in with an approved admin account."}
+                Enter your email and password. The system will open the correct dashboard for your
+                account — guest, host, or admin.
               </p>
 
-              <div className="mt-8">
-                <button
-                  type="button"
-                  onClick={signInGoogle}
-                  disabled={busy !== null}
-                  className="glass glass-hover glass-hover-active w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-ember/50 hover:text-ember disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {busy === "google" ? "Redirecting to Google..." : "Continue with Google"}
-                </button>
-              </div>
-
-              <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                <span className="h-px flex-1 bg-border/70" />
-                <span>Or email OTP</span>
-                <span className="h-px flex-1 bg-border/70" />
-              </div>
-
-              <form className="space-y-4" onSubmit={sendOtp}>
+              <form className="mt-8 space-y-4" onSubmit={signIn}>
                 <div>
                   <label htmlFor="signin-email" className="eyebrow mb-2 block text-foreground/90">
                     Email
@@ -319,22 +293,161 @@ function SignInPage() {
                     id="signin-email"
                     name="email"
                     type="email"
+                    autoComplete="username"
+                    required
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="signin-password" className="eyebrow mb-2 block text-foreground/90">
+                    Password
+                  </label>
+                  <input
+                    id="signin-password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={busy || !email.trim() || !password}
+                  className="w-full rounded-sm bg-ember py-3.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {busy ? "Signing in..." : "Sign in"}
+                </button>
+                {emailNotConfirmed ? (
+                  <button
+                    type="button"
+                    onClick={() => void resendConfirmation()}
+                    disabled={resendingConfirmation || !email.trim()}
+                    className="w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-ember/50 hover:text-ember disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {resendingConfirmation ? "Sending..." : "Resend confirmation email"}
+                  </button>
+                ) : null}
+              </form>
+
+              <p className="mt-6 text-center text-sm text-muted-foreground">
+                New guest?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("signup");
+                    setError(null);
+                    setNotice(null);
+                  }}
+                  className="text-ember underline-offset-4 transition-colors hover:underline"
+                >
+                  Create an account
+                </button>
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="eyebrow mb-3 text-ember/90">Guest registration</div>
+              <h1 className="font-display text-3xl tracking-tight md:text-4xl">Create account</h1>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                Only guests can sign up here. Host and admin logins are created by the platform
+                team.
+              </p>
+
+              <form className="mt-8 space-y-4" onSubmit={signUpGuest}>
+                <div>
+                  <label htmlFor="signup-name" className="eyebrow mb-2 block text-foreground/90">
+                    Full name
+                  </label>
+                  <input
+                    id="signup-name"
+                    name="fullName"
+                    type="text"
+                    autoComplete="name"
+                    required
+                    placeholder="Your name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="signup-email" className="eyebrow mb-2 block text-foreground/90">
+                    Email
+                  </label>
+                  <input
+                    id="signup-email"
+                    name="email"
+                    type="email"
                     autoComplete="email"
                     required
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-sm border border-input bg-background/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30"
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="signup-phone" className="eyebrow mb-2 block text-foreground/90">
+                    Phone
+                  </label>
+                  <input
+                    id="signup-phone"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder="+91 98XXXXXXX"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="signup-password" className="eyebrow mb-2 block text-foreground/90">
+                    Password
+                  </label>
+                  <input
+                    id="signup-password"
+                    name="password"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    minLength={8}
+                    placeholder="Min. 8 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={inputClass}
                   />
                 </div>
                 <button
                   type="submit"
-                  disabled={busy !== null || !email.trim()}
-                  className="w-full rounded-sm bg-ember py-3.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110"
+                  disabled={busy || !email.trim() || !password || !fullName.trim()}
+                  className="w-full rounded-sm bg-ember py-3.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {busy === "otp" ? "Sending magic link..." : "Send magic link"}
+                  {busy ? "Creating account..." : "Create guest account"}
                 </button>
               </form>
+
+              <p className="mt-6 text-center text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("signin");
+                    setError(null);
+                    setNotice(null);
+                  }}
+                  className="text-ember underline-offset-4 transition-colors hover:underline"
+                >
+                  Sign in
+                </button>
+              </p>
             </>
           )}
 

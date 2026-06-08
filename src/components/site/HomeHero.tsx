@@ -106,6 +106,12 @@ export function HomeHero() {
                 </span>
                 Watch Film
               </button>
+              <Link
+                to="/sign-in"
+                className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.45)] bg-background/15 px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink backdrop-blur-md transition-colors hover:border-ember/70 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
+              >
+                Sign in
+              </Link>
             </motion.div>
           </motion.div>
 

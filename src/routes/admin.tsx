@@ -1,15 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { ShieldCheck, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CreateHostForm } from "@/components/admin/CreateHostForm";
+import { ManagedUsersPanel } from "@/components/admin/ManagedUsersPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import { dashboardPathForRole } from "@/lib/roles";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Admin — The Royal Passage" },
-      { name: "description", content: "Platform administration for hosts, experiences, and bookings." },
+      { name: "description", content: "Create host logins and manage platform users." },
     ],
   }),
   component: AdminDashboardPage,
@@ -18,11 +20,13 @@ export const Route = createFileRoute("/admin")({
 function AdminDashboardPage() {
   const navigate = useNavigate();
   const { user, role, loading } = useAuthUser();
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      void navigate({ to: "/sign-in", search: { role: "admin" } });
+      void navigate({ to: "/sign-in" });
       return;
     }
     if (role && role !== "admin") {
@@ -30,7 +34,16 @@ function AdminDashboardPage() {
     }
   }, [loading, navigate, role, user]);
 
-  if (loading || !user || role !== "admin") {
+  useEffect(() => {
+    if (!user) return;
+    void getSupabaseBrowser()
+      .auth.getSession()
+      .then(({ data }) => {
+        setAccessToken(data.session?.access_token ?? null);
+      });
+  }, [user]);
+
+  if (loading || !user || role !== "admin" || !accessToken) {
     return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
   }
 
@@ -38,23 +51,14 @@ function AdminDashboardPage() {
     <DashboardShell
       role="admin"
       title="Platform control"
-      subtitle="Oversee guests, hosts, experience approvals, and marketplace health."
+      subtitle="Guests sign up on their own. Create host logins here for experience providers — potters, chefs, guides, and makers."
     >
-      <div className="grid gap-4 sm:grid-cols-2">
-        <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6">
-          <Users className="h-5 w-5 text-ember" />
-          <h2 className="mt-4 font-display text-2xl">Hosts & guests</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Review host applications, verify profiles, and manage user access across the platform.
-          </p>
-        </article>
-        <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6">
-          <ShieldCheck className="h-5 w-5 text-ember" />
-          <h2 className="mt-4 font-display text-2xl">Experience curation</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Approve listings, monitor bookings, and keep the Royal Passage standard consistent.
-          </p>
-        </article>
+      <div className="space-y-8">
+        <CreateHostForm
+          accessToken={accessToken}
+          onCreated={() => setRefreshKey((value) => value + 1)}
+        />
+        <ManagedUsersPanel accessToken={accessToken} refreshKey={refreshKey} />
       </div>
     </DashboardShell>
   );

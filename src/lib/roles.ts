@@ -10,9 +10,9 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
-  guest: "Browse and book curated experiences in Mysuru.",
-  host: "Offer experiences — pottery, farm walks, culinary sessions, and more.",
-  admin: "Manage the platform, hosts, and published experiences.",
+  guest: "Sign up or sign in to book experiences.",
+  host: "Sign in with login credentials provided by Royal Passage.",
+  admin: "Sign in with your admin credentials.",
 };
 
 export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
@@ -25,6 +25,11 @@ const INTENDED_ROLE_KEY = "rp_intended_role_v1";
 
 export function isUserRole(value: string | null | undefined): value is UserRole {
   return USER_ROLES.includes(value as UserRole);
+}
+
+/** Only guests may self-register on the public sign-in page. */
+export function canSelfRegister(role: UserRole): boolean {
+  return role === "guest";
 }
 
 export function readIntendedRole(): UserRole {

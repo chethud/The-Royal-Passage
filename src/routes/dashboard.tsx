@@ -22,7 +22,7 @@ function GuestDashboardPage() {
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      void navigate({ to: "/sign-in", search: { role: "guest" } });
+      void navigate({ to: "/sign-in" });
       return;
     }
     if (role && role !== "guest") {

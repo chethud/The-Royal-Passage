@@ -23,7 +23,7 @@ export function RoleSelector({ value, onChange, className }: RoleSelectorProps) 
 
   return (
     <div className={cn("space-y-3", className)}>
-      <p className="eyebrow text-foreground/90">Sign in as</p>
+      <p className="eyebrow text-foreground/90">Continue as</p>
       <div className="grid gap-2 sm:grid-cols-3">
         {roles.map((role) => {
           const Icon = ROLE_ICONS[role];

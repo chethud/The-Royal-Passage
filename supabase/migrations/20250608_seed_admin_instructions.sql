@@ -1,0 +1,11 @@
+-- Admin login (create via Dashboard or `npm run setup:admin`):
+--   Email:    Admin@gmail.com
+--   Password: Admin@123
+--
+-- After the auth user exists, ensure the profile role is admin:
+--
+-- update public.profiles
+-- set role = 'admin', full_name = 'Platform Admin'
+-- where id = (
+--   select id from auth.users where lower(email) = lower('Admin@gmail.com')
+-- );

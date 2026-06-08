@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { isApiConfigured } from "@/lib/api/client";
+import { fetchCatalog, fetchExperienceBySlug, createBooking as apiCreateBooking } from "@/lib/api/marketplace";
 import type { Experience } from "@/data/experiences";
 import {
   getExperience as getStaticExperience,
@@ -92,8 +94,16 @@ async function loadPublishedWithSlots(): Promise<Experience[]> {
   return approved.map((e) => mapRowToExperience(e, byExp.get(e.id) ?? []));
 }
 
-/** Listing + filters: uses Supabase when configured; otherwise static demo data. */
+/** Listing + filters: FastAPI when configured; else Supabase; otherwise static demo data. */
 export const getCatalogForUi = createServerFn({ method: "GET" }).handler(async () => {
+  if (isApiConfigured()) {
+    try {
+      return await fetchCatalog();
+    } catch {
+      return fallbackCatalog();
+    }
+  }
+
   if (!isSupabaseConfigured()) {
     return fallbackCatalog();
   }
@@ -120,6 +130,14 @@ export const getExperienceForDetail = createServerFn({ method: "GET" })
     return { slug: input.slug.trim() };
   })
   .handler(async ({ data }): Promise<{ exp: Experience; source: "live" | "static" } | null> => {
+    if (isApiConfigured()) {
+      try {
+        return await fetchExperienceBySlug(data.slug);
+      } catch {
+        // Fall through to Supabase/static fallback.
+      }
+    }
+
     if (isSupabaseConfigured()) {
       try {
         const fromDb = await getOrSetServerCache(
@@ -153,6 +171,10 @@ export const createPendingBooking = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => bookingInput.parse(raw))
   .handler(
     async ({ data }): Promise<{ bookingId: string; subtotalMinor: number; status: string }> => {
+      if (isApiConfigured()) {
+        return apiCreateBooking(data);
+      }
+
       if (!isSupabaseConfigured()) {
         throw new Error("Supabase is not configured on the server.");
       }
