@@ -32,6 +32,7 @@ import { Route as DashboardCancelledRouteImport } from './routes/dashboard.cance
 import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
 import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookingId'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as ExperiencesSlugIndexRouteImport } from './routes/experiences.$slug.index'
 import { Route as HostExperiencesNewRouteImport } from './routes/host.experiences.new'
 import { Route as HostExperiencesExperienceIdRouteImport } from './routes/host.experiences.$experienceId'
 import { Route as HostBookingsBookingIdRouteImport } from './routes/host.bookings.$bookingId'
@@ -153,6 +154,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExperiencesSlugIndexRoute = ExperiencesSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ExperiencesSlugRoute,
+} as any)
 const HostExperiencesNewRoute = HostExperiencesNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -209,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -228,7 +235,6 @@ export interface FileRoutesByTo {
   '/dashboard/past': typeof DashboardPastRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
-  '/experiences/$slug': typeof ExperiencesSlugRouteWithChildren
   '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
   '/host/experiences': typeof HostExperiencesRouteWithChildren
@@ -239,6 +245,7 @@ export interface FileRoutesByTo {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/experiences/$slug': typeof ExperiencesSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -270,6 +277,7 @@ export interface FileRoutesById {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -302,6 +310,7 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/experiences/$slug/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -321,7 +330,6 @@ export interface FileRouteTypes {
     | '/dashboard/past'
     | '/dashboard/profile'
     | '/dashboard/wishlist'
-    | '/experiences/$slug'
     | '/host/bookings'
     | '/host/dashboard'
     | '/host/experiences'
@@ -332,6 +340,7 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/experiences/$slug'
   id:
     | '__root__'
     | '/'
@@ -362,6 +371,7 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/experiences/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -546,6 +556,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/experiences/$slug/': {
+      id: '/experiences/$slug/'
+      path: '/'
+      fullPath: '/experiences/$slug/'
+      preLoaderRoute: typeof ExperiencesSlugIndexRouteImport
+      parentRoute: typeof ExperiencesSlugRoute
+    }
     '/host/experiences/new': {
       id: '/host/experiences/new'
       path: '/new'
@@ -617,10 +634,12 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 interface ExperiencesSlugRouteChildren {
   ExperiencesSlugBookRoute: typeof ExperiencesSlugBookRoute
+  ExperiencesSlugIndexRoute: typeof ExperiencesSlugIndexRoute
 }
 
 const ExperiencesSlugRouteChildren: ExperiencesSlugRouteChildren = {
   ExperiencesSlugBookRoute: ExperiencesSlugBookRoute,
+  ExperiencesSlugIndexRoute: ExperiencesSlugIndexRoute,
 }
 
 const ExperiencesSlugRouteWithChildren = ExperiencesSlugRoute._addFileChildren(

@@ -91,7 +91,8 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
                 to="/experiences/$slug/book"
                 params={{ slug: exp.slug }}
                 search={{ slotId: nextSlot.id, guests: defaultGuests }}
-                className="luxury-btn-sm luxury-btn-primary"
+                resetScroll
+                className="relative z-10 luxury-btn-sm luxury-btn-primary"
               >
                 Book
               </Link>

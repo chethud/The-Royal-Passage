@@ -3,6 +3,12 @@ export type BookSearchParams = {
   guests?: number;
 };
 
+function readSlotId(s: Record<string, unknown>): string | undefined {
+  if (typeof s.slotId === "string" && s.slotId.trim()) return s.slotId.trim();
+  if (typeof s.slotID === "string" && s.slotID.trim()) return s.slotID.trim();
+  return undefined;
+}
+
 export function parseBookSearch(s: Record<string, unknown>): BookSearchParams {
   const guestsRaw = s.guests;
   let guests: number | undefined;
@@ -14,7 +20,7 @@ export function parseBookSearch(s: Record<string, unknown>): BookSearchParams {
   }
 
   return {
-    slotId: typeof s.slotId === "string" ? s.slotId : undefined,
+    slotId: readSlotId(s),
     guests,
   };
 }
