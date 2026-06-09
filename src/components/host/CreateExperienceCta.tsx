@@ -10,7 +10,7 @@ export function CreateExperienceCta({ variant = "card" }: CreateExperienceCtaPro
 
   if (variant === "inline") {
     return (
-      <Link to="/host/experiences/new" className={buttonClass}>
+      <Link to="/host/experiences/new" resetScroll className={buttonClass}>
         Add experience
       </Link>
     );
@@ -23,7 +23,7 @@ export function CreateExperienceCta({ variant = "card" }: CreateExperienceCtaPro
         Add a listing with photos, pricing, and bookable slots. Submit for admin review when you are
         ready to go live.
       </p>
-      <Link to="/host/experiences/new" className={`${buttonClass} mt-6`}>
+      <Link to="/host/experiences/new" resetScroll className={`${buttonClass} mt-6`}>
         Add experience
       </Link>
     </div>
