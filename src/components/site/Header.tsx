@@ -1,5 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Heart, LogOut, Menu, UserRound } from "lucide-react";
+import { LogOut, Menu, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
 import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav";
@@ -149,17 +149,6 @@ export function Header() {
             </>
           ) : (
             <>
-              {role === "guest" ? (
-                <Link
-                  to="/dashboard/wishlist"
-                  className={`${navLinkClass} inline-flex items-center${
-                    pathname.startsWith("/dashboard/wishlist") ? " text-ember header-nav-link--active" : ""
-                  }`}
-                  aria-label="Wishlist"
-                >
-                  <Heart className="h-4 w-4" />
-                </Link>
-              ) : null}
               <NotificationBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
