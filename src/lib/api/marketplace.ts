@@ -1,5 +1,10 @@
 import type { Experience } from "@/data/experiences";
-import { apiFetch } from "@/lib/api/client";
+import { create } from "@bufbuild/protobuf";
+import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
+import {
+  GetCatalogRequestSchema,
+  GetExperienceBySlugRequestSchema,
+} from "@/gen/royalpassage/v1/service_pb";
 
 export type CatalogPayload = {
   mode: "live" | "static";
@@ -15,11 +20,15 @@ export type ExperienceDetailPayload = {
 };
 
 export function fetchCatalog(citySlug?: string) {
-  const query = citySlug ? `?city=${encodeURIComponent(citySlug)}` : "";
-  return apiFetch<CatalogPayload>(`/api/v1/catalog${query}`);
+  const client = createRoyalPassageClient();
+  return rpcCall(() =>
+    client.getCatalog(create(GetCatalogRequestSchema, citySlug ? { citySlug } : {})),
+  ) as Promise<CatalogPayload>;
 }
 
 export function fetchExperienceBySlug(slug: string) {
-  return apiFetch<ExperienceDetailPayload>(`/api/v1/experiences/${encodeURIComponent(slug)}`);
+  const client = createRoyalPassageClient();
+  return rpcCall(() =>
+    client.getExperienceBySlug(create(GetExperienceBySlugRequestSchema, { slug })),
+  ) as Promise<ExperienceDetailPayload>;
 }
-

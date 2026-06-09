@@ -1,4 +1,9 @@
-import { apiFetch } from "@/lib/api/client";
+import { create } from "@bufbuild/protobuf";
+import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
+import {
+  AddToWishlistRequestSchema,
+  RemoveFromWishlistRequestSchema,
+} from "@/gen/royalpassage/v1/service_pb";
 
 export type WishlistExperienceSummary = {
   id: string;
@@ -21,19 +26,23 @@ export type WishlistItem = {
 };
 
 export function fetchWishlist(accessToken: string) {
-  return apiFetch<WishlistItem[]>("/api/v1/wishlist", { accessToken });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(async () => {
+    const response = await client.listWishlist({});
+    return response.items as WishlistItem[];
+  });
 }
 
 export function addWishlistItem(accessToken: string, experienceId: string) {
-  return apiFetch<WishlistItem>(`/api/v1/wishlist/${experienceId}`, {
-    method: "POST",
-    accessToken,
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.addToWishlist(create(AddToWishlistRequestSchema, { experienceId })),
+  ) as Promise<WishlistItem>;
 }
 
 export function removeWishlistItem(accessToken: string, experienceId: string) {
-  return apiFetch<{ ok: boolean }>(`/api/v1/wishlist/${experienceId}`, {
-    method: "DELETE",
-    accessToken,
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.removeFromWishlist(create(RemoveFromWishlistRequestSchema, { experienceId })),
+  );
 }

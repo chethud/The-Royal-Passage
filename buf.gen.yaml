@@ -1,0 +1,18 @@
+version: v2
+clean: true
+managed:
+  enabled: true
+inputs:
+  - directory: proto
+plugins:
+  - remote: buf.build/protocolbuffers/python
+    out: backend/app/rpc/gen
+  - remote: buf.build/protocolbuffers/pyi
+    out: backend/app/rpc/gen
+  - remote: buf.build/connectrpc/python
+    out: backend/app/rpc/gen
+  - remote: buf.build/bufbuild/es
+    out: src/gen
+    include_imports: true
+    opt:
+      - target=ts

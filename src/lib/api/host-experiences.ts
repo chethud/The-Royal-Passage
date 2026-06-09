@@ -1,4 +1,19 @@
-import { apiFetch } from "@/lib/api/client";
+import { create } from "@bufbuild/protobuf";
+import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
+import {
+  CreateHostSlotInputSchema,
+  DeleteHostExperienceRequestSchema,
+  DeleteHostSlotRequestSchema,
+  GetHostExperienceRequestSchema,
+  UpdateHostExperienceInputSchema,
+  UpdateHostSlotInputSchema,
+} from "@/gen/royalpassage/v1/service_pb";
+import {
+  CreateHostExperienceRequestSchema,
+  CreateHostSlotRequestSchema,
+  UpdateHostExperienceRequestSchema,
+  UpdateHostSlotRequestSchema,
+} from "@/gen/royalpassage/v1/types_pb";
 
 export type CategoryOption = { slug: string; label: string };
 
@@ -94,25 +109,33 @@ export type UpdateHostSlotPayload = {
 };
 
 export function fetchHostCategories(accessToken: string) {
-  return apiFetch<CategoryOption[]>("/api/v1/host/categories", { accessToken });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(async () => {
+    const response = await client.listHostCategories({});
+    return response.categories as CategoryOption[];
+  });
 }
 
 export function fetchHostExperiences(accessToken: string) {
-  return apiFetch<HostExperienceSummary[]>("/api/v1/host/experiences", { accessToken });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(async () => {
+    const response = await client.listHostExperiences({});
+    return response.experiences as HostExperienceSummary[];
+  });
 }
 
 export function fetchHostExperience(accessToken: string, experienceId: string) {
-  return apiFetch<HostExperienceDetail>(`/api/v1/host/experiences/${experienceId}`, {
-    accessToken,
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.getHostExperience(create(GetHostExperienceRequestSchema, { experienceId })),
+  ) as Promise<HostExperienceDetail>;
 }
 
 export function createHostExperience(accessToken: string, payload: CreateHostExperiencePayload) {
-  return apiFetch<HostExperienceDetail>("/api/v1/host/experiences", {
-    method: "POST",
-    accessToken,
-    body: JSON.stringify(payload),
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.createHostExperience(create(CreateHostExperienceRequestSchema, payload)),
+  ) as Promise<HostExperienceDetail>;
 }
 
 export function updateHostExperience(
@@ -120,18 +143,22 @@ export function updateHostExperience(
   experienceId: string,
   payload: UpdateHostExperiencePayload,
 ) {
-  return apiFetch<HostExperienceDetail>(`/api/v1/host/experiences/${experienceId}`, {
-    method: "PATCH",
-    accessToken,
-    body: JSON.stringify(payload),
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.updateHostExperience(
+      create(UpdateHostExperienceInputSchema, {
+        experienceId,
+        experience: create(UpdateHostExperienceRequestSchema, payload),
+      }),
+    ),
+  ) as Promise<HostExperienceDetail>;
 }
 
 export function deleteHostExperience(accessToken: string, experienceId: string) {
-  return apiFetch<{ ok: boolean }>(`/api/v1/host/experiences/${experienceId}`, {
-    method: "DELETE",
-    accessToken,
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.deleteHostExperience(create(DeleteHostExperienceRequestSchema, { experienceId })),
+  );
 }
 
 export function createHostSlot(
@@ -139,11 +166,15 @@ export function createHostSlot(
   experienceId: string,
   payload: CreateHostSlotPayload,
 ) {
-  return apiFetch<HostExperienceDetail>(`/api/v1/host/experiences/${experienceId}/slots`, {
-    method: "POST",
-    accessToken,
-    body: JSON.stringify(payload),
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.createHostSlot(
+      create(CreateHostSlotInputSchema, {
+        experienceId,
+        slot: create(CreateHostSlotRequestSchema, payload),
+      }),
+    ),
+  ) as Promise<HostExperienceDetail>;
 }
 
 export function updateHostSlot(
@@ -152,22 +183,21 @@ export function updateHostSlot(
   slotId: string,
   payload: UpdateHostSlotPayload,
 ) {
-  return apiFetch<HostExperienceDetail>(
-    `/api/v1/host/experiences/${experienceId}/slots/${slotId}`,
-    {
-      method: "PATCH",
-      accessToken,
-      body: JSON.stringify(payload),
-    },
-  );
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.updateHostSlot(
+      create(UpdateHostSlotInputSchema, {
+        experienceId,
+        slotId,
+        slot: create(UpdateHostSlotRequestSchema, payload),
+      }),
+    ),
+  ) as Promise<HostExperienceDetail>;
 }
 
 export function deleteHostSlot(accessToken: string, experienceId: string, slotId: string) {
-  return apiFetch<HostExperienceDetail>(
-    `/api/v1/host/experiences/${experienceId}/slots/${slotId}`,
-    {
-      method: "DELETE",
-      accessToken,
-    },
-  );
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.deleteHostSlot(create(DeleteHostSlotRequestSchema, { experienceId, slotId })),
+  ) as Promise<HostExperienceDetail>;
 }

@@ -6,7 +6,12 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useAuthUser } from "@/lib/auth-user";
 import { dashboardPathForRole, ROLE_LABELS } from "@/lib/roles";
-import { buildAuthRedirect, readAuthCallbackError } from "@/lib/auth-redirect";
+import {
+  buildAuthRedirect,
+  buildOAuthCallbackUrl,
+  readAuthCallbackError,
+  redirectOffLocalhostIfNeeded,
+} from "@/lib/auth-redirect";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
 const inputClass =
@@ -59,6 +64,7 @@ function SignInPage() {
   }, [user]);
 
   useEffect(() => {
+    redirectOffLocalhostIfNeeded();
     const oauthError = readAuthCallbackError();
     if (oauthError) {
       setError(oauthError);
@@ -91,7 +97,7 @@ function SignInPage() {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: buildAuthRedirect(redirect),
+          redirectTo: buildOAuthCallbackUrl(redirect),
         },
       });
       if (oauthError) throw oauthError;

@@ -1,0 +1,248 @@
+syntax = "proto3";
+
+package royalpassage.v1;
+
+import "google/protobuf/empty.proto";
+import "royalpassage/v1/types.proto";
+
+service RoyalPassageService {
+  rpc HealthCheck(google.protobuf.Empty) returns (HealthResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc ListCities(google.protobuf.Empty) returns (ListCitiesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetCity(GetCityRequest) returns (CitySummary) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetCatalog(GetCatalogRequest) returns (CatalogResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetExperienceBySlug(GetExperienceBySlugRequest) returns (ExperienceDetailResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse);
+
+  rpc ListMyBookings(ListMyBookingsRequest) returns (ListBookingsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetBooking(GetBookingRequest) returns (BookingSummary) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc CancelBooking(CancelBookingRequest) returns (BookingSummary);
+
+  rpc GetGuestProfile(google.protobuf.Empty) returns (GuestProfile) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc UpdateGuestProfile(UpdateGuestProfileRequest) returns (GuestProfile);
+
+  rpc ListWishlist(google.protobuf.Empty) returns (ListWishlistResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc AddToWishlist(AddToWishlistRequest) returns (WishlistItem);
+
+  rpc RemoveFromWishlist(RemoveFromWishlistRequest) returns (OkResponse);
+
+  rpc GetHostDashboard(google.protobuf.Empty) returns (HostDashboardStats) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc ListHostBookings(ListHostBookingsRequest) returns (ListBookingsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetHostBooking(GetHostBookingRequest) returns (BookingSummary) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetHostRevenue(google.protobuf.Empty) returns (HostRevenueSummary) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc ListHostReviews(google.protobuf.Empty) returns (ListHostReviewsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc ListHostCategories(google.protobuf.Empty) returns (ListHostCategoriesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc ListHostExperiences(google.protobuf.Empty) returns (ListHostExperiencesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc CreateHostExperience(CreateHostExperienceRequest) returns (HostExperienceDetail);
+
+  rpc GetHostExperience(GetHostExperienceRequest) returns (HostExperienceDetail) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc UpdateHostExperience(UpdateHostExperienceInput) returns (HostExperienceDetail);
+
+  rpc DeleteHostExperience(DeleteHostExperienceRequest) returns (OkResponse);
+
+  rpc CreateHostSlot(CreateHostSlotInput) returns (HostExperienceDetail);
+
+  rpc UpdateHostSlot(UpdateHostSlotInput) returns (HostExperienceDetail);
+
+  rpc DeleteHostSlot(DeleteHostSlotRequest) returns (HostExperienceDetail);
+
+  rpc ConfirmHostBooking(HostBookingActionRequest) returns (BookingSummary);
+
+  rpc RejectHostBooking(HostBookingActionRequest) returns (BookingSummary);
+
+  rpc MarkHostBookingPaid(HostBookingActionRequest) returns (BookingSummary);
+
+  rpc CompleteHostBooking(HostBookingActionRequest) returns (BookingSummary);
+
+  rpc GetAdminStats(google.protobuf.Empty) returns (AdminStats) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc ListAdminBookings(google.protobuf.Empty) returns (ListAdminBookingsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc ListAdminActivity(google.protobuf.Empty) returns (ListAdminActivityResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc ListAdminUsers(google.protobuf.Empty) returns (ListAdminUsersResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc CreateHost(CreateHostRequest) returns (CreateHostResponse);
+
+  rpc ListAdminExperiences(google.protobuf.Empty) returns (ListAdminExperiencesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc PublishExperience(AdminExperienceActionRequest) returns (AdminExperienceSummary);
+
+  rpc RejectExperience(AdminExperienceActionRequest) returns (AdminExperienceSummary);
+
+  rpc ListExperienceReviews(ListExperienceReviewsRequest) returns (ListExperienceReviewsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc CreateReview(CreateReviewRequest) returns (ReviewSummary);
+
+  rpc HostReplyToReview(HostReplyToReviewRequest) returns (ReviewSummary);
+
+  rpc ListAdminReviews(google.protobuf.Empty) returns (ListAdminReviewsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc HideAdminReview(HideAdminReviewRequest) returns (ReviewSummary);
+
+  rpc ListNotifications(google.protobuf.Empty) returns (ListNotificationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc MarkNotificationRead(MarkNotificationReadRequest) returns (NotificationSummary);
+
+  rpc MarkAllNotificationsRead(google.protobuf.Empty) returns (MarkAllNotificationsReadResponse);
+}
+
+message GetCityRequest {
+  string slug = 1;
+}
+
+message GetCatalogRequest {
+  optional string city_slug = 1;
+}
+
+message GetExperienceBySlugRequest {
+  string slug = 1;
+}
+
+message ListMyBookingsRequest {
+  optional string status = 1;
+}
+
+message GetBookingRequest {
+  string booking_id = 1;
+}
+
+message CancelBookingRequest {
+  string booking_id = 1;
+}
+
+message AddToWishlistRequest {
+  string experience_id = 1;
+}
+
+message RemoveFromWishlistRequest {
+  string experience_id = 1;
+}
+
+message ListHostBookingsRequest {
+  optional string status = 1;
+}
+
+message GetHostBookingRequest {
+  string booking_id = 1;
+}
+
+message GetHostExperienceRequest {
+  string experience_id = 1;
+}
+
+message DeleteHostExperienceRequest {
+  string experience_id = 1;
+}
+
+message CreateHostSlotInput {
+  string experience_id = 1;
+  CreateHostSlotRequest slot = 2;
+}
+
+message UpdateHostSlotInput {
+  string experience_id = 1;
+  string slot_id = 2;
+  UpdateHostSlotRequest slot = 3;
+}
+
+message DeleteHostSlotRequest {
+  string experience_id = 1;
+  string slot_id = 2;
+}
+
+message HostBookingActionRequest {
+  string booking_id = 1;
+}
+
+message AdminExperienceActionRequest {
+  string experience_id = 1;
+}
+
+message ListExperienceReviewsRequest {
+  string slug = 1;
+}
+
+message HostReplyToReviewRequest {
+  string review_id = 1;
+  HostReplyRequest reply = 2;
+}
+
+message HideAdminReviewRequest {
+  string review_id = 1;
+}
+
+message MarkNotificationReadRequest {
+  string notification_id = 1;
+}
+
+message UpdateHostExperienceInput {
+  string experience_id = 1;
+  UpdateHostExperienceRequest experience = 2;
+}

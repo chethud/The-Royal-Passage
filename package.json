@@ -11,10 +11,14 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "setup:admin": "node --env-file=.env scripts/create-admin.mjs",
-    "api:dev": "cd backend && python -m uvicorn app.main:app --reload --port 8000"
+    "api:dev": "cd backend && python -m uvicorn app.main:app --reload --port 8000",
+    "proto:generate": "npx buf generate"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "^2.12.0",
     "@cloudflare/vite-plugin": "^1.25.5",
+    "@connectrpc/connect": "^2.1.1",
+    "@connectrpc/connect-web": "^2.1.1",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -72,6 +76,8 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.70.0",
+    "@bufbuild/protoc-gen-es": "^2.12.0",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "^1.4.0",
     "@types/node": "^22.16.5",

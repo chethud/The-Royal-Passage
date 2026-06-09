@@ -1,4 +1,6 @@
-import { apiFetch } from "@/lib/api/client";
+import { create } from "@bufbuild/protobuf";
+import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
+import { UpdateGuestProfileRequestSchema } from "@/gen/royalpassage/v1/types_pb";
 
 export type GuestProfile = {
   id: string;
@@ -15,13 +17,13 @@ export type UpdateGuestProfilePayload = {
 };
 
 export function fetchGuestProfile(accessToken: string) {
-  return apiFetch<GuestProfile>("/api/v1/guest/profile", { accessToken });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() => client.getGuestProfile({})) as Promise<GuestProfile>;
 }
 
 export function updateGuestProfile(accessToken: string, payload: UpdateGuestProfilePayload) {
-  return apiFetch<GuestProfile>("/api/v1/guest/profile", {
-    method: "PATCH",
-    accessToken,
-    body: JSON.stringify(payload),
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.updateGuestProfile(create(UpdateGuestProfileRequestSchema, payload)),
+  ) as Promise<GuestProfile>;
 }

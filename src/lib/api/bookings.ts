@@ -1,4 +1,11 @@
-import { apiFetch } from "@/lib/api/client";
+import { create } from "@bufbuild/protobuf";
+import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
+import {
+  CancelBookingRequestSchema,
+  GetBookingRequestSchema,
+  ListMyBookingsRequestSchema,
+} from "@/gen/royalpassage/v1/service_pb";
+import { CreateBookingRequestSchema } from "@/gen/royalpassage/v1/types_pb";
 
 export type CreateBookingPayload = {
   slotId: string;
@@ -48,25 +55,38 @@ export type BookingSummary = {
 };
 
 export function createBooking(accessToken: string, payload: CreateBookingPayload) {
-  return apiFetch<CreateBookingResult>("/api/v1/bookings", {
-    method: "POST",
-    accessToken,
-    body: JSON.stringify(payload),
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.createBooking(
+      create(CreateBookingRequestSchema, {
+        slotId: payload.slotId,
+        guestCount: payload.guestCount,
+        notes: payload.notes,
+      }),
+    ),
+  );
 }
 
 export function fetchMyBookings(accessToken: string, status?: "upcoming" | "past" | "cancelled") {
-  const query = status ? `?status=${status}` : "";
-  return apiFetch<BookingSummary[]>(`/api/v1/bookings/me${query}`, { accessToken });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(async () => {
+    const response = await client.listMyBookings(
+      create(ListMyBookingsRequestSchema, status ? { status } : {}),
+    );
+    return response.bookings as BookingSummary[];
+  });
 }
 
 export function fetchBookingById(accessToken: string, bookingId: string) {
-  return apiFetch<BookingSummary>(`/api/v1/bookings/${bookingId}`, { accessToken });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.getBooking(create(GetBookingRequestSchema, { bookingId })),
+  ) as Promise<BookingSummary>;
 }
 
 export function cancelBooking(accessToken: string, bookingId: string) {
-  return apiFetch<BookingSummary>(`/api/v1/bookings/${bookingId}/cancel`, {
-    method: "POST",
-    accessToken,
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.cancelBooking(create(CancelBookingRequestSchema, { bookingId })),
+  ) as Promise<BookingSummary>;
 }

@@ -30,6 +30,7 @@ import { Route as DashboardPastRouteImport } from './routes/dashboard.past'
 import { Route as DashboardCancelledRouteImport } from './routes/dashboard.cancelled'
 import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
 import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookingId'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as HostExperiencesNewRouteImport } from './routes/host.experiences.new'
 import { Route as HostExperiencesExperienceIdRouteImport } from './routes/host.experiences.$experienceId'
 import { Route as HostBookingsBookingIdRouteImport } from './routes/host.bookings.$bookingId'
@@ -141,6 +142,11 @@ const BookingsBookingIdRoute = BookingsBookingIdRouteImport.update({
   path: '/bookings/$bookingId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HostExperiencesNewRoute = HostExperiencesNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -178,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/auth/callback'
     | '/bookings/$bookingId'
     | '/cities/$slug'
     | '/dashboard/cancelled'
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/auth/callback'
     | '/bookings/$bookingId'
     | '/cities/$slug'
     | '/dashboard/cancelled'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/auth/callback'
     | '/bookings/$bookingId'
     | '/cities/$slug'
     | '/dashboard/cancelled'
@@ -350,6 +362,7 @@ export interface RootRouteChildren {
   HostsRoute: typeof HostsRoute
   JournalRoute: typeof JournalRoute
   SignInRoute: typeof SignInRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   BookingsBookingIdRoute: typeof BookingsBookingIdRouteWithChildren
   HostBookingsRoute: typeof HostBookingsRouteWithChildren
   HostDashboardRoute: typeof HostDashboardRoute
@@ -507,6 +520,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookingsBookingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/host/experiences/new': {
       id: '/host/experiences/new'
       path: '/new'
@@ -645,6 +665,7 @@ const rootRouteChildren: RootRouteChildren = {
   HostsRoute: HostsRoute,
   JournalRoute: JournalRoute,
   SignInRoute: SignInRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   BookingsBookingIdRoute: BookingsBookingIdRouteWithChildren,
   HostBookingsRoute: HostBookingsRouteWithChildren,
   HostDashboardRoute: HostDashboardRoute,

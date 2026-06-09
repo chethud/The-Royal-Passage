@@ -1,4 +1,11 @@
-import { apiFetch } from "@/lib/api/client";
+import { create } from "@bufbuild/protobuf";
+import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
+import {
+  HideAdminReviewRequestSchema,
+  HostReplyToReviewRequestSchema,
+  ListExperienceReviewsRequestSchema,
+} from "@/gen/royalpassage/v1/service_pb";
+import { CreateReviewRequestSchema, HostReplyRequestSchema } from "@/gen/royalpassage/v1/types_pb";
 
 export type ReviewSummary = {
   id: string;
@@ -15,35 +22,48 @@ export type ReviewSummary = {
 };
 
 export function fetchExperienceReviews(slug: string) {
-  return apiFetch<ReviewSummary[]>(`/api/v1/experiences/${slug}/reviews`);
+  const client = createRoyalPassageClient();
+  return rpcCall(async () => {
+    const response = await client.listExperienceReviews(
+      create(ListExperienceReviewsRequestSchema, { slug }),
+    );
+    return response.reviews as ReviewSummary[];
+  });
 }
 
 export function submitReview(
   accessToken: string,
   payload: { bookingId: string; rating: number; comment?: string },
 ) {
-  return apiFetch<ReviewSummary>("/api/v1/reviews", {
-    method: "POST",
-    accessToken,
-    body: JSON.stringify(payload),
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.createReview(create(CreateReviewRequestSchema, payload)),
+  ) as Promise<ReviewSummary>;
 }
 
 export function hostReplyReview(accessToken: string, reviewId: string, reply: string) {
-  return apiFetch<ReviewSummary>(`/api/v1/host/reviews/${reviewId}/reply`, {
-    method: "POST",
-    accessToken,
-    body: JSON.stringify({ reply }),
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.hostReplyToReview(
+      create(HostReplyToReviewRequestSchema, {
+        reviewId,
+        reply: create(HostReplyRequestSchema, { reply }),
+      }),
+    ),
+  ) as Promise<ReviewSummary>;
 }
 
 export function fetchAdminReviews(accessToken: string) {
-  return apiFetch<ReviewSummary[]>("/api/v1/admin/reviews", { accessToken });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(async () => {
+    const response = await client.listAdminReviews({});
+    return response.reviews as ReviewSummary[];
+  });
 }
 
 export function hideAdminReview(accessToken: string, reviewId: string) {
-  return apiFetch<ReviewSummary>(`/api/v1/admin/reviews/${reviewId}/hide`, {
-    method: "PATCH",
-    accessToken,
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.hideAdminReview(create(HideAdminReviewRequestSchema, { reviewId })),
+  ) as Promise<ReviewSummary>;
 }

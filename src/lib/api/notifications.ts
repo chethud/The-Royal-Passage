@@ -1,4 +1,6 @@
-import { apiFetch } from "@/lib/api/client";
+import { create } from "@bufbuild/protobuf";
+import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
+import { MarkNotificationReadRequestSchema } from "@/gen/royalpassage/v1/service_pb";
 
 export type NotificationSummary = {
   id: string;
@@ -11,19 +13,21 @@ export type NotificationSummary = {
 };
 
 export function fetchNotifications(accessToken: string) {
-  return apiFetch<NotificationSummary[]>("/api/v1/notifications", { accessToken });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(async () => {
+    const response = await client.listNotifications({});
+    return response.notifications as NotificationSummary[];
+  });
 }
 
 export function markNotificationRead(accessToken: string, notificationId: string) {
-  return apiFetch<NotificationSummary>(`/api/v1/notifications/${notificationId}/read`, {
-    method: "POST",
-    accessToken,
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.markNotificationRead(create(MarkNotificationReadRequestSchema, { notificationId })),
+  ) as Promise<NotificationSummary>;
 }
 
 export function markAllNotificationsRead(accessToken: string) {
-  return apiFetch<{ ok: boolean; count: number }>("/api/v1/notifications/read-all", {
-    method: "POST",
-    accessToken,
-  });
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() => client.markAllNotificationsRead({}));
 }

@@ -15,7 +15,7 @@ function productionFallback(): string {
   return PRODUCTION_API_BASE_URL;
 }
 
-function readApiBaseUrl(): string {
+export function readApiBaseUrl(): string {
   const fromImport = resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL as string | undefined);
   if (fromImport) {
     if (typeof window !== "undefined" && fromImport.includes("localhost")) {
