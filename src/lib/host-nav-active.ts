@@ -2,12 +2,12 @@
 export function isHostNavItemActive(pathname: string, to: string): boolean {
   if (pathname === to) return true;
 
-  if (to === "/host/experiences") {
-    return /^\/host\/experiences\/[^/]+$/.test(pathname);
-  }
+  // "/host/experiences/new" must not also activate "My Experiences".
+  if (to === "/host/experiences/new") return false;
 
-  if (to === "/host/experiences/new") {
-    return false;
+  if (to === "/host/experiences") {
+    const segment = pathname.match(/^\/host\/experiences\/([^/]+)$/)?.[1];
+    return segment !== undefined && segment !== "new";
   }
 
   return pathname.startsWith(`${to}/`);

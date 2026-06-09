@@ -5,7 +5,10 @@ import { isApiConfigured, readApiBaseUrl, toErrorMessage } from "@/lib/api/clien
 
 function authInterceptor(accessToken: string): Interceptor {
   return (next) => async (req) => {
-    req.header.set("Authorization", `Bearer ${accessToken}`);
+    const token = accessToken.trim();
+    if (token) {
+      req.header.set("Authorization", token.startsWith("Bearer ") ? token : `Bearer ${token}`);
+    }
     return next(req);
   };
 }

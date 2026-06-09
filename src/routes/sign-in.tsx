@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
+import { JwtSignInForm } from "@/components/auth/JwtSignInForm";
 import { RoleBadge } from "@/components/auth/RoleBadge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -38,6 +39,7 @@ function SignInPage() {
   const navigate = Route.useNavigate();
   const { redirect } = Route.useSearch();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [showJwtSignIn, setShowJwtSignIn] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -421,6 +423,26 @@ function SignInPage() {
                   Create an account
                 </button>
               </p>
+
+              <div className="mt-8 border-t border-[oklch(0.88_0.08_86_/_0.25)] pt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowJwtSignIn((open) => !open)}
+                  className="w-full text-left text-sm font-medium text-foreground transition-colors hover:text-ember"
+                >
+                  {showJwtSignIn ? "Hide host / admin JWT sign-in" : "Host or admin? Sign in with JWT"}
+                </button>
+                {showJwtSignIn ? (
+                  <div className="mt-4">
+                    <JwtSignInForm
+                      busy={busy}
+                      onBusyChange={setBusy}
+                      onError={setError}
+                      onNotice={setNotice}
+                    />
+                  </div>
+                ) : null}
+              </div>
             </>
           ) : (
             <>
