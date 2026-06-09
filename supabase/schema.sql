@@ -656,6 +656,23 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+-- Backfill profiles for auth users missing a row (OAuth / pre-trigger signups). Safe to re-run.
+insert into public.profiles (id, full_name, phone, role)
+select
+  u.id,
+  coalesce(
+    u.raw_user_meta_data->>'full_name',
+    u.raw_user_meta_data->>'name',
+    nullif(split_part(u.email, '@', 1), ''),
+    'Guest'
+  ),
+  u.raw_user_meta_data->>'phone',
+  'guest'
+from auth.users u
+left join public.profiles p on p.id = u.id
+where p.id is null
+on conflict (id) do nothing;
+
 -- ---------------------------------------------------------------------------
 -- Seed data (deterministic UUIDs for idempotent re-runs)
 -- ---------------------------------------------------------------------------

@@ -1,114 +1,132 @@
 import { Link } from "@tanstack/react-router";
-import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
-import type { MouseEvent } from "react";
+import { Clock, MapPin, Star, Users } from "lucide-react";
+import { motion } from "motion/react";
 import type { Experience } from "@/data/experiences";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
-import { formatDateShort } from "@/lib/date-format";
 
 export function ExperienceCard({ exp }: { exp: Experience }) {
   const nextSlot = exp.slots.find((s) => s.available > 0);
   const reduceMotion = usePrefersReducedMotion();
-
-  const mx = useMotionValue(0.5);
-  const my = useMotionValue(0.5);
-  const rotX = useTransform(my, [0, 1], [5.5, -5.5]);
-  const rotY = useTransform(mx, [0, 1], [-6.5, 6.5]);
-  const springX = useSpring(rotX, { stiffness: 280, damping: 26, mass: 0.4 });
-  const springY = useSpring(rotY, { stiffness: 280, damping: 26, mass: 0.4 });
-
-  const handleMove = (e: MouseEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    mx.set((e.clientX - r.left) / r.width);
-    my.set((e.clientY - r.top) / r.height);
-  };
-  const handleLeave = () => {
-    mx.set(0.5);
-    my.set(0.5);
-  };
+  const sym = exp.currencySymbol ?? "₹";
+  const maxGuests = exp.maxGuestsPerBooking ?? nextSlot?.capacity ?? 10;
 
   const card = (
-    <div className="group block">
-      <div className="relative">
+    <article className="luxury-card group flex h-full flex-col overflow-hidden rounded-[20px] border border-[#C8A25A]/22 bg-[#4A0000]/45 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-sm transition-all duration-500 hover:-translate-y-1 hover:border-[#C8A25A]/45 hover:shadow-[0_0_40px_-12px_#C8A25A55]">
+      <div className="relative h-[320px] overflow-hidden">
         <Link
           to="/experiences/$slug"
           params={{ slug: exp.slug }}
-          className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ember focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]"
         >
-          <div
-            className="relative aspect-[4/5] overflow-hidden rounded-md bg-muted/40 shadow-soft ring-1 ring-[oklch(0.88_0.08_86_/_0.22)] transition-shadow duration-500 group-hover:shadow-[var(--shadow-lift)]"
-            style={{ transformStyle: "preserve-3d" }}
-          >
-            <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/40 via-transparent to-amber-100/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-            <img
-              src={exp.image}
-              alt={exp.title}
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
-            />
-            <div
-              className="absolute top-3 left-3 z-20 flex gap-2"
-              style={{ transform: "translateZ(24px)" }}
-            >
-          <span className="border border-[oklch(0.88_0.08_86_/_0.25)] bg-background/75 px-2.5 py-1 text-[0.65rem] uppercase tracking-wider text-foreground shadow-soft backdrop-blur-md">
+          <img
+            src={exp.image}
+            alt={exp.title}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#4A0000]/90 via-[#4A0000]/20 to-transparent" />
+        </Link>
+
+        <div className="absolute left-4 top-4 z-20 flex flex-wrap gap-2">
+          <span className="rounded-full border border-[#C8A25A]/35 bg-[#4A0000]/75 px-3 py-1 text-[0.62rem] font-medium uppercase tracking-[0.16em] text-[#F7F1E8] backdrop-blur-md">
             {exp.category}
           </span>
-          {exp.verifiedHost && (
-            <span className="border border-ember/40 bg-ember/95 px-2.5 py-1 text-[0.65rem] uppercase tracking-wider text-primary-foreground shadow-soft">
+          {exp.verifiedHost ? (
+            <span className="rounded-full border border-[#C8A25A]/50 bg-gradient-to-r from-[#C8A25A] to-[#D4AF6A] px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#4A0000]">
               Verified
             </span>
-          )}
-            </div>
-          </div>
-        </Link>
-        <WishlistButton
-          experienceId={exp.id}
-          className="absolute top-3 right-3 z-30"
-        />
+          ) : null}
+        </div>
+
+        <WishlistButton experienceId={exp.id} className="absolute right-4 top-4 z-30" />
       </div>
-      <div className="flex justify-between gap-4 pt-4">
+
+      <div className="flex flex-1 flex-col p-6">
+        <div className="flex items-center gap-1.5 text-xs text-[#D6C8B5]">
+          <MapPin className="h-3.5 w-3.5 text-[#C8A25A]" />
+          {exp.city}
+        </div>
+
         <Link
           to="/experiences/$slug"
           params={{ slug: exp.slug }}
-          className="min-w-0 flex-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ember"
+          className="mt-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]"
         >
-          <div className="text-xs text-muted-foreground">{exp.city}</div>
-          <h3 className="mt-0.5 truncate font-display text-xl leading-tight">{exp.title}</h3>
-          <div className="mt-1 text-sm text-ink-soft">
-            {nextSlot
-              ? `${nextSlot.available} seats · ${formatDateShort(nextSlot.date)}`
-              : "Sold out"}
-          </div>
+          <h3 className="font-display text-2xl leading-tight text-[#F7F1E8] transition-colors group-hover:text-[#D4AF6A]">
+            {exp.title}
+          </h3>
         </Link>
-        <div className="shrink-0 text-right">
-          <div className="text-[0.65rem] uppercase tracking-wider text-muted-foreground">From</div>
-          <div className="font-display text-lg">
-            {exp.currencySymbol ?? "€"}
-            {exp.pricePerPerson}
+
+        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-[#D6C8B5]">
+          {exp.tagline || exp.description}
+        </p>
+
+        <div className="mt-5 flex flex-wrap gap-4 text-xs text-[#D6C8B5]">
+          <span className="inline-flex items-center gap-1.5">
+            <Clock className="h-3.5 w-3.5 text-[#C8A25A]" />
+            {exp.durationHours}h
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <Users className="h-3.5 w-3.5 text-[#C8A25A]" />
+            Up to {maxGuests} guests
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-[#D4AF6A]">
+            <Star className="h-3.5 w-3.5 fill-current" />
+            {exp.rating}
+          </span>
+        </div>
+
+        <div className="mt-auto flex items-end justify-between gap-4 pt-6">
+          <div>
+            <div className="text-[0.65rem] uppercase tracking-[0.16em] text-[#D6C8B5]">
+              Starting from
+            </div>
+            <div className="font-display text-3xl text-[#F7F1E8]">
+              {sym}
+              {exp.pricePerPerson}
+            </div>
+            <div className="text-xs text-[#D6C8B5]">per guest</div>
           </div>
-          <div className="mt-1 text-xs text-ember">★ {exp.rating}</div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-3">
           {nextSlot ? (
             <Link
-              to="/experiences/$slug"
+              to="/experiences/$slug/book"
               params={{ slug: exp.slug }}
-              hash="book"
-              className="mt-3 inline-flex rounded-sm bg-ember px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110"
+              search={{ slotId: nextSlot.id, guests: Math.min(2, nextSlot.available) }}
+              className="luxury-btn-primary text-center text-xs"
             >
-              Book
+              Book experience
             </Link>
-          ) : null}
+          ) : (
+            <span className="luxury-btn-primary pointer-events-none text-center text-xs opacity-50">
+              Sold out
+            </span>
+          )}
+          <Link
+            to="/experiences/$slug"
+            params={{ slug: exp.slug }}
+            className="luxury-btn-secondary text-center text-xs"
+          >
+            View details
+          </Link>
         </div>
       </div>
-    </div>
+    </article>
   );
 
   if (reduceMotion) return card;
 
   return (
-    <div className="[perspective:1400px]" onMouseMove={handleMove} onMouseLeave={handleLeave}>
-      <motion.div style={{ rotateX: springX, rotateY: springY, transformStyle: "preserve-3d" }}>
-        {card}
-      </motion.div>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {card}
+    </motion.div>
   );
 }

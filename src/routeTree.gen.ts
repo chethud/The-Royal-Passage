@@ -27,6 +27,7 @@ import { Route as ExperiencesSlugRouteImport } from './routes/experiences.$slug'
 import { Route as DashboardWishlistRouteImport } from './routes/dashboard.wishlist'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardPastRouteImport } from './routes/dashboard.past'
+import { Route as DashboardHistoryRouteImport } from './routes/dashboard.history'
 import { Route as DashboardCancelledRouteImport } from './routes/dashboard.cancelled'
 import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
 import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookingId'
@@ -127,6 +128,11 @@ const DashboardPastRoute = DashboardPastRouteImport.update({
   path: '/past',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardCancelledRoute = DashboardCancelledRouteImport.update({
   id: '/cancelled',
   path: '/cancelled',
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/past': typeof DashboardPastRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/past': typeof DashboardPastRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/past': typeof DashboardPastRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/bookings/$bookingId'
     | '/cities/$slug'
     | '/dashboard/cancelled'
+    | '/dashboard/history'
     | '/dashboard/past'
     | '/dashboard/profile'
     | '/dashboard/wishlist'
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/bookings/$bookingId'
     | '/cities/$slug'
     | '/dashboard/cancelled'
+    | '/dashboard/history'
     | '/dashboard/past'
     | '/dashboard/profile'
     | '/dashboard/wishlist'
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/bookings/$bookingId'
     | '/cities/$slug'
     | '/dashboard/cancelled'
+    | '/dashboard/history'
     | '/dashboard/past'
     | '/dashboard/profile'
     | '/dashboard/wishlist'
@@ -499,6 +511,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardPastRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/history': {
+      id: '/dashboard/history'
+      path: '/history'
+      fullPath: '/dashboard/history'
+      preLoaderRoute: typeof DashboardHistoryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/cancelled': {
       id: '/dashboard/cancelled'
       path: '/cancelled'
@@ -578,6 +597,7 @@ const CitiesRouteWithChildren =
 
 interface DashboardRouteChildren {
   DashboardCancelledRoute: typeof DashboardCancelledRoute
+  DashboardHistoryRoute: typeof DashboardHistoryRoute
   DashboardPastRoute: typeof DashboardPastRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardWishlistRoute: typeof DashboardWishlistRoute
@@ -585,6 +605,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardCancelledRoute: DashboardCancelledRoute,
+  DashboardHistoryRoute: DashboardHistoryRoute,
   DashboardPastRoute: DashboardPastRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardWishlistRoute: DashboardWishlistRoute,

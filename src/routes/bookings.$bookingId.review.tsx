@@ -84,7 +84,7 @@ function BookingReviewPage() {
         <Header />
         <div className="container-page py-20 max-w-lg">
           <p className="text-destructive">{loadError ?? "Booking not found."}</p>
-          <Link to="/dashboard/past" className="mt-4 inline-block text-ember hover:underline">
+          <Link to="/dashboard/history" className="mt-4 inline-block text-ember hover:underline">
             Back to past bookings
           </Link>
         </div>
@@ -115,8 +115,8 @@ function BookingReviewPage() {
               >
                 View experience
               </Link>
-              <Link to="/dashboard/past" className="text-sm text-ember hover:underline">
-                Past bookings
+              <Link to="/dashboard/history" className="text-sm text-ember hover:underline">
+                Booking history
               </Link>
             </div>
           </div>

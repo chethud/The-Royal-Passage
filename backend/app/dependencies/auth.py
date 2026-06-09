@@ -2,6 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.dependencies.supabase import get_supabase_admin
+from app.services.profiles import ensure_user_profile
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -19,17 +20,13 @@ async def get_current_user(
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token.")
 
-    profile = (
-        supabase.table("profiles")
-        .select("role, full_name, phone, host_id, created_at")
-        .eq("id", user.id)
-        .maybe_single()
-        .execute()
-    )
-
-    row = profile.data
-    if not row:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Profile not found.")
+    try:
+        row = ensure_user_profile(supabase, user)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(exc),
+        ) from exc
 
     return {"user": user, "profile": row, "token": credentials.credentials}
 

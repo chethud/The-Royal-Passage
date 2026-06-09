@@ -1,42 +1,74 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useTransition } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ExperienceCard } from "@/components/site/ExperienceCard";
+import { ExperiencesHero } from "@/components/experiences/ExperiencesHero";
+import { ExperiencesSearchBar } from "@/components/experiences/ExperiencesSearchBar";
+import { ExperiencesFilterSidebar } from "@/components/experiences/ExperiencesFilterSidebar";
+import { ExperiencesEmptyState } from "@/components/experiences/ExperiencesEmptyState";
+import { ExperienceCardSkeleton } from "@/components/experiences/ExperienceCardSkeleton";
+import { useAuthUser } from "@/lib/auth-user";
 import { listCities } from "@/lib/city-fns";
+import {
+  filterExperiences,
+  paginateExperiences,
+  totalPages,
+  type ExperienceSearch,
+  PAGE_SIZE,
+} from "@/lib/experience-filters";
 import { getCatalogForUi } from "@/lib/marketplace-fns";
 import { canonicalLink } from "@/lib/seo-helpers";
 import { SITE_URL } from "@/lib/seo";
 
-type Search = {
-  category?: string;
-  city?: string;
-};
+function parseSearch(s: Record<string, unknown>): ExperienceSearch {
+  const num = (v: unknown) => (typeof v === "string" && v ? Number(v) : undefined);
+  return {
+    category: typeof s.category === "string" ? s.category : undefined,
+    city: typeof s.city === "string" ? s.city : undefined,
+    q: typeof s.q === "string" ? s.q : undefined,
+    minPrice: num(s.minPrice),
+    maxPrice: num(s.maxPrice),
+    duration:
+      s.duration === "short" ||
+      s.duration === "half" ||
+      s.duration === "full" ||
+      s.duration === "multi"
+        ? s.duration
+        : undefined,
+    availability:
+      s.availability === "today" ||
+      s.availability === "tomorrow" ||
+      s.availability === "week" ||
+      s.availability === "weekend"
+        ? s.availability
+        : undefined,
+    page: num(s.page) ?? 1,
+  };
+}
 
 export const Route = createFileRoute("/experiences")({
   loader: async () => {
     const [catalog, cities] = await Promise.all([getCatalogForUi(), listCities()]);
     return { ...catalog, cityOptions: cities };
   },
-  validateSearch: (s: Record<string, unknown>): Search => ({
-    category: typeof s.category === "string" ? s.category : undefined,
-    city: typeof s.city === "string" ? s.city : undefined,
-  }),
+  validateSearch: parseSearch,
   head: ({ search }) => {
     const cityLabel = search.city
       ? search.city.charAt(0).toUpperCase() + search.city.slice(1)
       : null;
     const title = cityLabel
       ? `${cityLabel} experiences — The Royal Passage`
-      : "All experiences — The Royal Passage";
+      : "Luxury experiences — The Royal Passage";
     return {
       meta: [
         { title },
         {
           name: "description",
           content: cityLabel
-            ? `Browse curated experiences in ${cityLabel} hosted by verified local experts.`
-            : "Browse curated, time-bound experiences hosted by verified artisans across South India.",
+            ? `Browse curated luxury experiences in ${cityLabel} hosted by verified local experts.`
+            : "Discover extraordinary curated experiences — cultural, wellness, culinary and rural journeys across South India.",
         },
         { property: "og:title", content: title },
         { property: "og:type", content: "website" },
@@ -53,129 +85,138 @@ function ExperiencesPage() {
   const { experiences, categories, cityOptions } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
+  const { user } = useAuthUser();
+  const [pending, startTransition] = useTransition();
 
-  const filtered = useMemo(() => {
-    return experiences.filter((e) => {
-      if (search.category && e.category !== search.category) return false;
-      if (search.city) {
-        const citySlug = search.city.toLowerCase();
-        const matchesSlug = e.citySlug === citySlug;
-        const cityRow = cityOptions.find((c) => c.slug === citySlug);
-        const matchesName =
-          e.city.toLowerCase() === citySlug ||
-          (cityRow ? e.city.toLowerCase() === cityRow.name.toLowerCase() : false);
-        if (!matchesSlug && !matchesName) return false;
-      }
-      return true;
+  const filtered = useMemo(
+    () => filterExperiences(experiences, search, cityOptions),
+    [cityOptions, experiences, search],
+  );
+
+  const page = search.page ?? 1;
+  const pages = totalPages(filtered.length);
+  const paged = useMemo(() => paginateExperiences(filtered, page), [filtered, page]);
+
+  const updateSearch = (patch: Partial<ExperienceSearch>) => {
+    startTransition(() => {
+      void navigate({ search: (prev) => ({ ...prev, ...patch }) });
     });
-  }, [cityOptions, experiences, search.category, search.city]);
+  };
 
-  const updateCategory = (category: string | undefined) =>
-    navigate({ search: (prev) => ({ ...prev, category }) });
-
-  const updateCity = (city: string | undefined) =>
-    navigate({ search: (prev) => ({ ...prev, city }) });
+  const resetFilters = () => {
+    void navigate({
+      search: {
+        category: undefined,
+        city: undefined,
+        q: undefined,
+        minPrice: undefined,
+        maxPrice: undefined,
+        duration: undefined,
+        availability: undefined,
+        page: 1,
+      },
+    });
+  };
 
   return (
-    <div className="pt-[var(--header-height)] text-foreground">
+    <div className="text-foreground">
       <Header />
-      <section className="container-page pt-10 pb-6 sm:pt-12 sm:pb-8">
-        <div className="eyebrow mb-3">The library</div>
-        <h1 className="font-display text-4xl sm:text-5xl md:text-6xl">All experiences</h1>
-        <p className="mt-4 max-w-xl text-sm sm:text-base text-muted-foreground">
-          {filtered.length} of {experiences.length} experiences
-          {search.city
-            ? ` in ${cityOptions.find((c) => c.slug === search.city)?.name ?? search.city}`
-            : ""}
-          {search.category ? ` · ${search.category}` : ""}.
-        </p>
+
+      <ExperiencesHero signedIn={Boolean(user)} />
+
+      <section className="container-page -mt-8 relative z-20 pb-8">
+        <ExperiencesSearchBar
+          value={search.q ?? ""}
+          onChange={(q) => updateSearch({ q: q || undefined, page: 1 })}
+        />
       </section>
 
-      <section className="container-page grid lg:grid-cols-[260px_1fr] gap-8 lg:gap-10 pb-16 md:pb-20">
-        <aside className="glass self-start space-y-8 rounded-md border border-[oklch(0.72_0.09_78_/_0.22)] p-6 lg:sticky lg:top-[calc(var(--header-height)+1rem)]">
-          <FilterGroup label="City">
-            <FilterChip active={!search.city} onClick={() => updateCity(undefined)}>
-              All
-            </FilterChip>
-            {cityOptions.map((c) => (
-              <FilterChip
-                key={c.slug}
-                active={search.city === c.slug}
-                onClick={() => updateCity(search.city === c.slug ? undefined : c.slug)}
-              >
-                {c.name}
-              </FilterChip>
-            ))}
-          </FilterGroup>
-          <FilterGroup label="Category">
-            <FilterChip active={!search.category} onClick={() => updateCategory(undefined)}>
-              All
-            </FilterChip>
-            {categories.map((c) => (
-              <FilterChip
-                key={c}
-                active={search.category === c}
-                onClick={() => updateCategory(search.category === c ? undefined : c)}
-              >
-                {c}
-              </FilterChip>
-            ))}
-          </FilterGroup>
-        </aside>
+      <section id="experiences-grid" className="container-page pb-20">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-[#C8A25A]/15 pb-6">
+          <div>
+            <p className="eyebrow text-[#D4AF6A]">Curated collection</p>
+            <h2 className="mt-2 font-display text-3xl text-[#F7F1E8] md:text-4xl">
+              {filtered.length} experience{filtered.length === 1 ? "" : "s"}
+            </h2>
+            <p className="mt-2 text-sm text-[#D6C8B5]">
+              Handpicked journeys from verified hosts across South India
+            </p>
+          </div>
+          <p className="text-sm text-[#D6C8B5]">
+            Page {Math.min(page, pages)} of {pages}
+          </p>
+        </div>
 
-        <div>
-          {filtered.length === 0 ? (
-            <div className="glass rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] p-16 text-center">
-              <p className="font-display text-2xl">Nothing matches.</p>
-              <p className="text-sm text-muted-foreground mt-2">Try another category.</p>
-              <Link to="/experiences" className="mt-6 inline-block underline underline-offset-4">
-                View all
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-5 sm:gap-x-6 gap-y-10 sm:gap-y-12">
-              {filtered.map((e) => (
-                <ExperienceCard key={e.id} exp={e} />
-              ))}
-            </div>
-          )}
+        <div className="flex flex-col gap-10 lg:flex-row lg:gap-12">
+          <ExperiencesFilterSidebar
+            search={search}
+            categories={categories}
+            cityOptions={cityOptions}
+            onUpdate={updateSearch}
+            onReset={resetFilters}
+          />
+
+          <div className="min-w-0 flex-1">
+            <AnimatePresence mode="wait">
+              {pending ? (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
+                >
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <ExperienceCardSkeleton key={i} />
+                  ))}
+                </motion.div>
+              ) : filtered.length === 0 ? (
+                <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <ExperiencesEmptyState onReset={resetFilters} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key={`grid-${page}-${search.q}-${search.city}-${search.category}`}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
+                >
+                  {paged.map((e) => (
+                    <ExperienceCard key={e.id} exp={e} />
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {filtered.length > PAGE_SIZE ? (
+              <div className="mt-12 flex items-center justify-center gap-3">
+                <button
+                  type="button"
+                  disabled={page <= 1}
+                  onClick={() => updateSearch({ page: Math.max(1, page - 1) })}
+                  className="luxury-btn-secondary disabled:opacity-40"
+                >
+                  Previous
+                </button>
+                <span className="px-4 text-sm text-[#D6C8B5]">
+                  {page} / {pages}
+                </span>
+                <button
+                  type="button"
+                  disabled={page >= pages}
+                  onClick={() => updateSearch({ page: Math.min(pages, page + 1) })}
+                  className="luxury-btn-secondary disabled:opacity-40"
+                >
+                  Next
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </section>
 
       <Footer />
     </div>
-  );
-}
-
-function FilterGroup({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <div className="eyebrow mb-3">{label}</div>
-      <div className="flex flex-wrap gap-2">{children}</div>
-    </div>
-  );
-}
-
-function FilterChip({
-  active,
-  onClick,
-  children,
-}: {
-  active?: boolean;
-  onClick?: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-sm px-3 py-1.5 text-xs transition-all ${
-        active
-          ? "border border-ember bg-ember/95 font-medium text-primary-foreground shadow-[var(--shadow-gold)]"
-          : "border border-[oklch(0.72_0.09_78_/_0.25)] bg-background/15 text-foreground hover:border-ember/45"
-      }`}
-    >
-      {children}
-    </button>
   );
 }

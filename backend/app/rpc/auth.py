@@ -3,6 +3,7 @@ from connectrpc.errors import ConnectError
 from connectrpc.request import RequestContext
 
 from app.dependencies.supabase import get_supabase_admin
+from app.services.profiles import ensure_user_profile
 
 
 def _read_bearer_token(ctx: RequestContext) -> str:
@@ -21,16 +22,10 @@ def resolve_current_user(ctx: RequestContext) -> dict:
     if not user:
         raise ConnectError(Code.UNAUTHENTICATED, "Invalid or expired token.")
 
-    profile = (
-        supabase.table("profiles")
-        .select("role, full_name, phone, host_id, created_at")
-        .eq("id", user.id)
-        .maybe_single()
-        .execute()
-    )
-    row = profile.data if profile else None
-    if not row:
-        raise ConnectError(Code.PERMISSION_DENIED, "Profile not found.")
+    try:
+        row = ensure_user_profile(supabase, user)
+    except ValueError as exc:
+        raise ConnectError(Code.INTERNAL, str(exc)) from exc
 
     return {"user": user, "profile": row, "token": token}
 

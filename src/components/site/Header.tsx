@@ -1,5 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { LogOut, Menu, UserRound } from "lucide-react";
+import { Heart, LogOut, Menu, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
 import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav";
@@ -51,7 +51,7 @@ function navItemsForUser(role: UserRole | null | undefined, signedIn: boolean): 
 }
 
 const navLinkClass =
-  "rounded-sm px-1 py-1 text-ink/80 transition-colors hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60";
+  "header-nav-link rounded-sm px-1 py-1 text-ink/80 transition-colors hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60";
 
 const sheetLinkClass =
   "rounded-sm px-3 py-2.5 text-sm uppercase tracking-[0.16em] text-ink/85 hover:bg-white/5 hover:text-ember";
@@ -127,7 +127,7 @@ export function Header() {
               <Link
                 key={`${item.to}-${item.label}`}
                 to={item.to as "/experiences"}
-                className={`${navLinkClass}${active ? " text-ember" : ""}`}
+                className={`${navLinkClass}${active ? " text-ember header-nav-link--active" : ""}`}
               >
                 {item.label}
               </Link>
@@ -149,6 +149,17 @@ export function Header() {
             </>
           ) : (
             <>
+              {role === "guest" ? (
+                <Link
+                  to="/dashboard/wishlist"
+                  className={`${navLinkClass} inline-flex items-center${
+                    pathname.startsWith("/dashboard/wishlist") ? " text-ember header-nav-link--active" : ""
+                  }`}
+                  aria-label="Wishlist"
+                >
+                  <Heart className="h-4 w-4" />
+                </Link>
+              ) : null}
               <NotificationBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -220,7 +231,7 @@ export function Header() {
                   <SheetClose asChild key={`${item.to}-${item.label}`}>
                     <Link
                       to={item.to as "/experiences"}
-                      className={`${sheetLinkClass}${active ? " text-ember" : ""}`}
+                      className={`${sheetLinkClass}${active ? " text-ember header-nav-link--active" : ""}`}
                     >
                       {item.label}
                     </Link>
