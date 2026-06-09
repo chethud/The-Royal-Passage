@@ -1,14 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import heroPalaceImg from "@/assets/hero-image.png";
 import heroDinnerImg from "@/assets/hero.jpg";
 import expDiningImg from "@/assets/exp-dining.jpg";
 import expCraftImg from "@/assets/exp-craft.jpg";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { HeroSlideshow } from "@/components/site/HeroSlideshow";
-import { ClocheIcon, CrownIcon, LotusBudIcon, LotusIcon } from "@/components/site/PillarIcons";
 
 const softEase = [0.22, 1, 0.36, 1] as const;
 
@@ -20,13 +19,6 @@ const revealItem = {
   hidden: { opacity: 0, y: 28 },
   show: { opacity: 1, y: 0, transition: { duration: 0.75, ease: softEase } },
 };
-
-const sidePillars = [
-  { icon: LotusBudIcon, label: "Authentic & Local" },
-  { icon: CrownIcon, label: "Royal Heritage" },
-  { icon: LotusIcon, label: "Sustainable Tourism" },
-  { icon: ClocheIcon, label: "Bespoke Service" },
-];
 
 const heroSlides = [
   { src: heroPalaceImg, alt: "Mysuru Palace at golden hour through arched colonnade" },
@@ -62,7 +54,7 @@ export function HomeHero() {
 
       {/* CONTENT */}
       <div className="container-page relative z-10 flex min-h-[max(640px,100dvh)] flex-col justify-center pt-[var(--header-height)]">
-        <div className="grid items-center gap-10 py-14 md:grid-cols-[1fr_auto] md:gap-12 md:py-20 lg:gap-16">
+        <div className="py-14 md:py-20">
           <motion.div className="max-w-2xl" variants={revealParent} initial="hidden" animate="show">
             <motion.div variants={revealItem} className="eyebrow mb-5 text-ember/95">
               Curated Experiences · Timeless Memories
@@ -97,15 +89,6 @@ export function HomeHero() {
                 Explore Experiences
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
-              <button
-                type="button"
-                className="group inline-flex items-center gap-3 rounded-sm border border-[oklch(0.88_0.08_86_/_0.45)] bg-background/15 px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink backdrop-blur-md transition-colors hover:border-ember/70 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
-              >
-                <span className="flex h-6 w-6 items-center justify-center rounded-full border border-ember/60 bg-ember/15">
-                  <Play className="h-3 w-3 fill-ember text-ember" />
-                </span>
-                Watch Film
-              </button>
               <Link
                 to="/sign-in"
                 className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.45)] bg-background/15 px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink backdrop-blur-md transition-colors hover:border-ember/70 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
@@ -114,29 +97,6 @@ export function HomeHero() {
               </Link>
             </motion.div>
           </motion.div>
-
-          {/* SIDE PILLARS */}
-          <motion.aside
-            aria-label="Our standards"
-            className="hidden md:block"
-            initial={{ opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6, duration: 0.9, ease: softEase }}
-          >
-            <ul className="flex flex-col items-center gap-5 border-l border-[oklch(0.88_0.08_86_/_0.18)] py-2 pl-5 lg:gap-7 lg:pl-7">
-              {sidePillars.map(({ icon: Icon, label }) => (
-                <li
-                  key={label}
-                  className="group flex flex-col items-center gap-2 text-center text-[0.58rem] uppercase tracking-[0.2em] text-ink/75 transition-colors hover:text-ember lg:text-[0.62rem] lg:tracking-[0.22em]"
-                >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/20 text-ember/90 backdrop-blur-md transition-all group-hover:border-ember/70 group-hover:bg-ember/10 lg:h-12 lg:w-12">
-                    <Icon className="h-5 w-5 lg:h-6 lg:w-6" />
-                  </span>
-                  <span className="max-w-[5rem] leading-tight">{label}</span>
-                </li>
-              ))}
-            </ul>
-          </motion.aside>
         </div>
 
         {/* SLIDE DOTS */}
