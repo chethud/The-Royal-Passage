@@ -1,22 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
-  ChefHat,
   ChevronLeft,
   ChevronRight,
-  Compass,
   Flame,
   Landmark,
   Palette,
-  Trees,
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import expCraftImg from "@/assets/exp-craft.jpg";
-import culinaryCoursesImg from "@/assets/culinary-courses.png";
-import natureWalksKukkarahalliImg from "@/assets/nature-walks-kukkarahalli.png";
-import curatedExpeditionsImg from "@/assets/curated-expeditions.png";
 import heroPalaceImg from "@/assets/hero-image.png";
 import outdoorCookingImg from "@/assets/outdoor-cooking.png";
 
@@ -39,14 +33,6 @@ const cards: ShowcaseCard[] = [
     href: "/experiences?category=Craft",
   },
   {
-    icon: ChefHat,
-    title: "Culinary Courses",
-    description: "Discover the rich flavours of Mysuru's royal kitchens.",
-    image: culinaryCoursesImg,
-    alt: "A traditional Mysuru culinary course in progress",
-    href: "/experiences?category=Dining",
-  },
-  {
     icon: Flame,
     title: "Outdoor Cooking",
     description: "Cook in nature, fire in the wild. Memories that linger.",
@@ -55,28 +41,12 @@ const cards: ShowcaseCard[] = [
     href: "/experiences?category=Tasting",
   },
   {
-    icon: Trees,
-    title: "Nature Walks",
-    description: "Breathe in the greens and unwind with every step.",
-    image: natureWalksKukkarahalliImg,
-    alt: "A serene walk along Kukkarahalli Lake in Mysuru",
-    href: "/experiences?category=Wellness",
-  },
-  {
     icon: Landmark,
     title: "Heritage Walks",
     description: "Walk through stories carved in stone.",
     image: heroPalaceImg,
     alt: "Mysuru palace at golden hour",
     href: "/experiences",
-  },
-  {
-    icon: Compass,
-    title: "Curated Expeditions",
-    description: "Tailored journeys, crafted just for you.",
-    image: curatedExpeditionsImg,
-    alt: "A bespoke curated expedition through Mysuru's landscapes",
-    href: "/experiences?category=Drive",
   },
 ];
 

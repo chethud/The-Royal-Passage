@@ -21,6 +21,12 @@ export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
   admin: "/admin",
 };
 
+export const ROLE_PROFILE_PATH: Record<UserRole, string> = {
+  guest: "/dashboard/profile",
+  host: "/host/profile",
+  admin: "/admin/profile",
+};
+
 const INTENDED_ROLE_KEY = "rp_intended_role_v1";
 
 export function isUserRole(value: string | null | undefined): value is UserRole {
@@ -46,6 +52,11 @@ export function writeIntendedRole(role: UserRole) {
 export function dashboardPathForRole(role: UserRole | null | undefined): string {
   if (!role) return "/sign-in";
   return ROLE_DASHBOARD_PATH[role];
+}
+
+export function profilePathForRole(role: UserRole | null | undefined): string {
+  if (!role) return "/sign-in";
+  return ROLE_PROFILE_PATH[role];
 }
 
 /** Host or admin — not allowed to book as a guest. */

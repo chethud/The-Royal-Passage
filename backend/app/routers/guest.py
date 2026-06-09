@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.config import settings
-from app.dependencies.auth import require_guest
+from app.dependencies.auth import get_current_user, require_guest
 from app.models.schemas import GuestProfile, UpdateGuestProfileRequest, WishlistItem
 from app.services.guest_profile import get_guest_profile, update_guest_profile
 from app.services.wishlist import add_to_wishlist, list_wishlist, remove_from_wishlist
@@ -10,14 +10,14 @@ router = APIRouter(prefix="/api/v1", tags=["guest"])
 
 
 @router.get("/guest/profile", response_model=GuestProfile)
-def guest_profile(_auth=Depends(require_guest)):
+def guest_profile(_auth=Depends(get_current_user)):
     if not settings.supabase_configured:
         raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
     return get_guest_profile(_auth)
 
 
 @router.patch("/guest/profile", response_model=GuestProfile)
-def patch_guest_profile(payload: UpdateGuestProfileRequest, _auth=Depends(require_guest)):
+def patch_guest_profile(payload: UpdateGuestProfileRequest, _auth=Depends(get_current_user)):
     if not settings.supabase_configured:
         raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
     try:

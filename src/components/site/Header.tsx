@@ -24,17 +24,14 @@ import {
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
-import { dashboardPathForRole, type UserRole } from "@/lib/roles";
+import { dashboardPathForRole, profilePathForRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 type NavItem = { label: string; to: string };
 
 const publicNavItems: NavItem[] = [
-  { label: "Experiences", to: "/experiences" },
-  { label: "Cities", to: "/cities" },
   { label: "About Us", to: "/hosts" },
   { label: "Journal", to: "/journal" },
-  { label: "Contact", to: "/contact" },
 ];
 
 function navItemsForUser(role: UserRole | null | undefined, signedIn: boolean): NavItem[] {
@@ -72,6 +69,7 @@ export function Header() {
   const [elevated, setElevated] = useState(false);
   const { displayName, user, role } = useAuthUser();
   const dashboardPath = role ? dashboardPathForRole(role) : "/sign-in";
+  const profilePath = role ? profilePathForRole(role) : "/sign-in";
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -161,20 +159,18 @@ export function Header() {
                       Dashboard
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to={profilePath} className="cursor-pointer">
+                      <UserRound className="h-4 w-4" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
                   {role === "guest" ? (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link to="/experiences" className="cursor-pointer">
-                          Browse experiences
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/dashboard/profile" className="cursor-pointer">
-                          <UserRound className="h-4 w-4" />
-                          Profile
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
+                    <DropdownMenuItem asChild>
+                      <Link to="/experiences" className="cursor-pointer">
+                        Browse experiences
+                      </Link>
+                    </DropdownMenuItem>
                   ) : null}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -246,19 +242,17 @@ export function Header() {
                       {displayName ?? "Account"}
                     </Link>
                   </SheetClose>
+                  <SheetClose asChild>
+                    <Link to={profilePath} className={sheetLinkClass}>
+                      Profile
+                    </Link>
+                  </SheetClose>
                   {role === "guest" ? (
-                    <>
-                      <SheetClose asChild>
-                        <Link to="/experiences" className={sheetLinkClass}>
-                          Browse experiences
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link to="/dashboard/profile" className={sheetLinkClass}>
-                          Profile
-                        </Link>
-                      </SheetClose>
-                    </>
+                    <SheetClose asChild>
+                      <Link to="/experiences" className={sheetLinkClass}>
+                        Browse experiences
+                      </Link>
+                    </SheetClose>
                   ) : null}
                   <button
                     type="button"

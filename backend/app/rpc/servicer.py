@@ -160,7 +160,7 @@ class RoyalPassageServiceImpl(RoyalPassageService):
     @_rpc
     async def get_guest_profile(self, _request: empty_pb2.Empty, ctx: RequestContext) -> types_pb2.GuestProfile:
         _ensure_supabase()
-        auth = require_guest(ctx)
+        auth = resolve_current_user(ctx)
         return pydantic_to_proto(get_guest_profile(auth), types_pb2.GuestProfile)
 
     @_rpc
@@ -168,7 +168,7 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         self, request: types_pb2.UpdateGuestProfileRequest, ctx: RequestContext
     ) -> types_pb2.GuestProfile:
         _ensure_supabase()
-        auth = require_guest(ctx)
+        auth = resolve_current_user(ctx)
         payload = proto_to_pydantic(request, s.UpdateGuestProfileRequest)
         return pydantic_to_proto(update_guest_profile(auth, payload), types_pb2.GuestProfile)
 

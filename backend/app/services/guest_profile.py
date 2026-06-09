@@ -17,9 +17,6 @@ def get_guest_profile(auth: dict) -> GuestProfile:
 
 
 def update_guest_profile(auth: dict, payload: UpdateGuestProfileRequest) -> GuestProfile:
-    if auth["profile"].get("role") != "guest":
-        raise ValueError("Only guest profiles can be updated here.")
-
     updates: dict = {}
     if payload.fullName is not None:
         updates["full_name"] = payload.fullName.strip()

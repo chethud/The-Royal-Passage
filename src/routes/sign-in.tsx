@@ -3,8 +3,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { JwtSignInForm } from "@/components/auth/JwtSignInForm";
 import { RoleBadge } from "@/components/auth/RoleBadge";
-import { Header } from "@/components/site/Header";
-import { Footer } from "@/components/site/Footer";
+import { SignInHeroLayout } from "@/components/auth/SignInHeroLayout";
 import { useAuthUser } from "@/lib/auth-user";
 import { dashboardPathForRole, isGuestAccount, isStaffRole, ROLE_LABELS } from "@/lib/roles";
 import {
@@ -16,7 +15,9 @@ import {
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
 const inputClass =
-  "w-full rounded-sm border border-input bg-background/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+  "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 text-sm text-ink placeholder:text-ink/45 backdrop-blur-sm focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+
+const cardTitleClass = "font-display text-2xl tracking-tight text-ink md:text-[1.75rem]";
 
 type SignInSearch = {
   redirect?: string;
@@ -254,27 +255,72 @@ function SignInPage() {
     void navigate({ to: "/sign-in" });
   };
 
+  const heroContent = user
+    ? {
+        eyebrow: "Your account",
+        title: (
+          <>
+            Welcome,
+            <br />
+            <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
+              {displayName ?? "Member"}
+            </span>
+          </>
+        ),
+        description:
+          "Your access level is set automatically. You will be redirected to your dashboard, or update your profile below.",
+      }
+    : mode === "signin"
+      ? {
+          eyebrow: "Curated Experiences · Timeless Memories",
+          title: (
+            <>
+              Welcome
+              <br />
+              <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
+                Back,
+              </span>
+              <br />
+              Royally
+            </>
+          ),
+          description:
+            "Step into the cultural heart of Karnataka. Sign in to book experiences, manage your journeys, and unlock your Royal Passage account.",
+        }
+      : {
+          eyebrow: "Guest Registration",
+          title: (
+            <>
+              Join the
+              <br />
+              <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
+                Royal Passage
+              </span>
+            </>
+          ),
+          description:
+            "Create a guest account to save wishlists, request bookings, and receive confirmations for curated Mysuru experiences.",
+        };
+
   return (
-    <div className="pt-[var(--header-height)] text-foreground">
-      <Header />
-      <section className="container-page flex min-h-[70vh] flex-col items-center justify-center py-16 md:py-24">
-        <div className="glass-strong w-full max-w-md rounded-md px-8 py-10 md:px-10 md:py-12">
+    <SignInHeroLayout
+      eyebrow={heroContent.eyebrow}
+      title={heroContent.title}
+      description={heroContent.description}
+    >
+      <div className="glass-strong w-full rounded-md px-7 py-9 md:px-9 md:py-10">
           {user ? (
             <>
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <div className="eyebrow text-ember/90">Your account</div>
                 {role ? <RoleBadge role={role} /> : null}
               </div>
-              <h1 className="font-display text-3xl tracking-tight md:text-4xl">
-                Welcome, {displayName ?? "Member"}
-              </h1>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Your access level is set automatically. You will be redirected to your{" "}
-                {role ? ROLE_LABELS[role].toLowerCase() : "account"} dashboard.
+              <h2 className={cardTitleClass}>Account details</h2>
+              <p className="mt-2 text-sm leading-relaxed text-ink/75">
+                Redirecting to your {role ? ROLE_LABELS[role].toLowerCase() : "account"} dashboard.
               </p>
               <form className="mt-8 space-y-4" onSubmit={updateProfile}>
                 <div>
-                  <label htmlFor="profile-name" className="eyebrow mb-2 block text-foreground/90">
+                  <label htmlFor="profile-name" className="eyebrow mb-2 block text-ink/90">
                     Full name
                   </label>
                   <input
@@ -289,7 +335,7 @@ function SignInPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="profile-email" className="eyebrow mb-2 block text-foreground/90">
+                  <label htmlFor="profile-email" className="eyebrow mb-2 block text-ink/90">
                     Email
                   </label>
                   <input
@@ -297,11 +343,11 @@ function SignInPage() {
                     type="email"
                     value={user.email ?? ""}
                     disabled
-                    className="w-full rounded-sm border border-input/70 bg-background/30 px-4 py-3 text-sm text-muted-foreground"
+                    className="w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)] bg-background/30 px-4 py-3 text-sm text-ink/55"
                   />
                 </div>
                 <div>
-                  <label htmlFor="profile-phone" className="eyebrow mb-2 block text-foreground/90">
+                  <label htmlFor="profile-phone" className="eyebrow mb-2 block text-ink/90">
                     Phone
                   </label>
                   <input
@@ -325,7 +371,7 @@ function SignInPage() {
                 {role ? (
                   <Link
                     to={dashboardPathForRole(role)}
-                    className="block w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-center text-sm font-medium text-foreground transition-colors hover:border-ember/50 hover:text-ember"
+                    className="block w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-center text-sm font-medium text-ink transition-colors hover:border-ember/50 hover:text-ember"
                   >
                     Go to {ROLE_LABELS[role]} dashboard
                   </Link>
@@ -333,7 +379,7 @@ function SignInPage() {
                 <button
                   type="button"
                   onClick={signOut}
-                  className="glass glass-hover glass-hover-active w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-ember/50 hover:text-ember"
+                  className="glass glass-hover glass-hover-active w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-sm font-medium text-ink transition-colors hover:border-ember/50 hover:text-ember"
                 >
                   Sign out
                 </button>
@@ -342,10 +388,9 @@ function SignInPage() {
           ) : mode === "signin" ? (
             <>
               <div className="eyebrow mb-3 text-ember/90">Member access</div>
-              <h1 className="font-display text-3xl tracking-tight md:text-4xl">Sign in</h1>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Sign in with Google or use your email and password. Guests can also create an
-                account below.
+              <h2 className={cardTitleClass}>Sign in</h2>
+              <p className="mt-2 text-sm leading-relaxed text-ink/75">
+                Use Google or your email and password. New guests can create an account below.
               </p>
 
               <div className="mt-8 space-y-4">
@@ -356,7 +401,7 @@ function SignInPage() {
                 />
                 <div className="flex items-center gap-3">
                   <div className="hairline flex-1" />
-                  <span className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                  <span className="text-xs uppercase tracking-[0.14em] text-ink/55">
                     or email
                   </span>
                   <div className="hairline flex-1" />
@@ -365,7 +410,7 @@ function SignInPage() {
 
               <form className="mt-4 space-y-4" onSubmit={signIn}>
                 <div>
-                  <label htmlFor="signin-email" className="eyebrow mb-2 block text-foreground/90">
+                  <label htmlFor="signin-email" className="eyebrow mb-2 block text-ink/90">
                     Email
                   </label>
                   <input
@@ -381,7 +426,7 @@ function SignInPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="signin-password" className="eyebrow mb-2 block text-foreground/90">
+                  <label htmlFor="signin-password" className="eyebrow mb-2 block text-ink/90">
                     Password
                   </label>
                   <input
@@ -408,14 +453,14 @@ function SignInPage() {
                     type="button"
                     onClick={() => void resendConfirmation()}
                     disabled={resendingConfirmation || !email.trim()}
-                    className="w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-ember/50 hover:text-ember disabled:cursor-not-allowed disabled:opacity-70"
+                    className="w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-sm font-medium text-ink transition-colors hover:border-ember/50 hover:text-ember disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {resendingConfirmation ? "Sending..." : "Resend confirmation email"}
                   </button>
                 ) : null}
               </form>
 
-              <p className="mt-6 text-center text-sm text-muted-foreground">
+              <p className="mt-6 text-center text-sm text-ink/70">
                 New guest?{" "}
                 <button
                   type="button"
@@ -434,7 +479,7 @@ function SignInPage() {
                 <button
                   type="button"
                   onClick={() => setShowJwtSignIn((open) => !open)}
-                  className="w-full text-left text-sm font-medium text-foreground transition-colors hover:text-ember"
+                  className="w-full text-left text-sm font-medium text-ink transition-colors hover:text-ember"
                 >
                   {showJwtSignIn ? "Hide host / admin JWT sign-in" : "Host or admin? Sign in with JWT"}
                 </button>
@@ -453,10 +498,10 @@ function SignInPage() {
           ) : (
             <>
               <div className="eyebrow mb-3 text-ember/90">Guest registration</div>
-              <h1 className="font-display text-3xl tracking-tight md:text-4xl">Create account</h1>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Create a guest account with Google or email. Host and admin logins are created by
-                the platform team.
+              <h2 className={cardTitleClass}>Create account</h2>
+              <p className="mt-2 text-sm leading-relaxed text-ink/75">
+                Sign up with Google or email. Host and admin logins are created by the platform
+                team.
               </p>
 
               <div className="mt-8 space-y-4">
@@ -468,7 +513,7 @@ function SignInPage() {
                 />
                 <div className="flex items-center gap-3">
                   <div className="hairline flex-1" />
-                  <span className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                  <span className="text-xs uppercase tracking-[0.14em] text-ink/55">
                     or email
                   </span>
                   <div className="hairline flex-1" />
@@ -477,7 +522,7 @@ function SignInPage() {
 
               <form className="mt-4 space-y-4" onSubmit={signUpGuest}>
                 <div>
-                  <label htmlFor="signup-name" className="eyebrow mb-2 block text-foreground/90">
+                  <label htmlFor="signup-name" className="eyebrow mb-2 block text-ink/90">
                     Full name
                   </label>
                   <input
@@ -493,7 +538,7 @@ function SignInPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="signup-email" className="eyebrow mb-2 block text-foreground/90">
+                  <label htmlFor="signup-email" className="eyebrow mb-2 block text-ink/90">
                     Email
                   </label>
                   <input
@@ -509,7 +554,7 @@ function SignInPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="signup-phone" className="eyebrow mb-2 block text-foreground/90">
+                  <label htmlFor="signup-phone" className="eyebrow mb-2 block text-ink/90">
                     Phone
                   </label>
                   <input
@@ -524,7 +569,7 @@ function SignInPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="signup-password" className="eyebrow mb-2 block text-foreground/90">
+                  <label htmlFor="signup-password" className="eyebrow mb-2 block text-ink/90">
                     Password
                   </label>
                   <input
@@ -549,7 +594,7 @@ function SignInPage() {
                 </button>
               </form>
 
-              <p className="mt-6 text-center text-sm text-muted-foreground">
+              <p className="mt-6 text-center text-sm text-ink/70">
                 Already have an account?{" "}
                 <button
                   type="button"
@@ -578,14 +623,14 @@ function SignInPage() {
           )}
           {notice && (
             <p
-              className="mt-4 rounded-sm border border-ember/25 bg-ember/10 px-4 py-3 text-sm text-foreground"
+              className="mt-4 rounded-sm border border-ember/25 bg-ember/10 px-4 py-3 text-sm text-ink"
               role="status"
             >
               {notice}
             </p>
           )}
 
-          <p className="mt-8 text-center text-sm text-muted-foreground">
+          <p className="mt-8 text-center text-sm text-ink/70">
             <Link
               to="/experiences"
               className="text-ember underline-offset-4 transition-colors hover:underline"
@@ -594,8 +639,6 @@ function SignInPage() {
             </Link>
           </p>
         </div>
-      </section>
-      <Footer />
-    </div>
+    </SignInHeroLayout>
   );
 }

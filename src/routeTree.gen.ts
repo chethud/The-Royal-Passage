@@ -21,6 +21,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as HostReviewsRouteImport } from './routes/host.reviews'
 import { Route as HostRevenueRouteImport } from './routes/host.revenue'
+import { Route as HostProfileRouteImport } from './routes/host.profile'
 import { Route as HostExperiencesRouteImport } from './routes/host.experiences'
 import { Route as HostDashboardRouteImport } from './routes/host.dashboard'
 import { Route as HostBookingsRouteImport } from './routes/host.bookings'
@@ -33,6 +34,7 @@ import { Route as DashboardCancelledRouteImport } from './routes/dashboard.cance
 import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
 import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookingId'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as HostExperiencesIndexRouteImport } from './routes/host.experiences.index'
 import { Route as HostBookingsIndexRouteImport } from './routes/host.bookings.index'
 import { Route as ExperiencesSlugIndexRouteImport } from './routes/experiences.$slug.index'
@@ -102,6 +104,11 @@ const HostRevenueRoute = HostRevenueRouteImport.update({
   path: '/host/revenue',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HostProfileRoute = HostProfileRouteImport.update({
+  id: '/host/profile',
+  path: '/host/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HostExperiencesRoute = HostExperiencesRouteImport.update({
   id: '/host/experiences',
   path: '/host/experiences',
@@ -162,6 +169,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminProfileRoute = AdminProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AdminRoute,
+} as any)
 const HostExperiencesIndexRoute = HostExperiencesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -206,7 +218,7 @@ const BookingsBookingIdReviewRoute = BookingsBookingIdReviewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/cities': typeof CitiesRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
@@ -214,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
@@ -226,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
   '/host/experiences': typeof HostExperiencesRouteWithChildren
+  '/host/profile': typeof HostProfileRoute
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -240,13 +254,14 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/cities': typeof CitiesRouteWithChildren
   '/contact': typeof ContactRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
@@ -256,6 +271,7 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
   '/host/dashboard': typeof HostDashboardRoute
+  '/host/profile': typeof HostProfileRoute
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -271,7 +287,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/cities': typeof CitiesRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
@@ -279,6 +295,7 @@ export interface FileRoutesById {
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
@@ -291,6 +308,7 @@ export interface FileRoutesById {
   '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
   '/host/experiences': typeof HostExperiencesRouteWithChildren
+  '/host/profile': typeof HostProfileRoute
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -315,6 +333,7 @@ export interface FileRouteTypes {
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
     | '/cities/$slug'
@@ -327,6 +346,7 @@ export interface FileRouteTypes {
     | '/host/bookings'
     | '/host/dashboard'
     | '/host/experiences'
+    | '/host/profile'
     | '/host/revenue'
     | '/host/reviews'
     | '/dashboard/'
@@ -348,6 +368,7 @@ export interface FileRouteTypes {
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
     | '/cities/$slug'
@@ -357,6 +378,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/wishlist'
     | '/host/dashboard'
+    | '/host/profile'
     | '/host/revenue'
     | '/host/reviews'
     | '/dashboard'
@@ -379,6 +401,7 @@ export interface FileRouteTypes {
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
     | '/cities/$slug'
@@ -391,6 +414,7 @@ export interface FileRouteTypes {
     | '/host/bookings'
     | '/host/dashboard'
     | '/host/experiences'
+    | '/host/profile'
     | '/host/revenue'
     | '/host/reviews'
     | '/dashboard/'
@@ -406,7 +430,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   CitiesRoute: typeof CitiesRouteWithChildren
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
@@ -419,6 +443,7 @@ export interface RootRouteChildren {
   HostBookingsRoute: typeof HostBookingsRouteWithChildren
   HostDashboardRoute: typeof HostDashboardRoute
   HostExperiencesRoute: typeof HostExperiencesRouteWithChildren
+  HostProfileRoute: typeof HostProfileRoute
   HostRevenueRoute: typeof HostRevenueRoute
   HostReviewsRoute: typeof HostReviewsRoute
 }
@@ -509,6 +534,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HostRevenueRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/host/profile': {
+      id: '/host/profile'
+      path: '/host/profile'
+      fullPath: '/host/profile'
+      preLoaderRoute: typeof HostProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/host/experiences': {
       id: '/host/experiences'
       path: '/host/experiences'
@@ -593,6 +625,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/profile': {
+      id: '/admin/profile'
+      path: '/profile'
+      fullPath: '/admin/profile'
+      preLoaderRoute: typeof AdminProfileRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/host/experiences/': {
       id: '/host/experiences/'
       path: '/'
@@ -651,6 +690,16 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminRouteChildren {
+  AdminProfileRoute: typeof AdminProfileRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminProfileRoute: AdminProfileRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface CitiesRouteChildren {
   CitiesSlugRoute: typeof CitiesSlugRoute
@@ -754,7 +803,7 @@ const HostExperiencesRouteWithChildren = HostExperiencesRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   CitiesRoute: CitiesRouteWithChildren,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
@@ -767,6 +816,7 @@ const rootRouteChildren: RootRouteChildren = {
   HostBookingsRoute: HostBookingsRouteWithChildren,
   HostDashboardRoute: HostDashboardRoute,
   HostExperiencesRoute: HostExperiencesRouteWithChildren,
+  HostProfileRoute: HostProfileRoute,
   HostRevenueRoute: HostRevenueRoute,
   HostReviewsRoute: HostReviewsRoute,
 }

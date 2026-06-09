@@ -16,14 +16,7 @@ const MAPS_LINK = "https://maps.app.goo.gl/Qy3oqMKGpJDQUbeZ9";
 const MAPS_EMBED =
   "https://maps.google.com/maps?q=5th+Cross+Road,+Saraswathipuram,+Mysuru,+Karnataka+570009&hl=en&z=15&output=embed";
 
-const experiences = [
-  "Pottery Courses",
-  "Culinary Courses",
-  "Outdoor Cooking",
-  "Nature Walks",
-  "Heritage Walks",
-  "Curated Expeditions",
-];
+const experiences = ["Pottery Experience", "Outdoor Cooking", "Heritage Walks"];
 
 export function Footer() {
   return (
