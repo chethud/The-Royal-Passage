@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { RoleBadge } from "@/components/auth/RoleBadge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useAuthUser } from "@/lib/auth-user";
 import { dashboardPathForRole, ROLE_LABELS } from "@/lib/roles";
+import { buildAuthRedirect, readAuthCallbackError } from "@/lib/auth-redirect";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
 const inputClass =
@@ -36,6 +38,7 @@ function SignInPage() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [busy, setBusy] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
   const [resendingConfirmation, setResendingConfirmation] = useState(false);
   const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -56,6 +59,13 @@ function SignInPage() {
   }, [user]);
 
   useEffect(() => {
+    const oauthError = readAuthCallbackError();
+    if (oauthError) {
+      setError(oauthError);
+    }
+  }, []);
+
+  useEffect(() => {
     if (loading || !user || !role) return;
     if (redirect && role === "guest" && redirect.startsWith("/")) {
       window.location.href = redirect;
@@ -66,6 +76,30 @@ function SignInPage() {
 
   const isEmailNotConfirmedError = (message: string) =>
     /email not confirmed/i.test(message);
+
+  const signInWithGoogle = async () => {
+    setError(null);
+    setNotice(null);
+
+    if (!supabase) {
+      setError("Supabase browser auth is not configured.");
+      return;
+    }
+
+    try {
+      setGoogleBusy(true);
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: buildAuthRedirect(redirect),
+        },
+      });
+      if (oauthError) throw oauthError;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to start Google sign-in.");
+      setGoogleBusy(false);
+    }
+  };
 
   const signIn = async (e: FormEvent) => {
     e.preventDefault();
@@ -121,6 +155,9 @@ function SignInPage() {
       const { error: resendError } = await supabase.auth.resend({
         type: "signup",
         email: trimmedEmail,
+        options: {
+          emailRedirectTo: buildAuthRedirect(redirect),
+        },
       });
       if (resendError) throw resendError;
       setNotice(`Confirmation email sent to ${trimmedEmail}. Check your inbox and spam folder.`);
@@ -147,6 +184,7 @@ function SignInPage() {
         email: email.trim(),
         password,
         options: {
+          emailRedirectTo: buildAuthRedirect(redirect),
           data: {
             full_name: fullName.trim(),
             phone: phone.trim() || null,
@@ -292,11 +330,26 @@ function SignInPage() {
               <div className="eyebrow mb-3 text-ember/90">Member access</div>
               <h1 className="font-display text-3xl tracking-tight md:text-4xl">Sign in</h1>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Enter your email and password. The system will open the correct dashboard for your
-                account — guest, host, or admin.
+                Sign in with Google or use your email and password. Guests can also create an
+                account below.
               </p>
 
-              <form className="mt-8 space-y-4" onSubmit={signIn}>
+              <div className="mt-8 space-y-4">
+                <GoogleSignInButton
+                  busy={googleBusy}
+                  disabled={!browserConfigured}
+                  onClick={() => void signInWithGoogle()}
+                />
+                <div className="flex items-center gap-3">
+                  <div className="hairline flex-1" />
+                  <span className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                    or email
+                  </span>
+                  <div className="hairline flex-1" />
+                </div>
+              </div>
+
+              <form className="mt-4 space-y-4" onSubmit={signIn}>
                 <div>
                   <label htmlFor="signin-email" className="eyebrow mb-2 block text-foreground/90">
                     Email
@@ -368,11 +421,27 @@ function SignInPage() {
               <div className="eyebrow mb-3 text-ember/90">Guest registration</div>
               <h1 className="font-display text-3xl tracking-tight md:text-4xl">Create account</h1>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Only guests can sign up here. Host and admin logins are created by the platform
-                team.
+                Create a guest account with Google or email. Host and admin logins are created by
+                the platform team.
               </p>
 
-              <form className="mt-8 space-y-4" onSubmit={signUpGuest}>
+              <div className="mt-8 space-y-4">
+                <GoogleSignInButton
+                  busy={googleBusy}
+                  disabled={!browserConfigured}
+                  label="Sign up with Google"
+                  onClick={() => void signInWithGoogle()}
+                />
+                <div className="flex items-center gap-3">
+                  <div className="hairline flex-1" />
+                  <span className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                    or email
+                  </span>
+                  <div className="hairline flex-1" />
+                </div>
+              </div>
+
+              <form className="mt-4 space-y-4" onSubmit={signUpGuest}>
                 <div>
                   <label htmlFor="signup-name" className="eyebrow mb-2 block text-foreground/90">
                     Full name

@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => {
   const viteSupabaseUrl = env.VITE_SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "";
   const viteSupabaseAnon = env.VITE_SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY ?? "";
   const viteApiBaseUrl = env.VITE_API_BASE_URL ?? process.env.VITE_API_BASE_URL ?? "";
+  const viteSiteUrl = env.VITE_SITE_URL ?? process.env.VITE_SITE_URL ?? "";
 
   return {
     cloudflare: false,
@@ -27,6 +28,7 @@ export default defineConfig(({ mode }) => {
         "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(viteSupabaseUrl),
         "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(viteSupabaseAnon),
         "import.meta.env.VITE_API_BASE_URL": JSON.stringify(viteApiBaseUrl),
+        "import.meta.env.VITE_SITE_URL": JSON.stringify(viteSiteUrl),
       },
       server: {
         port: 5173,
