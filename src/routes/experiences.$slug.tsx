@@ -231,7 +231,7 @@ function ExperienceDetail() {
               onGuestsChange={setGuests}
               variant="select"
               signedIn={Boolean(user)}
-              userRole={role}
+              userRole={user ? (role ?? "guest") : null}
             />
           </div>
         </div>

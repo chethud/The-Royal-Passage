@@ -6,7 +6,7 @@ import { RoleBadge } from "@/components/auth/RoleBadge";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useAuthUser } from "@/lib/auth-user";
-import { dashboardPathForRole, ROLE_LABELS } from "@/lib/roles";
+import { dashboardPathForRole, isGuestAccount, isStaffRole, ROLE_LABELS } from "@/lib/roles";
 import {
   buildAuthRedirect,
   buildOAuthCallbackUrl,
@@ -74,12 +74,18 @@ function SignInPage() {
   }, []);
 
   useEffect(() => {
-    if (loading || !user || !role) return;
-    if (redirect && role === "guest" && redirect.startsWith("/")) {
+    if (loading || !user) return;
+    if (isStaffRole(role)) {
+      void navigate({ to: dashboardPathForRole(role) });
+      return;
+    }
+    if (redirect && isGuestAccount(role) && redirect.startsWith("/")) {
       window.location.href = redirect;
       return;
     }
-    void navigate({ to: dashboardPathForRole(role) });
+    if (role) {
+      void navigate({ to: dashboardPathForRole(role) });
+    }
   }, [loading, navigate, redirect, role, user]);
 
   const isEmailNotConfirmedError = (message: string) =>

@@ -4,12 +4,14 @@ import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPa
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { useAuthUser } from "@/lib/auth-user";
-import { createBooking } from "@/lib/api/bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
+import { fetchGuestProfile } from "@/lib/api/guest";
+import { submitBooking } from "@/lib/booking-fns";
 import { bookExperiencePath, guestBookingLimits, parseBookSearch } from "@/lib/booking-url";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 import { getExperienceForDetail } from "@/lib/marketplace-fns";
+import { isGuestAccount, isStaffRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 export const Route = createFileRoute("/experiences/$slug/book")({
@@ -32,7 +34,7 @@ export const Route = createFileRoute("/experiences/$slug/book")({
 });
 
 function BookExperiencePage() {
-  const { exp } = Route.useLoaderData();
+  const { exp, source } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate();
   const { user, role, loading } = useAuthUser();
@@ -48,12 +50,13 @@ function BookExperiencePage() {
   const [guests, setGuests] = useState(() => {
     if (!initialSlot) return 1;
     const { min, max } = guestBookingLimits(exp, initialSlot.available);
-    const preferred = search.guests ?? 2;
+    const preferred = search.guests ?? min;
     return Math.min(Math.max(min, preferred), max);
   });
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [profileReady, setProfileReady] = useState(false);
 
   const sym = exp.currencySymbol ?? "₹";
   const totalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
@@ -61,6 +64,7 @@ function BookExperiencePage() {
     slotId: selectedSlot?.id,
     guests,
   });
+  const isLiveExperience = source === "live";
 
   useEffect(() => {
     if (loading) return;
@@ -68,10 +72,40 @@ function BookExperiencePage() {
       void navigate({ to: "/sign-in", search: { redirect: redirectPath } });
       return;
     }
-    if (role && role !== "guest") {
+    if (isStaffRole(role)) {
       void navigate({ to: "/dashboard" });
     }
   }, [loading, navigate, redirectPath, role, user]);
+
+  useEffect(() => {
+    if (!user || isStaffRole(role)) {
+      setProfileReady(false);
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        if (!isApiConfigured()) {
+          if (!cancelled) setProfileReady(true);
+          return;
+        }
+        const { data: sessionData } = await getSupabaseBrowser().auth.getSession();
+        const token = sessionData.session?.access_token;
+        if (token) {
+          await fetchGuestProfile(token);
+        }
+      } catch {
+        // Booking will surface a clearer error if profile sync fails.
+      } finally {
+        if (!cancelled) setProfileReady(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [role, user]);
 
   useEffect(() => {
     if (!selectedSlot) return;
@@ -81,6 +115,11 @@ function BookExperiencePage() {
 
   const handleSubmit = async () => {
     if (!selectedSlot || !user) return;
+    if (!isLiveExperience) {
+      setError("This experience is not available for online booking yet. Please browse live listings.");
+      return;
+    }
+
     setBusy(true);
     setError(null);
 
@@ -92,16 +131,18 @@ function BookExperiencePage() {
       const token = sessionData.session?.access_token;
       if (!token) throw new Error("Please sign in again to complete your booking.");
 
-      const result = await createBooking(token, {
-        slotId: selectedSlot.id,
-        guestCount: guests,
-        notes: notes.trim() || undefined,
+      const result = await submitBooking({
+        data: {
+          accessToken: token,
+          slotId: selectedSlot.id,
+          guestCount: guests,
+          notes: notes.trim() || undefined,
+        },
       });
 
       void navigate({
-        to: "/bookings/$bookingId",
-        params: { bookingId: result.bookingId },
-        search: { confirmed: true },
+        to: "/dashboard",
+        search: { booked: result.bookingId },
       });
     } catch (err) {
       setError(toErrorMessage(err, "Failed to create booking."));
@@ -110,8 +151,19 @@ function BookExperiencePage() {
     }
   };
 
-  if (loading || !user) {
-    return <div className="min-h-screen pt-[var(--header-height)]" />;
+  if (loading || !user || !profileReady) {
+    return (
+      <div className="min-h-screen pt-[var(--header-height)] text-foreground">
+        <Header />
+        <div className="container-page py-16">
+          <p className="text-sm text-muted-foreground">Preparing your booking…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isGuestAccount(role)) {
+    return null;
   }
 
   return (
@@ -127,6 +179,13 @@ function BookExperiencePage() {
         >
           ← Back to experience
         </Link>
+
+        {!isLiveExperience ? (
+          <div className="mt-6 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            This listing is preview-only and cannot be booked online. Please choose a live experience
+            from the library.
+          </div>
+        ) : null}
 
         <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_380px]">
           <div>
@@ -145,7 +204,7 @@ function BookExperiencePage() {
                 onGuestsChange={setGuests}
                 variant="checkout"
                 signedIn
-                userRole="guest"
+                userRole={role ?? "guest"}
                 notes={notes}
                 onNotesChange={setNotes}
                 onConfirm={() => void handleSubmit()}

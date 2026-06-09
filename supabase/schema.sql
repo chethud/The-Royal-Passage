@@ -1,16 +1,27 @@
--- The Royal Passage — FULL project schema (PostgreSQL)
--- Includes: profiles, hosts, experiences, COD bookings, wishlist, reviews, notifications, audit_logs, RLS, seed data.
--- Paste into: Supabase Dashboard → SQL Editor → New query → Run
--- Safe to re-run on EXISTING databases: uses IF NOT EXISTS, ADD COLUMN IF NOT EXISTS,
--- idempotent FK blocks, ON CONFLICT, and DROP POLICY IF EXISTS (upgrades old tables in place).
--- Payment: Pay-at-venue (COD) only — no online payment gateway
--- Platform commission: 10% (admin) / 90% (host payout) — stored per booking.
--- Profiles: auto-created on auth sign-up + backfilled from auth.users + ensured before booking insert.
--- Seed UUIDs must be valid hex (0-9, a-f only); prefixes like "s1..." are invalid.
+-- =============================================================================
+-- The Royal Passage — COMPLETE database schema (single file)
+-- =============================================================================
+-- Run this ONE file only in: Supabase Dashboard → SQL Editor → New query → Run
 --
--- RLS: broad read access for `anon` + `authenticated` so SELECT returns rows in the
--- Data API. Writes are not granted to anonymous clients (no INSERT/UPDATE/DELETE policies).
--- The app backend uses the service role key, which bypasses RLS.
+-- Includes everything from supabase/migrations/* and fix-missing-profiles.sql:
+--   • profiles, hosts, cities, categories, experiences, slots
+--   • COD bookings (10% platform / 90% host payout)
+--   • wishlist, reviews, notifications, audit_logs, platform_settings
+--   • RLS policies, auth triggers, seat reservation functions
+--   • profile backfill + booking guest FK repair
+--   • seed hosts, experiences, slots (dates refresh on re-run), reviews
+--
+-- Safe to re-run on EXISTING databases:
+--   IF NOT EXISTS, ADD COLUMN IF NOT EXISTS, ON CONFLICT, DROP POLICY IF EXISTS
+--
+-- Payment: Pay-at-venue (COD) only — no online payment gateway.
+-- Profiles: auto-created on sign-up + backfilled from auth.users + ensured on booking insert.
+--
+-- Admin account (create in Dashboard → Authentication, then run the block at the bottom):
+--   Email: Admin@gmail.com   Password: Admin@123
+--
+-- RLS: broad read for anon/authenticated; writes via service role (backend API).
+-- =============================================================================
 
 -- ---------------------------------------------------------------------------
 -- Extensions
@@ -676,6 +687,13 @@ create policy "bookings_select_host"
   using (
     exists (
       select 1
+      from public.experiences e
+      join public.hosts h on h.id = e.host_id
+      where e.id = bookings.experience_id
+        and h.auth_user_id = auth.uid()
+    )
+    or exists (
+      select 1
       from public.profiles p
       join public.experiences e on e.host_id = p.host_id
       where p.id = auth.uid()
@@ -893,7 +911,7 @@ insert into public.experiences (
   )
 on conflict (id) do nothing;
 
--- Slots: relative dates so listings stay “current” after seed
+-- Slots: relative dates so listings stay “current” after every re-run
 insert into public.experience_slots (id, experience_id, slot_date, start_time, end_time, capacity, seats_sold, is_blocked)
 values
   ('50000001-0000-4000-8000-000000000001', 'e0000001-0000-0000-0000-000000000001', (current_date + 2), '09:30', '12:30', 8, 3, false),
@@ -903,7 +921,13 @@ values
   ('50000005-0000-4000-8000-000000000005', 'e0000003-0000-0000-0000-000000000003', (current_date + 2), '18:00', '19:30', 10, 2, false),
   ('50000006-0000-4000-8000-000000000006', 'e0000004-0000-0000-0000-000000000004', (current_date + 3), '10:00', '12:00', 14, 6, false),
   ('50000007-0000-4000-8000-000000000007', 'e0000005-0000-0000-0000-000000000005', (current_date + 1), '17:00', '18:45', 15, 4, false)
-on conflict (id) do nothing;
+on conflict (id) do update set
+  experience_id = excluded.experience_id,
+  slot_date = excluded.slot_date,
+  start_time = excluded.start_time,
+  end_time = excluded.end_time,
+  capacity = excluded.capacity,
+  is_blocked = excluded.is_blocked;
 
 insert into public.reviews (id, experience_id, rating, comment, reviewer_display_name) values
   ('60000001-0000-4000-8000-000000000001', 'e0000001-0000-0000-0000-000000000001', 5, 'Calm, skilled instructors — the wheel finally made sense.', 'Aditi'),
@@ -911,8 +935,77 @@ insert into public.reviews (id, experience_id, rating, comment, reviewer_display
 on conflict (id) do nothing;
 
 -- ---------------------------------------------------------------------------
--- Sanity checks (optional — comment out if your SQL client dislikes multiple statements)
+-- REPAIR: profiles + bookings (from fix-missing-profiles.sql) — safe to re-run
+-- Fixes: bookings_guest_id_fkey when guest exists in auth but not in profiles
 -- ---------------------------------------------------------------------------
--- select 'hosts', count(*) from public.hosts
+insert into public.profiles (id, full_name, phone, role)
+select
+  u.id,
+  coalesce(
+    u.raw_user_meta_data->>'full_name',
+    u.raw_user_meta_data->>'name',
+    nullif(split_part(u.email, '@', 1), ''),
+    'Guest'
+  ),
+  u.raw_user_meta_data->>'phone',
+  'guest'
+from auth.users u
+left join public.profiles p on p.id = u.id
+where p.id is null
+on conflict (id) do nothing;
+
+update public.bookings b
+set guest_id = b.customer_user_id
+where b.guest_id is null
+  and b.customer_user_id is not null
+  and exists (select 1 from public.profiles p where p.id = b.customer_user_id);
+
+-- Re-apply 10% commission on any legacy booking rows still missing the split
+update public.bookings
+set
+  platform_fee_minor = round(subtotal_minor * 0.10),
+  host_payout_minor = subtotal_minor - round(subtotal_minor * 0.10)
+where subtotal_minor > 0
+  and (platform_fee_minor = 0 or host_payout_minor = 0);
+
+-- ---------------------------------------------------------------------------
+-- ADMIN SETUP (run AFTER creating auth user in Dashboard → Authentication)
+-- ---------------------------------------------------------------------------
+-- update public.profiles
+-- set role = 'admin', full_name = coalesce(full_name, 'Platform Admin')
+-- where id = (
+--   select id from auth.users where lower(email) = lower('Admin@gmail.com')
+-- );
+--
+-- If no profile row yet for the admin auth user:
+-- insert into public.profiles (id, full_name, role)
+-- select id, 'Platform Admin', 'admin'
+-- from auth.users
+-- where lower(email) = lower('Admin@gmail.com')
+-- on conflict (id) do update set role = 'admin', full_name = excluded.full_name;
+
+-- ---------------------------------------------------------------------------
+-- HOST SETUP (after admin creates host auth user via API / admin panel)
+-- ---------------------------------------------------------------------------
+-- update public.hosts
+-- set auth_user_id = (select id from auth.users where lower(email) = lower('host@example.com'))
+-- where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+--
+-- update public.profiles
+-- set role = 'host', host_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', full_name = 'Host Name'
+-- where id = (select id from auth.users where lower(email) = lower('host@example.com'));
+
+-- ---------------------------------------------------------------------------
+-- SANITY CHECKS (optional — uncomment to verify after running)
+-- ---------------------------------------------------------------------------
+-- select 'profiles' as tbl, count(*) from public.profiles
+-- union all select 'hosts', count(*) from public.hosts
 -- union all select 'experiences', count(*) from public.experiences
--- union all select 'slots', count(*) from public.experience_slots;
+-- union all select 'slots', count(*) from public.experience_slots
+-- union all select 'bookings', count(*) from public.bookings;
+--
+-- select u.id, u.email, p.id as profile_id, p.role
+-- from auth.users u
+-- left join public.profiles p on p.id = u.id
+-- order by u.created_at desc
+-- limit 20;

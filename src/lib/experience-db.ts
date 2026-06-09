@@ -33,6 +33,8 @@ export type ExperienceRow = {
   review_count: number;
   currency_code: string;
   status: string;
+  min_guests_per_booking?: number;
+  max_guests_per_booking?: number;
   hosts: HostEmbed | null;
   experience_categories: CategoryEmbed | null;
 };
@@ -101,5 +103,7 @@ export function mapRowToExperience(exp: ExperienceRow, slots: SlotRow[]): Experi
     cancellation: exp.cancellation_policy ?? "",
     slots: uiSlots,
     currencySymbol: currencySymbol(exp.currency_code),
+    minGuestsPerBooking: exp.min_guests_per_booking ?? 1,
+    maxGuestsPerBooking: exp.max_guests_per_booking ?? 10,
   };
 }

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { isApiConfigured } from "@/lib/api/client";
+import { fetchGuestProfile } from "@/lib/api/guest";
 import { ensureGuestProfile, fetchUserProfile, type UserProfile } from "@/lib/profiles";
-import type { UserRole } from "@/lib/roles";
+import { isUserRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
 const USER_CACHE_KEY = "rp_auth_user_v1";
@@ -55,15 +57,34 @@ function userDisplayName(user: User | null, profile: UserProfile | null, cachedU
   return null;
 }
 
-async function loadProfileForUser(user: User): Promise<UserProfile | null> {
+function mapApiGuestProfile(apiProfile: Awaited<ReturnType<typeof fetchGuestProfile>>): UserProfile {
+  return {
+    id: apiProfile.id,
+    fullName: apiProfile.fullName,
+    phone: apiProfile.phone,
+    role: isUserRole(apiProfile.role) ? apiProfile.role : "guest",
+    hostId: null,
+  };
+}
+
+async function loadProfileForUser(user: User, accessToken?: string | null): Promise<UserProfile | null> {
   const supabase = getSupabaseBrowser();
   const meta = user.user_metadata ?? {};
   const fullName = (meta.full_name as string | undefined) ?? (meta.name as string | undefined);
   const phone = (meta.phone as string | undefined) ?? user.phone ?? undefined;
 
-  const profile =
+  let profile =
     (await fetchUserProfile(supabase, user.id)) ??
     (await ensureGuestProfile(supabase, user.id, { fullName, phone }));
+
+  if (!profile && accessToken && isApiConfigured()) {
+    try {
+      const apiProfile = await fetchGuestProfile(accessToken);
+      profile = mapApiGuestProfile(apiProfile);
+    } catch {
+      // API profile sync is best-effort; local profile may still work.
+    }
+  }
 
   return profile;
 }
@@ -95,7 +116,8 @@ export function useAuthUser() {
         return;
       }
 
-      const nextProfile = await loadProfileForUser(nextUser);
+      const { data } = await supabase.auth.getSession();
+      const nextProfile = await loadProfileForUser(nextUser, data.session?.access_token);
       if (!mounted) return;
       setProfile(nextProfile);
       writeCachedUser(nextUser, nextProfile?.role);

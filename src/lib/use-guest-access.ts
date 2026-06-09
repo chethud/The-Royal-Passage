@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuthUser } from "@/lib/auth-user";
-import { dashboardPathForRole } from "@/lib/roles";
+import { dashboardPathForRole, isGuestAccount, isStaffRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 export function useGuestAccess() {
@@ -18,13 +18,14 @@ export function useGuestAccess() {
       return;
     }
 
-    if (role && role !== "guest") {
+    if (isStaffRole(role)) {
       void navigate({ to: dashboardPathForRole(role) });
     }
   }, [loading, navigate, role, user]);
 
   useEffect(() => {
-    if (!user || role !== "guest") {
+    if (!user || !isGuestAccount(role)) {
+      setAccessToken(null);
       setTokenLoading(false);
       return;
     }
@@ -40,7 +41,12 @@ export function useGuestAccess() {
       });
   }, [role, user]);
 
-  const ready = !loading && !tokenLoading && Boolean(user) && role === "guest" && Boolean(accessToken);
+  const ready =
+    !loading &&
+    !tokenLoading &&
+    Boolean(user) &&
+    isGuestAccount(role) &&
+    Boolean(accessToken);
 
   return {
     user,

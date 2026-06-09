@@ -4,6 +4,7 @@ import type { Experience, Slot } from "@/data/experiences";
 import { bookExperiencePath, guestBookingLimits } from "@/lib/booking-url";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
+import { isGuestAccount, isStaffRole } from "@/lib/roles";
 
 type ExperienceBookingPanelProps = {
   exp: Pick<
@@ -50,8 +51,9 @@ export function ExperienceBookingPanel({
     ? { slotId: selectedSlot.id, guests }
     : undefined;
   const bookPath = bookExperiencePath(exp.slug, bookSearch);
-  const canBookAsGuest = signedIn && userRole === "guest";
+  const canBookAsGuest = signedIn && isGuestAccount(userRole);
   const needsSignIn = !signedIn;
+  const staffSignedIn = signedIn && isStaffRole(userRole);
 
   return (
     <div className="glass rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] p-6 md:p-8">
@@ -195,6 +197,10 @@ export function ExperienceBookingPanel({
                 >
                   Sign in to book
                 </Link>
+              ) : staffSignedIn ? (
+                <p className="rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)] px-4 py-3 text-center text-sm text-muted-foreground">
+                  Host and admin accounts cannot book experiences. Sign in with a guest account.
+                </p>
               ) : !canBookAsGuest ? (
                 <p className="rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)] px-4 py-3 text-center text-sm text-muted-foreground">
                   Sign in with a guest account to book this experience.
@@ -215,10 +221,15 @@ export function ExperienceBookingPanel({
             </>
           ) : (
             <>
+              {!selectedSlot ? (
+                <p className="mb-4 rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)] px-4 py-3 text-center text-sm text-muted-foreground">
+                  Select an available date to continue.
+                </p>
+              ) : null}
               <button
                 type="button"
                 disabled={!selectedSlot || busy}
-                onClick={onConfirm}
+                onClick={() => onConfirm?.()}
                 className="w-full rounded-sm bg-ember py-4 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:opacity-50"
               >
                 {busy ? "Submitting…" : "Request booking"}

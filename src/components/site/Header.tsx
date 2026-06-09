@@ -32,10 +32,8 @@ type NavItem = { label: string; to: string };
 const publicNavItems: NavItem[] = [
   { label: "Experiences", to: "/experiences" },
   { label: "Cities", to: "/cities" },
-  { label: "Curated Journeys", to: "/experiences" },
   { label: "About Us", to: "/hosts" },
   { label: "Journal", to: "/journal" },
-  { label: "Gallery", to: "/experiences" },
   { label: "Contact", to: "/contact" },
 ];
 

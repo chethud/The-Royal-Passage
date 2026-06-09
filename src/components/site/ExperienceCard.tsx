@@ -4,11 +4,15 @@ import { motion } from "motion/react";
 import type { Experience } from "@/data/experiences";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { guestBookingLimits } from "@/lib/booking-url";
 
 export function ExperienceCard({ exp }: { exp: Experience }) {
   const nextSlot = exp.slots.find((s) => s.available > 0);
   const reduceMotion = usePrefersReducedMotion();
   const sym = exp.currencySymbol ?? "₹";
+  const defaultGuests = nextSlot
+    ? guestBookingLimits(exp, nextSlot.available).min
+    : 1;
 
   const card = (
     <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#C8A25A]/20 bg-[#4A0000]/40 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-[#C8A25A]/40 hover:shadow-[0_0_24px_-10px_#C8A25A44]">
@@ -86,7 +90,7 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
               <Link
                 to="/experiences/$slug/book"
                 params={{ slug: exp.slug }}
-                search={{ slotId: nextSlot.id, guests: Math.min(2, nextSlot.available) }}
+                search={{ slotId: nextSlot.id, guests: defaultGuests }}
                 className="luxury-btn-sm luxury-btn-primary"
               >
                 Book

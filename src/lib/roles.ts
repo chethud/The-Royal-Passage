@@ -47,3 +47,13 @@ export function dashboardPathForRole(role: UserRole | null | undefined): string 
   if (!role) return "/sign-in";
   return ROLE_DASHBOARD_PATH[role];
 }
+
+/** Host or admin — not allowed to book as a guest. */
+export function isStaffRole(role: UserRole | null | undefined): boolean {
+  return role === "host" || role === "admin";
+}
+
+/** Signed-in user who may book experiences (guest, or profile still loading). */
+export function isGuestAccount(role: UserRole | null | undefined): boolean {
+  return !isStaffRole(role);
+}
