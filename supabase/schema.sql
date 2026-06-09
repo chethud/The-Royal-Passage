@@ -698,9 +698,9 @@ insert into public.experience_categories (slug, label, sort_order) values
 on conflict (slug) do nothing;
 
 insert into public.platform_settings (key, value) values
-  ('commission_percent', '12.5'::jsonb),
+  ('commission_percent', '10'::jsonb),
   ('default_currency', '"INR"'::jsonb)
-on conflict (key) do nothing;
+on conflict (key) do update set value = excluded.value;
 
 insert into public.hosts (id, display_name, email, bio, verified, approval_status) values
   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Heritage Clay Studio — Mysuru', 'studio@example.com',

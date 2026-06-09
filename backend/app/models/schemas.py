@@ -389,6 +389,15 @@ class AdminStats(BaseModel):
     revenueCollectedMinor: int
     pendingExperienceReviews: int
     currencySymbol: str = "₹"
+    confirmedBookings: int = 0
+    pendingBookings: int = 0
+    completedBookings: int = 0
+    cancelledBookings: int = 0
+    grossBookingValueMinor: int = 0
+    platformRevenueMinor: int = 0
+    hostPayoutDueMinor: int = 0
+    codPendingCollectionMinor: int = 0
+    commissionPercent: float = 10.0
 
 
 class AdminBookingRow(BaseModel):
@@ -401,3 +410,6 @@ class AdminBookingRow(BaseModel):
     totalAmount: int
     currencySymbol: str
     createdAt: str
+    platformFeeMinor: int = 0
+    hostPayoutMinor: int = 0
+    hostName: str | None = None

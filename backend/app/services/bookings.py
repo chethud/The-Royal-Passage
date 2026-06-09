@@ -42,7 +42,7 @@ def _reserve_seats(supabase, slot_id: str, guest_count: int) -> bool:
         .maybe_single()
         .execute()
     )
-    slot = slot_result.data
+    slot = slot_result.data if slot_result else None
     if not slot or slot.get("is_blocked"):
         return False
 
@@ -70,7 +70,7 @@ def _release_seats(supabase, slot_id: str, guest_count: int) -> None:
             .maybe_single()
             .execute()
         )
-        slot = slot_result.data
+        slot = slot_result.data if slot_result else None
         if slot:
             new_sold = max(0, slot.get("seats_sold", 0) - guest_count)
             supabase.table("experience_slots").update({"seats_sold": new_sold}).eq("id", slot_id).execute()
@@ -95,7 +95,7 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         .maybe_single()
         .execute()
     )
-    slot = slot_result.data
+    slot = slot_result.data if slot_result else None
     if not slot:
         raise ValueError("Slot not found.")
     if slot.get("is_blocked"):
@@ -122,11 +122,12 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         .maybe_single()
         .execute()
     )
-    raw_fee = (fee_result.data or {}).get("value", 12.5)
+    fee_row = fee_result.data if fee_result else None
+    raw_fee = (fee_row or {}).get("value", 10)
     try:
         commission_percent = float(raw_fee)
     except (TypeError, ValueError):
-        commission_percent = 12.5
+        commission_percent = 10.0
 
     subtotal_minor = experience["price_per_person_minor"] * payload.guestCount
     platform_fee_minor = round((subtotal_minor * commission_percent) / 100)
@@ -179,7 +180,7 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         .maybe_single()
         .execute()
     )
-    host_user_id = (host_result.data or {}).get("auth_user_id")
+    host_user_id = ((host_result.data if host_result else None) or {}).get("auth_user_id")
     if host_user_id:
         create_notification(
             host_user_id,
@@ -311,7 +312,7 @@ def get_booking_by_id(booking_id: str, auth: dict) -> BookingSummary:
         .maybe_single()
         .execute()
     )
-    row = result.data
+    row = result.data if result else None
     if not row:
         raise ValueError("Booking not found.")
 
@@ -332,7 +333,7 @@ def cancel_guest_booking(booking_id: str, auth: dict) -> BookingSummary:
         .maybe_single()
         .execute()
     )
-    row = result.data
+    row = result.data if result else None
     if not row:
         raise ValueError("Booking not found.")
     if row.get("guest_id") != user_id:

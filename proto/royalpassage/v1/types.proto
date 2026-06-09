@@ -390,6 +390,15 @@ message AdminStats {
   int32 revenue_collected_minor = 5;
   int32 pending_experience_reviews = 6;
   string currency_symbol = 7;
+  int32 confirmed_bookings = 8;
+  int32 pending_bookings = 9;
+  int32 completed_bookings = 10;
+  int32 cancelled_bookings = 11;
+  int32 gross_booking_value_minor = 12;
+  int32 platform_revenue_minor = 13;
+  int32 host_payout_due_minor = 14;
+  int32 cod_pending_collection_minor = 15;
+  double commission_percent = 16;
 }
 
 message AdminBookingRow {
@@ -402,6 +411,9 @@ message AdminBookingRow {
   int32 total_amount = 7;
   string currency_symbol = 8;
   string created_at = 9;
+  int32 platform_fee_minor = 10;
+  int32 host_payout_minor = 11;
+  optional string host_name = 12;
 }
 
 message OkResponse {

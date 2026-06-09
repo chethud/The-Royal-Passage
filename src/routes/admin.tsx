@@ -117,7 +117,10 @@ function AdminDashboardPage() {
           <h2 className="font-display text-2xl">Recent bookings</h2>
           <p className="mt-1 text-sm text-muted-foreground">Latest guest reservations across all hosts.</p>
           <div className="mt-6">
-            <AdminBookingsTable bookings={bookings} />
+            <AdminBookingsTable
+              bookings={bookings}
+              commissionPercent={stats?.commissionPercent ?? 10}
+            />
           </div>
         </section>
 

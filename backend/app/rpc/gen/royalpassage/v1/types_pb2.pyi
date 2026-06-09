@@ -694,7 +694,7 @@ class AuditLogEntry(_message.Message):
     def __init__(self, id: _Optional[str] = ..., action: _Optional[str] = ..., entity_type: _Optional[str] = ..., entity_id: _Optional[str] = ..., actor_name: _Optional[str] = ..., metadata: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., created_at: _Optional[str] = ...) -> None: ...
 
 class AdminStats(_message.Message):
-    __slots__ = ("total_guests", "total_hosts", "published_experiences", "total_bookings", "revenue_collected_minor", "pending_experience_reviews", "currency_symbol")
+    __slots__ = ("total_guests", "total_hosts", "published_experiences", "total_bookings", "revenue_collected_minor", "pending_experience_reviews", "currency_symbol", "confirmed_bookings", "pending_bookings", "completed_bookings", "cancelled_bookings", "gross_booking_value_minor", "platform_revenue_minor", "host_payout_due_minor", "cod_pending_collection_minor", "commission_percent")
     TOTAL_GUESTS_FIELD_NUMBER: _ClassVar[int]
     TOTAL_HOSTS_FIELD_NUMBER: _ClassVar[int]
     PUBLISHED_EXPERIENCES_FIELD_NUMBER: _ClassVar[int]
@@ -702,6 +702,15 @@ class AdminStats(_message.Message):
     REVENUE_COLLECTED_MINOR_FIELD_NUMBER: _ClassVar[int]
     PENDING_EXPERIENCE_REVIEWS_FIELD_NUMBER: _ClassVar[int]
     CURRENCY_SYMBOL_FIELD_NUMBER: _ClassVar[int]
+    CONFIRMED_BOOKINGS_FIELD_NUMBER: _ClassVar[int]
+    PENDING_BOOKINGS_FIELD_NUMBER: _ClassVar[int]
+    COMPLETED_BOOKINGS_FIELD_NUMBER: _ClassVar[int]
+    CANCELLED_BOOKINGS_FIELD_NUMBER: _ClassVar[int]
+    GROSS_BOOKING_VALUE_MINOR_FIELD_NUMBER: _ClassVar[int]
+    PLATFORM_REVENUE_MINOR_FIELD_NUMBER: _ClassVar[int]
+    HOST_PAYOUT_DUE_MINOR_FIELD_NUMBER: _ClassVar[int]
+    COD_PENDING_COLLECTION_MINOR_FIELD_NUMBER: _ClassVar[int]
+    COMMISSION_PERCENT_FIELD_NUMBER: _ClassVar[int]
     total_guests: int
     total_hosts: int
     published_experiences: int
@@ -709,10 +718,19 @@ class AdminStats(_message.Message):
     revenue_collected_minor: int
     pending_experience_reviews: int
     currency_symbol: str
-    def __init__(self, total_guests: _Optional[int] = ..., total_hosts: _Optional[int] = ..., published_experiences: _Optional[int] = ..., total_bookings: _Optional[int] = ..., revenue_collected_minor: _Optional[int] = ..., pending_experience_reviews: _Optional[int] = ..., currency_symbol: _Optional[str] = ...) -> None: ...
+    confirmed_bookings: int
+    pending_bookings: int
+    completed_bookings: int
+    cancelled_bookings: int
+    gross_booking_value_minor: int
+    platform_revenue_minor: int
+    host_payout_due_minor: int
+    cod_pending_collection_minor: int
+    commission_percent: float
+    def __init__(self, total_guests: _Optional[int] = ..., total_hosts: _Optional[int] = ..., published_experiences: _Optional[int] = ..., total_bookings: _Optional[int] = ..., revenue_collected_minor: _Optional[int] = ..., pending_experience_reviews: _Optional[int] = ..., currency_symbol: _Optional[str] = ..., confirmed_bookings: _Optional[int] = ..., pending_bookings: _Optional[int] = ..., completed_bookings: _Optional[int] = ..., cancelled_bookings: _Optional[int] = ..., gross_booking_value_minor: _Optional[int] = ..., platform_revenue_minor: _Optional[int] = ..., host_payout_due_minor: _Optional[int] = ..., cod_pending_collection_minor: _Optional[int] = ..., commission_percent: _Optional[float] = ...) -> None: ...
 
 class AdminBookingRow(_message.Message):
-    __slots__ = ("id", "guest_name", "guest_email", "experience_title", "booking_status", "payment_status", "total_amount", "currency_symbol", "created_at")
+    __slots__ = ("id", "guest_name", "guest_email", "experience_title", "booking_status", "payment_status", "total_amount", "currency_symbol", "created_at", "platform_fee_minor", "host_payout_minor", "host_name")
     ID_FIELD_NUMBER: _ClassVar[int]
     GUEST_NAME_FIELD_NUMBER: _ClassVar[int]
     GUEST_EMAIL_FIELD_NUMBER: _ClassVar[int]
@@ -722,6 +740,9 @@ class AdminBookingRow(_message.Message):
     TOTAL_AMOUNT_FIELD_NUMBER: _ClassVar[int]
     CURRENCY_SYMBOL_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    PLATFORM_FEE_MINOR_FIELD_NUMBER: _ClassVar[int]
+    HOST_PAYOUT_MINOR_FIELD_NUMBER: _ClassVar[int]
+    HOST_NAME_FIELD_NUMBER: _ClassVar[int]
     id: str
     guest_name: str
     guest_email: str
@@ -731,7 +752,10 @@ class AdminBookingRow(_message.Message):
     total_amount: int
     currency_symbol: str
     created_at: str
-    def __init__(self, id: _Optional[str] = ..., guest_name: _Optional[str] = ..., guest_email: _Optional[str] = ..., experience_title: _Optional[str] = ..., booking_status: _Optional[str] = ..., payment_status: _Optional[str] = ..., total_amount: _Optional[int] = ..., currency_symbol: _Optional[str] = ..., created_at: _Optional[str] = ...) -> None: ...
+    platform_fee_minor: int
+    host_payout_minor: int
+    host_name: str
+    def __init__(self, id: _Optional[str] = ..., guest_name: _Optional[str] = ..., guest_email: _Optional[str] = ..., experience_title: _Optional[str] = ..., booking_status: _Optional[str] = ..., payment_status: _Optional[str] = ..., total_amount: _Optional[int] = ..., currency_symbol: _Optional[str] = ..., created_at: _Optional[str] = ..., platform_fee_minor: _Optional[int] = ..., host_payout_minor: _Optional[int] = ..., host_name: _Optional[str] = ...) -> None: ...
 
 class OkResponse(_message.Message):
     __slots__ = ("ok",)

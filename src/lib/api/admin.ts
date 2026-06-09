@@ -75,6 +75,15 @@ export type AdminStats = {
   revenueCollectedMinor: number;
   pendingExperienceReviews: number;
   currencySymbol: string;
+  confirmedBookings: number;
+  pendingBookings: number;
+  completedBookings: number;
+  cancelledBookings: number;
+  grossBookingValueMinor: number;
+  platformRevenueMinor: number;
+  hostPayoutDueMinor: number;
+  codPendingCollectionMinor: number;
+  commissionPercent: number;
 };
 
 export type AdminBookingRow = {
@@ -87,6 +96,9 @@ export type AdminBookingRow = {
   totalAmount: number;
   currencySymbol: string;
   createdAt: string;
+  platformFeeMinor: number;
+  hostPayoutMinor: number;
+  hostName: string | null;
 };
 
 export type AuditLogEntry = {

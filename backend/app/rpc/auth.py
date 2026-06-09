@@ -28,7 +28,7 @@ def resolve_current_user(ctx: RequestContext) -> dict:
         .maybe_single()
         .execute()
     )
-    row = profile.data
+    row = profile.data if profile else None
     if not row:
         raise ConnectError(Code.PERMISSION_DENIED, "Profile not found.")
 
