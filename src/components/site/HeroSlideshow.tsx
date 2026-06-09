@@ -1,11 +1,13 @@
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type HeroSlideshowProps = {
   images: Array<{ src: string; alt: string }>;
   intervalMs?: number;
   reduceMotion?: boolean;
   className?: string;
+  activeIndex?: number;
+  onActiveIndexChange?: (index: number) => void;
 };
 
 const softEase = [0.22, 1, 0.36, 1] as const;
@@ -15,18 +17,35 @@ export function HeroSlideshow({
   intervalMs = 3600,
   reduceMotion = false,
   className,
+  activeIndex: controlledIndex,
+  onActiveIndexChange,
 }: HeroSlideshowProps) {
   const safeImages = useMemo(() => images.filter((i) => Boolean(i?.src)), [images]);
-  const [active, setActive] = useState(0);
+  const [uncontrolledIndex, setUncontrolledIndex] = useState(0);
+  const isControlled = controlledIndex !== undefined;
+  const active = isControlled ? controlledIndex : uncontrolledIndex;
+
+  const setActive = useCallback(
+    (next: number) => {
+      if (safeImages.length === 0) return;
+      const normalized = ((next % safeImages.length) + safeImages.length) % safeImages.length;
+      if (onActiveIndexChange) {
+        onActiveIndexChange(normalized);
+      } else {
+        setUncontrolledIndex(normalized);
+      }
+    },
+    [onActiveIndexChange, safeImages.length],
+  );
 
   useEffect(() => {
     if (reduceMotion) return;
     if (safeImages.length <= 1) return;
     const id = window.setInterval(() => {
-      setActive((i) => (i + 1) % safeImages.length);
+      setActive(active + 1);
     }, intervalMs);
     return () => window.clearInterval(id);
-  }, [intervalMs, reduceMotion, safeImages.length]);
+  }, [active, intervalMs, reduceMotion, safeImages.length, setActive]);
 
   const current = safeImages[Math.min(active, Math.max(0, safeImages.length - 1))];
   if (!current) return null;

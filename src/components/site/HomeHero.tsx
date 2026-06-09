@@ -39,6 +39,8 @@ export function HomeHero() {
           images={heroSlides}
           reduceMotion={reduceMotion}
           intervalMs={6000}
+          activeIndex={activeSlide}
+          onActiveIndexChange={setActiveSlide}
           className="absolute inset-0 h-full w-full"
         />
         {/* darken & vignette so type stays readable */}
@@ -100,7 +102,7 @@ export function HomeHero() {
         </div>
 
         {/* SLIDE DOTS */}
-        <div className="absolute inset-x-0 bottom-8 flex items-center justify-center gap-2">
+        <div className="pointer-events-auto absolute inset-x-0 bottom-8 z-20 flex items-center justify-center gap-2">
           {heroSlides.map((slide, i) => (
             <button
               key={slide.src}
