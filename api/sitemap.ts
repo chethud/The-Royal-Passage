@@ -6,6 +6,7 @@ type VercelResponse = {
 };
 
 const CITY_SLUGS = ["mysuru", "bengaluru", "coorg", "chikmagalur", "hampi", "ooty"];
+const PRODUCTION_API_BASE_URL = "https://the-royal-passage.onrender.com";
 
 function resolveSiteUrl(): string {
   if (process.env.SITE_URL) return process.env.SITE_URL.replace(/\/$/, "");
@@ -13,11 +14,23 @@ function resolveSiteUrl(): string {
   return "https://the-royal-passage.vercel.app";
 }
 
+function resolveApiBaseUrl(): string {
+  const fromEnv = process.env.VITE_API_BASE_URL ?? process.env.API_BASE_URL;
+  if (fromEnv?.trim()) return fromEnv.trim().replace(/\/$/, "");
+  return PRODUCTION_API_BASE_URL;
+}
+
 async function fetchExperienceSlugs(): Promise<string[]> {
-  const apiBase = process.env.VITE_API_BASE_URL ?? process.env.API_BASE_URL;
-  if (!apiBase) return [];
+  const apiBase = resolveApiBaseUrl();
   try {
-    const response = await fetch(`${apiBase.replace(/\/$/, "")}/api/v1/catalog`);
+    const response = await fetch(
+      `${apiBase}/royalpassage.v1.RoyalPassageService/GetCatalog`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      },
+    );
     if (!response.ok) return [];
     const data = (await response.json()) as { experiences?: { slug: string }[] };
     return (data.experiences ?? []).map((row) => row.slug);

@@ -9,10 +9,20 @@ function resolveApiBaseUrl(raw: string | undefined): string {
   return raw.trim().replace(/\/$/, "");
 }
 
-function productionFallback(): string {
+function browserProductionFallback(): string {
   if (typeof window === "undefined") return "";
   if (isLocalHostname(window.location.hostname)) return "";
   return PRODUCTION_API_BASE_URL;
+}
+
+function serverProductionFallback(): string {
+  if (typeof process === "undefined") return "";
+  const fromProcess = resolveApiBaseUrl(process.env.VITE_API_BASE_URL);
+  if (fromProcess) return fromProcess;
+  if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+    return PRODUCTION_API_BASE_URL;
+  }
+  return "";
 }
 
 export function readApiBaseUrl(): string {
@@ -20,18 +30,16 @@ export function readApiBaseUrl(): string {
   if (fromImport) {
     if (typeof window !== "undefined" && fromImport.includes("localhost")) {
       if (!isLocalHostname(window.location.hostname)) {
-        return productionFallback() || fromImport;
+        return browserProductionFallback() || fromImport;
       }
     }
     return fromImport;
   }
 
-  if (typeof process !== "undefined") {
-    const fromProcess = resolveApiBaseUrl(process.env.VITE_API_BASE_URL);
-    if (fromProcess) return fromProcess;
-  }
+  const fromServer = serverProductionFallback();
+  if (fromServer) return fromServer;
 
-  return productionFallback();
+  return browserProductionFallback();
 }
 
 export function isApiConfigured(): boolean {

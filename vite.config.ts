@@ -43,7 +43,13 @@ export default defineConfig(({ mode }) => {
         // Bundle these so the Vercel function can be self-contained without bringing huge
         // optional Node deps along for the ride. Safe defaults that match TanStack Start's
         // own recommendations.
-        noExternal: ["@tanstack/react-start", "@tanstack/react-router"],
+        noExternal: [
+          "@tanstack/react-start",
+          "@tanstack/react-router",
+          "@connectrpc/connect",
+          "@connectrpc/connect-web",
+          "@bufbuild/protobuf",
+        ],
       },
     },
   };
