@@ -48,7 +48,7 @@ def _ensure_unique_slug(supabase, slug: str, exclude_id: str | None = None) -> s
         if exclude_id:
             query = query.neq("id", exclude_id)
         result = query.maybe_single().execute()
-        if not result.data:
+        if not (result.data if result else None):
             return candidate
         candidate = f"{slug}-{suffix}"
         suffix += 1
@@ -63,7 +63,7 @@ def _fetch_host_experience_row(supabase, experience_id: str, host_id: str) -> di
         .maybe_single()
         .execute()
     )
-    row = result.data
+    row = result.data if result else None
     if not row:
         raise ValueError("Experience not found.")
     return row
@@ -222,7 +222,7 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
         .maybe_single()
         .execute()
     )
-    if not category.data:
+    if not (category.data if category else None):
         raise ValueError("Invalid category.")
 
     slug = _ensure_unique_slug(supabase, payload.slug or _slugify(payload.title))
@@ -292,7 +292,7 @@ def update_host_experience(
             .maybe_single()
             .execute()
         )
-        if not category.data:
+        if not (category.data if category else None):
             raise ValueError("Invalid category.")
         updates["category_slug"] = payload.categorySlug
     if payload.citySlug is not None:
@@ -395,7 +395,7 @@ def update_host_slot(
         .maybe_single()
         .execute()
     )
-    slot = slot_result.data
+    slot = slot_result.data if slot_result else None
     if not slot:
         raise ValueError("Slot not found.")
 
@@ -433,7 +433,7 @@ def delete_host_slot(auth: dict, experience_id: str, slot_id: str) -> HostExperi
         .maybe_single()
         .execute()
     )
-    slot = slot_result.data
+    slot = slot_result.data if slot_result else None
     if not slot:
         raise ValueError("Slot not found.")
     if (slot.get("seats_sold") or 0) > 0:

@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "setup:admin": "node --env-file=.env scripts/create-admin.mjs",
     "api:dev": "cd backend && python -m uvicorn app.main:app --reload --port 8000",
-    "proto:generate": "npx buf generate"
+    "proto:generate": "npx buf generate",
+    "test:e2e": "node --env-file=backend/.env scripts/e2e-test.mjs"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.12.0",

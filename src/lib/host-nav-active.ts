@@ -1,4 +1,4 @@
-/** Whether a host sidebar/header nav item should appear active for the current path. */
+/** Whether a host header nav item should appear active for the current path. */
 export function isHostNavItemActive(pathname: string, to: string): boolean {
   if (pathname === to) return true;
 

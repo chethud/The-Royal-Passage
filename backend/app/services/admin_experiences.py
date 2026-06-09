@@ -35,7 +35,7 @@ def publish_experience(experience_id: str) -> AdminExperienceSummary:
         .maybe_single()
         .execute()
     )
-    row = result.data
+    row = result.data if result else None
     if not row:
         raise ValueError("Experience not found.")
     if row.get("status") != "pending_review":
@@ -63,7 +63,7 @@ def reject_experience(experience_id: str) -> AdminExperienceSummary:
         .maybe_single()
         .execute()
     )
-    row = result.data
+    row = result.data if result else None
     if not row:
         raise ValueError("Experience not found.")
     if row.get("status") != "pending_review":

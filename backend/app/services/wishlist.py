@@ -86,7 +86,7 @@ def add_to_wishlist(auth: dict, experience_id: str) -> WishlistItem:
         .maybe_single()
         .execute()
     )
-    experience = experience_result.data
+    experience = experience_result.data if experience_result else None
     if not experience:
         raise ValueError("Experience not found.")
     if experience.get("status") != "published":
@@ -100,7 +100,7 @@ def add_to_wishlist(auth: dict, experience_id: str) -> WishlistItem:
         .maybe_single()
         .execute()
     )
-    if existing.data:
+    if existing and existing.data:
         row_result = (
             supabase.table("wishlist")
             .select(WISHLIST_SELECT)
@@ -109,6 +109,8 @@ def add_to_wishlist(auth: dict, experience_id: str) -> WishlistItem:
             .maybe_single()
             .execute()
         )
+        if not row_result or not row_result.data:
+            raise ValueError("Wishlist item not found.")
         return _map_wishlist_row(row_result.data)
 
     insert_result = (
@@ -117,7 +119,7 @@ def add_to_wishlist(auth: dict, experience_id: str) -> WishlistItem:
         .select(WISHLIST_SELECT)
         .execute()
     )
-    insert_rows = insert_result.data or []
+    insert_rows = (insert_result.data if insert_result else None) or []
     row = insert_rows[0] if insert_rows else None
     if not row:
         raise ValueError("Failed to save experience.")

@@ -1,4 +1,4 @@
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { LogOut, Menu, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/sheet";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useAuthUser } from "@/lib/auth-user";
+import { isHostNavItemActive } from "@/lib/host-nav-active";
 import { dashboardPathForRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
@@ -55,12 +56,27 @@ const navLinkClass =
 const sheetLinkClass =
   "rounded-sm px-3 py-2.5 text-sm uppercase tracking-[0.16em] text-ink/85 hover:bg-white/5 hover:text-ember";
 
+function isHeaderNavItemActive(
+  role: UserRole | null | undefined,
+  pathname: string,
+  to: string,
+): boolean {
+  if (role === "host") return isHostNavItemActive(pathname, to);
+  if (role === "guest") {
+    const guestItem = GUEST_NAV_ITEMS.find((item) => item.to === to);
+    if (guestItem && "exact" in guestItem && guestItem.exact) return pathname === to;
+    return pathname === to || pathname.startsWith(`${to}/`);
+  }
+  return pathname === to || pathname.startsWith(`${to}/`);
+}
+
 export function Header() {
   const [elevated, setElevated] = useState(false);
   const { displayName, user, role } = useAuthUser();
   const dashboardPath = role ? dashboardPathForRole(role) : "/sign-in";
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const navItems = navItemsForUser(role, Boolean(user));
   const showPublicExtras = !user;
 
@@ -105,16 +121,18 @@ export function Header() {
         </Link>
 
         <nav className="hidden items-center gap-5 text-[0.72rem] font-medium uppercase tracking-[0.14em] md:flex lg:gap-7 lg:text-[0.76rem] lg:tracking-[0.16em]">
-          {navItems.map((item) => (
-            <Link
-              key={`${item.to}-${item.label}`}
-              to={item.to as "/experiences"}
-              className={navLinkClass}
-              activeProps={{ className: "text-ember" }}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const active = isHeaderNavItemActive(role, pathname, item.to);
+            return (
+              <Link
+                key={`${item.to}-${item.label}`}
+                to={item.to as "/experiences"}
+                className={`${navLinkClass}${active ? " text-ember" : ""}`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
 
           {showPublicExtras ? (
             <>
@@ -146,11 +164,19 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
                   {role === "guest" ? (
-                    <DropdownMenuItem asChild>
-                      <Link to="/experiences" className="cursor-pointer">
-                        Browse experiences
-                      </Link>
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/experiences" className="cursor-pointer">
+                          Browse experiences
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard/profile" className="cursor-pointer">
+                          <UserRound className="h-4 w-4" />
+                          Profile
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
                   ) : null}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -188,13 +214,19 @@ export function Header() {
               <SheetDescription className="sr-only">Site navigation menu</SheetDescription>
             </SheetHeader>
             <div className="mt-8 flex flex-col gap-1">
-              {navItems.map((item) => (
-                <SheetClose asChild key={`${item.to}-${item.label}`}>
-                  <Link to={item.to as "/experiences"} className={sheetLinkClass}>
-                    {item.label}
-                  </Link>
-                </SheetClose>
-              ))}
+              {navItems.map((item) => {
+                const active = isHeaderNavItemActive(role, pathname, item.to);
+                return (
+                  <SheetClose asChild key={`${item.to}-${item.label}`}>
+                    <Link
+                      to={item.to as "/experiences"}
+                      className={`${sheetLinkClass}${active ? " text-ember" : ""}`}
+                    >
+                      {item.label}
+                    </Link>
+                  </SheetClose>
+                );
+              })}
 
               {showPublicExtras ? (
                 <>
@@ -217,11 +249,18 @@ export function Header() {
                     </Link>
                   </SheetClose>
                   {role === "guest" ? (
-                    <SheetClose asChild>
-                      <Link to="/experiences" className={sheetLinkClass}>
-                        Browse experiences
-                      </Link>
-                    </SheetClose>
+                    <>
+                      <SheetClose asChild>
+                        <Link to="/experiences" className={sheetLinkClass}>
+                          Browse experiences
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link to="/dashboard/profile" className={sheetLinkClass}>
+                          Profile
+                        </Link>
+                      </SheetClose>
+                    </>
                   ) : null}
                   <button
                     type="button"

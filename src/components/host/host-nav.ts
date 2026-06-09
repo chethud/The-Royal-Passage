@@ -1,3 +1,4 @@
+/** Host dashboard sections — shown in the site header, not duplicated in the dashboard layout. */
 export const HOST_NAV_ITEMS = [
   { to: "/host/dashboard", label: "Overview" },
   { to: "/host/bookings", label: "Bookings" },
