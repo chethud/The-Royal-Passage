@@ -11,7 +11,7 @@ import { bookExperiencePath, guestBookingLimits, parseBookSearch } from "@/lib/b
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 import { getExperienceForDetail } from "@/lib/marketplace-fns";
-import { isGuestAccount, isStaffRole } from "@/lib/roles";
+import { dashboardPathForRole, isGuestAccount, isStaffRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 export const Route = createFileRoute("/experiences/$slug/book")({
@@ -73,7 +73,7 @@ function BookExperiencePage() {
       return;
     }
     if (isStaffRole(role)) {
-      void navigate({ to: "/dashboard" });
+      void navigate({ to: dashboardPathForRole(role) });
     }
   }, [loading, navigate, redirectPath, role, user]);
 
@@ -141,7 +141,7 @@ function BookExperiencePage() {
       });
 
       void navigate({
-        to: "/dashboard",
+        to: "/dashboard/history",
         search: { booked: result.bookingId },
       });
     } catch (err) {

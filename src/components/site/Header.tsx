@@ -3,7 +3,6 @@ import { LogOut, Menu, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
 import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav";
-import { GUEST_NAV_ITEMS } from "@/components/guest/guest-nav";
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
 import {
   DropdownMenu,
@@ -42,7 +41,7 @@ function navItemsForUser(role: UserRole | null | undefined, signedIn: boolean): 
   if (role === "host") {
     return HOST_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
-  return GUEST_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
+  return publicNavItems;
 }
 
 const navLinkClass =
@@ -57,11 +56,6 @@ function isHeaderNavItemActive(
   to: string,
 ): boolean {
   if (role === "host") return isHostNavItemActive(pathname, to);
-  if (role === "guest") {
-    const guestItem = GUEST_NAV_ITEMS.find((item) => item.to === to);
-    if (guestItem && "exact" in guestItem && guestItem.exact) return pathname === to;
-    return pathname === to || pathname.startsWith(`${to}/`);
-  }
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
@@ -74,7 +68,10 @@ export function Header() {
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const navItems = navItemsForUser(role, Boolean(user));
-  const showPublicExtras = !user;
+  const isGuest = role === "guest";
+  const showBookExperience = !user || isGuest;
+  const showSignIn = !user;
+  const showAccountMenu = Boolean(user);
 
   useEffect(() => {
     const onScroll = () => setElevated(window.scrollY > 20);
@@ -103,7 +100,7 @@ export function Header() {
         <Link
           to={user ? dashboardPath : "/"}
           className="flex shrink-0 items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember/60"
-          aria-label={user ? "Go to dashboard" : "The Royal Passage — Home"}
+          aria-label={user && !isGuest ? "Go to dashboard" : "The Royal Passage — Home"}
         >
           <img
             src={logoUrl}
@@ -130,20 +127,21 @@ export function Header() {
             );
           })}
 
-          {showPublicExtras ? (
-            <>
-              <Link
-                to="/experiences"
-                className={navLinkClass}
-                activeProps={{ className: "text-ember" }}
-              >
-                Book an Experience
-              </Link>
-              <Link to="/sign-in" className={navLinkClass} activeProps={{ className: "text-ember" }}>
-                Sign in
-              </Link>
-            </>
-          ) : (
+          {showBookExperience ? (
+            <Link
+              to="/experiences"
+              className={navLinkClass}
+              activeProps={{ className: "text-ember" }}
+            >
+              Book an Experience
+            </Link>
+          ) : null}
+          {showSignIn ? (
+            <Link to="/sign-in" className={navLinkClass} activeProps={{ className: "text-ember" }}>
+              Sign in
+            </Link>
+          ) : null}
+          {showAccountMenu ? (
             <>
               <NotificationBell />
               <DropdownMenu>
@@ -153,19 +151,36 @@ export function Header() {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuItem asChild>
-                    <Link to={dashboardPath} className="cursor-pointer">
-                      <UserRound className="h-4 w-4" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
+                  {isGuest ? (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/" className="cursor-pointer">
+                          <UserRound className="h-4 w-4" />
+                          Home
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard/history" className="cursor-pointer">
+                          <UserRound className="h-4 w-4" />
+                          History
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <DropdownMenuItem asChild>
+                      <Link to={dashboardPath} className="cursor-pointer">
+                        <UserRound className="h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link to={profilePath} className="cursor-pointer">
                       <UserRound className="h-4 w-4" />
                       Profile
                     </Link>
                   </DropdownMenuItem>
-                  {role === "guest" ? (
+                  {isGuest ? (
                     <DropdownMenuItem asChild>
                       <Link to="/experiences" className="cursor-pointer">
                         Browse experiences
@@ -186,7 +201,7 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
-          )}
+          ) : null}
         </nav>
 
         <Sheet>
@@ -222,32 +237,48 @@ export function Header() {
                 );
               })}
 
-              {showPublicExtras ? (
+              {showBookExperience ? (
+                <SheetClose asChild>
+                  <Link to="/experiences" className={sheetLinkClass}>
+                    Book an Experience
+                  </Link>
+                </SheetClose>
+              ) : null}
+              {showSignIn ? (
+                <SheetClose asChild>
+                  <Link to="/sign-in" className={sheetLinkClass}>
+                    Sign in
+                  </Link>
+                </SheetClose>
+              ) : null}
+              {showAccountMenu ? (
                 <>
-                  <SheetClose asChild>
-                    <Link to="/experiences" className={sheetLinkClass}>
-                      Book an Experience
-                    </Link>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Link to="/sign-in" className={sheetLinkClass}>
-                      Sign in
-                    </Link>
-                  </SheetClose>
-                </>
-              ) : (
-                <>
-                  <SheetClose asChild>
-                    <Link to={dashboardPath} className={sheetLinkClass}>
-                      {displayName ?? "Account"}
-                    </Link>
-                  </SheetClose>
+                  {isGuest ? (
+                    <>
+                      <SheetClose asChild>
+                        <Link to="/" className={sheetLinkClass}>
+                          Home
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link to="/dashboard/history" className={sheetLinkClass}>
+                          History
+                        </Link>
+                      </SheetClose>
+                    </>
+                  ) : (
+                    <SheetClose asChild>
+                      <Link to={dashboardPath} className={sheetLinkClass}>
+                        {displayName ?? "Account"}
+                      </Link>
+                    </SheetClose>
+                  )}
                   <SheetClose asChild>
                     <Link to={profilePath} className={sheetLinkClass}>
                       Profile
                     </Link>
                   </SheetClose>
-                  {role === "guest" ? (
+                  {isGuest ? (
                     <SheetClose asChild>
                       <Link to="/experiences" className={sheetLinkClass}>
                         Browse experiences
@@ -266,7 +297,7 @@ export function Header() {
                     {loggingOut ? "Logging out..." : "Logout"}
                   </button>
                 </>
-              )}
+              ) : null}
             </div>
           </SheetContent>
         </Sheet>

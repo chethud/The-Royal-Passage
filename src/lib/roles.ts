@@ -16,7 +16,7 @@ export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
 };
 
 export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
-  guest: "/dashboard",
+  guest: "/",
   host: "/host/dashboard",
   admin: "/admin",
 };
