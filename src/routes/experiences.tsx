@@ -124,30 +124,30 @@ function ExperiencesPage() {
 
       <ExperiencesHero signedIn={Boolean(user)} />
 
-      <section className="container-page -mt-8 relative z-20 pb-8">
+      <section className="container-page relative z-20 -mt-5 pb-5">
         <ExperiencesSearchBar
           value={search.q ?? ""}
           onChange={(q) => updateSearch({ q: q || undefined, page: 1 })}
         />
       </section>
 
-      <section id="experiences-grid" className="container-page pb-20">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-[#C8A25A]/15 pb-6">
+      <section id="experiences-grid" className="container-page pb-16">
+        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3 border-b border-[#C8A25A]/12 pb-4">
           <div>
-            <p className="eyebrow text-[#D4AF6A]">Curated collection</p>
-            <h2 className="mt-2 font-display text-3xl text-[#F7F1E8] md:text-4xl">
+            <p className="eyebrow text-[0.65rem] text-[#D4AF6A]">Curated collection</p>
+            <h2 className="mt-1 font-display text-2xl text-[#F7F1E8]">
               {filtered.length} experience{filtered.length === 1 ? "" : "s"}
             </h2>
-            <p className="mt-2 text-sm text-[#D6C8B5]">
-              Handpicked journeys from verified hosts across South India
+            <p className="mt-1 text-xs text-[#D6C8B5]">
+              Handpicked journeys from verified hosts
             </p>
           </div>
-          <p className="text-sm text-[#D6C8B5]">
+          <p className="text-xs text-[#D6C8B5]">
             Page {Math.min(page, pages)} of {pages}
           </p>
         </div>
 
-        <div className="flex flex-col gap-10 lg:flex-row lg:gap-12">
+        <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-8">
           <ExperiencesFilterSidebar
             search={search}
             categories={categories}
@@ -164,7 +164,7 @@ function ExperiencesPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
+                  className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
                 >
                   {Array.from({ length: 3 }).map((_, i) => (
                     <ExperienceCardSkeleton key={i} />
@@ -180,7 +180,7 @@ function ExperiencesPage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.35 }}
-                  className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
+                  className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
                 >
                   {paged.map((e) => (
                     <ExperienceCard key={e.id} exp={e} />
@@ -190,23 +190,23 @@ function ExperiencesPage() {
             </AnimatePresence>
 
             {filtered.length > PAGE_SIZE ? (
-              <div className="mt-12 flex items-center justify-center gap-3">
+              <div className="mt-8 flex items-center justify-center gap-2">
                 <button
                   type="button"
                   disabled={page <= 1}
                   onClick={() => updateSearch({ page: Math.max(1, page - 1) })}
-                  className="luxury-btn-secondary disabled:opacity-40"
+                  className="luxury-btn-sm luxury-btn-secondary disabled:opacity-40"
                 >
                   Previous
                 </button>
-                <span className="px-4 text-sm text-[#D6C8B5]">
+                <span className="px-3 text-xs text-[#D6C8B5]">
                   {page} / {pages}
                 </span>
                 <button
                   type="button"
                   disabled={page >= pages}
                   onClick={() => updateSearch({ page: Math.min(pages, page + 1) })}
-                  className="luxury-btn-secondary disabled:opacity-40"
+                  className="luxury-btn-sm luxury-btn-secondary disabled:opacity-40"
                 >
                   Next
                 </button>

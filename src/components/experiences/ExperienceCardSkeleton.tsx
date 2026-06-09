@@ -1,17 +1,12 @@
 export function ExperienceCardSkeleton() {
   return (
-    <div className="luxury-card overflow-hidden rounded-[20px] border border-[#C8A25A]/15">
-      <div className="luxury-shimmer h-[320px] w-full" />
-      <div className="space-y-4 p-6">
-        <div className="luxury-shimmer h-3 w-20 rounded" />
-        <div className="luxury-shimmer h-7 w-4/5 rounded" />
-        <div className="luxury-shimmer h-4 w-full rounded" />
-        <div className="flex gap-4">
-          <div className="luxury-shimmer h-4 w-16 rounded" />
-          <div className="luxury-shimmer h-4 w-20 rounded" />
-          <div className="luxury-shimmer h-4 w-14 rounded" />
-        </div>
-        <div className="luxury-shimmer h-12 w-full rounded-xl" />
+    <div className="overflow-hidden rounded-lg border border-[#C8A25A]/12">
+      <div className="luxury-shimmer aspect-[4/3] w-full" />
+      <div className="space-y-2.5 p-4">
+        <div className="luxury-shimmer h-2.5 w-16 rounded" />
+        <div className="luxury-shimmer h-5 w-4/5 rounded" />
+        <div className="luxury-shimmer h-3 w-full rounded" />
+        <div className="luxury-shimmer mt-3 h-8 w-full rounded" />
       </div>
     </div>
   );

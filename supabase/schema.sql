@@ -4,6 +4,8 @@
 -- Safe to re-run on EXISTING databases: uses IF NOT EXISTS, ADD COLUMN IF NOT EXISTS,
 -- idempotent FK blocks, ON CONFLICT, and DROP POLICY IF EXISTS (upgrades old tables in place).
 -- Payment: Pay-at-venue (COD) only — no online payment gateway
+-- Platform commission: 10% (admin) / 90% (host payout) — stored per booking.
+-- Profiles: auto-created on auth sign-up + backfilled from auth.users + ensured before booking insert.
 -- Seed UUIDs must be valid hex (0-9, a-f only); prefixes like "s1..." are invalid.
 --
 -- RLS: broad read access for `anon` + `authenticated` so SELECT returns rows in the
@@ -289,20 +291,41 @@ begin
   end if;
 end $$;
 
--- Backfill COD columns from legacy bookings data
+-- Backfill profiles BEFORE linking bookings.guest_id (prevents FK violations).
+insert into public.profiles (id, full_name, phone, role)
+select
+  u.id,
+  coalesce(
+    u.raw_user_meta_data->>'full_name',
+    u.raw_user_meta_data->>'name',
+    nullif(split_part(u.email, '@', 1), ''),
+    'Guest'
+  ),
+  u.raw_user_meta_data->>'phone',
+  'guest'
+from auth.users u
+left join public.profiles p on p.id = u.id
+where p.id is null
+on conflict (id) do nothing;
+
+-- Backfill COD columns from legacy bookings data (guest_id only when profile exists).
 update public.bookings
 set
   participant_count = coalesce(participant_count, guest_count),
   total_amount = coalesce(total_amount, subtotal_minor),
-  guest_id = coalesce(guest_id, customer_user_id),
   experience_id = coalesce(
     experience_id,
     (select es.experience_id from public.experience_slots es where es.id = bookings.slot_id)
   )
 where participant_count is null
    or total_amount is null
-   or experience_id is null
-   or guest_id is null;
+   or experience_id is null;
+
+update public.bookings b
+set guest_id = b.customer_user_id
+where b.guest_id is null
+  and b.customer_user_id is not null
+  and exists (select 1 from public.profiles p where p.id = b.customer_user_id);
 
 update public.bookings
 set booking_status = case
@@ -312,6 +335,14 @@ set booking_status = case
   else 'pending'
 end
 where booking_status = 'pending' and status is not null and status <> 'pending_payment';
+
+-- Backfill platform fee split (10% admin / 90% host) on legacy rows.
+update public.bookings
+set
+  platform_fee_minor = round(subtotal_minor * 0.10),
+  host_payout_minor = subtotal_minor - round(subtotal_minor * 0.10)
+where subtotal_minor > 0
+  and (platform_fee_minor = 0 or host_payout_minor = 0);
 
 create index if not exists idx_bookings_slot on public.bookings (slot_id);
 create index if not exists idx_bookings_guest on public.bookings (guest_id);
@@ -323,6 +354,46 @@ drop trigger if exists trg_bookings_updated on public.bookings;
 create trigger trg_bookings_updated
   before update on public.bookings
   for each row execute procedure public.set_updated_at();
+
+-- Ensure guest_id always has a matching profiles row (fixes OAuth / manual SQL inserts).
+create or replace function public.ensure_booking_guest_profile()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.guest_id is null then
+    return new;
+  end if;
+
+  insert into public.profiles (id, full_name, phone, role)
+  select
+    u.id,
+    coalesce(
+      u.raw_user_meta_data->>'full_name',
+      u.raw_user_meta_data->>'name',
+      nullif(split_part(u.email, '@', 1), ''),
+      'Guest'
+    ),
+    u.raw_user_meta_data->>'phone',
+    'guest'
+  from auth.users u
+  where u.id = new.guest_id
+  on conflict (id) do nothing;
+
+  if not exists (select 1 from public.profiles where id = new.guest_id) then
+    raise exception 'guest_id % is not a valid auth user — cannot create booking', new.guest_id;
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_bookings_ensure_guest_profile on public.bookings;
+create trigger trg_bookings_ensure_guest_profile
+  before insert or update of guest_id on public.bookings
+  for each row execute procedure public.ensure_booking_guest_profile();
 
 -- ---------------------------------------------------------------------------
 -- Atomic seat reservation (prevents overbooking)
@@ -641,7 +712,12 @@ begin
   insert into public.profiles (id, full_name, phone, role)
   values (
     new.id,
-    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'),
+    coalesce(
+      new.raw_user_meta_data->>'full_name',
+      new.raw_user_meta_data->>'name',
+      nullif(split_part(new.email, '@', 1), ''),
+      'Guest'
+    ),
     new.raw_user_meta_data->>'phone',
     'guest'
   )
@@ -656,7 +732,7 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- Backfill profiles for auth users missing a row (OAuth / pre-trigger signups). Safe to re-run.
+-- Backfill profiles again after auth trigger (OAuth / pre-trigger signups). Safe to re-run.
 insert into public.profiles (id, full_name, phone, role)
 select
   u.id,
@@ -672,6 +748,13 @@ from auth.users u
 left join public.profiles p on p.id = u.id
 where p.id is null
 on conflict (id) do nothing;
+
+-- Link any remaining bookings to profiles where customer_user_id matches.
+update public.bookings b
+set guest_id = b.customer_user_id
+where b.guest_id is null
+  and b.customer_user_id is not null
+  and exists (select 1 from public.profiles p where p.id = b.customer_user_id);
 
 -- ---------------------------------------------------------------------------
 -- Seed data (deterministic UUIDs for idempotent re-runs)

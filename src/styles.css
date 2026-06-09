@@ -345,6 +345,12 @@
   box-shadow: 0 0 24px -10px #c8a25a66;
 }
 
+.luxury-btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
 .luxury-range {
   accent-color: #c8a25a;
 }

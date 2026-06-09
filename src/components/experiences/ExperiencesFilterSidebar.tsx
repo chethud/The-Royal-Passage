@@ -12,16 +12,16 @@ type ExperiencesFilterSidebarProps = {
 };
 
 const DURATION_OPTIONS = [
-  { id: "short", label: "1–2 Hours" },
-  { id: "half", label: "Half Day" },
-  { id: "full", label: "Full Day" },
-  { id: "multi", label: "Multi Day" },
+  { id: "short", label: "1–2h" },
+  { id: "half", label: "Half day" },
+  { id: "full", label: "Full day" },
+  { id: "multi", label: "Multi day" },
 ] as const;
 
 const AVAILABILITY_OPTIONS = [
   { id: "today", label: "Today" },
   { id: "tomorrow", label: "Tomorrow" },
-  { id: "week", label: "This Week" },
+  { id: "week", label: "This week" },
   { id: "weekend", label: "Weekend" },
 ] as const;
 
@@ -36,14 +36,14 @@ export function ExperiencesFilterSidebar({
   const maxPrice = search.maxPrice ?? PRICE_MAX;
 
   return (
-    <aside className="luxury-filter-sidebar w-full shrink-0 lg:w-[280px]">
-      <div className="sticky top-[calc(var(--header-height)+1.5rem)] space-y-8 rounded-[20px] border border-[#C8A25A]/20 bg-[#4A0000]/65 p-6 backdrop-blur-md">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl text-[#F7F1E8]">Refine</h2>
+    <aside className="w-full shrink-0 lg:w-[220px] xl:w-[240px]">
+      <div className="sticky top-[calc(var(--header-height)+1rem)] space-y-5 rounded-lg border border-[#C8A25A]/18 bg-[#4A0000]/55 p-4 backdrop-blur-sm">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="font-display text-base text-[#F7F1E8]">Refine</h2>
           <button
             type="button"
             onClick={onReset}
-            className="text-xs uppercase tracking-[0.14em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
+            className="text-[0.65rem] uppercase tracking-[0.12em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
           >
             Reset
           </button>
@@ -86,21 +86,19 @@ export function ExperiencesFilterSidebar({
           ))}
         </FilterSection>
 
-        <FilterSection title="Price range">
-          <div className="space-y-3">
-            <input
-              type="range"
-              min={PRICE_MIN}
-              max={PRICE_MAX}
-              step={100}
-              value={maxPrice}
-              onChange={(e) => onUpdate({ maxPrice: Number(e.target.value), page: 1 })}
-              className="luxury-range w-full"
-            />
-            <div className="flex justify-between text-xs text-[#D6C8B5]">
-              <span>₹{minPrice}</span>
-              <span className="text-[#C8A25A]">Up to ₹{maxPrice}</span>
-            </div>
+        <FilterSection title="Price">
+          <input
+            type="range"
+            min={PRICE_MIN}
+            max={PRICE_MAX}
+            step={100}
+            value={maxPrice}
+            onChange={(e) => onUpdate({ maxPrice: Number(e.target.value), page: 1 })}
+            className="luxury-range w-full"
+          />
+          <div className="mt-1.5 flex justify-between text-[0.65rem] text-[#D6C8B5]">
+            <span>₹{minPrice}</span>
+            <span className="text-[#C8A25A]">≤ ₹{maxPrice}</span>
           </div>
         </FilterSection>
 
@@ -121,7 +119,7 @@ export function ExperiencesFilterSidebar({
           ))}
         </FilterSection>
 
-        <FilterSection title="Availability">
+        <FilterSection title="When">
           {AVAILABILITY_OPTIONS.map((opt) => (
             <FilterPill
               key={opt.id}
@@ -145,8 +143,8 @@ export function ExperiencesFilterSidebar({
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="eyebrow mb-3 text-[#D4AF6A]">{title}</h3>
-      <div className="flex flex-wrap gap-2">{children}</div>
+      <h3 className="eyebrow mb-2 text-[0.65rem] text-[#D4AF6A]">{title}</h3>
+      <div className="flex flex-wrap gap-1.5">{children}</div>
     </div>
   );
 }
@@ -164,10 +162,10 @@ function FilterPill({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full border px-3.5 py-1.5 text-xs transition-all duration-300 ${
+      className={`rounded-sm border px-2.5 py-1 text-[0.65rem] transition-colors ${
         active
-          ? "border-[#C8A25A] bg-gradient-to-r from-[#C8A25A] to-[#D4AF6A] font-medium text-[#4A0000] shadow-[0_0_24px_-6px_#C8A25A]"
-          : "border-[#C8A25A]/25 bg-[#5B0000]/40 text-[#F7F1E8] hover:border-[#C8A25A]/50 hover:shadow-[0_0_20px_-8px_#C8A25A]"
+          ? "border-[#C8A25A] bg-[#C8A25A] font-medium text-[#4A0000]"
+          : "border-[#C8A25A]/22 bg-[#5B0000]/35 text-[#F7F1E8] hover:border-[#C8A25A]/45"
       }`}
     >
       {children}
