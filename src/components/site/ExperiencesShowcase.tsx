@@ -8,7 +8,6 @@ import outdoorCookingImg from "@/assets/outdoor-cooking.png";
 type ShowcaseCard = {
   icon: LucideIcon;
   title: string;
-  description: string;
   image: string;
   alt: string;
   href: string;
@@ -18,7 +17,6 @@ const cards: ShowcaseCard[] = [
   {
     icon: Palette,
     title: "Pottery Experience",
-    description: "Get your hands muddy and share tradition with local artisans.",
     image: expCraftImg,
     alt: "Hands shaping clay on a pottery wheel",
     href: "/experiences?category=Craft",
@@ -26,7 +24,6 @@ const cards: ShowcaseCard[] = [
   {
     icon: Flame,
     title: "Outdoor Cooking",
-    description: "Cook in nature, fire in the wild. Memories that linger.",
     image: outdoorCookingImg,
     alt: "Open fire cooking in the wild under warm light",
     href: "/experiences?category=Tasting",
@@ -34,7 +31,6 @@ const cards: ShowcaseCard[] = [
   {
     icon: Landmark,
     title: "Heritage Walks",
-    description: "Walk through stories carved in stone.",
     image: heroPalaceImg,
     alt: "Mysuru palace at golden hour",
     href: "/experiences",
@@ -112,13 +108,6 @@ function ExperienceShowcaseCard({ card, index }: { card: ShowcaseCard; index: nu
           <h3 className="font-display text-lg uppercase tracking-[0.16em] text-ember drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)]">
             {card.title}
           </h3>
-          <p className="mt-3 text-sm leading-relaxed text-ink/85 drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
-            {card.description}
-          </p>
-          <span className="mt-5 inline-flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-ink transition-colors group-hover:text-ember">
-            Explore
-            <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-          </span>
         </div>
       </Link>
     </motion.article>
