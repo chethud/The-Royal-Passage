@@ -2,16 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { CreateExperienceWizard } from "@/components/experience/CreateExperienceWizard";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
-import { FALLBACK_CITIES, type CitySummary } from "@/lib/cities";
-import { fetchCities } from "@/lib/api/cities";
-import {
-  createHostExperience,
-  createHostSlot,
-  fetchHostCategories,
-  type CategoryOption,
-} from "@/lib/api/host-experiences";
+import { createHostExperience, createHostSlot } from "@/lib/api/host-experiences";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
-import { FALLBACK_CATEGORIES } from "@/lib/experience-categories";
+import {
+  getCachedHostFormReferenceData,
+  loadHostFormReferenceData,
+} from "@/lib/host-form-data";
 import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/experiences/new")({
@@ -24,36 +20,30 @@ export const Route = createFileRoute("/host/experiences/new")({
 function HostNewExperiencePage() {
   const navigate = useNavigate();
   const { accessToken, ready, loading } = useHostAccess();
-  const [categories, setCategories] = useState<CategoryOption[]>([]);
-  const [cities, setCities] = useState<CitySummary[]>([]);
+  const initialData = getCachedHostFormReferenceData();
+  const [categories, setCategories] = useState(initialData.categories);
+  const [cities, setCities] = useState(initialData.cities);
   const [pageError, setPageError] = useState<string | null>(null);
-  const [pageLoading, setPageLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const loadFormData = useCallback(async () => {
+  const refreshFormData = useCallback(async () => {
     if (!accessToken) return;
-    setPageLoading(true);
     try {
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
-      const [categoryRows, cityRows] = await Promise.all([
-        fetchHostCategories(accessToken).catch(() => FALLBACK_CATEGORIES),
-        fetchCities().catch(() => FALLBACK_CITIES),
-      ]);
-      setCategories(categoryRows.length > 0 ? categoryRows : FALLBACK_CATEGORIES);
-      setCities(cityRows.length > 0 ? cityRows : FALLBACK_CITIES);
+      const data = await loadHostFormReferenceData(accessToken);
+      setCategories(data.categories);
+      setCities(data.cities);
     } catch (err) {
-      setPageError(toErrorMessage(err, "Failed to load form data."));
-    } finally {
-      setPageLoading(false);
+      setPageError(toErrorMessage(err, "Failed to refresh form data."));
     }
   }, [accessToken]);
 
   useEffect(() => {
     if (!ready) return;
-    void loadFormData();
-  }, [loadFormData, ready]);
+    void refreshFormData();
+  }, [ready, refreshFormData]);
 
   const handleSubmit = async ({
     experience,
@@ -79,7 +69,14 @@ function HostNewExperiencePage() {
   };
 
   if (loading || !ready || !accessToken) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return (
+      <HostDashboardShell
+        title="New experience"
+        subtitle="Step through basics, pricing, photos, bookable slots, and submit for Royal Passage review."
+      >
+        <p className="text-sm text-muted-foreground">Preparing your workspace…</p>
+      </HostDashboardShell>
+    );
   }
 
   return (
@@ -87,25 +84,17 @@ function HostNewExperiencePage() {
       title="New experience"
       subtitle="Step through basics, pricing, photos, bookable slots, and submit for Royal Passage review."
     >
-      {pageLoading ? (
-        <p className="text-sm text-muted-foreground">Loading form…</p>
-      ) : pageError ? (
+      {pageError ? (
         <p className="mb-6 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {pageError}
         </p>
       ) : null}
-      {!pageLoading && categories.length > 0 ? (
-        <CreateExperienceWizard
-          categories={categories}
-          cities={cities.length > 0 ? cities : FALLBACK_CITIES}
-          saving={saving}
-          onSubmit={(payload) => void handleSubmit(payload)}
-        />
-      ) : !pageLoading && !pageError ? (
-        <p className="text-sm text-muted-foreground">
-          Could not load experience categories. Refresh the page or contact support.
-        </p>
-      ) : null}
+      <CreateExperienceWizard
+        categories={categories}
+        cities={cities}
+        saving={saving}
+        onSubmit={(payload) => void handleSubmit(payload)}
+      />
     </HostDashboardShell>
   );
 }

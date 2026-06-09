@@ -93,6 +93,7 @@ export function useAuthUser() {
   const configured = isSupabaseBrowserConfigured();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(configured);
   const [cachedUser, setCachedUser] = useState<CachedUser | null>(() => readCachedUser());
 
@@ -104,35 +105,45 @@ export function useAuthUser() {
     const supabase = getSupabaseBrowser();
     let mounted = true;
 
-    const syncUser = async (nextUser: User | null) => {
+    const syncUser = async (nextUser: User | null, sessionToken?: string | null) => {
       if (!mounted) return;
       setUser(nextUser);
 
       if (!nextUser) {
         setProfile(null);
+        setAccessToken(null);
         writeCachedUser(null);
         setCachedUser(readCachedUser());
         setLoading(false);
         return;
       }
 
-      const { data } = await supabase.auth.getSession();
-      const nextProfile = await loadProfileForUser(nextUser, data.session?.access_token);
+      const token = sessionToken ?? null;
+      setAccessToken(token);
+      setLoading(false);
+
+      const resolvedToken =
+        token ?? (await supabase.auth.getSession()).data.session?.access_token ?? null;
+      if (!mounted) return;
+      if (resolvedToken !== token) {
+        setAccessToken(resolvedToken);
+      }
+
+      const nextProfile = await loadProfileForUser(nextUser, resolvedToken);
       if (!mounted) return;
       setProfile(nextProfile);
       writeCachedUser(nextUser, nextProfile?.role);
       setCachedUser(readCachedUser());
-      setLoading(false);
     };
 
     void supabase.auth.getSession().then(({ data }) => {
-      void syncUser(data.session?.user ?? null);
+      void syncUser(data.session?.user ?? null, data.session?.access_token ?? null);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      void syncUser(session?.user ?? null);
+      void syncUser(session?.user ?? null, session?.access_token ?? null);
     });
 
     return () => {
@@ -148,5 +159,5 @@ export function useAuthUser() {
 
   const role = profile?.role ?? cachedUser?.role ?? null;
 
-  return { user, profile, role, loading, configured, displayName };
+  return { user, profile, role, loading, configured, displayName, accessToken };
 }

@@ -43,7 +43,14 @@ function HostExperiencesPage() {
   }, [loadPage, ready]);
 
   if (loading || !ready) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return (
+      <HostDashboardShell
+        title="My experiences"
+        subtitle="Create listings, manage slots, and submit for admin review."
+      >
+        <p className="text-sm text-muted-foreground">Loading your experiences…</p>
+      </HostDashboardShell>
+    );
   }
 
   return (
