@@ -1,5 +1,4 @@
-import { Link } from "@tanstack/react-router";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
 
@@ -66,7 +65,7 @@ export function JourneysSplit() {
     <section className="bg-background py-16 sm:py-20 md:py-24">
       <div className="container-page">
         <div className="grid overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.17_0.07_22)] shadow-soft md:grid-cols-2">
-          <div className="flex flex-col justify-center px-6 py-10 sm:px-12 sm:py-12 md:px-14 md:py-16">
+          <div className="flex min-h-[280px] flex-col justify-between px-6 py-10 sm:px-12 sm:py-12 md:min-h-[420px] md:px-14 md:py-16">
             <AnimatePresence mode="wait">
               <motion.div
                 key={slide.videoId}
@@ -85,25 +84,15 @@ export function JourneysSplit() {
               </motion.div>
             </AnimatePresence>
 
-            <div className="mt-7 flex flex-wrap items-center gap-4 sm:mt-8">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={goPrev}
-                  aria-label="Previous Mysuru story"
-                  className={navButtonClass}
-                >
-                  <ChevronLeft className="h-4 w-4" strokeWidth={1.8} />
-                </button>
-                <button
-                  type="button"
-                  onClick={goNext}
-                  aria-label="Next Mysuru story"
-                  className={navButtonClass}
-                >
-                  <ChevronRight className="h-4 w-4" strokeWidth={1.8} />
-                </button>
-              </div>
+            <div className="flex items-center justify-center gap-4 pt-8">
+              <button
+                type="button"
+                onClick={goPrev}
+                aria-label="Previous Mysuru story"
+                className={navButtonClass}
+              >
+                <ChevronLeft className="h-4 w-4" strokeWidth={1.8} />
+              </button>
 
               <div className="flex items-center gap-2">
                 {slides.map((item, index) => (
@@ -119,16 +108,15 @@ export function JourneysSplit() {
                   />
                 ))}
               </div>
-            </div>
 
-            <div className="mt-6">
-              <Link
-                to="/cities/mysuru"
-                className="group inline-flex items-center gap-2 rounded-sm bg-ember px-6 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-3.5 sm:text-xs"
+              <button
+                type="button"
+                onClick={goNext}
+                aria-label="Next Mysuru story"
+                className={navButtonClass}
               >
-                Explore Mysuru
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+                <ChevronRight className="h-4 w-4" strokeWidth={1.8} />
+              </button>
             </div>
           </div>
 
