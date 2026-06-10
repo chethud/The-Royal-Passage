@@ -1712,7 +1712,7 @@
 /* ───── Phase 4–5: ancient palace doors emerge and heave open in perspective ───── */
 .royal-signin-portal-doors {
   position: absolute;
-  inset: 6% 4% 4% 4%;
+  inset: 9% 14% 4% 14%;
   z-index: 14;
   display: flex;
   overflow: hidden;
