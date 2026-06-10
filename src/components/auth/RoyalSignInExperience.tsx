@@ -24,7 +24,7 @@ export function RoyalSignInExperience({ phase, portal }: RoyalSignInExperiencePr
     >
       <Link
         to="/"
-        className={`royal-signin-logo fixed top-5 left-5 z-[80] sm:top-6 sm:left-8 ${logoGlow ? "is-glowing" : ""} ${logoPulse ? "is-pulsing" : ""} ${unfolding ? "is-settled" : ""}`}
+        className={`royal-signin-logo fixed top-5 left-5 z-[80] sm:top-6 sm:left-8 ${logoGlow ? "is-glowing" : ""} ${logoPulse ? "is-pulsing" : ""}`}
         aria-label="The Royal Passage — Home"
       >
         <img
