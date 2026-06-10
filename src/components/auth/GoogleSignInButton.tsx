@@ -2,6 +2,7 @@ type GoogleSignInButtonProps = {
   disabled?: boolean;
   busy?: boolean;
   label?: string;
+  className?: string;
   onClick: () => void;
 };
 
@@ -32,6 +33,7 @@ export function GoogleSignInButton({
   disabled = false,
   busy = false,
   label = "Continue with Google",
+  className = "",
   onClick,
 }: GoogleSignInButtonProps) {
   return (
@@ -39,7 +41,10 @@ export function GoogleSignInButton({
       type="button"
       disabled={disabled || busy}
       onClick={onClick}
-      className="flex w-full items-center justify-center gap-3 rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/60 px-4 py-3.5 text-sm font-medium text-foreground transition-colors hover:border-ember/45 hover:bg-background/80 disabled:cursor-not-allowed disabled:opacity-70"
+      className={
+        className ||
+        "flex w-full items-center justify-center gap-3 rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/60 px-4 py-3.5 text-sm font-medium text-foreground transition-colors hover:border-ember/45 hover:bg-background/80 disabled:cursor-not-allowed disabled:opacity-70"
+      }
     >
       <GoogleIcon />
       {busy ? "Redirecting to Google…" : label}

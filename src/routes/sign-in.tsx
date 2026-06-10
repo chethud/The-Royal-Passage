@@ -16,9 +16,8 @@ import {
 } from "@/lib/auth-redirect";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
-const inputClass = "royal-signin-input";
-
-const cardTitleClass = "font-display text-xl tracking-[0.04em] text-[#F8F4E8] sm:text-2xl";
+const inputClass = "royal-signin-engraved-input";
+const inscriptionClass = "royal-signin-inscription";
 
 type SignInSearch = {
   redirect?: string;
@@ -282,20 +281,20 @@ function SignInPage() {
 
   return (
     <RoyalSignInExperience phase={phase}>
-      <div className="w-full">
           {user ? (
-            <>
-              <div className="mb-3 flex flex-wrap items-center gap-2">
+            <form className="royal-signin-engraved-form" onSubmit={updateProfile}>
+              <div className="mb-2 flex flex-wrap items-center justify-center gap-2">
                 {role ? <RoleBadge role={role} /> : null}
               </div>
-              <h2 className={cardTitleClass}>Account details</h2>
-              <p className="mt-2 text-sm leading-relaxed text-ink/75">
-                Redirecting to your {role ? ROLE_LABELS[role].toLowerCase() : "account"} dashboard.
+              <p className={`${inscriptionClass} ${inscriptionClass}--crest`}>Royal Registry</p>
+              <h2 className={`${inscriptionClass} ${inscriptionClass}--title`}>Thy Court Identity</h2>
+              <p className={`${inscriptionClass} ${inscriptionClass}--verse`}>
+                Redirecting to your {role ? ROLE_LABELS[role].toLowerCase() : "account"} chamber.
               </p>
-              <form className="mt-8 space-y-4" onSubmit={updateProfile}>
-                <div>
-                  <label htmlFor="profile-name" className="eyebrow mb-2 block text-ink/90">
-                    Full name
+              <div className="royal-signin-carved-divider" aria-hidden />
+                <div className="royal-signin-field">
+                  <label htmlFor="profile-name" className={inscriptionClass}>
+                    Full Name
                   </label>
                   <input
                     id="profile-name"
@@ -308,21 +307,21 @@ function SignInPage() {
                     className={inputClass}
                   />
                 </div>
-                <div>
-                  <label htmlFor="profile-email" className="eyebrow mb-2 block text-ink/90">
-                    Email
+                <div className="royal-signin-field">
+                  <label htmlFor="profile-email" className={inscriptionClass}>
+                    Royal Correspondence
                   </label>
                   <input
                     id="profile-email"
                     type="email"
                     value={user.email ?? ""}
                     disabled
-                    className="w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)] bg-background/30 px-4 py-3 text-sm text-ink/55"
+                    className="royal-signin-engraved-input is-muted"
                   />
                 </div>
-                <div>
-                  <label htmlFor="profile-phone" className="eyebrow mb-2 block text-ink/90">
-                    Phone
+                <div className="royal-signin-field">
+                  <label htmlFor="profile-phone" className={inscriptionClass}>
+                    Court Line
                   </label>
                   <input
                     id="profile-phone"
@@ -335,59 +334,37 @@ function SignInPage() {
                     className={inputClass}
                   />
                 </div>
-                <button
-                  type="submit"
-                  disabled={savingProfile}
-                  className="royal-signin-btn disabled:cursor-not-allowed"
-                >
-                  {savingProfile ? "Saving profile..." : "Save profile"}
+                <button type="submit" disabled={savingProfile} className="royal-signin-seal">
+                  {savingProfile ? "Recording..." : "Seal Profile"}
                 </button>
                 {role ? (
                   <Link
                     to={dashboardPathForRole(role)}
-                    className="block w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-center text-sm font-medium text-ink transition-colors hover:border-ember/50 hover:text-ember"
+                    className={`${inscriptionClass} ${inscriptionClass}--link mx-auto mt-2 block text-center`}
                   >
-                    Go to {ROLE_LABELS[role]} dashboard
+                    Enter {ROLE_LABELS[role]} chamber →
                   </Link>
                 ) : null}
                 <button
                   type="button"
                   onClick={signOut}
-                  className="glass glass-hover glass-hover-active w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-sm font-medium text-ink transition-colors hover:border-ember/50 hover:text-ember"
+                  className={`${inscriptionClass} ${inscriptionClass}--link mx-auto mt-3 block`}
                 >
-                  Sign out
+                  Depart the kingdom
                 </button>
-              </form>
-            </>
+            </form>
           ) : mode === "signin" ? (
-            <>
-              <p className="text-center text-[0.62rem] font-medium uppercase tracking-[0.32em] text-[#C9A227]">
-                The Royal Passage
+            <form className="royal-signin-engraved-form" onSubmit={signIn}>
+              <p className={`${inscriptionClass} ${inscriptionClass}--crest`}>The Royal Passage</p>
+              <h2 className={`${inscriptionClass} ${inscriptionClass}--title`}>Gateway of the Kingdom</h2>
+              <p className={`${inscriptionClass} ${inscriptionClass}--verse`}>
+                Present thy credentials. The palace itself shall judge thy passage.
               </p>
-              <h2 className={`${cardTitleClass} mt-3 text-center`}>Welcome to the Kingdom</h2>
-              <p className="mt-2 text-center text-sm leading-relaxed text-[#F8F4E8]/72">
-                Sign in to enter the palace and access your royal passage.
-              </p>
+              <div className="royal-signin-carved-divider" aria-hidden />
 
-              <div className="mt-8 space-y-4">
-                <GoogleSignInButton
-                  busy={googleBusy}
-                  disabled={!browserConfigured}
-                  onClick={() => void signInWithGoogle()}
-                />
-                <div className="flex items-center gap-3">
-                  <div className="hairline flex-1" />
-                  <span className="text-xs uppercase tracking-[0.14em] text-ink/55">
-                    or email
-                  </span>
-                  <div className="hairline flex-1" />
-                </div>
-              </div>
-
-              <form className="mt-4 space-y-4" onSubmit={signIn}>
-                <div>
-                  <label htmlFor="signin-email" className="eyebrow mb-2 block text-ink/90">
-                    Email
+                <div className="royal-signin-field">
+                  <label htmlFor="signin-email" className={inscriptionClass}>
+                    Royal Correspondence
                   </label>
                   <input
                     id="signin-email"
@@ -401,9 +378,9 @@ function SignInPage() {
                     className={inputClass}
                   />
                 </div>
-                <div>
-                  <label htmlFor="signin-password" className="eyebrow mb-2 block text-ink/90">
-                    Password
+                <div className="royal-signin-field">
+                  <label htmlFor="signin-password" className={inscriptionClass}>
+                    Seal of Passage
                   </label>
                   <input
                     id="signin-password"
@@ -417,27 +394,43 @@ function SignInPage() {
                     className={inputClass}
                   />
                 </div>
+                <div className="royal-signin-inscription-row">
+                  <label className={`${inscriptionClass} ${inscriptionClass}--small`}>
+                    <input type="checkbox" className="royal-signin-checkbox" /> Remember this visit
+                  </label>
+                  <button type="button" className={`${inscriptionClass} ${inscriptionClass}--link`}>
+                    Forgotten seal?
+                  </button>
+                </div>
+
                 <button
                   type="submit"
                   disabled={busy || isAnimating || !email.trim() || !password}
-                  className="royal-signin-btn disabled:cursor-not-allowed"
+                  className="royal-signin-seal"
                 >
-                  {busy || isAnimating ? "Entering..." : "Sign in"}
+                  {busy || isAnimating ? "Opening..." : "Enter the Palace"}
                 </button>
+
+                <GoogleSignInButton
+                  busy={googleBusy}
+                  disabled={!browserConfigured}
+                  className="royal-signin-google-inscription"
+                  onClick={() => void signInWithGoogle()}
+                />
+
                 {emailNotConfirmed ? (
                   <button
                     type="button"
                     onClick={() => void resendConfirmation()}
                     disabled={resendingConfirmation || !email.trim()}
-                    className="w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-sm font-medium text-ink transition-colors hover:border-ember/50 hover:text-ember disabled:cursor-not-allowed disabled:opacity-70"
+                    className={`${inscriptionClass} ${inscriptionClass}--link mx-auto block`}
                   >
-                    {resendingConfirmation ? "Sending..." : "Resend confirmation email"}
+                    {resendingConfirmation ? "Sending decree..." : "Resend confirmation decree"}
                   </button>
                 ) : null}
-              </form>
 
-              <p className="mt-6 text-center text-sm text-ink/70">
-                New guest?{" "}
+              <p className={`${inscriptionClass} ${inscriptionClass}--verse mt-4 text-center`}>
+                New to the court?{" "}
                 <button
                   type="button"
                   onClick={() => {
@@ -445,19 +438,18 @@ function SignInPage() {
                     setError(null);
                     setNotice(null);
                   }}
-                  className="text-ember underline-offset-4 transition-colors hover:underline"
+                  className={`${inscriptionClass} ${inscriptionClass}--link inline`}
                 >
-                  Create an account
+                  Request guest passage
                 </button>
               </p>
 
-              <div className="mt-8 border-t border-[oklch(0.88_0.08_86_/_0.25)] pt-6">
                 <button
                   type="button"
                   onClick={() => setShowJwtSignIn((open) => !open)}
-                  className="w-full text-left text-sm font-medium text-ink transition-colors hover:text-ember"
+                  className={`${inscriptionClass} ${inscriptionClass}--link mx-auto mt-4 block`}
                 >
-                  {showJwtSignIn ? "Hide host / admin JWT sign-in" : "Host or admin? Sign in with JWT"}
+                  {showJwtSignIn ? "Conceal court JWT entry" : "Host or admin court entry"}
                 </button>
                 {showJwtSignIn ? (
                   <div className="mt-4">
@@ -470,38 +462,19 @@ function SignInPage() {
                     />
                   </div>
                 ) : null}
-              </div>
-            </>
+            </form>
           ) : (
-            <>
-              <p className="text-center text-[0.62rem] font-medium uppercase tracking-[0.32em] text-[#C9A227]">
-                Guest Registration
+            <form className="royal-signin-engraved-form" onSubmit={signUpGuest}>
+              <p className={`${inscriptionClass} ${inscriptionClass}--crest`}>Guest Registration</p>
+              <h2 className={`${inscriptionClass} ${inscriptionClass}--title`}>Request Royal Passage</h2>
+              <p className={`${inscriptionClass} ${inscriptionClass}--verse`}>
+                Inscribe thy name upon the palace ledger of honoured guests.
               </p>
-              <h2 className={`${cardTitleClass} mt-3 text-center`}>Join the Kingdom</h2>
-              <p className="mt-2 text-center text-sm leading-relaxed text-[#F8F4E8]/72">
-                Create a guest account to book curated Mysuru experiences.
-              </p>
+              <div className="royal-signin-carved-divider" aria-hidden />
 
-              <div className="mt-8 space-y-4">
-                <GoogleSignInButton
-                  busy={googleBusy}
-                  disabled={!browserConfigured}
-                  label="Sign up with Google"
-                  onClick={() => void signInWithGoogle()}
-                />
-                <div className="flex items-center gap-3">
-                  <div className="hairline flex-1" />
-                  <span className="text-xs uppercase tracking-[0.14em] text-ink/55">
-                    or email
-                  </span>
-                  <div className="hairline flex-1" />
-                </div>
-              </div>
-
-              <form className="mt-4 space-y-4" onSubmit={signUpGuest}>
-                <div>
-                  <label htmlFor="signup-name" className="eyebrow mb-2 block text-ink/90">
-                    Full name
+                <div className="royal-signin-field">
+                  <label htmlFor="signup-name" className={inscriptionClass}>
+                    Full Name
                   </label>
                   <input
                     id="signup-name"
@@ -515,9 +488,9 @@ function SignInPage() {
                     className={inputClass}
                   />
                 </div>
-                <div>
-                  <label htmlFor="signup-email" className="eyebrow mb-2 block text-ink/90">
-                    Email
+                <div className="royal-signin-field">
+                  <label htmlFor="signup-email" className={inscriptionClass}>
+                    Royal Correspondence
                   </label>
                   <input
                     id="signup-email"
@@ -531,9 +504,9 @@ function SignInPage() {
                     className={inputClass}
                   />
                 </div>
-                <div>
-                  <label htmlFor="signup-phone" className="eyebrow mb-2 block text-ink/90">
-                    Phone
+                <div className="royal-signin-field">
+                  <label htmlFor="signup-phone" className={inscriptionClass}>
+                    Court Line
                   </label>
                   <input
                     id="signup-phone"
@@ -546,9 +519,9 @@ function SignInPage() {
                     className={inputClass}
                   />
                 </div>
-                <div>
-                  <label htmlFor="signup-password" className="eyebrow mb-2 block text-ink/90">
-                    Password
+                <div className="royal-signin-field">
+                  <label htmlFor="signup-password" className={inscriptionClass}>
+                    Seal of Passage
                   </label>
                   <input
                     id="signup-password"
@@ -563,17 +536,20 @@ function SignInPage() {
                     className={inputClass}
                   />
                 </div>
-                <button
-                  type="submit"
-                  disabled={busy || !email.trim() || !password || !fullName.trim()}
-                  className="royal-signin-btn disabled:cursor-not-allowed"
-                >
-                  {busy ? "Creating account..." : "Create guest account"}
+                <button type="submit" disabled={busy || !email.trim() || !password || !fullName.trim()} className="royal-signin-seal">
+                  {busy ? "Inscribing..." : "Seal Guest Passage"}
                 </button>
-              </form>
 
-              <p className="mt-6 text-center text-sm text-ink/70">
-                Already have an account?{" "}
+                <GoogleSignInButton
+                  busy={googleBusy}
+                  disabled={!browserConfigured}
+                  label="Decree via Google"
+                  className="royal-signin-google-inscription"
+                  onClick={() => void signInWithGoogle()}
+                />
+
+              <p className={`${inscriptionClass} ${inscriptionClass}--verse mt-4 text-center`}>
+                Already inscribed?{" "}
                 <button
                   type="button"
                   onClick={() => {
@@ -581,42 +557,42 @@ function SignInPage() {
                     setError(null);
                     setNotice(null);
                   }}
-                  className="text-ember underline-offset-4 transition-colors hover:underline"
+                  className={`${inscriptionClass} ${inscriptionClass}--link inline`}
                 >
-                  Sign in
+                  Return to the gateway
                 </button>
+              </p>
+              </form>
+          )}
+
+          {!user && (
+            <>
+              {!browserConfigured && (
+                <p className={`${inscriptionClass} ${inscriptionClass}--alert mt-4 text-center`}>
+                  Missing browser auth env vars. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+                </p>
+              )}
+              {error && (
+                <p className={`${inscriptionClass} ${inscriptionClass}--alert mt-4 text-center`}>{error}</p>
+              )}
+              {notice && (
+                <p className={`${inscriptionClass} ${inscriptionClass}--notice mt-4 text-center`} role="status">
+                  {notice}
+                </p>
+              )}
+              <p className={`${inscriptionClass} ${inscriptionClass}--verse mt-5 text-center`}>
+                <Link to="/" className={`${inscriptionClass} ${inscriptionClass}--link`}>
+                  Return beyond the palace gates →
+                </Link>
               </p>
             </>
           )}
 
-          {!browserConfigured && (
-            <p className="mt-4 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              Missing browser auth env vars. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+          {user && (error || notice) && (
+            <p className={`${inscriptionClass} ${error ? `${inscriptionClass}--alert` : `${inscriptionClass}--notice`} mt-4 text-center`}>
+              {error || notice}
             </p>
           )}
-          {error && (
-            <p className="mt-4 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {error}
-            </p>
-          )}
-          {notice && (
-            <p
-              className="mt-4 rounded-sm border border-ember/25 bg-ember/10 px-4 py-3 text-sm text-ink"
-              role="status"
-            >
-              {notice}
-            </p>
-          )}
-
-          <p className="mt-6 text-center text-sm text-[#F8F4E8]/65">
-            <Link
-              to="/"
-              className="text-[#D4AF37] underline-offset-4 transition-colors hover:underline"
-            >
-              Return to homepage →
-            </Link>
-          </p>
-        </div>
     </RoyalSignInExperience>
   );
 }

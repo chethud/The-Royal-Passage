@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import heroPalaceImg from "@/assets/hero-image.png";
 import logoUrl from "@/assets/logo/logo.png";
-import { MaharajaEmblem } from "@/components/site/RoyalHeritageDecor";
+import { RoyalPalaceGateway } from "@/components/auth/RoyalPalaceGateway";
 import type { RoyalSignInPhase } from "@/hooks/use-royal-sign-in-animation";
 
 type RoyalSignInExperienceProps = {
@@ -16,35 +16,13 @@ const TRAIL_PARTICLES = Array.from({ length: 14 }, (_, i) => ({
   size: 3 + (i % 2),
 }));
 
-function RoyalArch() {
-  return (
-    <svg
-      className="royal-signin-arch-svg h-full w-full"
-      viewBox="0 0 520 420"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      <path
-        d="M40 400 L40 180 Q 40 40, 260 40 Q 480 40, 480 180 L 480 400"
-        stroke="#D4AF37"
-        strokeWidth="2"
-        strokeOpacity="0.7"
-      />
-      <path
-        d="M70 400 L70 200 Q 70 70, 260 70 Q 450 70, 450 200 L 450 400"
-        stroke="#C9A227"
-        strokeWidth="1.2"
-        strokeOpacity="0.45"
-      />
-      <path d="M40 400 L480 400" stroke="#D4AF37" strokeWidth="1.5" strokeOpacity="0.5" />
-      <rect x="95" y="400" width="28" height="18" fill="#3B0000" stroke="#D4AF37" strokeWidth="0.8" strokeOpacity="0.5" />
-      <rect x="397" y="400" width="28" height="18" fill="#3B0000" stroke="#D4AF37" strokeWidth="0.8" strokeOpacity="0.5" />
-      <circle cx="260" cy="52" r="8" fill="#D4AF37" fillOpacity="0.35" stroke="#C9A227" strokeWidth="0.8" />
-      <path d="M200 400 L200 240 M320 400 L320 240" stroke="#D4AF37" strokeWidth="0.6" strokeOpacity="0.35" />
-    </svg>
-  );
-}
+const DUST_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  left: `${6 + ((i * 11) % 88)}%`,
+  top: `${10 + ((i * 17) % 75)}%`,
+  delay: `${(i * 0.45) % 4}s`,
+  size: 2 + (i % 3),
+}));
 
 export function RoyalSignInExperience({ phase, children }: RoyalSignInExperienceProps) {
   const showForm = phase === "idle" || phase === "glow" || phase === "arch";
@@ -71,7 +49,6 @@ export function RoyalSignInExperience({ phase, children }: RoyalSignInExperience
           decoding="async"
           className="h-11 w-auto object-contain object-left sm:h-14 md:h-16"
         />
-        <MaharajaEmblem className="royal-signin-logo-emblem pointer-events-none absolute -top-1 -right-2 h-5 w-5 opacity-0" />
       </Link>
 
       <div className={`royal-signin-scene ${cameraForward ? "is-forward" : ""}`}>
@@ -83,41 +60,34 @@ export function RoyalSignInExperience({ phase, children }: RoyalSignInExperience
         <div className="royal-signin-atmosphere pointer-events-none absolute inset-0" aria-hidden>
           <div className="royal-signin-fog absolute inset-0" />
           <div className="royal-signin-rays absolute inset-0" />
+          <div className="royal-signin-chandelier-glow absolute inset-x-0 top-0 h-48" />
         </div>
 
         <div className="royal-signin-dust pointer-events-none absolute inset-0" aria-hidden>
-          {TRAIL_PARTICLES.map((p) => (
+          {DUST_PARTICLES.map((p) => (
             <span
               key={`dust-${p.id}`}
               className="royal-signin-dust-mote absolute rounded-full bg-[#D4AF37]"
               style={{
-                left: `${12 + p.id * 5.5}%`,
-                top: `${18 + ((p.id * 13) % 60)}%`,
+                left: p.left,
+                top: p.top,
                 width: p.size,
                 height: p.size,
-                animationDelay: `${p.delay}s`,
+                animationDelay: p.delay,
               }}
             />
           ))}
         </div>
 
-        <div className="royal-signin-stage relative z-10 flex min-h-[100dvh] items-center justify-center px-4 pt-24 pb-12 sm:px-6">
-          <div className={`royal-signin-arch-wrap relative z-30 w-full max-w-[36rem] ${archLit ? "is-lit" : ""}`}>
-            <div className="royal-signin-torches pointer-events-none absolute -left-5 top-[38%] z-20 h-20 w-3 sm:-left-10" aria-hidden />
-            <div className="royal-signin-torches pointer-events-none absolute -right-5 top-[38%] z-20 h-20 w-3 sm:-right-10" aria-hidden />
-
-            <div className="royal-signin-arch-frame relative aspect-[520/420] w-full min-h-[280px] sm:min-h-[340px]">
-              <RoyalArch />
-
-              <div
-                className={`royal-signin-card-wrap absolute inset-0 z-20 flex items-center justify-center px-6 py-14 sm:px-10 sm:py-16 ${
-                  showForm ? "is-visible" : "is-hidden"
-                } ${phase === "glow" || phase === "arch" ? "is-glowing" : ""} ${phase === "dissolve" ? "is-dissolving" : ""}`}
-              >
-                <div className="royal-signin-card w-full max-w-[19rem] sm:max-w-sm">{children}</div>
-              </div>
-            </div>
-          </div>
+        <div className="royal-signin-stage relative z-10 flex min-h-[100dvh] items-center justify-center px-3 pt-20 pb-8 sm:px-5 sm:pt-24">
+          <RoyalPalaceGateway
+            lit={archLit}
+            formVisible={showForm}
+            formGlowing={phase === "glow" || phase === "arch"}
+            formDissolving={phase === "dissolve"}
+          >
+            {children}
+          </RoyalPalaceGateway>
 
           {showDoors ? (
             <div className={`royal-signin-doors pointer-events-none absolute inset-0 z-40 ${doorsOpen ? "is-open" : ""}`}>

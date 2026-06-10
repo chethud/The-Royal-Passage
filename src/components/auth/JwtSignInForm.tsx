@@ -3,8 +3,8 @@ import { signInWithJwtToken } from "@/lib/auth-jwt";
 import { decodeJwt, formatJwtJson } from "@/lib/jwt";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
-const inputClass =
-  "w-full rounded-sm border border-input bg-background/50 px-4 py-3 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+const inputClass = "royal-signin-engraved-input font-mono text-xs";
+const inscriptionClass = "royal-signin-inscription";
 
 type JwtSignInFormProps = {
   busy: boolean;
@@ -37,14 +37,13 @@ export function JwtSignInForm({ busy, onBusyChange, onError, onNotice, onSuccess
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
-      <p className="text-sm leading-relaxed text-muted-foreground">
-        Host and admin accounts can paste a Supabase JWT access token. API requests send it as{" "}
-        <span className="font-mono text-xs">Authorization: Bearer &lt;token&gt;</span>.
+    <form className="royal-signin-engraved-form mt-2" onSubmit={handleSubmit}>
+      <p className={`${inscriptionClass} ${inscriptionClass}--verse`}>
+        Host and admin may inscribe a court JWT upon the palace ledger.
       </p>
-      <div>
-        <label htmlFor="jwt-token" className="eyebrow mb-2 block text-foreground/90">
-          JWT access token
+      <div className="royal-signin-field">
+        <label htmlFor="jwt-token" className={inscriptionClass}>
+          Court JWT Decree
         </label>
         <textarea
           id="jwt-token"
@@ -54,33 +53,29 @@ export function JwtSignInForm({ busy, onBusyChange, onError, onNotice, onSuccess
           placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
           value={token}
           onChange={(e) => setToken(e.target.value)}
-          className={inputClass}
+          className={`${inputClass} min-h-[5.5rem] resize-y`}
         />
       </div>
 
       {decoded ? (
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <p className="eyebrow mb-2 text-foreground/90">Decoded header</p>
-            <pre className="max-h-40 overflow-auto rounded-sm border border-input/70 bg-background/40 p-3 font-mono text-[11px] leading-relaxed text-foreground/90">
+            <p className={inscriptionClass}>Decree Header</p>
+            <pre className="royal-signin-engraved-input max-h-32 overflow-auto p-2 font-mono text-[10px] leading-relaxed">
               {formatJwtJson(decoded.header)}
             </pre>
           </div>
           <div>
-            <p className="eyebrow mb-2 text-foreground/90">Decoded payload</p>
-            <pre className="max-h-40 overflow-auto rounded-sm border border-input/70 bg-background/40 p-3 font-mono text-[11px] leading-relaxed text-foreground/90">
+            <p className={inscriptionClass}>Decree Body</p>
+            <pre className="royal-signin-engraved-input max-h-32 overflow-auto p-2 font-mono text-[10px] leading-relaxed">
               {formatJwtJson(decoded.payload)}
             </pre>
           </div>
         </div>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={busy || !token.trim()}
-        className="w-full rounded-sm bg-ember py-3.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
-      >
-        {busy ? "Verifying JWT…" : "Sign in with JWT"}
+      <button type="submit" disabled={busy || !token.trim()} className="royal-signin-seal">
+        {busy ? "Verifying…" : "Seal JWT Entry"}
       </button>
     </form>
   );
