@@ -1,7 +1,6 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
-import { JwtSignInForm } from "@/components/auth/JwtSignInForm";
 import { RoleBadge } from "@/components/auth/RoleBadge";
 import { RoyalCrest } from "@/components/auth/RoyalCrest";
 import { EyeToggle, RoyalGateField, royalGateInputClass } from "@/components/auth/RoyalGateField";
@@ -32,7 +31,6 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   const redirect = typeof search.redirect === "string" ? search.redirect : undefined;
 
   const [mode, setMode] = useState<"signin" | "signup">(initialMode);
-  const [showJwtSignIn, setShowJwtSignIn] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -323,7 +321,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       </>
     } />
   ) : mode === "signin" ? (
-    <RoyalPalaceGateway {...gatewayFlags} onSubmit={signIn} annex={<>{statusAnnex}{showJwtSignIn ? <JwtSignInForm busy={busy} onBusyChange={setBusy} onError={setError} onNotice={setNotice} onSuccess={beginPalaceEntry} /> : null}</>} decree={
+    <RoyalPalaceGateway {...gatewayFlags} onSubmit={signIn} annex={statusAnnex} decree={
       <>
         <RoyalCrest className="royal-gate-decree__crest mx-auto" />
         <p className="royal-gate-decree__eyebrow">Welcome to</p>
@@ -349,10 +347,6 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
             </button>
           ) : null}
           <Link to="/sign-up" className="royal-gate-decree__link" onClick={() => { setMode("signup"); setError(null); setNotice(null); }}>Create Account</Link>
-          <button type="button" onClick={() => setShowJwtSignIn((o) => !o)} className="royal-gate-decree__link">
-            {showJwtSignIn ? "Hide JWT entry" : "Host / admin JWT"}
-          </button>
-          <Link to="/" className="royal-gate-decree__link">Return to homepage →</Link>
         </div>
       </>
     } />
