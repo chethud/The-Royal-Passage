@@ -57,9 +57,10 @@ type RoyalGateFieldProps = {
   label: string;
   icon?: keyof typeof ICONS;
   children: ReactNode;
+  trailing?: ReactNode;
 };
 
-export function RoyalGateField({ id, label, icon = "mail", children }: RoyalGateFieldProps) {
+export function RoyalGateField({ id, label, icon = "mail", children, trailing }: RoyalGateFieldProps) {
   const Icon = ICONS[icon];
   return (
     <div className="royal-gate-field">
@@ -69,8 +70,32 @@ export function RoyalGateField({ id, label, icon = "mail", children }: RoyalGate
       <div className="royal-gate-field__input-wrap">
         <Icon />
         {children}
+        {trailing}
       </div>
     </div>
+  );
+}
+
+export function EyeToggle({ visible, onToggle }: { visible: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      className="royal-gate-field__eye"
+      onClick={onToggle}
+      aria-label={visible ? "Hide password" : "Show password"}
+    >
+      {visible ? (
+        <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+          <path d="M2 2l16 16" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M1.5 10S4.5 4.5 10 4.5c1.3 0 2.5.3 3.5.8M18.5 10S15.5 15.5 10 15.5c-1.3 0-2.5-.3-3.5-.8" stroke="currentColor" strokeWidth="1.2" />
+        </svg>
+      ) : (
+        <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+          <path d="M1.5 10S4.5 4.5 10 4.5 18.5 10 18.5 10 15.5 15.5 10 15.5 1.5 10 1.5 10Z" stroke="currentColor" strokeWidth="1.2" />
+          <circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.2" />
+        </svg>
+      )}
+    </button>
   );
 }
 

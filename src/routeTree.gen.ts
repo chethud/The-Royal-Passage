@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as HostsRouteImport } from './routes/hosts'
@@ -44,6 +45,11 @@ import { Route as HostBookingsBookingIdRouteImport } from './routes/host.booking
 import { Route as ExperiencesSlugBookRouteImport } from './routes/experiences.$slug.book'
 import { Route as BookingsBookingIdReviewRouteImport } from './routes/bookings.$bookingId.review'
 
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
@@ -226,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/admin/profile': typeof AdminProfileRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -261,6 +268,7 @@ export interface FileRoutesByTo {
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/admin/profile': typeof AdminProfileRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -295,6 +303,7 @@ export interface FileRoutesById {
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/admin/profile': typeof AdminProfileRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -333,6 +342,7 @@ export interface FileRouteTypes {
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/sign-up'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -368,6 +378,7 @@ export interface FileRouteTypes {
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/sign-up'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -401,6 +412,7 @@ export interface FileRouteTypes {
     | '/hosts'
     | '/journal'
     | '/sign-in'
+    | '/sign-up'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -438,6 +450,7 @@ export interface RootRouteChildren {
   HostsRoute: typeof HostsRoute
   JournalRoute: typeof JournalRoute
   SignInRoute: typeof SignInRoute
+  SignUpRoute: typeof SignUpRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BookingsBookingIdRoute: typeof BookingsBookingIdRouteWithChildren
   HostBookingsRoute: typeof HostBookingsRouteWithChildren
@@ -450,6 +463,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sign-in': {
       id: '/sign-in'
       path: '/sign-in'
@@ -811,6 +831,7 @@ const rootRouteChildren: RootRouteChildren = {
   HostsRoute: HostsRoute,
   JournalRoute: JournalRoute,
   SignInRoute: SignInRoute,
+  SignUpRoute: SignUpRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BookingsBookingIdRoute: BookingsBookingIdRouteWithChildren,
   HostBookingsRoute: HostBookingsRouteWithChildren,

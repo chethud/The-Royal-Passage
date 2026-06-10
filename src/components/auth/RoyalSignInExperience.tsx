@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import heroPalaceImg from "@/assets/hero-image.png";
 import logoUrl from "@/assets/logo/logo.png";
+import { RoyalParticleCanvas } from "@/components/auth/RoyalParticleCanvas";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import type { RoyalSignInPhase } from "@/hooks/use-royal-sign-in-animation";
 import { getRoyalSignInPhaseFlags } from "@/lib/royal-sign-in-phase";
 
@@ -10,22 +12,9 @@ type RoyalSignInExperienceProps = {
   portal: ReactNode;
 };
 
-const TRAIL_PARTICLES = Array.from({ length: 24 }, (_, i) => ({
-  id: i,
-  delay: i * 0.045,
-  size: 3 + (i % 3),
-}));
-
-const DUST_PARTICLES = Array.from({ length: 40 }, (_, i) => ({
-  id: i,
-  left: `${3 + ((i * 7) % 94)}%`,
-  top: `${6 + ((i * 11) % 88)}%`,
-  delay: `${(i * 0.32) % 5}s`,
-  size: 2 + (i % 4),
-}));
-
 export function RoyalSignInExperience({ phase, portal }: RoyalSignInExperienceProps) {
-  const { cameraForward, showCourtyard, showTrail, logoGlow, logoPulse, unfolding } =
+  const reducedMotion = usePrefersReducedMotion();
+  const { cameraForward, showCourtyard, logoGlow, logoPulse, unfolding } =
     getRoyalSignInPhaseFlags(phase);
 
   return (
@@ -66,41 +55,11 @@ export function RoyalSignInExperience({ phase, portal }: RoyalSignInExperiencePr
           <div className="royal-signin-godrays absolute inset-0" />
         </div>
 
-        <div className="royal-signin-dust pointer-events-none absolute inset-0" aria-hidden>
-          {DUST_PARTICLES.map((p) => (
-            <span
-              key={`dust-${p.id}`}
-              className="royal-signin-dust-mote absolute rounded-full bg-[#D4AF37]"
-              style={{
-                left: p.left,
-                top: p.top,
-                width: p.size,
-                height: p.size,
-                animationDelay: p.delay,
-              }}
-            />
-          ))}
-        </div>
-
         <div className="royal-signin-stage relative z-10 flex min-h-[100dvh] items-center justify-center px-[1.5vw] pt-[4rem] pb-[1.5vh]">
           {portal}
         </div>
 
-        {showTrail ? (
-          <div className="royal-signin-trail pointer-events-none absolute inset-0 z-[70]" aria-hidden>
-            {TRAIL_PARTICLES.map((p) => (
-              <span
-                key={`trail-${p.id}`}
-                className="royal-signin-trail-particle absolute rounded-full bg-[#D4AF37]"
-                style={{
-                  width: p.size + 1,
-                  height: p.size + 1,
-                  animationDelay: `${p.delay}s`,
-                }}
-              />
-            ))}
-          </div>
-        ) : null}
+        <RoyalParticleCanvas phase={phase} reducedMotion={reducedMotion} />
 
         <div className={`royal-signin-unfold pointer-events-none absolute inset-0 z-[75] ${unfolding ? "is-active" : ""}`} aria-hidden>
           <div className="royal-signin-unfold__crest-burst" />

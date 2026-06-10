@@ -1,4 +1,4 @@
-import type { FormEvent, ReactNode } from "react";
+import { useEffect, useRef, type FormEvent, type ReactNode } from "react";
 
 export type RoyalPalaceGatewaySlots = {
   decree?: ReactNode;
@@ -46,6 +46,30 @@ export function RoyalPalaceGateway({
   doorsOpen,
   onSubmit,
 }: RoyalPalaceGatewayProps) {
+  const archPathRefs = useRef<Array<SVGPathElement | null>>([]);
+
+  // Stage 3 — illuminate the arch with an SVG stroke draw-on when lit.
+  useEffect(() => {
+    archPathRefs.current.forEach((path, i) => {
+      if (!path) return;
+      const len = path.getTotalLength();
+      path.style.strokeDasharray = String(len);
+      if (lit) {
+        path.style.transition = "none";
+        path.style.strokeDashoffset = String(len);
+        // force reflow so the transition runs from the offset start
+        void path.getBoundingClientRect();
+        requestAnimationFrame(() => {
+          path.style.transition = `stroke-dashoffset 2s ease-in-out ${i * 0.2}s`;
+          path.style.strokeDashoffset = "0";
+        });
+      } else {
+        path.style.transition = "none";
+        path.style.strokeDashoffset = String(len);
+      }
+    });
+  }, [lit]);
+
   const decreeClass = [
     "royal-gate-decree",
     formVisible ? "is-visible" : "is-hidden",
@@ -77,9 +101,9 @@ export function RoyalPalaceGateway({
               <stop offset="100%" stopColor="#7A5C10" stopOpacity="0.8" />
             </linearGradient>
           </defs>
-          <path d="M4 268 L4 68 Q 4 2, 450 2 Q 896 2, 896 68 L 896 268" stroke="url(#portal-arch-gold)" strokeWidth="5" />
-          <path d="M36 268 L36 88 Q 36 24, 450 24 Q 864 24, 864 88 L 864 268" stroke="#C9A227" strokeWidth="2.5" strokeOpacity="0.65" />
-          <path d="M68 268 L68 104 Q 68 48, 450 48 Q 832 48, 832 104 L 832 268" stroke="#D4AF37" strokeWidth="1.4" strokeOpacity="0.45" />
+          <path ref={(el) => { archPathRefs.current[0] = el; }} d="M4 268 L4 68 Q 4 2, 450 2 Q 896 2, 896 68 L 896 268" stroke="url(#portal-arch-gold)" strokeWidth="5" />
+          <path ref={(el) => { archPathRefs.current[1] = el; }} d="M36 268 L36 88 Q 36 24, 450 24 Q 864 24, 864 88 L 864 268" stroke="#C9A227" strokeWidth="2.5" strokeOpacity="0.65" />
+          <path ref={(el) => { archPathRefs.current[2] = el; }} d="M68 268 L68 104 Q 68 48, 450 48 Q 832 48, 832 104 L 832 268" stroke="#D4AF37" strokeWidth="1.4" strokeOpacity="0.45" />
           <ellipse cx="450" cy="30" rx="42" ry="18" fill="#D4AF37" fillOpacity="0.16" stroke="#C9A227" strokeWidth="1.4" />
           <path d="M120 72 Q 200 36, 280 72 M620 72 Q 700 36, 780 72" stroke="#C9A227" strokeWidth="0.9" strokeOpacity="0.55" />
           <path d="M200 108 Q 260 88, 320 108 M580 108 Q 640 88, 700 108" stroke="#D4AF37" strokeWidth="0.7" strokeOpacity="0.45" />

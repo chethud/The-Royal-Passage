@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Royal Passage — Cinematic Palace Entry</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+  :root {
+    --palace-black: #0A0604;
+    --royal-gold: #C9933A;
+    --molten-gold: #F5C842;
+    --ember-amber: #8B4A0E;
+    --ivory: #F2E4C4;
+    --maroon: #1A0A0A;
+    --dash-bg: #0D0805;
+    --display: "Cinzel Decorative", serif;
+    --label: "Cinzel", serif;
+    --ui: "Cormorant Garamond", serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    background: var(--palace-black);
+    color: var(--ivory);
+    font-family: var(--ui);
+    overflow: hidden;
+  }
+
+  body.dashboard-active { overflow: auto; }
+
+  /* ---------------------------------------------------------------- SCENE */
+  #scene {
+    position: fixed;
+    inset: 0;
+    perspective: 1400px;
+    perspective-origin: 50% 45%;
+    z-index: 1;
+    transition: filter 1.6s ease;
+    filter: brightness(0.78) saturate(0.9);
+  }
+  #scene.illuminated { filter: brightness(1.05) saturate(1.1); }
+
+  #scene-inner {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transform: scale(1) translateZ(0);
+    transition: transform 1200ms ease-in;
+    will-change: transform;
+  }
+  #scene-inner.dolly { transform: scale(1.6) translateZ(220px); }
+
+  /* ------------------------------------------------ BACKGROUND ARCHITECTURE */
+  .bg-layer { position: absolute; inset: 0; pointer-events: none; }
+
+  /* Deep environment glow + golden hour from the sides */
+  .bg-environment {
+    background:
+      radial-gradient(140% 90% at 50% 120%, rgba(139,74,14,0.42) 0%, transparent 55%),
+      radial-gradient(70% 80% at 8% 60%, rgba(201,147,58,0.28) 0%, transparent 45%),
+      radial-gradient(70% 80% at 92% 60%, rgba(201,147,58,0.28) 0%, transparent 45%),
+      radial-gradient(120% 120% at 50% 35%, rgba(26,10,10,0.2) 0%, var(--palace-black) 70%),
+      var(--palace-black);
+  }
+
+  /* Faux marble floor with conic sheen */
+  .bg-floor {
+    top: auto; bottom: 0; height: 32%;
+    background:
+      linear-gradient(180deg, transparent 0%, rgba(201,147,58,0.05) 40%, rgba(139,74,14,0.18) 100%),
+      conic-gradient(from 270deg at 50% 0%, rgba(245,200,66,0.08), transparent 30%, rgba(245,200,66,0.06) 60%, transparent 90%);
+    transform: perspective(500px) rotateX(58deg);
+    transform-origin: bottom center;
+    opacity: 0.7;
+  }
+
+  /* Decorative side domes/columns via conic + radial gradients */
+  .bg-pillars { mix-blend-mode: screen; opacity: 0.55; }
+  .bg-pillars::before,
+  .bg-pillars::after {
+    content: "";
+    position: absolute;
+    top: 6%;
+    width: 14%;
+    height: 80%;
+    background:
+      radial-gradient(60% 18% at 50% 4%, rgba(245,200,66,0.5), transparent 70%),
+      linear-gradient(180deg, rgba(201,147,58,0.32), rgba(139,74,14,0.12) 60%, transparent);
+    border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+    filter: blur(1px);
+  }
+  .bg-pillars::before { left: 3%; }
+  .bg-pillars::after { right: 3%; }
+
+  /* ------------------------------------------------------- ARCH (SVG) */
+  #arch-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(760px, 92vw);
+    height: min(86vh, 880px);
+    z-index: 3;
+  }
+  #arch-svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+  .arch-fill { fill: rgba(10,6,4,0.55); }
+
+  .arch-stroke {
+    fill: none;
+    stroke: var(--royal-gold);
+    stroke-width: 2.4;
+    filter: drop-shadow(0 0 2px rgba(201,147,58,0.4));
+    /* Stage 3 draw-on uses dash props set in JS */
+    transition: filter 1.2s ease;
+  }
+  #scene.illuminated .arch-stroke {
+    filter: drop-shadow(0 0 6px var(--molten-gold)) drop-shadow(0 0 18px rgba(245,200,66,0.55));
+  }
+  .arch-ornament {
+    fill: none;
+    stroke: var(--royal-gold);
+    stroke-width: 1.1;
+    opacity: 0;
+    transition: opacity 1.4s ease 0.6s;
+  }
+  #scene.illuminated .arch-ornament { opacity: 0.7; }
+
+  .arch-pattern-line { stroke: var(--molten-gold); stroke-width: 0.8; opacity: 0.6; }
+
+  /* ------------------------------------------------------- TORCHES */
+  .torch {
+    position: absolute;
+    top: 38%;
+    width: 46px;
+    height: 150px;
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+  .torch.lit { opacity: 1; }
+  .torch.left { left: 4%; }
+  .torch.right { right: 4%; }
+
+  .torch-bracket {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 12px; height: 80px;
+    background: linear-gradient(180deg, var(--royal-gold), var(--ember-amber));
+    border-radius: 3px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.6);
+  }
+  .torch-bowl {
+    position: absolute;
+    top: 34px; left: 50%;
+    transform: translateX(-50%);
+    width: 34px; height: 16px;
+    background: linear-gradient(180deg, var(--royal-gold), var(--ember-amber));
+    border-radius: 0 0 50% 50%;
+  }
+  .flame {
+    position: absolute;
+    left: 50%;
+    bottom: 100px;
+    transform: translateX(-50%);
+    border-radius: 50% 50% 35% 35%;
+    filter: blur(4px);
+    mix-blend-mode: screen;
+  }
+  .flame-outer {
+    width: 40px; height: 70px;
+    background: radial-gradient(50% 60% at 50% 80%, rgba(245,200,66,0.9), rgba(139,74,14,0.2) 70%, transparent);
+    animation: flameOuter 0.9s ease-in-out infinite alternate;
+  }
+  .flame-mid {
+    width: 26px; height: 54px;
+    background: radial-gradient(50% 60% at 50% 80%, rgba(255,215,0,0.95), rgba(201,147,58,0.4) 70%, transparent);
+    animation: flameMid 0.6s ease-in-out infinite alternate;
+  }
+  .flame-core {
+    width: 14px; height: 34px;
+    background: radial-gradient(50% 60% at 50% 80%, #fff5d6, rgba(245,200,66,0.7) 70%, transparent);
+    animation: flameCore 0.42s ease-in-out infinite alternate;
+  }
+  .torch-glow {
+    position: absolute;
+    left: 50%; bottom: 92px;
+    transform: translateX(-50%);
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,200,66,0.32), transparent 65%);
+    animation: torchPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes flameOuter { from { transform: translateX(-50%) scaleY(1) skewX(-3deg); opacity: 0.8; } to { transform: translateX(-52%) scaleY(1.12) skewX(4deg); opacity: 1; } }
+  @keyframes flameMid   { from { transform: translateX(-50%) scaleY(0.95) skewX(3deg); } to { transform: translateX(-48%) scaleY(1.15) skewX(-4deg); } }
+  @keyframes flameCore  { from { transform: translateX(-50%) scaleY(1); } to { transform: translateX(-50%) scaleY(1.22); } }
+  @keyframes torchPulse { 0%,100% { opacity: 0.5; } 50% { opacity: 0.9; } }
+
+  /* ------------------------------------------------------- PARTICLE CANVAS */
+  #particles {
+    position: fixed;
+    inset: 0;
+    z-index: 6;
+    pointer-events: none;
+  }
+
+  /* ------------------------------------------------------- LOGIN FORM */
+  #form-zone {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -48%);
+    z-index: 7;
+    width: min(360px, 80vw);
+  }
+  .login-card {
+    position: relative;
+    background: linear-gradient(160deg, rgba(26,10,10,0.94), rgba(10,6,4,0.96));
+    border: 1px solid var(--royal-gold);
+    border-radius: 6px;
+    padding: 30px 28px 26px;
+    box-shadow: 0 0 0 1px rgba(201,147,58,0.15), 0 18px 50px rgba(0,0,0,0.7), 0 0 40px rgba(201,147,58,0.12);
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .login-card.visible { opacity: 1; transform: translateY(0); }
+  .login-card.glow { animation: cardGlow 2.6s ease-in-out infinite; }
+  @keyframes cardGlow {
+    0%,100% { box-shadow: 0 0 0 1px rgba(201,147,58,0.15), 0 18px 50px rgba(0,0,0,0.7), 0 0 30px rgba(201,147,58,0.18); border-color: var(--royal-gold); }
+    50% { box-shadow: 0 0 0 1px rgba(245,200,66,0.4), 0 18px 50px rgba(0,0,0,0.7), 0 0 60px rgba(245,200,66,0.45); border-color: var(--molten-gold); }
+  }
+
+  .crest {
+    width: 46px; height: 46px;
+    margin: 0 auto 10px;
+    display: block;
+    filter: drop-shadow(0 0 8px rgba(245,200,66,0.5));
+  }
+  .card-title {
+    font-family: var(--label);
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--royal-gold);
+    margin-bottom: 2px;
+  }
+  .card-heading {
+    font-family: var(--display);
+    text-align: center;
+    font-size: 17px;
+    letter-spacing: 1.5px;
+    color: var(--ivory);
+    margin-bottom: 20px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+  }
+
+  .field { margin-bottom: 15px; }
+  .field label {
+    display: block;
+    font-family: var(--label);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--royal-gold);
+    margin-bottom: 5px;
+  }
+  .input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid rgba(201,147,58,0.4);
+    border-radius: 3px;
+    padding: 9px 11px;
+    background: rgba(10,6,4,0.6);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .input-wrap:focus-within {
+    border-color: var(--molten-gold);
+    box-shadow: 0 0 0 1px rgba(245,200,66,0.3), 0 0 14px rgba(245,200,66,0.2);
+  }
+  .input-wrap svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--royal-gold); }
+  .input-wrap input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--ivory);
+    font-family: var(--ui);
+    font-size: 16px;
+  }
+  .input-wrap input::placeholder { color: rgba(242,228,196,0.4); font-style: italic; }
+  .eye-btn { background: none; border: none; cursor: pointer; color: var(--royal-gold); display: flex; padding: 0; }
+
+  .form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 4px 0 18px;
+    font-family: var(--label);
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  .remember { display: flex; align-items: center; gap: 6px; color: rgba(242,228,196,0.8); cursor: pointer; }
+  .remember input { accent-color: var(--royal-gold); width: 13px; height: 13px; }
+  .link { color: var(--royal-gold); text-decoration: none; cursor: pointer; transition: color 0.25s ease; }
+  .link:hover { color: var(--molten-gold); text-shadow: 0 0 10px rgba(245,200,66,0.5); }
+
+  .signin-btn {
+    width: 100%;
+    border: none;
+    border-radius: 3px;
+    padding: 13px;
+    font-family: var(--label);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: #2a1606;
+    background: linear-gradient(135deg, var(--royal-gold) 0%, var(--molten-gold) 50%, var(--ember-amber) 100%);
+    background-size: 200% 100%;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(201,147,58,0.35);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background-position 0.6s ease;
+  }
+  .signin-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(245,200,66,0.55); background-position: 100% 0; }
+  .signin-btn:active { transform: translateY(0); }
+
+  .create-row { text-align: center; margin-top: 16px; font-size: 13px; color: rgba(242,228,196,0.7); }
+
+  /* dissolve: each child staggers via inline transition-delay set in JS */
+  .login-card.dissolving .dissolve-el {
+    opacity: 0 !important;
+    transform: scale(0.8) !important;
+    filter: blur(4px);
+  }
+  .dissolve-el { transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease; }
+
+  /* ------------------------------------------------------- DOORS */
+  #doors {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(520px, 70vw);
+    height: min(74vh, 760px);
+    z-index: 5;
+    display: flex;
+    pointer-events: none;
+    opacity: 0;
+  }
+  #doors.show { opacity: 1; }
+  .door {
+    flex: 1;
+    position: relative;
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.25) 0 14px, rgba(201,147,58,0.06) 14px 16px),
+      linear-gradient(180deg, #1c0f06, #0d0703 60%, #160c05);
+    border: 1px solid rgba(201,147,58,0.5);
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.85);
+    transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+  .door::before {
+    content: "";
+    position: absolute;
+    inset: 14%;
+    border: 1px solid rgba(201,147,58,0.4);
+    border-radius: 4px;
+  }
+  .door::after {
+    content: "";
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--molten-gold), var(--ember-amber));
+    box-shadow: 0 0 12px rgba(245,200,66,0.7);
+  }
+  .door.left { border-right: none; }
+  .door.left::after { right: 8%; }
+  .door.right::after { left: 8%; }
+  #doors.open .door.left { transform: translateX(-105%); }
+  #doors.open .door.right { transform: translateX(105%); }
+
+  #door-burst {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%) scale(0.2);
+    width: 120%; height: 120%;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--molten-gold) 0%, rgba(245,200,66,0.6) 22%, rgba(201,147,58,0.2) 45%, transparent 70%);
+    opacity: 0;
+    z-index: -1;
+    transition: transform 900ms cubic-bezier(0.22,1,0.36,1), opacity 900ms ease;
+  }
+  #doors.open #door-burst { opacity: 1; transform: translate(-50%,-50%) scale(1.1); }
+
+  /* ------------------------------------------------------- MOTION VIGNETTE */
+  #vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 45%, transparent 40%, rgba(10,6,4,0.9) 100%);
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+  #vignette.close { opacity: 1; }
+
+  /* ------------------------------------------------------- LOGO (top-left) */
+  #logo {
+    position: fixed;
+    top: 18px; left: 22px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1);
+  }
+  #logo.show { opacity: 1; transform: scale(1); }
+  #logo.pulse .logo-mark { animation: logoPulse 0.9s ease-out; }
+  @keyframes logoPulse {
+    0% { filter: drop-shadow(0 0 0 rgba(245,200,66,0)); transform: scale(1); }
+    40% { filter: drop-shadow(0 0 26px rgba(245,200,66,0.95)); transform: scale(1.25); }
+    100% { filter: drop-shadow(0 0 10px rgba(245,200,66,0.5)); transform: scale(1); }
+  }
+  .logo-mark { width: 40px; height: 40px; filter: drop-shadow(0 0 8px rgba(245,200,66,0.4)); }
+  .logo-text { display: flex; flex-direction: column; line-height: 1; opacity: 0; transition: opacity 0.6s ease 0.3s; }
+  #logo.show .logo-text { opacity: 1; }
+  .logo-text .lt-main { font-family: var(--display); font-size: 13px; letter-spacing: 2px; color: var(--molten-gold); }
+  .logo-text .lt-sub { font-family: var(--label); font-size: 8px; letter-spacing: 4px; color: var(--royal-gold); margin-top: 3px; }
+
+  /* ------------------------------------------------------- DASHBOARD */
+  #dashboard {
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    grid-template-rows: 60px 1fr;
+    grid-template-areas: "header header" "sidebar main";
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease;
+  }
+  #dashboard.reveal { opacity: 1; visibility: visible; }
+
+  .dash-header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px 0 200px;
+    background: rgba(10,6,4,0.85);
+    border-bottom: 1px solid rgba(201,147,58,0.25);
+    backdrop-filter: blur(8px);
+  }
+  .dash-welcome { display: flex; align-items: center; gap: 12px; font-family: var(--label); font-size: 12px; letter-spacing: 2px; color: var(--ivory); }
+  .dash-welcome svg { width: 18px; height: 18px; color: var(--royal-gold); cursor: pointer; transition: transform 0.4s ease; }
+  .dash-welcome svg:hover { transform: rotate(60deg); }
+
+  .dash-sidebar {
+    grid-area: sidebar;
+    background: var(--dash-bg);
+    border-right: 1px solid rgba(201,147,58,0.2);
+    padding: 26px 0;
+    transform: translateX(-100%);
+    transition: transform 0.7s cubic-bezier(0.22,1,0.36,1);
+  }
+  #dashboard.reveal .dash-sidebar { transform: translateX(0); }
+  .nav-item {
+    display: block;
+    font-family: var(--label);
+    font-size: 12px;
+    letter-spacing: 2.5px;
+    color: rgba(242,228,196,0.75);
+    padding: 13px 26px;
+    text-decoration: none;
+    position: relative;
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity 0.5s ease, transform 0.5s ease, color 0.3s ease;
+  }
+  #dashboard.reveal .nav-item.in { opacity: 1; transform: translateX(0); }
+  .nav-item::after {
+    content: "";
+    position: absolute;
+    left: 26px; bottom: 8px;
+    width: 0; height: 1px;
+    background: var(--molten-gold);
+    transition: width 0.3s ease;
+  }
+  .nav-item:hover { color: var(--molten-gold); }
+  .nav-item:hover::after { width: 36px; }
+
+  .dash-main {
+    grid-area: main;
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, rgba(10,6,4,0.4), rgba(10,6,4,0.85)),
+      radial-gradient(120% 90% at 80% 20%, rgba(201,147,58,0.35), transparent 55%),
+      radial-gradient(90% 80% at 20% 90%, rgba(139,74,14,0.4), transparent 50%),
+      linear-gradient(135deg, #1a0f06, #0d0703);
+  }
+  .hero-content {
+    position: absolute;
+    left: 8%; top: 50%;
+    transform: translateY(-50%);
+    max-width: 480px;
+    opacity: 0;
+    transition: opacity 0.9s ease 0.4s, transform 0.9s ease 0.4s;
+  }
+  #dashboard.reveal .hero-content { opacity: 1; }
+  .hero-eyebrow { font-family: var(--label); font-size: 11px; letter-spacing: 4px; color: var(--royal-gold); }
+  .hero-title { font-family: var(--display); font-size: clamp(28px, 4vw, 46px); line-height: 1.1; color: var(--ivory); margin: 14px 0; text-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+  .hero-sub { font-size: 18px; color: rgba(242,228,196,0.78); margin-bottom: 26px; line-height: 1.5; }
+  .explore-btn {
+    border: 1px solid var(--royal-gold);
+    background: linear-gradient(135deg, var(--royal-gold), var(--ember-amber));
+    color: #2a1606;
+    font-family: var(--label);
+    font-size: 12px;
+    letter-spacing: 3px;
+    padding: 13px 30px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .explore-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(245,200,66,0.45); }
+
+  /* ------------------------------------------------------- RESPONSIVE */
+  @media (max-width: 768px) {
+    #arch-wrap { width: 96vw; height: 80vh; }
+    .torch { display: none; }
+    #form-zone { width: 86vw; }
+    #dashboard { grid-template-columns: 1fr; grid-template-areas: "header" "main"; }
+    .dash-header { padding: 0 18px; }
+    .dash-sidebar { position: fixed; top: 60px; bottom: 0; width: 200px; z-index: 30; }
+    .hero-content { left: 6%; right: 6%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============================================ SCENE / ARCH / TORCHES -->
+  <div id="scene">
+    <div id="scene-inner">
+      <div class="bg-layer bg-environment"></div>
+      <div class="bg-layer bg-pillars"></div>
+      <div class="bg-layer bg-floor"></div>
+
+      <!-- ARCH -->
+      <div id="arch-wrap">
+        <svg id="arch-svg" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <defs>
+            <pattern id="archDiamonds" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <rect width="20" height="20" fill="none"/>
+              <rect x="6" y="6" width="8" height="8" fill="none" stroke="#C9933A" stroke-width="0.8" opacity="0.6"/>
+            </pattern>
+          </defs>
+
+          <!-- Arch silhouette fill (pointed Mughal arch + columns) -->
+          <path class="arch-fill" d="
+            M 40 590
+            L 40 230
+            Q 40 90 200 40
+            Q 360 90 360 230
+            L 360 590
+            L 320 590
+            L 320 250
+            Q 320 150 200 110
+            Q 80 150 80 250
+            L 80 590
+            Z" />
+
+          <!-- Outer traced stroke (animated draw-on in Stage 3) -->
+          <path id="arch-path" class="arch-stroke" d="
+            M 40 590
+            L 40 230
+            Q 40 90 200 40
+            Q 360 90 360 230
+            L 360 590" />
+
+          <!-- Inner traced stroke -->
+          <path id="arch-path-inner" class="arch-stroke" style="stroke-width:1.6;opacity:0.85" d="
+            M 80 590
+            L 80 250
+            Q 80 150 200 110
+            Q 320 150 320 250
+            L 320 590" />
+
+          <!-- Ornament band along the arch edge -->
+          <path class="arch-ornament" d="
+            M 60 230
+            Q 60 110 200 62
+            Q 340 110 340 230" stroke="url(#archDiamonds)" stroke-width="14"/>
+
+          <!-- Keystone medallion -->
+          <circle class="arch-ornament" cx="200" cy="70" r="14" />
+          <path class="arch-pattern-line" d="M186 70 L200 56 L214 70 L200 84 Z" opacity="0"/>
+        </svg>
+      </div>
+
+      <!-- TORCHES -->
+      <div class="torch left">
+        <div class="torch-glow"></div>
+        <div class="torch-bracket"></div>
+        <div class="torch-bowl"></div>
+        <div class="flame flame-outer"></div>
+        <div class="flame flame-mid"></div>
+        <div class="flame flame-core"></div>
+      </div>
+      <div class="torch right">
+        <div class="torch-glow"></div>
+        <div class="torch-bracket"></div>
+        <div class="torch-bowl"></div>
+        <div class="flame flame-outer"></div>
+        <div class="flame flame-mid"></div>
+        <div class="flame flame-core"></div>
+      </div>
+
+      <!-- DOORS -->
+      <div id="doors">
+        <div id="door-burst"></div>
+        <div class="door left"></div>
+        <div class="door right"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ PARTICLE CANVAS -->
+  <canvas id="particles"></canvas>
+
+  <!-- ============================================ MOTION VIGNETTE -->
+  <div id="vignette"></div>
+
+  <!-- ============================================ LOGIN FORM -->
+  <div id="form-zone">
+    <form class="login-card" id="loginCard" autocomplete="off">
+      <svg class="crest dissolve-el" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="32" r="30" stroke="#C9933A" stroke-width="1.4" fill="#1A0A0A"/>
+        <path d="M32 8 L38 26 L56 26 L42 37 L47 55 L32 44 L17 55 L22 37 L8 26 L26 26 Z" fill="#C9933A" stroke="#F5C842" stroke-width="0.8"/>
+        <circle cx="32" cy="30" r="6" fill="#1A0A0A" stroke="#F2E4C4" stroke-width="0.6"/>
+      </svg>
+      <p class="card-title dissolve-el">WELCOME TO</p>
+      <h1 class="card-heading dissolve-el">THE ROYAL PASSAGE</h1>
+
+      <div class="field dissolve-el">
+        <label for="email">Email or Phone</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M2 5.5A2.5 2.5 0 0 1 4.5 3h11A2.5 2.5 0 0 1 18 5.5v9A2.5 2.5 0 0 1 15.5 17h-11A2.5 2.5 0 0 1 2 14.5v-9Z" stroke="currentColor" stroke-width="1.2"/><path d="M3 6l7 5 7-5" stroke="currentColor" stroke-width="1.2"/></svg>
+          <input id="email" type="text" placeholder="you@kingdom.in" />
+        </div>
+      </div>
+
+      <div class="field dissolve-el">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="4.5" y="8.5" width="11" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 8.5V6.5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.2"/></svg>
+          <input id="password" type="password" placeholder="Your royal seal" />
+          <button type="button" class="eye-btn" id="eyeBtn" aria-label="Toggle password">
+            <svg id="eyeIcon" viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M1.5 10S4.5 4.5 10 4.5 18.5 10 18.5 10 15.5 15.5 10 15.5 1.5 10 1.5 10Z" stroke="currentColor" stroke-width="1.2"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.2"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-row dissolve-el">
+        <label class="remember"><input type="checkbox" /> REMEMBER ME</label>
+        <a class="link">Forgot Password?</a>
+      </div>
+
+      <button type="submit" class="signin-btn dissolve-el" id="signinBtn">SIGN IN</button>
+      <p class="create-row dissolve-el">New here? <a class="link">Create Account</a></p>
+    </form>
+  </div>
+
+  <!-- ============================================ TOP-LEFT LOGO -->
+  <div id="logo">
+    <svg class="logo-mark" viewBox="0 0 64 64" fill="none">
+      <circle cx="32" cy="32" r="30" stroke="#F5C842" stroke-width="1.4" fill="#0A0604"/>
+      <path d="M16 40 L20 22 L28 32 L32 18 L36 32 L44 22 L48 40 Z" fill="#F5C842" stroke="#C9933A" stroke-width="0.8"/>
+      <circle cx="20" cy="20" r="2" fill="#F5C842"/><circle cx="32" cy="15" r="2.2" fill="#F5C842"/><circle cx="44" cy="20" r="2" fill="#F5C842"/>
+      <rect x="16" y="42" width="32" height="4" fill="#C9933A"/>
+    </svg>
+    <div class="logo-text">
+      <span class="lt-main">ROYAL</span>
+      <span class="lt-sub">THE ROYAL PASSAGE</span>
+    </div>
+  </div>
+
+  <!-- ============================================ DASHBOARD -->
+  <div id="dashboard">
+    <header class="dash-header">
+      <div class="dash-welcome">
+        Welcome back, Guest
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.4"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" stroke="currentColor" stroke-width="1.2"/></svg>
+      </div>
+    </header>
+    <nav class="dash-sidebar">
+      <a class="nav-item">HOME</a>
+      <a class="nav-item">DESTINATIONS</a>
+      <a class="nav-item">EXPERIENCES</a>
+      <a class="nav-item">HERITAGE</a>
+      <a class="nav-item">JOURNAL</a>
+      <a class="nav-item">GALLERY</a>
+      <a class="nav-item">CONTACT</a>
+    </nav>
+    <main class="dash-main">
+      <div class="hero-content">
+        <p class="hero-eyebrow">DISCOVER THE ROYAL LEGACY</p>
+        <h2 class="hero-title">Discover the Royal Legacy of Mysuru</h2>
+        <p class="hero-sub">Walk through the timeless beauty of palaces, culture, traditions and royal heritage.</p>
+        <button class="explore-btn">EXPLORE NOW</button>
+      </div>
+    </main>
+  </div>
+
+<script>
+(() => {
+  "use strict";
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------------------------------------------------------------- elements
+  const scene      = document.getElementById("scene");
+  const sceneInner = document.getElementById("scene-inner");
+  const canvas     = document.getElementById("particles");
+  const ctx        = canvas.getContext("2d");
+  const card       = document.getElementById("loginCard");
+  const doors      = document.getElementById("doors");
+  const vignette   = document.getElementById("vignette");
+  const logo       = document.getElementById("logo");
+  const dashboard  = document.getElementById("dashboard");
+  const torches    = document.querySelectorAll(".torch");
+  const navItems   = document.querySelectorAll(".nav-item");
+
+  // ---------------------------------------------------------------- canvas size
+  let W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + "px"; canvas.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  // ---------------------------------------------------------------- particles
+  const COLORS = ["#C9933A", "#F5C842", "#FFD700"];
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  class RoyalParticle {
+    constructor() { this.reset(true); }
+    reset(initial) {
+      this.x = rand(W * 0.3, W * 0.7);
+      this.y = initial ? rand(H * 0.35, H * 0.75) : H * 0.62 + rand(-30, 30);
+      this.baseX = this.x;
+      this.vx = rand(-0.3, 0.3);
+      this.vy = rand(-0.7, -0.25);
+      this.radius = rand(1, 3);
+      this.opacity = rand(0.3, 0.9);
+      this.fadeDir = Math.random() < 0.5 ? -1 : 1;
+      this.color = COLORS[(Math.random() * COLORS.length) | 0];
+      this.state = "float";              // float | converge | trail | burst
+      this.phase = rand(0, Math.PI * 2); // sine wobble seed
+      this.target = null;
+      this.px = this.x; this.py = this.y;
+      this.life = 0;
+    }
+    update(t) {
+      this.px = this.x; this.py = this.y;
+      this.life += 1;
+      if (this.state === "float") {
+        this.phase += 0.02;
+        this.x = this.baseX + Math.sin(this.phase) * 18 + this.vx * this.life * 0.2;
+        this.y += this.vy;
+        this.opacity += this.fadeDir * 0.006;
+        if (this.opacity < 0.3) { this.opacity = 0.3; this.fadeDir = 1; }
+        if (this.opacity > 0.9) { this.opacity = 0.9; this.fadeDir = -1; }
+        if (this.y < -10) { this.reset(false); }
+      } else if (this.state === "converge") {
+        const tx = W / 2, ty = H / 2;
+        this.x += (tx - this.x) * 0.08;
+        this.y += (ty - this.y) * 0.08;
+        this.opacity = Math.min(1, this.opacity + 0.02);
+      } else if (this.state === "burst") {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= 1.01; this.vy *= 1.01;
+        this.opacity -= 0.012;
+        if (this.opacity <= 0) { this.opacity = rand(0.4, 0.9); this.x = W/2; this.y = H/2;
+          const a = rand(0, Math.PI*2), s = rand(2, 7); this.vx = Math.cos(a)*s; this.vy = Math.sin(a)*s; }
+      } else if (this.state === "trail") {
+        if (!this.target) this.target = { x: 42, y: 38 };
+        // bezier-ish ease toward top-left with upward swirl
+        const cx = this.x + (this.target.x - this.x) * 0.06;
+        const cy = this.y + (this.target.y - this.y) * 0.06;
+        this.x = cx + Math.sin((this.life + this.phase * 10) * 0.15) * 6;
+        this.y = cy;
+        this.opacity = Math.max(0, this.opacity - 0.004);
+      }
+    }
+    draw() {
+      if (this.state === "trail") {
+        ctx.strokeStyle = this.color;
+        ctx.globalAlpha = this.opacity * 0.5;
+        ctx.lineWidth = this.radius;
+        ctx.beginPath();
+        ctx.moveTo(this.px, this.py);
+        ctx.lineTo(this.x, this.y);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = this.opacity;
+      ctx.fillStyle = this.color;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  let particles = [];
+  let particlesActive = false;
+  let rafId = null;
+  let t = 0;
+
+  function spawnParticles(n) {
+    particles = [];
+    for (let i = 0; i < n; i++) particles.push(new RoyalParticle());
+  }
+  function setState(state) { particles.forEach(p => p.state = state); }
+  function doubleDensity() {
+    const extra = particles.length;
+    for (let i = 0; i < extra; i++) {
+      const p = new RoyalParticle();
+      p.state = "burst";
+      p.x = W / 2; p.y = H / 2;
+      const a = rand(0, Math.PI * 2), s = rand(2, 7);
+      p.vx = Math.cos(a) * s; p.vy = Math.sin(a) * s;
+      particles.push(p);
+    }
+  }
+  function loop() {
+    t++;
+    ctx.clearRect(0, 0, W, H);
+    if (particlesActive) for (const p of particles) { p.update(t); p.draw(); }
+    ctx.globalAlpha = 1;
+    rafId = requestAnimationFrame(loop);
+  }
+  loop();
+
+  // ---------------------------------------------------------------- arch draw-on
+  function prepArchDraw() {
+    ["arch-path", "arch-path-inner"].forEach(id => {
+      const path = document.getElementById(id);
+      const len = path.getTotalLength();
+      path.style.strokeDasharray = len;
+      path.style.strokeDashoffset = len;
+      path.style.transition = "none";
+    });
+  }
+  function runArchDraw() {
+    ["arch-path", "arch-path-inner"].forEach((id, i) => {
+      const path = document.getElementById(id);
+      path.style.transition = `stroke-dashoffset 2s ease-in-out ${i * 0.2}s`;
+      requestAnimationFrame(() => { path.style.strokeDashoffset = 0; });
+    });
+  }
+
+  // ---------------------------------------------------------------- password eye
+  const eyeBtn = document.getElementById("eyeBtn");
+  const pwd = document.getElementById("password");
+  eyeBtn.addEventListener("click", () => {
+    const showing = pwd.type === "text";
+    pwd.type = showing ? "password" : "text";
+    eyeBtn.style.color = showing ? "var(--royal-gold)" : "var(--molten-gold)";
+  });
+
+  // ============================================================ TIMELINE
+  function runTimeline(steps) {
+    steps.forEach(({ delay, fn }) => setTimeout(fn, delay));
+  }
+
+  // ----- Load-time stages (1 → 3) ---------------------------------
+  function startIntro() {
+    if (reduceMotion) { jumpToDashboard(); return; }
+    prepArchDraw();
+    runTimeline([
+      // Stage 1 — initial screen, form fades in
+      { delay: 300,  fn: () => card.classList.add("visible") },
+      // Stage 2 — form glows + particles
+      { delay: 1000, fn: () => { spawnParticles(80); particlesActive = true; card.classList.add("glow"); } },
+      // Stage 3 — arch illuminates + torches ignite
+      { delay: 3000, fn: () => { scene.classList.add("illuminated"); runArchDraw(); torches.forEach(tc => tc.classList.add("lit")); } },
+    ]);
+  }
+
+  // ----- Sign-in stages (4 → 9) -----------------------------------
+  function startEntry() {
+    if (reduceMotion) { jumpToDashboard(); return; }
+    card.classList.remove("glow");
+
+    // Stage 4 — form dissolves (staggered) + particles converge
+    const els = card.querySelectorAll(".dissolve-el");
+    els.forEach((el, i) => { el.style.transitionDelay = (i * 80) + "ms"; });
+    card.classList.add("dissolving");
+    setState("converge");
+
+    runTimeline([
+      // Stage 5 — doors open + golden burst + density doubles
+      { delay: 600, fn: () => {
+          card.style.display = "none";
+          doors.classList.add("show");
+          requestAnimationFrame(() => doors.classList.add("open"));
+          setState("burst");
+          doubleDensity();
+      }},
+      // Stage 6 — camera dolly forward + vignette pass
+      { delay: 1400, fn: () => {
+          sceneInner.classList.add("dolly");
+          vignette.classList.add("close");
+      }},
+      { delay: 2050, fn: () => vignette.classList.remove("close") },
+      // Stage 7 — particles rise into trail toward top-left
+      { delay: 2600, fn: () => setState("trail") },
+      // Stage 8 — merge into logo
+      { delay: 3600, fn: () => {
+          logo.classList.add("show", "pulse");
+          particlesActive = false;
+          ctx.clearRect(0, 0, W, H);
+      }},
+      // Stage 9 — dashboard unfolds
+      { delay: 4200, fn: () => revealDashboard() },
+    ]);
+  }
+
+  function revealDashboard() {
+    document.body.classList.add("dashboard-active");
+    dashboard.classList.add("reveal");
+    navItems.forEach((item, i) => setTimeout(() => item.classList.add("in"), i * 60));
+  }
+
+  function jumpToDashboard() {
+    particlesActive = false;
+    ctx.clearRect(0, 0, W, H);
+    card.style.display = "none";
+    scene.style.display = "none";
+    logo.classList.add("show");
+    revealDashboard();
+  }
+
+  // ============================================================ EVENTS
+  card.addEventListener("submit", (e) => { e.preventDefault(); startEntry(); });
+
+  // kick off the intro on load
+  if (document.readyState === "complete") startIntro();
+  else window.addEventListener("load", startIntro);
+})();
+</script>
+</body>
+</html>
