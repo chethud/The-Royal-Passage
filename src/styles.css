@@ -374,3 +374,89 @@
   background-size: 200% 100%;
   animation: luxury-shimmer 1.6s ease-in-out infinite;
 }
+
+/* Royal vintage Mysuru slider */
+@keyframes royal-ken-burns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes royal-particle-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translate3d(6px, -14px, 0);
+    opacity: 0.75;
+  }
+}
+
+@keyframes royal-chandelier-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}
+
+.royal-slider-paper {
+  background-color: #3d0000;
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% 0%, #5b000044 0%, transparent 55%),
+    radial-gradient(circle at 20% 80%, #d4af3710 0%, transparent 40%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      #2a0a0a18 2px,
+      #2a0a0a18 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      #2a0a0a12 3px,
+      #2a0a0a12 4px
+    );
+}
+
+.royal-slider-ken-burns {
+  animation: royal-ken-burns 18s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.royal-slider-particle {
+  animation: royal-particle-drift 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.royal-slider-chandelier {
+  animation: royal-chandelier-pulse 6s ease-in-out infinite;
+}
+
+.royal-nav-halo {
+  transition:
+    border-color 0.45s ease,
+    box-shadow 0.45s ease,
+    background 0.45s ease,
+    transform 0.45s ease;
+}
+
+.royal-nav-halo:hover {
+  border-color: #d4af37;
+  background: #2a0a0acc;
+  box-shadow:
+    0 0 0 1px #d4af3744,
+    0 0 24px #d4af3766,
+    0 0 48px #d4af3733,
+    inset 0 0 18px #d4af3722;
+  transform: scale(1.06);
+}
