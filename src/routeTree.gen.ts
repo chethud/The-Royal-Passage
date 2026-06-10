@@ -44,6 +44,7 @@ import { Route as HostExperiencesExperienceIdRouteImport } from './routes/host.e
 import { Route as HostBookingsBookingIdRouteImport } from './routes/host.bookings.$bookingId'
 import { Route as ExperiencesSlugBookRouteImport } from './routes/experiences.$slug.book'
 import { Route as BookingsBookingIdReviewRouteImport } from './routes/bookings.$bookingId.review'
+import { Route as AdminExperiencesExperienceIdRouteImport } from './routes/admin.experiences.$experienceId'
 
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
@@ -221,6 +222,12 @@ const BookingsBookingIdReviewRoute = BookingsBookingIdReviewRouteImport.update({
   path: '/review',
   getParentRoute: () => BookingsBookingIdRoute,
 } as any)
+const AdminExperiencesExperienceIdRoute =
+  AdminExperiencesExperienceIdRouteImport.update({
+    id: '/experiences/$experienceId',
+    path: '/experiences/$experienceId',
+    getParentRoute: () => AdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
@@ -283,6 +291,7 @@ export interface FileRoutesByTo {
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
@@ -321,6 +330,7 @@ export interface FileRoutesById {
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
@@ -360,6 +370,7 @@ export interface FileRouteTypes {
     | '/host/revenue'
     | '/host/reviews'
     | '/dashboard/'
+    | '/admin/experiences/$experienceId'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
     | '/host/bookings/$bookingId'
@@ -393,6 +404,7 @@ export interface FileRouteTypes {
     | '/host/revenue'
     | '/host/reviews'
     | '/dashboard'
+    | '/admin/experiences/$experienceId'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
     | '/host/bookings/$bookingId'
@@ -430,6 +442,7 @@ export interface FileRouteTypes {
     | '/host/revenue'
     | '/host/reviews'
     | '/dashboard/'
+    | '/admin/experiences/$experienceId'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
     | '/host/bookings/$bookingId'
@@ -708,15 +721,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookingsBookingIdReviewRouteImport
       parentRoute: typeof BookingsBookingIdRoute
     }
+    '/admin/experiences/$experienceId': {
+      id: '/admin/experiences/$experienceId'
+      path: '/experiences/$experienceId'
+      fullPath: '/admin/experiences/$experienceId'
+      preLoaderRoute: typeof AdminExperiencesExperienceIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
   AdminProfileRoute: typeof AdminProfileRoute
+  AdminExperiencesExperienceIdRoute: typeof AdminExperiencesExperienceIdRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminProfileRoute: AdminProfileRoute,
+  AdminExperiencesExperienceIdRoute: AdminExperiencesExperienceIdRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

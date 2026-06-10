@@ -123,6 +123,7 @@ message HostDashboardStats {
   int32 today_bookings = 8;
   int32 published_experiences = 9;
   string currency_symbol = 10;
+  int32 total_bookings = 11;
 }
 
 message HostRevenueDay {
@@ -267,6 +268,7 @@ message HostExperienceDetail {
   repeated HostSlotDetail slots = 24;
   string created_at = 25;
   string updated_at = 26;
+  repeated string gallery_urls = 27;
 }
 
 message CreateHostExperienceRequest {
@@ -289,6 +291,7 @@ message CreateHostExperienceRequest {
   int32 min_guests_per_booking = 17;
   int32 max_guests_per_booking = 18;
   bool submit_for_review = 19;
+  repeated string gallery_urls = 20;
 }
 
 message UpdateHostExperienceRequest {
@@ -311,6 +314,7 @@ message UpdateHostExperienceRequest {
   optional int32 min_guests_per_booking = 17;
   optional int32 max_guests_per_booking = 18;
   bool submit_for_review = 19;
+  repeated string gallery_urls = 20;
 }
 
 message CreateHostSlotRequest {
@@ -336,6 +340,41 @@ message AdminExperienceSummary {
   string status = 5;
   string host_name = 6;
   string created_at = 7;
+}
+
+message AdminExperienceDetail {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  optional string tagline = 4;
+  optional string description = 5;
+  string category_slug = 6;
+  string category_label = 7;
+  string city = 8;
+  optional string city_slug = 9;
+  optional string region = 10;
+  optional string address = 11;
+  int32 duration_minutes = 12;
+  int32 price_per_person_minor = 13;
+  string status = 14;
+  optional string hero_image_url = 15;
+  repeated string inclusions = 16;
+  repeated string exclusions = 17;
+  repeated string requirements = 18;
+  optional string cancellation_policy = 19;
+  int32 min_guests_per_booking = 20;
+  int32 max_guests_per_booking = 21;
+  string currency_code = 22;
+  string currency_symbol = 23;
+  repeated HostSlotDetail slots = 24;
+  string created_at = 25;
+  string updated_at = 26;
+  repeated string gallery_urls = 27;
+  string host_name = 28;
+  optional string host_email = 29;
+  optional string host_phone = 30;
+  optional string host_bio = 31;
+  bool host_verified = 32;
 }
 
 message ReviewSummary {

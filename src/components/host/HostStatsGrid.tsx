@@ -7,10 +7,10 @@ type HostStatsGridProps = {
 
 export function HostStatsGrid({ stats }: HostStatsGridProps) {
   const items = [
+    { label: "Total bookings", value: String(stats.totalBookings) },
     { label: "Today's sessions", value: String(stats.todayBookings) },
     { label: "Pending requests", value: String(stats.pendingBookings) },
     { label: "Confirmed", value: String(stats.confirmedBookings) },
-    { label: "Upcoming", value: String(stats.upcomingBookings) },
     {
       label: "Week estimate",
       value: formatMoney(stats.weekRevenueEstimateMinor, stats.currencySymbol),
@@ -24,7 +24,6 @@ export function HostStatsGrid({ stats }: HostStatsGridProps) {
       value: formatMoney(stats.revenuePendingMinor, stats.currencySymbol),
     },
     { label: "Completed", value: String(stats.completedBookings) },
-    { label: "Live experiences", value: String(stats.publishedExperiences) },
   ];
 
   return (

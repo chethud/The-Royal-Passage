@@ -4,6 +4,7 @@ from app.config import settings
 from app.dependencies.auth import require_admin
 from app.models.schemas import (
     AdminBookingRow,
+    AdminExperienceDetail,
     AdminExperienceSummary,
     AdminStats,
     AuditLogEntry,
@@ -12,7 +13,12 @@ from app.models.schemas import (
     ManagedUser,
 )
 from app.services.admin_analytics import get_admin_stats, list_admin_activity, list_admin_bookings
-from app.services.admin_experiences import list_pending_experiences, publish_experience, reject_experience
+from app.services.admin_experiences import (
+    get_admin_experience,
+    list_pending_experiences,
+    publish_experience,
+    reject_experience,
+)
 from app.services.admin_users import create_host_account, list_managed_users
 from app.services.audit import log_audit
 
@@ -62,6 +68,16 @@ def admin_pending_experiences(_auth=Depends(require_admin)):
     if not settings.supabase_configured:
         raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
     return list_pending_experiences()
+
+
+@router.get("/experiences/{experience_id}", response_model=AdminExperienceDetail)
+def admin_get_experience(experience_id: str, _auth=Depends(require_admin)):
+    if not settings.supabase_configured:
+        raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
+    try:
+        return get_admin_experience(experience_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 @router.post("/experiences/{experience_id}/publish", response_model=AdminExperienceSummary)

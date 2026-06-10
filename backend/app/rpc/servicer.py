@@ -16,7 +16,12 @@ from app.models import schemas as s
 from app.rpc.auth import require_admin, require_guest, require_host, resolve_current_user
 from app.rpc.converters import proto_to_pydantic, pydantic_to_proto
 from app.services.admin_analytics import get_admin_stats, list_admin_activity, list_admin_bookings
-from app.services.admin_experiences import list_pending_experiences, publish_experience, reject_experience
+from app.services.admin_experiences import (
+    get_admin_experience,
+    list_pending_experiences,
+    publish_experience,
+    reject_experience,
+)
 from app.services.admin_users import create_host_account, list_managed_users
 from app.services.audit import log_audit
 from app.services.bookings import cancel_guest_booking, create_cod_booking, get_booking_by_id, list_guest_bookings
@@ -422,6 +427,15 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         return types_pb2.ListAdminExperiencesResponse(
             experiences=[pydantic_to_proto(e, types_pb2.AdminExperienceSummary) for e in experiences]
         )
+
+    @_rpc
+    async def get_admin_experience(
+        self, request: service_pb2.AdminExperienceActionRequest, ctx: RequestContext
+    ) -> types_pb2.AdminExperienceDetail:
+        _ensure_supabase()
+        require_admin(ctx)
+        detail = get_admin_experience(request.experience_id)
+        return pydantic_to_proto(detail, types_pb2.AdminExperienceDetail)
 
     @_rpc
     async def publish_experience(

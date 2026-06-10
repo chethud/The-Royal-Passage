@@ -126,6 +126,10 @@ service RoyalPassageService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
+  rpc GetAdminExperience(AdminExperienceActionRequest) returns (AdminExperienceDetail) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   rpc PublishExperience(AdminExperienceActionRequest) returns (AdminExperienceSummary);
 
   rpc RejectExperience(AdminExperienceActionRequest) returns (AdminExperienceSummary);

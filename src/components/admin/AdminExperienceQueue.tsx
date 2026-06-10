@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusBadge";
 import {
@@ -89,6 +90,13 @@ export function AdminExperienceQueue({ accessToken, refreshKey = 0 }: AdminExper
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <ExperienceStatusBadge status={row.status} />
+                <Link
+                  to="/admin/experiences/$experienceId"
+                  params={{ experienceId: row.id }}
+                  className={`${btn} border-ember/50 text-ember hover:bg-ember/10`}
+                >
+                  Review
+                </Link>
                 <button
                   type="button"
                   disabled={busyId === row.id}

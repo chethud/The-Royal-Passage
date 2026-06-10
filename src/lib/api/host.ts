@@ -17,6 +17,7 @@ export type HostDashboardStats = {
   upcomingBookings: number;
   todayBookings: number;
   publishedExperiences: number;
+  totalBookings: number;
   currencySymbol: string;
 };
 

@@ -121,6 +121,7 @@ class HostDashboardStats(BaseModel):
     upcomingBookings: int
     todayBookings: int
     publishedExperiences: int
+    totalBookings: int
     currencySymbol: str = "₹"
 
 
@@ -255,6 +256,7 @@ class HostExperienceDetail(BaseModel):
     pricePerPersonMinor: int
     status: str
     heroImageUrl: str | None
+    galleryUrls: list[str] = Field(default_factory=list)
     inclusions: list[str]
     exclusions: list[str]
     requirements: list[str]
@@ -281,6 +283,7 @@ class CreateHostExperienceRequest(BaseModel):
     durationMinutes: int = Field(ge=30, le=480)
     pricePerPersonMinor: int = Field(ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
+    galleryUrls: list[str] = Field(default_factory=list)
     inclusions: list[str] = Field(default_factory=list)
     exclusions: list[str] = Field(default_factory=list)
     requirements: list[str] = Field(default_factory=list)
@@ -303,6 +306,7 @@ class UpdateHostExperienceRequest(BaseModel):
     durationMinutes: int | None = Field(default=None, ge=30, le=480)
     pricePerPersonMinor: int | None = Field(default=None, ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
+    galleryUrls: list[str] | None = None
     inclusions: list[str] | None = None
     exclusions: list[str] | None = None
     requirements: list[str] | None = None
@@ -335,6 +339,41 @@ class AdminExperienceSummary(BaseModel):
     status: str
     hostName: str
     createdAt: str
+
+
+class AdminExperienceDetail(BaseModel):
+    id: str
+    slug: str
+    title: str
+    tagline: str | None
+    description: str | None
+    categorySlug: str
+    categoryLabel: str
+    city: str
+    citySlug: str | None = None
+    region: str | None
+    address: str | None
+    durationMinutes: int
+    pricePerPersonMinor: int
+    status: str
+    heroImageUrl: str | None
+    galleryUrls: list[str] = Field(default_factory=list)
+    inclusions: list[str]
+    exclusions: list[str]
+    requirements: list[str]
+    cancellationPolicy: str | None
+    minGuestsPerBooking: int
+    maxGuestsPerBooking: int
+    currencyCode: str
+    currencySymbol: str
+    slots: list[HostSlotDetail]
+    createdAt: str
+    updatedAt: str
+    hostName: str
+    hostEmail: str | None = None
+    hostPhone: str | None = None
+    hostBio: str | None = None
+    hostVerified: bool = False
 
 
 class ReviewSummary(BaseModel):

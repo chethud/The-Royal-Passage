@@ -1,8 +1,11 @@
 import { useMemo, useState } from "react";
+import { WeekdaySlotBuilder } from "@/components/experience/WeekdaySlotBuilder";
 import type { CategoryOption, CreateHostSlotPayload } from "@/lib/api/host-experiences";
 import type { CitySummary } from "@/lib/cities";
+import { HOST_CITY_SLUG } from "@/lib/host-form-data";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
+import { mergeUniqueSlots } from "@/lib/weekday-slots";
 
 type CreateExperienceWizardProps = {
   categories: CategoryOption[];
@@ -21,6 +24,7 @@ type CreateExperienceWizardProps = {
       durationMinutes: number;
       pricePerPersonMinor: number;
       heroImageUrl?: string;
+      galleryUrls?: string[];
       inclusions: string[];
       exclusions: string[];
       requirements: string[];
@@ -85,13 +89,13 @@ export function CreateExperienceWizard({
   const [tagline, setTagline] = useState("");
   const [description, setDescription] = useState("");
   const [categorySlug, setCategorySlug] = useState(categories[0]?.slug ?? "");
-  const [citySlug, setCitySlug] = useState(cities[0]?.slug ?? "mysuru");
+  const citySlug = HOST_CITY_SLUG;
   const [region, setRegion] = useState("Karnataka");
   const [address, setAddress] = useState("");
   const [durationMinutes, setDurationMinutes] = useState(120);
   const [priceMajor, setPriceMajor] = useState(0);
-  const [heroImageUrl, setHeroImageUrl] = useState("");
-  const [heroPreviewFailed, setHeroPreviewFailed] = useState(false);
+  const [photoUrls, setPhotoUrls] = useState<string[]>([""]);
+  const [photoPreviewErrors, setPhotoPreviewErrors] = useState<Record<number, boolean>>({});
   const [inclusions, setInclusions] = useState("");
   const [exclusions, setExclusions] = useState("");
   const [requirements, setRequirements] = useState("");
@@ -101,14 +105,16 @@ export function CreateExperienceWizard({
   const [submitForReview, setSubmitForReview] = useState(false);
 
   const [draftSlots, setDraftSlots] = useState<DraftSlot[]>([]);
-  const [slotDate, setSlotDate] = useState("");
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("12:00");
-  const [slotCapacity, setSlotCapacity] = useState(8);
 
   const categoryLabel = categories.find((c) => c.slug === categorySlug)?.label ?? categorySlug;
-  const cityName = cities.find((c) => c.slug === citySlug)?.name ?? citySlug;
-  const showHeroPreview = heroImageUrl.trim() && isValidUrl(heroImageUrl.trim()) && !heroPreviewFailed;
+  const cityName =
+    cities.find((c) => c.slug === citySlug)?.name ??
+    cities[0]?.name ??
+    "Mysuru";
+  const validPhotoUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
+  const previewablePhotos = validPhotoUrls.filter(
+    (url, index) => isValidUrl(url) && !photoPreviewErrors[index],
+  );
 
   const sortedDraftSlots = useMemo(
     () =>
@@ -143,8 +149,9 @@ export function CreateExperienceWizard({
       return null;
     }
     if (current === 3) {
-      const hero = heroImageUrl.trim();
-      if (hero && !isValidUrl(hero)) return "Hero image must be a valid http(s) URL.";
+      for (const url of validPhotoUrls) {
+        if (!isValidUrl(url)) return "Each photo must be a valid http(s) URL.";
+      }
       return null;
     }
     return null;
@@ -165,27 +172,23 @@ export function CreateExperienceWizard({
     setStep((s) => Math.max(1, s - 1));
   };
 
-  const addDraftSlot = () => {
-    if (!slotDate) {
-      setStepError("Pick a date for the slot.");
-      return;
-    }
-    if (startTime >= endTime) {
-      setStepError("End time must be after start time.");
-      return;
-    }
+  const addWeeklySlots = (slots: CreateHostSlotPayload[]) => {
     setStepError(null);
-    setDraftSlots((prev) => [
-      ...prev,
-      {
-        key: `${slotDate}-${startTime}-${endTime}-${Date.now()}`,
-        slotDate,
-        startTime,
-        endTime,
-        capacity: slotCapacity,
-      },
-    ]);
-    setSlotDate("");
+    setDraftSlots((prev) => {
+      const merged = mergeUniqueSlots(
+        prev.map(({ slotDate: d, startTime: s, endTime: e, capacity }) => ({
+          slotDate: d,
+          startTime: s,
+          endTime: e,
+          capacity,
+        })),
+        slots,
+      );
+      return merged.map((slot, index) => ({
+        key: `${slot.slotDate}-${slot.startTime}-${slot.endTime}-${index}`,
+        ...slot,
+      }));
+    });
   };
 
   const removeDraftSlot = (key: string) => {
@@ -199,6 +202,7 @@ export function CreateExperienceWizard({
       return;
     }
     setStepError(null);
+    const galleryUrls = validPhotoUrls.filter(isValidUrl);
     onSubmit({
       experience: {
         title: title.trim(),
@@ -211,7 +215,8 @@ export function CreateExperienceWizard({
         address: address.trim() || undefined,
         durationMinutes,
         pricePerPersonMinor: priceMajor * 100,
-        heroImageUrl: heroImageUrl.trim() || undefined,
+        heroImageUrl: galleryUrls[0],
+        galleryUrls,
         inclusions: splitLines(inclusions),
         exclusions: splitLines(exclusions),
         requirements: splitLines(requirements),
@@ -329,18 +334,14 @@ export function CreateExperienceWizard({
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="text-sm">
               <span className="eyebrow text-muted-foreground">City</span>
-              <select
-                required
-                value={citySlug}
-                onChange={(e) => setCitySlug(e.target.value)}
-                className={inputClass}
-              >
-                {cities.map((city) => (
-                  <option key={city.slug} value={city.slug}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
+              <input
+                readOnly
+                value={cityName}
+                className={`${inputClass} bg-muted/30 text-muted-foreground`}
+              />
+              <span className="mt-1 block text-xs text-muted-foreground">
+                The Royal Passage currently lists experiences in Mysuru only.
+              </span>
             </label>
             <label className="text-sm">
               <span className="eyebrow text-muted-foreground">Region</span>
@@ -400,30 +401,72 @@ export function CreateExperienceWizard({
       {step === 3 ? (
         <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8 space-y-5">
           <h3 className="font-display text-xl">Photos & details</h3>
-          <div className="grid gap-5 lg:grid-cols-2">
-            <label className="text-sm lg:col-span-2">
-              <span className="eyebrow text-muted-foreground">Hero image URL</span>
-              <input
-                value={heroImageUrl}
-                onChange={(e) => {
-                  setHeroPreviewFailed(false);
-                  setHeroImageUrl(e.target.value);
-                }}
-                placeholder="https://…"
-                className={inputClass}
-              />
-              <span className="mt-1 block text-xs text-muted-foreground">
-                Paste a public image link. File upload can be added later.
-              </span>
-            </label>
-            {showHeroPreview ? (
-              <div className="lg:col-span-2 overflow-hidden rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)]">
-                <img
-                  src={heroImageUrl.trim()}
-                  alt="Hero preview"
-                  className="aspect-[16/9] w-full object-cover"
-                  onError={() => setHeroPreviewFailed(true)}
-                />
+          <div className="space-y-4">
+            <div>
+              <span className="eyebrow text-muted-foreground">Experience photos</span>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Add as many public image links as you like. The first photo becomes the cover image.
+              </p>
+              <div className="mt-3 space-y-3">
+                {photoUrls.map((url, index) => (
+                  <div key={`photo-${index}`} className="flex flex-wrap items-start gap-2">
+                    <input
+                      value={url}
+                      onChange={(e) => {
+                        const next = [...photoUrls];
+                        next[index] = e.target.value;
+                        setPhotoUrls(next);
+                        setPhotoPreviewErrors((prev) => {
+                          const copy = { ...prev };
+                          delete copy[index];
+                          return copy;
+                        });
+                      }}
+                      placeholder={`https://… photo ${index + 1}`}
+                      className={`${inputClass} min-w-[240px] flex-1`}
+                    />
+                    {photoUrls.length > 1 ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPhotoUrls((prev) => prev.filter((_, rowIndex) => rowIndex !== index))
+                        }
+                        className="rounded-sm border border-destructive/40 px-3 py-2 text-xs text-destructive"
+                      >
+                        Remove
+                      </button>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setPhotoUrls((prev) => [...prev, ""])}
+                className="mt-3 rounded-sm border border-ember/50 px-4 py-2 text-sm hover:bg-ember/10"
+              >
+                Add another photo
+              </button>
+            </div>
+            {previewablePhotos.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {previewablePhotos.map((url) => (
+                  <div
+                    key={url}
+                    className="overflow-hidden rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)]"
+                  >
+                    <img
+                      src={url}
+                      alt="Experience photo preview"
+                      className="aspect-[4/3] w-full object-cover"
+                      onError={() => {
+                        const index = photoUrls.findIndex((item) => item.trim() === url);
+                        if (index >= 0) {
+                          setPhotoPreviewErrors((prev) => ({ ...prev, [index]: true }));
+                        }
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
             ) : null}
           </div>
@@ -471,81 +514,41 @@ export function CreateExperienceWizard({
           <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8 space-y-5">
             <h3 className="font-display text-xl">Bookable slots</h3>
             <p className="text-sm text-muted-foreground">
-              Add session dates guests can book. You can skip this and add slots later from your
-              experience page.
+              Pick weekdays like Monday–Friday, set your session time, and generate bookable dates.
+              You can skip this and add slots later from your experience page.
             </p>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <label className="text-sm">
-                <span className="eyebrow text-muted-foreground">Date</span>
-                <input
-                  type="date"
-                  value={slotDate}
-                  onChange={(e) => setSlotDate(e.target.value)}
-                  className={inputClass}
-                />
-              </label>
-              <label className="text-sm">
-                <span className="eyebrow text-muted-foreground">Start</span>
-                <input
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className={inputClass}
-                />
-              </label>
-              <label className="text-sm">
-                <span className="eyebrow text-muted-foreground">End</span>
-                <input
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className={inputClass}
-                />
-              </label>
-              <label className="text-sm">
-                <span className="eyebrow text-muted-foreground">Capacity</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={slotCapacity}
-                  onChange={(e) => setSlotCapacity(Number(e.target.value))}
-                  className={inputClass}
-                />
-              </label>
-            </div>
-            <button
-              type="button"
-              onClick={addDraftSlot}
-              className="rounded-sm border border-ember/50 px-4 py-2 text-sm hover:bg-ember/10"
-            >
-              Add slot to list
-            </button>
+            <WeekdaySlotBuilder onAddSlots={addWeeklySlots} />
           </div>
 
           {sortedDraftSlots.length === 0 ? (
             <p className="text-sm text-muted-foreground">No slots added yet — optional for now.</p>
           ) : (
-            <ul className="divide-y divide-[oklch(0.88_0.08_86_/_0.15)] rounded-md border border-[oklch(0.88_0.08_86_/_0.15)]">
-              {sortedDraftSlots.map((slot) => (
-                <li
-                  key={slot.key}
-                  className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm"
-                >
-                  <span>
-                    {formatDateLong(slot.slotDate)} · {slot.startTime}–{slot.endTime} ·{" "}
-                    {slot.capacity} seats
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => removeDraftSlot(slot.key)}
-                    className="text-xs text-destructive hover:underline"
+            <div>
+              <p className="mb-3 text-sm text-muted-foreground">
+                {sortedDraftSlots.length} slot{sortedDraftSlots.length === 1 ? "" : "s"} ready to
+                publish.
+              </p>
+              <ul className="max-h-72 divide-y divide-[oklch(0.88_0.08_86_/_0.15)] overflow-y-auto rounded-md border border-[oklch(0.88_0.08_86_/_0.15)]">
+                {sortedDraftSlots.map((slot) => (
+                  <li
+                    key={slot.key}
+                    className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm"
                   >
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
+                    <span>
+                      {formatDateLong(slot.slotDate)} · {slot.startTime}–{slot.endTime} ·{" "}
+                      {slot.capacity} seats
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeDraftSlot(slot.key)}
+                      className="text-xs text-destructive hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       ) : null}
@@ -558,13 +561,16 @@ export function CreateExperienceWizard({
             Passage review.
           </p>
 
-          {showHeroPreview ? (
-            <div className="overflow-hidden rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)]">
-              <img
-                src={heroImageUrl.trim()}
-                alt={title}
-                className="aspect-[16/9] w-full object-cover"
-              />
+          {previewablePhotos.length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {previewablePhotos.slice(0, 3).map((url) => (
+                <div
+                  key={url}
+                  className="overflow-hidden rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)]"
+                >
+                  <img src={url} alt={title} className="aspect-[4/3] w-full object-cover" />
+                </div>
+              ))}
             </div>
           ) : null}
 
@@ -600,6 +606,14 @@ export function CreateExperienceWizard({
               <dt className="eyebrow text-muted-foreground">Guests per booking</dt>
               <dd className="mt-1">
                 {minGuests}–{maxGuests}
+              </dd>
+            </div>
+            <div className="sm:col-span-2">
+              <dt className="eyebrow text-muted-foreground">Photos</dt>
+              <dd className="mt-1">
+                {validPhotoUrls.length === 0
+                  ? "None added"
+                  : `${validPhotoUrls.length} photo${validPhotoUrls.length === 1 ? "" : "s"}`}
               </dd>
             </div>
             <div className="sm:col-span-2">

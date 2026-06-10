@@ -134,6 +134,9 @@ class RoyalPassageService(Protocol):
     async def list_admin_experiences(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListAdminExperiencesResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def get_admin_experience(self, request: royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminExperienceDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
     async def publish_experience(self, request: royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminExperienceSummary:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
@@ -549,6 +552,16 @@ class RoyalPassageServiceASGIApplication(ConnectASGIApplication[RoyalPassageServ
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.list_admin_experiences,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetAdminExperience": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetAdminExperience",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.AdminExperienceDetail,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_admin_experience,
                 ),
                 "/royalpassage.v1.RoyalPassageService/PublishExperience": Endpoint.unary(
                     method=MethodInfo(
@@ -1468,6 +1481,28 @@ class RoyalPassageServiceClient(ConnectClient):
             use_get=use_get,
         )
 
+    async def get_admin_experience(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.AdminExperienceDetail:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetAdminExperience",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.AdminExperienceDetail,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
     async def publish_experience(
         self,
         request: royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest,
@@ -1754,6 +1789,8 @@ class RoyalPassageServiceSync(Protocol):
     def create_host(self, request: royalpassage_dot_v1_dot_types__pb2.CreateHostRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateHostResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def list_admin_experiences(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListAdminExperiencesResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_admin_experience(self, request: royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminExperienceDetail:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def publish_experience(self, request: royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminExperienceSummary:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
@@ -2160,6 +2197,16 @@ class RoyalPassageServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.list_admin_experiences,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetAdminExperience": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetAdminExperience",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.AdminExperienceDetail,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_admin_experience,
                 ),
                 "/royalpassage.v1.RoyalPassageService/PublishExperience": EndpointSync.unary(
                     method=MethodInfo(
@@ -3072,6 +3119,28 @@ class RoyalPassageServiceClientSync(ConnectClientSync):
                 service_name="royalpassage.v1.RoyalPassageService",
                 input=google_dot_protobuf_dot_empty__pb2.Empty,
                 output=royalpassage_dot_v1_dot_types__pb2.ListAdminExperiencesResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def get_admin_experience(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.AdminExperienceDetail:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetAdminExperience",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.AdminExperienceDetail,
                 idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,

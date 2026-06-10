@@ -33,6 +33,7 @@ const experiencePayloadSchema = z.object({
   durationMinutes: z.number().int().min(30).max(480),
   pricePerPersonMinor: z.number().int().min(0),
   heroImageUrl: z.string().max(500).optional(),
+  galleryUrls: z.array(z.string().max(500)).optional(),
   inclusions: z.array(z.string()).optional(),
   exclusions: z.array(z.string()).optional(),
   requirements: z.array(z.string()).optional(),

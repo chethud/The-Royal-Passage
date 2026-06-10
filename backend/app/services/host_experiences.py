@@ -117,6 +117,7 @@ def _map_host_experience(row: dict, slots: list[dict]) -> HostExperienceDetail:
         pricePerPersonMinor=int(row.get("price_per_person_minor") or 0),
         status=row.get("status") or "draft",
         heroImageUrl=row.get("hero_image_url"),
+        galleryUrls=row.get("gallery_urls") or [],
         inclusions=row.get("inclusions") or [],
         exclusions=row.get("exclusions") or [],
         requirements=row.get("requirements") or [],
@@ -228,6 +229,8 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
     slug = _ensure_unique_slug(supabase, payload.slug or _slugify(payload.title))
     status = "pending_review" if payload.submitForReview else "draft"
     city_slug, city_name = _resolve_city_fields(payload.citySlug, payload.city)
+    gallery_urls = payload.galleryUrls or []
+    hero_image_url = payload.heroImageUrl or (gallery_urls[0] if gallery_urls else None)
 
     insert_row = {
         "host_id": host_id,
@@ -242,7 +245,8 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
         "address": payload.address,
         "duration_minutes": payload.durationMinutes,
         "price_per_person_minor": payload.pricePerPersonMinor,
-        "hero_image_url": payload.heroImageUrl,
+        "hero_image_url": hero_image_url,
+        "gallery_urls": gallery_urls,
         "inclusions": payload.inclusions,
         "exclusions": payload.exclusions,
         "requirements": payload.requirements,
@@ -311,6 +315,10 @@ def update_host_experience(
         updates["price_per_person_minor"] = payload.pricePerPersonMinor
     if payload.heroImageUrl is not None:
         updates["hero_image_url"] = payload.heroImageUrl
+    if payload.galleryUrls is not None:
+        updates["gallery_urls"] = payload.galleryUrls
+        if payload.heroImageUrl is None and payload.galleryUrls:
+            updates["hero_image_url"] = payload.galleryUrls[0]
     if payload.inclusions is not None:
         updates["inclusions"] = payload.inclusions
     if payload.exclusions is not None:

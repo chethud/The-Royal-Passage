@@ -18,6 +18,7 @@ import {
   type HostExperienceDetail,
 } from "@/lib/api/host-experiences";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
+import { hostOperatingCities } from "@/lib/host-form-data";
 import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/experiences/$experienceId")({
@@ -53,7 +54,7 @@ function HostExperienceDetailPage() {
       ]);
       setExperience(detail);
       setCategories(cats);
-      setCities(cityRows);
+      setCities(hostOperatingCities(cityRows));
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to load experience."));
     } finally {
@@ -99,20 +100,35 @@ function HostExperienceDetailPage() {
     setExperience(updated);
   };
 
-  const handleAddSlot = async (payload: {
-    slotDate: string;
-    startTime: string;
-    endTime: string;
-    capacity: number;
-  }) => {
-    if (!accessToken) return;
+  const handleAddManySlots = async (
+    payloads: {
+      slotDate: string;
+      startTime: string;
+      endTime: string;
+      capacity: number;
+    }[],
+  ) => {
+    if (!accessToken || !experience || payloads.length === 0) return;
+    const existing = new Set(
+      experience.slots.map((slot) => `${slot.date}|${slot.start}|${slot.end}`),
+    );
+    const toCreate = payloads.filter(
+      (slot) => !existing.has(`${slot.slotDate}|${slot.startTime}|${slot.endTime}`),
+    );
+    if (toCreate.length === 0) {
+      setPageError("Those weekly sessions are already on the calendar.");
+      return;
+    }
     setSlotBusy(true);
     setPageError(null);
     try {
-      const updated = await createHostSlot(accessToken, experienceId, payload);
+      let updated = experience;
+      for (const payload of toCreate) {
+        updated = await createHostSlot(accessToken, experienceId, payload);
+      }
       refreshExperience(updated);
     } catch (err) {
-      setPageError(toErrorMessage(err, "Failed to add slot."));
+      setPageError(toErrorMessage(err, "Failed to add weekly schedule."));
     } finally {
       setSlotBusy(false);
     }
@@ -228,7 +244,7 @@ function HostExperienceDetailPage() {
           <SlotManager
             slots={experience.slots}
             busy={slotBusy}
-            onAdd={(payload) => void handleAddSlot(payload)}
+            onAddMany={(payloads) => void handleAddManySlots(payloads)}
             onToggleBlock={(slotId, isBlocked) => void handleToggleBlock(slotId, isBlocked)}
             onDelete={(slotId) => void handleDeleteSlot(slotId)}
           />

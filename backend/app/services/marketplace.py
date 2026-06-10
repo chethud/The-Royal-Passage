@@ -9,6 +9,11 @@ experience_categories ( label )
 """
 
 
+def _host_visible_in_catalog(host: dict | None) -> bool:
+    status = (host or {}).get("approval_status")
+    return status not in ("rejected", "suspended")
+
+
 def load_published_experiences(city_slug: str | None = None) -> list[Experience]:
     supabase = get_supabase_admin()
     query = (
@@ -20,11 +25,11 @@ def load_published_experiences(city_slug: str | None = None) -> list[Experience]
         query = query.eq("city_slug", city_slug)
     result = query.execute()
     rows = result.data or []
-    approved = [r for r in rows if (r.get("hosts") or {}).get("approval_status") == "approved"]
-    if not approved:
+    visible = [r for r in rows if _host_visible_in_catalog(r.get("hosts"))]
+    if not visible:
         return []
 
-    ids = [r["id"] for r in approved]
+    ids = [r["id"] for r in visible]
     slots_result = (
         supabase.table("experience_slots")
         .select("*")
@@ -37,7 +42,7 @@ def load_published_experiences(city_slug: str | None = None) -> list[Experience]
     for slot in slots:
         by_exp.setdefault(slot["experience_id"], []).append(slot)
 
-    return [map_row_to_experience(row, by_exp.get(row["id"], [])) for row in approved]
+    return [map_row_to_experience(row, by_exp.get(row["id"], [])) for row in visible]
 
 
 def load_experience_by_slug(slug: str) -> Experience | None:
@@ -53,7 +58,7 @@ def load_experience_by_slug(slug: str) -> Experience | None:
     row = result.data
     if not row:
         return None
-    if (row.get("hosts") or {}).get("approval_status") != "approved":
+    if not _host_visible_in_catalog(row.get("hosts")):
         return None
 
     slots_result = (

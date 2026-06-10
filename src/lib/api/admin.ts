@@ -3,6 +3,7 @@ import type { UserRole } from "@/lib/roles";
 import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
 import { AdminExperienceActionRequestSchema } from "@/gen/royalpassage/v1/service_pb";
 import { CreateHostRequestSchema } from "@/gen/royalpassage/v1/types_pb";
+import type { HostSlotDetail } from "@/lib/api/host-experiences";
 
 export type ManagedUser = {
   id: string;
@@ -45,12 +46,54 @@ export type AdminExperienceSummary = {
   createdAt: string;
 };
 
+export type AdminExperienceDetail = {
+  id: string;
+  slug: string;
+  title: string;
+  tagline: string | null;
+  description: string | null;
+  categorySlug: string;
+  categoryLabel: string;
+  city: string;
+  citySlug: string | null;
+  region: string | null;
+  address: string | null;
+  durationMinutes: number;
+  pricePerPersonMinor: number;
+  status: string;
+  heroImageUrl: string | null;
+  galleryUrls: string[];
+  inclusions: string[];
+  exclusions: string[];
+  requirements: string[];
+  cancellationPolicy: string | null;
+  minGuestsPerBooking: number;
+  maxGuestsPerBooking: number;
+  currencyCode: string;
+  currencySymbol: string;
+  slots: HostSlotDetail[];
+  createdAt: string;
+  updatedAt: string;
+  hostName: string;
+  hostEmail: string | null;
+  hostPhone: string | null;
+  hostBio: string | null;
+  hostVerified: boolean;
+};
+
 export function fetchPendingExperiences(accessToken: string) {
   const client = createRoyalPassageClient(accessToken);
   return rpcCall(async () => {
     const response = await client.listAdminExperiences({});
     return response.experiences as AdminExperienceSummary[];
   });
+}
+
+export function fetchAdminExperience(accessToken: string, experienceId: string) {
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.getAdminExperience(create(AdminExperienceActionRequestSchema, { experienceId })),
+  ) as Promise<AdminExperienceDetail>;
 }
 
 export function publishExperience(accessToken: string, experienceId: string) {

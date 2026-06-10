@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { CategoryOption, HostExperienceDetail } from "@/lib/api/host-experiences";
 import type { CitySummary } from "@/lib/cities";
+import { HOST_CITY_SLUG } from "@/lib/host-form-data";
 
 type HostExperienceFormProps = {
   categories: CategoryOption[];
@@ -20,6 +21,7 @@ type HostExperienceFormProps = {
     durationMinutes: number;
     pricePerPersonMinor: number;
     heroImageUrl?: string;
+    galleryUrls?: string[];
     inclusions: string[];
     exclusions: string[];
     requirements: string[];
@@ -54,16 +56,21 @@ export function HostExperienceForm({
   const [tagline, setTagline] = useState(initial?.tagline ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [categorySlug, setCategorySlug] = useState(initial?.categorySlug ?? categories[0]?.slug ?? "");
-  const [citySlug, setCitySlug] = useState(
-    initial?.citySlug ?? cities[0]?.slug ?? "mysuru",
-  );
+  const [citySlug] = useState(initial?.citySlug ?? HOST_CITY_SLUG);
   const [region, setRegion] = useState(initial?.region ?? "Karnataka");
   const [address, setAddress] = useState(initial?.address ?? "");
   const [durationMinutes, setDurationMinutes] = useState(initial?.durationMinutes ?? 120);
   const [priceMajor, setPriceMajor] = useState(
     initial ? Math.round(initial.pricePerPersonMinor / 100) : 0,
   );
-  const [heroImageUrl, setHeroImageUrl] = useState(initial?.heroImageUrl ?? "");
+  const [photoUrls, setPhotoUrls] = useState<string[]>(() => {
+    const existing = initial?.galleryUrls?.length
+      ? initial.galleryUrls
+      : initial?.heroImageUrl
+        ? [initial.heroImageUrl]
+        : [""];
+    return existing.length > 0 ? existing : [""];
+  });
   const [inclusions, setInclusions] = useState(joinLines(initial?.inclusions ?? []));
   const [exclusions, setExclusions] = useState(joinLines(initial?.exclusions ?? []));
   const [requirements, setRequirements] = useState(joinLines(initial?.requirements ?? []));
@@ -72,11 +79,17 @@ export function HostExperienceForm({
   const [maxGuests, setMaxGuests] = useState(initial?.maxGuestsPerBooking ?? 10);
   const [submitForReview, setSubmitForReview] = useState(false);
 
+  const cityName =
+    cities.find((city) => city.slug === citySlug)?.name ??
+    cities[0]?.name ??
+    "Mysuru";
+
   const inputClass =
     "mt-1 w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/50 px-3 py-2 text-sm";
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    const galleryUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
     onSubmit({
       title: title.trim(),
       slug: slug.trim() || undefined,
@@ -88,7 +101,8 @@ export function HostExperienceForm({
       address: address.trim() || undefined,
       durationMinutes,
       pricePerPersonMinor: priceMajor * 100,
-      heroImageUrl: heroImageUrl.trim() || undefined,
+      heroImageUrl: galleryUrls[0],
+      galleryUrls,
       inclusions: splitLines(inclusions),
       exclusions: splitLines(exclusions),
       requirements: splitLines(requirements),
@@ -168,19 +182,11 @@ export function HostExperienceForm({
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="text-sm">
             <span className="eyebrow text-muted-foreground">City</span>
-            <select
-              required
-              disabled={readOnly}
-              value={citySlug}
-              onChange={(e) => setCitySlug(e.target.value)}
-              className={inputClass}
-            >
-              {cities.map((city) => (
-                <option key={city.slug} value={city.slug}>
-                  {city.name}
-                </option>
-              ))}
-            </select>
+            <input
+              readOnly
+              value={cityName}
+              className={`${inputClass} bg-muted/30 text-muted-foreground`}
+            />
           </label>
           <label className="text-sm">
             <span className="eyebrow text-muted-foreground">Region</span>
@@ -247,15 +253,44 @@ export function HostExperienceForm({
               className={inputClass}
             />
           </label>
-          <label className="sm:col-span-2 text-sm">
-            <span className="eyebrow text-muted-foreground">Hero image URL</span>
-            <input
-              disabled={readOnly}
-              value={heroImageUrl}
-              onChange={(e) => setHeroImageUrl(e.target.value)}
-              className={inputClass}
-            />
-          </label>
+          <div className="sm:col-span-2 space-y-3">
+            <span className="eyebrow text-muted-foreground">Experience photos</span>
+            {photoUrls.map((url, index) => (
+              <div key={`photo-${index}`} className="flex flex-wrap items-start gap-2">
+                <input
+                  disabled={readOnly}
+                  value={url}
+                  onChange={(e) => {
+                    const next = [...photoUrls];
+                    next[index] = e.target.value;
+                    setPhotoUrls(next);
+                  }}
+                  placeholder={`https://… photo ${index + 1}`}
+                  className={`${inputClass} min-w-[240px] flex-1`}
+                />
+                {!readOnly && photoUrls.length > 1 ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPhotoUrls((prev) => prev.filter((_, rowIndex) => rowIndex !== index))
+                    }
+                    className="rounded-sm border border-destructive/40 px-3 py-2 text-xs text-destructive"
+                  >
+                    Remove
+                  </button>
+                ) : null}
+              </div>
+            ))}
+            {!readOnly ? (
+              <button
+                type="button"
+                onClick={() => setPhotoUrls((prev) => [...prev, ""])}
+                className="rounded-sm border border-ember/50 px-4 py-2 text-sm hover:bg-ember/10"
+              >
+                Add another photo
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
 

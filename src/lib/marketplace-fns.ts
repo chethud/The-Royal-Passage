@@ -26,6 +26,11 @@ function fallbackCatalog() {
   };
 }
 
+function hostVisibleInCatalog(host: ExperienceRow["hosts"]): boolean {
+  const status = host?.approval_status;
+  return status !== "rejected" && status !== "suspended";
+}
+
 async function loadExperienceFromDbBySlug(slug: string): Promise<Experience | null> {
   const supabase = getSupabaseAdmin();
   const { data: row, error } = await supabase
@@ -44,7 +49,7 @@ async function loadExperienceFromDbBySlug(slug: string): Promise<Experience | nu
   if (error) throw new Error(error.message);
   if (!row) return null;
   const exp = row as ExperienceRow;
-  if (exp.hosts?.approval_status !== "approved") return null;
+  if (!hostVisibleInCatalog(exp.hosts)) return null;
 
   const { data: slotRows, error: e2 } = await supabase
     .from("experience_slots")
@@ -71,10 +76,10 @@ async function loadPublishedWithSlots(): Promise<Experience[]> {
 
   if (e1) throw new Error(e1.message);
   const rows = (exps ?? []) as ExperienceRow[];
-  const approved = rows.filter((r) => r.hosts?.approval_status === "approved");
-  if (approved.length === 0) return [];
+  const visible = rows.filter((r) => hostVisibleInCatalog(r.hosts));
+  if (visible.length === 0) return [];
 
-  const ids = approved.map((r) => r.id);
+  const ids = visible.map((r) => r.id);
   const { data: slotRows, error: e2 } = await supabase
     .from("experience_slots")
     .select("*")
@@ -90,7 +95,7 @@ async function loadPublishedWithSlots(): Promise<Experience[]> {
     byExp.set(s.experience_id, list);
   }
 
-  return approved.map((e) => mapRowToExperience(e, byExp.get(e.id) ?? []));
+  return visible.map((e) => mapRowToExperience(e, byExp.get(e.id) ?? []));
 }
 
 /** Listing + filters: FastAPI when configured; else Supabase; otherwise static demo data. */

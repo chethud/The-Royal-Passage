@@ -90,6 +90,7 @@ def get_host_dashboard(auth: dict) -> HostDashboardStats:
             upcomingBookings=0,
             todayBookings=0,
             publishedExperiences=0,
+            totalBookings=0,
         )
 
     bookings_result = (
@@ -108,6 +109,7 @@ def get_host_dashboard(auth: dict) -> HostDashboardStats:
     pending = sum(1 for b in bookings if b.get("booking_status") == "pending")
     confirmed = sum(1 for b in bookings if b.get("booking_status") == "confirmed")
     completed = sum(1 for b in bookings if b.get("booking_status") == "completed")
+    total_bookings = len(bookings)
     upcoming = pending + confirmed
     revenue = sum(_booking_amount(b) for b in bookings if b.get("payment_status") == "paid")
     revenue_pending = sum(
@@ -147,6 +149,7 @@ def get_host_dashboard(auth: dict) -> HostDashboardStats:
         upcomingBookings=upcoming,
         todayBookings=today_bookings,
         publishedExperiences=published,
+        totalBookings=total_bookings,
     )
 
 
