@@ -739,12 +739,24 @@
   position: relative;
   min-height: 100dvh;
   transform: translate3d(0, 0, 0) scale(1);
-  transition: transform 2.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: transform 3.2s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
 .royal-signin-scene.is-forward {
-  transform: translate3d(0, -8%, 0) scale(1.22);
+  transform: translate3d(0, -6%, 0) scale(1.18);
+}
+
+.royal-signin-bg-img {
+  transform: scale(1.06);
+  transition:
+    transform 3.2s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 2.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.royal-signin-page--activation .royal-signin-bg-img,
+.royal-signin-page--ready .royal-signin-bg-img {
+  filter: brightness(1.1) saturate(1.05);
 }
 
 .royal-signin-page--forward .royal-signin-gateway,
@@ -753,18 +765,13 @@
 .royal-signin-page--logo .royal-signin-gateway,
 .royal-signin-page--unfold .royal-signin-gateway {
   opacity: 0;
-  transform: scale(1.15) translateY(-6%);
-  transition: opacity 1.5s ease, transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transform: scale(1.1) translateY(-4%);
+  transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1), transform 3.2s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
 
-.royal-signin-bg-img {
-  transform: scale(1.06);
-  transition: transform 2.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
 .royal-signin-scene.is-forward .royal-signin-bg-img {
-  transform: scale(1.18);
+  transform: scale(1.14);
 }
 
 .royal-signin-bg-vignette {
@@ -869,32 +876,47 @@
 .royal-signin-gateway {
   position: relative;
   display: grid;
-  grid-template-columns: 18% 1fr 18%;
-  grid-template-rows: 10% 8% 1fr 6%;
-  width: min(80vw, 72rem);
-  height: min(80dvh, 54rem);
-  min-height: 34rem;
+  grid-template-columns: 1fr;
+  grid-template-rows: 9% 10% 1fr 5%;
+  width: min(72vw, 52rem);
+  height: min(78dvh, 50rem);
+  min-height: 30rem;
   margin: 0 auto;
+  overflow: hidden;
   filter: drop-shadow(0 0 40px #d4af3733);
-  transition: filter 1s ease, transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition:
+    filter 2.4s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 3.2s cubic-bezier(0.22, 1, 0.36, 1);
   background: transparent;
   border: none;
   padding: 0;
-  animation: royal-gate-breathe 8s ease-in-out infinite;
+  animation: royal-gate-breathe 10s ease-in-out infinite;
 }
 
 @keyframes royal-gate-breathe {
   0%,
   100% {
-    transform: scale(1);
+    filter: drop-shadow(0 0 40px #d4af3733);
   }
   50% {
-    transform: scale(1.008);
+    filter: drop-shadow(0 0 52px #d4af3755);
   }
 }
 
 .royal-signin-gateway.is-lit {
   filter: drop-shadow(0 0 64px #d4af37aa) drop-shadow(0 0 110px #c9a22766);
+  animation: royal-gate-breathe-lit 10s ease-in-out infinite;
+}
+
+@keyframes royal-gate-breathe-lit {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 64px #d4af37aa) drop-shadow(0 0 110px #c9a22766);
+  }
+  50% {
+    filter: drop-shadow(0 0 72px #d4af37cc) drop-shadow(0 0 120px #c9a22788);
+  }
 }
 
 .royal-signin-gateway.is-awakening .royal-signin-gateway__energy-veins {
@@ -959,72 +981,33 @@
 
 .royal-signin-gateway__keystone-arch svg {
   display: block;
-  width: 110%;
-  margin-inline: -5%;
+  width: 100%;
   height: auto;
   filter: drop-shadow(0 0 24px #d4af3766);
-}
-
-.royal-signin-gateway__pillar {
-  position: relative;
-  z-index: 4;
-  grid-row: 3 / 5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.royal-signin-gateway__pillar--left {
-  grid-column: 1;
-}
-
-.royal-signin-gateway__pillar--right {
-  grid-column: 3;
-}
-
-.royal-signin-gateway__pillar-cap,
-.royal-signin-gateway__pillar-base {
-  width: 92%;
-  height: 1.1rem;
-  background: linear-gradient(180deg, #d4af37 0%, #8b6914 55%, #c9a227 100%);
-  border: 1px solid #d4af3766;
-  box-shadow: inset 0 1px 0 #f8f4e833;
-}
-
-.royal-signin-gateway__pillar-shaft {
-  flex: 1;
-  width: 78%;
-  background:
-    repeating-linear-gradient(90deg, transparent, transparent 5px, rgba(0, 0, 0, 0.08) 5px, rgba(0, 0, 0, 0.08) 10px),
-    linear-gradient(180deg, #6b3830 0%, #4a2420 40%, #3d1818 100%);
-  border-inline: 2px solid #d4af3744;
-  box-shadow: inset 0 0 36px #00000088;
-  position: relative;
-}
-
-.royal-signin-gateway__pillar-carving {
-  position: absolute;
-  inset: 18% 12%;
-  border-top: 1px solid #d4af3733;
-  border-bottom: 1px solid #00000055;
-  background: linear-gradient(180deg, #c9a22722 0%, transparent 100%);
+  transition: opacity 2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .royal-signin-gateway__torch {
   position: absolute;
-  top: 28%;
+  top: 32%;
   z-index: 7;
   display: flex;
   flex-direction: column;
   align-items: center;
+  opacity: 0.35;
+  transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.royal-signin-gateway.is-lit .royal-signin-gateway__torch {
+  opacity: 1;
 }
 
 .royal-signin-gateway__torch--left {
-  left: 10%;
+  left: 14%;
 }
 
 .royal-signin-gateway__torch--right {
-  right: 10%;
+  right: 14%;
 }
 
 .royal-signin-gateway__torch-basket {
@@ -1063,7 +1046,7 @@
 
 .royal-signin-gateway__opening {
   position: relative;
-  grid-column: 2;
+  grid-column: 1;
   grid-row: 3 / 5;
   z-index: 8;
   display: flex;
@@ -1113,10 +1096,10 @@
     inset 0 2px 0 #d4af3722,
     0 0 48px #00000088;
   transition:
-    opacity 0.65s ease,
-    transform 0.65s ease,
-    filter 0.65s ease,
-    box-shadow 0.8s ease;
+    opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 1.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .royal-gate-decree__stone-frame {
@@ -1130,11 +1113,26 @@
 .royal-gate-decree.is-visible {
   opacity: 1;
   pointer-events: auto;
+  animation: royal-decree-enter 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .royal-gate-decree.is-hidden {
   opacity: 0;
+  transform: translateY(12px) scale(0.96);
   pointer-events: none;
+}
+
+@keyframes royal-decree-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.94);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
 }
 
 .royal-gate-decree.is-glowing {
@@ -1152,9 +1150,13 @@
 
 .royal-gate-decree.is-dissolving {
   opacity: 0;
-  transform: scale(0.82);
-  filter: blur(12px) brightness(2.2);
+  transform: scale(0.9);
+  filter: blur(6px) brightness(1.5);
   pointer-events: none;
+  transition:
+    opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .royal-gate-decree__content {
@@ -1269,7 +1271,7 @@
   height: 100%;
   z-index: 65;
   pointer-events: none;
-  transition: opacity 0.6s ease;
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   mix-blend-mode: screen;
 }
 
@@ -1476,8 +1478,8 @@
   display: flex;
   overflow: hidden;
   opacity: 0;
-  transform: scale(0.92);
-  transition: opacity 1.5s ease, transform 2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transform: scale(0.94);
+  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1), transform 2.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .royal-signin-portal-doors.is-revealed {
@@ -1489,7 +1491,7 @@
   position: relative;
   flex: 1;
   transform: translate3d(0, 0, 0);
-  transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: transform 2.6s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 

@@ -32,16 +32,16 @@ const INTRO_SEQUENCE: RoyalSignInPhase[] = ["seal", "activation", "ready"];
 
 /** Durations aligned to storyboard timeline (ms). */
 const DURATIONS: Record<Exclude<RoyalSignInPhase, "idle" | "ready" | "done">, number> = {
-  seal: 1400,
-  activation: 1800,
-  dissolve: 1200,
-  "doors-reveal": 2000,
-  "doors-open": 3000,
-  forward: 4000,
-  courtyard: 2000,
-  particles: 2000,
-  logo: 1500,
-  unfold: 2000,
+  seal: 1800,
+  activation: 2200,
+  dissolve: 900,
+  "doors-reveal": 1600,
+  "doors-open": 2400,
+  forward: 3200,
+  courtyard: 1800,
+  particles: 1800,
+  logo: 1200,
+  unfold: 1800,
 };
 
 export function useRoyalSignInAnimation(reducedMotion: boolean) {
@@ -104,7 +104,7 @@ export function useRoyalSignInAnimation(reducedMotion: boolean) {
     };
 
     // brief beat so the form fades in (Stage 1) before it glows (Stage 2)
-    const id = window.setTimeout(runStep, 400);
+    const id = window.setTimeout(runStep, 500);
     timersRef.current.push(id);
   }, [clearTimers, reducedMotion]);
 

@@ -60,7 +60,7 @@ export function RoyalPalaceGateway({
         // force reflow so the transition runs from the offset start
         void path.getBoundingClientRect();
         requestAnimationFrame(() => {
-          path.style.transition = `stroke-dashoffset 2s ease-in-out ${i * 0.2}s`;
+          path.style.transition = `stroke-dashoffset 2.4s cubic-bezier(0.4, 0, 0.2, 1) ${i * 0.25}s`;
           path.style.strokeDashoffset = "0";
         });
       } else {
@@ -107,7 +107,6 @@ export function RoyalPalaceGateway({
           <ellipse cx="450" cy="30" rx="42" ry="18" fill="#D4AF37" fillOpacity="0.16" stroke="#C9A227" strokeWidth="1.4" />
           <path d="M120 72 Q 200 36, 280 72 M620 72 Q 700 36, 780 72" stroke="#C9A227" strokeWidth="0.9" strokeOpacity="0.55" />
           <path d="M200 108 Q 260 88, 320 108 M580 108 Q 640 88, 700 108" stroke="#D4AF37" strokeWidth="0.7" strokeOpacity="0.45" />
-          <path d="M340 268 L340 172 M560 268 L560 172 M260 268 L260 196 M640 268 L640 196" stroke="#D4AF37" strokeWidth="0.8" strokeOpacity="0.4" />
         </svg>
       </div>
 
@@ -118,22 +117,6 @@ export function RoyalPalaceGateway({
       <div className="royal-signin-gateway__torch royal-signin-gateway__torch--right" aria-hidden>
         <div className="royal-signin-gateway__torch-basket" />
         <div className="royal-signin-gateway__torch-flame" />
-      </div>
-
-      <div className="royal-signin-gateway__pillar royal-signin-gateway__pillar--left" aria-hidden>
-        <div className="royal-signin-gateway__pillar-cap" />
-        <div className="royal-signin-gateway__pillar-shaft">
-          <div className="royal-signin-gateway__pillar-carving" />
-        </div>
-        <div className="royal-signin-gateway__pillar-base" />
-      </div>
-
-      <div className="royal-signin-gateway__pillar royal-signin-gateway__pillar--right" aria-hidden>
-        <div className="royal-signin-gateway__pillar-cap" />
-        <div className="royal-signin-gateway__pillar-shaft">
-          <div className="royal-signin-gateway__pillar-carving" />
-        </div>
-        <div className="royal-signin-gateway__pillar-base" />
       </div>
 
       <div className="royal-signin-gateway__opening">
