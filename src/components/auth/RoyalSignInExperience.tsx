@@ -49,11 +49,12 @@ function RoyalArch() {
 export function RoyalSignInExperience({ phase, children }: RoyalSignInExperienceProps) {
   const showForm = phase === "idle" || phase === "glow" || phase === "arch";
   const archLit = phase !== "idle";
+  const showDoors = ["dissolve", "doors", "forward", "particles", "logo", "unfold", "done"].includes(phase);
   const doorsOpen = ["doors", "forward", "particles", "logo", "unfold", "done"].includes(phase);
   const cameraForward = ["forward", "particles", "logo", "unfold", "done"].includes(phase);
   const showTrail = ["particles", "logo", "unfold"].includes(phase);
-  const logoGlow = ["logo", "unfold", "done"].includes(phase);
-  const unfolding = phase === "unfold" || phase === "done";
+  const logoGlow = ["logo", "unfold"].includes(phase);
+  const unfolding = phase === "unfold";
 
   return (
     <div className={`royal-signin-page ${phase !== "idle" ? `royal-signin-page--${phase}` : ""}`} data-phase={phase}>
@@ -100,30 +101,34 @@ export function RoyalSignInExperience({ phase, children }: RoyalSignInExperience
           ))}
         </div>
 
-        <div className="royal-signin-stage relative z-10 flex min-h-[100dvh] items-center justify-center px-4 pt-20 pb-10">
-          <div className={`royal-signin-arch-wrap relative w-full max-w-[34rem] ${archLit ? "is-lit" : ""}`}>
-            <div className="royal-signin-torches pointer-events-none absolute -left-4 top-1/3 h-16 w-3 sm:-left-8" aria-hidden />
-            <div className="royal-signin-torches pointer-events-none absolute -right-4 top-1/3 h-16 w-3 sm:-right-8" aria-hidden />
+        <div className="royal-signin-stage relative z-10 flex min-h-[100dvh] items-center justify-center px-4 pt-24 pb-12 sm:px-6">
+          <div className={`royal-signin-arch-wrap relative z-30 w-full max-w-[36rem] ${archLit ? "is-lit" : ""}`}>
+            <div className="royal-signin-torches pointer-events-none absolute -left-5 top-[38%] z-20 h-20 w-3 sm:-left-10" aria-hidden />
+            <div className="royal-signin-torches pointer-events-none absolute -right-5 top-[38%] z-20 h-20 w-3 sm:-right-10" aria-hidden />
 
-            <div className="royal-signin-arch-frame relative aspect-[520/420] w-full">
+            <div className="royal-signin-arch-frame relative aspect-[520/420] w-full min-h-[280px] sm:min-h-[340px]">
               <RoyalArch />
 
               <div
-                className={`royal-signin-card-wrap absolute inset-0 flex items-center justify-center px-8 py-16 sm:px-12 ${
-                  showForm ? "" : "is-hidden"
-                } ${phase === "glow" || phase === "arch" ? "is-glowing" : ""} ${phase === "dissolve" || !showForm ? "is-dissolving" : ""}`}
+                className={`royal-signin-card-wrap absolute inset-0 z-20 flex items-center justify-center px-6 py-14 sm:px-10 sm:py-16 ${
+                  showForm ? "is-visible" : "is-hidden"
+                } ${phase === "glow" || phase === "arch" ? "is-glowing" : ""} ${phase === "dissolve" ? "is-dissolving" : ""}`}
               >
-                <div className="royal-signin-card w-full max-w-sm">{children}</div>
+                <div className="royal-signin-card w-full max-w-[19rem] sm:max-w-sm">{children}</div>
               </div>
             </div>
           </div>
 
-          <div className={`royal-signin-doors pointer-events-none absolute inset-0 z-20 ${doorsOpen ? "is-open" : ""}`}>
-            <div className="royal-signin-door royal-signin-door--left" />
-            <div className="royal-signin-door royal-signin-door--right" />
-          </div>
+          {showDoors ? (
+            <div className={`royal-signin-doors pointer-events-none absolute inset-0 z-40 ${doorsOpen ? "is-open" : ""}`}>
+              <div className="royal-signin-door royal-signin-door--left" />
+              <div className="royal-signin-door royal-signin-door--right" />
+            </div>
+          ) : null}
 
-          <div className={`royal-signin-burst pointer-events-none absolute inset-0 z-[15] ${doorsOpen ? "is-active" : ""}`} aria-hidden />
+          {showDoors ? (
+            <div className={`royal-signin-burst pointer-events-none absolute inset-0 z-[35] ${doorsOpen ? "is-active" : ""}`} aria-hidden />
+          ) : null}
         </div>
 
         {showTrail ? (

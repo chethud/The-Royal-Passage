@@ -757,7 +757,9 @@
 }
 
 .royal-signin-bg-vignette {
-  background: radial-gradient(ellipse 80% 70% at 50% 45%, transparent 0%, #2a0a0a88 72%);
+  background:
+    linear-gradient(180deg, #2a0a0a55 0%, transparent 28%, transparent 72%, #2a0a0a99 100%),
+    radial-gradient(ellipse 85% 75% at 50% 45%, transparent 0%, #2a0a0a77 72%);
 }
 
 .royal-signin-fog {
@@ -795,10 +797,15 @@
 
 .royal-signin-arch-wrap {
   transition: filter 0.8s ease;
+  filter: drop-shadow(0 0 20px #d4af3744);
+}
+
+.royal-signin-arch-svg {
+  filter: drop-shadow(0 0 12px #d4af3755);
 }
 
 .royal-signin-arch-wrap.is-lit {
-  filter: drop-shadow(0 0 28px #d4af3766) drop-shadow(0 0 60px #c9a22733);
+  filter: drop-shadow(0 0 32px #d4af3788) drop-shadow(0 0 64px #c9a22744);
 }
 
 .royal-signin-arch-wrap.is-lit .royal-signin-arch-svg {
@@ -847,10 +854,17 @@
 }
 
 .royal-signin-card-wrap {
+  opacity: 0;
+  pointer-events: none;
   transition:
     opacity 0.65s ease,
     transform 0.65s ease,
     filter 0.65s ease;
+}
+
+.royal-signin-card-wrap.is-visible {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .royal-signin-card-wrap.is-glowing {
