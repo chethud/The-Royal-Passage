@@ -735,16 +735,33 @@
   color: #f8f4e8;
 }
 
+.royal-signin-page.is-exiting .royal-signin-scene {
+  opacity: 0;
+  transform: translate3d(0, -3%, 0) scale(1.04);
+  transition:
+    opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.royal-signin-page.is-exiting .royal-signin-stage {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.royal-signin-page.is-exiting .royal-signin-logo {
+  z-index: 90;
+}
+
 .royal-signin-scene {
   position: relative;
   min-height: 100dvh;
   transform: translate3d(0, 0, 0) scale(1);
-  transition: transform 3.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
 .royal-signin-scene.is-forward {
-  transform: translate3d(0, -6%, 0) scale(1.18);
+  transform: translate3d(0, -5%, 0) scale(1.12);
 }
 
 .royal-signin-bg-img {
@@ -877,7 +894,7 @@
   position: relative;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 9% 10% 1fr 5%;
+  grid-template-rows: 7% 1fr;
   width: min(72vw, 52rem);
   height: min(78dvh, 50rem);
   min-height: 30rem;
@@ -936,44 +953,9 @@
   }
 }
 
-.royal-signin-gateway__chhatris {
-  grid-column: 1 / -1;
-  grid-row: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 0 12%;
-  z-index: 6;
-  pointer-events: none;
-}
-
-.royal-signin-gateway__chhatri {
-  width: 3.2rem;
-  height: 2.2rem;
-  background: linear-gradient(180deg, #c9a227 0%, #8b6914 100%);
-  border: 1px solid #d4af3766;
-  border-radius: 2px 2px 0 0;
-  box-shadow: 0 0 16px #d4af3744;
-  position: relative;
-}
-
-.royal-signin-gateway__chhatri::after {
-  content: "";
-  position: absolute;
-  inset: 0.35rem 0.5rem auto;
-  height: 0.55rem;
-  background: #d4af37;
-  border-radius: 1px;
-}
-
-.royal-signin-gateway__chhatri--center {
-  width: 4rem;
-  height: 2.6rem;
-}
-
 .royal-signin-gateway__keystone-arch {
   grid-column: 1 / -1;
-  grid-row: 2;
+  grid-row: 1;
   z-index: 5;
   pointer-events: none;
   align-self: end;
@@ -1047,7 +1029,7 @@
 .royal-signin-gateway__opening {
   position: relative;
   grid-column: 1;
-  grid-row: 3 / 5;
+  grid-row: 2;
   z-index: 8;
   display: flex;
   flex-direction: column;
@@ -1271,8 +1253,13 @@
   height: 100%;
   z-index: 65;
   pointer-events: none;
-  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   mix-blend-mode: screen;
+}
+
+.royal-signin-page--logo .royal-signin-particle-canvas,
+.royal-signin-page.is-exiting .royal-signin-particle-canvas {
+  opacity: 0.85;
 }
 
 .royal-gate-decree__row {
@@ -1459,18 +1446,6 @@
   }
 }
 
-.royal-signin-gateway__threshold {
-  position: absolute;
-  bottom: -0.35rem;
-  left: 3%;
-  right: 3%;
-  height: 0.55rem;
-  z-index: 1;
-  background: linear-gradient(180deg, #c9a227 0%, #7a5c10 100%);
-  box-shadow: 0 6px 20px #00000077;
-  pointer-events: none;
-}
-
 .royal-signin-portal-doors {
   position: absolute;
   inset: 4% 0 8% 0;
@@ -1479,7 +1454,7 @@
   overflow: hidden;
   opacity: 0;
   transform: scale(0.94);
-  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1), transform 2.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .royal-signin-portal-doors.is-revealed {
@@ -1491,7 +1466,7 @@
   position: relative;
   flex: 1;
   transform: translate3d(0, 0, 0);
-  transition: transform 2.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
@@ -1821,7 +1796,7 @@
 }
 
 .royal-signin-logo.is-pulsing {
-  animation: royal-logo-absorb 1.5s ease-in-out 1;
+  animation: royal-logo-absorb 0.55s cubic-bezier(0.22, 1, 0.36, 1) 1;
 }
 
 @keyframes royal-logo-absorb {
@@ -1829,13 +1804,13 @@
     transform: scale(1);
     filter: drop-shadow(0 0 12px #d4af3744);
   }
-  50% {
-    transform: scale(1.12);
-    filter: drop-shadow(0 0 48px #d4af37ff) drop-shadow(0 0 80px #c9a227aa);
+  45% {
+    transform: scale(1.14);
+    filter: drop-shadow(0 0 52px #d4af37ff) drop-shadow(0 0 72px #c9a227aa);
   }
   100% {
-    transform: scale(1.06);
-    filter: drop-shadow(0 0 32px #d4af37cc);
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 28px #d4af37cc);
   }
 }
 

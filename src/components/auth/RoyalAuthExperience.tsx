@@ -108,6 +108,17 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     start(() => {});
   }, [start]);
 
+  // Navigate as sparks merge into the logo — skip the fake dashboard unfold.
+  useEffect(() => {
+    if (phase !== "logo" || !pendingPalaceEntryRef.current || loading || !user) return;
+    const id = window.setTimeout(() => {
+      if (!pendingPalaceEntryRef.current) return;
+      pendingPalaceEntryRef.current = false;
+      finishPalaceEntry();
+    }, 480);
+    return () => window.clearTimeout(id);
+  }, [finishPalaceEntry, loading, phase, user]);
+
   useEffect(() => {
     if (phase !== "done" || !pendingPalaceEntryRef.current || loading || !user) return;
     pendingPalaceEntryRef.current = false;

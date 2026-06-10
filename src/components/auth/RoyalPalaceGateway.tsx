@@ -86,14 +86,8 @@ export function RoyalPalaceGateway({
       onSubmit={onSubmit}
       noValidate={!onSubmit}
     >
-      <div className="royal-signin-gateway__chhatris" aria-hidden>
-        <span className="royal-signin-gateway__chhatri" />
-        <span className="royal-signin-gateway__chhatri royal-signin-gateway__chhatri--center" />
-        <span className="royal-signin-gateway__chhatri" />
-      </div>
-
       <div className="royal-signin-gateway__keystone-arch" aria-hidden>
-        <svg viewBox="0 0 900 280" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin meet">
+        <svg viewBox="0 0 900 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin meet">
           <defs>
             <linearGradient id="portal-arch-gold" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#F8F4E8" stopOpacity="0.25" />
@@ -101,12 +95,29 @@ export function RoyalPalaceGateway({
               <stop offset="100%" stopColor="#7A5C10" stopOpacity="0.8" />
             </linearGradient>
           </defs>
-          <path ref={(el) => { archPathRefs.current[0] = el; }} d="M4 268 L4 68 Q 4 2, 450 2 Q 896 2, 896 68 L 896 268" stroke="url(#portal-arch-gold)" strokeWidth="5" />
-          <path ref={(el) => { archPathRefs.current[1] = el; }} d="M36 268 L36 88 Q 36 24, 450 24 Q 864 24, 864 88 L 864 268" stroke="#C9A227" strokeWidth="2.5" strokeOpacity="0.65" />
-          <path ref={(el) => { archPathRefs.current[2] = el; }} d="M68 268 L68 104 Q 68 48, 450 48 Q 832 48, 832 104 L 832 268" stroke="#D4AF37" strokeWidth="1.4" strokeOpacity="0.45" />
-          <ellipse cx="450" cy="30" rx="42" ry="18" fill="#D4AF37" fillOpacity="0.16" stroke="#C9A227" strokeWidth="1.4" />
-          <path d="M120 72 Q 200 36, 280 72 M620 72 Q 700 36, 780 72" stroke="#C9A227" strokeWidth="0.9" strokeOpacity="0.55" />
-          <path d="M200 108 Q 260 88, 320 108 M580 108 Q 640 88, 700 108" stroke="#D4AF37" strokeWidth="0.7" strokeOpacity="0.45" />
+          <path
+            ref={(el) => { archPathRefs.current[0] = el; }}
+            d="M 120 110 Q 120 28, 450 8 Q 780 28, 780 110"
+            stroke="url(#portal-arch-gold)"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+          <path
+            ref={(el) => { archPathRefs.current[1] = el; }}
+            d="M 160 108 Q 160 42, 450 22 Q 740 42, 740 108"
+            stroke="#C9A227"
+            strokeWidth="2"
+            strokeOpacity="0.65"
+            strokeLinecap="round"
+          />
+          <path
+            ref={(el) => { archPathRefs.current[2] = el; }}
+            d="M 200 106 Q 200 54, 450 36 Q 700 54, 700 106"
+            stroke="#D4AF37"
+            strokeWidth="1.2"
+            strokeOpacity="0.45"
+            strokeLinecap="round"
+          />
         </svg>
       </div>
 
@@ -184,7 +195,6 @@ export function RoyalPalaceGateway({
         {annex ? <div className="royal-signin-gateway__annex">{annex}</div> : null}
       </div>
 
-      <div className="royal-signin-gateway__threshold" aria-hidden />
       <div className="royal-signin-gateway__breath" aria-hidden />
     </form>
   );

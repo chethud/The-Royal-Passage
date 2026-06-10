@@ -14,11 +14,14 @@ type RoyalSignInExperienceProps = {
 
 export function RoyalSignInExperience({ phase, portal }: RoyalSignInExperienceProps) {
   const reducedMotion = usePrefersReducedMotion();
-  const { cameraForward, showCourtyard, logoGlow, logoPulse, unfolding } =
+  const { cameraForward, showCourtyard, logoGlow, logoPulse, isExiting } =
     getRoyalSignInPhaseFlags(phase);
 
   return (
-    <div className={`royal-signin-page ${phase !== "idle" ? `royal-signin-page--${phase}` : ""}`} data-phase={phase}>
+    <div
+      className={`royal-signin-page ${phase !== "idle" ? `royal-signin-page--${phase}` : ""} ${isExiting ? "is-exiting" : ""}`}
+      data-phase={phase}
+    >
       <Link
         to="/"
         className={`royal-signin-logo fixed top-5 left-5 z-[80] sm:top-6 sm:left-8 ${logoGlow ? "is-glowing" : ""} ${logoPulse ? "is-pulsing" : ""} ${unfolding ? "is-settled" : ""}`}
@@ -60,22 +63,6 @@ export function RoyalSignInExperience({ phase, portal }: RoyalSignInExperiencePr
         </div>
 
         <RoyalParticleCanvas phase={phase} reducedMotion={reducedMotion} />
-
-        <div className={`royal-signin-unfold pointer-events-none absolute inset-0 z-[75] ${unfolding ? "is-active" : ""}`} aria-hidden>
-          <div className="royal-signin-unfold__crest-burst" />
-          <nav className="royal-signin-unfold__nav" aria-hidden>
-            <span>Home</span>
-            <span>Destinations</span>
-            <span>Experiences</span>
-            <span>Journal</span>
-            <span>Contact</span>
-          </nav>
-          <div className="royal-signin-unfold__hero" aria-hidden>
-            <p className="royal-signin-unfold__eyebrow">The Royal Passage</p>
-            <h2 className="royal-signin-unfold__title">Discover the Royal Legacy of Mysuru</h2>
-            <span className="royal-signin-unfold__cta">Explore Now</span>
-          </div>
-        </div>
       </div>
     </div>
   );

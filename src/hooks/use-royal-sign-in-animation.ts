@@ -15,33 +15,31 @@ export type RoyalSignInPhase =
   | "unfold"
   | "done";
 
-/** Stages 4–9: triggered when the user signs in (form already lit). */
+/** Stages 4–8: sign-in exit — particles merge into logo, then navigate to dashboard. */
 const SEQUENCE: RoyalSignInPhase[] = [
   "dissolve",
   "doors-reveal",
   "doors-open",
   "forward",
-  "courtyard",
   "particles",
   "logo",
-  "unfold",
 ];
 
 /** Stages 1–3: cinematic intro that auto-plays on page load and rests at "ready". */
 const INTRO_SEQUENCE: RoyalSignInPhase[] = ["seal", "activation", "ready"];
 
-/** Durations aligned to storyboard timeline (ms). */
+/** Durations (ms) — kept tight so sparks reach the logo quickly. */
 const DURATIONS: Record<Exclude<RoyalSignInPhase, "idle" | "ready" | "done">, number> = {
-  seal: 1800,
-  activation: 2200,
-  dissolve: 900,
-  "doors-reveal": 1600,
-  "doors-open": 2400,
-  forward: 3200,
-  courtyard: 1800,
-  particles: 1800,
-  logo: 1200,
-  unfold: 1800,
+  seal: 1400,
+  activation: 1600,
+  dissolve: 450,
+  "doors-reveal": 300,
+  "doors-open": 500,
+  forward: 650,
+  courtyard: 0,
+  particles: 850,
+  logo: 600,
+  unfold: 0,
 };
 
 export function useRoyalSignInAnimation(reducedMotion: boolean) {
