@@ -12,9 +12,18 @@ type RoyalSignInExperienceProps = {
   portal: ReactNode;
 };
 
+const DUST_MOTES = Array.from({ length: 26 }, (_, i) => ({
+  id: i,
+  left: `${(i * 37) % 100}%`,
+  top: `${12 + ((i * 23) % 80)}%`,
+  size: 1.5 + (i % 3),
+  delay: `${(i * 0.7) % 6}s`,
+  duration: `${5 + (i % 5)}s`,
+}));
+
 export function RoyalSignInExperience({ phase, portal }: RoyalSignInExperienceProps) {
   const reducedMotion = usePrefersReducedMotion();
-  const { cameraForward, showCourtyard, logoGlow, logoPulse, isExiting } =
+  const { cameraForward, showCourtyard, doorsFlooding, logoGlow, logoPulse, isExiting } =
     getRoyalSignInPhaseFlags(phase);
 
   return (
@@ -56,9 +65,32 @@ export function RoyalSignInExperience({ phase, portal }: RoyalSignInExperiencePr
           <div className="royal-signin-chandelier-glow absolute inset-x-0 top-0 h-56" />
           <div className="royal-signin-sunset absolute inset-0" />
           <div className="royal-signin-godrays absolute inset-0" />
+          {!reducedMotion && (
+            <div className="royal-signin-dust absolute inset-0">
+              {DUST_MOTES.map((m) => (
+                <span
+                  key={`dust-${m.id}`}
+                  className="royal-signin-dust-mote absolute rounded-full"
+                  style={{
+                    left: m.left,
+                    top: m.top,
+                    width: m.size,
+                    height: m.size,
+                    animationDelay: m.delay,
+                    animationDuration: m.duration,
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="royal-signin-stage relative z-10 flex min-h-[100dvh] items-center justify-center px-[1.5vw] pt-[4rem] pb-[1.5vh]">
+        <div
+          className={`royal-signin-doorflood pointer-events-none absolute inset-0 ${doorsFlooding ? "is-active" : ""}`}
+          aria-hidden
+        />
+
+        <div className="royal-signin-stage relative z-10 flex min-h-[100dvh] items-center justify-center px-[1vw] pt-[3vh] pb-[1.5vh]">
           {portal}
         </div>
 

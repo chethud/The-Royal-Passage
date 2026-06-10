@@ -15,12 +15,13 @@ export type RoyalSignInPhase =
   | "unfold"
   | "done";
 
-/** Stages 4–8: sign-in exit — particles merge into logo, then navigate to dashboard. */
+/** Stages 4–9: ceremonial palace entry — dissolve, doors, camera forward, kingdom reveal, sparks to logo. */
 const SEQUENCE: RoyalSignInPhase[] = [
   "dissolve",
   "doors-reveal",
   "doors-open",
   "forward",
+  "courtyard",
   "particles",
   "logo",
 ];
@@ -28,17 +29,17 @@ const SEQUENCE: RoyalSignInPhase[] = [
 /** Stages 1–3: cinematic intro that auto-plays on page load and rests at "ready". */
 const INTRO_SEQUENCE: RoyalSignInPhase[] = ["seal", "activation", "ready"];
 
-/** Durations (ms) — kept tight so sparks reach the logo quickly. */
+/** Durations (ms) — paced like a film sequence: doors heave open, camera glides, sparks crown the logo. */
 const DURATIONS: Record<Exclude<RoyalSignInPhase, "idle" | "ready" | "done">, number> = {
   seal: 1400,
   activation: 1600,
-  dissolve: 450,
-  "doors-reveal": 300,
-  "doors-open": 500,
-  forward: 650,
-  courtyard: 0,
-  particles: 850,
-  logo: 600,
+  dissolve: 700,
+  "doors-reveal": 900,
+  "doors-open": 1500,
+  forward: 1400,
+  courtyard: 1000,
+  particles: 1100,
+  logo: 700,
   unfold: 0,
 };
 

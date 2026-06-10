@@ -62,12 +62,17 @@ export const buildEmailConfirmRedirect = buildAuthRedirect;
 /**
  * If Supabase Site URL is still localhost, OAuth may land on localhost with tokens in the URL.
  * Bounce to the production site while preserving query/hash so the session can be established.
+ * Plain localhost visits (no auth payload) stay local so the app remains usable in development.
  */
 export function redirectOffLocalhostIfNeeded(): void {
   if (typeof window === "undefined") return;
 
   const { hostname, pathname, search, hash } = window.location;
   if (!isLocalHostname(hostname)) return;
+
+  const hasAuthPayload =
+    /[?#&](access_token|refresh_token|code|error_description)=/.test(`${search}${hash}`);
+  if (!hasAuthPayload) return;
 
   const production = getConfiguredSiteOrigin() ?? PRODUCTION_SITE_ORIGIN;
   if (isLocalOrigin(production)) return;

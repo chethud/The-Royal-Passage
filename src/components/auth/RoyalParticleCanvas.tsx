@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { RoyalSignInPhase } from "@/hooks/use-royal-sign-in-animation";
 
-type ParticleState = "float" | "converge" | "burst" | "trail" | "absorb";
+type ParticleState = "float" | "converge" | "burst" | "rise" | "trail" | "absorb";
 
 const COLORS = ["#C9933A", "#F5C842", "#FFD700"];
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
@@ -67,6 +67,21 @@ class RoyalParticle {
     this.opacity = rand(0.5, 0.85);
   }
 
+  /** Courtyard reveal — sparks rise from the marble grounds in a slow spiral. */
+  toRise() {
+    this.state = "rise";
+    this.x = rand(this.w * 0.15, this.w * 0.85);
+    this.baseX = this.x;
+    this.y = this.h + rand(0, this.h * 0.25);
+    this.vy = rand(-4.5, -2.2);
+    this.radius = rand(1, 2.8);
+    this.opacity = rand(0.4, 0.9);
+    this.phase = rand(0, Math.PI * 2);
+    this.life = 0;
+    this.px = this.x;
+    this.py = this.y;
+  }
+
   update() {
     this.px = this.x;
     this.py = this.y;
@@ -93,6 +108,11 @@ class RoyalParticle {
       this.vy *= 1.006;
       this.opacity -= 0.02;
       if (this.opacity <= 0) this.opacity = 0;
+    } else if (this.state === "rise") {
+      this.y += this.vy;
+      this.x = this.baseX + Math.sin(this.life * 0.045 + this.phase) * 36;
+      this.opacity = Math.min(0.95, this.opacity + 0.01);
+      if (this.y < -20) this.toRise();
     } else if (this.state === "trail") {
       if (this.trailDelay > 0) {
         this.trailDelay -= 1;
@@ -143,6 +163,7 @@ const PARTICLE_STATE_BY_PHASE: Partial<Record<RoyalSignInPhase, ParticleState>> 
   "doors-reveal": "converge",
   "doors-open": "burst",
   forward: "trail",
+  courtyard: "rise",
   particles: "trail",
   logo: "absorb",
 };
@@ -155,6 +176,7 @@ const VISIBLE_PHASES: RoyalSignInPhase[] = [
   "doors-reveal",
   "doors-open",
   "forward",
+  "courtyard",
   "particles",
   "logo",
 ];
@@ -198,7 +220,7 @@ export function RoyalParticleCanvas({ phase, reducedMotion }: Props) {
     window.addEventListener("resize", resize);
 
     const { w, h } = sizeRef.current;
-    particlesRef.current = Array.from({ length: 48 }, () => new RoyalParticle(w, h));
+    particlesRef.current = Array.from({ length: 96 }, () => new RoyalParticle(w, h));
 
     const loop = () => {
       const { w: vw, h: vh } = sizeRef.current;
@@ -209,7 +231,7 @@ export function RoyalParticleCanvas({ phase, reducedMotion }: Props) {
       if (targetState && VISIBLE_PHASES.includes(activePhase)) {
         if (activePhase === "doors-open" && !burstBoostedRef.current) {
           burstBoostedRef.current = true;
-          for (let i = 0; i < 24; i++) {
+          for (let i = 0; i < 48; i++) {
             const p = new RoyalParticle(vw, vh);
             p.toBurst();
             particlesRef.current.push(p);
@@ -221,6 +243,8 @@ export function RoyalParticleCanvas({ phase, reducedMotion }: Props) {
           if (p.state !== targetState) {
             if (targetState === "burst") {
               p.toBurst();
+            } else if (targetState === "rise") {
+              p.toRise();
             } else {
               p.state = targetState;
             }
