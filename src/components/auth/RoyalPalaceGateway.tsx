@@ -1,123 +1,184 @@
-import type { ReactNode } from "react";
+import type { FormEvent, ReactNode } from "react";
 
-type RoyalPalaceGatewayProps = {
-  children: ReactNode;
+export type RoyalPalaceGatewaySlots = {
+  decree?: ReactNode;
+  annex?: ReactNode;
+};
+
+type RoyalPalaceGatewayProps = RoyalPalaceGatewaySlots & {
   lit: boolean;
   formVisible: boolean;
   formGlowing: boolean;
   formDissolving: boolean;
+  sealActive: boolean;
+  activationActive: boolean;
+  showSealRings: boolean;
+  showDissolveParticles: boolean;
+  showDoors: boolean;
+  doorsRevealing: boolean;
+  doorsUnlocking: boolean;
+  doorsOpen: boolean;
+  onSubmit?: (e: FormEvent<HTMLFormElement>) => void;
 };
 
+const DISSOLVE_PARTICLES = Array.from({ length: 36 }, (_, i) => ({
+  id: i,
+  left: `${12 + ((i * 17) % 76)}%`,
+  delay: `${(i * 0.03) % 0.9}s`,
+  size: 2 + (i % 4),
+  drift: `${-40 + (i % 8) * 12}px`,
+}));
+
 export function RoyalPalaceGateway({
-  children,
+  decree,
+  annex,
   lit,
   formVisible,
   formGlowing,
   formDissolving,
+  sealActive,
+  activationActive,
+  showSealRings,
+  showDissolveParticles,
+  showDoors,
+  doorsRevealing,
+  doorsUnlocking,
+  doorsOpen,
+  onSubmit,
 }: RoyalPalaceGatewayProps) {
+  const decreeClass = [
+    "royal-gate-decree",
+    formVisible ? "is-visible" : "is-hidden",
+    formGlowing ? "is-glowing" : "",
+    formDissolving ? "is-dissolving" : "",
+    sealActive ? "is-seal-active" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className={`royal-signin-gateway ${lit ? "is-lit" : ""}`}>
-      <div className="royal-signin-gateway__lantern royal-signin-gateway__lantern--left" aria-hidden />
-      <div className="royal-signin-gateway__lantern royal-signin-gateway__lantern--right" aria-hidden />
+    <form
+      className={`royal-signin-gateway ${lit ? "is-lit" : ""} ${activationActive ? "is-awakening" : ""}`}
+      onSubmit={onSubmit}
+      noValidate={!onSubmit}
+    >
+      <div className="royal-signin-gateway__chhatris" aria-hidden>
+        <span className="royal-signin-gateway__chhatri" />
+        <span className="royal-signin-gateway__chhatri royal-signin-gateway__chhatri--center" />
+        <span className="royal-signin-gateway__chhatri" />
+      </div>
+
+      <div className="royal-signin-gateway__keystone-arch" aria-hidden>
+        <svg viewBox="0 0 900 280" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin meet">
+          <defs>
+            <linearGradient id="portal-arch-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#F8F4E8" stopOpacity="0.25" />
+              <stop offset="50%" stopColor="#D4AF37" stopOpacity="1" />
+              <stop offset="100%" stopColor="#7A5C10" stopOpacity="0.8" />
+            </linearGradient>
+          </defs>
+          <path d="M4 268 L4 68 Q 4 2, 450 2 Q 896 2, 896 68 L 896 268" stroke="url(#portal-arch-gold)" strokeWidth="5" />
+          <path d="M36 268 L36 88 Q 36 24, 450 24 Q 864 24, 864 88 L 864 268" stroke="#C9A227" strokeWidth="2.5" strokeOpacity="0.65" />
+          <path d="M68 268 L68 104 Q 68 48, 450 48 Q 832 48, 832 104 L 832 268" stroke="#D4AF37" strokeWidth="1.4" strokeOpacity="0.45" />
+          <ellipse cx="450" cy="30" rx="42" ry="18" fill="#D4AF37" fillOpacity="0.16" stroke="#C9A227" strokeWidth="1.4" />
+          <path d="M120 72 Q 200 36, 280 72 M620 72 Q 700 36, 780 72" stroke="#C9A227" strokeWidth="0.9" strokeOpacity="0.55" />
+          <path d="M200 108 Q 260 88, 320 108 M580 108 Q 640 88, 700 108" stroke="#D4AF37" strokeWidth="0.7" strokeOpacity="0.45" />
+          <path d="M340 268 L340 172 M560 268 L560 172 M260 268 L260 196 M640 268 L640 196" stroke="#D4AF37" strokeWidth="0.8" strokeOpacity="0.4" />
+        </svg>
+      </div>
+
+      <div className="royal-signin-gateway__torch royal-signin-gateway__torch--left" aria-hidden>
+        <div className="royal-signin-gateway__torch-basket" />
+        <div className="royal-signin-gateway__torch-flame" />
+      </div>
+      <div className="royal-signin-gateway__torch royal-signin-gateway__torch--right" aria-hidden>
+        <div className="royal-signin-gateway__torch-basket" />
+        <div className="royal-signin-gateway__torch-flame" />
+      </div>
 
       <div className="royal-signin-gateway__pillar royal-signin-gateway__pillar--left" aria-hidden>
         <div className="royal-signin-gateway__pillar-cap" />
-        <div className="royal-signin-gateway__pillar-shaft" />
+        <div className="royal-signin-gateway__pillar-shaft">
+          <div className="royal-signin-gateway__pillar-carving" />
+        </div>
         <div className="royal-signin-gateway__pillar-base" />
       </div>
 
       <div className="royal-signin-gateway__pillar royal-signin-gateway__pillar--right" aria-hidden>
         <div className="royal-signin-gateway__pillar-cap" />
-        <div className="royal-signin-gateway__pillar-shaft" />
+        <div className="royal-signin-gateway__pillar-shaft">
+          <div className="royal-signin-gateway__pillar-carving" />
+        </div>
         <div className="royal-signin-gateway__pillar-base" />
       </div>
 
-      <svg
-        className="royal-signin-gateway__arch-svg pointer-events-none absolute top-0 left-1/2 w-[108%] max-w-none -translate-x-1/2"
-        viewBox="0 0 640 220"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden
-        preserveAspectRatio="xMidYMin meet"
-      >
-        <defs>
-          <linearGradient id="royal-arch-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#F8F4E8" stopOpacity="0.15" />
-            <stop offset="45%" stopColor="#D4AF37" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="#8B6914" stopOpacity="0.7" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M16 210 L16 82 Q 16 8, 320 8 Q 624 8, 624 82 L 624 210"
-          stroke="url(#royal-arch-gold)"
-          strokeWidth="3"
-        />
-        <path
-          d="M44 210 L44 98 Q 44 32, 320 32 Q 596 32, 596 98 L 596 210"
-          stroke="#C9A227"
-          strokeWidth="1.8"
-          strokeOpacity="0.55"
-        />
-        <path
-          d="M72 210 L72 112 Q 72 56, 320 56 Q 568 56, 568 112 L 568 210"
-          stroke="#D4AF37"
-          strokeWidth="1"
-          strokeOpacity="0.38"
-        />
-        <ellipse cx="320" cy="22" rx="28" ry="14" fill="#D4AF37" fillOpacity="0.12" stroke="#C9A227" strokeWidth="1" />
-        <circle cx="320" cy="22" r="10" fill="#D4AF37" fillOpacity="0.3" stroke="#C9A227" strokeWidth="0.8" />
-        <path
-          d="M304 22 L320 38 L336 22 M312 28 L328 28"
-          stroke="#F8F4E8"
-          strokeWidth="0.6"
-          strokeOpacity="0.5"
-        />
-        <path
-          d="M268 210 L268 138 M352 210 L352 138 M228 210 L228 158 M392 210 L392 158 M188 210 L188 172 M432 210 L432 172"
-          stroke="#D4AF37"
-          strokeWidth="0.65"
-          strokeOpacity="0.42"
-        />
-        <path
-          d="M96 76 Q 136 52, 176 76 M464 76 Q 504 52, 544 76"
-          stroke="#C9A227"
-          strokeWidth="0.55"
-          strokeOpacity="0.48"
-        />
-        <path
-          d="M148 96 Q 168 84, 188 96 M452 96 Q 472 84, 492 96"
-          stroke="#D4AF37"
-          strokeWidth="0.45"
-          strokeOpacity="0.4"
-        />
-        <path
-          d="M280 64 Q 300 48, 320 64 Q 340 48, 360 64"
-          stroke="#D4AF37"
-          strokeWidth="0.5"
-          strokeOpacity="0.45"
-        />
-        <path
-          d="M120 130 Q 140 118, 160 130 M480 130 Q 500 118, 520 130"
-          stroke="#C9A227"
-          strokeWidth="0.4"
-          strokeOpacity="0.35"
-        />
-      </svg>
+      <div className="royal-signin-gateway__opening">
+        <div className="royal-signin-gateway__opening-glow" aria-hidden />
+        <div className="royal-signin-gateway__opening-mist" aria-hidden />
+        <div className="royal-signin-gateway__energy-veins" aria-hidden />
 
-      <div className="royal-signin-gateway__wall">
-        <div className="royal-signin-gateway__filigree royal-signin-gateway__filigree--top" aria-hidden />
-        <div className="royal-signin-gateway__filigree royal-signin-gateway__filigree--bottom" aria-hidden />
+        {showDoors ? (
+          <div
+            className={`royal-signin-portal-doors ${doorsRevealing ? "is-revealed" : ""} ${doorsUnlocking ? "is-unlocking" : ""} ${doorsOpen ? "is-open" : ""}`}
+          >
+            <div className="royal-signin-portal-door royal-signin-portal-door--left">
+              <div className="royal-signin-portal-door__panel">
+                <div className="royal-signin-portal-door__emblem" />
+                <div className="royal-signin-portal-door__carving" />
+              </div>
+              <div className="royal-signin-portal-door__ring" />
+            </div>
+            <div className="royal-signin-portal-door royal-signin-portal-door--right">
+              <div className="royal-signin-portal-door__panel">
+                <div className="royal-signin-portal-door__emblem" />
+                <div className="royal-signin-portal-door__carving" />
+              </div>
+              <div className="royal-signin-portal-door__ring" />
+            </div>
+          </div>
+        ) : null}
 
-        <div
-          className={`royal-signin-arch-inscription ${
-            formVisible ? "is-visible" : "is-hidden"
-          } ${formGlowing ? "is-glowing" : ""} ${formDissolving ? "is-dissolving" : ""}`}
-        >
-          {children}
-        </div>
+        {showDoors ? (
+          <div className={`royal-signin-portal-burst ${doorsOpen ? "is-active" : ""} ${doorsUnlocking ? "is-leaking" : ""}`} aria-hidden />
+        ) : null}
+
+        {showDissolveParticles ? (
+          <div className="royal-signin-dissolve-particles" aria-hidden>
+            {DISSOLVE_PARTICLES.map((p) => (
+              <span
+                key={`dissolve-${p.id}`}
+                className="royal-signin-dissolve-mote"
+                style={{
+                  left: p.left,
+                  width: p.size,
+                  height: p.size,
+                  animationDelay: p.delay,
+                  ["--drift" as string]: p.drift,
+                }}
+              />
+            ))}
+          </div>
+        ) : null}
+
+        {decree ? (
+          <div className={decreeClass}>
+            <div className="royal-gate-decree__stone-frame" aria-hidden />
+            {showSealRings ? (
+              <div className="royal-signin-seal-rings" aria-hidden>
+                <span className="royal-signin-seal-ring" />
+                <span className="royal-signin-seal-ring royal-signin-seal-ring--delay" />
+                <span className="royal-signin-seal-ring royal-signin-seal-ring--delay2" />
+              </div>
+            ) : null}
+            <div className="royal-gate-decree__content">{decree}</div>
+          </div>
+        ) : null}
+
+        {annex ? <div className="royal-signin-gateway__annex">{annex}</div> : null}
       </div>
 
       <div className="royal-signin-gateway__threshold" aria-hidden />
-    </div>
+      <div className="royal-signin-gateway__breath" aria-hidden />
+    </form>
   );
 }

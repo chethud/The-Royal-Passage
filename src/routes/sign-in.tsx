@@ -3,6 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { JwtSignInForm } from "@/components/auth/JwtSignInForm";
 import { RoleBadge } from "@/components/auth/RoleBadge";
+import { RoyalCrest } from "@/components/auth/RoyalCrest";
+import { RoyalGateField, royalGateInputClass } from "@/components/auth/RoyalGateField";
+import { RoyalPalaceGateway } from "@/components/auth/RoyalPalaceGateway";
 import { RoyalSignInExperience } from "@/components/auth/RoyalSignInExperience";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { useRoyalSignInAnimation } from "@/hooks/use-royal-sign-in-animation";
@@ -14,9 +17,9 @@ import {
   readAuthCallbackError,
   redirectOffLocalhostIfNeeded,
 } from "@/lib/auth-redirect";
+import { getRoyalSignInPhaseFlags } from "@/lib/royal-sign-in-phase";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
-const inputClass = "royal-signin-engraved-input";
 const inscriptionClass = "royal-signin-inscription";
 
 type SignInSearch = {
@@ -53,7 +56,7 @@ function SignInPage() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const browserConfigured = isSupabaseBrowserConfigured();
-  const { user, displayName, role, loading } = useAuthUser();
+  const { user, role, loading } = useAuthUser();
   const reducedMotion = usePrefersReducedMotion();
   const { phase, start, isAnimating } = useRoyalSignInAnimation(reducedMotion);
   const pendingPalaceEntryRef = useRef(false);
@@ -61,6 +64,8 @@ function SignInPage() {
     if (!browserConfigured) return null;
     return getSupabaseBrowser();
   }, [browserConfigured]);
+
+  const phaseFlags = getRoyalSignInPhaseFlags(phase);
 
   useEffect(() => {
     if (!user) return;
@@ -111,8 +116,7 @@ function SignInPage() {
     }
   }, [isAnimating, loading, navigate, redirect, role, user]);
 
-  const isEmailNotConfirmedError = (message: string) =>
-    /email not confirmed/i.test(message);
+  const isEmailNotConfirmedError = (message: string) => /email not confirmed/i.test(message);
 
   const signInWithGoogle = async () => {
     setError(null);
@@ -279,320 +283,111 @@ function SignInPage() {
     void navigate({ to: "/sign-in" });
   };
 
-  return (
-    <RoyalSignInExperience phase={phase}>
-          {user ? (
-            <form className="royal-signin-engraved-form" onSubmit={updateProfile}>
-              <div className="mb-2 flex flex-wrap items-center justify-center gap-2">
-                {role ? <RoleBadge role={role} /> : null}
-              </div>
-              <p className={`${inscriptionClass} ${inscriptionClass}--crest`}>Royal Registry</p>
-              <h2 className={`${inscriptionClass} ${inscriptionClass}--title`}>Thy Court Identity</h2>
-              <p className={`${inscriptionClass} ${inscriptionClass}--verse`}>
-                Redirecting to your {role ? ROLE_LABELS[role].toLowerCase() : "account"} chamber.
-              </p>
-              <div className="royal-signin-carved-divider" aria-hidden />
-                <div className="royal-signin-field">
-                  <label htmlFor="profile-name" className={inscriptionClass}>
-                    Full Name
-                  </label>
-                  <input
-                    id="profile-name"
-                    name="fullName"
-                    type="text"
-                    autoComplete="name"
-                    placeholder="Your name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className={inputClass}
-                  />
-                </div>
-                <div className="royal-signin-field">
-                  <label htmlFor="profile-email" className={inscriptionClass}>
-                    Royal Correspondence
-                  </label>
-                  <input
-                    id="profile-email"
-                    type="email"
-                    value={user.email ?? ""}
-                    disabled
-                    className="royal-signin-engraved-input is-muted"
-                  />
-                </div>
-                <div className="royal-signin-field">
-                  <label htmlFor="profile-phone" className={inscriptionClass}>
-                    Court Line
-                  </label>
-                  <input
-                    id="profile-phone"
-                    name="phone"
-                    type="tel"
-                    autoComplete="tel"
-                    placeholder="+91 98XXXXXXX"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className={inputClass}
-                  />
-                </div>
-                <button type="submit" disabled={savingProfile} className="royal-signin-seal">
-                  {savingProfile ? "Recording..." : "Seal Profile"}
-                </button>
-                {role ? (
-                  <Link
-                    to={dashboardPathForRole(role)}
-                    className={`${inscriptionClass} ${inscriptionClass}--link mx-auto mt-2 block text-center`}
-                  >
-                    Enter {ROLE_LABELS[role]} chamber →
-                  </Link>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={signOut}
-                  className={`${inscriptionClass} ${inscriptionClass}--link mx-auto mt-3 block`}
-                >
-                  Depart the kingdom
-                </button>
-            </form>
-          ) : mode === "signin" ? (
-            <form className="royal-signin-engraved-form" onSubmit={signIn}>
-              <p className={`${inscriptionClass} ${inscriptionClass}--crest`}>The Royal Passage</p>
-              <h2 className={`${inscriptionClass} ${inscriptionClass}--title`}>Gateway of the Kingdom</h2>
-              <p className={`${inscriptionClass} ${inscriptionClass}--verse`}>
-                Present thy credentials. The palace itself shall judge thy passage.
-              </p>
-              <div className="royal-signin-carved-divider" aria-hidden />
-
-                <div className="royal-signin-field">
-                  <label htmlFor="signin-email" className={inscriptionClass}>
-                    Royal Correspondence
-                  </label>
-                  <input
-                    id="signin-email"
-                    name="email"
-                    type="email"
-                    autoComplete="username"
-                    required
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className={inputClass}
-                  />
-                </div>
-                <div className="royal-signin-field">
-                  <label htmlFor="signin-password" className={inscriptionClass}>
-                    Seal of Passage
-                  </label>
-                  <input
-                    id="signin-password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={inputClass}
-                  />
-                </div>
-                <div className="royal-signin-inscription-row">
-                  <label className={`${inscriptionClass} ${inscriptionClass}--small`}>
-                    <input type="checkbox" className="royal-signin-checkbox" /> Remember this visit
-                  </label>
-                  <button type="button" className={`${inscriptionClass} ${inscriptionClass}--link`}>
-                    Forgotten seal?
-                  </button>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={busy || isAnimating || !email.trim() || !password}
-                  className="royal-signin-seal"
-                >
-                  {busy || isAnimating ? "Opening..." : "Enter the Palace"}
-                </button>
-
-                <GoogleSignInButton
-                  busy={googleBusy}
-                  disabled={!browserConfigured}
-                  className="royal-signin-google-inscription"
-                  onClick={() => void signInWithGoogle()}
-                />
-
-                {emailNotConfirmed ? (
-                  <button
-                    type="button"
-                    onClick={() => void resendConfirmation()}
-                    disabled={resendingConfirmation || !email.trim()}
-                    className={`${inscriptionClass} ${inscriptionClass}--link mx-auto block`}
-                  >
-                    {resendingConfirmation ? "Sending decree..." : "Resend confirmation decree"}
-                  </button>
-                ) : null}
-
-              <p className={`${inscriptionClass} ${inscriptionClass}--verse mt-4 text-center`}>
-                New to the court?{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode("signup");
-                    setError(null);
-                    setNotice(null);
-                  }}
-                  className={`${inscriptionClass} ${inscriptionClass}--link inline`}
-                >
-                  Request guest passage
-                </button>
-              </p>
-
-                <button
-                  type="button"
-                  onClick={() => setShowJwtSignIn((open) => !open)}
-                  className={`${inscriptionClass} ${inscriptionClass}--link mx-auto mt-4 block`}
-                >
-                  {showJwtSignIn ? "Conceal court JWT entry" : "Host or admin court entry"}
-                </button>
-                {showJwtSignIn ? (
-                  <div className="mt-4">
-                    <JwtSignInForm
-                      busy={busy}
-                      onBusyChange={setBusy}
-                      onError={setError}
-                      onNotice={setNotice}
-                      onSuccess={beginPalaceEntry}
-                    />
-                  </div>
-                ) : null}
-            </form>
-          ) : (
-            <form className="royal-signin-engraved-form" onSubmit={signUpGuest}>
-              <p className={`${inscriptionClass} ${inscriptionClass}--crest`}>Guest Registration</p>
-              <h2 className={`${inscriptionClass} ${inscriptionClass}--title`}>Request Royal Passage</h2>
-              <p className={`${inscriptionClass} ${inscriptionClass}--verse`}>
-                Inscribe thy name upon the palace ledger of honoured guests.
-              </p>
-              <div className="royal-signin-carved-divider" aria-hidden />
-
-                <div className="royal-signin-field">
-                  <label htmlFor="signup-name" className={inscriptionClass}>
-                    Full Name
-                  </label>
-                  <input
-                    id="signup-name"
-                    name="fullName"
-                    type="text"
-                    autoComplete="name"
-                    required
-                    placeholder="Your name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className={inputClass}
-                  />
-                </div>
-                <div className="royal-signin-field">
-                  <label htmlFor="signup-email" className={inscriptionClass}>
-                    Royal Correspondence
-                  </label>
-                  <input
-                    id="signup-email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className={inputClass}
-                  />
-                </div>
-                <div className="royal-signin-field">
-                  <label htmlFor="signup-phone" className={inscriptionClass}>
-                    Court Line
-                  </label>
-                  <input
-                    id="signup-phone"
-                    name="phone"
-                    type="tel"
-                    autoComplete="tel"
-                    placeholder="+91 98XXXXXXX"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className={inputClass}
-                  />
-                </div>
-                <div className="royal-signin-field">
-                  <label htmlFor="signup-password" className={inscriptionClass}>
-                    Seal of Passage
-                  </label>
-                  <input
-                    id="signup-password"
-                    name="password"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    minLength={8}
-                    placeholder="Min. 8 characters"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={inputClass}
-                  />
-                </div>
-                <button type="submit" disabled={busy || !email.trim() || !password || !fullName.trim()} className="royal-signin-seal">
-                  {busy ? "Inscribing..." : "Seal Guest Passage"}
-                </button>
-
-                <GoogleSignInButton
-                  busy={googleBusy}
-                  disabled={!browserConfigured}
-                  label="Decree via Google"
-                  className="royal-signin-google-inscription"
-                  onClick={() => void signInWithGoogle()}
-                />
-
-              <p className={`${inscriptionClass} ${inscriptionClass}--verse mt-4 text-center`}>
-                Already inscribed?{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode("signin");
-                    setError(null);
-                    setNotice(null);
-                  }}
-                  className={`${inscriptionClass} ${inscriptionClass}--link inline`}
-                >
-                  Return to the gateway
-                </button>
-              </p>
-              </form>
-          )}
-
-          {!user && (
-            <>
-              {!browserConfigured && (
-                <p className={`${inscriptionClass} ${inscriptionClass}--alert mt-4 text-center`}>
-                  Missing browser auth env vars. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
-                </p>
-              )}
-              {error && (
-                <p className={`${inscriptionClass} ${inscriptionClass}--alert mt-4 text-center`}>{error}</p>
-              )}
-              {notice && (
-                <p className={`${inscriptionClass} ${inscriptionClass}--notice mt-4 text-center`} role="status">
-                  {notice}
-                </p>
-              )}
-              <p className={`${inscriptionClass} ${inscriptionClass}--verse mt-5 text-center`}>
-                <Link to="/" className={`${inscriptionClass} ${inscriptionClass}--link`}>
-                  Return beyond the palace gates →
-                </Link>
-              </p>
-            </>
-          )}
-
-          {user && (error || notice) && (
-            <p className={`${inscriptionClass} ${error ? `${inscriptionClass}--alert` : `${inscriptionClass}--notice`} mt-4 text-center`}>
-              {error || notice}
-            </p>
-          )}
-    </RoyalSignInExperience>
+  const statusAnnex = (
+    <>
+      {!browserConfigured && (
+        <p className={`${inscriptionClass} ${inscriptionClass}--alert text-center`}>
+          Missing browser auth env vars. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+        </p>
+      )}
+      {error ? <p className={`${inscriptionClass} ${inscriptionClass}--alert text-center`}>{error}</p> : null}
+      {notice ? (
+        <p className={`${inscriptionClass} ${inscriptionClass}--notice text-center`} role="status">
+          {notice}
+        </p>
+      ) : null}
+    </>
   );
+
+  const portal = user ? (
+    <RoyalPalaceGateway {...phaseFlags} onSubmit={updateProfile} annex={statusAnnex} decree={
+      <>
+        {role ? <div className="mb-2 flex justify-center"><RoleBadge role={role} /></div> : null}
+        <RoyalCrest className="royal-gate-decree__crest mx-auto" />
+        <h2 className="royal-gate-decree__title">Thy Court Identity</h2>
+        <p className="royal-gate-decree__subtitle">
+          Redirecting to your {role ? ROLE_LABELS[role].toLowerCase() : "account"} chamber.
+        </p>
+        <RoyalGateField id="profile-name" label="Full Name" icon="user">
+          <input id="profile-name" name="fullName" type="text" autoComplete="name" placeholder="Your name" value={fullName} onChange={(e) => setFullName(e.target.value)} className={royalGateInputClass()} />
+        </RoyalGateField>
+        <RoyalGateField id="profile-email" label="Email" icon="mail">
+          <input id="profile-email" type="email" value={user.email ?? ""} disabled className={royalGateInputClass(true)} />
+        </RoyalGateField>
+        <RoyalGateField id="profile-phone" label="Phone" icon="phone">
+          <input id="profile-phone" name="phone" type="tel" autoComplete="tel" placeholder="+91 98XXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} className={royalGateInputClass()} />
+        </RoyalGateField>
+        <button type="submit" disabled={savingProfile} className="royal-gate-decree__submit">
+          {savingProfile ? "Recording…" : "Seal Profile"}
+        </button>
+        <div className="royal-gate-decree__links">
+          {role ? <Link to={dashboardPathForRole(role)} className="royal-gate-decree__link">Enter {ROLE_LABELS[role]} chamber →</Link> : null}
+          <button type="button" onClick={signOut} className="royal-gate-decree__link">Depart the kingdom</button>
+        </div>
+      </>
+    } />
+  ) : mode === "signin" ? (
+    <RoyalPalaceGateway {...phaseFlags} onSubmit={signIn} annex={<>{statusAnnex}{showJwtSignIn ? <JwtSignInForm busy={busy} onBusyChange={setBusy} onError={setError} onNotice={setNotice} onSuccess={beginPalaceEntry} /> : null}</>} decree={
+      <>
+        <RoyalCrest className="royal-gate-decree__crest mx-auto" />
+        <h2 className="royal-gate-decree__title">Welcome to the Royal Passage</h2>
+        <RoyalGateField id="signin-email" label="Email or Phone" icon="mail">
+          <input id="signin-email" name="email" type="email" autoComplete="username" required placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className={royalGateInputClass()} />
+        </RoyalGateField>
+        <RoyalGateField id="signin-password" label="Password" icon="lock">
+          <input id="signin-password" name="password" type="password" autoComplete="current-password" required placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} className={royalGateInputClass()} />
+        </RoyalGateField>
+        <div className="royal-gate-decree__row">
+          <label className="royal-gate-decree__remember"><input type="checkbox" className="royal-signin-checkbox" /> Remember Me</label>
+          <button type="button" className="royal-gate-decree__link">Forgot Password?</button>
+        </div>
+        <button type="submit" disabled={busy || isAnimating || !email.trim() || !password} className="royal-gate-decree__submit">
+          {busy || isAnimating ? "Opening…" : "Enter the Palace"}
+        </button>
+        <div className="royal-gate-decree__links">
+          <GoogleSignInButton busy={googleBusy} disabled={!browserConfigured} className="royal-gate-decree__link royal-gate-decree__link--google" onClick={() => void signInWithGoogle()} />
+          {emailNotConfirmed ? (
+            <button type="button" onClick={() => void resendConfirmation()} disabled={resendingConfirmation || !email.trim()} className="royal-gate-decree__link">
+              {resendingConfirmation ? "Sending…" : "Resend confirmation"}
+            </button>
+          ) : null}
+          <button type="button" onClick={() => { setMode("signup"); setError(null); setNotice(null); }} className="royal-gate-decree__link">Create Account</button>
+          <button type="button" onClick={() => setShowJwtSignIn((o) => !o)} className="royal-gate-decree__link">
+            {showJwtSignIn ? "Hide JWT entry" : "Host / admin JWT"}
+          </button>
+          <Link to="/" className="royal-gate-decree__link">Return to homepage →</Link>
+        </div>
+      </>
+    } />
+  ) : (
+    <RoyalPalaceGateway {...phaseFlags} onSubmit={signUpGuest} annex={statusAnnex} decree={
+      <>
+        <RoyalCrest className="royal-gate-decree__crest mx-auto" />
+        <h2 className="royal-gate-decree__title">Request Royal Passage</h2>
+        <p className="royal-gate-decree__subtitle">Inscribe thy name upon the palace ledger.</p>
+        <RoyalGateField id="signup-name" label="Full Name" icon="user">
+          <input id="signup-name" name="fullName" type="text" autoComplete="name" required placeholder="Your name" value={fullName} onChange={(e) => setFullName(e.target.value)} className={royalGateInputClass()} />
+        </RoyalGateField>
+        <RoyalGateField id="signup-email" label="Email" icon="mail">
+          <input id="signup-email" name="email" type="email" autoComplete="email" required placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className={royalGateInputClass()} />
+        </RoyalGateField>
+        <RoyalGateField id="signup-phone" label="Phone" icon="phone">
+          <input id="signup-phone" name="phone" type="tel" autoComplete="tel" placeholder="+91 98XXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} className={royalGateInputClass()} />
+        </RoyalGateField>
+        <RoyalGateField id="signup-password" label="Password" icon="lock">
+          <input id="signup-password" name="password" type="password" autoComplete="new-password" required minLength={8} placeholder="Min. 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} className={royalGateInputClass()} />
+        </RoyalGateField>
+        <button type="submit" disabled={busy || !email.trim() || !password || !fullName.trim()} className="royal-gate-decree__submit">
+          {busy ? "Inscribing…" : "Seal Guest Passage"}
+        </button>
+        <div className="royal-gate-decree__links">
+          <GoogleSignInButton busy={googleBusy} disabled={!browserConfigured} label="Sign up with Google" className="royal-gate-decree__link royal-gate-decree__link--google" onClick={() => void signInWithGoogle()} />
+          <button type="button" onClick={() => { setMode("signin"); setError(null); setNotice(null); }} className="royal-gate-decree__link">Return to gateway</button>
+          <Link to="/" className="royal-gate-decree__link">Return to homepage →</Link>
+        </div>
+      </>
+    } />
+  );
+
+  return <RoyalSignInExperience phase={phase} portal={portal} />;
 }

@@ -2,36 +2,43 @@ import { useCallback, useRef, useState } from "react";
 
 export type RoyalSignInPhase =
   | "idle"
-  | "glow"
-  | "arch"
+  | "seal"
+  | "activation"
   | "dissolve"
-  | "doors"
+  | "doors-reveal"
+  | "doors-open"
   | "forward"
+  | "courtyard"
   | "particles"
   | "logo"
   | "unfold"
   | "done";
 
 const SEQUENCE: RoyalSignInPhase[] = [
-  "glow",
-  "arch",
+  "seal",
+  "activation",
   "dissolve",
-  "doors",
+  "doors-reveal",
+  "doors-open",
   "forward",
+  "courtyard",
   "particles",
   "logo",
   "unfold",
 ];
 
+/** Durations aligned to storyboard timeline (ms). */
 const DURATIONS: Record<Exclude<RoyalSignInPhase, "idle" | "done">, number> = {
-  glow: 650,
-  arch: 750,
-  dissolve: 700,
-  doors: 1500,
-  forward: 1800,
-  particles: 2200,
-  logo: 1100,
-  unfold: 1300,
+  seal: 1000,
+  activation: 1500,
+  dissolve: 1200,
+  "doors-reveal": 2000,
+  "doors-open": 3000,
+  forward: 4000,
+  courtyard: 2000,
+  particles: 2000,
+  logo: 1500,
+  unfold: 2000,
 };
 
 export function useRoyalSignInAnimation(reducedMotion: boolean) {

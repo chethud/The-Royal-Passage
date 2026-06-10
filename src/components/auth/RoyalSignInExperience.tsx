@@ -2,43 +2,37 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import heroPalaceImg from "@/assets/hero-image.png";
 import logoUrl from "@/assets/logo/logo.png";
-import { RoyalPalaceGateway } from "@/components/auth/RoyalPalaceGateway";
 import type { RoyalSignInPhase } from "@/hooks/use-royal-sign-in-animation";
+import { getRoyalSignInPhaseFlags } from "@/lib/royal-sign-in-phase";
 
 type RoyalSignInExperienceProps = {
   phase: RoyalSignInPhase;
-  children: ReactNode;
+  portal: ReactNode;
 };
 
-const TRAIL_PARTICLES = Array.from({ length: 14 }, (_, i) => ({
+const TRAIL_PARTICLES = Array.from({ length: 24 }, (_, i) => ({
   id: i,
-  delay: i * 0.055,
-  size: 3 + (i % 2),
+  delay: i * 0.045,
+  size: 3 + (i % 3),
 }));
 
-const DUST_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+const DUST_PARTICLES = Array.from({ length: 40 }, (_, i) => ({
   id: i,
-  left: `${6 + ((i * 11) % 88)}%`,
-  top: `${10 + ((i * 17) % 75)}%`,
-  delay: `${(i * 0.45) % 4}s`,
-  size: 2 + (i % 3),
+  left: `${3 + ((i * 7) % 94)}%`,
+  top: `${6 + ((i * 11) % 88)}%`,
+  delay: `${(i * 0.32) % 5}s`,
+  size: 2 + (i % 4),
 }));
 
-export function RoyalSignInExperience({ phase, children }: RoyalSignInExperienceProps) {
-  const showForm = phase === "idle" || phase === "glow" || phase === "arch";
-  const archLit = phase !== "idle";
-  const showDoors = ["dissolve", "doors", "forward", "particles", "logo", "unfold", "done"].includes(phase);
-  const doorsOpen = ["doors", "forward", "particles", "logo", "unfold", "done"].includes(phase);
-  const cameraForward = ["forward", "particles", "logo", "unfold", "done"].includes(phase);
-  const showTrail = ["particles", "logo", "unfold"].includes(phase);
-  const logoGlow = ["logo", "unfold"].includes(phase);
-  const unfolding = phase === "unfold";
+export function RoyalSignInExperience({ phase, portal }: RoyalSignInExperienceProps) {
+  const { cameraForward, showCourtyard, showTrail, logoGlow, logoPulse, unfolding } =
+    getRoyalSignInPhaseFlags(phase);
 
   return (
     <div className={`royal-signin-page ${phase !== "idle" ? `royal-signin-page--${phase}` : ""}`} data-phase={phase}>
       <Link
         to="/"
-        className={`royal-signin-logo fixed top-5 left-5 z-[80] sm:top-6 sm:left-8 ${logoGlow ? "is-glowing" : ""} ${unfolding ? "is-settled" : ""}`}
+        className={`royal-signin-logo fixed top-5 left-5 z-[80] sm:top-6 sm:left-8 ${logoGlow ? "is-glowing" : ""} ${logoPulse ? "is-pulsing" : ""} ${unfolding ? "is-settled" : ""}`}
         aria-label="The Royal Passage — Home"
       >
         <img
@@ -51,16 +45,25 @@ export function RoyalSignInExperience({ phase, children }: RoyalSignInExperience
         />
       </Link>
 
-      <div className={`royal-signin-scene ${cameraForward ? "is-forward" : ""}`}>
+      <div
+        className={`royal-signin-scene ${cameraForward ? "is-forward" : ""} ${showCourtyard ? "is-courtyard" : ""}`}
+      >
         <div className="royal-signin-bg absolute inset-0">
           <img src={heroPalaceImg} alt="" className="royal-signin-bg-img h-full w-full object-cover" decoding="async" />
           <div className="royal-signin-bg-vignette absolute inset-0" aria-hidden />
         </div>
 
+        <div className="royal-signin-courtyard-layer pointer-events-none absolute inset-0" aria-hidden>
+          <img src={heroPalaceImg} alt="" className="royal-signin-courtyard-img h-full w-full object-cover" decoding="async" />
+          <div className="royal-signin-courtyard-glow absolute inset-0" />
+        </div>
+
         <div className="royal-signin-atmosphere pointer-events-none absolute inset-0" aria-hidden>
           <div className="royal-signin-fog absolute inset-0" />
           <div className="royal-signin-rays absolute inset-0" />
-          <div className="royal-signin-chandelier-glow absolute inset-x-0 top-0 h-48" />
+          <div className="royal-signin-chandelier-glow absolute inset-x-0 top-0 h-56" />
+          <div className="royal-signin-sunset absolute inset-0" />
+          <div className="royal-signin-godrays absolute inset-0" />
         </div>
 
         <div className="royal-signin-dust pointer-events-none absolute inset-0" aria-hidden>
@@ -79,26 +82,8 @@ export function RoyalSignInExperience({ phase, children }: RoyalSignInExperience
           ))}
         </div>
 
-        <div className="royal-signin-stage relative z-10 flex min-h-[100dvh] items-center justify-center px-3 pt-20 pb-8 sm:px-5 sm:pt-24">
-          <RoyalPalaceGateway
-            lit={archLit}
-            formVisible={showForm}
-            formGlowing={phase === "glow" || phase === "arch"}
-            formDissolving={phase === "dissolve"}
-          >
-            {children}
-          </RoyalPalaceGateway>
-
-          {showDoors ? (
-            <div className={`royal-signin-doors pointer-events-none absolute inset-0 z-40 ${doorsOpen ? "is-open" : ""}`}>
-              <div className="royal-signin-door royal-signin-door--left" />
-              <div className="royal-signin-door royal-signin-door--right" />
-            </div>
-          ) : null}
-
-          {showDoors ? (
-            <div className={`royal-signin-burst pointer-events-none absolute inset-0 z-[35] ${doorsOpen ? "is-active" : ""}`} aria-hidden />
-          ) : null}
+        <div className="royal-signin-stage relative z-10 flex min-h-[100dvh] items-center justify-center px-[1.5vw] pt-[4rem] pb-[1.5vh]">
+          {portal}
         </div>
 
         {showTrail ? (
@@ -117,7 +102,21 @@ export function RoyalSignInExperience({ phase, children }: RoyalSignInExperience
           </div>
         ) : null}
 
-        <div className={`royal-signin-unfold pointer-events-none absolute inset-0 z-[75] ${unfolding ? "is-active" : ""}`} aria-hidden />
+        <div className={`royal-signin-unfold pointer-events-none absolute inset-0 z-[75] ${unfolding ? "is-active" : ""}`} aria-hidden>
+          <div className="royal-signin-unfold__crest-burst" />
+          <nav className="royal-signin-unfold__nav" aria-hidden>
+            <span>Home</span>
+            <span>Destinations</span>
+            <span>Experiences</span>
+            <span>Journal</span>
+            <span>Contact</span>
+          </nav>
+          <div className="royal-signin-unfold__hero" aria-hidden>
+            <p className="royal-signin-unfold__eyebrow">The Royal Passage</p>
+            <h2 className="royal-signin-unfold__title">Discover the Royal Legacy of Mysuru</h2>
+            <span className="royal-signin-unfold__cta">Explore Now</span>
+          </div>
+        </div>
       </div>
     </div>
   );
