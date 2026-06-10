@@ -4,6 +4,7 @@ export type RoyalSignInPhase =
   | "idle"
   | "seal"
   | "activation"
+  | "ready"
   | "dissolve"
   | "doors-reveal"
   | "doors-open"
@@ -14,9 +15,8 @@ export type RoyalSignInPhase =
   | "unfold"
   | "done";
 
+/** Stages 4–9: triggered when the user signs in (form already lit). */
 const SEQUENCE: RoyalSignInPhase[] = [
-  "seal",
-  "activation",
   "dissolve",
   "doors-reveal",
   "doors-open",
@@ -27,10 +27,13 @@ const SEQUENCE: RoyalSignInPhase[] = [
   "unfold",
 ];
 
+/** Stages 1–3: cinematic intro that auto-plays on page load and rests at "ready". */
+const INTRO_SEQUENCE: RoyalSignInPhase[] = ["seal", "activation", "ready"];
+
 /** Durations aligned to storyboard timeline (ms). */
-const DURATIONS: Record<Exclude<RoyalSignInPhase, "idle" | "done">, number> = {
-  seal: 1000,
-  activation: 1500,
+const DURATIONS: Record<Exclude<RoyalSignInPhase, "idle" | "ready" | "done">, number> = {
+  seal: 1400,
+  activation: 1800,
   dissolve: 1200,
   "doors-reveal": 2000,
   "doors-open": 3000,
@@ -69,7 +72,10 @@ export function useRoyalSignInAnimation(reducedMotion: boolean) {
         }
         setPhase(step);
         index += 1;
-        const id = window.setTimeout(runStep, DURATIONS[step]);
+        const id = window.setTimeout(
+          runStep,
+          DURATIONS[step as Exclude<RoyalSignInPhase, "idle" | "ready" | "done">],
+        );
         timersRef.current.push(id);
       };
 
@@ -78,10 +84,41 @@ export function useRoyalSignInAnimation(reducedMotion: boolean) {
     [clearTimers, reducedMotion],
   );
 
+  /** Auto-play the on-load intro (Stages 1–3) and rest at "ready". */
+  const intro = useCallback(() => {
+    clearTimers();
+    if (reducedMotion) {
+      setPhase("ready");
+      return;
+    }
+
+    let index = 0;
+    const runStep = () => {
+      const step = INTRO_SEQUENCE[index];
+      if (!step) return;
+      setPhase(step);
+      index += 1;
+      if (step === "ready") return; // rest here, waiting for sign-in
+      const id = window.setTimeout(runStep, DURATIONS[step as Exclude<RoyalSignInPhase, "idle" | "ready" | "done">]);
+      timersRef.current.push(id);
+    };
+
+    // brief beat so the form fades in (Stage 1) before it glows (Stage 2)
+    const id = window.setTimeout(runStep, 400);
+    timersRef.current.push(id);
+  }, [clearTimers, reducedMotion]);
+
   const reset = useCallback(() => {
     clearTimers();
     setPhase("idle");
   }, [clearTimers]);
 
-  return { phase, start, reset, isAnimating: phase !== "idle" && phase !== "done" };
+  return {
+    phase,
+    start,
+    intro,
+    reset,
+    // "ready" is a resting state — not a blocking animation
+    isAnimating: phase !== "idle" && phase !== "ready" && phase !== "done",
+  };
 }

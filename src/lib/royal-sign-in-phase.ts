@@ -24,11 +24,16 @@ const POST_DOORS_OPEN: RoyalSignInPhase[] = [
 
 export function getRoyalSignInPhaseFlags(phase: RoyalSignInPhase) {
   return {
-    showForm: phase === "idle" || phase === "seal" || phase === "activation" || phase === "dissolve",
+    showForm:
+      phase === "idle" ||
+      phase === "seal" ||
+      phase === "activation" ||
+      phase === "ready" ||
+      phase === "dissolve",
     sealActive: phase === "seal",
-    activationActive: phase === "activation" || POST_DISSOLVE.includes(phase),
+    activationActive: phase === "activation" || phase === "ready" || POST_DISSOLVE.includes(phase),
     archLit: phase !== "idle",
-    formGlowing: phase === "seal" || phase === "activation",
+    formGlowing: phase === "seal" || phase === "activation" || phase === "ready",
     formDissolving: phase === "dissolve",
     showDoors: POST_DISSOLVE.includes(phase),
     doorsRevealing: POST_DISSOLVE.includes(phase),

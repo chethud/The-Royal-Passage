@@ -48,14 +48,29 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   const browserConfigured = isSupabaseBrowserConfigured();
   const { user, role, loading } = useAuthUser();
   const reducedMotion = usePrefersReducedMotion();
-  const { phase, start, isAnimating } = useRoyalSignInAnimation(reducedMotion);
+  const { phase, start, intro, isAnimating } = useRoyalSignInAnimation(reducedMotion);
   const pendingPalaceEntryRef = useRef(false);
+  const introStartedRef = useRef(false);
   const supabase = useMemo(() => {
     if (!browserConfigured) return null;
     return getSupabaseBrowser();
   }, [browserConfigured]);
 
   const phaseFlags = getRoyalSignInPhaseFlags(phase);
+  const gatewayFlags = {
+    lit: phaseFlags.archLit,
+    formVisible: phaseFlags.showForm,
+    formGlowing: phaseFlags.formGlowing,
+    formDissolving: phaseFlags.formDissolving,
+    sealActive: phaseFlags.sealActive,
+    activationActive: phaseFlags.activationActive,
+    showSealRings: phaseFlags.showSealRings,
+    showDissolveParticles: phaseFlags.showDissolveParticles,
+    showDoors: phaseFlags.showDoors,
+    doorsRevealing: phaseFlags.doorsRevealing,
+    doorsUnlocking: phaseFlags.doorsUnlocking,
+    doorsOpen: phaseFlags.doorsOpen,
+  };
   const passwordType = showPassword ? "text" : "password";
   const eyeToggle = <EyeToggle visible={showPassword} onToggle={() => setShowPassword((v) => !v)} />;
 
@@ -73,6 +88,14 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       setError(oauthError);
     }
   }, []);
+
+  // Stages 1–3 play automatically on load for a visitor, lighting the arch
+  // and glowing the form before they sign in.
+  useEffect(() => {
+    if (loading || user || introStartedRef.current) return;
+    introStartedRef.current = true;
+    intro();
+  }, [intro, loading, user]);
 
   const finishPalaceEntry = useCallback(() => {
     if (redirect && isGuestAccount(role) && redirect.startsWith("/")) {
@@ -273,7 +296,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   );
 
   const portal = user ? (
-    <RoyalPalaceGateway {...phaseFlags} onSubmit={updateProfile} annex={statusAnnex} decree={
+    <RoyalPalaceGateway {...gatewayFlags} onSubmit={updateProfile} annex={statusAnnex} decree={
       <>
         {role ? <div className="mb-2 flex justify-center"><RoleBadge role={role} /></div> : null}
         <RoyalCrest className="royal-gate-decree__crest mx-auto" />
@@ -300,7 +323,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       </>
     } />
   ) : mode === "signin" ? (
-    <RoyalPalaceGateway {...phaseFlags} onSubmit={signIn} annex={<>{statusAnnex}{showJwtSignIn ? <JwtSignInForm busy={busy} onBusyChange={setBusy} onError={setError} onNotice={setNotice} onSuccess={beginPalaceEntry} /> : null}</>} decree={
+    <RoyalPalaceGateway {...gatewayFlags} onSubmit={signIn} annex={<>{statusAnnex}{showJwtSignIn ? <JwtSignInForm busy={busy} onBusyChange={setBusy} onError={setError} onNotice={setNotice} onSuccess={beginPalaceEntry} /> : null}</>} decree={
       <>
         <RoyalCrest className="royal-gate-decree__crest mx-auto" />
         <p className="royal-gate-decree__eyebrow">Welcome to</p>
@@ -334,7 +357,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       </>
     } />
   ) : (
-    <RoyalPalaceGateway {...phaseFlags} onSubmit={signUpGuest} annex={statusAnnex} decree={
+    <RoyalPalaceGateway {...gatewayFlags} onSubmit={signUpGuest} annex={statusAnnex} decree={
       <>
         <RoyalCrest className="royal-gate-decree__crest mx-auto" />
         <p className="royal-gate-decree__eyebrow">Join the Kingdom</p>

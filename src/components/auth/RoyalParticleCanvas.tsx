@@ -118,9 +118,9 @@ class RoyalParticle {
 
 const PARTICLE_STATE_BY_PHASE: Partial<Record<RoyalSignInPhase, ParticleState>> = {
   idle: "float",
-  glow: "float",
   seal: "float",
   activation: "float",
+  ready: "float",
   dissolve: "converge",
   "doors-reveal": "burst",
   "doors-open": "burst",
@@ -133,6 +133,7 @@ const ACTIVE_PHASES: RoyalSignInPhase[] = [
   "idle",
   "seal",
   "activation",
+  "ready",
   "dissolve",
   "doors-reveal",
   "doors-open",
