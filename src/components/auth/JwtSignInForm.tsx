@@ -11,9 +11,10 @@ type JwtSignInFormProps = {
   onBusyChange: (busy: boolean) => void;
   onError: (message: string | null) => void;
   onNotice: (message: string | null) => void;
+  onSuccess?: () => void;
 };
 
-export function JwtSignInForm({ busy, onBusyChange, onError, onNotice }: JwtSignInFormProps) {
+export function JwtSignInForm({ busy, onBusyChange, onError, onNotice, onSuccess }: JwtSignInFormProps) {
   const [token, setToken] = useState("");
   const decoded = useMemo(() => (token.trim() ? decodeJwt(token) : null), [token]);
 
@@ -26,7 +27,8 @@ export function JwtSignInForm({ busy, onBusyChange, onError, onNotice }: JwtSign
     try {
       onBusyChange(true);
       await signInWithJwtToken(supabase, token);
-      onNotice("Signed in with JWT. Redirecting to your dashboard…");
+      onSuccess?.();
+      onNotice("Signed in with JWT. Entering the kingdom…");
     } catch (err) {
       onError(err instanceof Error ? err.message : "JWT sign-in failed.");
     } finally {

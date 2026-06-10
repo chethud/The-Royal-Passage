@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { JwtSignInForm } from "@/components/auth/JwtSignInForm";
 import { RoleBadge } from "@/components/auth/RoleBadge";
-import { SignInHeroLayout } from "@/components/auth/SignInHeroLayout";
+import { RoyalSignInExperience } from "@/components/auth/RoyalSignInExperience";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { useRoyalSignInAnimation } from "@/hooks/use-royal-sign-in-animation";
 import { useAuthUser } from "@/lib/auth-user";
 import { dashboardPathForRole, isGuestAccount, isStaffRole, ROLE_LABELS } from "@/lib/roles";
 import {
@@ -14,10 +16,9 @@ import {
 } from "@/lib/auth-redirect";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
-const inputClass =
-  "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 text-sm text-ink placeholder:text-ink/45 backdrop-blur-sm focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+const inputClass = "royal-signin-input";
 
-const cardTitleClass = "font-display text-2xl tracking-tight text-ink md:text-[1.75rem]";
+const cardTitleClass = "font-display text-xl tracking-[0.04em] text-[#F8F4E8] sm:text-2xl";
 
 type SignInSearch = {
   redirect?: string;
@@ -54,6 +55,9 @@ function SignInPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const browserConfigured = isSupabaseBrowserConfigured();
   const { user, displayName, role, loading } = useAuthUser();
+  const reducedMotion = usePrefersReducedMotion();
+  const { phase, start, isAnimating } = useRoyalSignInAnimation(reducedMotion);
+  const pendingPalaceEntryRef = useRef(false);
   const supabase = useMemo(() => {
     if (!browserConfigured) return null;
     return getSupabaseBrowser();
@@ -74,8 +78,27 @@ function SignInPage() {
     }
   }, []);
 
+  const finishPalaceEntry = useCallback(() => {
+    if (redirect && isGuestAccount(role) && redirect.startsWith("/")) {
+      window.location.href = redirect;
+      return;
+    }
+    void navigate({ to: dashboardPathForRole(role) });
+  }, [navigate, redirect, role]);
+
+  const beginPalaceEntry = useCallback(() => {
+    pendingPalaceEntryRef.current = true;
+    start(() => {});
+  }, [start]);
+
   useEffect(() => {
-    if (loading || !user) return;
+    if (phase !== "done" || !pendingPalaceEntryRef.current || loading || !user) return;
+    pendingPalaceEntryRef.current = false;
+    finishPalaceEntry();
+  }, [finishPalaceEntry, loading, phase, user]);
+
+  useEffect(() => {
+    if (loading || !user || isAnimating || pendingPalaceEntryRef.current) return;
     if (isStaffRole(role)) {
       void navigate({ to: dashboardPathForRole(role) });
       return;
@@ -87,7 +110,7 @@ function SignInPage() {
     if (role) {
       void navigate({ to: dashboardPathForRole(role) });
     }
-  }, [loading, navigate, redirect, role, user]);
+  }, [isAnimating, loading, navigate, redirect, role, user]);
 
   const isEmailNotConfirmedError = (message: string) =>
     /email not confirmed/i.test(message);
@@ -134,7 +157,8 @@ function SignInPage() {
         password,
       });
       if (signInError) throw signInError;
-      setNotice("Signed in successfully.");
+      setNotice("Welcome to the kingdom.");
+      beginPalaceEntry();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to sign in.";
       if (isEmailNotConfirmedError(message)) {
@@ -208,7 +232,8 @@ function SignInPage() {
       });
       if (signUpError) throw signUpError;
       if (data.session) {
-        setNotice("Account created. You are signed in.");
+        setNotice("Account created. Entering the kingdom…");
+        beginPalaceEntry();
       } else {
         setNotice(
           "Account created. Check your email for a confirmation link, then sign in with your password.",
@@ -255,60 +280,9 @@ function SignInPage() {
     void navigate({ to: "/sign-in" });
   };
 
-  const heroContent = user
-    ? {
-        eyebrow: "Your account",
-        title: (
-          <>
-            Welcome,
-            <br />
-            <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-              {displayName ?? "Member"}
-            </span>
-          </>
-        ),
-        description:
-          "Your access level is set automatically. You will be redirected to your dashboard, or update your profile below.",
-      }
-    : mode === "signin"
-      ? {
-          eyebrow: "Curated Experiences · Timeless Memories",
-          title: (
-            <>
-              Welcome
-              <br />
-              <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-                Back,
-              </span>
-              <br />
-              Royally
-            </>
-          ),
-          description:
-            "Step into the cultural heart of Karnataka. Sign in to book experiences, manage your journeys, and unlock your Royal Passage account.",
-        }
-      : {
-          eyebrow: "Guest Registration",
-          title: (
-            <>
-              Join the
-              <br />
-              <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-                Royal Passage
-              </span>
-            </>
-          ),
-          description:
-            "Create a guest account to save wishlists, request bookings, and receive confirmations for curated Mysuru experiences.",
-        };
-
   return (
-    <SignInHeroLayout
-      eyebrow={heroContent.eyebrow}
-      title={heroContent.title}
-      description={heroContent.description}
-    >
-      <div className="glass-strong w-full rounded-md px-7 py-9 md:px-9 md:py-10">
+    <RoyalSignInExperience phase={phase}>
+      <div className="w-full">
           {user ? (
             <>
               <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -364,7 +338,7 @@ function SignInPage() {
                 <button
                   type="submit"
                   disabled={savingProfile}
-                  className="w-full rounded-sm bg-ember py-3.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="royal-signin-btn disabled:cursor-not-allowed"
                 >
                   {savingProfile ? "Saving profile..." : "Save profile"}
                 </button>
@@ -387,10 +361,12 @@ function SignInPage() {
             </>
           ) : mode === "signin" ? (
             <>
-              <div className="eyebrow mb-3 text-ember/90">Member access</div>
-              <h2 className={cardTitleClass}>Sign in</h2>
-              <p className="mt-2 text-sm leading-relaxed text-ink/75">
-                Use Google or your email and password. New guests can create an account below.
+              <p className="text-center text-[0.62rem] font-medium uppercase tracking-[0.32em] text-[#C9A227]">
+                The Royal Passage
+              </p>
+              <h2 className={`${cardTitleClass} mt-3 text-center`}>Welcome to the Kingdom</h2>
+              <p className="mt-2 text-center text-sm leading-relaxed text-[#F8F4E8]/72">
+                Sign in to enter the palace and access your royal passage.
               </p>
 
               <div className="mt-8 space-y-4">
@@ -443,10 +419,10 @@ function SignInPage() {
                 </div>
                 <button
                   type="submit"
-                  disabled={busy || !email.trim() || !password}
-                  className="w-full rounded-sm bg-ember py-3.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+                  disabled={busy || isAnimating || !email.trim() || !password}
+                  className="royal-signin-btn disabled:cursor-not-allowed"
                 >
-                  {busy ? "Signing in..." : "Sign in"}
+                  {busy || isAnimating ? "Entering..." : "Sign in"}
                 </button>
                 {emailNotConfirmed ? (
                   <button
@@ -490,6 +466,7 @@ function SignInPage() {
                       onBusyChange={setBusy}
                       onError={setError}
                       onNotice={setNotice}
+                      onSuccess={beginPalaceEntry}
                     />
                   </div>
                 ) : null}
@@ -497,11 +474,12 @@ function SignInPage() {
             </>
           ) : (
             <>
-              <div className="eyebrow mb-3 text-ember/90">Guest registration</div>
-              <h2 className={cardTitleClass}>Create account</h2>
-              <p className="mt-2 text-sm leading-relaxed text-ink/75">
-                Sign up with Google or email. Host and admin logins are created by the platform
-                team.
+              <p className="text-center text-[0.62rem] font-medium uppercase tracking-[0.32em] text-[#C9A227]">
+                Guest Registration
+              </p>
+              <h2 className={`${cardTitleClass} mt-3 text-center`}>Join the Kingdom</h2>
+              <p className="mt-2 text-center text-sm leading-relaxed text-[#F8F4E8]/72">
+                Create a guest account to book curated Mysuru experiences.
               </p>
 
               <div className="mt-8 space-y-4">
@@ -588,7 +566,7 @@ function SignInPage() {
                 <button
                   type="submit"
                   disabled={busy || !email.trim() || !password || !fullName.trim()}
-                  className="w-full rounded-sm bg-ember py-3.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="royal-signin-btn disabled:cursor-not-allowed"
                 >
                   {busy ? "Creating account..." : "Create guest account"}
                 </button>
@@ -630,15 +608,15 @@ function SignInPage() {
             </p>
           )}
 
-          <p className="mt-8 text-center text-sm text-ink/70">
+          <p className="mt-6 text-center text-sm text-[#F8F4E8]/65">
             <Link
-              to="/experiences"
-              className="text-ember underline-offset-4 transition-colors hover:underline"
+              to="/"
+              className="text-[#D4AF37] underline-offset-4 transition-colors hover:underline"
             >
-              Browse experiences →
+              Return to homepage →
             </Link>
           </p>
         </div>
-    </SignInHeroLayout>
+    </RoyalSignInExperience>
   );
 }
