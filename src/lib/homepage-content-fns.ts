@@ -14,7 +14,7 @@ import {
   DEFAULT_HOMEPAGE_CONTENT,
   type HomepageContent,
 } from "@/lib/homepage-content";
-import { isSupabaseConfigured } from "@/lib/env.server";
+import { getSupabaseConfigError } from "@/lib/env.server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 const showcaseIconKeySchema = z.enum(["pottery", "flame", "heritage"]);
@@ -58,10 +58,9 @@ export const saveHomepageShowcase = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }): Promise<{ version: number }> => {
-    if (!isSupabaseConfigured()) {
-      throw new Error(
-        "Homepage save is not configured on the server. Set SUPABASE_SERVICE_ROLE_KEY in your hosting environment (e.g. Vercel).",
-      );
+    const configError = getSupabaseConfigError();
+    if (configError) {
+      throw new Error(configError);
     }
 
     await requireEditor(data.accessToken);
@@ -79,10 +78,9 @@ export const saveHomepageJournal = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }): Promise<{ version: number }> => {
-    if (!isSupabaseConfigured()) {
-      throw new Error(
-        "Homepage save is not configured on the server. Set SUPABASE_SERVICE_ROLE_KEY in your hosting environment (e.g. Vercel).",
-      );
+    const configError = getSupabaseConfigError();
+    if (configError) {
+      throw new Error(configError);
     }
 
     await requireEditor(data.accessToken);

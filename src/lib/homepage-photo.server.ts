@@ -13,7 +13,10 @@ import {
   EXPERIENCE_PHOTOS_BUCKET,
   MAX_EXPERIENCE_PHOTO_BYTES,
 } from "@/lib/experience-photo-upload";
-import { isSupabaseConfigured, isSupabaseReadable } from "@/lib/env.server";
+import {
+  getSupabaseConfigError,
+  isSupabaseReadable,
+} from "@/lib/env.server";
 import { getSupabaseAdmin, getSupabaseServerRead } from "@/lib/supabase/admin";
 
 export type ApplyHomepagePhotoInput = {
@@ -103,10 +106,9 @@ async function uploadHomepagePhotoAdmin(
 export async function commitHomepagePhotoWithUpload(
   input: CommitHomepagePhotoUploadInput,
 ): Promise<ApplyHomepagePhotoResult> {
-  if (!isSupabaseConfigured()) {
-    throw new Error(
-      "Photo upload is not configured on the server. Set SUPABASE_SERVICE_ROLE_KEY in your hosting environment (e.g. Vercel).",
-    );
+  const configError = getSupabaseConfigError();
+  if (configError) {
+    throw new Error(configError);
   }
 
   const user = await requireEditor(input.accessToken);
@@ -225,10 +227,9 @@ export async function fetchHomepageContentFromDb(): Promise<HomepageContent> {
 export async function applyHomepagePhotoCore(
   input: ApplyHomepagePhotoInput,
 ): Promise<ApplyHomepagePhotoResult> {
-  if (!isSupabaseConfigured()) {
-    throw new Error(
-      "Homepage save is not configured on the server. Set SUPABASE_SERVICE_ROLE_KEY in your hosting environment (e.g. Vercel).",
-    );
+  const configError = getSupabaseConfigError();
+  if (configError) {
+    throw new Error(configError);
   }
 
   let parsedUrl: URL;

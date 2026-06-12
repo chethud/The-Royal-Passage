@@ -2,6 +2,7 @@ import {
   applyHomepagePhotoCore,
   commitHomepagePhotoWithUpload,
 } from "../src/lib/homepage-photo.server.js";
+import { getSupabaseConfigError } from "../src/lib/env.server.js";
 
 type VercelRequest = {
   method?: string;
@@ -46,6 +47,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    const configError = getSupabaseConfigError();
+    if (configError) {
+      res.setHeader("Content-Type", "application/json");
+      return res.status(500).end(JSON.stringify({ error: configError }));
+    }
+
     const payload = readRequestBody(req);
     const accessToken = payload.accessToken?.trim();
     const section = payload.section;

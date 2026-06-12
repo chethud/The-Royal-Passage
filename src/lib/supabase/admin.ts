@@ -1,5 +1,9 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/env.server";
+import {
+  getSupabaseAnonKey,
+  getSupabaseServiceRoleKey,
+  getSupabaseUrl,
+} from "@/lib/env.server";
 
 let cachedAdmin: SupabaseClient | null = null;
 let cachedRead: SupabaseClient | null = null;
@@ -7,7 +11,7 @@ let cachedRead: SupabaseClient | null = null;
 /** Service-role client — bypasses RLS; use only from server functions / loaders. */
 export function getSupabaseAdmin(): SupabaseClient {
   const url = getSupabaseUrl();
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key = getSupabaseServiceRoleKey();
   if (!url || !key) {
     throw new Error(
       "Missing SUPABASE_URL (or VITE_SUPABASE_URL) or SUPABASE_SERVICE_ROLE_KEY in the server environment.",
@@ -26,7 +30,7 @@ export function getSupabaseServerRead(): SupabaseClient | null {
   const url = getSupabaseUrl();
   if (!url) return null;
 
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = getSupabaseServiceRoleKey();
   if (serviceKey) {
     return getSupabaseAdmin();
   }

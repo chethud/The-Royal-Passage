@@ -1,4 +1,4 @@
-import { commitHomepagePhotoWithUpload } from "@/lib/homepage-photo.server";
+import { applyHomepagePhoto } from "@/lib/homepage-content-fns";
 import { validateExperiencePhotoFile } from "@/lib/experience-photo-upload";
 
 export type HomepagePhotoCommitResult = {
@@ -78,13 +78,15 @@ async function saveHomepagePhotoViaServerFn(
   file: File,
 ): Promise<HomepagePhotoCommitResult> {
   const base64 = await fileToBase64(file);
-  return commitHomepagePhotoWithUpload({
-    accessToken,
-    section,
-    itemIndex,
-    fileName: file.name,
-    mimeType: file.type,
-    base64,
+  return applyHomepagePhoto({
+    data: {
+      accessToken,
+      section,
+      itemIndex,
+      fileName: file.name,
+      mimeType: file.type,
+      base64,
+    },
   });
 }
 
@@ -106,7 +108,11 @@ export async function commitHomepagePhotoForEditor(
       return await saveHomepagePhotoViaServerFn(accessToken, section, itemIndex, file);
     } catch (serverFnError) {
       const apiMessage = apiError instanceof Error ? apiError.message : "API save failed.";
-      const fnMessage = serverFnError instanceof Error ? serverFnError.message : "Server save failed.";
+      const fnMessage =
+        serverFnError instanceof Error ? serverFnError.message : "Server save failed.";
+      if (apiMessage === fnMessage) {
+        throw new Error(apiMessage);
+      }
       throw new Error(`${apiMessage} ${fnMessage}`.trim());
     }
   }
