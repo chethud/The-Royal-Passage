@@ -80,3 +80,142 @@ export function mergeUniqueSlots(
   }
   return merged;
 }
+
+const WEEKDAY_ORDER: WeekdayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
+export function sortWeekdays(weekdays: WeekdayKey[]): WeekdayKey[] {
+  return WEEKDAY_ORDER.filter((day) => weekdays.includes(day));
+}
+
+export function formatWeekdayLabels(weekdays: WeekdayKey[]): string {
+  const sorted = sortWeekdays(weekdays);
+  if (sorted.length === 0) return "No days selected";
+  if (sorted.length === 7) return "Every day";
+
+  const labels = sorted.map((key) => WEEKDAY_OPTIONS.find((d) => d.key === key)?.label ?? key);
+  if (sorted.join(",") === "mon,tue,wed,thu,fri") return "Monday–Friday";
+  if (sorted.join(",") === "sat,sun") return "Saturday & Sunday";
+
+  return labels.join(", ");
+}
+
+export function formatTime12h(time24: string): string {
+  const [hourPart, minutePart] = time24.split(":");
+  const hour = Number.parseInt(hourPart ?? "0", 10);
+  const minute = Number.parseInt(minutePart ?? "0", 10);
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return time24;
+
+  const period = hour >= 12 ? "PM" : "AM";
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${String(minute).padStart(2, "0")} ${period}`;
+}
+
+export function formatDateReadable(isoDate: string): string {
+  const date = parseLocalDate(isoDate);
+  return new Intl.DateTimeFormat("en-IN", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+export type SchedulePreview = {
+  count: number;
+  weekdayLabel: string;
+  timeLabel: string;
+  dateRangeLabel: string;
+  sampleDates: string[];
+  isValid: boolean;
+  validationMessage: string | null;
+};
+
+export function buildSchedulePreview(params: {
+  weekdays: WeekdayKey[];
+  fromDate: string;
+  toDate: string;
+  startTime: string;
+  endTime: string;
+  capacity: number;
+}): SchedulePreview {
+  const weekdayLabel = formatWeekdayLabels(params.weekdays);
+  const timeLabel = `${formatTime12h(params.startTime)} – ${formatTime12h(params.endTime)}`;
+  const dateRangeLabel =
+    params.fromDate && params.toDate
+      ? `${formatDateReadable(params.fromDate)} → ${formatDateReadable(params.toDate)}`
+      : "Choose a date range";
+
+  if (params.weekdays.length === 0) {
+    return {
+      count: 0,
+      weekdayLabel,
+      timeLabel,
+      dateRangeLabel,
+      sampleDates: [],
+      isValid: false,
+      validationMessage: "Select at least one weekday.",
+    };
+  }
+  if (!params.fromDate || !params.toDate) {
+    return {
+      count: 0,
+      weekdayLabel,
+      timeLabel,
+      dateRangeLabel,
+      isValid: false,
+      validationMessage: "Choose the first and last bookable dates.",
+    };
+  }
+  if (params.fromDate > params.toDate) {
+    return {
+      count: 0,
+      weekdayLabel,
+      timeLabel,
+      dateRangeLabel,
+      isValid: false,
+      validationMessage: "Last date must be on or after the first date.",
+    };
+  }
+  if (params.startTime >= params.endTime) {
+    return {
+      count: 0,
+      weekdayLabel,
+      timeLabel,
+      dateRangeLabel,
+      isValid: false,
+      validationMessage: "Session end time must be after the start time.",
+    };
+  }
+  if (params.capacity < 1) {
+    return {
+      count: 0,
+      weekdayLabel,
+      timeLabel,
+      dateRangeLabel,
+      isValid: false,
+      validationMessage: "Capacity must be at least 1 guest.",
+    };
+  }
+
+  const slots = expandWeekdaySlots(params);
+  if (slots.length === 0) {
+    return {
+      count: 0,
+      weekdayLabel,
+      timeLabel,
+      dateRangeLabel,
+      isValid: false,
+      validationMessage: "No sessions match these weekdays in the selected date range.",
+    };
+  }
+
+  return {
+    count: slots.length,
+    weekdayLabel,
+    timeLabel,
+    dateRangeLabel,
+    sampleDates: slots.slice(0, 4).map((slot) => formatDateReadable(slot.slotDate)),
+    isValid: true,
+    validationMessage: null,
+  };
+}

@@ -10,8 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "setup:admin": "node --env-file=.env scripts/create-admin.mjs",
-    "setup:editor": "node --env-file=.env scripts/create-editor.mjs",
+    "setup:admin": "node --env-file=.env.local --env-file=.env scripts/create-admin.mjs",
+    "setup:editor": "node --env-file=.env.local --env-file=.env scripts/create-editor.mjs",
     "api:dev": "cd backend && python -m uvicorn app.main:app --reload --port 8000",
     "proto:generate": "npx buf generate",
     "test:e2e": "node --env-file=backend/.env scripts/e2e-test.mjs"

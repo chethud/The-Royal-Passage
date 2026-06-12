@@ -2,6 +2,7 @@ import type { CreateHostSlotPayload } from "@/lib/api/host-experiences";
 import type { HostSlotDetail } from "@/lib/api/host-experiences";
 import { WeekdaySlotBuilder } from "@/components/experience/WeekdaySlotBuilder";
 import { formatDateLong } from "@/lib/date-format";
+import { formatTime12h } from "@/lib/weekday-slots";
 
 type SlotManagerProps = {
   slots: HostSlotDetail[];
@@ -26,8 +27,8 @@ export function SlotManager({
       <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-5">
         <h3 className="font-display text-xl">Weekly schedule</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Select weekdays such as Monday–Friday, choose a date range, and generate bookable
-          sessions in bulk.
+          Choose which days and times guests can book, set your date range, then add sessions in
+          bulk. The preview shows exactly how many sessions will be created before you confirm.
         </p>
         <div className="mt-4">
           <WeekdaySlotBuilder busy={busy} onAddSlots={onAddMany} />
@@ -54,7 +55,7 @@ export function SlotManager({
                 <tr key={slot.id} className="border-b border-[oklch(0.88_0.08_86_/_0.1)]">
                   <td className="px-3 py-3">{formatDateLong(slot.date)}</td>
                   <td className="px-3 py-3">
-                    {slot.start} – {slot.end}
+                    {formatTime12h(slot.start)} – {formatTime12h(slot.end)}
                   </td>
                   <td className="px-3 py-3">{slot.capacity}</td>
                   <td className="px-3 py-3">{slot.seatsSold}</td>

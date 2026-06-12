@@ -2,10 +2,7 @@ import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { RoleBadge } from "@/components/auth/RoleBadge";
-import { RoyalCrest } from "@/components/auth/RoyalCrest";
-import { EyeToggle, RoyalGateField, royalGateInputClass } from "@/components/auth/RoyalGateField";
-import { RoyalPalaceGateway } from "@/components/auth/RoyalPalaceGateway";
-import { RoyalSignInExperience } from "@/components/auth/RoyalSignInExperience";
+import { SignInHeroLayout } from "@/components/auth/SignInHeroLayout";
 import { useAuthUser } from "@/lib/auth-user";
 import { dashboardPathForRole, isGuestAccount, isStaffRole, ROLE_LABELS } from "@/lib/roles";
 import {
@@ -16,7 +13,10 @@ import {
 } from "@/lib/auth-redirect";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
-const inscriptionClass = "royal-signin-inscription";
+const inputClass =
+  "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 text-sm text-ink placeholder:text-ink/45 backdrop-blur-sm focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+
+const cardTitleClass = "font-display text-2xl tracking-tight text-ink md:text-[1.75rem]";
 
 type RoyalAuthExperienceProps = {
   initialMode: "signin" | "signup";
@@ -41,14 +41,13 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const browserConfigured = isSupabaseBrowserConfigured();
-  const { user, role, loading } = useAuthUser();
+  const { user, displayName, role, loading } = useAuthUser();
   const supabase = useMemo(() => {
     if (!browserConfigured) return null;
     return getSupabaseBrowser();
   }, [browserConfigured]);
 
   const passwordType = showPassword ? "text" : "password";
-  const eyeToggle = <EyeToggle visible={showPassword} onToggle={() => setShowPassword((v) => !v)} />;
 
   useEffect(() => {
     if (!user) return;
@@ -118,7 +117,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
         password,
       });
       if (signInError) throw signInError;
-      setNotice("Welcome to the kingdom.");
+      setNotice("Signed in successfully.");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to sign in.";
       if (isEmailNotConfirmedError(message)) {
@@ -182,7 +181,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       });
       if (signUpError) throw signUpError;
       if (data.session) {
-        setNotice("Account created. Welcome to the kingdom.");
+        setNotice("Account created. You are signed in.");
       } else {
         setNotice(
           "Account created. Check your email for a confirmation link, then sign in with your password.",
@@ -226,109 +225,377 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     void navigate({ to: "/sign-in" });
   };
 
-  const statusAnnex = (
-    <>
-      {!browserConfigured && (
-        <p className={`${inscriptionClass} ${inscriptionClass}--alert text-center`}>
-          Missing browser auth env vars. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
-        </p>
-      )}
-      {error ? <p className={`${inscriptionClass} ${inscriptionClass}--alert text-center`}>{error}</p> : null}
-      {notice ? (
-        <p className={`${inscriptionClass} ${inscriptionClass}--notice text-center`} role="status">
-          {notice}
-        </p>
-      ) : null}
-    </>
-  );
+  const heroContent = user
+    ? {
+        eyebrow: "Your account",
+        title: (
+          <>
+            Welcome,
+            <br />
+            <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
+              {displayName ?? "Member"}
+            </span>
+          </>
+        ),
+        description:
+          "Your access level is set automatically. You will be redirected to your dashboard, or update your profile below.",
+      }
+    : mode === "signin"
+      ? {
+          eyebrow: "Curated Experiences · Timeless Memories",
+          title: (
+            <>
+              Welcome
+              <br />
+              <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
+                Back,
+              </span>
+              <br />
+              Royally
+            </>
+          ),
+          description:
+            "Step into the cultural heart of Karnataka. Sign in to book experiences, manage your journeys, and unlock your Royal Passage account.",
+        }
+      : {
+          eyebrow: "Guest Registration",
+          title: (
+            <>
+              Join the
+              <br />
+              <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
+                Royal Passage
+              </span>
+            </>
+          ),
+          description:
+            "Create a guest account to save wishlists, request bookings, and receive confirmations for curated Mysuru experiences.",
+        };
 
-  const portal = user ? (
-    <RoyalPalaceGateway onSubmit={updateProfile} annex={statusAnnex} decree={
-      <>
-        {role ? <div className="mb-2 flex justify-center"><RoleBadge role={role} /></div> : null}
-        <RoyalCrest className="royal-gate-decree__crest mx-auto" />
-        <h2 className="royal-gate-decree__title">Thy Court Identity</h2>
-        <p className="royal-gate-decree__subtitle">
-          Redirecting to your {role ? ROLE_LABELS[role].toLowerCase() : "account"} chamber.
-        </p>
-        <RoyalGateField id="profile-name" label="Full Name" icon="user">
-          <input id="profile-name" name="fullName" type="text" autoComplete="name" placeholder="Your name" value={fullName} onChange={(e) => setFullName(e.target.value)} className={royalGateInputClass()} />
-        </RoyalGateField>
-        <RoyalGateField id="profile-email" label="Email" icon="mail">
-          <input id="profile-email" type="email" value={user.email ?? ""} disabled className={royalGateInputClass(true)} />
-        </RoyalGateField>
-        <RoyalGateField id="profile-phone" label="Phone" icon="phone">
-          <input id="profile-phone" name="phone" type="tel" autoComplete="tel" placeholder="+91 98XXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} className={royalGateInputClass()} />
-        </RoyalGateField>
-        <button type="submit" disabled={savingProfile} className="royal-gate-decree__submit">
-          {savingProfile ? "Recording…" : "Seal Profile"}
-        </button>
-        <div className="royal-gate-decree__links">
-          {role ? <Link to={dashboardPathForRole(role)} className="royal-gate-decree__link">Enter {ROLE_LABELS[role]} chamber →</Link> : null}
-          <button type="button" onClick={signOut} className="royal-gate-decree__link">Depart the kingdom</button>
-        </div>
-      </>
-    } />
-  ) : mode === "signin" ? (
-    <RoyalPalaceGateway onSubmit={signIn} annex={statusAnnex} decree={
-      <>
-        <RoyalCrest className="royal-gate-decree__crest mx-auto" />
-        <p className="royal-gate-decree__eyebrow">Welcome to</p>
-        <h2 className="royal-gate-decree__title">The Royal Passage</h2>
-        <RoyalGateField id="signin-email" label="Email or Phone" icon="mail">
-          <input id="signin-email" name="email" type="email" autoComplete="username" required placeholder="you@kingdom.in" value={email} onChange={(e) => setEmail(e.target.value)} className={royalGateInputClass()} />
-        </RoyalGateField>
-        <RoyalGateField id="signin-password" label="Password" icon="lock" trailing={eyeToggle}>
-          <input id="signin-password" name="password" type={passwordType} autoComplete="current-password" required placeholder="Your royal seal" value={password} onChange={(e) => setPassword(e.target.value)} className={royalGateInputClass()} />
-        </RoyalGateField>
-        <div className="royal-gate-decree__row">
-          <label className="royal-gate-decree__remember"><input type="checkbox" className="royal-signin-checkbox" /> Remember Me</label>
-          <button type="button" className="royal-gate-decree__link">Forgot Password?</button>
-        </div>
-        <button type="submit" disabled={busy || !email.trim() || !password} className="royal-gate-decree__submit">
-          {busy ? "Opening…" : "Enter the Palace"}
-        </button>
-        <div className="royal-gate-decree__links">
-          <GoogleSignInButton busy={googleBusy} disabled={!browserConfigured} className="royal-gate-decree__link royal-gate-decree__link--google" onClick={() => void signInWithGoogle()} />
-          {emailNotConfirmed ? (
-            <button type="button" onClick={() => void resendConfirmation()} disabled={resendingConfirmation || !email.trim()} className="royal-gate-decree__link">
-              {resendingConfirmation ? "Sending…" : "Resend confirmation"}
-            </button>
-          ) : null}
-          <Link to="/sign-up" className="royal-gate-decree__link" onClick={() => { setMode("signup"); setError(null); setNotice(null); }}>Create Account</Link>
-        </div>
-      </>
-    } />
-  ) : (
-    <RoyalPalaceGateway onSubmit={signUpGuest} annex={statusAnnex} decree={
-      <>
-        <RoyalCrest className="royal-gate-decree__crest mx-auto" />
-        <p className="royal-gate-decree__eyebrow">Join the Kingdom</p>
-        <h2 className="royal-gate-decree__title">Request Royal Passage</h2>
-        <p className="royal-gate-decree__subtitle">Inscribe thy name upon the palace ledger.</p>
-        <RoyalGateField id="signup-name" label="Full Name" icon="user">
-          <input id="signup-name" name="fullName" type="text" autoComplete="name" required placeholder="Your name" value={fullName} onChange={(e) => setFullName(e.target.value)} className={royalGateInputClass()} />
-        </RoyalGateField>
-        <RoyalGateField id="signup-email" label="Email" icon="mail">
-          <input id="signup-email" name="email" type="email" autoComplete="email" required placeholder="you@kingdom.in" value={email} onChange={(e) => setEmail(e.target.value)} className={royalGateInputClass()} />
-        </RoyalGateField>
-        <RoyalGateField id="signup-phone" label="Phone" icon="phone">
-          <input id="signup-phone" name="phone" type="tel" autoComplete="tel" placeholder="+91 98XXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} className={royalGateInputClass()} />
-        </RoyalGateField>
-        <RoyalGateField id="signup-password" label="Password" icon="lock" trailing={eyeToggle}>
-          <input id="signup-password" name="password" type={passwordType} autoComplete="new-password" required minLength={8} placeholder="Min. 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} className={royalGateInputClass()} />
-        </RoyalGateField>
-        <button type="submit" disabled={busy || !email.trim() || !password || !fullName.trim()} className="royal-gate-decree__submit">
-          {busy ? "Inscribing…" : "Seal Guest Passage"}
-        </button>
-        <div className="royal-gate-decree__links">
-          <GoogleSignInButton busy={googleBusy} disabled={!browserConfigured} label="Sign up with Google" className="royal-gate-decree__link royal-gate-decree__link--google" onClick={() => void signInWithGoogle()} />
-          <Link to="/sign-in" className="royal-gate-decree__link" onClick={() => { setMode("signin"); setError(null); setNotice(null); }}>Return to gateway</Link>
-          <Link to="/" className="royal-gate-decree__link">Return to homepage →</Link>
-        </div>
-      </>
-    } />
-  );
+  return (
+    <SignInHeroLayout
+      eyebrow={heroContent.eyebrow}
+      title={heroContent.title}
+      description={heroContent.description}
+    >
+      <div className="glass-strong w-full rounded-md px-7 py-9 md:px-9 md:py-10">
+        {user ? (
+          <>
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              {role ? <RoleBadge role={role} /> : null}
+            </div>
+            <h2 className={cardTitleClass}>Account details</h2>
+            <p className="mt-2 text-sm leading-relaxed text-ink/75">
+              Redirecting to your {role ? ROLE_LABELS[role].toLowerCase() : "account"} dashboard.
+            </p>
+            <form className="mt-6 space-y-4" onSubmit={updateProfile}>
+              <div>
+                <label htmlFor="profile-name" className="eyebrow mb-2 block text-ink/90">
+                  Full name
+                </label>
+                <input
+                  id="profile-name"
+                  name="fullName"
+                  type="text"
+                  autoComplete="name"
+                  placeholder="Your name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="profile-email" className="eyebrow mb-2 block text-ink/90">
+                  Email
+                </label>
+                <input
+                  id="profile-email"
+                  type="email"
+                  value={user.email ?? ""}
+                  disabled
+                  className={`${inputClass} opacity-70`}
+                />
+              </div>
+              <div>
+                <label htmlFor="profile-phone" className="eyebrow mb-2 block text-ink/90">
+                  Phone
+                </label>
+                <input
+                  id="profile-phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="+91 98XXXXXXX"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={savingProfile}
+                className="w-full rounded-sm bg-ember py-3.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {savingProfile ? "Saving…" : "Save profile"}
+              </button>
+            </form>
+            <div className="mt-6 flex flex-col gap-3 text-center text-sm">
+              {role ? (
+                <Link
+                  to={dashboardPathForRole(role)}
+                  className="text-ember underline-offset-4 hover:underline"
+                >
+                  Go to {ROLE_LABELS[role]} dashboard →
+                </Link>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="text-ink/70 underline-offset-4 hover:text-ink hover:underline"
+              >
+                Sign out
+              </button>
+            </div>
+          </>
+        ) : mode === "signin" ? (
+          <>
+            <div className="eyebrow mb-3 text-ember/90">Sign in</div>
+            <h2 className={cardTitleClass}>The Royal Passage</h2>
+            <p className="mt-2 text-sm leading-relaxed text-ink/75">
+              Sign in with Google or your email and password. Your role is assigned automatically.
+            </p>
 
-  return <RoyalSignInExperience portal={portal} />;
+            <div className="mt-8 space-y-4">
+              <GoogleSignInButton
+                busy={googleBusy}
+                disabled={!browserConfigured}
+                onClick={() => void signInWithGoogle()}
+              />
+              <div className="flex items-center gap-3">
+                <div className="hairline flex-1" />
+                <span className="text-xs uppercase tracking-[0.14em] text-ink/55">or email</span>
+                <div className="hairline flex-1" />
+              </div>
+            </div>
+
+            <form className="mt-4 space-y-4" onSubmit={signIn}>
+              <div>
+                <label htmlFor="signin-email" className="eyebrow mb-2 block text-ink/90">
+                  Email
+                </label>
+                <input
+                  id="signin-email"
+                  name="email"
+                  type="email"
+                  autoComplete="username"
+                  required
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="signin-password" className="eyebrow mb-2 block text-ink/90">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="signin-password"
+                    name="password"
+                    type={passwordType}
+                    autoComplete="current-password"
+                    required
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`${inputClass} pr-12`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink/60 hover:text-ink"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={busy || !email.trim() || !password}
+                className="w-full rounded-sm bg-ember py-3.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {busy ? "Signing in…" : "Sign in"}
+              </button>
+              {emailNotConfirmed ? (
+                <button
+                  type="button"
+                  onClick={() => void resendConfirmation()}
+                  disabled={resendingConfirmation || !email.trim()}
+                  className="w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-sm font-medium text-ink transition-colors hover:border-ember/50 hover:text-ember disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {resendingConfirmation ? "Sending…" : "Resend confirmation email"}
+                </button>
+              ) : null}
+            </form>
+
+            <p className="mt-6 text-center text-sm text-ink/70">
+              New guest?{" "}
+              <Link
+                to="/sign-up"
+                className="text-ember underline-offset-4 transition-colors hover:underline"
+                onClick={() => {
+                  setMode("signup");
+                  setError(null);
+                  setNotice(null);
+                }}
+              >
+                Create an account
+              </Link>
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="eyebrow mb-3 text-ember/90">Guest registration</div>
+            <h2 className={cardTitleClass}>Create account</h2>
+            <p className="mt-2 text-sm leading-relaxed text-ink/75">
+              Sign up with Google or email. Host, editor, and admin logins are created by the
+              platform team.
+            </p>
+
+            <div className="mt-8 space-y-4">
+              <GoogleSignInButton
+                busy={googleBusy}
+                disabled={!browserConfigured}
+                label="Sign up with Google"
+                onClick={() => void signInWithGoogle()}
+              />
+              <div className="flex items-center gap-3">
+                <div className="hairline flex-1" />
+                <span className="text-xs uppercase tracking-[0.14em] text-ink/55">or email</span>
+                <div className="hairline flex-1" />
+              </div>
+            </div>
+
+            <form className="mt-4 space-y-4" onSubmit={signUpGuest}>
+              <div>
+                <label htmlFor="signup-name" className="eyebrow mb-2 block text-ink/90">
+                  Full name
+                </label>
+                <input
+                  id="signup-name"
+                  name="fullName"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  placeholder="Your name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="signup-email" className="eyebrow mb-2 block text-ink/90">
+                  Email
+                </label>
+                <input
+                  id="signup-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="signup-phone" className="eyebrow mb-2 block text-ink/90">
+                  Phone
+                </label>
+                <input
+                  id="signup-phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="+91 98XXXXXXX"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="signup-password" className="eyebrow mb-2 block text-ink/90">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="signup-password"
+                    name="password"
+                    type={passwordType}
+                    autoComplete="new-password"
+                    required
+                    minLength={8}
+                    placeholder="Min. 8 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`${inputClass} pr-12`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink/60 hover:text-ink"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={busy || !email.trim() || !password || !fullName.trim()}
+                className="w-full rounded-sm bg-ember py-3.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {busy ? "Creating account…" : "Create guest account"}
+              </button>
+            </form>
+
+            <p className="mt-6 text-center text-sm text-ink/70">
+              Already have an account?{" "}
+              <Link
+                to="/sign-in"
+                className="text-ember underline-offset-4 transition-colors hover:underline"
+                onClick={() => {
+                  setMode("signin");
+                  setError(null);
+                  setNotice(null);
+                }}
+              >
+                Sign in
+              </Link>
+            </p>
+          </>
+        )}
+
+        {!browserConfigured ? (
+          <p className="mt-4 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            Missing browser auth env vars. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+          </p>
+        ) : null}
+        {error ? (
+          <p className="mt-4 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
+        {notice ? (
+          <p
+            className="mt-4 rounded-sm border border-ember/25 bg-ember/10 px-4 py-3 text-sm text-ink"
+            role="status"
+          >
+            {notice}
+          </p>
+        ) : null}
+      </div>
+    </SignInHeroLayout>
+  );
 }

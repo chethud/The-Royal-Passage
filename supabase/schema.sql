@@ -1056,6 +1056,24 @@ create policy "Hosts delete own experience photos"
   );
 
 -- ---------------------------------------------------------------------------
+-- Editor login (homepage CMS) — run once per environment
+-- ---------------------------------------------------------------------------
+-- Option A (recommended): add SUPABASE_SERVICE_ROLE_KEY to .env.local, then:
+--   npm run setup:editor
+--   Email: edit@gmail.com   Password: Edit@123
+--
+-- Option B (Supabase Dashboard): Authentication → Users → Add user
+--   (email edit@gmail.com, password Edit@123, auto-confirm email), then run:
+--
+-- insert into public.profiles (id, full_name, role)
+-- select id, 'Homepage Editor', 'editor'
+-- from auth.users
+-- where lower(email) = 'edit@gmail.com'
+-- on conflict (id) do update set role = 'editor', full_name = 'Homepage Editor';
+--
+-- Ensure profiles.role allows editor (see check constraint above).
+
+-- ---------------------------------------------------------------------------
 -- SANITY CHECKS (optional — uncomment to verify after running)
 -- ---------------------------------------------------------------------------
 -- select 'profiles' as tbl, count(*) from public.profiles

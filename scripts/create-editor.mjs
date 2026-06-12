@@ -21,8 +21,12 @@ const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!url || !serviceKey) {
   console.error(
-    "Missing VITE_SUPABASE_URL (or SUPABASE_URL) or SUPABASE_SERVICE_ROLE_KEY in .env",
+    "Missing VITE_SUPABASE_URL (or SUPABASE_URL) or SUPABASE_SERVICE_ROLE_KEY.",
   );
+  console.error(
+    "Add them to .env.local (Supabase Dashboard → Project Settings → API → service_role key).",
+  );
+  console.error("Then run: npm run setup:editor");
   process.exit(1);
 }
 

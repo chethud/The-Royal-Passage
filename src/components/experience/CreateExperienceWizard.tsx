@@ -8,7 +8,7 @@ import { isPublicImageUrl } from "@/lib/experience-photo-upload";
 import { HOST_CITY_SLUG } from "@/lib/host-form-data";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
-import { mergeUniqueSlots } from "@/lib/weekday-slots";
+import { mergeUniqueSlots, formatTime12h } from "@/lib/weekday-slots";
 
 type CreateExperienceWizardProps = {
   categories: CategoryOption[];
@@ -442,19 +442,23 @@ export function CreateExperienceWizard({
           <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8 space-y-5">
             <h3 className="font-display text-xl">Bookable slots</h3>
             <p className="text-sm text-muted-foreground">
-              Pick weekdays like Monday–Friday, set your session time, and generate bookable dates.
-              You can skip this and add slots later from your experience page.
+              Create when guests can book your experience: choose weekdays, a date range, session
+              times, and capacity. You can skip this step and add schedules later from your
+              experience page.
             </p>
             <WeekdaySlotBuilder onAddSlots={addWeeklySlots} />
           </div>
 
           {sortedDraftSlots.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No slots added yet — optional for now.</p>
+            <p className="text-sm text-muted-foreground">
+              No sessions added yet — optional for now. Use the builder above to generate your
+              weekly schedule.
+            </p>
           ) : (
             <div>
-              <p className="mb-3 text-sm text-muted-foreground">
-                {sortedDraftSlots.length} slot{sortedDraftSlots.length === 1 ? "" : "s"} ready to
-                publish.
+              <p className="mb-3 text-sm font-medium text-ink">
+                {sortedDraftSlots.length} session{sortedDraftSlots.length === 1 ? "" : "s"} ready to
+                publish
               </p>
               <ul className="max-h-72 divide-y divide-[oklch(0.88_0.08_86_/_0.15)] overflow-y-auto rounded-md border border-[oklch(0.88_0.08_86_/_0.15)]">
                 {sortedDraftSlots.map((slot) => (
@@ -463,8 +467,9 @@ export function CreateExperienceWizard({
                     className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm"
                   >
                     <span>
-                      {formatDateLong(slot.slotDate)} · {slot.startTime}–{slot.endTime} ·{" "}
-                      {slot.capacity} seats
+                      {formatDateLong(slot.slotDate)} · {formatTime12h(slot.startTime)} –{" "}
+                      {formatTime12h(slot.endTime)} · {slot.capacity} guest
+                      {slot.capacity === 1 ? "" : "s"}
                     </span>
                     <button
                       type="button"
