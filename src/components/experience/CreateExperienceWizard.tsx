@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
 import { WeekdaySlotBuilder } from "@/components/experience/WeekdaySlotBuilder";
+import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import type { CategoryOption, CreateHostSlotPayload } from "@/lib/api/host-experiences";
 import type { CitySummary } from "@/lib/cities";
 import { isPublicImageUrl } from "@/lib/experience-photo-upload";
@@ -87,7 +88,7 @@ export function CreateExperienceWizard({
   const [address, setAddress] = useState("");
   const [durationMinutes, setDurationMinutes] = useState(120);
   const [priceMajor, setPriceMajor] = useState(0);
-  const [photoUrls, setPhotoUrls] = useState<string[]>([""]);
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [inclusions, setInclusions] = useState("");
   const [exclusions, setExclusions] = useState("");
   const [requirements, setRequirements] = useState("");
@@ -357,11 +358,9 @@ export function CreateExperienceWizard({
             </label>
             <label className="text-sm">
               <span className="eyebrow text-muted-foreground">Price per person (₹)</span>
-              <input
-                type="number"
-                min={0}
+              <RupeeAmountInput
                 value={priceMajor}
-                onChange={(e) => setPriceMajor(Number(e.target.value))}
+                onChange={setPriceMajor}
                 className={inputClass}
               />
             </label>

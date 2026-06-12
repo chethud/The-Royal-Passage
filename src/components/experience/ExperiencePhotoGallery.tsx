@@ -1,9 +1,11 @@
+import { ImagePlus, Link2, Loader2, Star, X } from "lucide-react";
 import { useRef, useState } from "react";
 import {
   isPublicImageUrl,
   uploadExperiencePhotos,
 } from "@/lib/experience-photo-upload";
 import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
+import { cn } from "@/lib/utils";
 
 type ExperiencePhotoGalleryProps = {
   photoUrls: string[];
@@ -22,16 +24,28 @@ export function ExperiencePhotoGallery({
   const [previewErrors, setPreviewErrors] = useState<Record<number, boolean>>({});
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [urlDraft, setUrlDraft] = useState("");
 
-  const trimmedUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
-  const previewablePhotos = photoUrls
-    .map((url, index) => ({ url: url.trim(), index }))
-    .filter(({ url, index }) => url && isPublicImageUrl(url) && !previewErrors[index]);
+  const savedPhotos = photoUrls.map((url) => url.trim()).filter(Boolean);
+  const uploadAvailable = isSupabaseBrowserConfigured();
 
   const appendUrls = (urls: string[]) => {
     if (urls.length === 0) return;
-    const existing = photoUrls.map((url) => url.trim()).filter(Boolean);
-    onChange([...existing, ...urls]);
+    onChange([...savedPhotos, ...urls]);
+  };
+
+  const removePhoto = (index: number) => {
+    onChange(savedPhotos.filter((_, rowIndex) => rowIndex !== index));
+    setPreviewErrors((prev) => {
+      const next: Record<number, boolean> = {};
+      for (const [key, value] of Object.entries(prev)) {
+        const row = Number(key);
+        if (row === index) continue;
+        next[row > index ? row - 1 : row] = value;
+      }
+      return next;
+    });
   };
 
   const handleFilesSelected = async (files: FileList | null) => {
@@ -51,19 +65,29 @@ export function ExperiencePhotoGallery({
     }
   };
 
-  const uploadAvailable = isSupabaseBrowserConfigured();
+  const addUrlDraft = () => {
+    const next = urlDraft.trim();
+    if (!next) return;
+    if (!isPublicImageUrl(next)) {
+      setUploadError("Enter a valid http(s) image link.");
+      return;
+    }
+    setUploadError(null);
+    appendUrls([next]);
+    setUrlDraft("");
+    setShowUrlInput(false);
+  };
 
   return (
     <div className="space-y-4">
       <div>
         <span className="eyebrow text-muted-foreground">Experience photos</span>
         <p className="mt-1 text-xs text-muted-foreground">
-          Upload images from your device or paste public image links. The first photo becomes the cover
-          image.
+          Browse and upload images from your device. The first photo becomes the cover image.
         </p>
 
         {!readOnly ? (
-          <div className="mt-3 flex flex-wrap items-center gap-3">
+          <div className="mt-4 space-y-3">
             <input
               ref={fileInputRef}
               type="file"
@@ -73,93 +97,128 @@ export function ExperiencePhotoGallery({
               disabled={uploading || !uploadAvailable}
               onChange={(e) => void handleFilesSelected(e.target.files)}
             />
+
             <button
               type="button"
               disabled={uploading || !uploadAvailable}
               onClick={() => fileInputRef.current?.click()}
-              className="rounded-sm border border-ember/50 px-4 py-2 text-sm hover:bg-ember/10 disabled:cursor-not-allowed disabled:opacity-50"
+              className={cn(
+                "flex w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed border-ember/45 bg-background/20 px-4 py-8 text-sm transition-colors",
+                "hover:border-ember/70 hover:bg-ember/5 disabled:cursor-not-allowed disabled:opacity-50",
+              )}
             >
-              {uploading ? "Uploading…" : "Browse & upload"}
+              {uploading ? (
+                <>
+                  <Loader2 className="h-6 w-6 animate-spin text-ember" />
+                  <span>Uploading photos…</span>
+                </>
+              ) : (
+                <>
+                  <ImagePlus className="h-6 w-6 text-ember" />
+                  <span className="font-medium text-foreground">Browse & upload photos</span>
+                  <span className="text-xs text-muted-foreground">JPEG, PNG, WebP, or GIF · up to 5 MB each</span>
+                </>
+              )}
             </button>
+
             {!uploadAvailable ? (
-              <span className="text-xs text-muted-foreground">
-                Upload requires Supabase browser auth env vars.
-              </span>
+              <p className="text-xs text-muted-foreground">
+                Photo upload requires Supabase configuration. Sign in as a host and ensure
+                VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set.
+              </p>
             ) : null}
+
+            {!showUrlInput ? (
+              <button
+                type="button"
+                onClick={() => setShowUrlInput(true)}
+                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+              >
+                <Link2 className="h-3.5 w-3.5" />
+                Paste an image link instead
+              </button>
+            ) : (
+              <div className="flex flex-wrap items-start gap-2 rounded-sm border border-[oklch(0.88_0.08_86_/_0.2)] bg-background/10 p-3">
+                <input
+                  value={urlDraft}
+                  onChange={(e) => setUrlDraft(e.target.value)}
+                  placeholder="https://…"
+                  className={`${inputClass} min-w-[240px] flex-1`}
+                />
+                <button
+                  type="button"
+                  onClick={addUrlDraft}
+                  className="rounded-sm border border-ember/50 px-3 py-2 text-xs hover:bg-ember/10"
+                >
+                  Add link
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowUrlInput(false);
+                    setUrlDraft("");
+                    setUploadError(null);
+                  }}
+                  className="rounded-sm px-3 py-2 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
         ) : null}
 
         {uploadError ? <p className="mt-2 text-xs text-destructive">{uploadError}</p> : null}
       </div>
 
-      {!readOnly ? (
-        <div className="space-y-3">
-          <p className="text-xs text-muted-foreground">Or add a photo URL</p>
-          {photoUrls.map((url, index) => (
-            <div key={`photo-${index}`} className="flex flex-wrap items-start gap-2">
-              <input
-                value={url}
-                onChange={(e) => {
-                  const next = [...photoUrls];
-                  next[index] = e.target.value;
-                  onChange(next);
-                  setPreviewErrors((prev) => {
-                    const copy = { ...prev };
-                    delete copy[index];
-                    return copy;
-                  });
-                }}
-                placeholder={`https://… photo ${index + 1}`}
-                className={`${inputClass} min-w-[240px] flex-1`}
-              />
-              {photoUrls.length > 1 ? (
-                <button
-                  type="button"
-                  onClick={() => onChange(photoUrls.filter((_, rowIndex) => rowIndex !== index))}
-                  className="rounded-sm border border-destructive/40 px-3 py-2 text-xs text-destructive"
-                >
-                  Remove
-                </button>
-              ) : null}
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => onChange([...photoUrls, ""])}
-            className="rounded-sm border border-ember/50 px-4 py-2 text-sm hover:bg-ember/10"
-          >
-            Add photo URL
-          </button>
-        </div>
-      ) : trimmedUrls.length > 0 ? (
-        <ul className="space-y-2 text-sm text-muted-foreground">
-          {trimmedUrls.map((url) => (
-            <li key={url} className="truncate">
-              {url}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-sm text-muted-foreground">No photos added.</p>
-      )}
-
-      {previewablePhotos.length > 0 ? (
+      {savedPhotos.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {previewablePhotos.map(({ url, index }) => (
-            <div
-              key={`${url}-${index}`}
-              className="overflow-hidden rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)]"
-            >
-              <img
-                src={url}
-                alt="Experience photo preview"
-                className="aspect-[4/3] w-full object-cover"
-                onError={() => setPreviewErrors((prev) => ({ ...prev, [index]: true }))}
-              />
-            </div>
-          ))}
+          {savedPhotos.map((url, index) => {
+            const previewOk = isPublicImageUrl(url) && !previewErrors[index];
+            return (
+              <div
+                key={`${url}-${index}`}
+                className="group relative overflow-hidden rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)]"
+              >
+                {previewOk ? (
+                  <img
+                    src={url}
+                    alt={`Experience photo ${index + 1}`}
+                    className="aspect-[4/3] w-full object-cover"
+                    onError={() => setPreviewErrors((prev) => ({ ...prev, [index]: true }))}
+                  />
+                ) : (
+                  <div className="flex aspect-[4/3] items-center justify-center bg-muted/20 px-3 text-center text-xs text-muted-foreground">
+                    {url}
+                  </div>
+                )}
+
+                {index === 0 ? (
+                  <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-sm bg-black/65 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-ember">
+                    <Star className="h-3 w-3" />
+                    Cover
+                  </span>
+                ) : null}
+
+                {!readOnly ? (
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(index)}
+                    aria-label={`Remove photo ${index + 1}`}
+                    className="absolute right-2 top-2 rounded-sm bg-black/65 p-1.5 text-ink/90 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
-      ) : null}
+      ) : readOnly ? (
+        <p className="text-sm text-muted-foreground">No photos added.</p>
+      ) : (
+        <p className="text-sm text-muted-foreground">No photos uploaded yet.</p>
+      )}
     </div>
   );
 }

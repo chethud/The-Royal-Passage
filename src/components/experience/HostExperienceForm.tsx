@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
+import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import type { CategoryOption, HostExperienceDetail } from "@/lib/api/host-experiences";
 import type { CitySummary } from "@/lib/cities";
 import { HOST_CITY_SLUG } from "@/lib/host-form-data";
@@ -69,8 +70,8 @@ export function HostExperienceForm({
       ? initial.galleryUrls
       : initial?.heroImageUrl
         ? [initial.heroImageUrl]
-        : [""];
-    return existing.length > 0 ? existing : [""];
+        : [];
+    return existing;
   });
   const [inclusions, setInclusions] = useState(joinLines(initial?.inclusions ?? []));
   const [exclusions, setExclusions] = useState(joinLines(initial?.exclusions ?? []));
@@ -221,12 +222,10 @@ export function HostExperienceForm({
           </label>
           <label className="text-sm">
             <span className="eyebrow text-muted-foreground">Price per person (₹)</span>
-            <input
-              type="number"
-              min={0}
+            <RupeeAmountInput
               disabled={readOnly}
               value={priceMajor}
-              onChange={(e) => setPriceMajor(Number(e.target.value))}
+              onChange={setPriceMajor}
               className={inputClass}
             />
           </label>
