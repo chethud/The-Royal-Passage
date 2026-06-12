@@ -735,6 +735,28 @@
   color: #f8f4e8;
 }
 
+/* Static sign-in — no cinematic sequence or idle motion. */
+.royal-signin-page *,
+.royal-signin-page *::before,
+.royal-signin-page *::after {
+  animation: none !important;
+}
+
+.royal-signin-scene,
+.royal-signin-bg-img,
+.royal-signin-gateway,
+.royal-gate-decree,
+.royal-lantern,
+.royal-lantern__flame,
+.royal-signin-portal-door,
+.royal-signin-logo {
+  transition: none !important;
+}
+
+.royal-signin-scene {
+  will-change: auto;
+}
+
 .royal-signin-page.is-exiting .royal-signin-scene {
   opacity: 0;
   transform: translate3d(0, -3%, 0) scale(1.04);
@@ -963,23 +985,6 @@
   }
 }
 
-.royal-signin-gateway.is-awakening .royal-signin-gateway__energy-veins {
-  opacity: 1;
-}
-
-.royal-signin-gateway.is-lit .royal-signin-gateway__arch svg {
-  animation: royal-arch-glow 1.4s ease forwards;
-}
-
-@keyframes royal-arch-glow {
-  from {
-    opacity: 0.72;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 /* Monumental cusped arch spanning the entire gate */
 .royal-signin-gateway__arch {
   position: absolute;
@@ -1011,12 +1016,8 @@
   flex-direction: column;
   align-items: stretch;
   pointer-events: none;
-  opacity: 0.92;
-  transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.royal-signin-gateway.is-lit .royal-pillar {
   opacity: 1;
+  transition: none;
 }
 
 .royal-pillar--left {
@@ -1110,14 +1111,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  opacity: 0.45;
-  transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: royal-lantern-sway 7s ease-in-out infinite;
-  transform-origin: top center;
-}
-
-.royal-signin-gateway.is-lit .royal-lantern {
   opacity: 1;
+  transform-origin: top center;
 }
 
 .royal-lantern--left {

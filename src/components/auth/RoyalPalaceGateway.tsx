@@ -45,7 +45,7 @@ const ARCH_ROSETTES = Array.from({ length: 7 }, (_, i) => {
 
 export function RoyalPalaceGateway({ decree, annex, onSubmit }: RoyalPalaceGatewayProps) {
   return (
-    <form className="royal-signin-gateway is-lit is-awakening" onSubmit={onSubmit} noValidate={!onSubmit}>
+    <form className="royal-signin-gateway" onSubmit={onSubmit} noValidate={!onSubmit}>
       <div className="royal-signin-gateway__arch" aria-hidden>
         <svg viewBox="0 0 1000 640" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
           <defs>
@@ -157,7 +157,7 @@ export function RoyalPalaceGateway({ decree, annex, onSubmit }: RoyalPalaceGatew
         <div className="royal-signin-gateway__energy-veins" aria-hidden />
 
         {decree ? (
-          <div className="royal-gate-decree is-visible is-glowing">
+          <div className="royal-gate-decree">
             <div className="royal-gate-decree__stone-frame" aria-hidden />
             <div className="royal-gate-decree__content">{decree}</div>
           </div>

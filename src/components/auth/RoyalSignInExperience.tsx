@@ -31,22 +31,10 @@ export function RoyalSignInExperience({ portal }: RoyalSignInExperienceProps) {
           <div className="royal-signin-bg-vignette absolute inset-0" aria-hidden />
         </div>
 
-        <div className="royal-signin-atmosphere pointer-events-none absolute inset-0" aria-hidden>
-          <div className="royal-signin-fog absolute inset-0" />
-          <div className="royal-signin-rays absolute inset-0" />
-          <div className="royal-signin-chandelier-glow absolute inset-x-0 top-0 h-56" />
-          <div className="royal-signin-sunset absolute inset-0" />
-          <div className="royal-signin-godrays absolute inset-0" />
-        </div>
-
         <div className="royal-signin-stage relative z-10 flex min-h-[100dvh] items-center justify-center px-[1vw] pt-[3vh] pb-[1.5vh]">
           {portal}
         </div>
       </div>
-    </div>
-  );
-}
-</div>
     </div>
   );
 }
