@@ -1,13 +1,11 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { RoleBadge } from "@/components/auth/RoleBadge";
 import { RoyalCrest } from "@/components/auth/RoyalCrest";
 import { EyeToggle, RoyalGateField, royalGateInputClass } from "@/components/auth/RoyalGateField";
 import { RoyalPalaceGateway } from "@/components/auth/RoyalPalaceGateway";
 import { RoyalSignInExperience } from "@/components/auth/RoyalSignInExperience";
-import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
-import { useRoyalSignInAnimation } from "@/hooks/use-royal-sign-in-animation";
 import { useAuthUser } from "@/lib/auth-user";
 import { dashboardPathForRole, isGuestAccount, isStaffRole, ROLE_LABELS } from "@/lib/roles";
 import {
@@ -16,7 +14,6 @@ import {
   readAuthCallbackError,
   redirectOffLocalhostIfNeeded,
 } from "@/lib/auth-redirect";
-import { getRoyalSignInPhaseFlags } from "@/lib/royal-sign-in-phase";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
 const inscriptionClass = "royal-signin-inscription";
@@ -45,30 +42,11 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   const [notice, setNotice] = useState<string | null>(null);
   const browserConfigured = isSupabaseBrowserConfigured();
   const { user, role, loading } = useAuthUser();
-  const reducedMotion = usePrefersReducedMotion();
-  const { phase, start, intro, isAnimating } = useRoyalSignInAnimation(reducedMotion);
-  const pendingPalaceEntryRef = useRef(false);
-  const introStartedRef = useRef(false);
   const supabase = useMemo(() => {
     if (!browserConfigured) return null;
     return getSupabaseBrowser();
   }, [browserConfigured]);
 
-  const phaseFlags = getRoyalSignInPhaseFlags(phase);
-  const gatewayFlags = {
-    lit: phaseFlags.archLit,
-    formVisible: phaseFlags.showForm,
-    formGlowing: phaseFlags.formGlowing,
-    formDissolving: phaseFlags.formDissolving,
-    sealActive: phaseFlags.sealActive,
-    activationActive: phaseFlags.activationActive,
-    showSealRings: phaseFlags.showSealRings,
-    showDissolveParticles: phaseFlags.showDissolveParticles,
-    showDoors: phaseFlags.showDoors,
-    doorsRevealing: phaseFlags.doorsRevealing,
-    doorsUnlocking: phaseFlags.doorsUnlocking,
-    doorsOpen: phaseFlags.doorsOpen,
-  };
   const passwordType = showPassword ? "text" : "password";
   const eyeToggle = <EyeToggle visible={showPassword} onToggle={() => setShowPassword((v) => !v)} />;
 
@@ -87,46 +65,8 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     }
   }, []);
 
-  // Stages 1–3 play automatically on load for a visitor, lighting the arch
-  // and glowing the form before they sign in.
   useEffect(() => {
-    if (loading || user || introStartedRef.current) return;
-    introStartedRef.current = true;
-    intro();
-  }, [intro, loading, user]);
-
-  const finishPalaceEntry = useCallback(() => {
-    if (redirect && isGuestAccount(role) && redirect.startsWith("/")) {
-      window.location.href = redirect;
-      return;
-    }
-    void navigate({ to: dashboardPathForRole(role) });
-  }, [navigate, redirect, role]);
-
-  const beginPalaceEntry = useCallback(() => {
-    pendingPalaceEntryRef.current = true;
-    start(() => {});
-  }, [start]);
-
-  // Navigate as sparks merge into the logo — skip the fake dashboard unfold.
-  useEffect(() => {
-    if (phase !== "logo" || !pendingPalaceEntryRef.current || loading || !user) return;
-    const id = window.setTimeout(() => {
-      if (!pendingPalaceEntryRef.current) return;
-      pendingPalaceEntryRef.current = false;
-      finishPalaceEntry();
-    }, 480);
-    return () => window.clearTimeout(id);
-  }, [finishPalaceEntry, loading, phase, user]);
-
-  useEffect(() => {
-    if (phase !== "done" || !pendingPalaceEntryRef.current || loading || !user) return;
-    pendingPalaceEntryRef.current = false;
-    finishPalaceEntry();
-  }, [finishPalaceEntry, loading, phase, user]);
-
-  useEffect(() => {
-    if (loading || !user || isAnimating || pendingPalaceEntryRef.current) return;
+    if (loading || !user) return;
     if (isStaffRole(role)) {
       void navigate({ to: dashboardPathForRole(role) });
       return;
@@ -138,7 +78,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     if (role) {
       void navigate({ to: dashboardPathForRole(role) });
     }
-  }, [isAnimating, loading, navigate, redirect, role, user]);
+  }, [loading, navigate, redirect, role, user]);
 
   const isEmailNotConfirmedError = (message: string) => /email not confirmed/i.test(message);
 
@@ -179,7 +119,6 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       });
       if (signInError) throw signInError;
       setNotice("Welcome to the kingdom.");
-      beginPalaceEntry();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to sign in.";
       if (isEmailNotConfirmedError(message)) {
@@ -243,8 +182,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       });
       if (signUpError) throw signUpError;
       if (data.session) {
-        setNotice("Account created. Entering the kingdom…");
-        beginPalaceEntry();
+        setNotice("Account created. Welcome to the kingdom.");
       } else {
         setNotice(
           "Account created. Check your email for a confirmation link, then sign in with your password.",
@@ -305,7 +243,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   );
 
   const portal = user ? (
-    <RoyalPalaceGateway {...gatewayFlags} onSubmit={updateProfile} annex={statusAnnex} decree={
+    <RoyalPalaceGateway onSubmit={updateProfile} annex={statusAnnex} decree={
       <>
         {role ? <div className="mb-2 flex justify-center"><RoleBadge role={role} /></div> : null}
         <RoyalCrest className="royal-gate-decree__crest mx-auto" />
@@ -332,7 +270,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       </>
     } />
   ) : mode === "signin" ? (
-    <RoyalPalaceGateway {...gatewayFlags} onSubmit={signIn} annex={statusAnnex} decree={
+    <RoyalPalaceGateway onSubmit={signIn} annex={statusAnnex} decree={
       <>
         <RoyalCrest className="royal-gate-decree__crest mx-auto" />
         <p className="royal-gate-decree__eyebrow">Welcome to</p>
@@ -347,8 +285,8 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
           <label className="royal-gate-decree__remember"><input type="checkbox" className="royal-signin-checkbox" /> Remember Me</label>
           <button type="button" className="royal-gate-decree__link">Forgot Password?</button>
         </div>
-        <button type="submit" disabled={busy || isAnimating || !email.trim() || !password} className="royal-gate-decree__submit">
-          {busy || isAnimating ? "Opening…" : "Enter the Palace"}
+        <button type="submit" disabled={busy || !email.trim() || !password} className="royal-gate-decree__submit">
+          {busy ? "Opening…" : "Enter the Palace"}
         </button>
         <div className="royal-gate-decree__links">
           <GoogleSignInButton busy={googleBusy} disabled={!browserConfigured} className="royal-gate-decree__link royal-gate-decree__link--google" onClick={() => void signInWithGoogle()} />
@@ -362,7 +300,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       </>
     } />
   ) : (
-    <RoyalPalaceGateway {...gatewayFlags} onSubmit={signUpGuest} annex={statusAnnex} decree={
+    <RoyalPalaceGateway onSubmit={signUpGuest} annex={statusAnnex} decree={
       <>
         <RoyalCrest className="royal-gate-decree__crest mx-auto" />
         <p className="royal-gate-decree__eyebrow">Join the Kingdom</p>
@@ -392,5 +330,5 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     } />
   );
 
-  return <RoyalSignInExperience phase={phase} portal={portal} />;
+  return <RoyalSignInExperience portal={portal} />;
 }
