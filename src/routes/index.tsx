@@ -11,7 +11,7 @@ import { HomepageEditorBar } from "@/components/editor/HomepageEditorBar";
 import { useAuthUser } from "@/lib/auth-user";
 import { getCatalogForUi } from "@/lib/marketplace-fns";
 import {
-  getHomepageContent,
+  fetchHomepageContent,
   saveHomepageJournal,
   saveHomepageShowcase,
 } from "@/lib/homepage-content-fns";
@@ -22,9 +22,10 @@ import { isEditorRole } from "@/lib/roles";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [catalog, homepage] = await Promise.all([getCatalogForUi(), getHomepageContent()]);
+    const [catalog, homepage] = await Promise.all([getCatalogForUi(), fetchHomepageContent()]);
     return { ...catalog, homepage };
   },
+  staleTime: 0,
   head: () => ({
     meta: [
       { title: "The Royal Passage — Experience Mysuru, Royally" },
@@ -72,6 +73,10 @@ function Index() {
     [draft, savedSnapshot],
   );
 
+  const publicContent = homepage;
+  const editorContent = draft;
+  const displayVersion = isEditor ? editorContent.version : publicContent.version;
+
   const commitHomepage = useCallback((next: HomepageContent) => {
     skipHomepageSyncRef.current = true;
     setDraft(next);
@@ -81,10 +86,10 @@ function Index() {
   const persistShowcase = useCallback(
     async (items: HomepageShowcaseItem[]) => {
       if (!accessToken) throw new Error("Sign in as editor to save homepage photos.");
-      await saveHomepageShowcase({ data: { accessToken, items } });
+      const result = await saveHomepageShowcase({ data: { accessToken, items } });
       skipHomepageSyncRef.current = true;
-      setDraft((prev) => ({ ...prev, showcase: items }));
-      setSavedSnapshot((prev) => ({ ...prev, showcase: items }));
+      setDraft((prev) => ({ ...prev, showcase: result.items, version: result.version }));
+      setSavedSnapshot((prev) => ({ ...prev, showcase: result.items, version: result.version }));
       await router.invalidate();
     },
     [accessToken, router],
@@ -93,10 +98,10 @@ function Index() {
   const persistJournal = useCallback(
     async (items: HomepageJournalItem[]) => {
       if (!accessToken) throw new Error("Sign in as editor to save homepage photos.");
-      await saveHomepageJournal({ data: { accessToken, items } });
+      const result = await saveHomepageJournal({ data: { accessToken, items } });
       skipHomepageSyncRef.current = true;
-      setDraft((prev) => ({ ...prev, journal: items }));
-      setSavedSnapshot((prev) => ({ ...prev, journal: items }));
+      setDraft((prev) => ({ ...prev, journal: result.items, version: result.version }));
+      setSavedSnapshot((prev) => ({ ...prev, journal: result.items, version: result.version }));
       await router.invalidate();
     },
     [accessToken, router],
@@ -138,7 +143,8 @@ function Index() {
       <HomeHero />
 
       <ExperiencesShowcase
-        items={isEditor ? draft.showcase : homepage.showcase}
+        items={isEditor ? editorContent.showcase : publicContent.showcase}
+        imageVersion={displayVersion}
         editable={isEditor}
         onItemsChange={(showcase) => setDraft((prev) => ({ ...prev, showcase }))}
         uploadPhoto={isEditor ? uploadPhoto : undefined}
@@ -150,7 +156,8 @@ function Index() {
       <PillarsRow />
 
       <JournalPreview
-        items={isEditor ? draft.journal : homepage.journal}
+        items={isEditor ? editorContent.journal : publicContent.journal}
+        imageVersion={displayVersion}
         editable={isEditor}
         onItemsChange={(journal) => setDraft((prev) => ({ ...prev, journal }))}
         uploadPhoto={isEditor ? uploadPhoto : undefined}

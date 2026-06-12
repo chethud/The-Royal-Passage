@@ -2,14 +2,14 @@ import { Loader2, Save } from "lucide-react";
 import { useState } from "react";
 import { RoleBadge } from "@/components/auth/RoleBadge";
 import { saveHomepageJournal, saveHomepageShowcase } from "@/lib/homepage-content-fns";
-import type { HomepageJournalItem, HomepageShowcaseItem } from "@/lib/homepage-content";
+import type { HomepageContent, HomepageJournalItem, HomepageShowcaseItem } from "@/lib/homepage-content";
 
 type HomepageEditorBarProps = {
   accessToken: string;
   showcase: HomepageShowcaseItem[];
   journal: HomepageJournalItem[];
   dirty: boolean;
-  onSaved: (content: { showcase: HomepageShowcaseItem[]; journal: HomepageJournalItem[] }) => Promise<void>;
+  onSaved: (content: HomepageContent) => Promise<void>;
 };
 
 export function HomepageEditorBar({
@@ -28,10 +28,17 @@ export function HomepageEditorBar({
     setError(null);
     setMessage(null);
     try {
-      await saveHomepageShowcase({ data: { accessToken, items: showcase } });
-      await saveHomepageJournal({ data: { accessToken, items: journal } });
-      setMessage("Homepage updated — changes are live.");
-      await onSaved({ showcase, journal });
+      const [showcaseResult, journalResult] = await Promise.all([
+        saveHomepageShowcase({ data: { accessToken, items: showcase } }),
+        saveHomepageJournal({ data: { accessToken, items: journal } }),
+      ]);
+      const version = Math.max(showcaseResult.version, journalResult.version);
+      setMessage("Homepage updated — changes are live for all visitors.");
+      await onSaved({
+        showcase: showcaseResult.items,
+        journal: journalResult.items,
+        version,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save homepage content.");
     } finally {
@@ -45,7 +52,7 @@ export function HomepageEditorBar({
         <div className="flex flex-wrap items-center gap-3">
           <RoleBadge role="editor" />
           <p className="text-sm text-ink/90">
-            Edit mode — photos save automatically when changed. Use Save for text updates.
+            Edit mode — photos save automatically and go live for everyone. Use Save for text changes.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">

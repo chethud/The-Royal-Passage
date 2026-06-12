@@ -6,6 +6,8 @@ import outdoorCookingImg from "@/assets/outdoor-cooking.png";
 
 export const HOMEPAGE_SHOWCASE_KEY = "homepage_showcase";
 export const HOMEPAGE_JOURNAL_KEY = "homepage_journal";
+export const HOMEPAGE_VERSION_KEY = "homepage_content_version";
+export const HOMEPAGE_CACHE_KEY = "homepage-content-v1";
 
 export type ShowcaseIconKey = "pottery" | "flame" | "heritage";
 
@@ -29,7 +31,15 @@ export type HomepageJournalItem = {
 export type HomepageContent = {
   showcase: HomepageShowcaseItem[];
   journal: HomepageJournalItem[];
+  /** Bumped on every editor save so browsers/CDNs fetch fresh images. */
+  version: number;
 };
+
+export function withHomepageCacheBust(imageUrl: string, version: number): string {
+  if (!imageUrl.trim() || version <= 0) return imageUrl;
+  const join = imageUrl.includes("?") ? "&" : "?";
+  return `${imageUrl}${join}v=${version}`;
+}
 
 export const DEFAULT_HOMEPAGE_SHOWCASE: HomepageShowcaseItem[] = [
   {
@@ -85,6 +95,7 @@ export const DEFAULT_HOMEPAGE_JOURNAL: HomepageJournalItem[] = [
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   showcase: DEFAULT_HOMEPAGE_SHOWCASE,
   journal: DEFAULT_HOMEPAGE_JOURNAL,
+  version: 0,
 };
 
 function isShowcaseIconKey(value: unknown): value is ShowcaseIconKey {
@@ -116,9 +127,21 @@ function normalizeJournalItem(raw: unknown, fallback: HomepageJournalItem): Home
   };
 }
 
+function normalizeVersion(raw: unknown): number {
+  if (typeof raw === "number" && Number.isFinite(raw) && raw > 0) {
+    return Math.floor(raw);
+  }
+  if (typeof raw === "string" && raw.trim()) {
+    const parsed = Number(raw);
+    if (Number.isFinite(parsed) && parsed > 0) return Math.floor(parsed);
+  }
+  return 0;
+}
+
 export function normalizeHomepageContent(raw: {
   showcase?: unknown;
   journal?: unknown;
+  version?: unknown;
 }): HomepageContent {
   const showcaseRaw = Array.isArray(raw.showcase) ? raw.showcase : null;
   const journalRaw = Array.isArray(raw.journal) ? raw.journal : null;
@@ -130,5 +153,6 @@ export function normalizeHomepageContent(raw: {
     journal: DEFAULT_HOMEPAGE_JOURNAL.map((fallback, index) =>
       normalizeJournalItem(journalRaw?.[index], fallback),
     ),
+    version: normalizeVersion(raw.version),
   };
 }

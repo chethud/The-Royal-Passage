@@ -1,9 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { deleteServerCache } from "@/lib/cache.server";
 import {
   DEFAULT_HOMEPAGE_CONTENT,
+  HOMEPAGE_CACHE_KEY,
   HOMEPAGE_JOURNAL_KEY,
   HOMEPAGE_SHOWCASE_KEY,
+  HOMEPAGE_VERSION_KEY,
   normalizeHomepageContent,
   type HomepageContent,
   type HomepageJournalItem,
@@ -13,8 +16,8 @@ import {
   EXPERIENCE_PHOTOS_BUCKET,
   MAX_EXPERIENCE_PHOTO_BYTES,
 } from "@/lib/experience-photo-upload";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { isSupabaseConfigured } from "@/lib/env.server";
+import { isSupabaseConfigured, isSupabaseReadable } from "@/lib/env.server";
+import { getSupabaseAdmin, getSupabaseServerRead } from "@/lib/supabase/admin";
 
 const ALLOWED_HOMEPAGE_PHOTO_MIME = new Set([
   "image/jpeg",
@@ -42,6 +45,17 @@ function decodeBase64ToBytes(base64: string): Uint8Array {
     bytes[i] = binary.charCodeAt(i);
   }
   return bytes;
+}
+
+function parseVersionValue(raw: unknown): number {
+  if (typeof raw === "number" && Number.isFinite(raw) && raw > 0) {
+    return Math.floor(raw);
+  }
+  if (typeof raw === "string" && raw.trim()) {
+    const parsed = Number(raw);
+    if (Number.isFinite(parsed) && parsed > 0) return Math.floor(parsed);
+  }
+  return 0;
 }
 
 const showcaseIconKeySchema = z.enum(["pottery", "flame", "heritage"]);
@@ -87,18 +101,39 @@ async function requireEditor(accessToken: string) {
   return user;
 }
 
-async function loadHomepageContentFromDb(): Promise<HomepageContent> {
-  if (!isSupabaseConfigured()) {
+function invalidateHomepageCache() {
+  deleteServerCache(HOMEPAGE_CACHE_KEY);
+}
+
+async function bumpHomepageVersion(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<number> {
+  const version = Date.now();
+  const { error } = await supabase.from("platform_settings").upsert(
+    { key: HOMEPAGE_VERSION_KEY, value: version },
+    { onConflict: "key" },
+  );
+  if (error) throw new Error(error.message);
+  invalidateHomepageCache();
+  return version;
+}
+
+/** Load homepage CMS content from Supabase — safe to call directly from route loaders. */
+export async function fetchHomepageContent(): Promise<HomepageContent> {
+  if (!isSupabaseReadable()) {
     return DEFAULT_HOMEPAGE_CONTENT;
   }
 
-  const supabase = getSupabaseAdmin();
+  const supabase = getSupabaseServerRead();
+  if (!supabase) {
+    return DEFAULT_HOMEPAGE_CONTENT;
+  }
+
   const { data, error } = await supabase
     .from("platform_settings")
     .select("key, value")
-    .in("key", [HOMEPAGE_SHOWCASE_KEY, HOMEPAGE_JOURNAL_KEY]);
+    .in("key", [HOMEPAGE_SHOWCASE_KEY, HOMEPAGE_JOURNAL_KEY, HOMEPAGE_VERSION_KEY]);
 
   if (error) {
+    console.error("[homepage] Failed to load platform_settings:", error.message);
     return DEFAULT_HOMEPAGE_CONTENT;
   }
 
@@ -106,11 +141,12 @@ async function loadHomepageContentFromDb(): Promise<HomepageContent> {
   return normalizeHomepageContent({
     showcase: byKey.get(HOMEPAGE_SHOWCASE_KEY),
     journal: byKey.get(HOMEPAGE_JOURNAL_KEY),
+    version: parseVersionValue(byKey.get(HOMEPAGE_VERSION_KEY)),
   });
 }
 
 export const getHomepageContent = createServerFn({ method: "GET" }).handler(
-  async (): Promise<HomepageContent> => loadHomepageContentFromDb(),
+  async (): Promise<HomepageContent> => fetchHomepageContent(),
 );
 
 export const saveHomepageShowcase = createServerFn({ method: "POST" })
@@ -120,7 +156,13 @@ export const saveHomepageShowcase = createServerFn({ method: "POST" })
       items: z.array(showcaseItemSchema).length(3),
     }),
   )
-  .handler(async ({ data }): Promise<HomepageShowcaseItem[]> => {
+  .handler(async ({ data }): Promise<{ items: HomepageShowcaseItem[]; version: number }> => {
+    if (!isSupabaseConfigured()) {
+      throw new Error(
+        "Homepage save is not configured on the server. Set SUPABASE_SERVICE_ROLE_KEY in your hosting environment (e.g. Vercel).",
+      );
+    }
+
     await requireEditor(data.accessToken);
     const supabase = getSupabaseAdmin();
 
@@ -133,7 +175,9 @@ export const saveHomepageShowcase = createServerFn({ method: "POST" })
     );
 
     if (error) throw new Error(error.message);
-    return data.items;
+
+    const version = await bumpHomepageVersion(supabase);
+    return { items: data.items, version };
   });
 
 export const saveHomepageJournal = createServerFn({ method: "POST" })
@@ -143,7 +187,13 @@ export const saveHomepageJournal = createServerFn({ method: "POST" })
       items: z.array(journalItemSchema).length(3),
     }),
   )
-  .handler(async ({ data }): Promise<HomepageJournalItem[]> => {
+  .handler(async ({ data }): Promise<{ items: HomepageJournalItem[]; version: number }> => {
+    if (!isSupabaseConfigured()) {
+      throw new Error(
+        "Homepage save is not configured on the server. Set SUPABASE_SERVICE_ROLE_KEY in your hosting environment (e.g. Vercel).",
+      );
+    }
+
     await requireEditor(data.accessToken);
     const supabase = getSupabaseAdmin();
 
@@ -156,7 +206,9 @@ export const saveHomepageJournal = createServerFn({ method: "POST" })
     );
 
     if (error) throw new Error(error.message);
-    return data.items;
+
+    const version = await bumpHomepageVersion(supabase);
+    return { items: data.items, version };
   });
 
 export const uploadHomepagePhoto = createServerFn({ method: "POST" })
@@ -169,6 +221,12 @@ export const uploadHomepagePhoto = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }): Promise<{ publicUrl: string }> => {
+    if (!isSupabaseConfigured()) {
+      throw new Error(
+        "Photo upload is not configured on the server. Set SUPABASE_SERVICE_ROLE_KEY in your hosting environment (e.g. Vercel).",
+      );
+    }
+
     const user = await requireEditor(data.accessToken);
 
     if (!ALLOWED_HOMEPAGE_PHOTO_MIME.has(data.mimeType)) {
@@ -185,7 +243,7 @@ export const uploadHomepagePhoto = createServerFn({ method: "POST" })
     const path = `homepage/${user.id}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
 
     const { error } = await supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).upload(path, bytes, {
-      cacheControl: "3600",
+      cacheControl: "60",
       upsert: false,
       contentType: data.mimeType,
     });

@@ -6,9 +6,11 @@ import {
   EditableTextField,
 } from "@/components/editor/EditableHomepageFields";
 import type { HomepageJournalItem } from "@/lib/homepage-content";
+import { withHomepageCacheBust } from "@/lib/homepage-content";
 
 type JournalPreviewProps = {
   items: HomepageJournalItem[];
+  imageVersion?: number;
   editable?: boolean;
   onItemsChange?: (items: HomepageJournalItem[]) => void;
   uploadPhoto?: (file: File) => Promise<string>;
@@ -17,6 +19,7 @@ type JournalPreviewProps = {
 
 export function JournalPreview({
   items,
+  imageVersion = 0,
   editable = false,
   onItemsChange,
   uploadPhoto,
@@ -49,16 +52,17 @@ export function JournalPreview({
         </div>
 
         <div className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2 md:grid-cols-3 md:gap-7">
-          {items.map((story, idx) =>
-            editable ? (
+          {items.map((story, idx) => {
+            const imageSrc = withHomepageCacheBust(story.imageUrl, imageVersion);
+            return editable ? (
               <article
                 key={story.id}
                 className="overflow-hidden rounded-md border border-ember/40 bg-[oklch(0.98_0.01_86)] shadow-soft"
               >
                 <div className="relative aspect-[5/4] overflow-hidden sm:aspect-[4/5] md:aspect-[5/6]">
                   <img
-                    key={story.imageUrl}
-                    src={story.imageUrl}
+                    key={imageSrc}
+                    src={imageSrc}
                     alt={story.alt}
                     className="absolute inset-0 h-full w-full object-cover"
                   />
@@ -109,7 +113,7 @@ export function JournalPreview({
                   className="relative block aspect-[5/4] overflow-hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:aspect-[4/5] md:aspect-[5/6]"
                 >
                   <img
-                    src={story.imageUrl}
+                    src={imageSrc}
                     alt={story.alt}
                     loading="lazy"
                     decoding="async"
@@ -133,8 +137,8 @@ export function JournalPreview({
                   </div>
                 </Link>
               </motion.article>
-            ),
-          )}
+            );
+          })}
         </div>
       </div>
     </section>

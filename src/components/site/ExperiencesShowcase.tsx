@@ -11,6 +11,7 @@ import {
   RoyalPotteryIcon,
 } from "@/components/site/ExperienceShowcaseIcons";
 import type { HomepageShowcaseItem, ShowcaseIconKey } from "@/lib/homepage-content";
+import { withHomepageCacheBust } from "@/lib/homepage-content";
 import type { ComponentType, SVGProps } from "react";
 
 const ICON_BY_KEY: Record<ShowcaseIconKey, ComponentType<SVGProps<SVGSVGElement>>> = {
@@ -21,6 +22,7 @@ const ICON_BY_KEY: Record<ShowcaseIconKey, ComponentType<SVGProps<SVGSVGElement>
 
 type ExperiencesShowcaseProps = {
   items: HomepageShowcaseItem[];
+  imageVersion?: number;
   editable?: boolean;
   onItemsChange?: (items: HomepageShowcaseItem[]) => void;
   uploadPhoto?: (file: File) => Promise<string>;
@@ -29,6 +31,7 @@ type ExperiencesShowcaseProps = {
 
 export function ExperiencesShowcase({
   items,
+  imageVersion = 0,
   editable = false,
   onItemsChange,
   uploadPhoto,
@@ -63,6 +66,7 @@ export function ExperiencesShowcase({
               key={card.id}
               card={card}
               index={idx}
+              imageVersion={imageVersion}
               editable={editable}
               uploadPhoto={uploadPhoto}
               onPersistShowcase={onPersistShowcase}
@@ -79,6 +83,7 @@ export function ExperiencesShowcase({
 function ExperienceShowcaseCard({
   card,
   index,
+  imageVersion,
   editable,
   uploadPhoto,
   onPersistShowcase,
@@ -87,6 +92,7 @@ function ExperienceShowcaseCard({
 }: {
   card: HomepageShowcaseItem;
   index: number;
+  imageVersion: number;
   editable: boolean;
   uploadPhoto?: (file: File) => Promise<string>;
   onPersistShowcase?: (items: HomepageShowcaseItem[]) => Promise<void>;
@@ -94,14 +100,15 @@ function ExperienceShowcaseCard({
   onUpdate: (patch: Partial<HomepageShowcaseItem>) => void;
 }) {
   const Icon = ICON_BY_KEY[card.iconKey];
+  const imageSrc = withHomepageCacheBust(card.imageUrl, imageVersion);
 
   if (editable) {
     return (
       <article className="overflow-hidden rounded-md border border-ember/40 bg-[oklch(0.14_0.05_22)] shadow-soft">
         <div className="relative aspect-[5/4] overflow-hidden sm:aspect-[4/5] md:aspect-[5/6]">
           <img
-            key={card.imageUrl}
-            src={card.imageUrl}
+            key={imageSrc}
+            src={imageSrc}
             alt={card.alt}
             className="absolute inset-0 h-full w-full object-cover"
           />
@@ -145,7 +152,7 @@ function ExperienceShowcaseCard({
         className="relative block aspect-[5/4] overflow-hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:aspect-[4/5] md:aspect-[5/6]"
       >
         <img
-          src={card.imageUrl}
+          src={imageSrc}
           alt={card.alt}
           loading="lazy"
           decoding="async"

@@ -42,6 +42,10 @@ async function setRedis<T>(key: string, value: T, ttlSeconds: number): Promise<v
   await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
 }
 
+export function deleteServerCache(key: string) {
+  memoryCache.delete(key);
+}
+
 export async function getOrSetServerCache<T>(
   key: string,
   ttlSeconds: number,
