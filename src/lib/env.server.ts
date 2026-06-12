@@ -21,8 +21,34 @@ export function isSupabaseReadable(): boolean {
   return Boolean(url && (getSupabaseServiceRoleKey() || getSupabaseAnonKey()));
 }
 
+export function normalizeSupabaseProjectUrl(raw: string | undefined): string | undefined {
+  if (!raw?.trim()) return undefined;
+
+  let url = raw.trim().replace(/\/+$/, "");
+  url = url.replace(/\/auth\/v1\/?$/i, "");
+
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return undefined;
+    return parsed.origin;
+  } catch {
+    return undefined;
+  }
+}
+
+export function readSupabaseProjectUrls(): string[] {
+  const candidates = [
+    readRuntimeEnv("VITE_SUPABASE_URL"),
+    readRuntimeEnv("SUPABASE_URL"),
+  ]
+    .map((value) => normalizeSupabaseProjectUrl(value))
+    .filter((value): value is string => Boolean(value));
+
+  return [...new Set(candidates)];
+}
+
 export function getSupabaseUrl(): string | undefined {
-  return readRuntimeEnv("SUPABASE_URL") ?? readRuntimeEnv("VITE_SUPABASE_URL");
+  return readSupabaseProjectUrls()[0];
 }
 
 export function getSupabaseAnonKey(): string | undefined {
