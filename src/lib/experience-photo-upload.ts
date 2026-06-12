@@ -1,9 +1,13 @@
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
+import {
+  ALLOWED_EXPERIENCE_PHOTO_MIME,
+  EXPERIENCE_PHOTOS_BUCKET,
+  MAX_EXPERIENCE_PHOTO_BYTES,
+} from "@/lib/experience-photos-config";
 
-export const EXPERIENCE_PHOTOS_BUCKET = "experience-photos";
-export const MAX_EXPERIENCE_PHOTO_BYTES = 5 * 1024 * 1024;
+export { EXPERIENCE_PHOTOS_BUCKET, MAX_EXPERIENCE_PHOTO_BYTES } from "@/lib/experience-photos-config";
 
-const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const ALLOWED_MIME = ALLOWED_EXPERIENCE_PHOTO_MIME;
 
 export function isPublicImageUrl(value: string): boolean {
   try {

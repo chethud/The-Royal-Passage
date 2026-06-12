@@ -1,10 +1,3 @@
-import {
-  applyHomepagePhotoCore,
-  commitHomepagePhotoWithUpload,
-  commitHomepagePhotoWithUploadBytes,
-} from "../src/lib/homepage-photo.server.js";
-import { getSupabaseConfigError } from "../src/lib/env.server.js";
-
 type VercelRequest = {
   method?: string;
   body?: unknown;
@@ -27,6 +20,41 @@ type HomepagePhotoRequest = {
   mimeType?: string;
   base64?: string;
 };
+
+type HomepagePhotoApi = {
+  getSupabaseConfigError: () => string | null;
+  commitHomepagePhotoWithUploadBytes: (input: {
+    accessToken: string;
+    section: "showcase" | "journal";
+    itemIndex: number;
+    fileName: string;
+    mimeType: string;
+    bytes: Uint8Array;
+  }) => Promise<{ publicUrl: string; version: number }>;
+  commitHomepagePhotoWithUpload: (input: {
+    accessToken: string;
+    section: "showcase" | "journal";
+    itemIndex: number;
+    fileName: string;
+    mimeType: string;
+    base64: string;
+  }) => Promise<{ publicUrl: string; version: number }>;
+  applyHomepagePhotoCore: (input: {
+    accessToken: string;
+    section: "showcase" | "journal";
+    itemIndex: number;
+    publicUrl: string;
+  }) => Promise<{ publicUrl: string; version: number }>;
+};
+
+let apiPromise: Promise<HomepagePhotoApi> | undefined;
+
+function loadHomepagePhotoApi() {
+  if (!apiPromise) {
+    apiPromise = import("../dist/server/homepage-photo-api.js") as Promise<HomepagePhotoApi>;
+  }
+  return apiPromise;
+}
 
 function headerValue(req: VercelRequest, name: string): string | undefined {
   const raw = req.headers?.[name.toLowerCase()] ?? req.headers?.[name];
@@ -103,17 +131,22 @@ function isBinaryPhotoRequest(req: VercelRequest): boolean {
   );
 }
 
+function jsonError(res: VercelResponse, status: number, message: string) {
+  res.setHeader("Content-Type", "application/json");
+  return res.status(status).end(JSON.stringify({ error: message }));
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
-    return res.status(405).end(JSON.stringify({ error: "Method not allowed." }));
+    return jsonError(res, 405, "Method not allowed.");
   }
 
   try {
-    const configError = getSupabaseConfigError();
+    const api = await loadHomepagePhotoApi();
+    const configError = api.getSupabaseConfigError();
     if (configError) {
-      res.setHeader("Content-Type", "application/json");
-      return res.status(500).end(JSON.stringify({ error: configError }));
+      return jsonError(res, 500, configError);
     }
 
     let result;
@@ -123,18 +156,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const section = parseSection(headerValue(req, "x-section"));
       const itemIndex = parseItemIndex(headerValue(req, "x-item-index"));
       const fileName = decodeFileName(headerValue(req, "x-file-name"));
-      const mimeType = headerValue(req, "content-type")?.split(";")[0]?.trim() || "application/octet-stream";
+      const mimeType =
+        headerValue(req, "content-type")?.split(";")[0]?.trim() || "application/octet-stream";
       const bytes = await readRawBody(req);
 
       if (!accessToken || !section || itemIndex == null) {
-        return res.status(400).end(JSON.stringify({ error: "Missing required upload headers." }));
+        return jsonError(res, 400, "Missing required upload headers.");
       }
 
       if (bytes.byteLength === 0) {
-        return res.status(400).end(JSON.stringify({ error: "Photo file is empty." }));
+        return jsonError(res, 400, "Photo file is empty.");
       }
 
-      result = await commitHomepagePhotoWithUploadBytes({
+      result = await api.commitHomepagePhotoWithUploadBytes({
         accessToken,
         section,
         itemIndex,
@@ -149,23 +183,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const itemIndex = payload.itemIndex;
 
       if (!accessToken || !section || itemIndex == null) {
-        return res.status(400).end(JSON.stringify({ error: "Missing required fields." }));
+        return jsonError(res, 400, "Missing required fields.");
       }
 
       if (section !== "showcase" && section !== "journal") {
-        return res.status(400).end(JSON.stringify({ error: "Invalid section." }));
+        return jsonError(res, 400, "Invalid section.");
       }
 
       if (!Number.isInteger(itemIndex) || itemIndex < 0 || itemIndex > 2) {
-        return res.status(400).end(JSON.stringify({ error: "Invalid item index." }));
+        return jsonError(res, 400, "Invalid item index.");
       }
 
       if (payload.base64?.trim()) {
         if (!payload.fileName?.trim() || !payload.mimeType?.trim()) {
-          return res.status(400).end(JSON.stringify({ error: "Missing file metadata." }));
+          return jsonError(res, 400, "Missing file metadata.");
         }
 
-        result = await commitHomepagePhotoWithUpload({
+        result = await api.commitHomepagePhotoWithUpload({
           accessToken,
           section,
           itemIndex,
@@ -174,14 +208,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           base64: payload.base64.trim(),
         });
       } else if (payload.publicUrl?.trim()) {
-        result = await applyHomepagePhotoCore({
+        result = await api.applyHomepagePhotoCore({
           accessToken,
           section,
           itemIndex,
           publicUrl: payload.publicUrl.trim(),
         });
       } else {
-        return res.status(400).end(JSON.stringify({ error: "Provide a photo file or publicUrl." }));
+        return jsonError(res, 400, "Provide a photo file or publicUrl.");
       }
     }
 
@@ -189,7 +223,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end(JSON.stringify(result));
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to save homepage photo.";
-    res.setHeader("Content-Type", "application/json");
-    return res.status(500).end(JSON.stringify({ error: message }));
+    return jsonError(res, 500, message);
   }
 }

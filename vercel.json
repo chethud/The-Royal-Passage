@@ -10,7 +10,8 @@
       "includeFiles": "dist/server/**"
     },
     "api/homepage-photo.ts": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": "dist/server/homepage-photo-api.js"
     }
   },
   "rewrites": [
