@@ -35,6 +35,15 @@ export type CommitHomepagePhotoUploadInput = {
   base64: string;
 };
 
+export type CommitHomepagePhotoUploadBytesInput = {
+  accessToken: string;
+  section: "showcase" | "journal";
+  itemIndex: number;
+  fileName: string;
+  mimeType: string;
+  bytes: Uint8Array;
+};
+
 export type ApplyHomepagePhotoResult = {
   publicUrl: string;
   version: number;
@@ -72,17 +81,16 @@ function toJsonb(value: unknown): unknown {
   return JSON.parse(JSON.stringify(value));
 }
 
-async function uploadHomepagePhotoAdmin(
+async function uploadHomepagePhotoAdminBytes(
   userId: string,
   fileName: string,
   mimeType: string,
-  base64: string,
+  bytes: Uint8Array,
 ): Promise<string> {
   if (!ALLOWED_HOMEPAGE_PHOTO_MIME.has(mimeType)) {
     throw new Error("Use a JPEG, PNG, WebP, or GIF image.");
   }
 
-  const bytes = decodeBase64ToBytes(base64);
   if (bytes.byteLength > MAX_EXPERIENCE_PHOTO_BYTES) {
     throw new Error("Image must be 5 MB or smaller.");
   }
@@ -101,6 +109,39 @@ async function uploadHomepagePhotoAdmin(
 
   const { data } = supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).getPublicUrl(path);
   return data.publicUrl;
+}
+
+async function uploadHomepagePhotoAdmin(
+  userId: string,
+  fileName: string,
+  mimeType: string,
+  base64: string,
+): Promise<string> {
+  return uploadHomepagePhotoAdminBytes(userId, fileName, mimeType, decodeBase64ToBytes(base64));
+}
+
+export async function commitHomepagePhotoWithUploadBytes(
+  input: CommitHomepagePhotoUploadBytesInput,
+): Promise<ApplyHomepagePhotoResult> {
+  const configError = getSupabaseConfigError();
+  if (configError) {
+    throw new Error(configError);
+  }
+
+  const user = await requireEditor(input.accessToken);
+  const publicUrl = await uploadHomepagePhotoAdminBytes(
+    user.id,
+    input.fileName,
+    input.mimeType,
+    input.bytes,
+  );
+
+  return applyHomepagePhotoCore({
+    accessToken: input.accessToken,
+    section: input.section,
+    itemIndex: input.itemIndex,
+    publicUrl,
+  });
 }
 
 export async function commitHomepagePhotoWithUpload(

@@ -3,7 +3,6 @@ import { z } from "zod";
 import {
   applyHomepagePhotoCore,
   bumpHomepageVersion,
-  commitHomepagePhotoWithUpload,
   fetchHomepageContentFromDb,
   requireEditor,
   writePlatformSetting,
@@ -96,32 +95,14 @@ export const applyHomepagePhoto = createServerFn({ method: "POST" })
       accessToken: z.string().min(1),
       section: z.enum(["showcase", "journal"]),
       itemIndex: z.number().int().min(0).max(2),
-      publicUrl: z.string().min(1).max(500).optional(),
-      fileName: z.string().min(1).max(200).optional(),
-      mimeType: z.string().min(1).optional(),
-      base64: z.string().min(1).optional(),
+      publicUrl: z.string().min(1).max(500),
     }),
   )
-  .handler(async ({ data }) => {
-    if (data.base64 && data.fileName && data.mimeType) {
-      return commitHomepagePhotoWithUpload({
-        accessToken: data.accessToken,
-        section: data.section,
-        itemIndex: data.itemIndex,
-        fileName: data.fileName,
-        mimeType: data.mimeType,
-        base64: data.base64,
-      });
-    }
-
-    if (!data.publicUrl) {
-      throw new Error("Provide a photo file or public URL.");
-    }
-
-    return applyHomepagePhotoCore({
+  .handler(async ({ data }) =>
+    applyHomepagePhotoCore({
       accessToken: data.accessToken,
       section: data.section,
       itemIndex: data.itemIndex,
       publicUrl: data.publicUrl,
-    });
-  });
+    }),
+  );

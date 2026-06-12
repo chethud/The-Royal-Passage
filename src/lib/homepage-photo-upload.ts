@@ -1,4 +1,3 @@
-import { applyHomepagePhoto } from "@/lib/homepage-content-fns";
 import { validateExperiencePhotoFile } from "@/lib/experience-photo-upload";
 
 export type HomepagePhotoCommitResult = {
@@ -6,25 +5,16 @@ export type HomepagePhotoCommitResult = {
   version: number;
 };
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result !== "string") {
-        reject(new Error("Could not read the selected image."));
-        return;
-      }
-      const base64 = result.includes(",") ? result.split(",")[1] : result;
-      if (!base64) {
-        reject(new Error("Could not read the selected image."));
-        return;
-      }
-      resolve(base64);
-    };
-    reader.onerror = () => reject(new Error("Could not read the selected image."));
-    reader.readAsDataURL(file);
-  });
+/** Vercel request bodies are capped at ~4.5 MB — stay under that for hosted uploads. */
+export const MAX_HOMEPAGE_PHOTO_BYTES = 4 * 1024 * 1024;
+
+export function validateHomepagePhotoFile(file: File): string | null {
+  const baseError = validateExperiencePhotoFile(file);
+  if (baseError) return baseError;
+  if (file.size > MAX_HOMEPAGE_PHOTO_BYTES) {
+    return `${file.name}: must be 4 MB or smaller on the live site.`;
+  }
+  return null;
 }
 
 async function readJsonResponse(
@@ -35,7 +25,8 @@ async function readJsonResponse(
   try {
     return JSON.parse(text) as { error?: string; publicUrl?: string; version?: number };
   } catch {
-    throw new Error(text.slice(0, 200) || "Unexpected server response.");
+    const cleaned = text.replace(/^A server error has occurred\s*/i, "").trim();
+    throw new Error(cleaned.slice(0, 240) || "Unexpected server response.");
   }
 }
 
@@ -45,22 +36,23 @@ async function saveHomepagePhotoViaApi(
   itemIndex: number,
   file: File,
 ): Promise<HomepagePhotoCommitResult> {
-  const base64 = await fileToBase64(file);
   const response = await fetch("/api/homepage-photo", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      accessToken,
-      section,
-      itemIndex,
-      fileName: file.name,
-      mimeType: file.type,
-      base64,
-    }),
+    headers: {
+      "Content-Type": file.type || "application/octet-stream",
+      "X-Access-Token": accessToken,
+      "X-Section": section,
+      "X-Item-Index": String(itemIndex),
+      "X-File-Name": encodeURIComponent(file.name || "photo.jpg"),
+    },
+    body: file,
   });
 
   const payload = await readJsonResponse(response);
   if (!response.ok) {
+    if (response.status === 413) {
+      throw new Error("Image is too large for upload. Use a photo under 4 MB.");
+    }
     throw new Error(payload.error ?? `Failed to save homepage photo (${response.status}).`);
   }
 
@@ -71,49 +63,16 @@ async function saveHomepagePhotoViaApi(
   return { publicUrl: payload.publicUrl, version: payload.version };
 }
 
-async function saveHomepagePhotoViaServerFn(
-  accessToken: string,
-  section: "showcase" | "journal",
-  itemIndex: number,
-  file: File,
-): Promise<HomepagePhotoCommitResult> {
-  const base64 = await fileToBase64(file);
-  return applyHomepagePhoto({
-    data: {
-      accessToken,
-      section,
-      itemIndex,
-      fileName: file.name,
-      mimeType: file.type,
-      base64,
-    },
-  });
-}
-
 export async function commitHomepagePhotoForEditor(
   accessToken: string,
   file: File,
   section: "showcase" | "journal",
   itemIndex: number,
 ): Promise<HomepagePhotoCommitResult> {
-  const validationError = validateExperiencePhotoFile(file);
+  const validationError = validateHomepagePhotoFile(file);
   if (validationError) {
     throw new Error(validationError);
   }
 
-  try {
-    return await saveHomepagePhotoViaApi(accessToken, section, itemIndex, file);
-  } catch (apiError) {
-    try {
-      return await saveHomepagePhotoViaServerFn(accessToken, section, itemIndex, file);
-    } catch (serverFnError) {
-      const apiMessage = apiError instanceof Error ? apiError.message : "API save failed.";
-      const fnMessage =
-        serverFnError instanceof Error ? serverFnError.message : "Server save failed.";
-      if (apiMessage === fnMessage) {
-        throw new Error(apiMessage);
-      }
-      throw new Error(`${apiMessage} ${fnMessage}`.trim());
-    }
-  }
+  return saveHomepagePhotoViaApi(accessToken, section, itemIndex, file);
 }
