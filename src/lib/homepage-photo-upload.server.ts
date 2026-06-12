@@ -13,6 +13,7 @@ import {
   MAX_EXPERIENCE_PHOTO_BYTES,
 } from "@/lib/experience-photos-config";
 import { getSupabaseConfigError } from "@/lib/env.server";
+import { verifySupabaseAccessToken } from "@/lib/auth-verify.server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export type ApplyHomepagePhotoInput = {
@@ -112,40 +113,20 @@ async function uploadHomepagePhotoAdmin(
 }
 
 export async function requireEditor(accessToken: string) {
-  const token = accessToken.trim();
-  if (!token) {
-    throw new Error("You must be signed in as an editor.");
-  }
-
+  const verified = await verifySupabaseAccessToken(accessToken);
   const supabase = getSupabaseAdmin();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser(token);
-
-  if (error) {
-    const message = error.message.toLowerCase();
-    if (message.includes("expired") || message.includes("invalid") || message.includes("jwt")) {
-      throw new Error("Session expired. Sign out and sign in again as editor.");
-    }
-    throw new Error(`Could not verify editor sign-in: ${error.message}`);
-  }
-
-  if (!user) {
-    throw new Error("You must be signed in as an editor.");
-  }
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("role")
-    .eq("id", user.id)
+    .eq("id", verified.id)
     .maybeSingle();
 
   if (profileError || profile?.role !== "editor") {
     throw new Error("Only editors can perform this action.");
   }
 
-  return user;
+  return { id: verified.id, email: verified.email ?? undefined };
 }
 
 function invalidateHomepageCache() {
