@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
 import type { CategoryOption, HostExperienceDetail } from "@/lib/api/host-experiences";
 import type { CitySummary } from "@/lib/cities";
 import { HOST_CITY_SLUG } from "@/lib/host-form-data";
@@ -253,43 +254,13 @@ export function HostExperienceForm({
               className={inputClass}
             />
           </label>
-          <div className="sm:col-span-2 space-y-3">
-            <span className="eyebrow text-muted-foreground">Experience photos</span>
-            {photoUrls.map((url, index) => (
-              <div key={`photo-${index}`} className="flex flex-wrap items-start gap-2">
-                <input
-                  disabled={readOnly}
-                  value={url}
-                  onChange={(e) => {
-                    const next = [...photoUrls];
-                    next[index] = e.target.value;
-                    setPhotoUrls(next);
-                  }}
-                  placeholder={`https://… photo ${index + 1}`}
-                  className={`${inputClass} min-w-[240px] flex-1`}
-                />
-                {!readOnly && photoUrls.length > 1 ? (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setPhotoUrls((prev) => prev.filter((_, rowIndex) => rowIndex !== index))
-                    }
-                    className="rounded-sm border border-destructive/40 px-3 py-2 text-xs text-destructive"
-                  >
-                    Remove
-                  </button>
-                ) : null}
-              </div>
-            ))}
-            {!readOnly ? (
-              <button
-                type="button"
-                onClick={() => setPhotoUrls((prev) => [...prev, ""])}
-                className="rounded-sm border border-ember/50 px-4 py-2 text-sm hover:bg-ember/10"
-              >
-                Add another photo
-              </button>
-            ) : null}
+          <div className="sm:col-span-2">
+            <ExperiencePhotoGallery
+              photoUrls={photoUrls}
+              onChange={setPhotoUrls}
+              readOnly={readOnly}
+              inputClass={inputClass}
+            />
           </div>
         </div>
       </div>

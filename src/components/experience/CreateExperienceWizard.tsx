@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
+import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
 import { WeekdaySlotBuilder } from "@/components/experience/WeekdaySlotBuilder";
 import type { CategoryOption, CreateHostSlotPayload } from "@/lib/api/host-experiences";
 import type { CitySummary } from "@/lib/cities";
+import { isPublicImageUrl } from "@/lib/experience-photo-upload";
 import { HOST_CITY_SLUG } from "@/lib/host-form-data";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
@@ -65,15 +67,6 @@ function slugFromTitle(title: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-function isValidUrl(value: string) {
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
 export function CreateExperienceWizard({
   categories,
   cities,
@@ -95,7 +88,6 @@ export function CreateExperienceWizard({
   const [durationMinutes, setDurationMinutes] = useState(120);
   const [priceMajor, setPriceMajor] = useState(0);
   const [photoUrls, setPhotoUrls] = useState<string[]>([""]);
-  const [photoPreviewErrors, setPhotoPreviewErrors] = useState<Record<number, boolean>>({});
   const [inclusions, setInclusions] = useState("");
   const [exclusions, setExclusions] = useState("");
   const [requirements, setRequirements] = useState("");
@@ -112,8 +104,9 @@ export function CreateExperienceWizard({
     cities[0]?.name ??
     "Mysuru";
   const validPhotoUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
-  const previewablePhotos = validPhotoUrls.filter(
-    (url, index) => isValidUrl(url) && !photoPreviewErrors[index],
+  const reviewPhotos = useMemo(
+    () => validPhotoUrls.filter(isPublicImageUrl),
+    [validPhotoUrls],
   );
 
   const sortedDraftSlots = useMemo(
@@ -150,7 +143,7 @@ export function CreateExperienceWizard({
     }
     if (current === 3) {
       for (const url of validPhotoUrls) {
-        if (!isValidUrl(url)) return "Each photo must be a valid http(s) URL.";
+        if (!isPublicImageUrl(url)) return "Each photo must be a valid http(s) URL.";
       }
       return null;
     }
@@ -202,7 +195,7 @@ export function CreateExperienceWizard({
       return;
     }
     setStepError(null);
-    const galleryUrls = validPhotoUrls.filter(isValidUrl);
+    const galleryUrls = validPhotoUrls.filter(isPublicImageUrl);
     onSubmit({
       experience: {
         title: title.trim(),
@@ -401,75 +394,11 @@ export function CreateExperienceWizard({
       {step === 3 ? (
         <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8 space-y-5">
           <h3 className="font-display text-xl">Photos & details</h3>
-          <div className="space-y-4">
-            <div>
-              <span className="eyebrow text-muted-foreground">Experience photos</span>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Add as many public image links as you like. The first photo becomes the cover image.
-              </p>
-              <div className="mt-3 space-y-3">
-                {photoUrls.map((url, index) => (
-                  <div key={`photo-${index}`} className="flex flex-wrap items-start gap-2">
-                    <input
-                      value={url}
-                      onChange={(e) => {
-                        const next = [...photoUrls];
-                        next[index] = e.target.value;
-                        setPhotoUrls(next);
-                        setPhotoPreviewErrors((prev) => {
-                          const copy = { ...prev };
-                          delete copy[index];
-                          return copy;
-                        });
-                      }}
-                      placeholder={`https://… photo ${index + 1}`}
-                      className={`${inputClass} min-w-[240px] flex-1`}
-                    />
-                    {photoUrls.length > 1 ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setPhotoUrls((prev) => prev.filter((_, rowIndex) => rowIndex !== index))
-                        }
-                        className="rounded-sm border border-destructive/40 px-3 py-2 text-xs text-destructive"
-                      >
-                        Remove
-                      </button>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={() => setPhotoUrls((prev) => [...prev, ""])}
-                className="mt-3 rounded-sm border border-ember/50 px-4 py-2 text-sm hover:bg-ember/10"
-              >
-                Add another photo
-              </button>
-            </div>
-            {previewablePhotos.length > 0 ? (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {previewablePhotos.map((url) => (
-                  <div
-                    key={url}
-                    className="overflow-hidden rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)]"
-                  >
-                    <img
-                      src={url}
-                      alt="Experience photo preview"
-                      className="aspect-[4/3] w-full object-cover"
-                      onError={() => {
-                        const index = photoUrls.findIndex((item) => item.trim() === url);
-                        if (index >= 0) {
-                          setPhotoPreviewErrors((prev) => ({ ...prev, [index]: true }));
-                        }
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </div>
+          <ExperiencePhotoGallery
+            photoUrls={photoUrls}
+            onChange={setPhotoUrls}
+            inputClass={inputClass}
+          />
           <label className="block text-sm">
             <span className="eyebrow text-muted-foreground">Inclusions (one per line)</span>
             <textarea
@@ -561,9 +490,9 @@ export function CreateExperienceWizard({
             Passage review.
           </p>
 
-          {previewablePhotos.length > 0 ? (
+          {reviewPhotos.length > 0 ? (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {previewablePhotos.slice(0, 3).map((url) => (
+              {reviewPhotos.slice(0, 3).map((url) => (
                 <div
                   key={url}
                   className="overflow-hidden rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)]"
