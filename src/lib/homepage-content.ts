@@ -127,7 +127,7 @@ function normalizeJournalItem(raw: unknown, fallback: HomepageJournalItem): Home
   };
 }
 
-function normalizeVersion(raw: unknown): number {
+export function parseVersionValue(raw: unknown): number {
   if (typeof raw === "number" && Number.isFinite(raw) && raw > 0) {
     return Math.floor(raw);
   }
@@ -138,13 +138,16 @@ function normalizeVersion(raw: unknown): number {
     }
   }
   if (typeof raw === "string" && raw.trim()) {
-    const parsed = Number(raw);
-    if (Number.isFinite(parsed) && parsed > 0) return Math.floor(parsed);
-    try {
-      return normalizeVersion(JSON.parse(raw));
-    } catch {
-      return 0;
+    const trimmed = raw.trim();
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      try {
+        return parseVersionValue(JSON.parse(trimmed));
+      } catch {
+        return 0;
+      }
     }
+    const parsed = Number(trimmed);
+    if (Number.isFinite(parsed) && parsed > 0) return Math.floor(parsed);
   }
   return 0;
 }
@@ -164,6 +167,6 @@ export function normalizeHomepageContent(raw: {
     journal: DEFAULT_HOMEPAGE_JOURNAL.map((fallback, index) =>
       normalizeJournalItem(journalRaw?.[index], fallback),
     ),
-    version: normalizeVersion(raw.version),
+    version: parseVersionValue(raw.version),
   };
 }
