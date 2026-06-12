@@ -8,7 +8,6 @@ type EditablePhotoFieldProps = {
   onImageChange: (url: string) => void;
   onAltChange: (alt: string) => void;
   uploadPhoto?: (file: File) => Promise<string>;
-  onPhotoSaved?: (url: string) => Promise<void>;
 };
 
 export function EditablePhotoField({
@@ -18,7 +17,6 @@ export function EditablePhotoField({
   onImageChange,
   onAltChange,
   uploadPhoto,
-  onPhotoSaved,
 }: EditablePhotoFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -33,9 +31,6 @@ export function EditablePhotoField({
     try {
       const url = await uploadPhoto(file);
       onImageChange(url);
-      if (onPhotoSaved) {
-        await onPhotoSaved(url);
-      }
       setSavedHint(true);
       window.setTimeout(() => setSavedHint(false), 2500);
     } catch (err) {

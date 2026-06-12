@@ -34,11 +34,7 @@ export function HomepageEditorBar({
       ]);
       const version = Math.max(showcaseResult.version, journalResult.version);
       setMessage("Homepage updated — changes are live for all visitors.");
-      await onSaved({
-        showcase: showcaseResult.items,
-        journal: journalResult.items,
-        version,
-      });
+      await onSaved({ showcase, journal, version });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save homepage content.");
     } finally {

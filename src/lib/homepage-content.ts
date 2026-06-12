@@ -131,9 +131,20 @@ function normalizeVersion(raw: unknown): number {
   if (typeof raw === "number" && Number.isFinite(raw) && raw > 0) {
     return Math.floor(raw);
   }
+  if (raw && typeof raw === "object" && "updatedAt" in raw) {
+    const updatedAt = (raw as { updatedAt?: unknown }).updatedAt;
+    if (typeof updatedAt === "number" && Number.isFinite(updatedAt) && updatedAt > 0) {
+      return Math.floor(updatedAt);
+    }
+  }
   if (typeof raw === "string" && raw.trim()) {
     const parsed = Number(raw);
     if (Number.isFinite(parsed) && parsed > 0) return Math.floor(parsed);
+    try {
+      return normalizeVersion(JSON.parse(raw));
+    } catch {
+      return 0;
+    }
   }
   return 0;
 }

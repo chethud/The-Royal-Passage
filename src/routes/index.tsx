@@ -10,13 +10,9 @@ import { JournalPreview } from "@/components/site/JournalPreview";
 import { HomepageEditorBar } from "@/components/editor/HomepageEditorBar";
 import { useAuthUser } from "@/lib/auth-user";
 import { getCatalogForUi } from "@/lib/marketplace-fns";
-import {
-  fetchHomepageContent,
-  saveHomepageJournal,
-  saveHomepageShowcase,
-} from "@/lib/homepage-content-fns";
-import type { HomepageContent, HomepageJournalItem, HomepageShowcaseItem } from "@/lib/homepage-content";
-import { uploadHomepagePhotoForEditor } from "@/lib/homepage-photo-upload";
+import { fetchHomepageContent } from "@/lib/homepage-content-fns";
+import type { HomepageContent } from "@/lib/homepage-content";
+import { commitHomepagePhotoForEditor } from "@/lib/homepage-photo-upload";
 import { buildHomeJsonLd, SITE_URL } from "@/lib/seo";
 import { isEditorRole } from "@/lib/roles";
 
@@ -83,44 +79,56 @@ function Index() {
     setSavedSnapshot(next);
   }, []);
 
-  const persistShowcase = useCallback(
-    async (items: HomepageShowcaseItem[]) => {
-      if (!accessToken) throw new Error("Sign in as editor to save homepage photos.");
-      const result = await saveHomepageShowcase({ data: { accessToken, items } });
-      skipHomepageSyncRef.current = true;
-      setDraft((prev) => ({ ...prev, showcase: result.items, version: result.version }));
-      setSavedSnapshot((prev) => ({ ...prev, showcase: result.items, version: result.version }));
-      await router.invalidate();
-    },
-    [accessToken, router],
-  );
+  const refreshHomepage = useCallback(() => {
+    void router.invalidate().catch(() => {
+      // Ignore cache refresh failures — local editor state is already updated.
+    });
+  }, [router]);
 
-  const persistJournal = useCallback(
-    async (items: HomepageJournalItem[]) => {
-      if (!accessToken) throw new Error("Sign in as editor to save homepage photos.");
-      const result = await saveHomepageJournal({ data: { accessToken, items } });
-      skipHomepageSyncRef.current = true;
-      setDraft((prev) => ({ ...prev, journal: result.items, version: result.version }));
-      setSavedSnapshot((prev) => ({ ...prev, journal: result.items, version: result.version }));
-      await router.invalidate();
-    },
-    [accessToken, router],
-  );
-
-  const uploadPhoto = useCallback(
-    async (file: File) => {
+  const createPhotoUploader = useCallback(
+    (section: "showcase" | "journal", itemIndex: number) => async (file: File) => {
       if (!accessToken) throw new Error("Sign in as editor to upload photos.");
-      return uploadHomepagePhotoForEditor(accessToken, file);
+
+      const result = await commitHomepagePhotoForEditor(accessToken, file, section, itemIndex);
+
+      skipHomepageSyncRef.current = true;
+      setDraft((prev) => {
+        if (section === "showcase") {
+          const showcase = prev.showcase.map((item, index) =>
+            index === itemIndex ? { ...item, imageUrl: result.publicUrl } : item,
+          );
+          return { ...prev, showcase, version: result.version };
+        }
+        const journal = prev.journal.map((item, index) =>
+          index === itemIndex ? { ...item, imageUrl: result.publicUrl } : item,
+        );
+        return { ...prev, journal, version: result.version };
+      });
+      setSavedSnapshot((prev) => {
+        if (section === "showcase") {
+          const showcase = prev.showcase.map((item, index) =>
+            index === itemIndex ? { ...item, imageUrl: result.publicUrl } : item,
+          );
+          return { ...prev, showcase, version: result.version };
+        }
+        const journal = prev.journal.map((item, index) =>
+          index === itemIndex ? { ...item, imageUrl: result.publicUrl } : item,
+        );
+        return { ...prev, journal, version: result.version };
+      });
+
+      refreshHomepage();
+      return result.publicUrl;
     },
-    [accessToken],
+    [accessToken, refreshHomepage],
   );
 
   const handleSaved = useCallback(
     async (content: HomepageContent) => {
       commitHomepage(content);
-      await router.invalidate();
+      refreshHomepage();
     },
-    [commitHomepage, router],
+    [commitHomepage, refreshHomepage],
   );
 
   return (
@@ -147,8 +155,7 @@ function Index() {
         imageVersion={displayVersion}
         editable={isEditor}
         onItemsChange={(showcase) => setDraft((prev) => ({ ...prev, showcase }))}
-        uploadPhoto={isEditor ? uploadPhoto : undefined}
-        onPersistShowcase={isEditor ? persistShowcase : undefined}
+        uploadPhoto={isEditor ? createPhotoUploader : undefined}
       />
 
       <JourneysSplit />
@@ -160,8 +167,7 @@ function Index() {
         imageVersion={displayVersion}
         editable={isEditor}
         onItemsChange={(journal) => setDraft((prev) => ({ ...prev, journal }))}
-        uploadPhoto={isEditor ? uploadPhoto : undefined}
-        onPersistJournal={isEditor ? persistJournal : undefined}
+        uploadPhoto={isEditor ? createPhotoUploader : undefined}
       />
 
       <Footer />

@@ -25,8 +25,7 @@ type ExperiencesShowcaseProps = {
   imageVersion?: number;
   editable?: boolean;
   onItemsChange?: (items: HomepageShowcaseItem[]) => void;
-  uploadPhoto?: (file: File) => Promise<string>;
-  onPersistShowcase?: (items: HomepageShowcaseItem[]) => Promise<void>;
+  uploadPhoto?: (section: "showcase" | "journal", itemIndex: number) => (file: File) => Promise<string>;
 };
 
 export function ExperiencesShowcase({
@@ -35,7 +34,6 @@ export function ExperiencesShowcase({
   editable = false,
   onItemsChange,
   uploadPhoto,
-  onPersistShowcase,
 }: ExperiencesShowcaseProps) {
   const updateItem = (index: number, patch: Partial<HomepageShowcaseItem>) => {
     if (!onItemsChange) return;
@@ -68,9 +66,7 @@ export function ExperiencesShowcase({
               index={idx}
               imageVersion={imageVersion}
               editable={editable}
-              uploadPhoto={uploadPhoto}
-              onPersistShowcase={onPersistShowcase}
-              allItems={items}
+              uploadPhoto={uploadPhoto ? uploadPhoto("showcase", idx) : undefined}
               onUpdate={(patch) => updateItem(idx, patch)}
             />
           ))}
@@ -86,8 +82,6 @@ function ExperienceShowcaseCard({
   imageVersion,
   editable,
   uploadPhoto,
-  onPersistShowcase,
-  allItems,
   onUpdate,
 }: {
   card: HomepageShowcaseItem;
@@ -95,8 +89,6 @@ function ExperienceShowcaseCard({
   imageVersion: number;
   editable: boolean;
   uploadPhoto?: (file: File) => Promise<string>;
-  onPersistShowcase?: (items: HomepageShowcaseItem[]) => Promise<void>;
-  allItems: HomepageShowcaseItem[];
   onUpdate: (patch: Partial<HomepageShowcaseItem>) => void;
 }) {
   const Icon = ICON_BY_KEY[card.iconKey];
@@ -120,16 +112,6 @@ function ExperienceShowcaseCard({
               uploadPhoto={uploadPhoto}
               onImageChange={(imageUrl) => onUpdate({ imageUrl })}
               onAltChange={(alt) => onUpdate({ alt })}
-              onPhotoSaved={
-                onPersistShowcase
-                  ? async (imageUrl) => {
-                      const next = allItems.map((item, idx) =>
-                        idx === index ? { ...item, imageUrl } : item,
-                      );
-                      await onPersistShowcase(next);
-                    }
-                  : undefined
-              }
             />
             <EditableTextField label="Title" value={card.title} onChange={(title) => onUpdate({ title })} />
             <EditableTextField label="Link" value={card.href} onChange={(href) => onUpdate({ href })} />

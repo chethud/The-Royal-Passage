@@ -51,11 +51,26 @@ function parseVersionValue(raw: unknown): number {
   if (typeof raw === "number" && Number.isFinite(raw) && raw > 0) {
     return Math.floor(raw);
   }
+  if (raw && typeof raw === "object" && "updatedAt" in raw) {
+    const updatedAt = (raw as { updatedAt?: unknown }).updatedAt;
+    if (typeof updatedAt === "number" && Number.isFinite(updatedAt) && updatedAt > 0) {
+      return Math.floor(updatedAt);
+    }
+  }
   if (typeof raw === "string" && raw.trim()) {
     const parsed = Number(raw);
     if (Number.isFinite(parsed) && parsed > 0) return Math.floor(parsed);
+    try {
+      return parseVersionValue(JSON.parse(raw));
+    } catch {
+      return 0;
+    }
   }
   return 0;
+}
+
+function toJsonb(value: unknown): unknown {
+  return JSON.parse(JSON.stringify(value));
 }
 
 const showcaseIconKeySchema = z.enum(["pottery", "flame", "heritage"]);
@@ -105,15 +120,44 @@ function invalidateHomepageCache() {
   deleteServerCache(HOMEPAGE_CACHE_KEY);
 }
 
-async function bumpHomepageVersion(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<number> {
-  const version = Date.now();
+async function writePlatformSetting(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  key: string,
+  value: unknown,
+) {
   const { error } = await supabase.from("platform_settings").upsert(
-    { key: HOMEPAGE_VERSION_KEY, value: version },
+    {
+      key,
+      value: toJsonb(value),
+    },
     { onConflict: "key" },
   );
   if (error) throw new Error(error.message);
+}
+
+async function bumpHomepageVersion(supabase: ReturnType<typeof getSupabaseAdmin>): Promise<number> {
+  const version = Date.now();
+  await writePlatformSetting(supabase, HOMEPAGE_VERSION_KEY, { updatedAt: version });
   invalidateHomepageCache();
   return version;
+}
+
+async function loadHomepageContentFromDb(supabase: NonNullable<ReturnType<typeof getSupabaseServerRead>>) {
+  const { data, error } = await supabase
+    .from("platform_settings")
+    .select("key, value")
+    .in("key", [HOMEPAGE_SHOWCASE_KEY, HOMEPAGE_JOURNAL_KEY, HOMEPAGE_VERSION_KEY]);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const byKey = new Map((data ?? []).map((row) => [row.key, row.value]));
+  return normalizeHomepageContent({
+    showcase: byKey.get(HOMEPAGE_SHOWCASE_KEY),
+    journal: byKey.get(HOMEPAGE_JOURNAL_KEY),
+    version: parseVersionValue(byKey.get(HOMEPAGE_VERSION_KEY)),
+  });
 }
 
 /** Load homepage CMS content from Supabase — safe to call directly from route loaders. */
@@ -127,22 +171,12 @@ export async function fetchHomepageContent(): Promise<HomepageContent> {
     return DEFAULT_HOMEPAGE_CONTENT;
   }
 
-  const { data, error } = await supabase
-    .from("platform_settings")
-    .select("key, value")
-    .in("key", [HOMEPAGE_SHOWCASE_KEY, HOMEPAGE_JOURNAL_KEY, HOMEPAGE_VERSION_KEY]);
-
-  if (error) {
-    console.error("[homepage] Failed to load platform_settings:", error.message);
+  try {
+    return await loadHomepageContentFromDb(supabase);
+  } catch (err) {
+    console.error("[homepage] Failed to load platform_settings:", err);
     return DEFAULT_HOMEPAGE_CONTENT;
   }
-
-  const byKey = new Map((data ?? []).map((row) => [row.key, row.value]));
-  return normalizeHomepageContent({
-    showcase: byKey.get(HOMEPAGE_SHOWCASE_KEY),
-    journal: byKey.get(HOMEPAGE_JOURNAL_KEY),
-    version: parseVersionValue(byKey.get(HOMEPAGE_VERSION_KEY)),
-  });
 }
 
 export const getHomepageContent = createServerFn({ method: "GET" }).handler(
@@ -156,7 +190,7 @@ export const saveHomepageShowcase = createServerFn({ method: "POST" })
       items: z.array(showcaseItemSchema).length(3),
     }),
   )
-  .handler(async ({ data }): Promise<{ items: HomepageShowcaseItem[]; version: number }> => {
+  .handler(async ({ data }): Promise<{ version: number }> => {
     if (!isSupabaseConfigured()) {
       throw new Error(
         "Homepage save is not configured on the server. Set SUPABASE_SERVICE_ROLE_KEY in your hosting environment (e.g. Vercel).",
@@ -165,19 +199,9 @@ export const saveHomepageShowcase = createServerFn({ method: "POST" })
 
     await requireEditor(data.accessToken);
     const supabase = getSupabaseAdmin();
-
-    const { error } = await supabase.from("platform_settings").upsert(
-      {
-        key: HOMEPAGE_SHOWCASE_KEY,
-        value: data.items,
-      },
-      { onConflict: "key" },
-    );
-
-    if (error) throw new Error(error.message);
-
+    await writePlatformSetting(supabase, HOMEPAGE_SHOWCASE_KEY, data.items);
     const version = await bumpHomepageVersion(supabase);
-    return { items: data.items, version };
+    return { version };
   });
 
 export const saveHomepageJournal = createServerFn({ method: "POST" })
@@ -187,7 +211,7 @@ export const saveHomepageJournal = createServerFn({ method: "POST" })
       items: z.array(journalItemSchema).length(3),
     }),
   )
-  .handler(async ({ data }): Promise<{ items: HomepageJournalItem[]; version: number }> => {
+  .handler(async ({ data }): Promise<{ version: number }> => {
     if (!isSupabaseConfigured()) {
       throw new Error(
         "Homepage save is not configured on the server. Set SUPABASE_SERVICE_ROLE_KEY in your hosting environment (e.g. Vercel).",
@@ -196,31 +220,23 @@ export const saveHomepageJournal = createServerFn({ method: "POST" })
 
     await requireEditor(data.accessToken);
     const supabase = getSupabaseAdmin();
-
-    const { error } = await supabase.from("platform_settings").upsert(
-      {
-        key: HOMEPAGE_JOURNAL_KEY,
-        value: data.items,
-      },
-      { onConflict: "key" },
-    );
-
-    if (error) throw new Error(error.message);
-
+    await writePlatformSetting(supabase, HOMEPAGE_JOURNAL_KEY, data.items);
     const version = await bumpHomepageVersion(supabase);
-    return { items: data.items, version };
+    return { version };
   });
 
-export const uploadHomepagePhoto = createServerFn({ method: "POST" })
+export const commitHomepagePhoto = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({
       accessToken: z.string().min(1),
+      section: z.enum(["showcase", "journal"]),
+      itemIndex: z.number().int().min(0).max(2),
       fileName: z.string().min(1).max(200),
       mimeType: z.string().min(1),
       base64: z.string().min(1),
     }),
   )
-  .handler(async ({ data }): Promise<{ publicUrl: string }> => {
+  .handler(async ({ data }): Promise<{ publicUrl: string; version: number }> => {
     if (!isSupabaseConfigured()) {
       throw new Error(
         "Photo upload is not configured on the server. Set SUPABASE_SERVICE_ROLE_KEY in your hosting environment (e.g. Vercel).",
@@ -242,14 +258,31 @@ export const uploadHomepagePhoto = createServerFn({ method: "POST" })
     const ext = extensionForMime(data.mimeType, data.fileName);
     const path = `homepage/${user.id}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
 
-    const { error } = await supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).upload(path, bytes, {
+    const { error: uploadError } = await supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).upload(path, bytes, {
       cacheControl: "60",
       upsert: false,
       contentType: data.mimeType,
     });
 
-    if (error) throw new Error(error.message);
+    if (uploadError) throw new Error(uploadError.message);
 
     const { data: publicData } = supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).getPublicUrl(path);
-    return { publicUrl: publicData.publicUrl };
+    const publicUrl = publicData.publicUrl;
+
+    const current = await loadHomepageContentFromDb(supabase);
+
+    if (data.section === "showcase") {
+      const items = current.showcase.map((item, index) =>
+        index === data.itemIndex ? { ...item, imageUrl: publicUrl } : item,
+      );
+      await writePlatformSetting(supabase, HOMEPAGE_SHOWCASE_KEY, items);
+    } else {
+      const items = current.journal.map((item, index) =>
+        index === data.itemIndex ? { ...item, imageUrl: publicUrl } : item,
+      );
+      await writePlatformSetting(supabase, HOMEPAGE_JOURNAL_KEY, items);
+    }
+
+    const version = await bumpHomepageVersion(supabase);
+    return { publicUrl, version };
   });

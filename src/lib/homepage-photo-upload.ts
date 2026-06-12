@@ -1,5 +1,5 @@
 import { validateExperiencePhotoFile } from "@/lib/experience-photo-upload";
-import { uploadHomepagePhoto } from "@/lib/homepage-content-fns";
+import { commitHomepagePhoto } from "@/lib/homepage-content-fns";
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -22,24 +22,31 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-export async function uploadHomepagePhotoForEditor(
+export type HomepagePhotoCommitResult = {
+  publicUrl: string;
+  version: number;
+};
+
+export async function commitHomepagePhotoForEditor(
   accessToken: string,
   file: File,
-): Promise<string> {
+  section: "showcase" | "journal",
+  itemIndex: number,
+): Promise<HomepagePhotoCommitResult> {
   const validationError = validateExperiencePhotoFile(file);
   if (validationError) {
     throw new Error(validationError);
   }
 
   const base64 = await fileToBase64(file);
-  const { publicUrl } = await uploadHomepagePhoto({
+  return commitHomepagePhoto({
     data: {
       accessToken,
+      section,
+      itemIndex,
       fileName: file.name,
       mimeType: file.type,
       base64,
     },
   });
-
-  return publicUrl;
 }

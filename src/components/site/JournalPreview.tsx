@@ -13,8 +13,7 @@ type JournalPreviewProps = {
   imageVersion?: number;
   editable?: boolean;
   onItemsChange?: (items: HomepageJournalItem[]) => void;
-  uploadPhoto?: (file: File) => Promise<string>;
-  onPersistJournal?: (items: HomepageJournalItem[]) => Promise<void>;
+  uploadPhoto?: (section: "showcase" | "journal", itemIndex: number) => (file: File) => Promise<string>;
 };
 
 export function JournalPreview({
@@ -23,7 +22,6 @@ export function JournalPreview({
   editable = false,
   onItemsChange,
   uploadPhoto,
-  onPersistJournal,
 }: JournalPreviewProps) {
   const updateItem = (index: number, patch: Partial<HomepageJournalItem>) => {
     if (!onItemsChange) return;
@@ -71,19 +69,9 @@ export function JournalPreview({
                       label={`Story ${idx + 1}`}
                       imageUrl={story.imageUrl}
                       alt={story.alt}
-                      uploadPhoto={uploadPhoto}
+                      uploadPhoto={uploadPhoto ? uploadPhoto("journal", idx) : undefined}
                       onImageChange={(imageUrl) => updateItem(idx, { imageUrl })}
                       onAltChange={(alt) => updateItem(idx, { alt })}
-                      onPhotoSaved={
-                        onPersistJournal
-                          ? async (imageUrl) => {
-                              const next = items.map((item, index) =>
-                                index === idx ? { ...item, imageUrl } : item,
-                              );
-                              await onPersistJournal(next);
-                            }
-                          : undefined
-                      }
                     />
                     <EditableTextField
                       label="Title"
