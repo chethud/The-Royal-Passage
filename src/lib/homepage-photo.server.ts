@@ -9,6 +9,10 @@ import {
   parseVersionValue,
   type HomepageContent,
 } from "@/lib/homepage-content";
+import {
+  EXPERIENCE_PHOTOS_BUCKET,
+  MAX_EXPERIENCE_PHOTO_BYTES,
+} from "@/lib/experience-photo-upload";
 import { isSupabaseConfigured, isSupabaseReadable } from "@/lib/env.server";
 import { getSupabaseAdmin, getSupabaseServerRead } from "@/lib/supabase/admin";
 
@@ -19,13 +23,106 @@ export type ApplyHomepagePhotoInput = {
   publicUrl: string;
 };
 
+export type CommitHomepagePhotoUploadInput = {
+  accessToken: string;
+  section: "showcase" | "journal";
+  itemIndex: number;
+  fileName: string;
+  mimeType: string;
+  base64: string;
+};
+
 export type ApplyHomepagePhotoResult = {
   publicUrl: string;
   version: number;
 };
 
+const ALLOWED_HOMEPAGE_PHOTO_MIME = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+
+function extensionForMime(mimeType: string, fileName: string): string {
+  const fromName = fileName.split(".").pop()?.toLowerCase();
+  if (fromName && ["jpg", "jpeg", "png", "webp", "gif"].includes(fromName)) {
+    return fromName === "jpeg" ? "jpg" : fromName;
+  }
+  if (mimeType === "image/jpeg") return "jpg";
+  if (mimeType === "image/png") return "png";
+  if (mimeType === "image/webp") return "webp";
+  if (mimeType === "image/gif") return "gif";
+  return "jpg";
+}
+
+function decodeBase64ToBytes(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
 function toJsonb(value: unknown): unknown {
   return JSON.parse(JSON.stringify(value));
+}
+
+async function uploadHomepagePhotoAdmin(
+  userId: string,
+  fileName: string,
+  mimeType: string,
+  base64: string,
+): Promise<string> {
+  if (!ALLOWED_HOMEPAGE_PHOTO_MIME.has(mimeType)) {
+    throw new Error("Use a JPEG, PNG, WebP, or GIF image.");
+  }
+
+  const bytes = decodeBase64ToBytes(base64);
+  if (bytes.byteLength > MAX_EXPERIENCE_PHOTO_BYTES) {
+    throw new Error("Image must be 5 MB or smaller.");
+  }
+
+  const supabase = getSupabaseAdmin();
+  const ext = extensionForMime(mimeType, fileName);
+  const path = `homepage/${userId}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+
+  const { error } = await supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).upload(path, bytes, {
+    cacheControl: "60",
+    upsert: false,
+    contentType: mimeType,
+  });
+
+  if (error) throw new Error(error.message);
+
+  const { data } = supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+export async function commitHomepagePhotoWithUpload(
+  input: CommitHomepagePhotoUploadInput,
+): Promise<ApplyHomepagePhotoResult> {
+  if (!isSupabaseConfigured()) {
+    throw new Error(
+      "Photo upload is not configured on the server. Set SUPABASE_SERVICE_ROLE_KEY in your hosting environment (e.g. Vercel).",
+    );
+  }
+
+  const user = await requireEditor(input.accessToken);
+  const publicUrl = await uploadHomepagePhotoAdmin(
+    user.id,
+    input.fileName,
+    input.mimeType,
+    input.base64,
+  );
+
+  return applyHomepagePhotoCore({
+    accessToken: input.accessToken,
+    section: input.section,
+    itemIndex: input.itemIndex,
+    publicUrl,
+  });
 }
 
 export async function requireEditor(accessToken: string) {

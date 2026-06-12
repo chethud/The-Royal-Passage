@@ -1038,6 +1038,7 @@ drop policy if exists "Public read experience photos" on storage.objects;
 drop policy if exists "Hosts upload experience photos" on storage.objects;
 drop policy if exists "Hosts update own experience photos" on storage.objects;
 drop policy if exists "Hosts delete own experience photos" on storage.objects;
+drop policy if exists "Editors upload homepage photos" on storage.objects;
 
 create policy "Public read experience photos"
   on storage.objects for select

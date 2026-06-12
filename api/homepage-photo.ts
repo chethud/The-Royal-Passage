@@ -1,4 +1,7 @@
-import { applyHomepagePhotoCore } from "../src/lib/homepage-photo.server.js";
+import {
+  applyHomepagePhotoCore,
+  commitHomepagePhotoWithUpload,
+} from "../src/lib/homepage-photo.server.js";
 
 type VercelRequest = {
   method?: string;
@@ -16,6 +19,9 @@ type HomepagePhotoRequest = {
   section?: "showcase" | "journal";
   itemIndex?: number;
   publicUrl?: string;
+  fileName?: string;
+  mimeType?: string;
+  base64?: string;
 };
 
 function readRequestBody(req: VercelRequest): HomepagePhotoRequest {
@@ -44,9 +50,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const accessToken = payload.accessToken?.trim();
     const section = payload.section;
     const itemIndex = payload.itemIndex;
-    const publicUrl = payload.publicUrl?.trim();
 
-    if (!accessToken || !section || itemIndex == null || !publicUrl) {
+    if (!accessToken || !section || itemIndex == null) {
       return res.status(400).end(JSON.stringify({ error: "Missing required fields." }));
     }
 
@@ -58,12 +63,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).end(JSON.stringify({ error: "Invalid item index." }));
     }
 
-    const result = await applyHomepagePhotoCore({
-      accessToken,
-      section,
-      itemIndex,
-      publicUrl,
-    });
+    let result;
+    if (payload.base64?.trim()) {
+      if (!payload.fileName?.trim() || !payload.mimeType?.trim()) {
+        return res.status(400).end(JSON.stringify({ error: "Missing file metadata." }));
+      }
+
+      result = await commitHomepagePhotoWithUpload({
+        accessToken,
+        section,
+        itemIndex,
+        fileName: payload.fileName.trim(),
+        mimeType: payload.mimeType.trim(),
+        base64: payload.base64.trim(),
+      });
+    } else if (payload.publicUrl?.trim()) {
+      result = await applyHomepagePhotoCore({
+        accessToken,
+        section,
+        itemIndex,
+        publicUrl: payload.publicUrl.trim(),
+      });
+    } else {
+      return res.status(400).end(JSON.stringify({ error: "Provide a photo file or publicUrl." }));
+    }
 
     res.setHeader("Content-Type", "application/json");
     return res.status(200).end(JSON.stringify(result));

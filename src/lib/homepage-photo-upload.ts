@@ -1,57 +1,39 @@
-import { applyHomepagePhoto } from "@/lib/homepage-content-fns";
-import {
-  EXPERIENCE_PHOTOS_BUCKET,
-  extensionForFile,
-  validateExperiencePhotoFile,
-} from "@/lib/experience-photo-upload";
-import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
+import { commitHomepagePhotoWithUpload } from "@/lib/homepage-photo.server";
+import { validateExperiencePhotoFile } from "@/lib/experience-photo-upload";
 
 export type HomepagePhotoCommitResult = {
   publicUrl: string;
   version: number;
 };
 
-async function uploadHomepageEditorPhoto(file: File): Promise<string> {
-  if (!isSupabaseBrowserConfigured()) {
-    throw new Error("Photo upload is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
-  }
-
-  const validationError = validateExperiencePhotoFile(file);
-  if (validationError) {
-    throw new Error(validationError);
-  }
-
-  const supabase = getSupabaseBrowser();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    throw new Error("Sign in as editor before uploading photos.");
-  }
-
-  const ext = extensionForFile(file);
-  const path = `homepage/${user.id}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
-
-  const { error } = await supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).upload(path, file, {
-    cacheControl: "60",
-    upsert: false,
-    contentType: file.type,
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result !== "string") {
+        reject(new Error("Could not read the selected image."));
+        return;
+      }
+      const base64 = result.includes(",") ? result.split(",")[1] : result;
+      if (!base64) {
+        reject(new Error("Could not read the selected image."));
+        return;
+      }
+      resolve(base64);
+    };
+    reader.onerror = () => reject(new Error("Could not read the selected image."));
+    reader.readAsDataURL(file);
   });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const { data } = supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).getPublicUrl(path);
-  return data.publicUrl;
 }
 
-async function readJsonResponse(response: Response): Promise<{ error?: string; version?: number }> {
+async function readJsonResponse(
+  response: Response,
+): Promise<{ error?: string; publicUrl?: string; version?: number }> {
   const text = await response.text();
   if (!text.trim()) return {};
   try {
-    return JSON.parse(text) as { error?: string; version?: number };
+    return JSON.parse(text) as { error?: string; publicUrl?: string; version?: number };
   } catch {
     throw new Error(text.slice(0, 200) || "Unexpected server response.");
   }
@@ -61,12 +43,20 @@ async function saveHomepagePhotoViaApi(
   accessToken: string,
   section: "showcase" | "journal",
   itemIndex: number,
-  publicUrl: string,
+  file: File,
 ): Promise<HomepagePhotoCommitResult> {
+  const base64 = await fileToBase64(file);
   const response = await fetch("/api/homepage-photo", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ accessToken, section, itemIndex, publicUrl }),
+    body: JSON.stringify({
+      accessToken,
+      section,
+      itemIndex,
+      fileName: file.name,
+      mimeType: file.type,
+      base64,
+    }),
   });
 
   const payload = await readJsonResponse(response);
@@ -74,21 +64,27 @@ async function saveHomepagePhotoViaApi(
     throw new Error(payload.error ?? `Failed to save homepage photo (${response.status}).`);
   }
 
-  if (typeof payload.version !== "number") {
-    throw new Error("Server did not return a content version.");
+  if (typeof payload.version !== "number" || typeof payload.publicUrl !== "string") {
+    throw new Error("Server did not return the saved photo.");
   }
 
-  return { publicUrl, version: payload.version };
+  return { publicUrl: payload.publicUrl, version: payload.version };
 }
 
 async function saveHomepagePhotoViaServerFn(
   accessToken: string,
   section: "showcase" | "journal",
   itemIndex: number,
-  publicUrl: string,
+  file: File,
 ): Promise<HomepagePhotoCommitResult> {
-  return applyHomepagePhoto({
-    data: { accessToken, section, itemIndex, publicUrl },
+  const base64 = await fileToBase64(file);
+  return commitHomepagePhotoWithUpload({
+    accessToken,
+    section,
+    itemIndex,
+    fileName: file.name,
+    mimeType: file.type,
+    base64,
   });
 }
 
@@ -98,13 +94,16 @@ export async function commitHomepagePhotoForEditor(
   section: "showcase" | "journal",
   itemIndex: number,
 ): Promise<HomepagePhotoCommitResult> {
-  const publicUrl = await uploadHomepageEditorPhoto(file);
+  const validationError = validateExperiencePhotoFile(file);
+  if (validationError) {
+    throw new Error(validationError);
+  }
 
   try {
-    return await saveHomepagePhotoViaApi(accessToken, section, itemIndex, publicUrl);
+    return await saveHomepagePhotoViaApi(accessToken, section, itemIndex, file);
   } catch (apiError) {
     try {
-      return await saveHomepagePhotoViaServerFn(accessToken, section, itemIndex, publicUrl);
+      return await saveHomepagePhotoViaServerFn(accessToken, section, itemIndex, file);
     } catch (serverFnError) {
       const apiMessage = apiError instanceof Error ? apiError.message : "API save failed.";
       const fnMessage = serverFnError instanceof Error ? serverFnError.message : "Server save failed.";
