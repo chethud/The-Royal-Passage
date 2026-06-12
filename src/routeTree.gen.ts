@@ -39,6 +39,7 @@ import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as HostExperiencesIndexRouteImport } from './routes/host.experiences.index'
 import { Route as HostBookingsIndexRouteImport } from './routes/host.bookings.index'
 import { Route as ExperiencesSlugIndexRouteImport } from './routes/experiences.$slug.index'
+import { Route as AdminExperiencesIndexRouteImport } from './routes/admin.experiences.index'
 import { Route as HostExperiencesNewRouteImport } from './routes/host.experiences.new'
 import { Route as HostExperiencesExperienceIdRouteImport } from './routes/host.experiences.$experienceId'
 import { Route as HostBookingsBookingIdRouteImport } from './routes/host.bookings.$bookingId'
@@ -196,6 +197,11 @@ const ExperiencesSlugIndexRoute = ExperiencesSlugIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ExperiencesSlugRoute,
 } as any)
+const AdminExperiencesIndexRoute = AdminExperiencesIndexRouteImport.update({
+  id: '/experiences/',
+  path: '/experiences/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const HostExperiencesNewRoute = HostExperiencesNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -263,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/admin/experiences/': typeof AdminExperiencesIndexRoute
   '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
   '/host/experiences/': typeof HostExperiencesIndexRoute
@@ -297,6 +304,7 @@ export interface FileRoutesByTo {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/admin/experiences': typeof AdminExperiencesIndexRoute
   '/experiences/$slug': typeof ExperiencesSlugIndexRoute
   '/host/bookings': typeof HostBookingsIndexRoute
   '/host/experiences': typeof HostExperiencesIndexRoute
@@ -336,6 +344,7 @@ export interface FileRoutesById {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/admin/experiences/': typeof AdminExperiencesIndexRoute
   '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
   '/host/experiences/': typeof HostExperiencesIndexRoute
@@ -376,6 +385,7 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/admin/experiences/'
     | '/experiences/$slug/'
     | '/host/bookings/'
     | '/host/experiences/'
@@ -410,6 +420,7 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/admin/experiences'
     | '/experiences/$slug'
     | '/host/bookings'
     | '/host/experiences'
@@ -448,6 +459,7 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/admin/experiences/'
     | '/experiences/$slug/'
     | '/host/bookings/'
     | '/host/experiences/'
@@ -686,6 +698,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExperiencesSlugIndexRouteImport
       parentRoute: typeof ExperiencesSlugRoute
     }
+    '/admin/experiences/': {
+      id: '/admin/experiences/'
+      path: '/experiences'
+      fullPath: '/admin/experiences/'
+      preLoaderRoute: typeof AdminExperiencesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/host/experiences/new': {
       id: '/host/experiences/new'
       path: '/new'
@@ -734,11 +753,13 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminProfileRoute: typeof AdminProfileRoute
   AdminExperiencesExperienceIdRoute: typeof AdminExperiencesExperienceIdRoute
+  AdminExperiencesIndexRoute: typeof AdminExperiencesIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminProfileRoute: AdminProfileRoute,
   AdminExperiencesExperienceIdRoute: AdminExperiencesExperienceIdRoute,
+  AdminExperiencesIndexRoute: AdminExperiencesIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

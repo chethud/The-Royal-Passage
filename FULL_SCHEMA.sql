@@ -28,6 +28,11 @@
 -- Admin account (create in Dashboard → Authentication, then run the block at the bottom):
 --   Email: Admin@gmail.com   Password: Admin@123
 --
+-- Editor account (homepage CMS) — Auth user MUST be created in Dashboard first:
+--   See supabase/create-editor-login.sql  OR  npm run setup:editor
+--   Email: edit@gmail.com   Password: Edit@123
+--   (FULL_SCHEMA.sql does NOT create auth passwords — only tables/data.)
+--
 -- RLS: broad read for anon/authenticated; writes via service role (backend API).
 -- =============================================================================
 
@@ -1047,6 +1052,18 @@ create policy "Hosts upload experience photos"
     and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+create policy "Editors upload homepage photos"
+  on storage.objects for insert
+  to authenticated
+  with check (
+    bucket_id = 'experience-photos'
+    and (storage.foldername(name))[1] = 'homepage'
+    and exists (
+      select 1 from public.profiles p
+      where p.id = auth.uid() and p.role = 'editor'
+    )
+  );
+
 create policy "Hosts update own experience photos"
   on storage.objects for update
   to authenticated
@@ -1095,3 +1112,4 @@ create policy "Hosts delete own experience photos"
 -- left join public.profiles p on p.id = u.id
 -- order by u.created_at desc
 -- limit 20;
+

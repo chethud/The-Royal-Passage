@@ -1,8 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { AdminActivityFeed } from "@/components/admin/AdminActivityFeed";
 import { AdminBookingsTable } from "@/components/admin/AdminBookingsTable";
-import { AdminExperienceQueue } from "@/components/admin/AdminExperienceQueue";
 import { AdminReviewsPanel } from "@/components/admin/AdminReviewsPanel";
 import { AdminStatsGrid } from "@/components/admin/AdminStatsGrid";
 import { CreateHostForm } from "@/components/admin/CreateHostForm";
@@ -134,11 +133,29 @@ function AdminDashboardPage() {
 
         <AdminReviewsPanel accessToken={accessToken} />
 
+        <section className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="font-display text-2xl">Experience approvals</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {stats?.pendingExperienceReviews
+                  ? `${stats.pendingExperienceReviews} submission${stats.pendingExperienceReviews === 1 ? "" : "s"} awaiting review.`
+                  : "Review host submissions before they go live."}
+              </p>
+            </div>
+            <Link
+              to="/admin/experiences"
+              className="rounded-sm border border-ember/50 bg-ember/10 px-4 py-2 text-sm font-medium text-ember hover:bg-ember/20"
+            >
+              Approve experiences →
+            </Link>
+          </div>
+        </section>
+
         <CreateHostForm
           accessToken={accessToken}
           onCreated={() => setRefreshKey((value) => value + 1)}
         />
-        <AdminExperienceQueue accessToken={accessToken} refreshKey={refreshKey} />
         <ManagedUsersPanel accessToken={accessToken} refreshKey={refreshKey} />
       </div>
     </DashboardShell>

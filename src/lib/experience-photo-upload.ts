@@ -14,7 +14,7 @@ export function isPublicImageUrl(value: string): boolean {
   }
 }
 
-function extensionForFile(file: File): string {
+export function extensionForFile(file: File): string {
   const fromName = file.name.split(".").pop()?.toLowerCase();
   if (fromName && ["jpg", "jpeg", "png", "webp", "gif"].includes(fromName)) {
     return fromName === "jpeg" ? "jpg" : fromName;

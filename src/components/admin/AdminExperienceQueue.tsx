@@ -1,25 +1,23 @@
 import { Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusBadge";
-import {
-  fetchPendingExperiences,
-  publishExperience,
-  rejectExperience,
-  type AdminExperienceSummary,
-} from "@/lib/api/admin";
+import { fetchPendingExperiences, type AdminExperienceSummary } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { formatDateLong } from "@/lib/date-format";
 
 type AdminExperienceQueueProps = {
   accessToken: string;
   refreshKey?: number;
+  onQueueChange?: () => void;
 };
 
-export function AdminExperienceQueue({ accessToken, refreshKey = 0 }: AdminExperienceQueueProps) {
+export function AdminExperienceQueue({
+  accessToken,
+  refreshKey = 0,
+}: AdminExperienceQueueProps) {
   const [rows, setRows] = useState<AdminExperienceSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [busyId, setBusyId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -41,30 +39,15 @@ export function AdminExperienceQueue({ accessToken, refreshKey = 0 }: AdminExper
     void load();
   }, [load, refreshKey]);
 
-  const runAction = async (
-    experienceId: string,
-    action: (token: string, id: string) => Promise<AdminExperienceSummary>,
-  ) => {
-    setBusyId(experienceId);
-    setError(null);
-    try {
-      await action(accessToken, experienceId);
-      await load();
-    } catch (err) {
-      setError(toErrorMessage(err, "Action failed."));
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const btn =
-    "rounded-sm border px-2 py-1 text-xs disabled:opacity-50 hover:border-ember/50";
+  const reviewBtn =
+    "inline-flex items-center rounded-sm border border-ember/55 bg-ember/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-ember transition-colors hover:bg-ember/20";
 
   return (
     <section className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6">
       <h2 className="font-display text-2xl">Experience approvals</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Publish host-submitted experiences after review.
+        Click <strong className="font-medium text-ink">Review</strong> to open the full submission on a
+        separate page, then publish or reject from there.
       </p>
 
       {loading ? (
@@ -80,39 +63,26 @@ export function AdminExperienceQueue({ accessToken, refreshKey = 0 }: AdminExper
           {rows.map((row) => (
             <li
               key={row.id}
-              className="flex flex-wrap items-center justify-between gap-4 rounded-sm border border-[oklch(0.88_0.08_86_/_0.2)] px-4 py-3"
+              className="flex flex-wrap items-center justify-between gap-4 rounded-sm border border-[oklch(0.88_0.08_86_/_0.2)] px-4 py-4"
             >
-              <div>
+              <div className="min-w-0 flex-1">
                 <div className="font-display text-lg">{row.title}</div>
-                <div className="text-sm text-muted-foreground">
+                <div className="mt-1 text-sm text-muted-foreground">
                   {row.hostName} · {row.city} · {formatDateLong(row.createdAt.slice(0, 10))}
                 </div>
+                {row.slug ? (
+                  <div className="mt-1 text-xs text-muted-foreground/80">Slug: {row.slug}</div>
+                ) : null}
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <ExperienceStatusBadge status={row.status} />
                 <Link
                   to="/admin/experiences/$experienceId"
                   params={{ experienceId: row.id }}
-                  className={`${btn} border-ember/50 text-ember hover:bg-ember/10`}
+                  className={reviewBtn}
                 >
                   Review
                 </Link>
-                <button
-                  type="button"
-                  disabled={busyId === row.id}
-                  className={btn}
-                  onClick={() => void runAction(row.id, publishExperience)}
-                >
-                  Publish
-                </button>
-                <button
-                  type="button"
-                  disabled={busyId === row.id}
-                  className={`${btn} border-destructive/40 text-destructive`}
-                  onClick={() => void runAction(row.id, rejectExperience)}
-                >
-                  Reject
-                </button>
               </div>
             </li>
           ))}

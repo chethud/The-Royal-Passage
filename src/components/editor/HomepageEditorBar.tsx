@@ -1,4 +1,3 @@
-import { useRouter } from "@tanstack/react-router";
 import { Loader2, Save } from "lucide-react";
 import { useState } from "react";
 import { RoleBadge } from "@/components/auth/RoleBadge";
@@ -10,7 +9,7 @@ type HomepageEditorBarProps = {
   showcase: HomepageShowcaseItem[];
   journal: HomepageJournalItem[];
   dirty: boolean;
-  onSaved: () => void;
+  onSaved: (content: { showcase: HomepageShowcaseItem[]; journal: HomepageJournalItem[] }) => Promise<void>;
 };
 
 export function HomepageEditorBar({
@@ -20,7 +19,6 @@ export function HomepageEditorBar({
   dirty,
   onSaved,
 }: HomepageEditorBarProps) {
-  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -33,8 +31,7 @@ export function HomepageEditorBar({
       await saveHomepageShowcase({ data: { accessToken, items: showcase } });
       await saveHomepageJournal({ data: { accessToken, items: journal } });
       setMessage("Homepage updated — changes are live.");
-      onSaved();
-      await router.invalidate();
+      await onSaved({ showcase, journal });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save homepage content.");
     } finally {
@@ -48,7 +45,7 @@ export function HomepageEditorBar({
         <div className="flex flex-wrap items-center gap-3">
           <RoleBadge role="editor" />
           <p className="text-sm text-ink/90">
-            Edit mode — update photos and text below, then save to publish live.
+            Edit mode — photos save automatically when changed. Use Save for text updates.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">

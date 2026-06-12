@@ -9,8 +9,40 @@ import {
   type HomepageJournalItem,
   type HomepageShowcaseItem,
 } from "@/lib/homepage-content";
+import {
+  EXPERIENCE_PHOTOS_BUCKET,
+  MAX_EXPERIENCE_PHOTO_BYTES,
+} from "@/lib/experience-photo-upload";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/env.server";
+
+const ALLOWED_HOMEPAGE_PHOTO_MIME = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+
+function extensionForMime(mimeType: string, fileName: string): string {
+  const fromName = fileName.split(".").pop()?.toLowerCase();
+  if (fromName && ["jpg", "jpeg", "png", "webp", "gif"].includes(fromName)) {
+    return fromName === "jpeg" ? "jpg" : fromName;
+  }
+  if (mimeType === "image/jpeg") return "jpg";
+  if (mimeType === "image/png") return "png";
+  if (mimeType === "image/webp") return "webp";
+  if (mimeType === "image/gif") return "gif";
+  return "jpg";
+}
+
+function decodeBase64ToBytes(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
 
 const showcaseIconKeySchema = z.enum(["pottery", "flame", "heritage"]);
 
@@ -92,10 +124,13 @@ export const saveHomepageShowcase = createServerFn({ method: "POST" })
     await requireEditor(data.accessToken);
     const supabase = getSupabaseAdmin();
 
-    const { error } = await supabase.from("platform_settings").upsert({
-      key: HOMEPAGE_SHOWCASE_KEY,
-      value: data.items,
-    });
+    const { error } = await supabase.from("platform_settings").upsert(
+      {
+        key: HOMEPAGE_SHOWCASE_KEY,
+        value: data.items,
+      },
+      { onConflict: "key" },
+    );
 
     if (error) throw new Error(error.message);
     return data.items;
@@ -112,11 +147,51 @@ export const saveHomepageJournal = createServerFn({ method: "POST" })
     await requireEditor(data.accessToken);
     const supabase = getSupabaseAdmin();
 
-    const { error } = await supabase.from("platform_settings").upsert({
-      key: HOMEPAGE_JOURNAL_KEY,
-      value: data.items,
-    });
+    const { error } = await supabase.from("platform_settings").upsert(
+      {
+        key: HOMEPAGE_JOURNAL_KEY,
+        value: data.items,
+      },
+      { onConflict: "key" },
+    );
 
     if (error) throw new Error(error.message);
     return data.items;
+  });
+
+export const uploadHomepagePhoto = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      accessToken: z.string().min(1),
+      fileName: z.string().min(1).max(200),
+      mimeType: z.string().min(1),
+      base64: z.string().min(1),
+    }),
+  )
+  .handler(async ({ data }): Promise<{ publicUrl: string }> => {
+    const user = await requireEditor(data.accessToken);
+
+    if (!ALLOWED_HOMEPAGE_PHOTO_MIME.has(data.mimeType)) {
+      throw new Error("Use a JPEG, PNG, WebP, or GIF image.");
+    }
+
+    const bytes = decodeBase64ToBytes(data.base64);
+    if (bytes.byteLength > MAX_EXPERIENCE_PHOTO_BYTES) {
+      throw new Error("Image must be 5 MB or smaller.");
+    }
+
+    const supabase = getSupabaseAdmin();
+    const ext = extensionForMime(data.mimeType, data.fileName);
+    const path = `homepage/${user.id}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+
+    const { error } = await supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).upload(path, bytes, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: data.mimeType,
+    });
+
+    if (error) throw new Error(error.message);
+
+    const { data: publicData } = supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).getPublicUrl(path);
+    return { publicUrl: publicData.publicUrl };
   });

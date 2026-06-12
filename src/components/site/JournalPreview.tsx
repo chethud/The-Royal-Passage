@@ -11,9 +11,17 @@ type JournalPreviewProps = {
   items: HomepageJournalItem[];
   editable?: boolean;
   onItemsChange?: (items: HomepageJournalItem[]) => void;
+  uploadPhoto?: (file: File) => Promise<string>;
+  onPersistJournal?: (items: HomepageJournalItem[]) => Promise<void>;
 };
 
-export function JournalPreview({ items, editable = false, onItemsChange }: JournalPreviewProps) {
+export function JournalPreview({
+  items,
+  editable = false,
+  onItemsChange,
+  uploadPhoto,
+  onPersistJournal,
+}: JournalPreviewProps) {
   const updateItem = (index: number, patch: Partial<HomepageJournalItem>) => {
     if (!onItemsChange) return;
     onItemsChange(items.map((item, idx) => (idx === index ? { ...item, ...patch } : item)));
@@ -49,6 +57,7 @@ export function JournalPreview({ items, editable = false, onItemsChange }: Journ
               >
                 <div className="relative aspect-[5/4] overflow-hidden sm:aspect-[4/5] md:aspect-[5/6]">
                   <img
+                    key={story.imageUrl}
                     src={story.imageUrl}
                     alt={story.alt}
                     className="absolute inset-0 h-full w-full object-cover"
@@ -58,8 +67,19 @@ export function JournalPreview({ items, editable = false, onItemsChange }: Journ
                       label={`Story ${idx + 1}`}
                       imageUrl={story.imageUrl}
                       alt={story.alt}
+                      uploadPhoto={uploadPhoto}
                       onImageChange={(imageUrl) => updateItem(idx, { imageUrl })}
                       onAltChange={(alt) => updateItem(idx, { alt })}
+                      onPhotoSaved={
+                        onPersistJournal
+                          ? async (imageUrl) => {
+                              const next = items.map((item, index) =>
+                                index === idx ? { ...item, imageUrl } : item,
+                              );
+                              await onPersistJournal(next);
+                            }
+                          : undefined
+                      }
                     />
                     <EditableTextField
                       label="Title"

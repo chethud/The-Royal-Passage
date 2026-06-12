@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { HomeHero } from "@/components/site/HomeHero";
@@ -10,8 +10,13 @@ import { JournalPreview } from "@/components/site/JournalPreview";
 import { HomepageEditorBar } from "@/components/editor/HomepageEditorBar";
 import { useAuthUser } from "@/lib/auth-user";
 import { getCatalogForUi } from "@/lib/marketplace-fns";
-import { getHomepageContent } from "@/lib/homepage-content-fns";
-import type { HomepageContent } from "@/lib/homepage-content";
+import {
+  getHomepageContent,
+  saveHomepageJournal,
+  saveHomepageShowcase,
+} from "@/lib/homepage-content-fns";
+import type { HomepageContent, HomepageJournalItem, HomepageShowcaseItem } from "@/lib/homepage-content";
+import { uploadHomepagePhotoForEditor } from "@/lib/homepage-photo-upload";
 import { buildHomeJsonLd, SITE_URL } from "@/lib/seo";
 import { isEditorRole } from "@/lib/roles";
 
@@ -43,6 +48,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const router = useRouter();
   const { experiences, homepage } = Route.useLoaderData();
   const { role, accessToken } = useAuthUser();
   const isEditor = isEditorRole(role);
@@ -50,8 +56,13 @@ function Index() {
 
   const [draft, setDraft] = useState<HomepageContent>(homepage);
   const [savedSnapshot, setSavedSnapshot] = useState<HomepageContent>(homepage);
+  const skipHomepageSyncRef = useRef(false);
 
   useEffect(() => {
+    if (skipHomepageSyncRef.current) {
+      skipHomepageSyncRef.current = false;
+      return;
+    }
     setDraft(homepage);
     setSavedSnapshot(homepage);
   }, [homepage]);
@@ -59,6 +70,52 @@ function Index() {
   const dirty = useMemo(
     () => JSON.stringify(draft) !== JSON.stringify(savedSnapshot),
     [draft, savedSnapshot],
+  );
+
+  const commitHomepage = useCallback((next: HomepageContent) => {
+    skipHomepageSyncRef.current = true;
+    setDraft(next);
+    setSavedSnapshot(next);
+  }, []);
+
+  const persistShowcase = useCallback(
+    async (items: HomepageShowcaseItem[]) => {
+      if (!accessToken) throw new Error("Sign in as editor to save homepage photos.");
+      await saveHomepageShowcase({ data: { accessToken, items } });
+      skipHomepageSyncRef.current = true;
+      setDraft((prev) => ({ ...prev, showcase: items }));
+      setSavedSnapshot((prev) => ({ ...prev, showcase: items }));
+      await router.invalidate();
+    },
+    [accessToken, router],
+  );
+
+  const persistJournal = useCallback(
+    async (items: HomepageJournalItem[]) => {
+      if (!accessToken) throw new Error("Sign in as editor to save homepage photos.");
+      await saveHomepageJournal({ data: { accessToken, items } });
+      skipHomepageSyncRef.current = true;
+      setDraft((prev) => ({ ...prev, journal: items }));
+      setSavedSnapshot((prev) => ({ ...prev, journal: items }));
+      await router.invalidate();
+    },
+    [accessToken, router],
+  );
+
+  const uploadPhoto = useCallback(
+    async (file: File) => {
+      if (!accessToken) throw new Error("Sign in as editor to upload photos.");
+      return uploadHomepagePhotoForEditor(accessToken, file);
+    },
+    [accessToken],
+  );
+
+  const handleSaved = useCallback(
+    async (content: HomepageContent) => {
+      commitHomepage(content);
+      await router.invalidate();
+    },
+    [commitHomepage, router],
   );
 
   return (
@@ -70,7 +127,7 @@ function Index() {
           showcase={draft.showcase}
           journal={draft.journal}
           dirty={dirty}
-          onSaved={() => setSavedSnapshot(draft)}
+          onSaved={handleSaved}
         />
       ) : null}
       <script
@@ -84,6 +141,8 @@ function Index() {
         items={isEditor ? draft.showcase : homepage.showcase}
         editable={isEditor}
         onItemsChange={(showcase) => setDraft((prev) => ({ ...prev, showcase }))}
+        uploadPhoto={isEditor ? uploadPhoto : undefined}
+        onPersistShowcase={isEditor ? persistShowcase : undefined}
       />
 
       <JourneysSplit />
@@ -94,6 +153,8 @@ function Index() {
         items={isEditor ? draft.journal : homepage.journal}
         editable={isEditor}
         onItemsChange={(journal) => setDraft((prev) => ({ ...prev, journal }))}
+        uploadPhoto={isEditor ? uploadPhoto : undefined}
+        onPersistJournal={isEditor ? persistJournal : undefined}
       />
 
       <Footer />

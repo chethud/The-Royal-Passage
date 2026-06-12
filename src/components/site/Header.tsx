@@ -56,6 +56,10 @@ function isHeaderNavItemActive(
   to: string,
 ): boolean {
   if (role === "host") return isHostNavItemActive(pathname, to);
+  if (role === "admin") {
+    if (to === "/admin") return pathname === "/admin";
+    return pathname === to || pathname.startsWith(`${to}/`);
+  }
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 

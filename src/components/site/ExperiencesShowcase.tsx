@@ -23,9 +23,17 @@ type ExperiencesShowcaseProps = {
   items: HomepageShowcaseItem[];
   editable?: boolean;
   onItemsChange?: (items: HomepageShowcaseItem[]) => void;
+  uploadPhoto?: (file: File) => Promise<string>;
+  onPersistShowcase?: (items: HomepageShowcaseItem[]) => Promise<void>;
 };
 
-export function ExperiencesShowcase({ items, editable = false, onItemsChange }: ExperiencesShowcaseProps) {
+export function ExperiencesShowcase({
+  items,
+  editable = false,
+  onItemsChange,
+  uploadPhoto,
+  onPersistShowcase,
+}: ExperiencesShowcaseProps) {
   const updateItem = (index: number, patch: Partial<HomepageShowcaseItem>) => {
     if (!onItemsChange) return;
     onItemsChange(items.map((item, idx) => (idx === index ? { ...item, ...patch } : item)));
@@ -56,6 +64,9 @@ export function ExperiencesShowcase({ items, editable = false, onItemsChange }: 
               card={card}
               index={idx}
               editable={editable}
+              uploadPhoto={uploadPhoto}
+              onPersistShowcase={onPersistShowcase}
+              allItems={items}
               onUpdate={(patch) => updateItem(idx, patch)}
             />
           ))}
@@ -69,11 +80,17 @@ function ExperienceShowcaseCard({
   card,
   index,
   editable,
+  uploadPhoto,
+  onPersistShowcase,
+  allItems,
   onUpdate,
 }: {
   card: HomepageShowcaseItem;
   index: number;
   editable: boolean;
+  uploadPhoto?: (file: File) => Promise<string>;
+  onPersistShowcase?: (items: HomepageShowcaseItem[]) => Promise<void>;
+  allItems: HomepageShowcaseItem[];
   onUpdate: (patch: Partial<HomepageShowcaseItem>) => void;
 }) {
   const Icon = ICON_BY_KEY[card.iconKey];
@@ -83,6 +100,7 @@ function ExperienceShowcaseCard({
       <article className="overflow-hidden rounded-md border border-ember/40 bg-[oklch(0.14_0.05_22)] shadow-soft">
         <div className="relative aspect-[5/4] overflow-hidden sm:aspect-[4/5] md:aspect-[5/6]">
           <img
+            key={card.imageUrl}
             src={card.imageUrl}
             alt={card.alt}
             className="absolute inset-0 h-full w-full object-cover"
@@ -92,8 +110,19 @@ function ExperienceShowcaseCard({
               label={`Experience ${index + 1}`}
               imageUrl={card.imageUrl}
               alt={card.alt}
+              uploadPhoto={uploadPhoto}
               onImageChange={(imageUrl) => onUpdate({ imageUrl })}
               onAltChange={(alt) => onUpdate({ alt })}
+              onPhotoSaved={
+                onPersistShowcase
+                  ? async (imageUrl) => {
+                      const next = allItems.map((item, idx) =>
+                        idx === index ? { ...item, imageUrl } : item,
+                      );
+                      await onPersistShowcase(next);
+                    }
+                  : undefined
+              }
             />
             <EditableTextField label="Title" value={card.title} onChange={(title) => onUpdate({ title })} />
             <EditableTextField label="Link" value={card.href} onChange={(href) => onUpdate({ href })} />

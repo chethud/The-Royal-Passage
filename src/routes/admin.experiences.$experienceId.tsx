@@ -83,7 +83,7 @@ function AdminExperienceReviewPage() {
       } else {
         await rejectExperience(accessToken, experienceId);
       }
-      void navigate({ to: "/admin" });
+      void navigate({ to: "/admin/experiences" });
     } catch (err) {
       setPageError(toErrorMessage(err, "Action failed."));
     } finally {
@@ -105,8 +105,8 @@ function AdminExperienceReviewPage() {
       subtitle="Review the full host submission before publishing to the marketplace."
     >
       <div className="mb-8 flex flex-wrap items-center gap-3">
-        <Link to="/admin" className="text-sm text-ember hover:underline">
-          ← Back to admin
+        <Link to="/admin/experiences" className="text-sm text-ember hover:underline">
+          ← Back to approvals
         </Link>
       </div>
 
