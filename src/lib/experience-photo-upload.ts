@@ -51,7 +51,7 @@ export async function uploadExperiencePhoto(file: File): Promise<string> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    throw new Error("Sign in as a host before uploading photos.");
+    throw new Error("Sign in before uploading photos.");
   }
 
   const ext = extensionForFile(file);

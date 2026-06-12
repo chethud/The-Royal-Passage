@@ -4,7 +4,6 @@ import {
   HeritageCompass,
   MaharajaEmblem,
   PalaceArchFrame,
-  PalaceDoorPanel,
 } from "@/components/site/RoyalHeritageDecor";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -59,9 +58,10 @@ const slides: HeritageSlide[] = [
   },
 ];
 
-const DOOR_CLOSE_MS = 380;
-const DOOR_OPEN_MS = 2400;
+const CURTAIN_CLOSE_MS = 380;
+const CURTAIN_OPEN_MS = 2400;
 const CONTENT_REVEAL_MS = 520;
+const INITIAL_CURTAIN_OPEN_MS = 400;
 
 const dustParticles = Array.from({ length: 8 }, (_, i) => ({
   id: i,
@@ -80,6 +80,19 @@ function youtubeEmbedUrl(videoId: string, autoplay: boolean) {
     iv_load_policy: "3",
   });
   return `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
+}
+
+function RoyalCurtain({ side }: { side: "left" | "right" }) {
+  return (
+    <div className={`royal-curtain royal-curtain--${side}`}>
+      <div className="royal-curtain-valance" aria-hidden />
+      <div className="royal-curtain-panel">
+        <div className="royal-curtain-folds" aria-hidden />
+        <div className="royal-curtain-sheen" aria-hidden />
+        <div className="royal-curtain-tassel" aria-hidden />
+      </div>
+    </div>
+  );
 }
 
 function RoyalMedallion({ active, label }: { active: boolean; label: string }) {
@@ -165,8 +178,8 @@ function SlideMedia({ slide, isActive, visible, reducedMotion }: SlideMediaProps
 
 export function JourneysSplit() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [doorsOpen, setDoorsOpen] = useState(true);
-  const [contentVisible, setContentVisible] = useState(true);
+  const [curtainsOpen, setCurtainsOpen] = useState(false);
+  const [contentVisible, setContentVisible] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [themeFlash, setThemeFlash] = useState<SlideTheme | null>(null);
@@ -192,16 +205,16 @@ export function JourneysSplit() {
       setIsLocked(true);
       setIsTransitioning(true);
       setContentVisible(false);
-      setDoorsOpen(false);
+      setCurtainsOpen(false);
 
-      const closeMs = reducedMotion ? 120 : DOOR_CLOSE_MS;
-      const openMs = reducedMotion ? 280 : DOOR_OPEN_MS;
+      const closeMs = reducedMotion ? 120 : CURTAIN_CLOSE_MS;
+      const openMs = reducedMotion ? 280 : CURTAIN_OPEN_MS;
       const revealMs = reducedMotion ? 80 : CONTENT_REVEAL_MS;
 
       schedule(() => {
         setActiveIndex(next);
         setThemeFlash(slides[next].theme);
-        setDoorsOpen(true);
+        setCurtainsOpen(true);
 
         schedule(() => {
           setContentVisible(true);
@@ -218,6 +231,17 @@ export function JourneysSplit() {
   );
 
   useEffect(() => () => clearTimers(), [clearTimers]);
+
+  useEffect(() => {
+    if (reducedMotion) {
+      setCurtainsOpen(true);
+      setContentVisible(true);
+      return;
+    }
+
+    schedule(() => setCurtainsOpen(true), INITIAL_CURTAIN_OPEN_MS);
+    schedule(() => setContentVisible(true), INITIAL_CURTAIN_OPEN_MS + 700);
+  }, [reducedMotion, schedule]);
 
   const goPrev = () => goTo(activeIndex - 1);
   const goNext = () => goTo(activeIndex + 1);
@@ -280,17 +304,13 @@ export function JourneysSplit() {
               ) : null}
 
               <div
-                className={`royal-golden-burst pointer-events-none absolute inset-0 z-[38] ${doorsOpen && contentVisible ? "" : "is-active"}`}
+                className={`royal-golden-burst pointer-events-none absolute inset-0 z-[38] ${curtainsOpen && contentVisible ? "" : "is-active"}`}
                 aria-hidden
               />
 
-              <div className={`royal-doors absolute inset-0 z-[45] overflow-hidden ${doorsOpen ? "is-open" : "is-closed"}`}>
-                <div className="royal-door royal-door--left">
-                  <PalaceDoorPanel side="left" />
-                </div>
-                <div className="royal-door royal-door--right">
-                  <PalaceDoorPanel side="right" />
-                </div>
+              <div className={`royal-curtains absolute inset-0 z-[45] overflow-hidden ${curtainsOpen ? "is-open" : "is-closed"}`}>
+                <RoyalCurtain side="left" />
+                <RoyalCurtain side="right" />
               </div>
             </div>
           </div>

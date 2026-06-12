@@ -546,54 +546,123 @@
   animation-play-state: paused;
 }
 
-/* Palace doors — CSS transform only */
-.royal-doors {
+/* Royal theatre curtains — velvet drape reveal */
+.royal-curtains {
   pointer-events: none;
 }
 
-.royal-door {
+.royal-curtain {
   position: absolute;
   inset-block: 0;
-  width: 50%;
+  width: 52%;
   will-change: transform;
   transform: translate3d(0, 0, 0);
-  transition: transform 2.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: transform 2.4s cubic-bezier(0.22, 0.61, 0.36, 1);
   backface-visibility: hidden;
 }
 
-.royal-door--left {
+.royal-curtain--left {
   left: 0;
 }
 
-.royal-door--right {
+.royal-curtain--right {
   right: 0;
 }
 
-.royal-doors.is-open .royal-door--left {
-  transform: translate3d(-100%, 0, 0);
+.royal-curtains.is-open .royal-curtain--left {
+  transform: translate3d(-102%, 0, 0) scaleX(0.92);
 }
 
-.royal-doors.is-open .royal-door--right {
-  transform: translate3d(100%, 0, 0);
+.royal-curtains.is-open .royal-curtain--right {
+  transform: translate3d(102%, 0, 0) scaleX(0.92);
 }
 
-.royal-doors.is-closed .royal-door--left,
-.royal-doors.is-closed .royal-door--right {
+.royal-curtains.is-closed .royal-curtain--left,
+.royal-curtains.is-closed .royal-curtain--right {
   transform: translate3d(0, 0, 0);
   transition-duration: 0.38s;
 }
 
-.royal-door-panel {
-  background: linear-gradient(165deg, #2a0a0a 0%, #3b0000 40%, #1a0505 100%);
-  box-shadow: inset 0 0 50px #00000099;
+.royal-curtain-valance {
+  position: absolute;
+  inset-inline: -4%;
+  top: 0;
+  z-index: 2;
+  height: 2.75rem;
+  background: linear-gradient(180deg, #5c0a12 0%, #3b0000 55%, #2a0a0a 100%);
+  border-bottom: 2px solid #d4af3766;
+  box-shadow: 0 8px 24px #00000088, inset 0 -1px 0 #d4af3744;
 }
 
-.royal-door-carving {
-  background: linear-gradient(180deg, #3b0000 0%, #2a0a0a 100%);
+.royal-curtain-valance::after {
+  content: "";
+  position: absolute;
+  inset-inline: 8%;
+  bottom: -0.45rem;
+  height: 0.9rem;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(180deg, #8a1020, #3b0000);
+  box-shadow: 0 6px 14px #00000066;
 }
 
-.royal-door-handle {
-  background: linear-gradient(180deg, #c9a227, #d4af37, #8a6f1f);
+.royal-curtain-panel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(165deg, #6b0f1a 0%, #3b0000 38%, #2a0a0a 100%);
+  box-shadow: inset -8px 0 28px #00000066, inset 8px 0 28px #00000066;
+}
+
+.royal-curtain--left .royal-curtain-panel {
+  border-right: 2px solid #d4af3740;
+}
+
+.royal-curtain--right .royal-curtain-panel {
+  border-left: 2px solid #d4af3740;
+}
+
+.royal-curtain-folds {
+  position: absolute;
+  inset: 2.5rem 0 0;
+  background: repeating-linear-gradient(
+    90deg,
+    #3b0000 0px,
+    #5c0a12 18px,
+    #2a0a0a 36px,
+    #6b0f1a 54px,
+    #3b0000 72px
+  );
+  opacity: 0.85;
+}
+
+.royal-curtain-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    118deg,
+    transparent 0%,
+    #d4af3718 42%,
+    transparent 58%,
+    #ffffff08 72%,
+    transparent 100%
+  );
+}
+
+.royal-curtain-tassel {
+  position: absolute;
+  bottom: 0;
+  width: 1.25rem;
+  height: 4.5rem;
+  background: linear-gradient(180deg, #c9a227, #8a6f1f 55%, #5c4a14);
+  box-shadow: 0 0 12px #d4af3744;
+}
+
+.royal-curtain--left .royal-curtain-tassel {
+  right: 0.65rem;
+}
+
+.royal-curtain--right .royal-curtain-tassel {
+  left: 0.65rem;
 }
 
 /* Golden burst */
@@ -715,7 +784,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .royal-door {
+  .royal-curtain {
     transition-duration: 0.2s;
   }
 

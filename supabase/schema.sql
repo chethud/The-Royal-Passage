@@ -50,7 +50,7 @@ create table if not exists public.profiles (
   full_name text,
   phone text,
   role text not null default 'guest'
-    check (role in ('guest', 'host', 'admin')),
+    check (role in ('guest', 'host', 'admin', 'editor')),
   host_id uuid,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -817,7 +817,17 @@ on conflict (slug) do nothing;
 
 insert into public.platform_settings (key, value) values
   ('commission_percent', '10'::jsonb),
-  ('default_currency', '"INR"'::jsonb)
+  ('default_currency', '"INR"'::jsonb),
+  ('homepage_showcase', '[
+    {"id":"showcase-pottery","iconKey":"pottery","title":"Pottery Experience","imageUrl":"/assets/exp-craft.jpg","alt":"Hands shaping clay on a pottery wheel","href":"/experiences?category=Craft"},
+    {"id":"showcase-cooking","iconKey":"flame","title":"Outdoor Cooking","imageUrl":"/assets/outdoor-cooking.png","alt":"Open fire cooking in the wild under warm light","href":"/experiences?category=Tasting"},
+    {"id":"showcase-heritage","iconKey":"heritage","title":"Heritage Walks","imageUrl":"/assets/hero-image.png","alt":"Mysuru palace at golden hour","href":"/experiences"}
+  ]'::jsonb),
+  ('homepage_journal', '[
+    {"id":"journal-walk","imageUrl":"/assets/hero-image.png","alt":"Mysuru Palace illuminated at sunset","title":"A Walk Through Time","excerpt":"Heritage walks in Mysuru are like stepping into a royal era."},
+    {"id":"journal-flavours","imageUrl":"/assets/masala-dose.png","alt":"A crisp masala dose served with chutneys","title":"Flavours of Mysuru","excerpt":"Explore the culinary legacy of the Wadiyars."},
+    {"id":"journal-nature","imageUrl":"/assets/nature-walks.png","alt":"A nature trail winding through the green hills near Mysuru","title":"Nature''s Escape","excerpt":"Unwind in the serene trails around Mysuru."}
+  ]'::jsonb)
 on conflict (key) do update set value = excluded.value;
 
 insert into public.hosts (id, display_name, email, bio, verified, approval_status) values

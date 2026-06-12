@@ -1,51 +1,36 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
-import expCraftImg from "@/assets/exp-craft.jpg";
-import heroPalaceImg from "@/assets/hero-image.png";
-import outdoorCookingImg from "@/assets/outdoor-cooking.png";
+import {
+  EditablePhotoField,
+  EditableTextField,
+} from "@/components/editor/EditableHomepageFields";
 import {
   RoyalFlameIcon,
   RoyalHeritageIcon,
   RoyalPotteryIcon,
 } from "@/components/site/ExperienceShowcaseIcons";
+import type { HomepageShowcaseItem, ShowcaseIconKey } from "@/lib/homepage-content";
 import type { ComponentType, SVGProps } from "react";
 
-type ShowcaseIcon = ComponentType<SVGProps<SVGSVGElement>>;
-
-type ShowcaseCard = {
-  icon: ShowcaseIcon;
-  title: string;
-  image: string;
-  alt: string;
-  href: string;
+const ICON_BY_KEY: Record<ShowcaseIconKey, ComponentType<SVGProps<SVGSVGElement>>> = {
+  pottery: RoyalPotteryIcon,
+  flame: RoyalFlameIcon,
+  heritage: RoyalHeritageIcon,
 };
 
-const cards: ShowcaseCard[] = [
-  {
-    icon: RoyalPotteryIcon,
-    title: "Pottery Experience",
-    image: expCraftImg,
-    alt: "Hands shaping clay on a pottery wheel",
-    href: "/experiences?category=Craft",
-  },
-  {
-    icon: RoyalFlameIcon,
-    title: "Outdoor Cooking",
-    image: outdoorCookingImg,
-    alt: "Open fire cooking in the wild under warm light",
-    href: "/experiences?category=Tasting",
-  },
-  {
-    icon: RoyalHeritageIcon,
-    title: "Heritage Walks",
-    image: heroPalaceImg,
-    alt: "Mysuru palace at golden hour",
-    href: "/experiences",
-  },
-];
+type ExperiencesShowcaseProps = {
+  items: HomepageShowcaseItem[];
+  editable?: boolean;
+  onItemsChange?: (items: HomepageShowcaseItem[]) => void;
+};
 
-export function ExperiencesShowcase() {
+export function ExperiencesShowcase({ items, editable = false, onItemsChange }: ExperiencesShowcaseProps) {
+  const updateItem = (index: number, patch: Partial<HomepageShowcaseItem>) => {
+    if (!onItemsChange) return;
+    onItemsChange(items.map((item, idx) => (idx === index ? { ...item, ...patch } : item)));
+  };
+
   return (
     <section className="relative border-y border-[oklch(0.88_0.08_86_/_0.1)] bg-[oklch(0.16_0.07_22)] py-16 sm:py-20 md:py-24">
       <div className="container-page">
@@ -53,18 +38,26 @@ export function ExperiencesShowcase() {
           <h2 className="font-display text-3xl tracking-tight text-ink text-balance sm:text-4xl md:text-5xl">
             Our Top 3 Experiences
           </h2>
-          <Link
-            to="/experiences"
-            className="group inline-flex items-center gap-2 self-start rounded-sm text-xs font-semibold uppercase tracking-[0.22em] text-ember transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:self-auto"
-          >
-            View all experiences
-            <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-          </Link>
+          {!editable ? (
+            <Link
+              to="/experiences"
+              className="group inline-flex items-center gap-2 self-start rounded-sm text-xs font-semibold uppercase tracking-[0.22em] text-ember transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:self-auto"
+            >
+              View all experiences
+              <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+            </Link>
+          ) : null}
         </div>
 
         <div className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2 md:grid-cols-3 md:gap-7">
-          {cards.map((card, idx) => (
-            <ExperienceShowcaseCard key={card.title} card={card} index={idx} />
+          {items.map((card, idx) => (
+            <ExperienceShowcaseCard
+              key={card.id}
+              card={card}
+              index={idx}
+              editable={editable}
+              onUpdate={(patch) => updateItem(idx, patch)}
+            />
           ))}
         </div>
       </div>
@@ -72,8 +65,43 @@ export function ExperiencesShowcase() {
   );
 }
 
-function ExperienceShowcaseCard({ card, index }: { card: ShowcaseCard; index: number }) {
-  const Icon = card.icon;
+function ExperienceShowcaseCard({
+  card,
+  index,
+  editable,
+  onUpdate,
+}: {
+  card: HomepageShowcaseItem;
+  index: number;
+  editable: boolean;
+  onUpdate: (patch: Partial<HomepageShowcaseItem>) => void;
+}) {
+  const Icon = ICON_BY_KEY[card.iconKey];
+
+  if (editable) {
+    return (
+      <article className="overflow-hidden rounded-md border border-ember/40 bg-[oklch(0.14_0.05_22)] shadow-soft">
+        <div className="relative aspect-[5/4] overflow-hidden sm:aspect-[4/5] md:aspect-[5/6]">
+          <img
+            src={card.imageUrl}
+            alt={card.alt}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-x-0 bottom-0 space-y-3 bg-gradient-to-t from-black/95 via-black/80 to-transparent p-4">
+            <EditablePhotoField
+              label={`Experience ${index + 1}`}
+              imageUrl={card.imageUrl}
+              alt={card.alt}
+              onImageChange={(imageUrl) => onUpdate({ imageUrl })}
+              onAltChange={(alt) => onUpdate({ alt })}
+            />
+            <EditableTextField label="Title" value={card.title} onChange={(title) => onUpdate({ title })} />
+            <EditableTextField label="Link" value={card.href} onChange={(href) => onUpdate({ href })} />
+          </div>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <motion.article
@@ -88,7 +116,7 @@ function ExperienceShowcaseCard({ card, index }: { card: ShowcaseCard; index: nu
         className="relative block aspect-[5/4] overflow-hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:aspect-[4/5] md:aspect-[5/6]"
       >
         <img
-          src={card.image}
+          src={card.imageUrl}
           alt={card.alt}
           loading="lazy"
           decoding="async"

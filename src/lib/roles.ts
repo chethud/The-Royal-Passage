@@ -1,5 +1,5 @@
 /** Platform roles — experience providers are called **hosts** in this product. */
-export const USER_ROLES = ["guest", "host", "admin"] as const;
+export const USER_ROLES = ["guest", "host", "admin", "editor"] as const;
 
 export type UserRole = (typeof USER_ROLES)[number];
 
@@ -7,24 +7,28 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   guest: "Guest",
   host: "Host",
   admin: "Admin",
+  editor: "Editor",
 };
 
 export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
   guest: "Sign up or sign in to book experiences.",
   host: "Sign in with login credentials provided by Royal Passage.",
   admin: "Sign in with your admin credentials.",
+  editor: "Sign in to edit homepage photos and stories.",
 };
 
 export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
   guest: "/",
   host: "/host/dashboard",
   admin: "/admin",
+  editor: "/",
 };
 
 export const ROLE_PROFILE_PATH: Record<UserRole, string> = {
   guest: "/dashboard/profile",
   host: "/host/profile",
   admin: "/admin/profile",
+  editor: "/",
 };
 
 const INTENDED_ROLE_KEY = "rp_intended_role_v1";
@@ -59,9 +63,13 @@ export function profilePathForRole(role: UserRole | null | undefined): string {
   return ROLE_PROFILE_PATH[role];
 }
 
-/** Host or admin — not allowed to book as a guest. */
+/** Host, admin, or editor — not allowed to book as a guest. */
 export function isStaffRole(role: UserRole | null | undefined): boolean {
-  return role === "host" || role === "admin";
+  return role === "host" || role === "admin" || role === "editor";
+}
+
+export function isEditorRole(role: UserRole | null | undefined): boolean {
+  return role === "editor";
 }
 
 /** Signed-in user who may book experiences (guest, or profile still loading). */
