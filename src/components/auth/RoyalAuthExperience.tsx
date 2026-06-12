@@ -2,7 +2,7 @@ import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { RoleBadge } from "@/components/auth/RoleBadge";
-import { SignInHeroLayout } from "@/components/auth/SignInHeroLayout";
+import { AuthPageLayout } from "@/components/auth/AuthPageLayout";
 import { useAuthUser } from "@/lib/auth-user";
 import { dashboardPathForRole, isGuestAccount, isStaffRole, ROLE_LABELS } from "@/lib/roles";
 import {
@@ -15,8 +15,6 @@ import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/
 
 const inputClass =
   "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 text-sm text-ink placeholder:text-ink/45 backdrop-blur-sm focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
-
-const cardTitleClass = "font-display text-2xl tracking-tight text-ink md:text-[1.75rem]";
 
 type RoyalAuthExperienceProps = {
   initialMode: "signin" | "signup";
@@ -225,70 +223,32 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     void navigate({ to: "/sign-in" });
   };
 
-  const heroContent = user
+  const pageMeta = user
     ? {
-        eyebrow: "Your account",
-        title: (
-          <>
-            Welcome,
-            <br />
-            <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-              {displayName ?? "Member"}
-            </span>
-          </>
-        ),
-        description:
+        title: `Welcome, ${displayName ?? "Member"}`,
+        subtitle:
           "Your access level is set automatically. You will be redirected to your dashboard, or update your profile below.",
       }
     : mode === "signin"
       ? {
-          eyebrow: "Curated Experiences · Timeless Memories",
-          title: (
-            <>
-              Welcome
-              <br />
-              <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-                Back,
-              </span>
-              <br />
-              Royally
-            </>
-          ),
-          description:
-            "Step into the cultural heart of Karnataka. Sign in to book experiences, manage your journeys, and unlock your Royal Passage account.",
+          title: "Sign in",
+          subtitle:
+            "Sign in with Google or your email and password. Your role is assigned automatically.",
         }
       : {
-          eyebrow: "Guest Registration",
-          title: (
-            <>
-              Join the
-              <br />
-              <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-                Royal Passage
-              </span>
-            </>
-          ),
-          description:
-            "Create a guest account to save wishlists, request bookings, and receive confirmations for curated Mysuru experiences.",
+          title: "Create account",
+          subtitle:
+            "Create a guest account to book experiences. Host, editor, and admin logins are created by the platform team.",
         };
 
   return (
-    <SignInHeroLayout
-      eyebrow={heroContent.eyebrow}
-      title={heroContent.title}
-      description={heroContent.description}
-    >
-      <div className="glass-strong w-full rounded-md px-7 py-9 md:px-9 md:py-10">
+    <AuthPageLayout title={pageMeta.title} subtitle={pageMeta.subtitle}>
         {user ? (
           <>
-            <div className="mb-3 flex flex-wrap items-center gap-2">
+            <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
               {role ? <RoleBadge role={role} /> : null}
             </div>
-            <h2 className={cardTitleClass}>Account details</h2>
-            <p className="mt-2 text-sm leading-relaxed text-ink/75">
-              Redirecting to your {role ? ROLE_LABELS[role].toLowerCase() : "account"} dashboard.
-            </p>
-            <form className="mt-6 space-y-4" onSubmit={updateProfile}>
+            <form className="space-y-4" onSubmit={updateProfile}>
               <div>
                 <label htmlFor="profile-name" className="eyebrow mb-2 block text-ink/90">
                   Full name
@@ -359,13 +319,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
           </>
         ) : mode === "signin" ? (
           <>
-            <div className="eyebrow mb-3 text-ember/90">Sign in</div>
-            <h2 className={cardTitleClass}>The Royal Passage</h2>
-            <p className="mt-2 text-sm leading-relaxed text-ink/75">
-              Sign in with Google or your email and password. Your role is assigned automatically.
-            </p>
-
-            <div className="mt-8 space-y-4">
+            <div className="space-y-4">
               <GoogleSignInButton
                 busy={googleBusy}
                 disabled={!browserConfigured}
@@ -456,14 +410,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
           </>
         ) : (
           <>
-            <div className="eyebrow mb-3 text-ember/90">Guest registration</div>
-            <h2 className={cardTitleClass}>Create account</h2>
-            <p className="mt-2 text-sm leading-relaxed text-ink/75">
-              Sign up with Google or email. Host, editor, and admin logins are created by the
-              platform team.
-            </p>
-
-            <div className="mt-8 space-y-4">
+            <div className="space-y-4">
               <GoogleSignInButton
                 busy={googleBusy}
                 disabled={!browserConfigured}
@@ -595,7 +542,6 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
             {notice}
           </p>
         ) : null}
-      </div>
-    </SignInHeroLayout>
+    </AuthPageLayout>
   );
 }
