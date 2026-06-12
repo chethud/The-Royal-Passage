@@ -117,6 +117,14 @@ function decodeFileName(raw: string | undefined): string {
   }
 }
 
+function readAccessToken(req: VercelRequest): string | undefined {
+  const authorization = headerValue(req, "authorization");
+  if (authorization?.startsWith("Bearer ")) {
+    return authorization.slice("Bearer ".length).trim();
+  }
+  return headerValue(req, "x-access-token")?.trim();
+}
+
 function isJsonRequest(req: VercelRequest): boolean {
   const contentType = headerValue(req, "content-type") ?? "";
   return contentType.includes("application/json");
@@ -152,7 +160,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let result;
 
     if (isBinaryPhotoRequest(req) && !isJsonRequest(req)) {
-      const accessToken = headerValue(req, "x-access-token")?.trim();
+      const accessToken = readAccessToken(req);
       const section = parseSection(headerValue(req, "x-section"));
       const itemIndex = parseItemIndex(headerValue(req, "x-item-index"));
       const fileName = decodeFileName(headerValue(req, "x-file-name"));

@@ -157,7 +157,7 @@ export function useAuthUser() {
     [cachedUser, profile, user],
   );
 
-  const role = profile?.role ?? cachedUser?.role ?? null;
+  const role = profile?.role ?? (user ? cachedUser?.role : null) ?? null;
 
   return { user, profile, role, loading, configured, displayName, accessToken };
 }

@@ -1,6 +1,7 @@
 import { Loader2, Save } from "lucide-react";
 import { useState } from "react";
 import { RoleBadge } from "@/components/auth/RoleBadge";
+import { resolveAccessToken } from "@/lib/auth-session";
 import { saveHomepageJournal, saveHomepageShowcase } from "@/lib/homepage-content-fns";
 import type { HomepageContent, HomepageJournalItem, HomepageShowcaseItem } from "@/lib/homepage-content";
 
@@ -28,9 +29,10 @@ export function HomepageEditorBar({
     setError(null);
     setMessage(null);
     try {
+      const token = await resolveAccessToken();
       const [showcaseResult, journalResult] = await Promise.all([
-        saveHomepageShowcase({ data: { accessToken, items: showcase } }),
-        saveHomepageJournal({ data: { accessToken, items: journal } }),
+        saveHomepageShowcase({ data: { accessToken: token, items: showcase } }),
+        saveHomepageJournal({ data: { accessToken: token, items: journal } }),
       ]);
       const version = Math.max(showcaseResult.version, journalResult.version);
       setMessage("Homepage updated — changes are live for all visitors.");

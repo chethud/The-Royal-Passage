@@ -112,13 +112,26 @@ async function uploadHomepagePhotoAdmin(
 }
 
 export async function requireEditor(accessToken: string) {
+  const token = accessToken.trim();
+  if (!token) {
+    throw new Error("You must be signed in as an editor.");
+  }
+
   const supabase = getSupabaseAdmin();
   const {
     data: { user },
     error,
-  } = await supabase.auth.getUser(accessToken);
+  } = await supabase.auth.getUser(token);
 
-  if (error || !user) {
+  if (error) {
+    const message = error.message.toLowerCase();
+    if (message.includes("expired") || message.includes("invalid") || message.includes("jwt")) {
+      throw new Error("Session expired. Sign out and sign in again as editor.");
+    }
+    throw new Error(`Could not verify editor sign-in: ${error.message}`);
+  }
+
+  if (!user) {
     throw new Error("You must be signed in as an editor.");
   }
 

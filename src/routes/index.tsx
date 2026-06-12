@@ -48,7 +48,7 @@ function Index() {
   const router = useRouter();
   const { experiences, homepage } = Route.useLoaderData();
   const { role, accessToken } = useAuthUser();
-  const isEditor = isEditorRole(role);
+  const isEditor = isEditorRole(role) && Boolean(accessToken);
   const ldJson = buildHomeJsonLd(experiences);
 
   const [draft, setDraft] = useState<HomepageContent>(homepage);
@@ -87,7 +87,7 @@ function Index() {
 
   const createPhotoUploader = useCallback(
     (section: "showcase" | "journal", itemIndex: number) => async (file: File) => {
-      if (!accessToken) throw new Error("Sign in as editor to upload photos.");
+      if (!accessToken) throw new Error("Sign in again as editor to upload photos.");
 
       const result = await commitHomepagePhotoForEditor(accessToken, file, section, itemIndex);
 

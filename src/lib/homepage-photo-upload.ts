@@ -1,3 +1,4 @@
+import { resolveAccessToken } from "@/lib/auth-session";
 import { validateExperiencePhotoFile } from "@/lib/experience-photo-upload";
 
 export type HomepagePhotoCommitResult = {
@@ -31,16 +32,16 @@ async function readJsonResponse(
 }
 
 async function saveHomepagePhotoViaApi(
-  accessToken: string,
   section: "showcase" | "journal",
   itemIndex: number,
   file: File,
 ): Promise<HomepagePhotoCommitResult> {
+  const accessToken = await resolveAccessToken();
   const response = await fetch("/api/homepage-photo", {
     method: "POST",
     headers: {
+      Authorization: `Bearer ${accessToken}`,
       "Content-Type": file.type || "application/octet-stream",
-      "X-Access-Token": accessToken,
       "X-Section": section,
       "X-Item-Index": String(itemIndex),
       "X-File-Name": encodeURIComponent(file.name || "photo.jpg"),
@@ -64,7 +65,7 @@ async function saveHomepagePhotoViaApi(
 }
 
 export async function commitHomepagePhotoForEditor(
-  accessToken: string,
+  _accessToken: string | null | undefined,
   file: File,
   section: "showcase" | "journal",
   itemIndex: number,
@@ -74,5 +75,5 @@ export async function commitHomepagePhotoForEditor(
     throw new Error(validationError);
   }
 
-  return saveHomepagePhotoViaApi(accessToken, section, itemIndex, file);
+  return saveHomepagePhotoViaApi(section, itemIndex, file);
 }
