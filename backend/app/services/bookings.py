@@ -320,7 +320,9 @@ def get_booking_by_id(booking_id: str, auth: dict) -> BookingSummary:
         raise ValueError("Booking not found.")
 
     if row.get("guest_id") != user_id:
-        raise ValueError("You do not have access to this booking.")
+        role = auth.get("profile", {}).get("role")
+        if role != "admin":
+            raise ValueError("You do not have access to this booking.")
 
     return _map_booking_row(row)
 
