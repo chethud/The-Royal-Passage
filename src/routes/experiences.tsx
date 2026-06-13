@@ -28,8 +28,6 @@ function parseSearch(s: Record<string, unknown>): ExperienceSearch {
     category: typeof s.category === "string" ? s.category : undefined,
     city: typeof s.city === "string" ? s.city : undefined,
     q: typeof s.q === "string" ? s.q : undefined,
-    minPrice: num(s.minPrice),
-    maxPrice: num(s.maxPrice),
     duration:
       s.duration === "short" ||
       s.duration === "half" ||
@@ -110,8 +108,6 @@ function ExperiencesPage() {
         category: undefined,
         city: undefined,
         q: undefined,
-        minPrice: undefined,
-        maxPrice: undefined,
         duration: undefined,
         availability: undefined,
         page: 1,

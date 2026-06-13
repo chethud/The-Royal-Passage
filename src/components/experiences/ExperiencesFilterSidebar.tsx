@@ -1,5 +1,4 @@
 import type { ExperienceSearch } from "@/lib/experience-filters";
-import { PRICE_MAX, PRICE_MIN } from "@/lib/experience-filters";
 
 type CityOption = { slug: string; name: string };
 
@@ -32,9 +31,6 @@ export function ExperiencesFilterSidebar({
   onUpdate,
   onReset,
 }: ExperiencesFilterSidebarProps) {
-  const minPrice = search.minPrice ?? PRICE_MIN;
-  const maxPrice = search.maxPrice ?? PRICE_MAX;
-
   return (
     <aside className="w-full shrink-0 lg:w-[220px] xl:w-[240px]">
       <div className="sticky top-[calc(var(--header-height)+1rem)] space-y-5 rounded-lg border border-[#C8A25A]/18 bg-[#4A0000]/55 p-4 backdrop-blur-sm">
@@ -84,22 +80,6 @@ export function ExperiencesFilterSidebar({
               {c}
             </FilterPill>
           ))}
-        </FilterSection>
-
-        <FilterSection title="Price">
-          <input
-            type="range"
-            min={PRICE_MIN}
-            max={PRICE_MAX}
-            step={100}
-            value={maxPrice}
-            onChange={(e) => onUpdate({ maxPrice: Number(e.target.value), page: 1 })}
-            className="luxury-range w-full"
-          />
-          <div className="mt-1.5 flex justify-between text-[0.65rem] text-[#D6C8B5]">
-            <span>₹{minPrice}</span>
-            <span className="text-[#C8A25A]">≤ ₹{maxPrice}</span>
-          </div>
         </FilterSection>
 
         <FilterSection title="Duration">

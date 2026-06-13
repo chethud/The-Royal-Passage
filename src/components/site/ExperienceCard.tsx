@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Clock, MapPin, Star } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { motion } from "motion/react";
 import type { Experience } from "@/data/experiences";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
@@ -11,14 +11,13 @@ import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
 export function ExperienceCard({ exp }: { exp: Experience }) {
   const nextSlot = filterSlotsWithinBookingWindow(exp.slots).find((s) => s.available > 0);
   const reduceMotion = usePrefersReducedMotion();
-  const sym = exp.currencySymbol ?? "₹";
   const defaultGuests = nextSlot
     ? guestBookingLimits(exp, nextSlot.available).min
     : 1;
 
   const card = (
-    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#C8A25A]/20 bg-[#4A0000]/40 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-[#C8A25A]/40 hover:shadow-[0_0_24px_-10px_#C8A25A44]">
-      <div className="relative aspect-[4/3] overflow-hidden">
+    <article className="group flex h-full min-h-[360px] flex-col overflow-hidden rounded-lg border border-[#C8A25A]/20 bg-[#4A0000]/40 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-[#C8A25A]/40 hover:shadow-[0_0_24px_-10px_#C8A25A44]">
+      <div className="relative min-h-0 flex-[7] overflow-hidden">
         <Link
           to="/experiences/$slug"
           params={{ slug: exp.slug }}
@@ -50,68 +49,45 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
-        <div className="flex items-center gap-1 text-[0.7rem] text-[#D6C8B5]">
-          <MapPin className="h-3 w-3 shrink-0 text-[#C8A25A]" />
-          <span className="truncate">{exp.city}</span>
-        </div>
-
-        <Link
-          to="/experiences/$slug"
-          params={{ slug: exp.slug }}
-          className="mt-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]"
-        >
-          <h3 className="line-clamp-2 font-display text-lg leading-snug text-[#F7F1E8] transition-colors group-hover:text-[#D4AF6A]">
-            {exp.title}
-          </h3>
-        </Link>
-
-        <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-[#D6C8B5]/90">
-          {exp.tagline || exp.description}
-        </p>
-
-        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.7rem] text-[#D6C8B5]">
-          <span className="inline-flex items-center gap-1">
-            <Clock className="h-3 w-3 text-[#C8A25A]" />
-            {exp.durationHours}h
-          </span>
-          <span className="inline-flex items-center gap-1 text-[#D4AF6A]">
-            <Star className="h-3 w-3 fill-current" />
-            {exp.rating}
-          </span>
-        </div>
-
-        <div className="mt-auto flex items-center justify-between gap-3 border-t border-[#C8A25A]/12 pt-3">
-          <div>
-            <div className="text-[0.6rem] uppercase tracking-[0.14em] text-[#D6C8B5]">From</div>
-            <div className="font-display text-xl leading-none text-[#F7F1E8]">
-              {sym}
-              {exp.pricePerPerson}
-            </div>
+      <div className="flex min-h-0 flex-[3] flex-col justify-between p-3 sm:p-3.5">
+        <div className="min-w-0">
+          <div className="flex items-center gap-1 text-[0.65rem] text-[#D6C8B5]">
+            <MapPin className="h-3 w-3 shrink-0 text-[#C8A25A]" />
+            <span className="truncate">{exp.city}</span>
           </div>
 
-          <div className="flex shrink-0 flex-col items-end gap-1.5">
-            {nextSlot ? (
-              <Link
-                to="/experiences/$slug/book"
-                params={{ slug: exp.slug }}
-                search={{ slotId: nextSlot.id, guests: defaultGuests }}
-                resetScroll
-                className="relative z-10 luxury-btn-sm luxury-btn-primary"
-              >
-                Book
-              </Link>
-            ) : (
-              <span className="luxury-btn-sm luxury-btn-primary pointer-events-none opacity-50">Sold out</span>
-            )}
+          <Link
+            to="/experiences/$slug"
+            params={{ slug: exp.slug }}
+            className="mt-1 block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]"
+          >
+            <h3 className="line-clamp-2 font-display text-base leading-snug text-[#F7F1E8] transition-colors group-hover:text-[#D4AF6A] sm:text-[1.05rem]">
+              {exp.title}
+            </h3>
+          </Link>
+        </div>
+
+        <div className="mt-2 flex items-center justify-end gap-2">
+          {nextSlot ? (
             <Link
-              to="/experiences/$slug"
+              to="/experiences/$slug/book"
               params={{ slug: exp.slug }}
-              className="text-[0.65rem] uppercase tracking-[0.12em] text-[#D4AF6A] hover:text-[#F7F1E8]"
+              search={{ slotId: nextSlot.id, guests: defaultGuests }}
+              resetScroll
+              className="relative z-10 luxury-btn-sm luxury-btn-primary"
             >
-              Details →
+              Book
             </Link>
-          </div>
+          ) : (
+            <span className="luxury-btn-sm luxury-btn-primary pointer-events-none opacity-50">Sold out</span>
+          )}
+          <Link
+            to="/experiences/$slug"
+            params={{ slug: exp.slug }}
+            className="text-[0.65rem] uppercase tracking-[0.12em] text-[#D4AF6A] hover:text-[#F7F1E8]"
+          >
+            Details →
+          </Link>
         </div>
       </div>
     </article>

@@ -5,15 +5,11 @@ export type ExperienceSearch = {
   category?: string;
   city?: string;
   q?: string;
-  minPrice?: number;
-  maxPrice?: number;
   duration?: "short" | "half" | "full" | "multi";
   availability?: "today" | "tomorrow" | "week" | "weekend";
   page?: number;
 };
 
-export const PRICE_MIN = 500;
-export const PRICE_MAX = 10000;
 export const PAGE_SIZE = 9;
 
 /** True when the experience has at least one open slot in the booking window. */
@@ -107,10 +103,6 @@ export function filterExperiences(
         .toLowerCase();
       if (!haystack.includes(q)) return false;
     }
-
-    const price = e.pricePerPerson;
-    if (search.minPrice != null && price < search.minPrice) return false;
-    if (search.maxPrice != null && price > search.maxPrice) return false;
 
     if (!matchesDuration(e.durationHours, search.duration)) return false;
     if (!matchesAvailability(e, search.availability)) return false;
