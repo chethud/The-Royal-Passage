@@ -31,7 +31,7 @@ export function HomepageEditorBar({ role, draft, savedSnapshot, onSaved }: Homep
   const dirty =
     role === "admin"
       ? journalDirty || showcaseDirty || heroDirty || journeysDirty
-      : journalDirty;
+      : journalDirty || journeysDirty;
 
   const save = async () => {
     setBusy(true);
@@ -48,6 +48,13 @@ export function HomepageEditorBar({ role, draft, savedSnapshot, onSaved }: Homep
         versions.push(journalResult.version);
       }
 
+      if (role === "admin" || journeysDirty) {
+        const journeysResult = await saveHomepageJourneys({
+          data: { accessToken: token, items: draft.journeys },
+        });
+        versions.push(journeysResult.version);
+      }
+
       if (role === "admin") {
         if (showcaseDirty) {
           const showcaseResult = await saveHomepageShowcase({
@@ -60,12 +67,6 @@ export function HomepageEditorBar({ role, draft, savedSnapshot, onSaved }: Homep
             data: { accessToken: token, items: draft.hero },
           });
           versions.push(heroResult.version);
-        }
-        if (journeysDirty) {
-          const journeysResult = await saveHomepageJourneys({
-            data: { accessToken: token, items: draft.journeys },
-          });
-          versions.push(journeysResult.version);
         }
       }
 
@@ -81,8 +82,8 @@ export function HomepageEditorBar({ role, draft, savedSnapshot, onSaved }: Homep
 
   const hint =
     role === "admin"
-      ? "Admin edit mode — journal, hero slideshow, top 3 experiences, and video section. Photos save instantly; use Save for text and video IDs."
-      : "Editor mode — journal section only. Photos save automatically; use Save for story text.";
+      ? "Admin edit mode — journal, hero slideshow, top 3 experiences, and heritage video section. Photos save instantly; use Save for text and video links."
+      : "Editor mode — journal and heritage video section (title, description, YouTube link). Photos save automatically; use Save for text and video links.";
 
   return (
     <div className="sticky top-0 z-50 border-b border-ember/35 bg-[oklch(0.14_0.06_22_/_0.96)] backdrop-blur-md">

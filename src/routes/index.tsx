@@ -18,6 +18,7 @@ import { buildHomeJsonLd, SITE_URL } from "@/lib/seo";
 import {
   canEditHomepageAdminSections,
   canEditHomepageJournal,
+  canEditHomepageJourneys,
   isAdminRole,
   isEditorRole,
 } from "@/lib/roles";
@@ -55,9 +56,12 @@ function Index() {
   const { experiences, homepage } = Route.useLoaderData();
   const { role, accessToken } = useAuthUser();
   const canEditJournal = canEditHomepageJournal(role) && Boolean(accessToken);
+  const canEditJourneys = canEditHomepageJourneys(role) && Boolean(accessToken);
   const canEditAdminSections = canEditHomepageAdminSections(role) && Boolean(accessToken);
   const showEditorBar =
-    Boolean(accessToken) && (isEditorRole(role) || isAdminRole(role)) && (canEditJournal || canEditAdminSections);
+    Boolean(accessToken) &&
+    (isEditorRole(role) || isAdminRole(role)) &&
+    (canEditJournal || canEditJourneys || canEditAdminSections);
   const ldJson = buildHomeJsonLd(experiences);
 
   const [draft, setDraft] = useState<HomepageContent>(homepage);
@@ -74,7 +78,7 @@ function Index() {
   }, [homepage]);
 
   const publicContent = homepage;
-  const isEditing = canEditJournal || canEditAdminSections;
+  const isEditing = canEditJournal || canEditJourneys || canEditAdminSections;
   const editContent = draft;
   const displayVersion = isEditing ? editContent.version : publicContent.version;
 
@@ -183,7 +187,7 @@ function Index() {
 
       <JourneysSplit
         slides={isEditing ? editContent.journeys : publicContent.journeys}
-        editable={canEditAdminSections}
+        editable={canEditJourneys}
         onSlidesChange={(journeys) => setDraft((prev) => ({ ...prev, journeys }))}
       />
 

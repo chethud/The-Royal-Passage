@@ -14,7 +14,7 @@ export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
   guest: "Sign up or sign in to book experiences.",
   host: "Sign in with login credentials provided by Royal Passage.",
   admin: "Sign in with your admin credentials — manage bookings, experiences, and homepage hero, showcase, and video sections.",
-  editor: "Sign in to edit journal photos and stories on the homepage.",
+  editor: "Sign in to edit journal stories and the heritage video section on the homepage.",
 };
 
 export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
@@ -81,7 +81,12 @@ export function canEditHomepageJournal(role: UserRole | null | undefined): boole
   return role === "editor" || role === "admin";
 }
 
-/** Hero, top experiences, video section — admins only. */
+/** Heritage video section (title, description, YouTube link) — editors and admins. */
+export function canEditHomepageJourneys(role: UserRole | null | undefined): boolean {
+  return role === "editor" || role === "admin";
+}
+
+/** Hero and top experiences — admins only. */
 export function canEditHomepageAdminSections(role: UserRole | null | undefined): boolean {
   return role === "admin";
 }

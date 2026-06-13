@@ -242,10 +242,11 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
       {editable && active ? (
         <div className="container-page relative z-20 mb-6">
           <div className="rounded-md border border-ember/35 bg-black/50 p-4 backdrop-blur-sm">
-            <p className="eyebrow mb-1 text-ember">Admin — video slide {activeIndex + 1} of {slides.length}</p>
+            <p className="eyebrow mb-1 text-ember">Edit — heritage slide {activeIndex + 1} of {slides.length}</p>
             <p className="mb-3 text-xs text-ink/75">
-              Use the <strong className="text-ember">Change video</strong> box on the video, or edit text below.
-              Switch slides with the medallions at the bottom. Save from the sticky bar at the top.
+              Update the <strong className="text-ember">title</strong>, <strong className="text-ember">description</strong>, or{" "}
+              <strong className="text-ember">YouTube link</strong> below, or use the video panel on the right.
+              Switch slides with the medallions. Click <strong className="text-ember">Save changes</strong> in the bar at the top.
             </p>
             <div className="grid gap-3 md:grid-cols-2">
               <EditableTextField

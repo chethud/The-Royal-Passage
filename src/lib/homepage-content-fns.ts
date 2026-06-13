@@ -143,7 +143,7 @@ export const saveHomepageJourneys = createServerFn({ method: "POST" })
       throw new Error(configError);
     }
 
-    await requireHomepageAdmin(data.accessToken);
+    await requireHomepageJournalEditor(data.accessToken);
     const supabase = getSupabaseAdmin();
     await writePlatformSetting(supabase, HOMEPAGE_JOURNEYS_KEY, data.items);
     const version = await bumpHomepageVersion(supabase);
