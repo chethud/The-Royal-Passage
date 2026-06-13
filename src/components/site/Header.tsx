@@ -169,6 +169,12 @@ export function Header() {
                           History
                         </Link>
                       </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard/cart" className="cursor-pointer">
+                          <UserRound className="h-4 w-4" />
+                          Cart
+                        </Link>
+                      </DropdownMenuItem>
                     </>
                   ) : (
                     <DropdownMenuItem asChild>
@@ -267,6 +273,11 @@ export function Header() {
                       <SheetClose asChild>
                         <Link to="/dashboard/history" className={sheetLinkClass}>
                           History
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link to="/dashboard/cart" className={sheetLinkClass}>
+                          Cart
                         </Link>
                       </SheetClose>
                     </>

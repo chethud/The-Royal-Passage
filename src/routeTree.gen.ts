@@ -31,6 +31,7 @@ import { Route as DashboardWishlistRouteImport } from './routes/dashboard.wishli
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardPastRouteImport } from './routes/dashboard.past'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard.history'
+import { Route as DashboardCartRouteImport } from './routes/dashboard.cart'
 import { Route as DashboardCancelledRouteImport } from './routes/dashboard.cancelled'
 import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
 import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookingId'
@@ -162,6 +163,11 @@ const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardCartRoute = DashboardCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardCancelledRoute = DashboardCancelledRouteImport.update({
   id: '/cancelled',
   path: '/cancelled',
@@ -281,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
+  '/dashboard/cart': typeof DashboardCartRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/past': typeof DashboardPastRoute
   '/dashboard/profile': typeof DashboardProfileRoute
@@ -324,6 +331,7 @@ export interface FileRoutesByTo {
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
+  '/dashboard/cart': typeof DashboardCartRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/past': typeof DashboardPastRoute
   '/dashboard/profile': typeof DashboardProfileRoute
@@ -366,6 +374,7 @@ export interface FileRoutesById {
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
+  '/dashboard/cart': typeof DashboardCartRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/past': typeof DashboardPastRoute
   '/dashboard/profile': typeof DashboardProfileRoute
@@ -412,6 +421,7 @@ export interface FileRouteTypes {
     | '/bookings/$bookingId'
     | '/cities/$slug'
     | '/dashboard/cancelled'
+    | '/dashboard/cart'
     | '/dashboard/history'
     | '/dashboard/past'
     | '/dashboard/profile'
@@ -455,6 +465,7 @@ export interface FileRouteTypes {
     | '/bookings/$bookingId'
     | '/cities/$slug'
     | '/dashboard/cancelled'
+    | '/dashboard/cart'
     | '/dashboard/history'
     | '/dashboard/past'
     | '/dashboard/profile'
@@ -496,6 +507,7 @@ export interface FileRouteTypes {
     | '/bookings/$bookingId'
     | '/cities/$slug'
     | '/dashboard/cancelled'
+    | '/dashboard/cart'
     | '/dashboard/history'
     | '/dashboard/past'
     | '/dashboard/profile'
@@ -702,6 +714,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardHistoryRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/cart': {
+      id: '/dashboard/cart'
+      path: '/cart'
+      fullPath: '/dashboard/cart'
+      preLoaderRoute: typeof DashboardCartRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/cancelled': {
       id: '/dashboard/cancelled'
       path: '/cancelled'
@@ -882,6 +901,7 @@ const CitiesRouteWithChildren =
 
 interface DashboardRouteChildren {
   DashboardCancelledRoute: typeof DashboardCancelledRoute
+  DashboardCartRoute: typeof DashboardCartRoute
   DashboardHistoryRoute: typeof DashboardHistoryRoute
   DashboardPastRoute: typeof DashboardPastRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
@@ -891,6 +911,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardCancelledRoute: DashboardCancelledRoute,
+  DashboardCartRoute: DashboardCartRoute,
   DashboardHistoryRoute: DashboardHistoryRoute,
   DashboardPastRoute: DashboardPastRoute,
   DashboardProfileRoute: DashboardProfileRoute,

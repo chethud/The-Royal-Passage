@@ -1,13 +1,23 @@
 import { Link } from "@tanstack/react-router";
+import { ShoppingCart } from "lucide-react";
 import { motion } from "motion/react";
 import heroImage from "@/assets/curated-expeditions.png";
+import { ExperiencesSearchBar } from "@/components/experiences/ExperiencesSearchBar";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 type ExperiencesHeroProps = {
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+  showWishlistHeart?: boolean;
   signedIn?: boolean;
 };
 
-export function ExperiencesHero({ signedIn }: ExperiencesHeroProps) {
+export function ExperiencesHero({
+  searchValue,
+  onSearchChange,
+  showWishlistHeart = false,
+  signedIn = false,
+}: ExperiencesHeroProps) {
   const reduceMotion = usePrefersReducedMotion();
 
   return (
@@ -35,23 +45,39 @@ export function ExperiencesHero({ signedIn }: ExperiencesHeroProps) {
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#D6C8B5] md:text-base">
             Curated cultural, wellness, culinary and rural journeys across Mysuru and beyond.
           </p>
-          <div className="mt-6 flex flex-wrap gap-3">
+
+          <div className="mt-6">
             <a href="#experiences-grid" className="luxury-btn-sm luxury-btn-primary">
               Explore Experiences
             </a>
-            {signedIn ? (
-              <Link to="/dashboard/wishlist" className="luxury-btn-sm luxury-btn-secondary">
-                View Wishlist
-              </Link>
-            ) : (
-              <Link
-                to="/sign-in"
-                search={{ redirect: "/experiences" }}
-                className="luxury-btn-sm luxury-btn-secondary"
-              >
-                Sign in to save
-              </Link>
-            )}
+          </div>
+
+          <div className="mt-4 flex max-w-xl items-stretch gap-2">
+            <ExperiencesSearchBar
+              value={searchValue}
+              onChange={onSearchChange}
+              className="min-w-0 flex-1"
+            />
+            {showWishlistHeart ? (
+              signedIn ? (
+                <Link
+                  to="/dashboard/cart"
+                  className="inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-lg border border-[#C8A25A]/22 bg-[#4A0000]/50 text-[#D4AF6A] backdrop-blur-sm transition-colors hover:border-[#C8A25A]/45 hover:bg-[#5B0000]/60 hover:text-[#F7F1E8] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A25A]/25"
+                  aria-label="View cart and wishlist"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                </Link>
+              ) : (
+                <Link
+                  to="/sign-in"
+                  search={{ redirect: "/experiences" }}
+                  className="inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-lg border border-[#C8A25A]/22 bg-[#4A0000]/50 text-[#D4AF6A] backdrop-blur-sm transition-colors hover:border-[#C8A25A]/45 hover:bg-[#5B0000]/60 hover:text-[#F7F1E8] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A25A]/25"
+                  aria-label="Sign in to use cart and wishlist"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                </Link>
+              )
+            ) : null}
           </div>
         </motion.div>
       </div>

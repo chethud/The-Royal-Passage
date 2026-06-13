@@ -6,7 +6,7 @@ type GuestEmptyStateProps = {
   title: string;
   description: string;
   ctaLabel?: string;
-  ctaTo?: "/experiences" | "/dashboard/wishlist";
+  ctaTo?: "/experiences" | "/dashboard/cart" | "/dashboard/wishlist";
 };
 
 export function GuestEmptyState({

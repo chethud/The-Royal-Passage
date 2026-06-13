@@ -5,11 +5,11 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ExperienceCard } from "@/components/site/ExperienceCard";
 import { ExperiencesHero } from "@/components/experiences/ExperiencesHero";
-import { ExperiencesSearchBar } from "@/components/experiences/ExperiencesSearchBar";
 import { ExperiencesFilterSidebar } from "@/components/experiences/ExperiencesFilterSidebar";
 import { ExperiencesEmptyState } from "@/components/experiences/ExperiencesEmptyState";
 import { ExperienceCardSkeleton } from "@/components/experiences/ExperienceCardSkeleton";
 import { useAuthUser } from "@/lib/auth-user";
+import { isGuestAccount } from "@/lib/roles";
 import { listCities } from "@/lib/city-fns";
 import {
   filterExperiences,
@@ -85,7 +85,8 @@ function ExperiencesPage() {
   const { experiences, categories, cityOptions } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  const { user } = useAuthUser();
+  const { user, role } = useAuthUser();
+  const showWishlistHeart = !user || isGuestAccount(role);
   const [pending, startTransition] = useTransition();
 
   const filtered = useMemo(
@@ -122,16 +123,14 @@ function ExperiencesPage() {
     <div className="text-foreground">
       <Header />
 
-      <ExperiencesHero signedIn={Boolean(user)} />
+      <ExperiencesHero
+        signedIn={Boolean(user)}
+        showWishlistHeart={showWishlistHeart}
+        searchValue={search.q ?? ""}
+        onSearchChange={(q) => updateSearch({ q: q || undefined, page: 1 })}
+      />
 
-      <section className="container-page relative z-20 -mt-5 pb-5">
-        <ExperiencesSearchBar
-          value={search.q ?? ""}
-          onChange={(q) => updateSearch({ q: q || undefined, page: 1 })}
-        />
-      </section>
-
-      <section id="experiences-grid" className="container-page pb-16">
+      <section id="experiences-grid" className="container-page pb-16 pt-8">
         <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3 border-b border-[#C8A25A]/12 pb-4">
           <div>
             <p className="eyebrow text-[0.65rem] text-[#D4AF6A]">Curated collection</p>

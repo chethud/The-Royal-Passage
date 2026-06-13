@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPanel";
 import { ExperienceReviewsSection } from "@/components/reviews/ExperienceReviewsSection";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import type { Slot } from "@/data/experiences";
@@ -136,7 +137,10 @@ function ExperienceDetail() {
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl leading-tight">
               {exp.title}
             </h1>
-            <WishlistButton experienceId={exp.id} className="shrink-0" />
+            <div className="flex shrink-0 items-center gap-2">
+              <AddToCartButton exp={exp} showLabel />
+              <WishlistButton experienceId={exp.id} />
+            </div>
           </div>
           <p className="mt-4 text-base sm:text-lg italic text-muted-foreground">{exp.tagline}</p>
 

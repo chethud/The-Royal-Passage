@@ -3,6 +3,7 @@ import { Clock, MapPin, Star } from "lucide-react";
 import { motion } from "motion/react";
 import type { Experience } from "@/data/experiences";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { guestBookingLimits } from "@/lib/booking-url";
 import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
@@ -43,7 +44,10 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
           ) : null}
         </div>
 
-        <WishlistButton experienceId={exp.id} className="absolute right-2.5 top-2.5 z-30 scale-90" />
+        <div className="absolute right-2.5 top-2.5 z-30 flex items-center gap-1.5">
+          <AddToCartButton exp={exp} />
+          <WishlistButton experienceId={exp.id} className="scale-90" />
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col p-4">

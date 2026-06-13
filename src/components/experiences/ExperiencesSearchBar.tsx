@@ -3,11 +3,12 @@ import { Search, X } from "lucide-react";
 type ExperiencesSearchBarProps = {
   value: string;
   onChange: (value: string) => void;
+  className?: string;
 };
 
-export function ExperiencesSearchBar({ value, onChange }: ExperiencesSearchBarProps) {
+export function ExperiencesSearchBar({ value, onChange, className = "" }: ExperiencesSearchBarProps) {
   return (
-    <div className="relative">
+    <div className={`relative ${className}`}>
       <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#C8A25A]" />
       <input
         type="search"
