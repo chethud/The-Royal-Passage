@@ -16,12 +16,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 type SlideTheme = HomepageJourneySlide["theme"];
 
-const CURTAIN_CLOSE_MS = 420;
-const CURTAIN_AJAR_MS = 650;
-const CURTAIN_OPEN_MS = 3000;
-const CONTENT_REVEAL_MS = 600;
-const VIDEO_REVEAL_MS = 1400;
-const INITIAL_AJAR_MS = 500;
+const CURTAIN_CLOSE_MS = 480;
+const CURTAIN_HOLD_CLOSED_MS = 420;
+const CURTAIN_AJAR_MS = 900;
+const CURTAIN_OPEN_MS = 7500;
+const CONTENT_REVEAL_MS = 700;
+const VIDEO_REVEAL_MS = 2200;
 
 const dustParticles = Array.from({ length: 8 }, (_, i) => ({
   id: i,
@@ -191,7 +191,7 @@ type JourneysSplitProps = {
 
 export function JourneysSplit({ slides, editable = false, onSlidesChange }: JourneysSplitProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [curtainPhase, setCurtainPhase] = useState<VideoCurtainPhase>("ajar");
+  const [curtainPhase, setCurtainPhase] = useState<VideoCurtainPhase>("closed");
   const [videoRevealed, setVideoRevealed] = useState(false);
   const [curtainsOpen, setCurtainsOpen] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
@@ -225,6 +225,7 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
       setCurtainPhase("closed");
 
       const closeMs = reducedMotion ? 120 : CURTAIN_CLOSE_MS;
+      const holdMs = reducedMotion ? 0 : CURTAIN_HOLD_CLOSED_MS;
       const ajarMs = reducedMotion ? 0 : CURTAIN_AJAR_MS;
       const openMs = reducedMotion ? 280 : CURTAIN_OPEN_MS;
       const revealMs = reducedMotion ? 80 : CONTENT_REVEAL_MS;
@@ -232,27 +233,32 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
       schedule(() => {
         setActiveIndex(next);
         setThemeFlash(slides[next].theme);
-        setCurtainPhase(reducedMotion ? "open" : "ajar");
-        setCurtainsOpen(true);
+        setCurtainPhase(reducedMotion ? "open" : "closed");
+        setCurtainsOpen(false);
 
         if (!reducedMotion) {
           schedule(() => {
-            setCurtainPhase("open");
-            schedule(() => setVideoRevealed(true), VIDEO_REVEAL_MS);
-          }, ajarMs);
+            setCurtainPhase("ajar");
+            schedule(() => {
+              setCurtainPhase("open");
+              setCurtainsOpen(true);
+              schedule(() => setVideoRevealed(true), VIDEO_REVEAL_MS);
+            }, ajarMs);
+          }, holdMs);
         } else {
+          setCurtainsOpen(true);
           setVideoRevealed(true);
         }
 
         schedule(() => {
           setContentVisible(true);
           setThemeFlash(null);
-        }, revealMs);
+        }, closeMs + holdMs + revealMs);
 
         schedule(() => {
           setIsTransitioning(false);
           setIsLocked(false);
-        }, openMs + ajarMs);
+        }, closeMs + holdMs + ajarMs + openMs);
       }, closeMs);
     },
     [activeIndex, clearTimers, isLocked, reducedMotion, schedule],
@@ -269,13 +275,16 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
       return;
     }
 
-    setCurtainPhase("ajar");
+    setCurtainPhase("closed");
     schedule(() => {
-      setCurtainPhase("open");
-      setCurtainsOpen(true);
-      schedule(() => setVideoRevealed(true), VIDEO_REVEAL_MS);
-    }, INITIAL_AJAR_MS);
-    schedule(() => setContentVisible(true), INITIAL_AJAR_MS + 700);
+      setCurtainPhase("ajar");
+      schedule(() => {
+        setCurtainPhase("open");
+        setCurtainsOpen(true);
+        schedule(() => setVideoRevealed(true), VIDEO_REVEAL_MS);
+      }, CURTAIN_AJAR_MS);
+    }, CURTAIN_HOLD_CLOSED_MS);
+    schedule(() => setContentVisible(true), CURTAIN_HOLD_CLOSED_MS + CURTAIN_AJAR_MS + 900);
   }, [reducedMotion, schedule]);
 
   const goPrev = () => goTo(activeIndex - 1);

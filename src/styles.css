@@ -546,40 +546,40 @@
   animation-play-state: paused;
 }
 
-/* Royal theatre curtains — cinematic velvet reveal on video stage */
+/* Royal theatre curtains — photoreal velvet reveal (reference-matched) */
 .royal-video-curtains {
   pointer-events: none;
   position: absolute;
   inset: 0;
   z-index: 25;
   overflow: hidden;
-  perspective: 1400px;
-  perspective-origin: 50% 28%;
+  perspective: 1600px;
+  perspective-origin: 50% 22%;
 }
 
 .royal-stage-spotlight {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 4;
   background:
-    radial-gradient(ellipse 85% 55% at 50% -8%, #fff8e618 0%, transparent 58%),
-    radial-gradient(ellipse 60% 40% at 50% 0%, #d4af3722 0%, transparent 70%);
-  mix-blend-mode: screen;
-  opacity: 0.9;
+    radial-gradient(ellipse 90% 50% at 50% -5%, #fff8e614 0%, transparent 55%),
+    radial-gradient(ellipse 70% 45% at 50% 100%, #00000055 0%, transparent 65%);
+  mix-blend-mode: soft-light;
+  opacity: 0.85;
 }
 
 .royal-stage-void {
-  box-shadow: inset 0 0 120px #000000;
+  box-shadow: inset 0 0 140px #000000;
 }
 
 .royal-slide-video {
   opacity: 0;
-  filter: brightness(0.35);
-  transform: translate3d(0, 0, 0) scale(1.03);
+  filter: brightness(0.08);
+  transform: translate3d(0, 0, 0) scale(1.02);
   transition:
-    transform 2.4s cubic-bezier(0.22, 0.61, 0.36, 1),
-    opacity 1.35s cubic-bezier(0.22, 0.61, 0.36, 1) 0.45s,
-    filter 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.35s;
+    transform 2.8s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.35s,
+    filter 2.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.25s;
 }
 
 .royal-slide-video.is-revealed {
@@ -591,10 +591,6 @@
   transform: translate3d(0, 0, 0) scale(1);
 }
 
-.royal-curtains {
-  pointer-events: none;
-}
-
 .royal-curtain {
   position: absolute;
   inset-block: 0;
@@ -602,285 +598,164 @@
   will-change: transform;
   transform-style: preserve-3d;
   transform: translate3d(0, 0, 0);
-  transition: transform 3s cubic-bezier(0.22, 0.61, 0.36, 1);
   backface-visibility: hidden;
-  z-index: 3;
+  z-index: 2;
+  overflow: hidden;
 }
 
 .royal-curtain--left {
   left: 0;
-  transform-origin: left center;
+  transform-origin: 100% 0%;
 }
 
 .royal-curtain--right {
   right: 0;
-  transform-origin: right center;
+  transform-origin: 0% 0%;
 }
 
-/* Slightly parted — gold tiebacks hold center gap */
-.royal-video-curtains--ajar .royal-curtain--left {
-  transform: translate3d(-5.5%, 0, 0) rotateY(10deg) scaleX(1.02);
+.royal-curtain-texture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  pointer-events: none;
 }
 
-.royal-video-curtains--ajar .royal-curtain--right {
-  transform: translate3d(5.5%, 0, 0) rotateY(-10deg) scaleX(1.02);
+.royal-curtain--left .royal-curtain-texture {
+  object-position: right center;
 }
 
-.royal-video-curtains--open .royal-curtain--left {
-  transform: translate3d(-108%, 0, 0) rotateY(16deg) scaleX(0.86);
-  transition-duration: 3.1s;
+.royal-curtain--right .royal-curtain-texture {
+  object-position: left center;
 }
 
-.royal-video-curtains--open .royal-curtain--right {
-  transform: translate3d(108%, 0, 0) rotateY(-16deg) scaleX(0.86);
-  transition-duration: 3.1s;
+.royal-curtain-shadow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #00000066 0%, transparent 28%, transparent 72%, #00000066 100%);
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+  transition: opacity 0.6s ease;
+}
+
+/* Fully closed — panels meet at center seam */
+.royal-video-curtains--closed .royal-curtain {
+  transition:
+    transform 0.48s cubic-bezier(0.55, 0.06, 0.68, 0.19),
+    filter 0.48s ease;
 }
 
 .royal-video-curtains--closed .royal-curtain--left {
-  transform: translate3d(3.5%, 0, 0) rotateY(-4deg);
-  transition-duration: 0.42s;
-  transition-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  transform: translate3d(5.5%, 0, 0) rotateY(2deg);
 }
 
 .royal-video-curtains--closed .royal-curtain--right {
-  transform: translate3d(-3.5%, 0, 0) rotateY(4deg);
-  transition-duration: 0.42s;
-  transition-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  transform: translate3d(-5.5%, 0, 0) rotateY(-2deg);
 }
 
-.royal-curtains.is-open .royal-curtain--left {
-  transform: translate3d(-102%, 0, 0) scaleX(0.92);
+/* Ajar — bottom corners pull back, gold tiebacks hold the sweep */
+.royal-video-curtains--ajar .royal-curtain {
+  transition:
+    transform 0.95s cubic-bezier(0.33, 0.04, 0.22, 1),
+    filter 0.95s ease;
 }
 
-.royal-curtains.is-open .royal-curtain--right {
-  transform: translate3d(102%, 0, 0) scaleX(0.92);
+.royal-video-curtains--ajar .royal-curtain--left {
+  transform: translate3d(-11%, 0, 0) rotateY(-24deg) scaleX(1.04);
 }
 
-.royal-curtains.is-closed .royal-curtain--left,
-.royal-curtains.is-closed .royal-curtain--right {
-  transform: translate3d(0, 0, 0);
-  transition-duration: 0.38s;
+.royal-video-curtains--ajar .royal-curtain--right {
+  transform: translate3d(11%, 0, 0) rotateY(24deg) scaleX(1.04);
 }
 
-.royal-curtain-valance {
-  position: absolute;
-  inset-inline: -5%;
-  top: 0;
-  z-index: 4;
-  height: 3rem;
-  background:
-    linear-gradient(180deg, #7a1222 0%, #4a0812 42%, #2a0a0a 100%);
-  border-bottom: 2px solid #d4af3777;
-  box-shadow:
-    0 10px 28px #000000aa,
-    inset 0 1px 0 #d4af3744,
-    inset 0 -2px 8px #00000066;
+.royal-video-curtains--ajar .royal-curtain-shadow {
+  opacity: 0.22;
 }
 
-.royal-curtain-valance::after {
-  content: "";
-  position: absolute;
-  inset-inline: 6%;
-  bottom: -0.55rem;
-  height: 1.1rem;
-  border-radius: 0 0 999px 999px;
-  background: linear-gradient(180deg, #9a1830, #4a0812 70%, #2a0a0a);
-  box-shadow: 0 8px 18px #00000077;
+/* Open — slow sweep aside revealing black void, then video */
+.royal-video-curtains--open .royal-curtain {
+  transition:
+    transform 7.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+    filter 7.5s ease;
 }
 
-.royal-curtain-panel {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  background: linear-gradient(168deg, #7a1222 0%, #4a0812 32%, #2a0808 68%, #1a0404 100%);
-  box-shadow:
-    inset -14px 0 36px #00000088,
-    inset 14px 0 36px #00000088,
-    0 0 40px #00000066;
+.royal-video-curtains--open .royal-curtain--left {
+  transform: translate3d(-101%, 0, 0) rotateY(-8deg) scaleX(0.68);
 }
 
-.royal-curtain--left .royal-curtain-panel {
-  border-right: 2px solid #d4af3748;
+.royal-video-curtains--open .royal-curtain--right {
+  transform: translate3d(101%, 0, 0) rotateY(8deg) scaleX(0.68);
 }
 
-.royal-curtain--right .royal-curtain-panel {
-  border-left: 2px solid #d4af3748;
-}
-
-.royal-curtain-velvet {
-  position: absolute;
-  inset: 2.85rem 0 0;
-  background:
-    radial-gradient(ellipse 120% 80% at 50% 0%, #9a183044 0%, transparent 55%),
-    linear-gradient(180deg, #6b0f1a 0%, #3b0000 100%);
-}
-
-.royal-curtain-folds {
-  position: absolute;
-  inset: 2.85rem 0 0;
-  background: repeating-linear-gradient(
-    90deg,
-    #2a0808 0px,
-    #5c0a12 14px,
-    #8a1830 28px,
-    #3b0000 42px,
-    #6b0f1a 56px,
-    #2a0808 70px
-  );
-  opacity: 0.92;
-  filter: contrast(1.08) saturate(1.12);
-}
-
-.royal-curtain-depth {
-  position: absolute;
-  inset: 2.85rem 0 0;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    #00000022 22px,
-    transparent 44px
-  );
-  mix-blend-mode: multiply;
-}
-
-.royal-curtain-sheen {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, #fff8e622 0%, transparent 22%),
-    linear-gradient(
-      118deg,
-      transparent 0%,
-      #d4af3728 38%,
-      transparent 52%,
-      #ffffff0c 68%,
-      transparent 100%
-    );
-  animation: royal-curtain-sheen-drift 8s ease-in-out infinite;
-}
-
-@keyframes royal-curtain-sheen-drift {
-  0%,
-  100% {
-    opacity: 0.75;
-    transform: translateX(-2%);
-  }
-  50% {
-    opacity: 1;
-    transform: translateX(2%);
-  }
-}
-
-.royal-curtain-edge {
-  position: absolute;
-  inset-block: 2.85rem 0;
-  width: 3px;
-  background: linear-gradient(180deg, #d4af37aa, #8a6f1f66 55%, #d4af3744);
-  box-shadow: 0 0 12px #d4af3744;
-}
-
-.royal-curtain--left .royal-curtain-edge {
-  right: 0;
-}
-
-.royal-curtain--right .royal-curtain-edge {
-  left: 0;
-}
-
-.royal-curtain-tassel {
-  position: absolute;
-  bottom: 0;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 1.5rem;
-}
-
-.royal-curtain--left .royal-curtain-tassel {
-  right: 0.35rem;
-}
-
-.royal-curtain--right .royal-curtain-tassel {
-  left: 0.35rem;
-}
-
-.royal-curtain-tassel-cord {
-  width: 2px;
-  height: 2.5rem;
-  background: linear-gradient(180deg, #c9a227, #8a6f1f);
-}
-
-.royal-curtain-tassel-head {
-  width: 0.85rem;
-  height: 1.1rem;
-  border-radius: 999px 999px 40% 40%;
-  background: linear-gradient(180deg, #e8c547, #c9a227 45%, #8a6f1f);
-  box-shadow: 0 0 10px #d4af3755;
-}
-
-.royal-curtain-tassel-fringe {
-  width: 1.35rem;
-  height: 2.75rem;
-  background: linear-gradient(180deg, #c9a227, #8a6f1f 50%, #5c4a14);
-  clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
-  box-shadow: 0 4px 10px #00000066;
+.royal-video-curtains--open .royal-curtain-shadow {
+  opacity: 0.12;
 }
 
 .royal-curtain-tiebacks {
   position: absolute;
   inset: 0;
-  z-index: 6;
+  z-index: 3;
   pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.55s ease;
-}
-
-.royal-video-curtains--open .royal-curtain-tiebacks,
-.royal-video-curtains--closed .royal-curtain-tiebacks {
-  opacity: 0;
 }
 
 .royal-tieback {
   position: absolute;
-  top: 38%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  bottom: 11%;
+  width: 3.75rem;
+  height: auto;
+  object-fit: contain;
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 0.55s ease 0.15s,
+    transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1) 0.1s;
+  filter: drop-shadow(0 4px 10px #00000088);
 }
 
 .royal-tieback--left {
-  left: calc(50% - 1.35rem);
+  left: calc(50% - 4.25rem);
 }
 
 .royal-tieback--right {
-  right: calc(50% - 1.35rem);
+  right: calc(50% - 4.25rem);
 }
 
-.royal-tieback-rope {
-  width: 3px;
-  height: 3.5rem;
-  background: linear-gradient(180deg, #e8c547, #c9a227 55%, #8a6f1f);
-  border-radius: 999px;
-  box-shadow: 0 0 8px #d4af3744;
-}
-
-.royal-tieback-tassel {
-  width: 1.1rem;
-  height: 2.4rem;
-  margin-top: 0.15rem;
-  background: linear-gradient(180deg, #e8c547, #c9a227 40%, #8a6f1f 75%, #5c4a14);
-  clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
-  box-shadow: 0 6px 14px #00000088;
-}
-
-.royal-curtain-tassel {
+.royal-video-curtains--ajar .royal-tieback,
+.royal-video-curtains--open .royal-tieback {
   opacity: 1;
-  transition: opacity 0.45s ease;
+  transform: scale(1);
 }
 
-.royal-video-curtains--open .royal-curtain-tassel {
+.royal-video-curtains--ajar .royal-tieback--right,
+.royal-video-curtains--open .royal-tieback--right {
+  transform: scale(1);
+}
+
+.royal-video-curtains--closed .royal-tieback {
   opacity: 0;
+  transition-duration: 0.25s;
+  transition-delay: 0s;
+}
+
+.royal-video-curtains--open .royal-tieback {
+  bottom: 9%;
+  transition:
+    opacity 0.4s ease,
+    bottom 7.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 7.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.royal-video-curtains--open .royal-tieback--left {
+  left: 2.5%;
+  transform: scale(1.05);
+}
+
+.royal-video-curtains--open .royal-tieback--right {
+  right: 2.5%;
+  transform: scale(1.05);
 }
 
 /* Golden burst */
@@ -994,11 +869,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   .royal-curtain {
-    transition-duration: 0.2s;
+    transition-duration: 0.2s !important;
   }
 
-  .royal-curtain-sheen {
-    animation: none;
+  .royal-tieback {
+    transition-duration: 0.15s !important;
   }
 
   .royal-slide-video {
