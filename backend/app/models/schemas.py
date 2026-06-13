@@ -40,6 +40,10 @@ class Experience(BaseModel):
     reviewsCount: int
     image: str
     inclusions: list[str]
+    galleryUrls: list[str] = Field(default_factory=list)
+    exclusions: list[str] = Field(default_factory=list)
+    requirements: list[str] = Field(default_factory=list)
+    region: str | None = None
     cancellation: str
     slots: list[Slot]
     currencySymbol: str | None = "₹"

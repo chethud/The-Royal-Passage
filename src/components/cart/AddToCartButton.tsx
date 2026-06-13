@@ -4,6 +4,7 @@ import type { Experience } from "@/data/experiences";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
 import { cartItemFromExperience } from "@/lib/cart-storage";
 import { useAuthUser } from "@/lib/auth-user";
+import { hasBookableSlot } from "@/lib/experience-filters";
 import { isGuestAccount } from "@/lib/roles";
 
 type AddToCartButtonProps = {
@@ -17,8 +18,13 @@ export function AddToCartButton({ exp, className = "", showLabel = false }: AddT
   const { add, has } = useExperienceCart();
   const [busy, setBusy] = useState(false);
   const inCart = has(exp.id);
+  const canBook = hasBookableSlot(exp);
 
   if (user && !isGuestAccount(role)) {
+    return null;
+  }
+
+  if (!canBook) {
     return null;
   }
 

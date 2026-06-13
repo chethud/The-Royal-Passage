@@ -146,7 +146,6 @@ function ExperiencesPage() {
           <ExperiencesFilterSidebar
             search={search}
             categories={categories}
-            cityOptions={cityOptions}
             onUpdate={updateSearch}
             onReset={resetFilters}
           />

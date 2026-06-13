@@ -43,7 +43,11 @@ def load_published_experiences(city_slug: str | None = None) -> list[Experience]
     for slot in slots:
         by_exp.setdefault(slot["experience_id"], []).append(slot)
 
-    return [map_row_to_experience(row, filter_guest_bookable_slots(by_exp.get(row["id"], []))) for row in visible]
+    mapped = [
+        map_row_to_experience(row, filter_guest_bookable_slots(by_exp.get(row["id"], [])))
+        for row in visible
+    ]
+    return [exp for exp in mapped if any(slot.available > 0 for slot in exp.slots)]
 
 
 def load_experience_by_slug(slug: str) -> Experience | None:

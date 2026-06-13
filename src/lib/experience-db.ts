@@ -28,6 +28,8 @@ export type ExperienceRow = {
   hero_image_url: string | null;
   inclusions: string[];
   exclusions: string[];
+  requirements?: string[];
+  gallery_urls?: string[];
   cancellation_policy: string | null;
   average_rating: string | number;
   review_count: number;
@@ -100,6 +102,10 @@ export function mapRowToExperience(exp: ExperienceRow, slots: SlotRow[]): Experi
     reviewsCount: exp.review_count,
     image: exp.hero_image_url ?? "",
     inclusions: exp.inclusions ?? [],
+    exclusions: exp.exclusions ?? [],
+    requirements: exp.requirements ?? [],
+    galleryUrls: exp.gallery_urls?.length ? exp.gallery_urls : exp.hero_image_url ? [exp.hero_image_url] : [],
+    region: exp.region ?? undefined,
     cancellation: exp.cancellation_policy ?? "",
     slots: uiSlots,
     currencySymbol: currencySymbol(exp.currency_code),

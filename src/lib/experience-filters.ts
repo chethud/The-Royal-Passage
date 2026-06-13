@@ -17,6 +17,18 @@ export function hasBookableSlot(exp: Experience): boolean {
   return filterSlotsWithinBookingWindow(exp.slots).some((slot) => slot.available > 0);
 }
 
+/** Catalog listings only show experiences guests can actually book this week. */
+export function filterBookableExperiences(experiences: Experience[]): Experience[] {
+  return experiences.filter(hasBookableSlot);
+}
+
+export function buildCatalogMeta(experiences: Experience[]) {
+  return {
+    categories: [...new Set(experiences.map((e) => e.category))].sort(),
+    cities: [...new Set(experiences.map((e) => e.city))].sort(),
+  };
+}
+
 function startOfDay(d: Date) {
   const x = new Date(d);
   x.setHours(0, 0, 0, 0);

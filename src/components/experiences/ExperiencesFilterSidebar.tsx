@@ -1,11 +1,8 @@
 import type { ExperienceSearch } from "@/lib/experience-filters";
 
-type CityOption = { slug: string; name: string };
-
 type ExperiencesFilterSidebarProps = {
   search: ExperienceSearch;
   categories: string[];
-  cityOptions: CityOption[];
   onUpdate: (patch: Partial<ExperienceSearch>) => void;
   onReset: () => void;
 };
@@ -27,7 +24,6 @@ const AVAILABILITY_OPTIONS = [
 export function ExperiencesFilterSidebar({
   search,
   categories,
-  cityOptions,
   onUpdate,
   onReset,
 }: ExperiencesFilterSidebarProps) {
@@ -44,23 +40,6 @@ export function ExperiencesFilterSidebar({
             Reset
           </button>
         </div>
-
-        <FilterSection title="City">
-          <FilterPill active={!search.city} onClick={() => onUpdate({ city: undefined, page: 1 })}>
-            All
-          </FilterPill>
-          {cityOptions.map((c) => (
-            <FilterPill
-              key={c.slug}
-              active={search.city === c.slug}
-              onClick={() =>
-                onUpdate({ city: search.city === c.slug ? undefined : c.slug, page: 1 })
-              }
-            >
-              {c.name}
-            </FilterPill>
-          ))}
-        </FilterSection>
 
         <FilterSection title="Category">
           <FilterPill

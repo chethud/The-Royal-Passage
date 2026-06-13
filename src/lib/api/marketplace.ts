@@ -19,6 +19,17 @@ export type ExperienceDetailPayload = {
   source: "live" | "static";
 };
 
+function normalizeExperience(exp: Experience): Experience {
+  const galleryUrls =
+    exp.galleryUrls?.length ? exp.galleryUrls : exp.image ? [exp.image] : [];
+  return {
+    ...exp,
+    galleryUrls,
+    exclusions: exp.exclusions ?? [],
+    requirements: exp.requirements ?? [],
+  };
+}
+
 export function fetchCatalog(citySlug?: string) {
   const client = createRoyalPassageClient();
   return rpcCall(() =>
@@ -28,7 +39,10 @@ export function fetchCatalog(citySlug?: string) {
 
 export function fetchExperienceBySlug(slug: string) {
   const client = createRoyalPassageClient();
-  return rpcCall(() =>
-    client.getExperienceBySlug(create(GetExperienceBySlugRequestSchema, { slug })),
-  ) as Promise<ExperienceDetailPayload>;
+  return rpcCall(async () => {
+    const payload = (await client.getExperienceBySlug(
+      create(GetExperienceBySlugRequestSchema, { slug }),
+    )) as ExperienceDetailPayload;
+    return { ...payload, exp: normalizeExperience(payload.exp) };
+  });
 }

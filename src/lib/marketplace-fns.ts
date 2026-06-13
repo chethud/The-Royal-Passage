@@ -11,6 +11,7 @@ import {
 import { isSupabaseConfigured } from "@/lib/env.server";
 import { getOrSetServerCache } from "@/lib/cache.server";
 import { withGuestBookableSlots } from "@/lib/booking-window";
+import { buildCatalogMeta, filterBookableExperiences } from "@/lib/experience-filters";
 import { mapRowToExperience, type ExperienceRow, type SlotRow } from "@/lib/experience-db";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
@@ -19,12 +20,19 @@ type JsonValue = JsonPrimitive | JsonObject | JsonValue[];
 type JsonObject = { [key: string]: JsonValue };
 
 function fallbackCatalog() {
+  const experiences = filterBookableExperiences(staticExperiences);
+  const meta = buildCatalogMeta(experiences);
   return {
     mode: "static" as const,
-    experiences: staticExperiences,
-    categories: [...staticCategories],
-    cities: [...staticCities],
+    experiences,
+    categories: meta.categories.length > 0 ? meta.categories : [...staticCategories],
+    cities: meta.cities.length > 0 ? meta.cities : [...staticCities],
   };
+}
+
+function toBookableCatalog(mode: "live" | "static", experiences: Experience[]) {
+  const bookable = filterBookableExperiences(experiences);
+  return { mode, experiences: bookable, ...buildCatalogMeta(bookable) };
 }
 
 function hostVisibleInCatalog(host: ExperienceRow["hosts"]): boolean {
@@ -103,7 +111,8 @@ async function loadPublishedWithSlots(): Promise<Experience[]> {
 export const getCatalogForUi = createServerFn({ method: "GET" }).handler(async () => {
   if (isApiConfigured()) {
     try {
-      return await fetchCatalog();
+      const catalog = await fetchCatalog();
+      return toBookableCatalog(catalog.mode, catalog.experiences);
     } catch {
       return fallbackCatalog();
     }
@@ -114,12 +123,7 @@ export const getCatalogForUi = createServerFn({ method: "GET" }).handler(async (
   }
   try {
     const list = await getOrSetServerCache("catalog:published:v1", 60, loadPublishedWithSlots);
-    return {
-      mode: "live" as const,
-      experiences: list,
-      categories: [...new Set(list.map((e) => e.category))].sort(),
-      cities: [...new Set(list.map((e) => e.city))].sort(),
-    };
+    return toBookableCatalog("live", list);
   } catch {
     // Network / DNS errors should not white-screen the app.
     return fallbackCatalog();

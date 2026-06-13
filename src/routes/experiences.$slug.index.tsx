@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { MapPin } from "lucide-react";
 import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPanel";
+import { ExperienceDetailGallery } from "@/components/experiences/ExperienceDetailGallery";
 import { ExperienceReviewsSection } from "@/components/reviews/ExperienceReviewsSection";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
@@ -9,6 +11,7 @@ import { Footer } from "@/components/site/Footer";
 import type { Slot } from "@/data/experiences";
 import { useAuthUser } from "@/lib/auth-user";
 import { guestBookingLimits } from "@/lib/booking-url";
+import { hasBookableSlot } from "@/lib/experience-filters";
 import { getExperienceForDetail } from "@/lib/marketplace-fns";
 import { getExperienceReviews } from "@/lib/review-fns";
 import { buildExperienceJsonLd, SITE_URL } from "@/lib/seo";
@@ -68,6 +71,40 @@ export const Route = createFileRoute("/experiences/$slug/")({
   component: ExperienceDetail,
 });
 
+function ExperienceDetailList({
+  label,
+  items,
+  emptyMessage,
+}: {
+  label: string;
+  items: string[];
+  emptyMessage?: string;
+}) {
+  if (items.length === 0) {
+    if (!emptyMessage) return null;
+    return (
+      <div>
+        <div className="eyebrow mb-4">{label}</div>
+        <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="eyebrow mb-4">{label}</div>
+      <ul className="space-y-2">
+        {items.map((item) => (
+          <li key={item} className="flex gap-3 text-sm">
+            <span className="text-ember">—</span>
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function ExperienceDetail() {
   const { exp, reviews } = Route.useLoaderData();
   const { user, role } = useAuthUser();
@@ -87,6 +124,8 @@ function ExperienceDetail() {
   }, [exp, selectedSlot]);
 
   const ldJson = buildExperienceJsonLd(exp, reviews);
+  const locationLine = [exp.region, exp.city].filter(Boolean).join(" · ");
+  const canBook = hasBookableSlot(exp);
 
   return (
     <div className="pt-[var(--header-height)] text-foreground">
@@ -107,17 +146,7 @@ function ExperienceDetail() {
 
       <section className="container-page grid md:grid-cols-12 gap-8 md:gap-10">
         <div className="md:col-span-7">
-          <div className="aspect-[4/5] overflow-hidden rounded-md bg-muted ring-1 ring-[oklch(0.78_0.1_78_/_0.35)] ring-offset-2 ring-offset-background">
-            <img
-              src={exp.image}
-              alt={exp.title}
-              className="h-full w-full object-cover"
-              width={1200}
-              height={1500}
-              decoding="async"
-              fetchPriority="high"
-            />
-          </div>
+          <ExperienceDetailGallery exp={exp} />
         </div>
         <div className="md:col-span-5 md:pt-4">
           <div className="flex gap-2 mb-5">
@@ -130,9 +159,15 @@ function ExperienceDetail() {
               </span>
             )}
           </div>
-          <div className="text-sm text-muted-foreground">
-            {exp.city} · {exp.address}
-          </div>
+          {locationLine || exp.address ? (
+            <div className="flex items-start gap-2 text-sm text-muted-foreground">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-ember" aria-hidden />
+              <div>
+                {locationLine ? <div>{locationLine}</div> : null}
+                {exp.address ? <div className="mt-0.5">{exp.address}</div> : null}
+              </div>
+            </div>
+          ) : null}
           <div className="mt-2 flex items-start justify-between gap-4">
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl leading-tight">
               {exp.title}
@@ -169,7 +204,12 @@ function ExperienceDetail() {
 
           <div className="hairline my-6" />
 
-          <p className="text-sm leading-relaxed text-muted-foreground">{exp.description}</p>
+          <div className="space-y-4">
+            <div className="eyebrow">About this experience</div>
+            <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+              {exp.description}
+            </p>
+          </div>
 
           <div className="mt-6">
             <div className="eyebrow mb-2">Hosted by</div>
@@ -180,21 +220,23 @@ function ExperienceDetail() {
       </section>
 
       <section className="container-page py-12 sm:py-16 grid md:grid-cols-2 gap-8 md:gap-10">
-        <div>
-          <div className="eyebrow mb-4">What's included</div>
-          <ul className="space-y-2">
-            {exp.inclusions.map((i) => (
-              <li key={i} className="flex gap-3 text-sm">
-                <span className="text-ember">—</span>
-                {i}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <div className="eyebrow mb-4">Cancellation policy</div>
-          <p className="text-sm leading-relaxed text-muted-foreground">{exp.cancellation}</p>
-        </div>
+        <ExperienceDetailList label="What's included" items={exp.inclusions} />
+        <ExperienceDetailList
+          label="Not included"
+          items={exp.exclusions ?? []}
+          emptyMessage="All essentials are covered in this experience."
+        />
+      </section>
+
+      {(exp.requirements?.length ?? 0) > 0 ? (
+        <section className="container-page pb-12 sm:pb-16">
+          <ExperienceDetailList label="What to bring & know" items={exp.requirements ?? []} />
+        </section>
+      ) : null}
+
+      <section className="container-page pb-12 sm:pb-16">
+        <div className="eyebrow mb-4">Cancellation policy</div>
+        <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{exp.cancellation}</p>
       </section>
 
       <section className="container-page py-12 sm:py-16">
@@ -207,35 +249,53 @@ function ExperienceDetail() {
         </div>
       </section>
 
-      <section id="book" className="glass-strong border-y border-[oklch(0.88_0.08_86_/_0.1)]">
-        <div className="container-page py-14 sm:py-20 grid md:grid-cols-12 gap-8 md:gap-10">
-          <div className="md:col-span-5">
-            <div className="eyebrow mb-3">Reserve your seats</div>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl leading-tight">
-              Choose a date.
-              <br />
-              <em className="italic text-ember">Hold your moment.</em>
-            </h2>
-            <p className="mt-5 max-w-sm text-sm text-muted-foreground">
-              Seats are released on a first-come basis and held for 10 minutes during checkout to
-              ensure no one is double-booked.
-            </p>
-          </div>
+      {canBook ? (
+        <section id="book" className="glass-strong border-y border-[oklch(0.88_0.08_86_/_0.1)]">
+          <div className="container-page py-14 sm:py-20 grid md:grid-cols-12 gap-8 md:gap-10">
+            <div className="md:col-span-5">
+              <div className="eyebrow mb-3">Reserve your seats</div>
+              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl leading-tight">
+                Choose a date.
+                <br />
+                <em className="italic text-ember">Hold your moment.</em>
+              </h2>
+              <p className="mt-5 max-w-sm text-sm text-muted-foreground">
+                Seats are released on a first-come basis and held for 10 minutes during checkout to
+                ensure no one is double-booked.
+              </p>
+            </div>
 
-          <div className="md:col-span-7">
-            <ExperienceBookingPanel
-              exp={exp}
-              selectedSlot={selectedSlot}
-              onSelectSlot={setSelectedSlot}
-              guests={guests}
-              onGuestsChange={setGuests}
-              variant="select"
-              signedIn={Boolean(user)}
-              userRole={user ? (role ?? "guest") : null}
-            />
+            <div className="md:col-span-7">
+              <ExperienceBookingPanel
+                exp={exp}
+                selectedSlot={selectedSlot}
+                onSelectSlot={setSelectedSlot}
+                guests={guests}
+                onGuestsChange={setGuests}
+                variant="select"
+                signedIn={Boolean(user)}
+                userRole={user ? (role ?? "guest") : null}
+              />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : (
+        <section className="container-page py-12 sm:py-16">
+          <div className="glass rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] px-6 py-8 text-center sm:px-10">
+            <p className="font-display text-2xl">Booking opens soon</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              There are no available sessions in the next 7 days. Check back later or browse other
+              experiences.
+            </p>
+            <Link
+              to="/experiences"
+              className="mt-6 inline-flex text-sm text-ember underline-offset-4 hover:underline"
+            >
+              Browse the library →
+            </Link>
+          </div>
+        </section>
+      )}
 
       <Footer />
     </div>

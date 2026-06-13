@@ -1,5 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { BookingCheckoutWizard } from "@/components/booking/BookingCheckoutWizard";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/dashboard/cart/checkout/$slug")({
   validateSearch: parseBookSearch,
   loader: async ({ params }) => {
     const row = await getExperienceForDetail({ data: { slug: params.slug } });
-    if (!row) throw new Error("Experience not found.");
+    if (!row) throw notFound();
     return row;
   },
   head: ({ loaderData }) => ({
@@ -32,6 +32,11 @@ function CartCheckoutPage() {
   const navigate = useNavigate();
   const { role, ready, loading } = useGuestAccess();
   const { items: cartItems } = useExperienceCart();
+  const [cartHydrated, setCartHydrated] = useState(false);
+
+  useEffect(() => {
+    setCartHydrated(true);
+  }, []);
 
   const cartItem = useMemo(
     () => cartItems.find((item) => item.slug === exp.slug || item.experienceId === exp.id),
@@ -39,14 +44,22 @@ function CartCheckoutPage() {
   );
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !cartHydrated) return;
     if (!cartItem) {
       void navigate({ to: "/dashboard/cart" });
     }
-  }, [cartItem, navigate, ready]);
+  }, [cartHydrated, cartItem, navigate, ready]);
 
-  if (loading || !ready || !cartItem) {
+  if (loading || !ready || !cartHydrated) {
     return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+  }
+
+  if (!cartItem) {
+    return (
+      <GuestDashboardShell wide title="Checkout" subtitle="Returning to your cart…">
+        <p className="text-sm text-muted-foreground">This experience is no longer in your cart.</p>
+      </GuestDashboardShell>
+    );
   }
 
   return (

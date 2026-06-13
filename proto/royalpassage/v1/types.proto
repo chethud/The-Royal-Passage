@@ -46,6 +46,10 @@ message Experience {
   optional string currency_symbol = 21;
   int32 min_guests_per_booking = 22;
   int32 max_guests_per_booking = 23;
+  repeated string gallery_urls = 24;
+  repeated string exclusions = 25;
+  repeated string requirements = 26;
+  optional string region = 27;
 }
 
 message CatalogResponse {

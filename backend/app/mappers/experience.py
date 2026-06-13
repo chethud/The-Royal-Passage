@@ -36,6 +36,9 @@ def map_row_to_experience(row: dict, slots: list[dict]) -> Experience:
         for s in sorted_slots
     ]
 
+    gallery_urls = row.get("gallery_urls") or []
+    hero = row.get("hero_image_url") or ""
+
     return Experience(
         id=row["id"],
         slug=row["slug"],
@@ -53,8 +56,12 @@ def map_row_to_experience(row: dict, slots: list[dict]) -> Experience:
         pricePerPerson=round(row["price_per_person_minor"] / 100),
         rating=float(row.get("average_rating") or 0),
         reviewsCount=int(row.get("review_count") or 0),
-        image=row.get("hero_image_url") or "",
+        image=hero,
         inclusions=row.get("inclusions") or [],
+        galleryUrls=gallery_urls if gallery_urls else ([hero] if hero else []),
+        exclusions=row.get("exclusions") or [],
+        requirements=row.get("requirements") or [],
+        region=row.get("region"),
         cancellation=row.get("cancellation_policy") or "",
         slots=ui_slots,
         currencySymbol=_currency_symbol(row.get("currency_code") or "INR"),

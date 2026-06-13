@@ -34,6 +34,10 @@ export type Experience = {
   reviewsCount: number;
   image: string;
   inclusions: string[];
+  exclusions?: string[];
+  requirements?: string[];
+  galleryUrls?: string[];
+  region?: string;
   cancellation: string;
   slots: Slot[];
   /** UI price prefix — demo uses €, Supabase listings use ₹ */

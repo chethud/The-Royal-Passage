@@ -18,7 +18,10 @@ export function useExperienceCart() {
     setCount(cartItemCount());
   }, []);
 
-  useEffect(() => subscribeCart(sync), [sync]);
+  useEffect(() => {
+    sync();
+    return subscribeCart(sync);
+  }, [sync]);
 
   const add = useCallback((item: CartItem) => {
     setItems(addCartItem(item));
