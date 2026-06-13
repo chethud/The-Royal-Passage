@@ -13,11 +13,15 @@ type AdminExperienceApprovalRowProps = {
 
 export function AdminExperienceApprovalRow({
   row,
-  reviewLabel = "Review",
+  reviewLabel = "Review full details",
 }: AdminExperienceApprovalRowProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4">
-      <div className="min-w-0 flex-1">
+    <div className="flex flex-wrap items-center justify-between gap-4 rounded-sm border border-[oklch(0.88_0.08_86_/_0.15)] p-4 transition-colors hover:border-ember/30">
+      <Link
+        to="/admin/experiences/$experienceId"
+        params={{ experienceId: row.id }}
+        className="min-w-0 flex-1 hover:text-ember"
+      >
         <div className="font-display text-lg">{row.title}</div>
         <div className="mt-1 text-sm text-muted-foreground">
           {row.hostName} · {row.city} · {formatDateLong(row.createdAt.slice(0, 10))}
@@ -25,7 +29,7 @@ export function AdminExperienceApprovalRow({
         {row.slug ? (
           <div className="mt-1 text-xs text-muted-foreground/80">Slug: {row.slug}</div>
         ) : null}
-      </div>
+      </Link>
       <div className="flex flex-wrap items-center gap-3">
         <ExperienceStatusBadge status={row.status} />
         <Link

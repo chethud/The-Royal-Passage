@@ -30,6 +30,7 @@ function AdminExperienceReviewPage() {
   const [pageError, setPageError] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [justPublished, setJustPublished] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -51,9 +52,9 @@ function AdminExperienceReviewPage() {
       });
   }, [user]);
 
-  const loadExperience = useCallback(async () => {
+  const loadExperience = useCallback(async (silent = false) => {
     if (!accessToken) return;
-    setPageLoading(true);
+    if (!silent) setPageLoading(true);
     setPageError(null);
     try {
       if (!isApiConfigured()) {
@@ -64,7 +65,7 @@ function AdminExperienceReviewPage() {
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to load experience for review."));
     } finally {
-      setPageLoading(false);
+      if (!silent) setPageLoading(false);
     }
   }, [accessToken, experienceId]);
 
@@ -75,15 +76,28 @@ function AdminExperienceReviewPage() {
 
   const runAction = async (action: "publish" | "reject") => {
     if (!accessToken) return;
+    if (action === "publish") {
+      const ok = window.confirm(
+        "Approve and publish this experience to the live site? Guests will be able to browse and book it.",
+      );
+      if (!ok) return;
+    } else {
+      const ok = window.confirm("Reject this submission? It will not appear on the live site.");
+      if (!ok) return;
+    }
+
     setBusy(true);
     setPageError(null);
+    setJustPublished(false);
     try {
       if (action === "publish") {
         await publishExperience(accessToken, experienceId);
+        await loadExperience(true);
+        setJustPublished(true);
       } else {
         await rejectExperience(accessToken, experienceId);
+        void navigate({ to: "/admin/experiences" });
       }
-      void navigate({ to: "/admin/experiences" });
     } catch (err) {
       setPageError(toErrorMessage(err, "Action failed."));
     } finally {
@@ -98,43 +112,104 @@ function AdminExperienceReviewPage() {
     return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
   }
 
+  const isPending = experience?.status === "pending_review";
+  const isPublished = experience?.status === "published";
+  const canPublish = isPending && (experience?.slots.length ?? 0) > 0;
+
   return (
     <DashboardShell
       role="admin"
-      title="Review experience"
-      subtitle="Review the full host submission before publishing to the marketplace."
+      title={experience?.title ?? "Review experience"}
+      subtitle="Check every detail below — photos, host info, description, and slots — then approve to go live."
     >
-      <div className="mb-8 flex flex-wrap items-center gap-3">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link to="/admin/experiences" className="text-sm text-ember hover:underline">
-          ← Back to approvals
+          ← Back to pending list
         </Link>
+        {isPublished && experience.slug ? (
+          <Link
+            to="/experiences/$slug"
+            params={{ slug: experience.slug }}
+            className="text-sm font-medium text-ember hover:underline"
+          >
+            View live listing →
+          </Link>
+        ) : null}
       </div>
 
+      {justPublished && isPublished && experience?.slug ? (
+        <div className="mb-6 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-5 py-4">
+          <p className="font-display text-lg text-emerald-200">Approved and live on the marketplace</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Guests can now browse and book this experience on the public site.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              to="/experiences/$slug"
+              params={{ slug: experience.slug }}
+              className={`${btn} border-ember/50 bg-ember/10 text-ember`}
+            >
+              Open live page
+            </Link>
+            <Link to="/admin/experiences" className={`${btn} border-[oklch(0.88_0.08_86_/_0.35)]`}>
+              Back to pending list
+            </Link>
+          </div>
+        </div>
+      ) : null}
+
       {pageLoading ? (
-        <p className="text-sm text-muted-foreground">Loading experience details…</p>
+        <p className="text-sm text-muted-foreground">Loading full experience details…</p>
       ) : pageError && !experience ? (
         <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {pageError}
         </p>
       ) : experience ? (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {pageError ? (
             <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {pageError}
             </p>
           ) : null}
 
+          {isPending ? (
+            <div className="sticky top-[calc(var(--header-height)+0.75rem)] z-20 flex flex-wrap items-center justify-between gap-3 rounded-md border border-ember/30 bg-[oklch(0.14_0.06_22_/_0.95)] px-4 py-3 backdrop-blur-sm">
+              <p className="text-sm text-muted-foreground">
+                Review all sections, then approve to publish for guest bookings.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={busy || !canPublish}
+                  title={!canPublish ? "Host must add at least one bookable slot" : undefined}
+                  className={`${btn} bg-ember text-primary-foreground border-ember/70`}
+                  onClick={() => void runAction("publish")}
+                >
+                  Approve & publish live
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  className={`${btn} border-destructive/40 text-destructive`}
+                  onClick={() => void runAction("reject")}
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+          ) : null}
+
           <AdminExperienceReview experience={experience} />
 
-          {experience.status === "pending_review" ? (
+          {isPending ? (
             <div className="flex flex-wrap gap-3 border-t border-[oklch(0.88_0.08_86_/_0.15)] pt-6">
               <button
                 type="button"
-                disabled={busy}
+                disabled={busy || !canPublish}
                 className={`${btn} bg-ember text-primary-foreground border-ember/70`}
                 onClick={() => void runAction("publish")}
               >
-                Approve & publish
+                Approve & publish live
               </button>
               <button
                 type="button"
@@ -144,11 +219,16 @@ function AdminExperienceReviewPage() {
               >
                 Reject submission
               </button>
+              {!canPublish ? (
+                <p className="w-full text-xs text-amber-200/80">
+                  Add at least one bookable slot before this experience can go live.
+                </p>
+              ) : null}
             </div>
-          ) : experience.status === "published" ? (
-            <div className="space-y-4 border-t border-[oklch(0.88_0.08_86_/_0.15)] pt-6">
+          ) : isPublished ? (
+            <div className="space-y-3 border-t border-[oklch(0.88_0.08_86_/_0.15)] pt-6">
               <p className="text-sm text-emerald-300/90">
-                This experience is approved and live on the marketplace.
+                This experience is approved and live. Guests can book it on the public site.
               </p>
               {experience.slug ? (
                 <Link

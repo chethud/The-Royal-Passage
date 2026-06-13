@@ -53,7 +53,7 @@ function AdminExperiencesPage() {
     <DashboardShell
       role="admin"
       title="Approve experiences"
-      subtitle="Only submissions awaiting your review appear here. Open Review to see photos, details, and slots."
+      subtitle="Pending submissions only. Click Review full details to open the complete submission on its own page."
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <Link to="/admin" className="text-sm text-ember hover:underline">

@@ -86,6 +86,11 @@ def publish_experience(experience_id: str) -> AdminExperienceSummary:
     if row.get("status") != "pending_review":
         raise ValueError("Only experiences pending review can be published.")
 
+    slots = _load_slots(supabase, experience_id)
+    open_slots = [slot for slot in slots if not slot.get("is_blocked")]
+    if not open_slots:
+        raise ValueError("Cannot publish without at least one bookable slot.")
+
     supabase.table("experiences").update({"status": "published"}).eq("id", experience_id).execute()
 
     # Catalog only lists experiences from approved hosts; approving the experience

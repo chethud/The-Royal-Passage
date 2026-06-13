@@ -50,9 +50,9 @@ export function AdminExperienceQueue({ accessToken, refreshKey = 0 }: AdminExper
           </Link>
         </div>
       ) : (
-        <ul className="divide-y divide-[oklch(0.88_0.08_86_/_0.12)]">
+        <ul className="space-y-3">
           {rows.map((row) => (
-            <li key={row.id} className="py-4 first:pt-0 last:pb-0">
+            <li key={row.id}>
               <AdminExperienceApprovalRow row={row} />
             </li>
           ))}

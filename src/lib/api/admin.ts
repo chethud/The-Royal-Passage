@@ -3,7 +3,6 @@ import type { UserRole } from "@/lib/roles";
 import type { BookingSummary } from "@/lib/api/bookings";
 import { apiFetch } from "@/lib/api/client";
 import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
-import { AdminExperienceActionRequestSchema } from "@/gen/royalpassage/v1/service_pb";
 import { CreateHostRequestSchema } from "@/gen/royalpassage/v1/types_pb";
 import type { HostSlotDetail } from "@/lib/api/host-experiences";
 
@@ -84,11 +83,7 @@ export type AdminExperienceDetail = {
 };
 
 export function fetchAdminExperienceApprovals(accessToken: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(async () => {
-    const response = await client.listAdminExperiences({});
-    return response.experiences as AdminExperienceSummary[];
-  });
+  return apiFetch<AdminExperienceSummary[]>("/api/v1/admin/experiences", { accessToken });
 }
 
 /** @deprecated Use fetchAdminExperienceApprovals */
@@ -97,24 +92,23 @@ export function fetchPendingExperiences(accessToken: string) {
 }
 
 export function fetchAdminExperience(accessToken: string, experienceId: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() =>
-    client.getAdminExperience(create(AdminExperienceActionRequestSchema, { experienceId })),
-  ) as Promise<AdminExperienceDetail>;
+  return apiFetch<AdminExperienceDetail>(`/api/v1/admin/experiences/${experienceId}`, {
+    accessToken,
+  });
 }
 
 export function publishExperience(accessToken: string, experienceId: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() =>
-    client.publishExperience(create(AdminExperienceActionRequestSchema, { experienceId })),
-  ) as Promise<AdminExperienceSummary>;
+  return apiFetch<AdminExperienceSummary>(
+    `/api/v1/admin/experiences/${experienceId}/publish`,
+    { accessToken, method: "POST" },
+  );
 }
 
 export function rejectExperience(accessToken: string, experienceId: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() =>
-    client.rejectExperience(create(AdminExperienceActionRequestSchema, { experienceId })),
-  ) as Promise<AdminExperienceSummary>;
+  return apiFetch<AdminExperienceSummary>(
+    `/api/v1/admin/experiences/${experienceId}/reject`,
+    { accessToken, method: "POST" },
+  );
 }
 
 export type AdminStats = {
