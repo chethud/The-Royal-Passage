@@ -8,19 +8,13 @@ import {
   MaharajaEmblem,
   PalaceArchFrame,
 } from "@/components/site/RoyalHeritageDecor";
-import { RoyalVideoCurtain, type VideoCurtainPhase } from "@/components/site/RoyalVideoCurtain";
+import { RoyalVideoCurtain, type CurtainMotion } from "@/components/site/RoyalVideoCurtain";
 import type { HomepageJourneySlide } from "@/lib/homepage-content";
 import { normalizeYoutubeVideoInput } from "@/lib/youtube-video-id";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type SlideTheme = HomepageJourneySlide["theme"];
-
-const CURTAIN_CLOSE_MS = 520;
-const CURTAIN_HOLD_CLOSED_MS = 380;
-const CURTAIN_AJAR_MS = 1100;
-const CURTAIN_OPEN_MS = 5200;
-const CURTAIN_FADE_OUT_MS = 600;
 
 const dustParticles = Array.from({ length: 8 }, (_, i) => ({
   id: i,
@@ -55,11 +49,12 @@ function RoyalMedallion({ active, label }: { active: boolean; label: string }) {
 type SlideContentProps = {
   slide: HomepageJourneySlide;
   visible: boolean;
+  ready?: boolean;
 };
 
-function SlideContent({ slide, visible }: SlideContentProps) {
+function SlideContent({ slide, visible, ready = false }: SlideContentProps) {
   return (
-    <div className={`royal-slide-content relative flex flex-col justify-center px-7 py-12 sm:px-12 sm:py-16 md:px-16 md:py-20 ${visible ? "is-visible" : ""}`}>
+    <div className={`royal-slide-content relative flex flex-col justify-center px-7 py-12 sm:px-12 sm:py-16 md:px-16 md:py-20 ${visible ? "is-visible" : ""} ${ready ? "is-ready" : ""}`}>
       <PalaceArchFrame className="pointer-events-none absolute top-6 right-8 left-8 z-10 h-8 opacity-70 sm:top-8" />
 
       <div className="pointer-events-none absolute top-10 right-10 opacity-30">
@@ -100,21 +95,17 @@ function SlideContent({ slide, visible }: SlideContentProps) {
 type SlideMediaProps = {
   slide: HomepageJourneySlide;
   isActive: boolean;
-  visible: boolean;
   reducedMotion: boolean;
   editable?: boolean;
   onVideoIdChange?: (videoId: string) => void;
-  videoRevealed?: boolean;
 };
 
 function SlideMedia({
   slide,
   isActive,
-  visible,
   reducedMotion,
   editable,
   onVideoIdChange,
-  videoRevealed = true,
 }: SlideMediaProps) {
   const [videoInput, setVideoInput] = useState(slide.videoId);
 
@@ -128,16 +119,14 @@ function SlideMedia({
   };
 
   return (
-    <div className={`royal-slide-media relative min-h-[320px] overflow-hidden bg-black md:min-h-[480px] ${visible ? "is-visible" : ""}`}>
-      <div className="royal-stage-void absolute inset-0 z-0 bg-black" aria-hidden />
-
+    <div className="royal-slide-media relative min-h-[320px] overflow-hidden bg-black md:min-h-[480px]">
       <div
-        className={`royal-slide-video absolute inset-0 z-[1] ${isActive && !reducedMotion ? "royal-slider-ken-burns" : ""} ${videoRevealed ? "is-revealed" : ""}`}
+        className={`royal-slide-video absolute inset-0 z-[1] ${isActive && !reducedMotion ? "royal-slider-ken-burns" : ""}`}
       >
         <iframe
           key={`${slide.id}-${slide.videoId}`}
           title={slide.title}
-          src={youtubeEmbedUrl(slide.videoId, isActive && videoRevealed)}
+          src={youtubeEmbedUrl(slide.videoId, isActive)}
           className="absolute inset-0 h-full w-full border-0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
@@ -186,15 +175,12 @@ type JourneysSplitProps = {
 
 export function JourneysSplit({ slides, editable = false, onSlidesChange }: JourneysSplitProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [curtainPhase, setCurtainPhase] = useState<VideoCurtainPhase>("closed");
+  const [curtainMotion, setCurtainMotion] = useState<CurtainMotion>("closed");
   const [showCurtainOverlay, setShowCurtainOverlay] = useState(true);
-  const [curtainFadingOut, setCurtainFadingOut] = useState(false);
-  const [videoRevealed, setVideoRevealed] = useState(false);
-  const [curtainsOpen, setCurtainsOpen] = useState(false);
-  const [contentVisible, setContentVisible] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isLocked, setIsLocked] = useState(false);
+  const [isLocked, setIsLocked] = useState(true);
   const [themeFlash, setThemeFlash] = useState<SlideTheme | null>(null);
+  const pendingSlideRef = useRef<number | null>(null);
   const reducedMotion = usePrefersReducedMotion();
   const timersRef = useRef<number[]>([]);
 
@@ -208,6 +194,26 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
     timersRef.current.push(id);
   }, []);
 
+  const beginCurtainOpen = useCallback(() => {
+    setCurtainMotion("opening");
+  }, []);
+
+  const finishCurtainOpen = useCallback(() => {
+    setCurtainMotion("done");
+    setShowCurtainOverlay(false);
+    setIsTransitioning(false);
+    setIsLocked(false);
+    setThemeFlash(null);
+  }, []);
+
+  const handleClosingComplete = useCallback(() => {
+    if (pendingSlideRef.current === null) return;
+    setActiveIndex(pendingSlideRef.current);
+    setThemeFlash(slides[pendingSlideRef.current].theme);
+    pendingSlideRef.current = null;
+    beginCurtainOpen();
+  }, [beginCurtainOpen, slides]);
+
   const goTo = useCallback(
     (index: number) => {
       const next = (index + slides.length) % slides.length;
@@ -216,96 +222,34 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
       clearTimers();
       setIsLocked(true);
       setIsTransitioning(true);
-      setContentVisible(false);
-      setCurtainsOpen(false);
-      setVideoRevealed(false);
-      setCurtainPhase("closed");
       setShowCurtainOverlay(true);
-      setCurtainFadingOut(false);
+      setCurtainMotion("closing");
+      pendingSlideRef.current = next;
 
-      const closeMs = reducedMotion ? 120 : CURTAIN_CLOSE_MS;
-      const holdMs = reducedMotion ? 0 : CURTAIN_HOLD_CLOSED_MS;
-      const ajarMs = reducedMotion ? 0 : CURTAIN_AJAR_MS;
-      const openMs = reducedMotion ? 280 : CURTAIN_OPEN_MS;
-      const contentRevealAt = closeMs + holdMs + ajarMs + Math.floor(openMs * 0.58);
-      const dismissAt = closeMs + holdMs + ajarMs + openMs;
-
-      schedule(() => {
+      if (reducedMotion) {
         setActiveIndex(next);
-        setThemeFlash(slides[next].theme);
-        setCurtainPhase(reducedMotion ? "open" : "closed");
-        setCurtainsOpen(false);
-
-        if (!reducedMotion) {
-          schedule(() => {
-            setCurtainPhase("ajar");
-            schedule(() => {
-              setCurtainPhase("open");
-              setCurtainsOpen(true);
-              schedule(() => setVideoRevealed(true), Math.floor(openMs * 0.72));
-            }, ajarMs);
-          }, holdMs);
-
-          schedule(() => setCurtainFadingOut(true), dismissAt);
-          schedule(() => {
-            setShowCurtainOverlay(false);
-            setCurtainFadingOut(false);
-          }, dismissAt + CURTAIN_FADE_OUT_MS);
-        } else {
-          setCurtainsOpen(true);
-          setVideoRevealed(true);
-          setShowCurtainOverlay(false);
-        }
-
-        schedule(() => {
-          setContentVisible(true);
-          setThemeFlash(null);
-        }, contentRevealAt);
-
-        schedule(() => {
-          setIsTransitioning(false);
-          setIsLocked(false);
-        }, dismissAt + CURTAIN_FADE_OUT_MS);
-      }, closeMs);
+        setShowCurtainOverlay(false);
+        setCurtainMotion("done");
+        setIsTransitioning(false);
+        setIsLocked(false);
+        pendingSlideRef.current = null;
+      }
     },
-    [activeIndex, clearTimers, isLocked, reducedMotion, schedule],
+    [activeIndex, clearTimers, isLocked, reducedMotion, slides],
   );
 
   useEffect(() => () => clearTimers(), [clearTimers]);
 
   useEffect(() => {
     if (reducedMotion) {
-      setCurtainPhase("open");
-      setCurtainsOpen(true);
-      setContentVisible(true);
-      setVideoRevealed(true);
+      setCurtainMotion("done");
       setShowCurtainOverlay(false);
+      setIsLocked(false);
       return;
     }
 
-    setCurtainPhase("closed");
-    setShowCurtainOverlay(true);
-    setCurtainFadingOut(false);
-
-    const dismissAt = CURTAIN_HOLD_CLOSED_MS + CURTAIN_AJAR_MS + CURTAIN_OPEN_MS;
-    const contentRevealAt = CURTAIN_HOLD_CLOSED_MS + CURTAIN_AJAR_MS + Math.floor(CURTAIN_OPEN_MS * 0.58);
-
-    schedule(() => {
-      setCurtainPhase("ajar");
-      schedule(() => {
-        setCurtainPhase("open");
-        setCurtainsOpen(true);
-        schedule(() => setVideoRevealed(true), Math.floor(CURTAIN_OPEN_MS * 0.72));
-      }, CURTAIN_AJAR_MS);
-    }, CURTAIN_HOLD_CLOSED_MS);
-
-    schedule(() => setContentVisible(true), contentRevealAt);
-    schedule(() => setCurtainFadingOut(true), dismissAt);
-    schedule(() => {
-      setShowCurtainOverlay(false);
-      setCurtainFadingOut(false);
-    }, dismissAt + CURTAIN_FADE_OUT_MS);
-  }, [reducedMotion, schedule]);
+    schedule(() => beginCurtainOpen(), 120);
+  }, [beginCurtainOpen, reducedMotion, schedule]);
 
   const goPrev = () => goTo(activeIndex - 1);
   const goNext = () => goTo(activeIndex + 1);
@@ -414,19 +358,14 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
                     }`}
                     aria-hidden={!isActive}
                   >
-                    <SlideContent slide={item} visible={isActive && contentVisible} />
+                    <SlideContent slide={item} visible={isActive} ready={isActive && showCurtainOverlay} />
                     <SlideMedia
                       slide={item}
                       isActive={isActive}
-                      visible={isActive && contentVisible}
                       reducedMotion={reducedMotion}
                       editable={editable}
                       onVideoIdChange={(videoId) => updateSlide(index, { videoId })}
-                      videoRevealed={isActive ? videoRevealed : false}
                     />
-                    {isActive && !reducedMotion && showCurtainOverlay ? (
-                      <RoyalVideoCurtain phase={curtainPhase} fadingOut={curtainFadingOut} />
-                    ) : null}
                   </div>
                 );
               })}
@@ -436,9 +375,18 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
               ) : null}
 
               <div
-                className={`royal-golden-burst pointer-events-none absolute inset-0 z-[38] ${curtainsOpen && contentVisible ? "" : "is-active"}`}
+                className={`royal-golden-burst pointer-events-none absolute inset-0 z-[38] ${showCurtainOverlay ? "is-active" : ""}`}
                 aria-hidden
               />
+
+              {showCurtainOverlay && !reducedMotion ? (
+                <RoyalVideoCurtain
+                  key={`${activeIndex}-${curtainMotion}`}
+                  motion={curtainMotion}
+                  onOpeningComplete={finishCurtainOpen}
+                  onClosingComplete={handleClosingComplete}
+                />
+              ) : null}
             </div>
           </div>
         </div>

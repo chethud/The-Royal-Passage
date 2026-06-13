@@ -1,18 +1,28 @@
 import curtainLeft from "@/assets/curtain/panel-left.jpg";
 import curtainRight from "@/assets/curtain/panel-right.jpg";
 
-export type VideoCurtainPhase = "closed" | "ajar" | "open";
+export type CurtainMotion = "closed" | "opening" | "closing" | "done";
 
 type RoyalVideoCurtainProps = {
-  phase: VideoCurtainPhase;
-  fadingOut?: boolean;
+  motion: CurtainMotion;
+  onOpeningComplete?: () => void;
+  onClosingComplete?: () => void;
 };
 
-function CurtainPanel({ side }: { side: "left" | "right" }) {
+function CurtainPanel({
+  side,
+  onAnimationEnd,
+}: {
+  side: "left" | "right";
+  onAnimationEnd?: (event: React.AnimationEvent<HTMLDivElement>) => void;
+}) {
   const src = side === "left" ? curtainLeft : curtainRight;
 
   return (
-    <div className={`royal-curtain royal-curtain--${side}`}>
+    <div
+      className={`royal-curtain royal-curtain--${side}`}
+      onAnimationEnd={side === "left" ? onAnimationEnd : undefined}
+    >
       <img
         src={src}
         alt=""
@@ -26,16 +36,21 @@ function CurtainPanel({ side }: { side: "left" | "right" }) {
   );
 }
 
-export function RoyalVideoCurtain({ phase, fadingOut = false }: RoyalVideoCurtainProps) {
+export function RoyalVideoCurtain({ motion, onOpeningComplete, onClosingComplete }: RoyalVideoCurtainProps) {
+  const handleAnimationEnd = (event: React.AnimationEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    if (motion === "opening") onOpeningComplete?.();
+    if (motion === "closing") onClosingComplete?.();
+  };
+
   return (
-    <div
-      className={`royal-stage-curtains royal-stage-curtains--${phase} ${fadingOut ? "is-fading-out" : ""}`}
-      aria-hidden
-    >
-      <div className="royal-stage-void-layer" />
+    <div className={`royal-stage-curtains royal-stage-curtains--${motion}`} aria-hidden>
       <div className="royal-stage-spotlight" />
-      <CurtainPanel side="left" />
+      <CurtainPanel side="left" onAnimationEnd={handleAnimationEnd} />
       <CurtainPanel side="right" />
     </div>
   );
 }
+
+/** @deprecated Use CurtainMotion */
+export type VideoCurtainPhase = "closed" | "ajar" | "open";

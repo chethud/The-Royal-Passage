@@ -546,28 +546,17 @@
   animation-play-state: paused;
 }
 
-/* Royal theatre curtains — full-stage velvet reveal */
+/* Royal theatre curtains — full-stage reveal (content lives underneath) */
 .royal-stage-curtains {
   pointer-events: none;
   position: absolute;
   inset: 0;
   z-index: 35;
   overflow: hidden;
-  perspective: 1800px;
-  perspective-origin: 50% 18%;
-  opacity: 1;
-  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.royal-stage-curtains.is-fading-out {
-  opacity: 0;
-}
-
-.royal-stage-void-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: #000000;
+  perspective: 2000px;
+  perspective-origin: 50% 16%;
+  contain: layout paint;
+  transform: translateZ(0);
 }
 
 .royal-stage-spotlight {
@@ -576,33 +565,16 @@
   z-index: 4;
   background:
     radial-gradient(ellipse 95% 55% at 50% -8%, #fff8e618 0%, transparent 58%),
-    radial-gradient(ellipse 80% 50% at 50% 105%, #00000066 0%, transparent 62%);
+    radial-gradient(ellipse 80% 50% at 50% 105%, #00000044 0%, transparent 62%);
   mix-blend-mode: soft-light;
-  opacity: 0.9;
+  opacity: 0.85;
   pointer-events: none;
 }
 
-.royal-stage-void {
-  box-shadow: inset 0 0 140px #000000;
-}
-
 .royal-slide-video {
-  opacity: 0;
-  filter: brightness(0.06);
-  transform: translate3d(0, 0, 0) scale(1.015);
-  transition:
-    transform 2.4s cubic-bezier(0.33, 1, 0.68, 1),
-    opacity 1.8s cubic-bezier(0.33, 1, 0.68, 1) 0.2s,
-    filter 2s cubic-bezier(0.33, 1, 0.68, 1) 0.15s;
-}
-
-.royal-slide-video.is-revealed {
   opacity: 1;
-  filter: brightness(1);
-}
-
-.royal-slide-media.is-visible .royal-slide-video.is-revealed {
-  transform: translate3d(0, 0, 0) scale(1);
+  filter: none;
+  transform: translate3d(0, 0, 0);
 }
 
 .royal-curtain {
@@ -611,7 +583,6 @@
   width: 52%;
   will-change: transform;
   transform-style: preserve-3d;
-  transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   z-index: 2;
   overflow: hidden;
@@ -652,11 +623,11 @@
   background: repeating-linear-gradient(
     90deg,
     transparent 0px,
-    #00000018 18px,
+    #00000016 18px,
     transparent 36px
   );
   mix-blend-mode: multiply;
-  opacity: 0.55;
+  opacity: 0.5;
   pointer-events: none;
 }
 
@@ -667,14 +638,52 @@
     linear-gradient(90deg, #00000055 0%, transparent 32%, transparent 68%, #00000055 100%),
     linear-gradient(180deg, #00000033 0%, transparent 18%, transparent 82%, #00000044 100%);
   mix-blend-mode: multiply;
-  opacity: 0.4;
-  transition: opacity 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+  opacity: 0.38;
   pointer-events: none;
 }
 
-/* Fully closed — panels meet at center seam */
-.royal-stage-curtains--closed .royal-curtain {
-  transition: transform 0.52s cubic-bezier(0.55, 0.06, 0.68, 0.19);
+@keyframes royal-curtain-left-open {
+  0%,
+  8% {
+    transform: translate3d(4%, 0, 0) rotateY(1.5deg);
+  }
+  20% {
+    transform: translate3d(-7%, 0, 0) rotateY(-17deg) scaleX(1.025);
+  }
+  100% {
+    transform: translate3d(-103%, 0, 0) rotateY(-5deg) scaleX(0.76);
+  }
+}
+
+@keyframes royal-curtain-right-open {
+  0%,
+  8% {
+    transform: translate3d(-4%, 0, 0) rotateY(-1.5deg);
+  }
+  20% {
+    transform: translate3d(7%, 0, 0) rotateY(17deg) scaleX(1.025);
+  }
+  100% {
+    transform: translate3d(103%, 0, 0) rotateY(5deg) scaleX(0.76);
+  }
+}
+
+@keyframes royal-curtain-left-close {
+  0% {
+    transform: translate3d(-103%, 0, 0) rotateY(-5deg) scaleX(0.76);
+  }
+  100% {
+    transform: translate3d(4%, 0, 0) rotateY(1.5deg);
+  }
+}
+
+@keyframes royal-curtain-right-close {
+  0% {
+    transform: translate3d(103%, 0, 0) rotateY(5deg) scaleX(0.76);
+  }
+  100% {
+    transform: translate3d(-4%, 0, 0) rotateY(-1.5deg);
+  }
 }
 
 .royal-stage-curtains--closed .royal-curtain--left {
@@ -685,38 +694,20 @@
   transform: translate3d(-4%, 0, 0) rotateY(-1.5deg);
 }
 
-/* Ajar — bottom corners pull back */
-.royal-stage-curtains--ajar .royal-curtain {
-  transition: transform 1.1s cubic-bezier(0.33, 1, 0.68, 1);
+.royal-stage-curtains--opening .royal-curtain--left {
+  animation: royal-curtain-left-open 6.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.royal-stage-curtains--ajar .royal-curtain--left {
-  transform: translate3d(-9%, 0, 0) rotateY(-20deg) scaleX(1.03);
+.royal-stage-curtains--opening .royal-curtain--right {
+  animation: royal-curtain-right-open 6.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.royal-stage-curtains--ajar .royal-curtain--right {
-  transform: translate3d(9%, 0, 0) rotateY(20deg) scaleX(1.03);
+.royal-stage-curtains--closing .royal-curtain--left {
+  animation: royal-curtain-left-close 0.58s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
 }
 
-.royal-stage-curtains--ajar .royal-curtain-shadow {
-  opacity: 0.28;
-}
-
-/* Open — smooth sweep aside, then overlay fades out */
-.royal-stage-curtains--open .royal-curtain {
-  transition: transform 5.2s cubic-bezier(0.33, 1, 0.68, 1);
-}
-
-.royal-stage-curtains--open .royal-curtain--left {
-  transform: translate3d(-103%, 0, 0) rotateY(-6deg) scaleX(0.74);
-}
-
-.royal-stage-curtains--open .royal-curtain--right {
-  transform: translate3d(103%, 0, 0) rotateY(6deg) scaleX(0.74);
-}
-
-.royal-stage-curtains--open .royal-curtain-shadow {
-  opacity: 0.1;
+.royal-stage-curtains--closing .royal-curtain--right {
+  animation: royal-curtain-right-close 0.58s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
 }
 
 /* Golden burst */
@@ -798,6 +789,22 @@
   transition-delay: 0.42s;
 }
 
+.royal-slide-content.is-ready .royal-slide-eyebrow,
+.royal-slide-content.is-ready .royal-slide-title,
+.royal-slide-content.is-ready .royal-slide-line {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: none;
+  animation: none;
+}
+
+.royal-slide-content.is-ready .royal-slide-title {
+  color: #f8f4e8;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+}
+
 .royal-slide-content.is-visible p.royal-slide-line {
   transition-delay: var(--line-delay, 0.45s);
 }
@@ -830,17 +837,16 @@
 
 @media (prefers-reduced-motion: reduce) {
   .royal-curtain {
-    transition-duration: 0.2s !important;
+    animation: none !important;
   }
 
   .royal-stage-curtains {
-    transition: none;
+    display: none;
   }
 
   .royal-slide-video {
     opacity: 1;
     filter: none;
-    transition: none;
   }
 
   .royal-slide-content .royal-slide-eyebrow,
