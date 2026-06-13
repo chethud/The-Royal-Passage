@@ -1,5 +1,6 @@
 from datetime import date, datetime, timezone
 
+from app.booking_window import assert_slot_in_booking_window
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import (
     BookingExperienceSummary,
@@ -100,6 +101,8 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         raise ValueError("Slot not found.")
     if slot.get("is_blocked"):
         raise ValueError("This slot is not available.")
+
+    assert_slot_in_booking_window(slot.get("slot_date", ""))
 
     experience = slot.get("experiences")
     if not experience or experience.get("status") != "published":

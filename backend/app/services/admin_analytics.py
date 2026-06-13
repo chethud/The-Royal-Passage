@@ -149,6 +149,7 @@ def list_admin_bookings(limit: int = 500) -> list[AdminBookingRow]:
                 totalAmount=summary.totalAmount,
                 currencySymbol=summary.currencySymbol,
                 createdAt=summary.createdAt,
+                slotDate=summary.slot.date,
                 platformFeeMinor=int(row.get("platform_fee_minor") or 0),
                 hostPayoutMinor=int(row.get("host_payout_minor") or 0),
                 hostName=host.get("display_name") or summary.experience.hostName,

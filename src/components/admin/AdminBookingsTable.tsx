@@ -2,7 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import type { AdminBookingRow } from "@/lib/api/admin";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
-import type { BookingListStatus, BookingPaymentFilter } from "@/lib/dashboard-booking-filters";
+import type { BookingListStatus, BookingPaymentFilter, BookingDateView } from "@/lib/dashboard-booking-filters";
+import { bookingMatchesDateView } from "@/lib/booking-window";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 
@@ -11,14 +12,19 @@ type AdminBookingsTableProps = {
   commissionPercent?: number;
   initialStatus?: BookingListStatus;
   initialPayment?: BookingPaymentFilter;
+  initialDateView?: BookingDateView;
 };
 
 function filterAdminBookings(
   bookings: AdminBookingRow[],
   status: BookingListStatus,
   payment: BookingPaymentFilter,
+  dateView: BookingDateView,
 ): AdminBookingRow[] {
   return bookings.filter((booking) => {
+    if (status !== "today" && !bookingMatchesDateView(booking.slotDate, dateView)) {
+      return false;
+    }
     if (status !== "all" && booking.bookingStatus !== status) {
       return false;
     }
@@ -37,9 +43,11 @@ export function AdminBookingsTable({
   commissionPercent = 10,
   initialStatus = "all",
   initialPayment = "all",
+  initialDateView = "week",
 }: AdminBookingsTableProps) {
   const [statusFilter, setStatusFilter] = useState<BookingListStatus>(initialStatus);
   const [paymentFilter, setPaymentFilter] = useState<BookingPaymentFilter>(initialPayment);
+  const [dateView, setDateView] = useState<BookingDateView>(initialDateView);
 
   useEffect(() => {
     setStatusFilter(initialStatus);
@@ -49,14 +57,24 @@ export function AdminBookingsTable({
     setPaymentFilter(initialPayment);
   }, [initialPayment]);
 
+  useEffect(() => {
+    setDateView(initialDateView);
+  }, [initialDateView]);
+
   const filtered = useMemo(
-    () => filterAdminBookings(bookings, statusFilter, paymentFilter),
-    [bookings, paymentFilter, statusFilter],
+    () => filterAdminBookings(bookings, statusFilter, paymentFilter, dateView),
+    [bookings, dateView, paymentFilter, statusFilter],
   );
 
   if (bookings.length === 0) {
     return <p className="text-sm text-muted-foreground">No bookings yet.</p>;
   }
+
+  const dateViewButtons: { value: BookingDateView; label: string }[] = [
+    { value: "week", label: "Next 7 days" },
+    { value: "all", label: "All dates" },
+    { value: "history", label: "History" },
+  ];
 
   const statusButtons: BookingListStatus[] = [
     "all",
@@ -68,6 +86,23 @@ export function AdminBookingsTable({
 
   return (
     <section className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        {dateViewButtons.map(({ value, label }) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setDateView(value)}
+            className={`rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] ${
+              dateView === value
+                ? "border-ember/70 bg-ember/10 text-ember"
+                : "border-[oklch(0.88_0.08_86_/_0.35)] text-foreground/80"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="flex flex-wrap gap-2">
         {statusButtons.map((value) => (
           <button
@@ -126,6 +161,7 @@ export function AdminBookingsTable({
                 <th className="px-3 py-2">Guest</th>
                 <th className="px-3 py-2">Experience</th>
                 <th className="px-3 py-2">Host</th>
+                <th className="px-3 py-2">Session</th>
                 <th className="px-3 py-2">Booked</th>
                 <th className="px-3 py-2">Total</th>
                 <th className="px-3 py-2">Platform ({commissionPercent}%)</th>
@@ -156,6 +192,9 @@ export function AdminBookingsTable({
                     </Link>
                   </td>
                   <td className="px-3 py-3">{booking.hostName ?? "—"}</td>
+                  <td className="px-3 py-3 text-muted-foreground">
+                    {formatDateLong(booking.slotDate)}
+                  </td>
                   <td className="px-3 py-3 text-muted-foreground">
                     {formatDateLong(booking.createdAt.slice(0, 10))}
                   </td>

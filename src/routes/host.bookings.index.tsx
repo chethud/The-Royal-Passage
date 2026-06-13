@@ -26,7 +26,7 @@ export const Route = createFileRoute("/host/bookings/")({
 });
 
 function HostBookingsPage() {
-  const { status, payment } = Route.useSearch();
+  const { status, payment, dateView } = Route.useSearch();
   const { accessToken, ready, loading } = useHostAccess();
   const [bookings, setBookings] = useState<BookingSummary[]>([]);
   const [pageError, setPageError] = useState<string | null>(null);
@@ -94,6 +94,7 @@ function HostBookingsPage() {
           busyId={busyId}
           initialStatus={status ?? "all"}
           initialPayment={payment ?? "all"}
+          initialDateView={dateView ?? "week"}
           onConfirm={(id) => void runAction(id, confirmHostBooking)}
           onReject={(id) => void runAction(id, rejectHostBooking)}
           onMarkPaid={(id) => void runAction(id, markHostBookingPaid)}

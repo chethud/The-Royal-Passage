@@ -1,3 +1,4 @@
+from app.booking_window import filter_guest_bookable_slots
 from app.dependencies.supabase import get_supabase_admin
 from app.mappers.experience import map_row_to_experience
 from app.models.schemas import CatalogResponse, Experience, ExperienceDetailResponse
@@ -42,7 +43,7 @@ def load_published_experiences(city_slug: str | None = None) -> list[Experience]
     for slot in slots:
         by_exp.setdefault(slot["experience_id"], []).append(slot)
 
-    return [map_row_to_experience(row, by_exp.get(row["id"], [])) for row in visible]
+    return [map_row_to_experience(row, filter_guest_bookable_slots(by_exp.get(row["id"], []))) for row in visible]
 
 
 def load_experience_by_slug(slug: str) -> Experience | None:
@@ -68,7 +69,7 @@ def load_experience_by_slug(slug: str) -> Experience | None:
         .order("slot_date")
         .execute()
     )
-    return map_row_to_experience(row, slots_result.data or [])
+    return map_row_to_experience(row, filter_guest_bookable_slots(slots_result.data or []))
 
 
 def get_catalog(city_slug: str | None = None) -> CatalogResponse:

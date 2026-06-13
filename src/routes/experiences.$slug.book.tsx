@@ -7,6 +7,7 @@ import { useAuthUser } from "@/lib/auth-user";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { fetchGuestProfile } from "@/lib/api/guest";
 import { submitBooking } from "@/lib/booking-fns";
+import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
 import { bookExperiencePath, guestBookingLimits, parseBookSearch } from "@/lib/booking-url";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
@@ -39,12 +40,14 @@ function BookExperiencePage() {
   const navigate = useNavigate();
   const { user, role, loading } = useAuthUser();
 
+  const bookableSlots = useMemo(() => filterSlotsWithinBookingWindow(exp.slots), [exp.slots]);
+
   const initialSlot = useMemo(() => {
     const fromSearch = search.slotId
-      ? exp.slots.find((s) => s.id === search.slotId && s.available > 0)
+      ? bookableSlots.find((s) => s.id === search.slotId && s.available > 0)
       : null;
-    return fromSearch ?? exp.slots.find((s) => s.available > 0) ?? null;
-  }, [exp.slots, search.slotId]);
+    return fromSearch ?? bookableSlots.find((s) => s.available > 0) ?? null;
+  }, [bookableSlots, search.slotId]);
 
   const [selectedSlot, setSelectedSlot] = useState(initialSlot);
   const [guests, setGuests] = useState(() => {

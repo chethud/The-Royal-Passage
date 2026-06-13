@@ -3,7 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
 import { HostBookingActions } from "@/components/host/HostBookingActions";
 import type { BookingSummary } from "@/lib/api/bookings";
-import type { BookingListStatus, BookingPaymentFilter } from "@/lib/dashboard-booking-filters";
+import type { BookingListStatus, BookingPaymentFilter, BookingDateView } from "@/lib/dashboard-booking-filters";
+import { bookingMatchesDateView } from "@/lib/booking-window";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 
@@ -12,6 +13,7 @@ type HostBookingTableProps = {
   busyId: string | null;
   initialStatus?: BookingListStatus;
   initialPayment?: BookingPaymentFilter;
+  initialDateView?: BookingDateView;
   onConfirm: (id: string) => void;
   onReject: (id: string) => void;
   onMarkPaid: (id: string) => void;
@@ -25,10 +27,15 @@ function filterBookings(
   bookings: BookingSummary[],
   status: StatusFilter,
   payment: PaymentFilter,
+  dateView: BookingDateView,
 ): BookingSummary[] {
   const today = new Date().toISOString().slice(0, 10);
 
   return bookings.filter((booking) => {
+    if (status !== "today" && !bookingMatchesDateView(booking.slot.date, dateView)) {
+      return false;
+    }
+
     if (status === "today") {
       if (!["pending", "confirmed"].includes(booking.bookingStatus)) return false;
       if (booking.slot.date.slice(0, 10) !== today) return false;
@@ -52,6 +59,7 @@ export function HostBookingTable({
   busyId,
   initialStatus = "all",
   initialPayment = "all",
+  initialDateView = "week",
   onConfirm,
   onReject,
   onMarkPaid,
@@ -59,6 +67,7 @@ export function HostBookingTable({
 }: HostBookingTableProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialStatus);
   const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>(initialPayment);
+  const [dateView, setDateView] = useState<BookingDateView>(initialDateView);
 
   useEffect(() => {
     setStatusFilter(initialStatus);
@@ -68,10 +77,20 @@ export function HostBookingTable({
     setPaymentFilter(initialPayment);
   }, [initialPayment]);
 
+  useEffect(() => {
+    setDateView(initialDateView);
+  }, [initialDateView]);
+
   const filtered = useMemo(
-    () => filterBookings(bookings, statusFilter, paymentFilter),
-    [bookings, paymentFilter, statusFilter],
+    () => filterBookings(bookings, statusFilter, paymentFilter, dateView),
+    [bookings, dateView, paymentFilter, statusFilter],
   );
+
+  const dateViewButtons: { value: BookingDateView; label: string }[] = [
+    { value: "week", label: "Next 7 days" },
+    { value: "all", label: "All dates" },
+    { value: "history", label: "History" },
+  ];
 
   const statusButtons: StatusFilter[] = [
     "all",
@@ -84,6 +103,23 @@ export function HostBookingTable({
 
   return (
     <section className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        {dateViewButtons.map(({ value, label }) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setDateView(value)}
+            className={`rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] ${
+              dateView === value
+                ? "border-ember/70 bg-ember/10 text-ember"
+                : "border-[oklch(0.88_0.08_86_/_0.35)] text-foreground/80"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="flex flex-wrap gap-2">
         {statusButtons.map((value) => (
           <button

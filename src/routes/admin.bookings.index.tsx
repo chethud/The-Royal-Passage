@@ -24,7 +24,7 @@ export const Route = createFileRoute("/admin/bookings/")({
 
 function AdminBookingsPage() {
   const navigate = useNavigate();
-  const { status, payment } = Route.useSearch();
+  const { status, payment, dateView } = Route.useSearch();
   const { user, role, loading } = useAuthUser();
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [bookings, setBookings] = useState<AdminBookingRow[]>([]);
@@ -94,6 +94,7 @@ function AdminBookingsPage() {
           bookings={bookings}
           initialStatus={status ?? "all"}
           initialPayment={payment ?? "all"}
+          initialDateView={dateView ?? "week"}
         />
       )}
 

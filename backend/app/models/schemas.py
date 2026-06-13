@@ -449,6 +449,7 @@ class AdminBookingRow(BaseModel):
     totalAmount: int
     currencySymbol: str
     createdAt: str
+    slotDate: str
     platformFeeMinor: int = 0
     hostPayoutMinor: int = 0
     hostName: str | None = None

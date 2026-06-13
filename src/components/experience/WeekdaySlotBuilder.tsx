@@ -2,14 +2,15 @@ import { CalendarDays, Clock3, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { CreateHostSlotPayload } from "@/lib/api/host-experiences";
 import {
-  addDays,
   buildSchedulePreview,
   DEFAULT_WEEKDAYS,
   expandWeekdaySlots,
+  formatDateReadable,
   formatTime12h,
   WEEKDAY_OPTIONS,
   type WeekdayKey,
 } from "@/lib/weekday-slots";
+import { BOOKING_WINDOW_DAYS, bookingWindowEndIso } from "@/lib/booking-window";
 
 type WeekdaySlotBuilderProps = {
   busy?: boolean;
@@ -27,9 +28,10 @@ const WEEKDAY_PRESETS: { label: string; days: WeekdayKey[] }[] = [
 
 export function WeekdaySlotBuilder({ busy = false, onAddSlots }: WeekdaySlotBuilderProps) {
   const today = useMemo(() => formatToday(), []);
+  const windowEnd = useMemo(() => bookingWindowEndIso(today), [today]);
   const [weekdays, setWeekdays] = useState<WeekdayKey[]>(DEFAULT_WEEKDAYS);
   const [fromDate, setFromDate] = useState(today);
-  const [toDate, setToDate] = useState(addDays(today, 56));
+  const [toDate, setToDate] = useState(windowEnd);
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("12:00");
   const [capacity, setCapacity] = useState(8);
@@ -135,7 +137,8 @@ export function WeekdaySlotBuilder({ busy = false, onAddSlots }: WeekdaySlotBuil
           <div className="min-w-0 flex-1">
             <h4 className="font-display text-base text-ink">2. When can guests book?</h4>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-              Set the first and last calendar dates when this weekly schedule is available.
+              Guests can only book within the next {BOOKING_WINDOW_DAYS} days. Set dates from today
+              through {formatDateReadable(windowEnd)}.
             </p>
           </div>
         </div>
@@ -147,10 +150,13 @@ export function WeekdaySlotBuilder({ busy = false, onAddSlots }: WeekdaySlotBuil
               type="date"
               value={fromDate}
               min={today}
+              max={windowEnd}
               disabled={busy}
               onChange={(e) => {
                 setSuccess(null);
-                setFromDate(e.target.value);
+                const next = e.target.value;
+                setFromDate(next);
+                if (next > toDate) setToDate(next);
               }}
               className={fieldClass}
             />
@@ -161,7 +167,7 @@ export function WeekdaySlotBuilder({ busy = false, onAddSlots }: WeekdaySlotBuil
               type="date"
               value={toDate}
               min={fromDate || today}
-              disabled={busy}
+              max={windowEnd}
               onChange={(e) => {
                 setSuccess(null);
                 setToDate(e.target.value);

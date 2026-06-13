@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { PayAtVenueBadge } from "@/components/booking/PayAtVenueBadge";
 import type { Experience, Slot } from "@/data/experiences";
+import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
 import { bookExperiencePath, guestBookingLimits } from "@/lib/booking-url";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
@@ -41,7 +42,8 @@ export function ExperienceBookingPanel({
   error = null,
 }: ExperienceBookingPanelProps) {
   const sym = exp.currencySymbol ?? "₹";
-  const availableSlots = exp.slots.filter((s) => s.available > 0);
+  const visibleSlots = filterSlotsWithinBookingWindow(exp.slots);
+  const availableSlots = visibleSlots.filter((s) => s.available > 0);
   const limits = selectedSlot
     ? guestBookingLimits(exp, selectedSlot.available)
     : { min: exp.minGuestsPerBooking ?? 1, max: exp.maxGuestsPerBooking ?? 10 };
@@ -58,10 +60,13 @@ export function ExperienceBookingPanel({
   return (
     <div className="glass rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] p-6 md:p-8">
       <div className="eyebrow mb-3">Available slots</div>
+      <p className="mb-4 text-xs text-muted-foreground">
+        Showing the next 7 days from today. New dates are added by hosts on a rolling weekly basis.
+      </p>
 
-      {exp.slots.length === 0 ? (
+      {visibleSlots.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No bookable dates yet. Check back soon or contact Royal Passage.
+          No bookable dates in the next 7 days. Check back soon or contact Royal Passage.
         </p>
       ) : availableSlots.length === 0 ? (
         <p className="text-sm text-muted-foreground">
@@ -69,7 +74,7 @@ export function ExperienceBookingPanel({
         </p>
       ) : (
         <div className="space-y-2">
-          {exp.slots.map((slot) => {
+          {visibleSlots.map((slot) => {
             const sold = slot.available === 0;
             const active = selectedSlot?.id === slot.id;
             return (

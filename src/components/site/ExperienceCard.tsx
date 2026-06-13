@@ -5,9 +5,10 @@ import type { Experience } from "@/data/experiences";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { guestBookingLimits } from "@/lib/booking-url";
+import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
 
 export function ExperienceCard({ exp }: { exp: Experience }) {
-  const nextSlot = exp.slots.find((s) => s.available > 0);
+  const nextSlot = filterSlotsWithinBookingWindow(exp.slots).find((s) => s.available > 0);
   const reduceMotion = usePrefersReducedMotion();
   const sym = exp.currencySymbol ?? "₹";
   const defaultGuests = nextSlot

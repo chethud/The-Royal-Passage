@@ -1,4 +1,5 @@
 import type { Experience } from "@/data/experiences";
+import { isWithinBookingWindow } from "@/lib/booking-window";
 
 export type ExperienceSearch = {
   category?: string;
@@ -37,13 +38,20 @@ function matchesDuration(hours: number, duration?: ExperienceSearch["duration"])
   return hours > 10;
 }
 
+function formatLocalDate(d: Date): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function matchesAvailability(exp: Experience, availability?: ExperienceSearch["availability"]): boolean {
   if (!availability) return true;
   const today = startOfDay(new Date());
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const weekEnd = new Date(today);
-  weekEnd.setDate(weekEnd.getDate() + 7);
+  weekEnd.setDate(weekEnd.getDate() + 6);
 
   if (availability === "today") {
     return hasAvailableSlot(exp, (d) => d.getTime() === today.getTime());
@@ -52,7 +60,7 @@ function matchesAvailability(exp: Experience, availability?: ExperienceSearch["a
     return hasAvailableSlot(exp, (d) => d.getTime() === tomorrow.getTime());
   }
   if (availability === "week") {
-    return hasAvailableSlot(exp, (d) => d >= today && d <= weekEnd);
+    return hasAvailableSlot(exp, (d) => isWithinBookingWindow(formatLocalDate(d)));
   }
   const day = today.getDay();
   const daysUntilSaturday = (6 - day + 7) % 7;

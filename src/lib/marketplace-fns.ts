@@ -10,6 +10,7 @@ import {
 } from "@/data/experiences";
 import { isSupabaseConfigured } from "@/lib/env.server";
 import { getOrSetServerCache } from "@/lib/cache.server";
+import { withGuestBookableSlots } from "@/lib/booking-window";
 import { mapRowToExperience, type ExperienceRow, type SlotRow } from "@/lib/experience-db";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
@@ -58,7 +59,7 @@ async function loadExperienceFromDbBySlug(slug: string): Promise<Experience | nu
     .order("slot_date", { ascending: true });
   if (e2) throw new Error(e2.message);
 
-  return mapRowToExperience(exp, (slotRows ?? []) as SlotRow[]);
+  return withGuestBookableSlots(mapRowToExperience(exp, (slotRows ?? []) as SlotRow[]));
 }
 
 async function loadPublishedWithSlots(): Promise<Experience[]> {
@@ -95,7 +96,7 @@ async function loadPublishedWithSlots(): Promise<Experience[]> {
     byExp.set(s.experience_id, list);
   }
 
-  return visible.map((e) => mapRowToExperience(e, byExp.get(e.id) ?? []));
+  return visible.map((e) => withGuestBookableSlots(mapRowToExperience(e, byExp.get(e.id) ?? [])));
 }
 
 /** Listing + filters: FastAPI when configured; else Supabase; otherwise static demo data. */

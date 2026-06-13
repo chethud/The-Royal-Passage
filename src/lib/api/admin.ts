@@ -140,6 +140,7 @@ export type AdminBookingRow = {
   totalAmount: number;
   currencySymbol: string;
   createdAt: string;
+  slotDate: string;
   platformFeeMinor: number;
   hostPayoutMinor: number;
   hostName: string | null;
@@ -161,11 +162,7 @@ export function fetchAdminStats(accessToken: string) {
 }
 
 export function fetchAdminBookings(accessToken: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(async () => {
-    const response = await client.listAdminBookings({});
-    return response.bookings as AdminBookingRow[];
-  });
+  return apiFetch<AdminBookingRow[]>("/api/v1/admin/bookings", { accessToken });
 }
 
 export function fetchAdminBooking(accessToken: string, bookingId: string) {
