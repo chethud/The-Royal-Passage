@@ -16,12 +16,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 type SlideTheme = HomepageJourneySlide["theme"];
 
-const CURTAIN_CLOSE_MS = 480;
-const CURTAIN_HOLD_CLOSED_MS = 420;
-const CURTAIN_AJAR_MS = 900;
-const CURTAIN_OPEN_MS = 7500;
-const CONTENT_REVEAL_MS = 700;
-const VIDEO_REVEAL_MS = 2200;
+const CURTAIN_CLOSE_MS = 520;
+const CURTAIN_HOLD_CLOSED_MS = 380;
+const CURTAIN_AJAR_MS = 1100;
+const CURTAIN_OPEN_MS = 5200;
+const CURTAIN_FADE_OUT_MS = 600;
 
 const dustParticles = Array.from({ length: 8 }, (_, i) => ({
   id: i,
@@ -105,7 +104,6 @@ type SlideMediaProps = {
   reducedMotion: boolean;
   editable?: boolean;
   onVideoIdChange?: (videoId: string) => void;
-  curtainPhase?: VideoCurtainPhase;
   videoRevealed?: boolean;
 };
 
@@ -116,7 +114,6 @@ function SlideMedia({
   reducedMotion,
   editable,
   onVideoIdChange,
-  curtainPhase = "open",
   videoRevealed = true,
 }: SlideMediaProps) {
   const [videoInput, setVideoInput] = useState(slide.videoId);
@@ -148,8 +145,6 @@ function SlideMedia({
           referrerPolicy="strict-origin-when-cross-origin"
         />
       </div>
-
-      {isActive && !reducedMotion ? <RoyalVideoCurtain phase={curtainPhase} /> : null}
 
       {editable && isActive && onVideoIdChange ? (
         <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-50 border-t border-ember/45 bg-[#1a0505]/95 p-4 backdrop-blur-md">
@@ -192,6 +187,8 @@ type JourneysSplitProps = {
 export function JourneysSplit({ slides, editable = false, onSlidesChange }: JourneysSplitProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [curtainPhase, setCurtainPhase] = useState<VideoCurtainPhase>("closed");
+  const [showCurtainOverlay, setShowCurtainOverlay] = useState(true);
+  const [curtainFadingOut, setCurtainFadingOut] = useState(false);
   const [videoRevealed, setVideoRevealed] = useState(false);
   const [curtainsOpen, setCurtainsOpen] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
@@ -223,12 +220,15 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
       setCurtainsOpen(false);
       setVideoRevealed(false);
       setCurtainPhase("closed");
+      setShowCurtainOverlay(true);
+      setCurtainFadingOut(false);
 
       const closeMs = reducedMotion ? 120 : CURTAIN_CLOSE_MS;
       const holdMs = reducedMotion ? 0 : CURTAIN_HOLD_CLOSED_MS;
       const ajarMs = reducedMotion ? 0 : CURTAIN_AJAR_MS;
       const openMs = reducedMotion ? 280 : CURTAIN_OPEN_MS;
-      const revealMs = reducedMotion ? 80 : CONTENT_REVEAL_MS;
+      const contentRevealAt = closeMs + holdMs + ajarMs + Math.floor(openMs * 0.58);
+      const dismissAt = closeMs + holdMs + ajarMs + openMs;
 
       schedule(() => {
         setActiveIndex(next);
@@ -242,23 +242,30 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
             schedule(() => {
               setCurtainPhase("open");
               setCurtainsOpen(true);
-              schedule(() => setVideoRevealed(true), VIDEO_REVEAL_MS);
+              schedule(() => setVideoRevealed(true), Math.floor(openMs * 0.72));
             }, ajarMs);
           }, holdMs);
+
+          schedule(() => setCurtainFadingOut(true), dismissAt);
+          schedule(() => {
+            setShowCurtainOverlay(false);
+            setCurtainFadingOut(false);
+          }, dismissAt + CURTAIN_FADE_OUT_MS);
         } else {
           setCurtainsOpen(true);
           setVideoRevealed(true);
+          setShowCurtainOverlay(false);
         }
 
         schedule(() => {
           setContentVisible(true);
           setThemeFlash(null);
-        }, closeMs + holdMs + revealMs);
+        }, contentRevealAt);
 
         schedule(() => {
           setIsTransitioning(false);
           setIsLocked(false);
-        }, closeMs + holdMs + ajarMs + openMs);
+        }, dismissAt + CURTAIN_FADE_OUT_MS);
       }, closeMs);
     },
     [activeIndex, clearTimers, isLocked, reducedMotion, schedule],
@@ -272,19 +279,32 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
       setCurtainsOpen(true);
       setContentVisible(true);
       setVideoRevealed(true);
+      setShowCurtainOverlay(false);
       return;
     }
 
     setCurtainPhase("closed");
+    setShowCurtainOverlay(true);
+    setCurtainFadingOut(false);
+
+    const dismissAt = CURTAIN_HOLD_CLOSED_MS + CURTAIN_AJAR_MS + CURTAIN_OPEN_MS;
+    const contentRevealAt = CURTAIN_HOLD_CLOSED_MS + CURTAIN_AJAR_MS + Math.floor(CURTAIN_OPEN_MS * 0.58);
+
     schedule(() => {
       setCurtainPhase("ajar");
       schedule(() => {
         setCurtainPhase("open");
         setCurtainsOpen(true);
-        schedule(() => setVideoRevealed(true), VIDEO_REVEAL_MS);
+        schedule(() => setVideoRevealed(true), Math.floor(CURTAIN_OPEN_MS * 0.72));
       }, CURTAIN_AJAR_MS);
     }, CURTAIN_HOLD_CLOSED_MS);
-    schedule(() => setContentVisible(true), CURTAIN_HOLD_CLOSED_MS + CURTAIN_AJAR_MS + 900);
+
+    schedule(() => setContentVisible(true), contentRevealAt);
+    schedule(() => setCurtainFadingOut(true), dismissAt);
+    schedule(() => {
+      setShowCurtainOverlay(false);
+      setCurtainFadingOut(false);
+    }, dismissAt + CURTAIN_FADE_OUT_MS);
   }, [reducedMotion, schedule]);
 
   const goPrev = () => goTo(activeIndex - 1);
@@ -402,9 +422,11 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
                       reducedMotion={reducedMotion}
                       editable={editable}
                       onVideoIdChange={(videoId) => updateSlide(index, { videoId })}
-                      curtainPhase={isActive ? curtainPhase : "open"}
                       videoRevealed={isActive ? videoRevealed : false}
                     />
+                    {isActive && !reducedMotion && showCurtainOverlay ? (
+                      <RoyalVideoCurtain phase={curtainPhase} fadingOut={curtainFadingOut} />
+                    ) : null}
                   </div>
                 );
               })}

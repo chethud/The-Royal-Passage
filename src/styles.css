@@ -546,15 +546,28 @@
   animation-play-state: paused;
 }
 
-/* Royal theatre curtains — photoreal velvet reveal (reference-matched) */
-.royal-video-curtains {
+/* Royal theatre curtains — full-stage velvet reveal */
+.royal-stage-curtains {
   pointer-events: none;
   position: absolute;
   inset: 0;
-  z-index: 25;
+  z-index: 35;
   overflow: hidden;
-  perspective: 1600px;
-  perspective-origin: 50% 22%;
+  perspective: 1800px;
+  perspective-origin: 50% 18%;
+  opacity: 1;
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.royal-stage-curtains.is-fading-out {
+  opacity: 0;
+}
+
+.royal-stage-void-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #000000;
 }
 
 .royal-stage-spotlight {
@@ -562,10 +575,11 @@
   inset: 0;
   z-index: 4;
   background:
-    radial-gradient(ellipse 90% 50% at 50% -5%, #fff8e614 0%, transparent 55%),
-    radial-gradient(ellipse 70% 45% at 50% 100%, #00000055 0%, transparent 65%);
+    radial-gradient(ellipse 95% 55% at 50% -8%, #fff8e618 0%, transparent 58%),
+    radial-gradient(ellipse 80% 50% at 50% 105%, #00000066 0%, transparent 62%);
   mix-blend-mode: soft-light;
-  opacity: 0.85;
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 .royal-stage-void {
@@ -574,12 +588,12 @@
 
 .royal-slide-video {
   opacity: 0;
-  filter: brightness(0.08);
-  transform: translate3d(0, 0, 0) scale(1.02);
+  filter: brightness(0.06);
+  transform: translate3d(0, 0, 0) scale(1.015);
   transition:
-    transform 2.8s cubic-bezier(0.22, 0.61, 0.36, 1),
-    opacity 2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.35s,
-    filter 2.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.25s;
+    transform 2.4s cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 1.8s cubic-bezier(0.33, 1, 0.68, 1) 0.2s,
+    filter 2s cubic-bezier(0.33, 1, 0.68, 1) 0.15s;
 }
 
 .royal-slide-video.is-revealed {
@@ -594,7 +608,7 @@
 .royal-curtain {
   position: absolute;
   inset-block: 0;
-  width: 54%;
+  width: 52%;
   will-change: transform;
   transform-style: preserve-3d;
   transform: translate3d(0, 0, 0);
@@ -619,9 +633,9 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
   user-select: none;
   pointer-events: none;
+  filter: saturate(1.08) contrast(1.04);
 }
 
 .royal-curtain--left .royal-curtain-texture {
@@ -632,130 +646,77 @@
   object-position: left center;
 }
 
-.royal-curtain-shadow {
+.royal-curtain-fold {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, #00000066 0%, transparent 28%, transparent 72%, #00000066 100%);
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    #00000018 18px,
+    transparent 36px
+  );
   mix-blend-mode: multiply;
-  opacity: 0.35;
-  transition: opacity 0.6s ease;
-}
-
-/* Fully closed — panels meet at center seam */
-.royal-video-curtains--closed .royal-curtain {
-  transition:
-    transform 0.48s cubic-bezier(0.55, 0.06, 0.68, 0.19),
-    filter 0.48s ease;
-}
-
-.royal-video-curtains--closed .royal-curtain--left {
-  transform: translate3d(5.5%, 0, 0) rotateY(2deg);
-}
-
-.royal-video-curtains--closed .royal-curtain--right {
-  transform: translate3d(-5.5%, 0, 0) rotateY(-2deg);
-}
-
-/* Ajar — bottom corners pull back, gold tiebacks hold the sweep */
-.royal-video-curtains--ajar .royal-curtain {
-  transition:
-    transform 0.95s cubic-bezier(0.33, 0.04, 0.22, 1),
-    filter 0.95s ease;
-}
-
-.royal-video-curtains--ajar .royal-curtain--left {
-  transform: translate3d(-11%, 0, 0) rotateY(-24deg) scaleX(1.04);
-}
-
-.royal-video-curtains--ajar .royal-curtain--right {
-  transform: translate3d(11%, 0, 0) rotateY(24deg) scaleX(1.04);
-}
-
-.royal-video-curtains--ajar .royal-curtain-shadow {
-  opacity: 0.22;
-}
-
-/* Open — slow sweep aside revealing black void, then video */
-.royal-video-curtains--open .royal-curtain {
-  transition:
-    transform 7.5s cubic-bezier(0.22, 0.61, 0.36, 1),
-    filter 7.5s ease;
-}
-
-.royal-video-curtains--open .royal-curtain--left {
-  transform: translate3d(-101%, 0, 0) rotateY(-8deg) scaleX(0.68);
-}
-
-.royal-video-curtains--open .royal-curtain--right {
-  transform: translate3d(101%, 0, 0) rotateY(8deg) scaleX(0.68);
-}
-
-.royal-video-curtains--open .royal-curtain-shadow {
-  opacity: 0.12;
-}
-
-.royal-curtain-tiebacks {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
+  opacity: 0.55;
   pointer-events: none;
 }
 
-.royal-tieback {
+.royal-curtain-shadow {
   position: absolute;
-  bottom: 11%;
-  width: 3.75rem;
-  height: auto;
-  object-fit: contain;
-  opacity: 0;
-  transform: scale(0.85);
-  transition:
-    opacity 0.55s ease 0.15s,
-    transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1) 0.1s;
-  filter: drop-shadow(0 4px 10px #00000088);
+  inset: 0;
+  background:
+    linear-gradient(90deg, #00000055 0%, transparent 32%, transparent 68%, #00000055 100%),
+    linear-gradient(180deg, #00000033 0%, transparent 18%, transparent 82%, #00000044 100%);
+  mix-blend-mode: multiply;
+  opacity: 0.4;
+  transition: opacity 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+  pointer-events: none;
 }
 
-.royal-tieback--left {
-  left: calc(50% - 4.25rem);
+/* Fully closed — panels meet at center seam */
+.royal-stage-curtains--closed .royal-curtain {
+  transition: transform 0.52s cubic-bezier(0.55, 0.06, 0.68, 0.19);
 }
 
-.royal-tieback--right {
-  right: calc(50% - 4.25rem);
+.royal-stage-curtains--closed .royal-curtain--left {
+  transform: translate3d(4%, 0, 0) rotateY(1.5deg);
 }
 
-.royal-video-curtains--ajar .royal-tieback,
-.royal-video-curtains--open .royal-tieback {
-  opacity: 1;
-  transform: scale(1);
+.royal-stage-curtains--closed .royal-curtain--right {
+  transform: translate3d(-4%, 0, 0) rotateY(-1.5deg);
 }
 
-.royal-video-curtains--ajar .royal-tieback--right,
-.royal-video-curtains--open .royal-tieback--right {
-  transform: scale(1);
+/* Ajar — bottom corners pull back */
+.royal-stage-curtains--ajar .royal-curtain {
+  transition: transform 1.1s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
-.royal-video-curtains--closed .royal-tieback {
-  opacity: 0;
-  transition-duration: 0.25s;
-  transition-delay: 0s;
+.royal-stage-curtains--ajar .royal-curtain--left {
+  transform: translate3d(-9%, 0, 0) rotateY(-20deg) scaleX(1.03);
 }
 
-.royal-video-curtains--open .royal-tieback {
-  bottom: 9%;
-  transition:
-    opacity 0.4s ease,
-    bottom 7.5s cubic-bezier(0.22, 0.61, 0.36, 1),
-    transform 7.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+.royal-stage-curtains--ajar .royal-curtain--right {
+  transform: translate3d(9%, 0, 0) rotateY(20deg) scaleX(1.03);
 }
 
-.royal-video-curtains--open .royal-tieback--left {
-  left: 2.5%;
-  transform: scale(1.05);
+.royal-stage-curtains--ajar .royal-curtain-shadow {
+  opacity: 0.28;
 }
 
-.royal-video-curtains--open .royal-tieback--right {
-  right: 2.5%;
-  transform: scale(1.05);
+/* Open — smooth sweep aside, then overlay fades out */
+.royal-stage-curtains--open .royal-curtain {
+  transition: transform 5.2s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.royal-stage-curtains--open .royal-curtain--left {
+  transform: translate3d(-103%, 0, 0) rotateY(-6deg) scaleX(0.74);
+}
+
+.royal-stage-curtains--open .royal-curtain--right {
+  transform: translate3d(103%, 0, 0) rotateY(6deg) scaleX(0.74);
+}
+
+.royal-stage-curtains--open .royal-curtain-shadow {
+  opacity: 0.1;
 }
 
 /* Golden burst */
@@ -872,8 +833,8 @@
     transition-duration: 0.2s !important;
   }
 
-  .royal-tieback {
-    transition-duration: 0.15s !important;
+  .royal-stage-curtains {
+    transition: none;
   }
 
   .royal-slide-video {
