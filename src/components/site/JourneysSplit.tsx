@@ -8,7 +8,7 @@ import {
   MaharajaEmblem,
   PalaceArchFrame,
 } from "@/components/site/RoyalHeritageDecor";
-import type { HomepageJourneySlide } from "@/lib/homepage-content";
+import { DEFAULT_HOMEPAGE_JOURNEYS, type HomepageJourneySlide } from "@/lib/homepage-content";
 import { normalizeYoutubeVideoInput } from "@/lib/youtube-video-id";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -173,7 +173,8 @@ type JourneysSplitProps = {
   onSlidesChange?: (slides: HomepageJourneySlide[]) => void;
 };
 
-export function JourneysSplit({ slides, editable = false, onSlidesChange }: JourneysSplitProps) {
+export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesChange }: JourneysSplitProps) {
+  const slides = slidesProp?.length ? slidesProp : DEFAULT_HOMEPAGE_JOURNEYS;
   const [activeIndex, setActiveIndex] = useState(0);
   const [contentVisible, setContentVisible] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -224,6 +225,12 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
   useEffect(() => {
     setContentVisible(true);
   }, []);
+
+  useEffect(() => {
+    if (activeIndex >= slides.length) {
+      setActiveIndex(0);
+    }
+  }, [activeIndex, slides.length]);
 
   const goPrev = () => goTo(activeIndex - 1);
   const goNext = () => goTo(activeIndex + 1);

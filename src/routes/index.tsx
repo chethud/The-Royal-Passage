@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { HomeHero } from "@/components/site/HomeHero";
@@ -10,8 +10,8 @@ import { JournalPreview } from "@/components/site/JournalPreview";
 import { HomepageEditorBar } from "@/components/editor/HomepageEditorBar";
 import { useAuthUser } from "@/lib/auth-user";
 import { getCatalogForUi } from "@/lib/marketplace-fns";
-import { fetchHomepageContent } from "@/lib/homepage-content-fns";
-import type { HomepageContent } from "@/lib/homepage-content";
+import { getHomepageContent } from "@/lib/homepage-content-fns";
+import { normalizeHomepageContent, type HomepageContent } from "@/lib/homepage-content";
 import type { HomepagePhotoSection } from "@/lib/homepage-content-keys";
 import { commitHomepagePhotoForEditor } from "@/lib/homepage-photo-upload";
 import { buildHomeJsonLd, SITE_URL } from "@/lib/seo";
@@ -21,12 +21,20 @@ import {
   canEditHomepageJourneys,
   isAdminRole,
   isEditorRole,
+  type UserRole,
 } from "@/lib/roles";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [catalog, homepage] = await Promise.all([getCatalogForUi(), fetchHomepageContent()]);
-    return { ...catalog, homepage };
+    const [catalog, homepage] = await Promise.all([
+      getCatalogForUi(),
+      getHomepageContent().catch(() => normalizeHomepageContent({})),
+    ]);
+    return {
+      ...catalog,
+      experiences: catalog.experiences ?? [],
+      homepage: normalizeHomepageContent(homepage ?? {}),
+    };
   },
   staleTime: 0,
   head: () => ({
@@ -53,7 +61,9 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const router = useRouter();
-  const { experiences, homepage } = Route.useLoaderData();
+  const { experiences: loaderExperiences, homepage: loaderHomepage } = Route.useLoaderData();
+  const experiences = loaderExperiences ?? [];
+  const homepage = normalizeHomepageContent(loaderHomepage ?? {});
   const { role, accessToken } = useAuthUser();
   const canEditJournal = canEditHomepageJournal(role) && Boolean(accessToken);
   const canEditJourneys = canEditHomepageJourneys(role) && Boolean(accessToken);
@@ -143,7 +153,7 @@ function Index() {
     [commitHomepage, refreshHomepage],
   );
 
-  const editorBarRole = isAdminRole(role) ? "admin" : "editor";
+  const editorBarRole: Extract<UserRole, "editor" | "admin"> = isAdminRole(role) ? "admin" : "editor";
 
   return (
     <div className="overflow-x-hidden bg-background text-foreground">

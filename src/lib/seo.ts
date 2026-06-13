@@ -130,7 +130,7 @@ export function buildCityJsonLd(city: CitySummary) {
   };
 }
 
-export function buildHomeJsonLd(experiences: Experience[]) {
+export function buildHomeJsonLd(experiences: Experience[] = []) {
   const organizationId = `${SITE_URL}/#organization`;
   const websiteId = `${SITE_URL}/#website`;
   const homepageId = `${SITE_URL}/#homepage`;
