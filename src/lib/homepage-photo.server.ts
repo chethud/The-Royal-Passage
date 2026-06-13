@@ -3,7 +3,9 @@ import {
   normalizeHomepageContent as normalizeHomepageContentForUi,
 } from "@/lib/homepage-content";
 import {
+  HOMEPAGE_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
+  HOMEPAGE_JOURNEYS_KEY,
   HOMEPAGE_SHOWCASE_KEY,
   HOMEPAGE_VERSION_KEY,
   parseVersionValue,
@@ -18,6 +20,9 @@ export {
   commitHomepagePhotoWithUpload,
   commitHomepagePhotoWithUploadBytes,
   requireEditor,
+  requireHomepageAdmin,
+  requireHomepageJournalEditor,
+  requireHomepagePhotoAccess,
   writePlatformSetting,
   type ApplyHomepagePhotoInput,
   type ApplyHomepagePhotoResult,
@@ -38,20 +43,33 @@ export async function fetchHomepageContentFromDb(): Promise<HomepageContent> {
   const { data, error } = await supabase
     .from("platform_settings")
     .select("key, value")
-    .in("key", [HOMEPAGE_SHOWCASE_KEY, HOMEPAGE_JOURNAL_KEY, HOMEPAGE_VERSION_KEY]);
+    .in("key", [
+      HOMEPAGE_SHOWCASE_KEY,
+      HOMEPAGE_JOURNAL_KEY,
+      HOMEPAGE_HERO_KEY,
+      HOMEPAGE_JOURNEYS_KEY,
+      HOMEPAGE_VERSION_KEY,
+    ]);
 
   if (error) {
     throw new Error(error.message);
   }
 
   const byKey = new Map((data ?? []).map((row) => [row.key, row.value]));
-  if (!byKey.has(HOMEPAGE_SHOWCASE_KEY) && !byKey.has(HOMEPAGE_JOURNAL_KEY)) {
+  if (
+    !byKey.has(HOMEPAGE_SHOWCASE_KEY) &&
+    !byKey.has(HOMEPAGE_JOURNAL_KEY) &&
+    !byKey.has(HOMEPAGE_HERO_KEY) &&
+    !byKey.has(HOMEPAGE_JOURNEYS_KEY)
+  ) {
     return DEFAULT_HOMEPAGE_CONTENT;
   }
 
   return normalizeHomepageContentForUi({
     showcase: byKey.get(HOMEPAGE_SHOWCASE_KEY),
     journal: byKey.get(HOMEPAGE_JOURNAL_KEY),
+    hero: byKey.get(HOMEPAGE_HERO_KEY),
+    journeys: byKey.get(HOMEPAGE_JOURNEYS_KEY),
     version: parseVersionValue(byKey.get(HOMEPAGE_VERSION_KEY)),
   });
 }

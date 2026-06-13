@@ -13,7 +13,7 @@ type VercelResponse = {
 
 type HomepagePhotoRequest = {
   accessToken?: string;
-  section?: "showcase" | "journal";
+  section?: "showcase" | "journal" | "hero";
   itemIndex?: number;
   publicUrl?: string;
   fileName?: string;
@@ -25,7 +25,7 @@ type HomepagePhotoApi = {
   getSupabaseConfigError: () => string | null;
   commitHomepagePhotoWithUploadBytes: (input: {
     accessToken: string;
-    section: "showcase" | "journal";
+    section: "showcase" | "journal" | "hero";
     itemIndex: number;
     fileName: string;
     mimeType: string;
@@ -33,7 +33,7 @@ type HomepagePhotoApi = {
   }) => Promise<{ publicUrl: string; version: number }>;
   commitHomepagePhotoWithUpload: (input: {
     accessToken: string;
-    section: "showcase" | "journal";
+    section: "showcase" | "journal" | "hero";
     itemIndex: number;
     fileName: string;
     mimeType: string;
@@ -41,7 +41,7 @@ type HomepagePhotoApi = {
   }) => Promise<{ publicUrl: string; version: number }>;
   applyHomepagePhotoCore: (input: {
     accessToken: string;
-    section: "showcase" | "journal";
+    section: "showcase" | "journal" | "hero";
     itemIndex: number;
     publicUrl: string;
   }) => Promise<{ publicUrl: string; version: number }>;
@@ -96,16 +96,17 @@ async function readRawBody(req: VercelRequest): Promise<Buffer> {
   return Buffer.alloc(0);
 }
 
-function parseItemIndex(raw: string | undefined): number | null {
-  if (!raw) return null;
-  const value = Number.parseInt(raw, 10);
-  if (!Number.isInteger(value) || value < 0 || value > 2) return null;
-  return value;
+function parseSection(raw: string | undefined): "showcase" | "journal" | "hero" | null {
+  if (raw === "showcase" || raw === "journal" || raw === "hero") return raw;
+  return null;
 }
 
-function parseSection(raw: string | undefined): "showcase" | "journal" | null {
-  if (raw === "showcase" || raw === "journal") return raw;
-  return null;
+function parseItemIndex(raw: string | undefined, section: "showcase" | "journal" | "hero"): number | null {
+  if (!raw) return null;
+  const value = Number.parseInt(raw, 10);
+  const max = section === "hero" ? 3 : 2;
+  if (!Number.isInteger(value) || value < 0 || value > max) return null;
+  return value;
 }
 
 function decodeFileName(raw: string | undefined): string {
@@ -162,7 +163,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (isBinaryPhotoRequest(req) && !isJsonRequest(req)) {
       const accessToken = readAccessToken(req);
       const section = parseSection(headerValue(req, "x-section"));
-      const itemIndex = parseItemIndex(headerValue(req, "x-item-index"));
+      const itemIndex = section != null ? parseItemIndex(headerValue(req, "x-item-index"), section) : null;
       const fileName = decodeFileName(headerValue(req, "x-file-name"));
       const mimeType =
         headerValue(req, "content-type")?.split(";")[0]?.trim() || "application/octet-stream";
@@ -194,11 +195,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return jsonError(res, 400, "Missing required fields.");
       }
 
-      if (section !== "showcase" && section !== "journal") {
+      if (section !== "showcase" && section !== "journal" && section !== "hero") {
         return jsonError(res, 400, "Invalid section.");
       }
 
-      if (!Number.isInteger(itemIndex) || itemIndex < 0 || itemIndex > 2) {
+      const maxIndex = section === "hero" ? 3 : 2;
+      if (!Number.isInteger(itemIndex) || itemIndex < 0 || itemIndex > maxIndex) {
         return jsonError(res, 400, "Invalid item index.");
       }
 

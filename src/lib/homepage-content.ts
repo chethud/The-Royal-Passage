@@ -1,29 +1,39 @@
 import expCraftImg from "@/assets/exp-craft.jpg";
+import expDiningImg from "@/assets/exp-dining.jpg";
 import heroPalaceImg from "@/assets/hero-image.png";
+import heroDinnerImg from "@/assets/hero.jpg";
 import masalaDoseImg from "@/assets/masala-dose.png";
 import natureWalksImg from "@/assets/nature-walks.png";
 import outdoorCookingImg from "@/assets/outdoor-cooking.png";
 import {
   HOMEPAGE_CACHE_KEY,
+  HOMEPAGE_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
+  HOMEPAGE_JOURNEYS_KEY,
   HOMEPAGE_SHOWCASE_KEY,
   HOMEPAGE_VERSION_KEY,
   normalizeHomepageContent as normalizeHomepageContentBase,
   parseVersionValue,
   type HomepageContent,
+  type HomepageHeroSlide,
   type HomepageJournalItem,
+  type HomepageJourneySlide,
   type HomepageShowcaseItem,
   type ShowcaseIconKey,
 } from "@/lib/homepage-content-keys";
 
 export {
   HOMEPAGE_CACHE_KEY,
+  HOMEPAGE_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
+  HOMEPAGE_JOURNEYS_KEY,
   HOMEPAGE_SHOWCASE_KEY,
   HOMEPAGE_VERSION_KEY,
   parseVersionValue,
   type HomepageContent,
+  type HomepageHeroSlide,
   type HomepageJournalItem,
+  type HomepageJourneySlide,
   type HomepageShowcaseItem,
   type ShowcaseIconKey,
 };
@@ -31,11 +41,15 @@ export {
 export function normalizeHomepageContent(raw: {
   showcase?: unknown;
   journal?: unknown;
+  hero?: unknown;
+  journeys?: unknown;
   version?: unknown;
 }): HomepageContent {
   return normalizeHomepageContentBase(raw, {
     showcaseFallbacks: DEFAULT_HOMEPAGE_SHOWCASE,
     journalFallbacks: DEFAULT_HOMEPAGE_JOURNAL,
+    heroFallbacks: DEFAULT_HOMEPAGE_HERO,
+    journeysFallbacks: DEFAULT_HOMEPAGE_JOURNEYS,
   });
 }
 
@@ -96,8 +110,72 @@ export const DEFAULT_HOMEPAGE_JOURNAL: HomepageJournalItem[] = [
   },
 ];
 
+export const DEFAULT_HOMEPAGE_HERO: HomepageHeroSlide[] = [
+  {
+    id: "hero-palace",
+    imageUrl: heroPalaceImg,
+    alt: "Mysuru Palace at golden hour through arched colonnade",
+  },
+  {
+    id: "hero-dinner",
+    imageUrl: heroDinnerImg,
+    alt: "A candlelit private dinner under a glasshouse at dusk",
+  },
+  {
+    id: "hero-dining",
+    imageUrl: expDiningImg,
+    alt: "A plated culinary course in dramatic light",
+  },
+  {
+    id: "hero-craft",
+    imageUrl: expCraftImg,
+    alt: "Hands shaping clay on a pottery wheel",
+  },
+];
+
+export const DEFAULT_HOMEPAGE_JOURNEYS: HomepageJourneySlide[] = [
+  {
+    id: "palace",
+    title: "The Majestic Palace",
+    subtitle: "The Crown Jewel of Mysuru",
+    lines: [
+      "Breathe in the golden hour as sunlight crowns every dome.",
+      "Birds arc above carved sandstone as the kingdom awakens.",
+      "You have crossed the threshold — the palace welcomes its guest.",
+    ],
+    videoId: "9Mbxfupo6Tw",
+    theme: "palace",
+  },
+  {
+    id: "heritage",
+    title: "The Heritage of the Kingdom",
+    subtitle: "Stories Carved Through Time",
+    lines: [
+      "Ancient streets whisper of silk looms and sandalwood ateliers.",
+      "Royal markets, vintage maps, and manuscripts preserve a living dynasty.",
+      "Each lane is a chapter inked in gold upon the soul of Mysuru.",
+    ],
+    videoId: "imHm40ncWlA",
+    theme: "manuscript",
+  },
+  {
+    id: "dasara",
+    title: "The Grand Dasara Celebration",
+    subtitle: "The Festival of Royal Glory",
+    lines: [
+      "The palace ignites with a thousand lanterns at dusk.",
+      "Processions, dancers, and decorated elephants honour the Wadiyar legacy.",
+      "Witness the peak of royal grandeur beneath a canopy of gold.",
+    ],
+    videoId: "47MTWQ-sJvQ",
+    theme: "dasara",
+  },
+];
+
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   showcase: DEFAULT_HOMEPAGE_SHOWCASE,
   journal: DEFAULT_HOMEPAGE_JOURNAL,
+  hero: DEFAULT_HOMEPAGE_HERO,
+  journeys: DEFAULT_HOMEPAGE_JOURNEYS,
   version: 0,
 };

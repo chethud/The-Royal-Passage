@@ -2,27 +2,36 @@ import { Loader2, Save } from "lucide-react";
 import { useState } from "react";
 import { RoleBadge } from "@/components/auth/RoleBadge";
 import { resolveAccessToken } from "@/lib/auth-session";
-import { saveHomepageJournal, saveHomepageShowcase } from "@/lib/homepage-content-fns";
-import type { HomepageContent, HomepageJournalItem, HomepageShowcaseItem } from "@/lib/homepage-content";
+import {
+  saveHomepageHero,
+  saveHomepageJournal,
+  saveHomepageJourneys,
+  saveHomepageShowcase,
+} from "@/lib/homepage-content-fns";
+import type { HomepageContent } from "@/lib/homepage-content";
+import type { UserRole } from "@/lib/roles";
 
 type HomepageEditorBarProps = {
-  accessToken: string;
-  showcase: HomepageShowcaseItem[];
-  journal: HomepageJournalItem[];
-  dirty: boolean;
+  role: Extract<UserRole, "editor" | "admin">;
+  draft: HomepageContent;
+  savedSnapshot: HomepageContent;
   onSaved: (content: HomepageContent) => Promise<void>;
 };
 
-export function HomepageEditorBar({
-  accessToken,
-  showcase,
-  journal,
-  dirty,
-  onSaved,
-}: HomepageEditorBarProps) {
+export function HomepageEditorBar({ role, draft, savedSnapshot, onSaved }: HomepageEditorBarProps) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const journalDirty = JSON.stringify(draft.journal) !== JSON.stringify(savedSnapshot.journal);
+  const showcaseDirty = JSON.stringify(draft.showcase) !== JSON.stringify(savedSnapshot.showcase);
+  const heroDirty = JSON.stringify(draft.hero) !== JSON.stringify(savedSnapshot.hero);
+  const journeysDirty = JSON.stringify(draft.journeys) !== JSON.stringify(savedSnapshot.journeys);
+
+  const dirty =
+    role === "admin"
+      ? journalDirty || showcaseDirty || heroDirty || journeysDirty
+      : journalDirty;
 
   const save = async () => {
     setBusy(true);
@@ -30,13 +39,39 @@ export function HomepageEditorBar({
     setMessage(null);
     try {
       const token = await resolveAccessToken();
-      const [showcaseResult, journalResult] = await Promise.all([
-        saveHomepageShowcase({ data: { accessToken: token, items: showcase } }),
-        saveHomepageJournal({ data: { accessToken: token, items: journal } }),
-      ]);
-      const version = Math.max(showcaseResult.version, journalResult.version);
+      const versions: number[] = [];
+
+      if (role === "admin" || journalDirty) {
+        const journalResult = await saveHomepageJournal({
+          data: { accessToken: token, items: draft.journal },
+        });
+        versions.push(journalResult.version);
+      }
+
+      if (role === "admin") {
+        if (showcaseDirty) {
+          const showcaseResult = await saveHomepageShowcase({
+            data: { accessToken: token, items: draft.showcase },
+          });
+          versions.push(showcaseResult.version);
+        }
+        if (heroDirty) {
+          const heroResult = await saveHomepageHero({
+            data: { accessToken: token, items: draft.hero },
+          });
+          versions.push(heroResult.version);
+        }
+        if (journeysDirty) {
+          const journeysResult = await saveHomepageJourneys({
+            data: { accessToken: token, items: draft.journeys },
+          });
+          versions.push(journeysResult.version);
+        }
+      }
+
+      const version = versions.length > 0 ? Math.max(...versions) : draft.version;
       setMessage("Homepage updated — changes are live for all visitors.");
-      await onSaved({ showcase, journal, version });
+      await onSaved({ ...draft, version });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save homepage content.");
     } finally {
@@ -44,14 +79,17 @@ export function HomepageEditorBar({
     }
   };
 
+  const hint =
+    role === "admin"
+      ? "Admin edit mode — journal, hero slideshow, top 3 experiences, and video section. Photos save instantly; use Save for text and video IDs."
+      : "Editor mode — journal section only. Photos save automatically; use Save for story text.";
+
   return (
     <div className="sticky top-0 z-50 border-b border-ember/35 bg-[oklch(0.14_0.06_22_/_0.96)] backdrop-blur-md">
       <div className="container-page flex flex-wrap items-center justify-between gap-3 py-3">
         <div className="flex flex-wrap items-center gap-3">
-          <RoleBadge role="editor" />
-          <p className="text-sm text-ink/90">
-            Edit mode — photos save automatically and go live for everyone. Use Save for text changes.
-          </p>
+          <RoleBadge role={role} />
+          <p className="max-w-xl text-sm text-ink/90">{hint}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {message ? <p className="text-xs text-emerald-300/90">{message}</p> : null}

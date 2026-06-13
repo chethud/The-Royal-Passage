@@ -1,11 +1,17 @@
 import { deleteServerCache } from "@/lib/cache.server";
 import {
+  DEFAULT_HOMEPAGE_CONTENT,
+  normalizeHomepageContent as normalizeHomepageContentForUi,
+} from "@/lib/homepage-content";
+import {
   HOMEPAGE_CACHE_KEY,
+  HOMEPAGE_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
+  HOMEPAGE_JOURNEYS_KEY,
   HOMEPAGE_SHOWCASE_KEY,
   HOMEPAGE_VERSION_KEY,
-  normalizeHomepageContent,
   parseVersionValue,
+  type HomepagePhotoSection,
 } from "@/lib/homepage-content-keys";
 import {
   ALLOWED_EXPERIENCE_PHOTO_MIME,
@@ -18,14 +24,14 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export type ApplyHomepagePhotoInput = {
   accessToken: string;
-  section: "showcase" | "journal";
+  section: HomepagePhotoSection;
   itemIndex: number;
   publicUrl: string;
 };
 
 export type CommitHomepagePhotoUploadInput = {
   accessToken: string;
-  section: "showcase" | "journal";
+  section: HomepagePhotoSection;
   itemIndex: number;
   fileName: string;
   mimeType: string;
@@ -34,7 +40,7 @@ export type CommitHomepagePhotoUploadInput = {
 
 export type CommitHomepagePhotoUploadBytesInput = {
   accessToken: string;
-  section: "showcase" | "journal";
+  section: HomepagePhotoSection;
   itemIndex: number;
   fileName: string;
   mimeType: string;
@@ -112,7 +118,7 @@ async function uploadHomepagePhotoAdmin(
   return uploadHomepagePhotoAdminBytes(userId, fileName, mimeType, decodeBase64ToBytes(base64));
 }
 
-export async function requireEditor(accessToken: string) {
+export async function requireHomepagePhotoAccess(accessToken: string, section: HomepagePhotoSection) {
   const verified = await verifySupabaseAccessToken(accessToken);
   const supabase = getSupabaseAdmin();
 
@@ -122,8 +128,58 @@ export async function requireEditor(accessToken: string) {
     .eq("id", verified.id)
     .maybeSingle();
 
-  if (profileError || profile?.role !== "editor") {
+  if (profileError) {
+    throw new Error("Could not verify your account role.");
+  }
+
+  const role = profile?.role;
+  if (section === "journal") {
+    if (role !== "editor" && role !== "admin") {
+      throw new Error("Only editors or admins can edit journal photos.");
+    }
+  } else if (role !== "admin") {
+    throw new Error("Only admins can edit this homepage section.");
+  }
+
+  return { id: verified.id, email: verified.email ?? undefined, role: role as string };
+}
+
+/** @deprecated Use requireHomepagePhotoAccess */
+export async function requireEditor(accessToken: string) {
+  const user = await requireHomepagePhotoAccess(accessToken, "journal");
+  if (user.role !== "editor") {
     throw new Error("Only editors can perform this action.");
+  }
+  return user;
+}
+
+export async function requireHomepageAdmin(accessToken: string) {
+  const verified = await verifySupabaseAccessToken(accessToken);
+  const supabase = getSupabaseAdmin();
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", verified.id)
+    .maybeSingle();
+
+  if (profileError || profile?.role !== "admin") {
+    throw new Error("Only admins can perform this action.");
+  }
+
+  return { id: verified.id, email: verified.email ?? undefined };
+}
+
+export async function requireHomepageJournalEditor(accessToken: string) {
+  const verified = await verifySupabaseAccessToken(accessToken);
+  const supabase = getSupabaseAdmin();
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", verified.id)
+    .maybeSingle();
+
+  if (profileError || (profile?.role !== "editor" && profile?.role !== "admin")) {
+    throw new Error("Only editors or admins can edit journal content.");
   }
 
   return { id: verified.id, email: verified.email ?? undefined };
@@ -161,16 +217,33 @@ async function loadHomepageContentFromDb(supabase: ReturnType<typeof getSupabase
   const { data, error } = await supabase
     .from("platform_settings")
     .select("key, value")
-    .in("key", [HOMEPAGE_SHOWCASE_KEY, HOMEPAGE_JOURNAL_KEY, HOMEPAGE_VERSION_KEY]);
+    .in("key", [
+      HOMEPAGE_SHOWCASE_KEY,
+      HOMEPAGE_JOURNAL_KEY,
+      HOMEPAGE_HERO_KEY,
+      HOMEPAGE_JOURNEYS_KEY,
+      HOMEPAGE_VERSION_KEY,
+    ]);
 
   if (error) {
     throw new Error(error.message);
   }
 
   const byKey = new Map((data ?? []).map((row) => [row.key, row.value]));
-  return normalizeHomepageContent({
+  if (
+    !byKey.has(HOMEPAGE_SHOWCASE_KEY) &&
+    !byKey.has(HOMEPAGE_JOURNAL_KEY) &&
+    !byKey.has(HOMEPAGE_HERO_KEY) &&
+    !byKey.has(HOMEPAGE_JOURNEYS_KEY)
+  ) {
+    return DEFAULT_HOMEPAGE_CONTENT;
+  }
+
+  return normalizeHomepageContentForUi({
     showcase: byKey.get(HOMEPAGE_SHOWCASE_KEY),
     journal: byKey.get(HOMEPAGE_JOURNAL_KEY),
+    hero: byKey.get(HOMEPAGE_HERO_KEY),
+    journeys: byKey.get(HOMEPAGE_JOURNEYS_KEY),
     version: parseVersionValue(byKey.get(HOMEPAGE_VERSION_KEY)),
   });
 }
@@ -194,7 +267,7 @@ export async function applyHomepagePhotoCore(
     throw new Error("Uploaded photo URL must be public http(s).");
   }
 
-  await requireEditor(input.accessToken);
+  await requireHomepagePhotoAccess(input.accessToken, input.section);
   const supabase = getSupabaseAdmin();
   const current = await loadHomepageContentFromDb(supabase);
   const publicUrl = input.publicUrl.trim();
@@ -204,11 +277,16 @@ export async function applyHomepagePhotoCore(
       index === input.itemIndex ? { ...item, imageUrl: publicUrl } : item,
     );
     await writePlatformSetting(supabase, HOMEPAGE_SHOWCASE_KEY, items);
-  } else {
+  } else if (input.section === "journal") {
     const items = current.journal.map((item, index) =>
       index === input.itemIndex ? { ...item, imageUrl: publicUrl } : item,
     );
     await writePlatformSetting(supabase, HOMEPAGE_JOURNAL_KEY, items);
+  } else {
+    const items = current.hero.map((item, index) =>
+      index === input.itemIndex ? { ...item, imageUrl: publicUrl } : item,
+    );
+    await writePlatformSetting(supabase, HOMEPAGE_HERO_KEY, items);
   }
 
   const version = await bumpHomepageVersion(supabase);
@@ -223,7 +301,7 @@ export async function commitHomepagePhotoWithUploadBytes(
     throw new Error(configError);
   }
 
-  const user = await requireEditor(input.accessToken);
+  const user = await requireHomepagePhotoAccess(input.accessToken, input.section);
   const publicUrl = await uploadHomepagePhotoAdminBytes(
     user.id,
     input.fileName,
@@ -247,7 +325,7 @@ export async function commitHomepagePhotoWithUpload(
     throw new Error(configError);
   }
 
-  const user = await requireEditor(input.accessToken);
+  const user = await requireHomepagePhotoAccess(input.accessToken, input.section);
   const publicUrl = await uploadHomepagePhotoAdmin(
     user.id,
     input.fileName,

@@ -10,6 +10,7 @@ import {
   RoyalHeritageIcon,
   RoyalPotteryIcon,
 } from "@/components/site/ExperienceShowcaseIcons";
+import type { HomepagePhotoSection } from "@/lib/homepage-content-keys";
 import type { HomepageShowcaseItem, ShowcaseIconKey } from "@/lib/homepage-content";
 import { withHomepageCacheBust } from "@/lib/homepage-content";
 import type { ComponentType, SVGProps } from "react";
@@ -25,7 +26,7 @@ type ExperiencesShowcaseProps = {
   imageVersion?: number;
   editable?: boolean;
   onItemsChange?: (items: HomepageShowcaseItem[]) => void;
-  uploadPhoto?: (section: "showcase" | "journal", itemIndex: number) => (file: File) => Promise<string>;
+  uploadPhoto?: (section: HomepagePhotoSection, itemIndex: number) => (file: File) => Promise<string>;
 };
 
 export function ExperiencesShowcase({

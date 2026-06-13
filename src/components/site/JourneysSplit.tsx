@@ -1,62 +1,18 @@
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import {
+  EditableTextField,
+} from "@/components/editor/EditableHomepageFields";
+import {
   CornerFiligree,
   HeritageCompass,
   MaharajaEmblem,
   PalaceArchFrame,
 } from "@/components/site/RoyalHeritageDecor";
+import type { HomepageJourneySlide } from "@/lib/homepage-content";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type SlideTheme = "palace" | "manuscript" | "dasara";
-
-type HeritageSlide = {
-  id: string;
-  title: string;
-  subtitle: string;
-  lines: string[];
-  videoId: string;
-  theme: SlideTheme;
-};
-
-const slides: HeritageSlide[] = [
-  {
-    id: "palace",
-    title: "The Majestic Palace",
-    subtitle: "The Crown Jewel of Mysuru",
-    lines: [
-      "Breathe in the golden hour as sunlight crowns every dome.",
-      "Birds arc above carved sandstone as the kingdom awakens.",
-      "You have crossed the threshold — the palace welcomes its guest.",
-    ],
-    videoId: "9Mbxfupo6Tw",
-    theme: "palace",
-  },
-  {
-    id: "heritage",
-    title: "The Heritage of the Kingdom",
-    subtitle: "Stories Carved Through Time",
-    lines: [
-      "Ancient streets whisper of silk looms and sandalwood ateliers.",
-      "Royal markets, vintage maps, and manuscripts preserve a living dynasty.",
-      "Each lane is a chapter inked in gold upon the soul of Mysuru.",
-    ],
-    videoId: "imHm40ncWlA",
-    theme: "manuscript",
-  },
-  {
-    id: "dasara",
-    title: "The Grand Dasara Celebration",
-    subtitle: "The Festival of Royal Glory",
-    lines: [
-      "The palace ignites with a thousand lanterns at dusk.",
-      "Processions, dancers, and decorated elephants honour the Wadiyar legacy.",
-      "Witness the peak of royal grandeur beneath a canopy of gold.",
-    ],
-    videoId: "47MTWQ-sJvQ",
-    theme: "dasara",
-  },
-];
+type SlideTheme = HomepageJourneySlide["theme"];
 
 const CURTAIN_CLOSE_MS = 380;
 const CURTAIN_OPEN_MS = 2400;
@@ -107,7 +63,7 @@ function RoyalMedallion({ active, label }: { active: boolean; label: string }) {
 }
 
 type SlideContentProps = {
-  slide: HeritageSlide;
+  slide: HomepageJourneySlide;
   visible: boolean;
 };
 
@@ -152,7 +108,7 @@ function SlideContent({ slide, visible }: SlideContentProps) {
 }
 
 type SlideMediaProps = {
-  slide: HeritageSlide;
+  slide: HomepageJourneySlide;
   isActive: boolean;
   visible: boolean;
   reducedMotion: boolean;
@@ -176,7 +132,13 @@ function SlideMedia({ slide, isActive, visible, reducedMotion }: SlideMediaProps
   );
 }
 
-export function JourneysSplit() {
+type JourneysSplitProps = {
+  slides: HomepageJourneySlide[];
+  editable?: boolean;
+  onSlidesChange?: (slides: HomepageJourneySlide[]) => void;
+};
+
+export function JourneysSplit({ slides, editable = false, onSlidesChange }: JourneysSplitProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [curtainsOpen, setCurtainsOpen] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
@@ -246,10 +208,68 @@ export function JourneysSplit() {
   const goPrev = () => goTo(activeIndex - 1);
   const goNext = () => goTo(activeIndex + 1);
 
+  const updateSlide = (index: number, patch: Partial<HomepageJourneySlide>) => {
+    if (!onSlidesChange) return;
+    onSlidesChange(slides.map((slide, idx) => (idx === index ? { ...slide, ...patch } : slide)));
+  };
+
+  const active = slides[activeIndex];
+
   return (
     <section
       className={`royal-heritage-section relative overflow-hidden bg-[#2A0A0A] py-16 sm:py-20 md:py-28 ${isTransitioning ? "is-transitioning" : ""}`}
     >
+      {editable && active ? (
+        <div className="container-page relative z-20 mb-8">
+          <div className="rounded-md border border-ember/35 bg-black/50 p-4 backdrop-blur-sm">
+            <p className="eyebrow mb-3 text-ember">Edit video slide {activeIndex + 1}</p>
+            <div className="grid gap-3 md:grid-cols-2">
+              <EditableTextField
+                label="YouTube video ID"
+                value={active.videoId}
+                onChange={(videoId) => updateSlide(activeIndex, { videoId })}
+              />
+              <EditableTextField
+                label="Subtitle"
+                value={active.subtitle}
+                onChange={(subtitle) => updateSlide(activeIndex, { subtitle })}
+              />
+              <EditableTextField
+                label="Title"
+                value={active.title}
+                onChange={(title) => updateSlide(activeIndex, { title })}
+              />
+              <EditableTextField
+                label="Line 1"
+                value={active.lines[0] ?? ""}
+                onChange={(line) =>
+                  updateSlide(activeIndex, {
+                    lines: [line, active.lines[1] ?? "", active.lines[2] ?? ""].filter(Boolean),
+                  })
+                }
+              />
+              <EditableTextField
+                label="Line 2"
+                value={active.lines[1] ?? ""}
+                onChange={(line) =>
+                  updateSlide(activeIndex, {
+                    lines: [active.lines[0] ?? "", line, active.lines[2] ?? ""].filter(Boolean),
+                  })
+                }
+              />
+              <EditableTextField
+                label="Line 3"
+                value={active.lines[2] ?? ""}
+                onChange={(line) =>
+                  updateSlide(activeIndex, {
+                    lines: [active.lines[0] ?? "", active.lines[1] ?? "", line].filter(Boolean),
+                  })
+                }
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div className="royal-light-rays pointer-events-none absolute inset-0" aria-hidden />
       <div className="royal-vintage-fog pointer-events-none absolute inset-0" aria-hidden />
       <div className="royal-slider-chandelier pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_70%_100%_at_50%_0%,#D4AF3722_0%,transparent_72%)]" aria-hidden />

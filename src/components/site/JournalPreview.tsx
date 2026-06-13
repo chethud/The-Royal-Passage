@@ -6,6 +6,7 @@ import {
   EditableTextField,
 } from "@/components/editor/EditableHomepageFields";
 import type { HomepageJournalItem } from "@/lib/homepage-content";
+import type { HomepagePhotoSection } from "@/lib/homepage-content-keys";
 import { withHomepageCacheBust } from "@/lib/homepage-content";
 
 type JournalPreviewProps = {
@@ -13,7 +14,7 @@ type JournalPreviewProps = {
   imageVersion?: number;
   editable?: boolean;
   onItemsChange?: (items: HomepageJournalItem[]) => void;
-  uploadPhoto?: (section: "showcase" | "journal", itemIndex: number) => (file: File) => Promise<string>;
+  uploadPhoto?: (section: HomepagePhotoSection, itemIndex: number) => (file: File) => Promise<string>;
 };
 
 export function JournalPreview({

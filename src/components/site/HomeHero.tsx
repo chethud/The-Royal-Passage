@@ -2,12 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import heroPalaceImg from "@/assets/hero-image.png";
-import heroDinnerImg from "@/assets/hero.jpg";
-import expDiningImg from "@/assets/exp-dining.jpg";
-import expCraftImg from "@/assets/exp-craft.jpg";
-import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { EditablePhotoField } from "@/components/editor/EditableHomepageFields";
 import { HeroSlideshow } from "@/components/site/HeroSlideshow";
+import type { HomepageHeroSlide } from "@/lib/homepage-content";
+import { withHomepageCacheBust } from "@/lib/homepage-content";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 const softEase = [0.22, 1, 0.36, 1] as const;
 
@@ -20,20 +19,36 @@ const revealItem = {
   show: { opacity: 1, y: 0, transition: { duration: 0.75, ease: softEase } },
 };
 
-const heroSlides = [
-  { src: heroPalaceImg, alt: "Mysuru Palace at golden hour through arched colonnade" },
-  { src: heroDinnerImg, alt: "A candlelit private dinner under a glasshouse at dusk" },
-  { src: expDiningImg, alt: "A plated culinary course in dramatic light" },
-  { src: expCraftImg, alt: "Hands shaping clay on a pottery wheel" },
-];
+type HomeHeroProps = {
+  slides: HomepageHeroSlide[];
+  imageVersion?: number;
+  editable?: boolean;
+  onSlidesChange?: (slides: HomepageHeroSlide[]) => void;
+  uploadPhoto?: (itemIndex: number) => (file: File) => Promise<string>;
+};
 
-export function HomeHero() {
+export function HomeHero({
+  slides,
+  imageVersion = 0,
+  editable = false,
+  onSlidesChange,
+  uploadPhoto,
+}: HomeHeroProps) {
   const reduceMotion = usePrefersReducedMotion();
   const [activeSlide, setActiveSlide] = useState(0);
 
+  const heroSlides = slides.map((slide) => ({
+    src: withHomepageCacheBust(slide.imageUrl, imageVersion),
+    alt: slide.alt,
+  }));
+
+  const updateSlide = (index: number, patch: Partial<HomepageHeroSlide>) => {
+    if (!onSlidesChange) return;
+    onSlidesChange(slides.map((slide, idx) => (idx === index ? { ...slide, ...patch } : slide)));
+  };
+
   return (
     <section className="relative min-h-[max(640px,100dvh)] w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)]">
-      {/* SLIDESHOW BACKGROUND */}
       <div className="absolute inset-0 z-0">
         <HeroSlideshow
           images={heroSlides}
@@ -43,7 +58,6 @@ export function HomeHero() {
           onActiveIndexChange={setActiveSlide}
           className="absolute inset-0 h-full w-full"
         />
-        {/* darken & vignette so type stays readable */}
         <div
           className="pointer-events-none absolute inset-0 bg-[linear-gradient(95deg,oklch(0.12_0.06_22_/_0.82)_0%,oklch(0.12_0.06_22_/_0.55)_45%,oklch(0.12_0.06_22_/_0.25)_75%,oklch(0.12_0.06_22_/_0.6)_100%)]"
           aria-hidden
@@ -54,7 +68,6 @@ export function HomeHero() {
         />
       </div>
 
-      {/* CONTENT */}
       <div className="container-page relative z-10 flex min-h-[max(640px,100dvh)] flex-col justify-center pt-[var(--header-height)]">
         <div className="py-14 md:py-20">
           <motion.div className="max-w-2xl" variants={revealParent} initial="hidden" animate="show">
@@ -101,11 +114,25 @@ export function HomeHero() {
           </motion.div>
         </div>
 
-        {/* SLIDE DOTS */}
+        {editable && uploadPhoto ? (
+          <div className="pointer-events-auto absolute inset-x-0 bottom-24 z-20 px-4 sm:bottom-28">
+            <div className="container-page max-w-md">
+              <EditablePhotoField
+                label={`Hero slide ${activeSlide + 1} of ${slides.length}`}
+                imageUrl={slides[activeSlide]?.imageUrl ?? ""}
+                alt={slides[activeSlide]?.alt ?? ""}
+                uploadPhoto={uploadPhoto(activeSlide)}
+                onImageChange={(imageUrl) => updateSlide(activeSlide, { imageUrl })}
+                onAltChange={(alt) => updateSlide(activeSlide, { alt })}
+              />
+            </div>
+          </div>
+        ) : null}
+
         <div className="pointer-events-auto absolute inset-x-0 bottom-8 z-20 flex items-center justify-center gap-2">
           {heroSlides.map((slide, i) => (
             <button
-              key={slide.src}
+              key={`${slide.src}-${i}`}
               type="button"
               onClick={() => setActiveSlide(i)}
               aria-label={`Go to slide ${i + 1}`}

@@ -1,6 +1,8 @@
 import { resolveAccessToken } from "@/lib/auth-session";
 import { validateExperiencePhotoFile } from "@/lib/experience-photo-upload";
 
+import type { HomepagePhotoSection } from "@/lib/homepage-content-keys";
+
 export type HomepagePhotoCommitResult = {
   publicUrl: string;
   version: number;
@@ -32,7 +34,7 @@ async function readJsonResponse(
 }
 
 async function saveHomepagePhotoViaApi(
-  section: "showcase" | "journal",
+  section: HomepagePhotoSection,
   itemIndex: number,
   file: File,
 ): Promise<HomepagePhotoCommitResult> {
@@ -67,7 +69,7 @@ async function saveHomepagePhotoViaApi(
 export async function commitHomepagePhotoForEditor(
   _accessToken: string | null | undefined,
   file: File,
-  section: "showcase" | "journal",
+  section: HomepagePhotoSection,
   itemIndex: number,
 ): Promise<HomepagePhotoCommitResult> {
   const validationError = validateHomepagePhotoFile(file);
