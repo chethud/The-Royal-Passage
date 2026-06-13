@@ -8,13 +8,14 @@ import {
   MaharajaEmblem,
   PalaceArchFrame,
 } from "@/components/site/RoyalHeritageDecor";
-import { RoyalVideoCurtain, type CurtainMotion } from "@/components/site/RoyalVideoCurtain";
 import type { HomepageJourneySlide } from "@/lib/homepage-content";
 import { normalizeYoutubeVideoInput } from "@/lib/youtube-video-id";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type SlideTheme = HomepageJourneySlide["theme"];
+
+const SLIDE_TRANSITION_MS = 420;
 
 const dustParticles = Array.from({ length: 8 }, (_, i) => ({
   id: i,
@@ -49,12 +50,11 @@ function RoyalMedallion({ active, label }: { active: boolean; label: string }) {
 type SlideContentProps = {
   slide: HomepageJourneySlide;
   visible: boolean;
-  ready?: boolean;
 };
 
-function SlideContent({ slide, visible, ready = false }: SlideContentProps) {
+function SlideContent({ slide, visible }: SlideContentProps) {
   return (
-    <div className={`royal-slide-content relative flex flex-col justify-center px-7 py-12 sm:px-12 sm:py-16 md:px-16 md:py-20 ${visible ? "is-visible" : ""} ${ready ? "is-ready" : ""}`}>
+    <div className={`royal-slide-content relative flex flex-col justify-center px-7 py-12 sm:px-12 sm:py-16 md:px-16 md:py-20 ${visible ? "is-visible" : ""}`}>
       <PalaceArchFrame className="pointer-events-none absolute top-6 right-8 left-8 z-10 h-8 opacity-70 sm:top-8" />
 
       <div className="pointer-events-none absolute top-10 right-10 opacity-30">
@@ -175,12 +175,10 @@ type JourneysSplitProps = {
 
 export function JourneysSplit({ slides, editable = false, onSlidesChange }: JourneysSplitProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [curtainMotion, setCurtainMotion] = useState<CurtainMotion>("closed");
-  const [showCurtainOverlay, setShowCurtainOverlay] = useState(true);
+  const [contentVisible, setContentVisible] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isLocked, setIsLocked] = useState(true);
+  const [isLocked, setIsLocked] = useState(false);
   const [themeFlash, setThemeFlash] = useState<SlideTheme | null>(null);
-  const pendingSlideRef = useRef<number | null>(null);
   const reducedMotion = usePrefersReducedMotion();
   const timersRef = useRef<number[]>([]);
 
@@ -194,26 +192,6 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
     timersRef.current.push(id);
   }, []);
 
-  const beginCurtainOpen = useCallback(() => {
-    setCurtainMotion("opening");
-  }, []);
-
-  const finishCurtainOpen = useCallback(() => {
-    setCurtainMotion("done");
-    setShowCurtainOverlay(false);
-    setIsTransitioning(false);
-    setIsLocked(false);
-    setThemeFlash(null);
-  }, []);
-
-  const handleClosingComplete = useCallback(() => {
-    if (pendingSlideRef.current === null) return;
-    setActiveIndex(pendingSlideRef.current);
-    setThemeFlash(slides[pendingSlideRef.current].theme);
-    pendingSlideRef.current = null;
-    beginCurtainOpen();
-  }, [beginCurtainOpen, slides]);
-
   const goTo = useCallback(
     (index: number) => {
       const next = (index + slides.length) % slides.length;
@@ -222,34 +200,30 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
       clearTimers();
       setIsLocked(true);
       setIsTransitioning(true);
-      setShowCurtainOverlay(true);
-      setCurtainMotion("closing");
-      pendingSlideRef.current = next;
+      setContentVisible(false);
 
-      if (reducedMotion) {
+      const transitionMs = reducedMotion ? 80 : SLIDE_TRANSITION_MS;
+
+      schedule(() => {
         setActiveIndex(next);
-        setShowCurtainOverlay(false);
-        setCurtainMotion("done");
-        setIsTransitioning(false);
-        setIsLocked(false);
-        pendingSlideRef.current = null;
-      }
+        setThemeFlash(slides[next].theme);
+        setContentVisible(true);
+
+        schedule(() => {
+          setThemeFlash(null);
+          setIsTransitioning(false);
+          setIsLocked(false);
+        }, transitionMs);
+      }, transitionMs);
     },
-    [activeIndex, clearTimers, isLocked, reducedMotion, slides],
+    [activeIndex, clearTimers, isLocked, reducedMotion, schedule, slides],
   );
 
   useEffect(() => () => clearTimers(), [clearTimers]);
 
   useEffect(() => {
-    if (reducedMotion) {
-      setCurtainMotion("done");
-      setShowCurtainOverlay(false);
-      setIsLocked(false);
-      return;
-    }
-
-    schedule(() => beginCurtainOpen(), 120);
-  }, [beginCurtainOpen, reducedMotion, schedule]);
+    setContentVisible(true);
+  }, []);
 
   const goPrev = () => goTo(activeIndex - 1);
   const goNext = () => goTo(activeIndex + 1);
@@ -358,7 +332,7 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
                     }`}
                     aria-hidden={!isActive}
                   >
-                    <SlideContent slide={item} visible={isActive} ready={isActive && showCurtainOverlay} />
+                    <SlideContent slide={item} visible={isActive && contentVisible} />
                     <SlideMedia
                       slide={item}
                       isActive={isActive}
@@ -372,20 +346,6 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
 
               {themeFlash ? (
                 <div className={`royal-theme-flash royal-theme-flash--${themeFlash}`} aria-hidden />
-              ) : null}
-
-              <div
-                className={`royal-golden-burst pointer-events-none absolute inset-0 z-[38] ${showCurtainOverlay ? "is-active" : ""}`}
-                aria-hidden
-              />
-
-              {showCurtainOverlay && !reducedMotion ? (
-                <RoyalVideoCurtain
-                  key={`${activeIndex}-${curtainMotion}`}
-                  motion={curtainMotion}
-                  onOpeningComplete={finishCurtainOpen}
-                  onClosingComplete={handleClosingComplete}
-                />
               ) : null}
             </div>
           </div>
