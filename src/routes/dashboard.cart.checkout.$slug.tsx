@@ -51,6 +51,7 @@ function CartCheckoutPage() {
 
   return (
     <GuestDashboardShell
+      wide
       title="Checkout"
       subtitle="Choose your date, payment method, and send a booking request to your host."
     >
@@ -60,7 +61,7 @@ function CartCheckoutPage() {
 
       <div className="mt-4">
         <div className="eyebrow mb-2 text-ember/90">Booking request</div>
-        <h2 className="font-display text-3xl">{exp.title}</h2>
+        <h2 className="font-display text-2xl">{exp.title}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           {exp.city} · {exp.hostName}
         </p>

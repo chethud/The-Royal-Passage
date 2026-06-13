@@ -90,15 +90,14 @@ function GuestCartPage() {
         </p>
       ) : null}
 
-      <section className="space-y-4">
+      <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <ShoppingCart className="h-5 w-5 text-ember" />
-          <h2 className="font-display text-2xl text-foreground">Cart items</h2>
-          <span className="text-sm text-muted-foreground">({cartItems.length})</span>
+          <ShoppingCart className="h-4 w-4 text-ember" />
+          <h2 className="font-display text-lg text-foreground">Cart items</h2>
+          <span className="text-xs text-muted-foreground">({cartItems.length})</span>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Experiences you added to cart. Use <strong className="text-foreground">Buy</strong> to continue
-          to checkout.
+        <p className="text-xs text-muted-foreground">
+          Use <strong className="text-foreground">Buy</strong> to continue to checkout.
         </p>
         <CartItemsSection
           items={cartItems}
@@ -107,17 +106,16 @@ function GuestCartPage() {
         />
       </section>
 
-      <section className="mt-14 space-y-4 border-t border-[oklch(0.88_0.08_86_/_0.12)] pt-10">
+      <section className="mt-10 space-y-3 border-t border-[oklch(0.88_0.08_86_/_0.12)] pt-8">
         <div className="flex items-center gap-2">
-          <span className="text-lg text-ember">♥</span>
-          <h2 className="font-display text-2xl text-foreground">Wishlist</h2>
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-ember">♥</span>
+          <h2 className="font-display text-lg text-foreground">Wishlist</h2>
+          <span className="text-xs text-muted-foreground">
             ({pageLoading ? "…" : wishlistItems.length})
           </span>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Saved for later. Use <strong className="text-foreground">Add to cart</strong> when you want to
-          book.
+        <p className="text-xs text-muted-foreground">
+          Use <strong className="text-foreground">Add to cart</strong> when you want to book.
         </p>
         {pageLoading ? (
           <p className="text-sm text-muted-foreground">Loading wishlist…</p>

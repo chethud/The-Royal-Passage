@@ -15,23 +15,23 @@ export function BookingCard({ booking, showActions, onCancel, cancelling }: Book
   const canCancel = ["pending", "confirmed"].includes(booking.bookingStatus);
 
   return (
-    <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] overflow-hidden">
-      <div className="grid sm:grid-cols-[140px_1fr] gap-0">
+    <article className="glass-strong overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.15)]">
+      <div className="grid gap-0 sm:grid-cols-[96px_1fr]">
         {booking.experience.image ? (
           <img
             src={booking.experience.image}
             alt=""
-            className="h-36 w-full object-cover sm:h-full sm:min-h-[140px]"
+            className="h-24 w-full object-cover sm:h-full sm:min-h-[96px]"
           />
         ) : (
-          <div className="h-36 bg-muted sm:h-full sm:min-h-[140px]" />
+          <div className="h-24 bg-muted sm:h-full sm:min-h-[96px]" />
         )}
-        <div className="p-5 sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h3 className="font-display text-xl">{booking.experience.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {booking.experience.city} · Hosted by {booking.experience.hostName}
+        <div className="p-4">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="font-display text-lg leading-snug">{booking.experience.title}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {booking.experience.city} · {booking.experience.hostName}
               </p>
             </div>
             <BookingStatusChip
@@ -40,7 +40,7 @@ export function BookingCard({ booking, showActions, onCancel, cancelling }: Book
             />
           </div>
 
-          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
+          <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-3 sm:text-sm">
             <div>
               <dt className="eyebrow text-muted-foreground">When</dt>
               <dd className="mt-1">

@@ -69,7 +69,7 @@ export function BookingCheckoutWizard({
   };
 
   return (
-    <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_380px]">
+    <div className="mt-6 grid gap-8 xl:grid-cols-[1fr_320px]">
       <div>
         {!isLiveExperience ? (
           <div className="mb-6 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
