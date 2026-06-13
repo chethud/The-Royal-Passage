@@ -39,8 +39,11 @@ import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as HostExperiencesIndexRouteImport } from './routes/host.experiences.index'
 import { Route as HostBookingsIndexRouteImport } from './routes/host.bookings.index'
 import { Route as ExperiencesSlugIndexRouteImport } from './routes/experiences.$slug.index'
+import { Route as AdminReviewsIndexRouteImport } from './routes/admin.reviews.index'
+import { Route as AdminHostsIndexRouteImport } from './routes/admin.hosts.index'
 import { Route as AdminExperiencesIndexRouteImport } from './routes/admin.experiences.index'
 import { Route as AdminBookingsIndexRouteImport } from './routes/admin.bookings.index'
+import { Route as AdminActivityIndexRouteImport } from './routes/admin.activity.index'
 import { Route as HostExperiencesNewRouteImport } from './routes/host.experiences.new'
 import { Route as HostExperiencesExperienceIdRouteImport } from './routes/host.experiences.$experienceId'
 import { Route as HostBookingsBookingIdRouteImport } from './routes/host.bookings.$bookingId'
@@ -199,6 +202,16 @@ const ExperiencesSlugIndexRoute = ExperiencesSlugIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ExperiencesSlugRoute,
 } as any)
+const AdminReviewsIndexRoute = AdminReviewsIndexRouteImport.update({
+  id: '/reviews/',
+  path: '/reviews/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHostsIndexRoute = AdminHostsIndexRouteImport.update({
+  id: '/hosts/',
+  path: '/hosts/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminExperiencesIndexRoute = AdminExperiencesIndexRouteImport.update({
   id: '/experiences/',
   path: '/experiences/',
@@ -207,6 +220,11 @@ const AdminExperiencesIndexRoute = AdminExperiencesIndexRouteImport.update({
 const AdminBookingsIndexRoute = AdminBookingsIndexRouteImport.update({
   id: '/bookings/',
   path: '/bookings/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminActivityIndexRoute = AdminActivityIndexRouteImport.update({
+  id: '/activity/',
+  path: '/activity/',
   getParentRoute: () => AdminRoute,
 } as any)
 const HostExperiencesNewRoute = HostExperiencesNewRouteImport.update({
@@ -282,8 +300,11 @@ export interface FileRoutesByFullPath {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/admin/activity/': typeof AdminActivityIndexRoute
   '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
+  '/admin/hosts/': typeof AdminHostsIndexRoute
+  '/admin/reviews/': typeof AdminReviewsIndexRoute
   '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
   '/host/experiences/': typeof HostExperiencesIndexRoute
@@ -319,8 +340,11 @@ export interface FileRoutesByTo {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/admin/activity': typeof AdminActivityIndexRoute
   '/admin/bookings': typeof AdminBookingsIndexRoute
   '/admin/experiences': typeof AdminExperiencesIndexRoute
+  '/admin/hosts': typeof AdminHostsIndexRoute
+  '/admin/reviews': typeof AdminReviewsIndexRoute
   '/experiences/$slug': typeof ExperiencesSlugIndexRoute
   '/host/bookings': typeof HostBookingsIndexRoute
   '/host/experiences': typeof HostExperiencesIndexRoute
@@ -361,8 +385,11 @@ export interface FileRoutesById {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/admin/activity/': typeof AdminActivityIndexRoute
   '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
+  '/admin/hosts/': typeof AdminHostsIndexRoute
+  '/admin/reviews/': typeof AdminReviewsIndexRoute
   '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
   '/host/experiences/': typeof HostExperiencesIndexRoute
@@ -404,8 +431,11 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/admin/activity/'
     | '/admin/bookings/'
     | '/admin/experiences/'
+    | '/admin/hosts/'
+    | '/admin/reviews/'
     | '/experiences/$slug/'
     | '/host/bookings/'
     | '/host/experiences/'
@@ -441,8 +471,11 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/admin/activity'
     | '/admin/bookings'
     | '/admin/experiences'
+    | '/admin/hosts'
+    | '/admin/reviews'
     | '/experiences/$slug'
     | '/host/bookings'
     | '/host/experiences'
@@ -482,8 +515,11 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/admin/activity/'
     | '/admin/bookings/'
     | '/admin/experiences/'
+    | '/admin/hosts/'
+    | '/admin/reviews/'
     | '/experiences/$slug/'
     | '/host/bookings/'
     | '/host/experiences/'
@@ -722,6 +758,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExperiencesSlugIndexRouteImport
       parentRoute: typeof ExperiencesSlugRoute
     }
+    '/admin/reviews/': {
+      id: '/admin/reviews/'
+      path: '/reviews'
+      fullPath: '/admin/reviews/'
+      preLoaderRoute: typeof AdminReviewsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/hosts/': {
+      id: '/admin/hosts/'
+      path: '/hosts'
+      fullPath: '/admin/hosts/'
+      preLoaderRoute: typeof AdminHostsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/experiences/': {
       id: '/admin/experiences/'
       path: '/experiences'
@@ -734,6 +784,13 @@ declare module '@tanstack/react-router' {
       path: '/bookings'
       fullPath: '/admin/bookings/'
       preLoaderRoute: typeof AdminBookingsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/activity/': {
+      id: '/admin/activity/'
+      path: '/activity'
+      fullPath: '/admin/activity/'
+      preLoaderRoute: typeof AdminActivityIndexRouteImport
       parentRoute: typeof AdminRoute
     }
     '/host/experiences/new': {
@@ -792,16 +849,22 @@ interface AdminRouteChildren {
   AdminProfileRoute: typeof AdminProfileRoute
   AdminBookingsBookingIdRoute: typeof AdminBookingsBookingIdRoute
   AdminExperiencesExperienceIdRoute: typeof AdminExperiencesExperienceIdRoute
+  AdminActivityIndexRoute: typeof AdminActivityIndexRoute
   AdminBookingsIndexRoute: typeof AdminBookingsIndexRoute
   AdminExperiencesIndexRoute: typeof AdminExperiencesIndexRoute
+  AdminHostsIndexRoute: typeof AdminHostsIndexRoute
+  AdminReviewsIndexRoute: typeof AdminReviewsIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminProfileRoute: AdminProfileRoute,
   AdminBookingsBookingIdRoute: AdminBookingsBookingIdRoute,
   AdminExperiencesExperienceIdRoute: AdminExperiencesExperienceIdRoute,
+  AdminActivityIndexRoute: AdminActivityIndexRoute,
   AdminBookingsIndexRoute: AdminBookingsIndexRoute,
   AdminExperiencesIndexRoute: AdminExperiencesIndexRoute,
+  AdminHostsIndexRoute: AdminHostsIndexRoute,
+  AdminReviewsIndexRoute: AdminReviewsIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

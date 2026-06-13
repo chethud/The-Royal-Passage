@@ -1,25 +1,25 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AdminExperienceQueue } from "@/components/admin/AdminExperienceQueue";
+import { CreateHostForm } from "@/components/admin/CreateHostForm";
+import { ManagedUsersPanel } from "@/components/admin/ManagedUsersPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
-import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { dashboardPathForRole } from "@/lib/roles";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { NOINDEX_META } from "@/lib/seo-helpers";
-import { useNavigate } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/admin/experiences/")({
+export const Route = createFileRoute("/admin/hosts/")({
   head: () => ({
     meta: [
-      { title: "Approve experiences — The Royal Passage" },
-      { name: "description", content: "Review pending host-submitted experiences." },
+      { title: "Host accounts — The Royal Passage" },
+      { name: "description", content: "Create host login credentials and manage platform users." },
       ...NOINDEX_META,
     ],
   }),
-  component: AdminExperiencesPage,
+  component: AdminHostsPage,
 });
 
-function AdminExperiencesPage() {
+function AdminHostsPage() {
   const navigate = useNavigate();
   const { user, role, loading } = useAuthUser();
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -52,18 +52,20 @@ function AdminExperiencesPage() {
   return (
     <DashboardShell
       role="admin"
-      title="Approve experiences"
-      subtitle="Only submissions awaiting your review appear here. Open Review to see photos, details, and slots."
+      title="Host accounts"
+      subtitle="Create login credentials for new hosts and view all platform users."
     >
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Link to="/admin" className="text-sm text-ember hover:underline">
-          ← Overview
-        </Link>
-        <Link to="/experiences" className="text-sm text-muted-foreground hover:text-ember">
-          View live catalog →
-        </Link>
+      <Link to="/admin" className="mb-5 inline-block text-sm text-ember hover:underline">
+        ← Overview
+      </Link>
+
+      <div className="space-y-8">
+        <CreateHostForm
+          accessToken={accessToken}
+          onCreated={() => setRefreshKey((value) => value + 1)}
+        />
+        <ManagedUsersPanel accessToken={accessToken} refreshKey={refreshKey} />
       </div>
-      <AdminExperienceQueue accessToken={accessToken} refreshKey={refreshKey} />
     </DashboardShell>
   );
 }

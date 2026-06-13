@@ -1,29 +1,27 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AdminExperienceQueue } from "@/components/admin/AdminExperienceQueue";
+import { AdminReviewsPanel } from "@/components/admin/AdminReviewsPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
-import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { dashboardPathForRole } from "@/lib/roles";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { NOINDEX_META } from "@/lib/seo-helpers";
-import { useNavigate } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/admin/experiences/")({
+export const Route = createFileRoute("/admin/reviews/")({
   head: () => ({
     meta: [
-      { title: "Approve experiences — The Royal Passage" },
-      { name: "description", content: "Review pending host-submitted experiences." },
+      { title: "Admin reviews — The Royal Passage" },
+      { name: "description", content: "Moderate guest reviews across the marketplace." },
       ...NOINDEX_META,
     ],
   }),
-  component: AdminExperiencesPage,
+  component: AdminReviewsPage,
 });
 
-function AdminExperiencesPage() {
+function AdminReviewsPage() {
   const navigate = useNavigate();
   const { user, role, loading } = useAuthUser();
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (loading) return;
@@ -52,18 +50,13 @@ function AdminExperiencesPage() {
   return (
     <DashboardShell
       role="admin"
-      title="Approve experiences"
-      subtitle="Only submissions awaiting your review appear here. Open Review to see photos, details, and slots."
+      title="Review moderation"
+      subtitle="Verify or remove guest reviews across all experiences."
     >
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Link to="/admin" className="text-sm text-ember hover:underline">
-          ← Overview
-        </Link>
-        <Link to="/experiences" className="text-sm text-muted-foreground hover:text-ember">
-          View live catalog →
-        </Link>
-      </div>
-      <AdminExperienceQueue accessToken={accessToken} refreshKey={refreshKey} />
+      <Link to="/admin" className="mb-5 inline-block text-sm text-ember hover:underline">
+        ← Overview
+      </Link>
+      <AdminReviewsPanel accessToken={accessToken} />
     </DashboardShell>
   );
 }

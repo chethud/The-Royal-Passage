@@ -14,11 +14,15 @@ export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
   const commission = stats.commissionPercent ?? 10;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <StatCardSection title="Platform overview">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <ClickableStatCard label="Guests" value={String(stats.totalGuests)} />
-          <ClickableStatCard label="Hosts" value={String(stats.totalHosts)} />
+          <ClickableStatCard
+            label="Hosts"
+            value={String(stats.totalHosts)}
+            to="/admin/hosts"
+          />
           <ClickableStatCard
             label="Published experiences"
             value={String(stats.publishedExperiences)}

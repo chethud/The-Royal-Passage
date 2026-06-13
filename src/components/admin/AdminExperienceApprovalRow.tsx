@@ -16,7 +16,7 @@ export function AdminExperienceApprovalRow({
   reviewLabel = "Review",
 }: AdminExperienceApprovalRowProps) {
   return (
-    <li className="flex flex-wrap items-center justify-between gap-4 rounded-sm border border-[oklch(0.88_0.08_86_/_0.2)] px-4 py-4">
+    <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="min-w-0 flex-1">
         <div className="font-display text-lg">{row.title}</div>
         <div className="mt-1 text-sm text-muted-foreground">
@@ -36,12 +36,6 @@ export function AdminExperienceApprovalRow({
           {reviewLabel}
         </Link>
       </div>
-    </li>
+    </div>
   );
-}
-
-export function partitionExperienceApprovals(rows: AdminExperienceSummary[]) {
-  const pending = rows.filter((row) => row.status === "pending_review");
-  const approved = rows.filter((row) => row.status === "published");
-  return { pending, approved };
 }
