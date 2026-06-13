@@ -8,16 +8,20 @@ import {
   MaharajaEmblem,
   PalaceArchFrame,
 } from "@/components/site/RoyalHeritageDecor";
+import { RoyalVideoCurtain, type VideoCurtainPhase } from "@/components/site/RoyalVideoCurtain";
 import type { HomepageJourneySlide } from "@/lib/homepage-content";
+import { normalizeYoutubeVideoInput } from "@/lib/youtube-video-id";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type SlideTheme = HomepageJourneySlide["theme"];
 
-const CURTAIN_CLOSE_MS = 380;
-const CURTAIN_OPEN_MS = 2400;
-const CONTENT_REVEAL_MS = 520;
-const INITIAL_CURTAIN_OPEN_MS = 400;
+const CURTAIN_CLOSE_MS = 420;
+const CURTAIN_AJAR_MS = 650;
+const CURTAIN_OPEN_MS = 3000;
+const CONTENT_REVEAL_MS = 600;
+const VIDEO_REVEAL_MS = 1400;
+const INITIAL_AJAR_MS = 500;
 
 const dustParticles = Array.from({ length: 8 }, (_, i) => ({
   id: i,
@@ -36,19 +40,6 @@ function youtubeEmbedUrl(videoId: string, autoplay: boolean) {
     iv_load_policy: "3",
   });
   return `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
-}
-
-function RoyalCurtain({ side }: { side: "left" | "right" }) {
-  return (
-    <div className={`royal-curtain royal-curtain--${side}`}>
-      <div className="royal-curtain-valance" aria-hidden />
-      <div className="royal-curtain-panel">
-        <div className="royal-curtain-folds" aria-hidden />
-        <div className="royal-curtain-sheen" aria-hidden />
-        <div className="royal-curtain-tassel" aria-hidden />
-      </div>
-    </div>
-  );
 }
 
 function RoyalMedallion({ active, label }: { active: boolean; label: string }) {
@@ -112,15 +103,44 @@ type SlideMediaProps = {
   isActive: boolean;
   visible: boolean;
   reducedMotion: boolean;
+  editable?: boolean;
+  onVideoIdChange?: (videoId: string) => void;
+  curtainPhase?: VideoCurtainPhase;
+  videoRevealed?: boolean;
 };
 
-function SlideMedia({ slide, isActive, visible, reducedMotion }: SlideMediaProps) {
+function SlideMedia({
+  slide,
+  isActive,
+  visible,
+  reducedMotion,
+  editable,
+  onVideoIdChange,
+  curtainPhase = "open",
+  videoRevealed = true,
+}: SlideMediaProps) {
+  const [videoInput, setVideoInput] = useState(slide.videoId);
+
+  useEffect(() => {
+    setVideoInput(slide.videoId);
+  }, [slide.videoId]);
+
+  const commitVideoInput = () => {
+    if (!onVideoIdChange) return;
+    onVideoIdChange(normalizeYoutubeVideoInput(videoInput));
+  };
+
   return (
     <div className={`royal-slide-media relative min-h-[320px] overflow-hidden bg-black md:min-h-[480px] ${visible ? "is-visible" : ""}`}>
-      <div className={`royal-slide-video absolute inset-0 ${isActive && !reducedMotion ? "royal-slider-ken-burns" : ""}`}>
+      <div className="royal-stage-void absolute inset-0 z-0 bg-black" aria-hidden />
+
+      <div
+        className={`royal-slide-video absolute inset-0 z-[1] ${isActive && !reducedMotion ? "royal-slider-ken-burns" : ""} ${videoRevealed ? "is-revealed" : ""}`}
+      >
         <iframe
+          key={`${slide.id}-${slide.videoId}`}
           title={slide.title}
-          src={youtubeEmbedUrl(slide.videoId, isActive)}
+          src={youtubeEmbedUrl(slide.videoId, isActive && videoRevealed)}
           className="absolute inset-0 h-full w-full border-0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
@@ -128,6 +148,37 @@ function SlideMedia({ slide, isActive, visible, reducedMotion }: SlideMediaProps
           referrerPolicy="strict-origin-when-cross-origin"
         />
       </div>
+
+      {isActive && !reducedMotion ? <RoyalVideoCurtain phase={curtainPhase} /> : null}
+
+      {editable && isActive && onVideoIdChange ? (
+        <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-50 border-t border-ember/45 bg-[#1a0505]/95 p-4 backdrop-blur-md">
+          <p className="eyebrow mb-2 text-ember">Change video</p>
+          <label className="block space-y-1.5">
+            <span className="text-[0.62rem] uppercase tracking-[0.14em] text-ink/75">
+              YouTube link or video ID
+            </span>
+            <input
+              type="text"
+              value={videoInput}
+              placeholder="https://youtube.com/watch?v=… or 9Mbxfupo6Tw"
+              onChange={(event) => setVideoInput(event.target.value)}
+              onBlur={commitVideoInput}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  commitVideoInput();
+                }
+              }}
+              className="w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/90 px-3 py-2 text-sm text-ink"
+            />
+          </label>
+          <p className="mt-2 text-[0.65rem] leading-relaxed text-ink/70">
+            Preview updates instantly. Click <strong className="font-semibold text-ember">Save changes</strong> in
+            the admin bar at the top to publish for all visitors.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -140,6 +191,8 @@ type JourneysSplitProps = {
 
 export function JourneysSplit({ slides, editable = false, onSlidesChange }: JourneysSplitProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [curtainPhase, setCurtainPhase] = useState<VideoCurtainPhase>("ajar");
+  const [videoRevealed, setVideoRevealed] = useState(false);
   const [curtainsOpen, setCurtainsOpen] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -168,15 +221,28 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
       setIsTransitioning(true);
       setContentVisible(false);
       setCurtainsOpen(false);
+      setVideoRevealed(false);
+      setCurtainPhase("closed");
 
       const closeMs = reducedMotion ? 120 : CURTAIN_CLOSE_MS;
+      const ajarMs = reducedMotion ? 0 : CURTAIN_AJAR_MS;
       const openMs = reducedMotion ? 280 : CURTAIN_OPEN_MS;
       const revealMs = reducedMotion ? 80 : CONTENT_REVEAL_MS;
 
       schedule(() => {
         setActiveIndex(next);
         setThemeFlash(slides[next].theme);
+        setCurtainPhase(reducedMotion ? "open" : "ajar");
         setCurtainsOpen(true);
+
+        if (!reducedMotion) {
+          schedule(() => {
+            setCurtainPhase("open");
+            schedule(() => setVideoRevealed(true), VIDEO_REVEAL_MS);
+          }, ajarMs);
+        } else {
+          setVideoRevealed(true);
+        }
 
         schedule(() => {
           setContentVisible(true);
@@ -186,7 +252,7 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
         schedule(() => {
           setIsTransitioning(false);
           setIsLocked(false);
-        }, openMs);
+        }, openMs + ajarMs);
       }, closeMs);
     },
     [activeIndex, clearTimers, isLocked, reducedMotion, schedule],
@@ -196,13 +262,20 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
 
   useEffect(() => {
     if (reducedMotion) {
+      setCurtainPhase("open");
       setCurtainsOpen(true);
       setContentVisible(true);
+      setVideoRevealed(true);
       return;
     }
 
-    schedule(() => setCurtainsOpen(true), INITIAL_CURTAIN_OPEN_MS);
-    schedule(() => setContentVisible(true), INITIAL_CURTAIN_OPEN_MS + 700);
+    setCurtainPhase("ajar");
+    schedule(() => {
+      setCurtainPhase("open");
+      setCurtainsOpen(true);
+      schedule(() => setVideoRevealed(true), VIDEO_REVEAL_MS);
+    }, INITIAL_AJAR_MS);
+    schedule(() => setContentVisible(true), INITIAL_AJAR_MS + 700);
   }, [reducedMotion, schedule]);
 
   const goPrev = () => goTo(activeIndex - 1);
@@ -220,14 +293,18 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
       className={`royal-heritage-section relative overflow-hidden bg-[#2A0A0A] py-16 sm:py-20 md:py-28 ${isTransitioning ? "is-transitioning" : ""}`}
     >
       {editable && active ? (
-        <div className="container-page relative z-20 mb-8">
+        <div className="container-page relative z-20 mb-6">
           <div className="rounded-md border border-ember/35 bg-black/50 p-4 backdrop-blur-sm">
-            <p className="eyebrow mb-3 text-ember">Edit video slide {activeIndex + 1}</p>
+            <p className="eyebrow mb-1 text-ember">Admin — video slide {activeIndex + 1} of {slides.length}</p>
+            <p className="mb-3 text-xs text-ink/75">
+              Use the <strong className="text-ember">Change video</strong> box on the video, or edit text below.
+              Switch slides with the medallions at the bottom. Save from the sticky bar at the top.
+            </p>
             <div className="grid gap-3 md:grid-cols-2">
               <EditableTextField
-                label="YouTube video ID"
+                label="YouTube link or video ID"
                 value={active.videoId}
-                onChange={(videoId) => updateSlide(activeIndex, { videoId })}
+                onChange={(value) => updateSlide(activeIndex, { videoId: normalizeYoutubeVideoInput(value) })}
               />
               <EditableTextField
                 label="Subtitle"
@@ -314,6 +391,10 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
                       isActive={isActive}
                       visible={isActive && contentVisible}
                       reducedMotion={reducedMotion}
+                      editable={editable}
+                      onVideoIdChange={(videoId) => updateSlide(index, { videoId })}
+                      curtainPhase={isActive ? curtainPhase : "open"}
+                      videoRevealed={isActive ? videoRevealed : false}
                     />
                   </div>
                 );
@@ -327,11 +408,6 @@ export function JourneysSplit({ slides, editable = false, onSlidesChange }: Jour
                 className={`royal-golden-burst pointer-events-none absolute inset-0 z-[38] ${curtainsOpen && contentVisible ? "" : "is-active"}`}
                 aria-hidden
               />
-
-              <div className={`royal-curtains absolute inset-0 z-[45] overflow-hidden ${curtainsOpen ? "is-open" : "is-closed"}`}>
-                <RoyalCurtain side="left" />
-                <RoyalCurtain side="right" />
-              </div>
             </div>
           </div>
         </div>
