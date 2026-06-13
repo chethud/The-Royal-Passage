@@ -1,5 +1,5 @@
 import { ShoppingCart } from "lucide-react";
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import type { Experience } from "@/data/experiences";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
 import { cartItemFromExperience } from "@/lib/cart-storage";
@@ -22,7 +22,9 @@ export function AddToCartButton({ exp, className = "", showLabel = false }: AddT
     return null;
   }
 
-  const handleClick = () => {
+  const handleClick = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (inCart) return;
     setBusy(true);
     add(cartItemFromExperience(exp));

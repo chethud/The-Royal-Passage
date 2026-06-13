@@ -3,6 +3,7 @@ import { ExperienceCard } from "@/components/site/ExperienceCard";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { getCityBySlug } from "@/lib/city-fns";
+import { hasBookableSlot } from "@/lib/experience-filters";
 import { getCatalogForUi } from "@/lib/marketplace-fns";
 import { buildCityJsonLd, SITE_URL } from "@/lib/seo";
 import { canonicalLink } from "@/lib/seo-helpers";
@@ -16,9 +17,10 @@ export const Route = createFileRoute("/cities/$slug")({
     if (!city) throw notFound();
     const experiences = catalog.experiences.filter(
       (exp) =>
-        exp.citySlug === city.slug ||
-        exp.city.toLowerCase() === city.name.toLowerCase() ||
-        exp.city.toLowerCase() === city.slug,
+        (exp.citySlug === city.slug ||
+          exp.city.toLowerCase() === city.name.toLowerCase() ||
+          exp.city.toLowerCase() === city.slug) &&
+        hasBookableSlot(exp),
     );
     return { city, experiences };
   },

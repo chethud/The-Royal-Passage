@@ -6,7 +6,7 @@ import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
 import type { WishlistItem } from "@/lib/api/wishlist";
 import { cartItemFromWishlist } from "@/lib/cart-storage";
-import { deleteWishlistItem, listWishlist } from "@/lib/wishlist-fns";
+import { fetchWishlistBrowser, removeWishlistItemBrowser } from "@/lib/wishlist-browser";
 import { useGuestAccess } from "@/lib/use-guest-access";
 
 export const Route = createFileRoute("/dashboard/cart")({
@@ -36,7 +36,7 @@ function GuestCartPage() {
     setPageLoading(true);
     setPageError(null);
     try {
-      const rows = await listWishlist({ data: { accessToken } });
+      const rows = await fetchWishlistBrowser();
       setWishlistItems(rows);
     } catch (err) {
       setPageError(err instanceof Error ? err.message : "Failed to load wishlist.");
@@ -57,11 +57,10 @@ function GuestCartPage() {
   };
 
   const handleRemoveWishlist = async (experienceId: string) => {
-    if (!accessToken) return;
     setRemovingWishlistId(experienceId);
     setPageError(null);
     try {
-      await deleteWishlistItem({ data: { accessToken, experienceId } });
+      await removeWishlistItemBrowser(experienceId);
       setWishlistItems((rows) => rows.filter((row) => row.experienceId !== experienceId));
     } catch (err) {
       setPageError(err instanceof Error ? err.message : "Failed to remove wishlist item.");

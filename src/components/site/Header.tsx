@@ -1,9 +1,10 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { LogOut, Menu, UserRound } from "lucide-react";
+import { LogOut, Menu, ShoppingCart, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
 import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav";
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
+import { useExperienceCart } from "@/hooks/use-experience-cart";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +24,7 @@ import {
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
-import { dashboardPathForRole, profilePathForRole, type UserRole } from "@/lib/roles";
+import { dashboardPathForRole, isGuestAccount, profilePathForRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 type NavItem = { label: string; to: string };
@@ -73,6 +74,8 @@ export function Header() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const navItems = navItemsForUser(role, Boolean(user));
   const isGuest = role === "guest";
+  const showGuestShopping = !user || isGuestAccount(role);
+  const { count: cartCount } = useExperienceCart();
   const showBookExperience = !user || isGuest;
   const showSignIn = !user;
   const showAccountMenu = Boolean(user);
@@ -139,6 +142,37 @@ export function Header() {
             >
               Book an Experience
             </Link>
+          ) : null}
+          {showGuestShopping ? (
+            user && isGuest ? (
+              <Link
+                to="/dashboard/cart"
+                className={`${navLinkClass} inline-flex items-center gap-1.5`}
+                activeProps={{ className: "text-ember" }}
+              >
+                <ShoppingCart className="h-3.5 w-3.5" />
+                Cart
+                {cartCount > 0 ? (
+                  <span className="rounded-full bg-ember px-1.5 py-0.5 text-[0.6rem] font-semibold text-primary-foreground">
+                    {cartCount}
+                  </span>
+                ) : null}
+              </Link>
+            ) : (
+              <Link
+                to="/sign-in"
+                search={{ redirect: "/dashboard/cart" }}
+                className={`${navLinkClass} inline-flex items-center gap-1.5`}
+              >
+                <ShoppingCart className="h-3.5 w-3.5" />
+                Cart
+                {cartCount > 0 ? (
+                  <span className="rounded-full bg-ember px-1.5 py-0.5 text-[0.6rem] font-semibold text-primary-foreground">
+                    {cartCount}
+                  </span>
+                ) : null}
+              </Link>
+            )
           ) : null}
           {showSignIn ? (
             <Link to="/sign-in" className={navLinkClass} activeProps={{ className: "text-ember" }}>
@@ -252,6 +286,19 @@ export function Header() {
                   <Link to="/experiences" className={sheetLinkClass}>
                     Book an Experience
                   </Link>
+                </SheetClose>
+              ) : null}
+              {showGuestShopping ? (
+                <SheetClose asChild>
+                  {user && isGuest ? (
+                    <Link to="/dashboard/cart" className={sheetLinkClass}>
+                      Cart{cartCount > 0 ? ` (${cartCount})` : ""}
+                    </Link>
+                  ) : (
+                    <Link to="/sign-in" search={{ redirect: "/dashboard/cart" }} className={sheetLinkClass}>
+                      Cart{cartCount > 0 ? ` (${cartCount})` : ""}
+                    </Link>
+                  )}
                 </SheetClose>
               ) : null}
               {showSignIn ? (

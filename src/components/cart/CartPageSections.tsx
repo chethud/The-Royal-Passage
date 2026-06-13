@@ -35,25 +35,18 @@ export function CartItemsSection({ items, removingId, onRemove }: CartItemsSecti
           removing={removingId === item.experienceId}
           onRemove={() => onRemove(item.experienceId)}
           primaryAction={
-            item.slotId ? (
-              <Link
-                to="/experiences/$slug/book"
-                params={{ slug: item.slug }}
-                search={{ slotId: item.slotId, guests: item.guests ?? 1 }}
-                className="luxury-btn-sm luxury-btn-primary"
-              >
-                Buy
-              </Link>
-            ) : (
-              <Link
-                to="/experiences/$slug"
-                params={{ slug: item.slug }}
-                hash="book"
-                className="luxury-btn-sm luxury-btn-primary"
-              >
-                Buy
-              </Link>
-            )
+            <Link
+              to="/dashboard/cart/checkout/$slug"
+              params={{ slug: item.slug }}
+              search={
+                item.slotId
+                  ? { slotId: item.slotId, guests: item.guests ?? 1 }
+                  : undefined
+              }
+              className="luxury-btn-sm luxury-btn-primary"
+            >
+              Buy
+            </Link>
           }
         />
       ))}

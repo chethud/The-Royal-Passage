@@ -52,6 +52,7 @@ import { Route as ExperiencesSlugBookRouteImport } from './routes/experiences.$s
 import { Route as BookingsBookingIdReviewRouteImport } from './routes/bookings.$bookingId.review'
 import { Route as AdminExperiencesExperienceIdRouteImport } from './routes/admin.experiences.$experienceId'
 import { Route as AdminBookingsBookingIdRouteImport } from './routes/admin.bookings.$bookingId'
+import { Route as DashboardCartCheckoutSlugRouteImport } from './routes/dashboard.cart.checkout.$slug'
 
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
@@ -270,6 +271,12 @@ const AdminBookingsBookingIdRoute = AdminBookingsBookingIdRouteImport.update({
   path: '/bookings/$bookingId',
   getParentRoute: () => AdminRoute,
 } as any)
+const DashboardCartCheckoutSlugRoute =
+  DashboardCartCheckoutSlugRouteImport.update({
+    id: '/checkout/$slug',
+    path: '/checkout/$slug',
+    getParentRoute: () => DashboardCartRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -287,7 +294,7 @@ export interface FileRoutesByFullPath {
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
-  '/dashboard/cart': typeof DashboardCartRoute
+  '/dashboard/cart': typeof DashboardCartRouteWithChildren
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/past': typeof DashboardPastRoute
   '/dashboard/profile': typeof DashboardProfileRoute
@@ -315,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
   '/host/experiences/': typeof HostExperiencesIndexRoute
+  '/dashboard/cart/checkout/$slug': typeof DashboardCartCheckoutSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -331,7 +339,7 @@ export interface FileRoutesByTo {
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
-  '/dashboard/cart': typeof DashboardCartRoute
+  '/dashboard/cart': typeof DashboardCartRouteWithChildren
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/past': typeof DashboardPastRoute
   '/dashboard/profile': typeof DashboardProfileRoute
@@ -356,6 +364,7 @@ export interface FileRoutesByTo {
   '/experiences/$slug': typeof ExperiencesSlugIndexRoute
   '/host/bookings': typeof HostBookingsIndexRoute
   '/host/experiences': typeof HostExperiencesIndexRoute
+  '/dashboard/cart/checkout/$slug': typeof DashboardCartCheckoutSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -374,7 +383,7 @@ export interface FileRoutesById {
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
-  '/dashboard/cart': typeof DashboardCartRoute
+  '/dashboard/cart': typeof DashboardCartRouteWithChildren
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/past': typeof DashboardPastRoute
   '/dashboard/profile': typeof DashboardProfileRoute
@@ -402,6 +411,7 @@ export interface FileRoutesById {
   '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
   '/host/experiences/': typeof HostExperiencesIndexRoute
+  '/dashboard/cart/checkout/$slug': typeof DashboardCartCheckoutSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -449,6 +459,7 @@ export interface FileRouteTypes {
     | '/experiences/$slug/'
     | '/host/bookings/'
     | '/host/experiences/'
+    | '/dashboard/cart/checkout/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -490,6 +501,7 @@ export interface FileRouteTypes {
     | '/experiences/$slug'
     | '/host/bookings'
     | '/host/experiences'
+    | '/dashboard/cart/checkout/$slug'
   id:
     | '__root__'
     | '/'
@@ -535,6 +547,7 @@ export interface FileRouteTypes {
     | '/experiences/$slug/'
     | '/host/bookings/'
     | '/host/experiences/'
+    | '/dashboard/cart/checkout/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -861,6 +874,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBookingsBookingIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/dashboard/cart/checkout/$slug': {
+      id: '/dashboard/cart/checkout/$slug'
+      path: '/checkout/$slug'
+      fullPath: '/dashboard/cart/checkout/$slug'
+      preLoaderRoute: typeof DashboardCartCheckoutSlugRouteImport
+      parentRoute: typeof DashboardCartRoute
+    }
   }
 }
 
@@ -899,9 +919,21 @@ const CitiesRouteChildren: CitiesRouteChildren = {
 const CitiesRouteWithChildren =
   CitiesRoute._addFileChildren(CitiesRouteChildren)
 
+interface DashboardCartRouteChildren {
+  DashboardCartCheckoutSlugRoute: typeof DashboardCartCheckoutSlugRoute
+}
+
+const DashboardCartRouteChildren: DashboardCartRouteChildren = {
+  DashboardCartCheckoutSlugRoute: DashboardCartCheckoutSlugRoute,
+}
+
+const DashboardCartRouteWithChildren = DashboardCartRoute._addFileChildren(
+  DashboardCartRouteChildren,
+)
+
 interface DashboardRouteChildren {
   DashboardCancelledRoute: typeof DashboardCancelledRoute
-  DashboardCartRoute: typeof DashboardCartRoute
+  DashboardCartRoute: typeof DashboardCartRouteWithChildren
   DashboardHistoryRoute: typeof DashboardHistoryRoute
   DashboardPastRoute: typeof DashboardPastRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
@@ -911,7 +943,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardCancelledRoute: DashboardCancelledRoute,
-  DashboardCartRoute: DashboardCartRoute,
+  DashboardCartRoute: DashboardCartRouteWithChildren,
   DashboardHistoryRoute: DashboardHistoryRoute,
   DashboardPastRoute: DashboardPastRoute,
   DashboardProfileRoute: DashboardProfileRoute,

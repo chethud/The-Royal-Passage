@@ -24,6 +24,8 @@ type ExperienceBookingPanelProps = {
   onConfirm?: () => void;
   busy?: boolean;
   error?: string | null;
+  /** Hide sign-in / continue / confirm buttons (used inside multi-step checkout). */
+  hideActions?: boolean;
 };
 
 export function ExperienceBookingPanel({
@@ -40,6 +42,7 @@ export function ExperienceBookingPanel({
   onConfirm,
   busy = false,
   error = null,
+  hideActions = false,
 }: ExperienceBookingPanelProps) {
   const sym = exp.currencySymbol ?? "₹";
   const visibleSlots = filterSlotsWithinBookingWindow(exp.slots);
@@ -182,13 +185,13 @@ export function ExperienceBookingPanel({
             <PayAtVenueBadge />
           </div>
 
-          {error ? (
+          {error && !hideActions ? (
             <p className="mb-4 rounded-sm border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {error}
             </p>
           ) : null}
 
-          {variant === "select" ? (
+          {hideActions ? null : variant === "select" ? (
             <>
               {!selectedSlot ? (
                 <span className="flex w-full cursor-not-allowed items-center justify-center rounded-sm bg-ember/50 py-4 text-sm font-medium text-primary-foreground opacity-60">

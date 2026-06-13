@@ -1,5 +1,5 @@
 import type { Experience } from "@/data/experiences";
-import { isWithinBookingWindow } from "@/lib/booking-window";
+import { filterSlotsWithinBookingWindow, isWithinBookingWindow } from "@/lib/booking-window";
 
 export type ExperienceSearch = {
   category?: string;
@@ -15,6 +15,11 @@ export type ExperienceSearch = {
 export const PRICE_MIN = 500;
 export const PRICE_MAX = 10000;
 export const PAGE_SIZE = 9;
+
+/** True when the experience has at least one open slot in the booking window. */
+export function hasBookableSlot(exp: Experience): boolean {
+  return filterSlotsWithinBookingWindow(exp.slots).some((slot) => slot.available > 0);
+}
 
 function startOfDay(d: Date) {
   const x = new Date(d);
@@ -82,6 +87,8 @@ export function filterExperiences(
   const q = search.q?.trim().toLowerCase();
 
   return experiences.filter((e) => {
+    if (!hasBookableSlot(e)) return false;
+
     if (search.category && e.category !== search.category) return false;
 
     if (search.city) {

@@ -1,8 +1,13 @@
 import { Heart } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import { useAuthUser } from "@/lib/auth-user";
-import { getSupabaseBrowser } from "@/lib/supabase/browser";
-import { deleteWishlistItem, listWishlist, saveWishlistItem } from "@/lib/wishlist-fns";
+import { isGuestAccount } from "@/lib/roles";
+import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
+import {
+  addWishlistItemBrowser,
+  fetchWishlistIdsBrowser,
+  removeWishlistItemBrowser,
+} from "@/lib/wishlist-browser";
 
 type WishlistButtonProps = {
   experienceId: string;
@@ -14,51 +19,49 @@ export function WishlistButton({ experienceId, className = "" }: WishlistButtonP
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const canUseWishlist = Boolean(user) && isGuestAccount(role) && isSupabaseBrowserConfigured();
 
   const loadSavedState = useCallback(async () => {
-    if (!user || role !== "guest") {
+    if (!canUseWishlist) {
+      setSaved(false);
       setInitialized(true);
       return;
     }
 
     try {
-      const { data } = await getSupabaseBrowser().auth.getSession();
-      const token = data.session?.access_token;
-      if (!token) return;
-
-      const items = await listWishlist({ data: { accessToken: token } });
-      setSaved(items.some((item) => item.experienceId === experienceId));
+      const ids = await fetchWishlistIdsBrowser();
+      setSaved(ids.includes(experienceId));
     } catch {
-      // Ignore — wishlist is optional UI enhancement
+      setSaved(false);
     } finally {
       setInitialized(true);
     }
-  }, [experienceId, role, user]);
+  }, [canUseWishlist, experienceId]);
 
   useEffect(() => {
+    setInitialized(false);
     void loadSavedState();
   }, [loadSavedState]);
 
-  if (!user || role !== "guest" || !initialized) {
+  if (!canUseWishlist || !initialized) {
     return null;
   }
 
-  const toggle = async () => {
+  const toggle = async (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     setLoading(true);
     try {
-      const { data } = await getSupabaseBrowser().auth.getSession();
-      const token = data.session?.access_token;
-      if (!token) return;
-
       if (saved) {
-        await deleteWishlistItem({ data: { accessToken: token, experienceId } });
+        await removeWishlistItemBrowser(experienceId);
         setSaved(false);
       } else {
-        await saveWishlistItem({ data: { accessToken: token, experienceId } });
+        await addWishlistItemBrowser(experienceId);
         setSaved(true);
       }
     } catch {
-      // Keep UI stable on failure
+      // Reload saved state if the write failed (e.g. stale session).
+      await loadSavedState();
     } finally {
       setLoading(false);
     }
@@ -68,8 +71,8 @@ export function WishlistButton({ experienceId, className = "" }: WishlistButtonP
     <button
       type="button"
       disabled={loading}
-      onClick={() => void toggle()}
-      className={`rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/80 p-2.5 text-foreground backdrop-blur-sm transition-colors hover:border-ember/50 disabled:opacity-50 ${className}`}
+      onClick={(event) => void toggle(event)}
+      className={`rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/80 p-2.5 text-foreground backdrop-blur-sm transition-colors hover:border-ember/50 disabled:opacity-50 ${saved ? "border-ember/50" : ""} ${className}`}
       aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
       aria-pressed={saved}
     >
