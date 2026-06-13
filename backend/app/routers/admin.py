@@ -8,11 +8,17 @@ from app.models.schemas import (
     AdminExperienceSummary,
     AdminStats,
     AuditLogEntry,
+    BookingSummary,
     CreateHostRequest,
     CreateHostResponse,
     ManagedUser,
 )
-from app.services.admin_analytics import get_admin_stats, list_admin_activity, list_admin_bookings
+from app.services.admin_analytics import (
+    get_admin_booking_by_id,
+    get_admin_stats,
+    list_admin_activity,
+    list_admin_bookings,
+)
 from app.services.admin_experiences import (
     get_admin_experience,
     list_pending_experiences,
@@ -37,6 +43,16 @@ def admin_bookings(_auth=Depends(require_admin)):
     if not settings.supabase_configured:
         raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
     return list_admin_bookings()
+
+
+@router.get("/bookings/{booking_id}", response_model=BookingSummary)
+def admin_get_booking(booking_id: str, _auth=Depends(require_admin)):
+    if not settings.supabase_configured:
+        raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
+    try:
+        return get_admin_booking_by_id(booking_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 @router.get("/activity", response_model=list[AuditLogEntry])

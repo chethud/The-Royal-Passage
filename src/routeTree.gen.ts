@@ -40,12 +40,14 @@ import { Route as HostExperiencesIndexRouteImport } from './routes/host.experien
 import { Route as HostBookingsIndexRouteImport } from './routes/host.bookings.index'
 import { Route as ExperiencesSlugIndexRouteImport } from './routes/experiences.$slug.index'
 import { Route as AdminExperiencesIndexRouteImport } from './routes/admin.experiences.index'
+import { Route as AdminBookingsIndexRouteImport } from './routes/admin.bookings.index'
 import { Route as HostExperiencesNewRouteImport } from './routes/host.experiences.new'
 import { Route as HostExperiencesExperienceIdRouteImport } from './routes/host.experiences.$experienceId'
 import { Route as HostBookingsBookingIdRouteImport } from './routes/host.bookings.$bookingId'
 import { Route as ExperiencesSlugBookRouteImport } from './routes/experiences.$slug.book'
 import { Route as BookingsBookingIdReviewRouteImport } from './routes/bookings.$bookingId.review'
 import { Route as AdminExperiencesExperienceIdRouteImport } from './routes/admin.experiences.$experienceId'
+import { Route as AdminBookingsBookingIdRouteImport } from './routes/admin.bookings.$bookingId'
 
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
@@ -202,6 +204,11 @@ const AdminExperiencesIndexRoute = AdminExperiencesIndexRouteImport.update({
   path: '/experiences/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBookingsIndexRoute = AdminBookingsIndexRouteImport.update({
+  id: '/bookings/',
+  path: '/bookings/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const HostExperiencesNewRoute = HostExperiencesNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -234,6 +241,11 @@ const AdminExperiencesExperienceIdRoute =
     path: '/experiences/$experienceId',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminBookingsBookingIdRoute = AdminBookingsBookingIdRouteImport.update({
+  id: '/bookings/$bookingId',
+  path: '/bookings/$bookingId',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -263,12 +275,14 @@ export interface FileRoutesByFullPath {
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
   '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
@@ -298,12 +312,14 @@ export interface FileRoutesByTo {
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/admin/bookings': typeof AdminBookingsIndexRoute
   '/admin/experiences': typeof AdminExperiencesIndexRoute
   '/experiences/$slug': typeof ExperiencesSlugIndexRoute
   '/host/bookings': typeof HostBookingsIndexRoute
@@ -338,12 +354,14 @@ export interface FileRoutesById {
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
   '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
@@ -379,12 +397,14 @@ export interface FileRouteTypes {
     | '/host/revenue'
     | '/host/reviews'
     | '/dashboard/'
+    | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/admin/bookings/'
     | '/admin/experiences/'
     | '/experiences/$slug/'
     | '/host/bookings/'
@@ -414,12 +434,14 @@ export interface FileRouteTypes {
     | '/host/revenue'
     | '/host/reviews'
     | '/dashboard'
+    | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/admin/bookings'
     | '/admin/experiences'
     | '/experiences/$slug'
     | '/host/bookings'
@@ -453,12 +475,14 @@ export interface FileRouteTypes {
     | '/host/revenue'
     | '/host/reviews'
     | '/dashboard/'
+    | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/admin/bookings/'
     | '/admin/experiences/'
     | '/experiences/$slug/'
     | '/host/bookings/'
@@ -705,6 +729,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminExperiencesIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/bookings/': {
+      id: '/admin/bookings/'
+      path: '/bookings'
+      fullPath: '/admin/bookings/'
+      preLoaderRoute: typeof AdminBookingsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/host/experiences/new': {
       id: '/host/experiences/new'
       path: '/new'
@@ -747,18 +778,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminExperiencesExperienceIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/bookings/$bookingId': {
+      id: '/admin/bookings/$bookingId'
+      path: '/bookings/$bookingId'
+      fullPath: '/admin/bookings/$bookingId'
+      preLoaderRoute: typeof AdminBookingsBookingIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
   AdminProfileRoute: typeof AdminProfileRoute
+  AdminBookingsBookingIdRoute: typeof AdminBookingsBookingIdRoute
   AdminExperiencesExperienceIdRoute: typeof AdminExperiencesExperienceIdRoute
+  AdminBookingsIndexRoute: typeof AdminBookingsIndexRoute
   AdminExperiencesIndexRoute: typeof AdminExperiencesIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminProfileRoute: AdminProfileRoute,
+  AdminBookingsBookingIdRoute: AdminBookingsBookingIdRoute,
   AdminExperiencesExperienceIdRoute: AdminExperiencesExperienceIdRoute,
+  AdminBookingsIndexRoute: AdminBookingsIndexRoute,
   AdminExperiencesIndexRoute: AdminExperiencesIndexRoute,
 }
 

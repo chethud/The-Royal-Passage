@@ -11,9 +11,11 @@ import {
   rejectHostBooking,
 } from "@/lib/api/host";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
+import { parseBookingListSearch } from "@/lib/dashboard-booking-filters";
 import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/bookings/")({
+  validateSearch: parseBookingListSearch,
   head: () => ({
     meta: [
       { title: "Host bookings — The Royal Passage" },
@@ -24,6 +26,7 @@ export const Route = createFileRoute("/host/bookings/")({
 });
 
 function HostBookingsPage() {
+  const { status, payment } = Route.useSearch();
   const { accessToken, ready, loading } = useHostAccess();
   const [bookings, setBookings] = useState<BookingSummary[]>([]);
   const [pageError, setPageError] = useState<string | null>(null);
@@ -89,6 +92,8 @@ function HostBookingsPage() {
         <HostBookingTable
           bookings={bookings}
           busyId={busyId}
+          initialStatus={status ?? "all"}
+          initialPayment={payment ?? "all"}
           onConfirm={(id) => void runAction(id, confirmHostBooking)}
           onReject={(id) => void runAction(id, rejectHostBooking)}
           onMarkPaid={(id) => void runAction(id, markHostBookingPaid)}

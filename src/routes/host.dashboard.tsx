@@ -95,6 +95,7 @@ function HostOverviewPage() {
               </div>
               <Link
                 to="/host/bookings"
+                search={{ status: "today" }}
                 className="text-sm text-ember hover:underline"
               >
                 View all bookings
@@ -115,6 +116,7 @@ function HostOverviewPage() {
               </div>
               <Link
                 to="/host/bookings"
+                search={{ status: "pending" }}
                 className="text-sm text-ember hover:underline"
               >
                 Manage bookings

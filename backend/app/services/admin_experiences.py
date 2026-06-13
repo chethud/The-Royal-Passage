@@ -9,15 +9,23 @@ experience_categories ( slug, label )
 """
 
 
-def list_pending_experiences() -> list[AdminExperienceSummary]:
+def list_admin_experience_approvals() -> list[AdminExperienceSummary]:
+    """Pending submissions and published (approved) experiences — excludes drafts and rejected."""
     supabase = get_supabase_admin()
     result = (
         supabase.table("experiences")
         .select("id, slug, title, city, status, created_at, hosts ( display_name )")
-        .eq("status", "pending_review")
+        .in_("status", ["pending_review", "published"])
         .order("created_at", desc=True)
         .execute()
     )
+
+    rows = result.data or []
+    pending = [row for row in rows if row.get("status") == "pending_review"]
+    published = [row for row in rows if row.get("status") == "published"]
+    pending.sort(key=lambda row: row.get("created_at") or "", reverse=True)
+    published.sort(key=lambda row: row.get("created_at") or "", reverse=True)
+    ordered = pending + published
 
     return [
         AdminExperienceSummary(
@@ -29,8 +37,13 @@ def list_pending_experiences() -> list[AdminExperienceSummary]:
             hostName=(row.get("hosts") or {}).get("display_name") or "Host",
             createdAt=row.get("created_at", ""),
         )
-        for row in (result.data or [])
+        for row in ordered
     ]
+
+
+def list_pending_experiences() -> list[AdminExperienceSummary]:
+    """Backward-compatible alias — returns pending + approved experiences."""
+    return list_admin_experience_approvals()
 
 
 def get_admin_experience(experience_id: str) -> AdminExperienceDetail:

@@ -60,11 +60,7 @@ function AdminExperiencesPage() {
           ← Back to admin overview
         </Link>
       </div>
-      <AdminExperienceQueue
-        accessToken={accessToken}
-        refreshKey={refreshKey}
-        onQueueChange={() => setRefreshKey((value) => value + 1)}
-      />
+      <AdminExperienceQueue accessToken={accessToken} refreshKey={refreshKey} />
     </DashboardShell>
   );
 }

@@ -1,5 +1,7 @@
 import { create } from "@bufbuild/protobuf";
 import type { UserRole } from "@/lib/roles";
+import type { BookingSummary } from "@/lib/api/bookings";
+import { apiFetch } from "@/lib/api/client";
 import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
 import { AdminExperienceActionRequestSchema } from "@/gen/royalpassage/v1/service_pb";
 import { CreateHostRequestSchema } from "@/gen/royalpassage/v1/types_pb";
@@ -81,12 +83,17 @@ export type AdminExperienceDetail = {
   hostVerified: boolean;
 };
 
-export function fetchPendingExperiences(accessToken: string) {
+export function fetchAdminExperienceApprovals(accessToken: string) {
   const client = createRoyalPassageClient(accessToken);
   return rpcCall(async () => {
     const response = await client.listAdminExperiences({});
     return response.experiences as AdminExperienceSummary[];
   });
+}
+
+/** @deprecated Use fetchAdminExperienceApprovals */
+export function fetchPendingExperiences(accessToken: string) {
+  return fetchAdminExperienceApprovals(accessToken);
 }
 
 export function fetchAdminExperience(accessToken: string, experienceId: string) {
@@ -165,6 +172,10 @@ export function fetchAdminBookings(accessToken: string) {
     const response = await client.listAdminBookings({});
     return response.bookings as AdminBookingRow[];
   });
+}
+
+export function fetchAdminBooking(accessToken: string, bookingId: string) {
+  return apiFetch<BookingSummary>(`/api/v1/admin/bookings/${bookingId}`, { accessToken });
 }
 
 export function fetchAdminActivity(accessToken: string) {

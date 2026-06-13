@@ -122,7 +122,7 @@ def get_admin_stats() -> AdminStats:
     )
 
 
-def list_admin_bookings(limit: int = 50) -> list[AdminBookingRow]:
+def list_admin_bookings(limit: int = 500) -> list[AdminBookingRow]:
     supabase = get_supabase_admin()
     result = (
         supabase.table("bookings")
@@ -155,6 +155,21 @@ def list_admin_bookings(limit: int = 50) -> list[AdminBookingRow]:
             )
         )
     return rows
+
+
+def get_admin_booking_by_id(booking_id: str):
+    supabase = get_supabase_admin()
+    result = (
+        supabase.table("bookings")
+        .select(BOOKING_SELECT)
+        .eq("id", booking_id)
+        .maybe_single()
+        .execute()
+    )
+    row = result.data if result else None
+    if not row:
+        raise ValueError("Booking not found.")
+    return _map_booking_row(row)
 
 
 def list_admin_activity(limit: int = 20):

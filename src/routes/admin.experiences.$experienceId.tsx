@@ -134,7 +134,7 @@ function AdminExperienceReviewPage() {
                 className={`${btn} bg-ember text-primary-foreground border-ember/70`}
                 onClick={() => void runAction("publish")}
               >
-                Publish to marketplace
+                Approve & publish
               </button>
               <button
                 type="button"
@@ -144,6 +144,21 @@ function AdminExperienceReviewPage() {
               >
                 Reject submission
               </button>
+            </div>
+          ) : experience.status === "published" ? (
+            <div className="space-y-4 border-t border-[oklch(0.88_0.08_86_/_0.15)] pt-6">
+              <p className="text-sm text-emerald-300/90">
+                This experience is approved and live on the marketplace.
+              </p>
+              {experience.slug ? (
+                <Link
+                  to="/experiences/$slug"
+                  params={{ slug: experience.slug }}
+                  className={`${btn} inline-flex border-ember/50 text-ember`}
+                >
+                  View live listing →
+                </Link>
+              ) : null}
             </div>
           ) : null}
         </div>

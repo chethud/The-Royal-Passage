@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { AdminActivityFeed } from "@/components/admin/AdminActivityFeed";
 import { AdminBookingsTable } from "@/components/admin/AdminBookingsTable";
+import { AdminExperienceApprovalsPreview } from "@/components/admin/AdminExperienceQueue";
 import { AdminReviewsPanel } from "@/components/admin/AdminReviewsPanel";
 import { AdminStatsGrid } from "@/components/admin/AdminStatsGrid";
 import { CreateHostForm } from "@/components/admin/CreateHostForm";
@@ -113,11 +114,21 @@ function AdminDashboardPage() {
         ) : null}
 
         <section className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6">
-          <h2 className="font-display text-2xl">Recent bookings</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Latest guest reservations across all hosts.</p>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="font-display text-2xl">Recent bookings</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Latest guest reservations across all hosts.</p>
+            </div>
+            <Link
+              to="/admin/bookings"
+              className="text-sm text-ember hover:underline"
+            >
+              View all bookings →
+            </Link>
+          </div>
           <div className="mt-6">
             <AdminBookingsTable
-              bookings={bookings}
+              bookings={bookings.slice(0, 10)}
               commissionPercent={stats?.commissionPercent ?? 10}
             />
           </div>
@@ -147,9 +158,10 @@ function AdminDashboardPage() {
               to="/admin/experiences"
               className="rounded-sm border border-ember/50 bg-ember/10 px-4 py-2 text-sm font-medium text-ember hover:bg-ember/20"
             >
-              Approve experiences →
+              All approvals →
             </Link>
           </div>
+          <AdminExperienceApprovalsPreview accessToken={accessToken} refreshKey={refreshKey} />
         </section>
 
         <CreateHostForm
