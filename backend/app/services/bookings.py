@@ -240,6 +240,8 @@ def _map_booking_row(row: dict) -> BookingSummary:
         guestName=row.get("guest_name"),
         guestEmail=row.get("guest_email"),
         guestPhone=row.get("guest_phone"),
+        isPaused=bool(row.get("is_paused")),
+        pausedAt=row.get("paused_at"),
     )
 
 

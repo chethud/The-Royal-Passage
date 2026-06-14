@@ -61,6 +61,7 @@ export function BookingCard({
             <BookingStatusChip
               bookingStatus={booking.bookingStatus}
               paymentStatus={booking.paymentStatus}
+              isPaused={booking.isPaused}
               surface={surface}
             />
           </div>

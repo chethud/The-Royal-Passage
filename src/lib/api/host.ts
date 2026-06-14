@@ -87,7 +87,11 @@ export function fetchHostReviews(accessToken: string) {
   });
 }
 
-function hostBookingAction(accessToken: string, bookingId: string, action: "confirm" | "reject" | "markPaid" | "complete") {
+function hostBookingAction(
+  accessToken: string,
+  bookingId: string,
+  action: "confirm" | "reject" | "markPaid" | "complete" | "pause" | "resume",
+) {
   const client = createRoyalPassageClient(accessToken);
   const request = create(HostBookingActionRequestSchema, { bookingId });
   return rpcCall(() => {
@@ -100,6 +104,10 @@ function hostBookingAction(accessToken: string, bookingId: string, action: "conf
         return client.markHostBookingPaid(request);
       case "complete":
         return client.completeHostBooking(request);
+      case "pause":
+        return client.pauseHostBooking(request);
+      case "resume":
+        return client.resumeHostBooking(request);
     }
   }) as Promise<BookingSummary>;
 }
@@ -118,4 +126,12 @@ export function markHostBookingPaid(accessToken: string, bookingId: string) {
 
 export function completeHostBooking(accessToken: string, bookingId: string) {
   return hostBookingAction(accessToken, bookingId, "complete");
+}
+
+export function pauseHostBooking(accessToken: string, bookingId: string) {
+  return hostBookingAction(accessToken, bookingId, "pause");
+}
+
+export function resumeHostBooking(accessToken: string, bookingId: string) {
+  return hostBookingAction(accessToken, bookingId, "resume");
 }

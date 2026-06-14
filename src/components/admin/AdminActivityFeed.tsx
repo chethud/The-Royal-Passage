@@ -7,18 +7,17 @@ type AdminActivityFeedProps = {
 
 export function AdminActivityFeed({ entries }: AdminActivityFeedProps) {
   if (entries.length === 0) {
-    return <p className="text-sm text-muted-foreground">No recent activity.</p>;
+    return <p className="luxury-panel-body py-8 text-sm">No recent activity.</p>;
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="divide-y divide-[rgb(74_0_0/0.12)]">
       {entries.map((entry) => (
-        <li
-          key={entry.id}
-          className="rounded-sm border border-[oklch(0.88_0.08_86_/_0.15)] px-4 py-3 text-sm"
-        >
-          <div className="font-medium">{entry.action.replaceAll("_", " ")}</div>
-          <div className="text-xs text-muted-foreground">
+        <li key={entry.id} className="py-4 first:pt-0 last:pb-0 text-sm">
+          <div className="luxury-panel-heading font-medium capitalize">
+            {entry.action.replaceAll("_", " ")}
+          </div>
+          <div className="luxury-panel-body mt-1 text-xs">
             {entry.actorName ?? "System"} · {entry.entityType}
             {entry.entityId ? ` · ${entry.entityId.slice(0, 8)}` : ""} ·{" "}
             {formatDateLong(entry.createdAt.slice(0, 10))}

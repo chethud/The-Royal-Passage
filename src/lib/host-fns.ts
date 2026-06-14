@@ -11,7 +11,9 @@ import {
   fetchHostRevenue,
   fetchHostReviews,
   markHostBookingPaid,
+  pauseHostBooking,
   rejectHostBooking,
+  resumeHostBooking,
   type HostDashboardStats,
   type HostRevenueSummary,
   type HostReviewSummary,
@@ -88,4 +90,18 @@ export const hostCompleteBooking = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<BookingSummary> => {
     if (!isApiConfigured()) throw new Error("API is not configured.");
     return completeHostBooking(data.accessToken, data.bookingId);
+  });
+
+export const hostPauseBooking = createServerFn({ method: "POST" })
+  .inputValidator(tokenSchema.extend({ bookingId: z.string().min(1) }))
+  .handler(async ({ data }): Promise<BookingSummary> => {
+    if (!isApiConfigured()) throw new Error("API is not configured.");
+    return pauseHostBooking(data.accessToken, data.bookingId);
+  });
+
+export const hostResumeBooking = createServerFn({ method: "POST" })
+  .inputValidator(tokenSchema.extend({ bookingId: z.string().min(1) }))
+  .handler(async ({ data }): Promise<BookingSummary> => {
+    if (!isApiConfigured()) throw new Error("API is not configured.");
+    return resumeHostBooking(data.accessToken, data.bookingId);
   });

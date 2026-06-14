@@ -266,6 +266,8 @@ create table if not exists public.bookings (
   completed_at timestamptz,
   cancelled_at timestamptz,
   cancelled_by text check (cancelled_by is null or cancelled_by in ('guest', 'host', 'admin')),
+  is_paused boolean not null default false,
+  paused_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -283,7 +285,9 @@ alter table public.bookings
   add column if not exists confirmed_at timestamptz,
   add column if not exists completed_at timestamptz,
   add column if not exists cancelled_at timestamptz,
-  add column if not exists cancelled_by text;
+  add column if not exists cancelled_by text,
+  add column if not exists is_paused boolean not null default false,
+  add column if not exists paused_at timestamptz;
 
 do $$
 begin

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AdminExperienceQueue } from "@/components/admin/AdminExperienceQueue";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
@@ -54,16 +55,25 @@ function AdminExperiencesPage() {
       role="admin"
       title="Approve experiences"
       subtitle="Pending submissions only. Click Review full details to open the complete submission on its own page."
+      showRoleDescription={false}
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Link to="/admin" className="text-sm text-ember hover:underline">
+        <Link
+          to="/admin"
+          className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
+        >
           ← Overview
         </Link>
-        <Link to="/experiences" className="text-sm text-muted-foreground hover:text-ember">
+        <Link
+          to="/experiences"
+          className="luxury-panel-link text-sm font-medium hover:underline"
+        >
           View live catalog →
         </Link>
       </div>
-      <AdminExperienceQueue accessToken={accessToken} refreshKey={refreshKey} />
+      <LuxuryCheckoutPanel>
+        <AdminExperienceQueue accessToken={accessToken} refreshKey={refreshKey} />
+      </LuxuryCheckoutPanel>
     </DashboardShell>
   );
 }

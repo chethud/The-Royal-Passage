@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { PayAtVenueBadge } from "@/components/booking/PayAtVenueBadge";
 import { HostBookingActions } from "@/components/host/HostBookingActions";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
@@ -11,7 +12,9 @@ import {
   confirmHostBooking,
   fetchHostBooking,
   markHostBookingPaid,
+  pauseHostBooking,
   rejectHostBooking,
+  resumeHostBooking,
 } from "@/lib/api/host";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { formatMoney } from "@/lib/money";
@@ -77,10 +80,15 @@ function HostBookingDetailPage() {
   if (pageError || !booking) {
     return (
       <HostDashboardShell title="Booking" subtitle="Booking details and host actions.">
-        <p className="text-destructive">{pageError ?? "Booking not found."}</p>
-        <Link to="/host/bookings" className="mt-4 inline-block text-ember hover:underline">
-          Back to bookings
-        </Link>
+        <LuxuryCheckoutPanel>
+          <p className="text-destructive">{pageError ?? "Booking not found."}</p>
+          <Link
+            to="/host/bookings"
+            className="luxury-btn-sm luxury-btn-panel-outline mt-4 inline-flex items-center no-underline"
+          >
+            Back to bookings
+          </Link>
+        </LuxuryCheckoutPanel>
       </HostDashboardShell>
     );
   }
@@ -90,90 +98,97 @@ function HostBookingDetailPage() {
       title="Booking detail"
       subtitle="Review guest information and manage this reservation."
     >
-      <div className="space-y-8">
+      <LuxuryCheckoutPanel>
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="eyebrow mb-2 text-muted-foreground">Reference</div>
-            <h2 className="font-display text-3xl">{booking.experience.title}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
+          <div className="min-w-0">
+            <div className="eyebrow luxury-panel-label">Reference</div>
+            <h2 className="luxury-panel-heading mt-2 font-display text-2xl uppercase leading-tight tracking-[0.05em] sm:text-3xl">
+              {booking.experience.title}
+            </h2>
+            <p className="luxury-panel-body mt-2 text-sm">
               Ref: {booking.id.slice(0, 8).toUpperCase()}
             </p>
           </div>
           <BookingStatusChip
             bookingStatus={booking.bookingStatus}
             paymentStatus={booking.paymentStatus}
+            isPaused={booking.isPaused}
+            surface="light"
           />
         </div>
 
-        <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8">
-          <dl className="grid gap-5 sm:grid-cols-2 text-sm">
-            <div>
-              <dt className="eyebrow text-muted-foreground">Guest</dt>
-              <dd className="mt-1">{booking.guestName ?? "Guest"}</dd>
-              <dd className="text-xs text-muted-foreground">{booking.guestEmail}</dd>
-              {booking.guestPhone ? (
-                <dd className="text-xs text-muted-foreground">{booking.guestPhone}</dd>
-              ) : null}
-            </div>
-            <div>
-              <dt className="eyebrow text-muted-foreground">When</dt>
-              <dd className="mt-1 font-display text-lg">
-                {formatDateWeekdayShort(booking.slot.date)}, {booking.slot.start}
-              </dd>
-              <dd className="text-xs text-muted-foreground">{formatDateLong(booking.slot.date)}</dd>
-            </div>
-            <div>
-              <dt className="eyebrow text-muted-foreground">Where</dt>
-              <dd className="mt-1">{booking.experience.address || booking.experience.city}</dd>
-            </div>
-            <div>
-              <dt className="eyebrow text-muted-foreground">Guests</dt>
-              <dd className="mt-1">{booking.participantCount}</dd>
-            </div>
-            <div>
-              <dt className="eyebrow text-muted-foreground">Total</dt>
-              <dd className="mt-1 font-display text-2xl">
-                {formatMoney(booking.totalAmount, booking.currencySymbol)}
-              </dd>
-            </div>
-            <div>
-              <dt className="eyebrow text-muted-foreground">Payment</dt>
-              <dd className="mt-1 capitalize">
-                Pay at venue
-                {booking.paymentStatus === "paid" ? " · Paid" : " · Pending"}
-              </dd>
-            </div>
-          </dl>
-
-          {booking.notes ? (
-            <div className="mt-6 border-t border-[oklch(0.88_0.08_86_/_0.15)] pt-5">
-              <div className="eyebrow text-muted-foreground">Guest notes</div>
-              <p className="mt-2 text-sm">{booking.notes}</p>
-            </div>
-          ) : null}
-
-          <div className="mt-6">
-            <PayAtVenueBadge />
+        <dl className="mt-8 grid gap-5 border-t text-sm luxury-panel-divider pt-8 sm:grid-cols-2">
+          <div>
+            <dt className="eyebrow luxury-panel-label">Guest</dt>
+            <dd className="luxury-panel-body mt-1">{booking.guestName ?? "Guest"}</dd>
+            <dd className="luxury-panel-body text-xs">{booking.guestEmail}</dd>
+            {booking.guestPhone ? (
+              <dd className="luxury-panel-body text-xs">{booking.guestPhone}</dd>
+            ) : null}
           </div>
-        </div>
+          <div>
+            <dt className="eyebrow luxury-panel-label">When</dt>
+            <dd className="luxury-panel-heading mt-1 font-display text-lg">
+              {formatDateWeekdayShort(booking.slot.date)}, {booking.slot.start}
+            </dd>
+            <dd className="luxury-panel-body text-xs">{formatDateLong(booking.slot.date)}</dd>
+          </div>
+          <div>
+            <dt className="eyebrow luxury-panel-label">Where</dt>
+            <dd className="luxury-panel-body mt-1">
+              {booking.experience.address || booking.experience.city}
+            </dd>
+          </div>
+          <div>
+            <dt className="eyebrow luxury-panel-label">Guests</dt>
+            <dd className="luxury-panel-body mt-1">{booking.participantCount}</dd>
+          </div>
+          <div>
+            <dt className="eyebrow luxury-panel-label">Total</dt>
+            <dd className="luxury-panel-heading mt-1 font-display text-2xl">
+              {formatMoney(booking.totalAmount, booking.currencySymbol)}
+            </dd>
+          </div>
+          <div>
+            <dt className="eyebrow luxury-panel-label">Payment</dt>
+            <dd className="luxury-panel-body mt-1 capitalize">
+              Pay at venue
+              {booking.paymentStatus === "paid" ? " · Paid" : " · Pending"}
+            </dd>
+          </div>
+        </dl>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <HostBookingActions
-            booking={booking}
-            busy={busy}
-            layout="stack"
-            onConfirm={() => void runAction(confirmHostBooking)}
-            onReject={() => void runAction(rejectHostBooking)}
-            onMarkPaid={() => void runAction(markHostBookingPaid)}
-            onComplete={() => void runAction(completeHostBooking)}
-          />
-          <Link
-            to="/host/bookings"
-            className="rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-2 text-sm hover:border-ember/50"
-          >
-            Back to bookings
-          </Link>
+        {booking.notes ? (
+          <div className="mt-6 border-t luxury-panel-divider pt-5">
+            <div className="eyebrow luxury-panel-label">Guest notes</div>
+            <p className="luxury-panel-body mt-2 text-sm">{booking.notes}</p>
+          </div>
+        ) : null}
+
+        <div className="mt-6 border-t luxury-panel-divider pt-6">
+          <PayAtVenueBadge surface="light" />
         </div>
+      </LuxuryCheckoutPanel>
+
+      <div className="mt-8 flex flex-wrap items-center gap-3">
+        <HostBookingActions
+          booking={booking}
+          busy={busy}
+          layout="stack"
+          surface="light"
+          onConfirm={() => void runAction(confirmHostBooking)}
+          onReject={() => void runAction(rejectHostBooking)}
+          onMarkPaid={() => void runAction(markHostBookingPaid)}
+          onComplete={() => void runAction(completeHostBooking)}
+          onPause={() => void runAction(pauseHostBooking)}
+          onResume={() => void runAction(resumeHostBooking)}
+        />
+        <Link
+          to="/host/bookings"
+          className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
+        >
+          Back to bookings
+        </Link>
       </div>
     </HostDashboardShell>
   );

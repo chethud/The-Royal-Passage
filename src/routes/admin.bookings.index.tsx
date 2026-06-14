@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { AdminBookingsTable } from "@/components/admin/AdminBookingsTable";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
@@ -82,25 +83,32 @@ function AdminBookingsPage() {
       role="admin"
       title="Bookings"
       subtitle="Every guest reservation across all hosts — filter by status or payment to review who booked."
+      showRoleDescription={false}
     >
       {pageLoading ? (
-        <p className="text-sm text-muted-foreground">Loading bookings…</p>
+        <LuxuryCheckoutPanel>
+          <p className="luxury-panel-body py-8 text-sm">Loading bookings…</p>
+        </LuxuryCheckoutPanel>
       ) : pageError ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {pageError}
-        </p>
+        <LuxuryCheckoutPanel>
+          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {pageError}
+          </p>
+        </LuxuryCheckoutPanel>
       ) : (
-        <AdminBookingsTable
-          bookings={bookings}
-          initialStatus={status ?? "all"}
-          initialPayment={payment ?? "all"}
-          initialDateView={dateView ?? "week"}
-        />
+        <LuxuryCheckoutPanel>
+          <AdminBookingsTable
+            bookings={bookings}
+            initialStatus={status ?? "all"}
+            initialPayment={payment ?? "all"}
+            initialDateView={dateView ?? "week"}
+          />
+        </LuxuryCheckoutPanel>
       )}
 
       <Link
         to="/admin"
-        className="mt-8 inline-block text-sm text-ember hover:underline"
+        className="luxury-btn-sm luxury-btn-panel-outline mt-8 inline-flex items-center no-underline"
       >
         ← Back to overview
       </Link>

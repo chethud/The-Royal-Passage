@@ -110,9 +110,11 @@ class BookingSummary(BaseModel):
     notes: str | None
     createdAt: str
     confirmedAt: str | None = None
-    guestName: str | None = None
-    guestEmail: str | None = None
-    guestPhone: str | None = None
+  guestName: str | None = None
+  guestEmail: str | None = None
+  guestPhone: str | None = None
+  isPaused: bool = False
+  pausedAt: str | None = None
 
 
 class HostDashboardStats(BaseModel):
@@ -457,3 +459,4 @@ class AdminBookingRow(BaseModel):
     platformFeeMinor: int = 0
     hostPayoutMinor: int = 0
     hostName: str | None = None
+    isPaused: bool = False

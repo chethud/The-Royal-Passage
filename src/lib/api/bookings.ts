@@ -52,6 +52,8 @@ export type BookingSummary = {
   guestName?: string | null;
   guestEmail?: string | null;
   guestPhone?: string | null;
+  isPaused?: boolean;
+  pausedAt?: string | null;
 };
 
 function normalizeCreateBookingResult(result: {

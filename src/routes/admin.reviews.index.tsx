@@ -52,8 +52,12 @@ function AdminReviewsPage() {
       role="admin"
       title="Review moderation"
       subtitle="Verify or remove guest reviews across all experiences."
+      showRoleDescription={false}
     >
-      <Link to="/admin" className="mb-5 inline-block text-sm text-ember hover:underline">
+      <Link
+        to="/admin"
+        className="luxury-btn-sm luxury-btn-panel-outline mb-5 inline-flex items-center no-underline"
+      >
         ← Overview
       </Link>
       <AdminReviewsPanel accessToken={accessToken} />

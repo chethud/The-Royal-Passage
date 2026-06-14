@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { AdminStatsGrid } from "@/components/admin/AdminStatsGrid";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import { fetchAdminStats, type AdminStats } from "@/lib/api/admin";
@@ -79,32 +80,38 @@ function AdminOverviewPage() {
       role="admin"
       title="Platform control"
       subtitle="Key metrics at a glance. Open each section from the header menu for full details."
+      showRoleDescription={false}
     >
-      {analyticsLoading ? (
-        <p className="text-sm text-muted-foreground">Loading platform analytics…</p>
-      ) : analyticsError ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {analyticsError}
-        </p>
-      ) : stats ? (
-        <AdminStatsGrid stats={stats} />
-      ) : null}
+      <LuxuryCheckoutPanel>
+        {analyticsLoading ? (
+          <p className="luxury-panel-body py-8 text-sm">Loading platform analytics…</p>
+        ) : analyticsError ? (
+          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {analyticsError}
+          </p>
+        ) : stats ? (
+          <AdminStatsGrid stats={stats} />
+        ) : null}
+      </LuxuryCheckoutPanel>
 
       {stats ? (
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <QuickLink
-            to="/admin/experiences"
-            label="Review experiences"
-            detail={
-              stats.pendingExperienceReviews
-                ? `${stats.pendingExperienceReviews} awaiting approval`
-                : "No pending submissions"
-            }
-          />
-          <QuickLink to="/admin/bookings" label="All bookings" detail="Guest reservations & payouts" />
-          <QuickLink to="/admin/hosts" label="Host accounts" detail="Create login credentials" />
-          <QuickLink to="/admin/activity" label="Activity log" detail="Recent platform events" />
-        </div>
+        <LuxuryCheckoutPanel className="mt-8">
+          <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Quick links</h2>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <QuickLink
+              to="/admin/experiences"
+              label="Review experiences"
+              detail={
+                stats.pendingExperienceReviews
+                  ? `${stats.pendingExperienceReviews} awaiting approval`
+                  : "No pending submissions"
+              }
+            />
+            <QuickLink to="/admin/bookings" label="All bookings" detail="Guest reservations & payouts" />
+            <QuickLink to="/admin/hosts" label="Host accounts" detail="Create login credentials" />
+            <QuickLink to="/admin/activity" label="Activity log" detail="Recent platform events" />
+          </div>
+        </LuxuryCheckoutPanel>
       ) : null}
     </DashboardShell>
   );
@@ -114,10 +121,10 @@ function QuickLink({ to, label, detail }: { to: string; label: string; detail: s
   return (
     <Link
       to={to}
-      className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-4 transition-colors hover:border-ember/40"
+      className="block rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4 transition-colors hover:border-[rgb(74_0_0/0.28)]"
     >
-      <div className="font-display text-lg text-ember">{label}</div>
-      <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
+      <div className="luxury-panel-heading font-display text-lg">{label}</div>
+      <p className="luxury-panel-body mt-1 text-xs">{detail}</p>
     </Link>
   );
 }

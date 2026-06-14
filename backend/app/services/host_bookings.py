@@ -381,6 +381,8 @@ def mark_host_booking_paid(booking_id: str, auth: dict) -> BookingSummary:
 
     if row.get("booking_status") != "confirmed":
         raise ValueError("Only confirmed bookings can be marked as paid.")
+    if row.get("is_paused"):
+        raise ValueError("Resume the booking before marking it as paid.")
     if row.get("payment_status") == "paid":
         raise ValueError("Booking is already marked as paid.")
 
@@ -394,6 +396,8 @@ def complete_host_booking(booking_id: str, auth: dict) -> BookingSummary:
 
     if row.get("booking_status") != "confirmed":
         raise ValueError("Only confirmed bookings can be completed.")
+    if row.get("is_paused"):
+        raise ValueError("Resume the booking before completing it.")
     if row.get("payment_status") != "paid":
         raise ValueError("Mark the booking as paid before completing.")
 
@@ -415,6 +419,69 @@ def complete_host_booking(booking_id: str, auth: dict) -> BookingSummary:
             "review_request",
             "How was your experience?",
             "Leave a review to help other travellers discover great experiences.",
+            {"bookingId": booking_id},
+        )
+    return updated
+
+
+def pause_host_booking(booking_id: str, auth: dict) -> BookingSummary:
+    supabase = get_supabase_admin()
+    host_id = _resolve_host_id(auth)
+    row = _fetch_host_booking_row(supabase, booking_id, host_id)
+
+    if row.get("booking_status") != "confirmed":
+        raise ValueError("Only confirmed bookings can be paused.")
+    if row.get("is_paused"):
+        raise ValueError("Booking is already paused.")
+
+    now = datetime.now(timezone.utc).isoformat()
+    updated = _update_host_booking(
+        booking_id,
+        auth,
+        {
+            "is_paused": True,
+            "paused_at": now,
+        },
+    )
+    from app.services.notifications import create_notification
+
+    if row.get("guest_id"):
+        create_notification(
+            row["guest_id"],
+            "booking_paused",
+            "Booking paused",
+            "Your host temporarily paused this booking. They will resume it when ready.",
+            {"bookingId": booking_id},
+        )
+    return updated
+
+
+def resume_host_booking(booking_id: str, auth: dict) -> BookingSummary:
+    supabase = get_supabase_admin()
+    host_id = _resolve_host_id(auth)
+    row = _fetch_host_booking_row(supabase, booking_id, host_id)
+
+    if row.get("booking_status") != "confirmed":
+        raise ValueError("Only confirmed bookings can be resumed.")
+    if not row.get("is_paused"):
+        raise ValueError("Booking is not paused.")
+
+    updated = _update_host_booking(
+        booking_id,
+        auth,
+        {
+            "is_paused": False,
+            "paused_at": None,
+        },
+    )
+    from app.services.notifications import create_notification
+
+    if row.get("guest_id"):
+        create_notification(
+            row["guest_id"],
+            "booking_resumed",
+            "Booking resumed",
+            "Your host resumed your booking. See you at the experience.",
             {"bookingId": booking_id},
         )
     return updated

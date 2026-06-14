@@ -116,6 +116,12 @@ class RoyalPassageService(Protocol):
     async def complete_host_booking(self, request: royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.BookingSummary:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def pause_host_booking(self, request: royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.BookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def resume_host_booking(self, request: royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.BookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
     async def get_admin_stats(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminStats:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
@@ -492,6 +498,26 @@ class RoyalPassageServiceASGIApplication(ConnectASGIApplication[RoyalPassageServ
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.complete_host_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/PauseHostBooking": Endpoint.unary(
+                    method=MethodInfo(
+                        name="PauseHostBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.BookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.pause_host_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ResumeHostBooking": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ResumeHostBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.BookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.resume_host_booking,
                 ),
                 "/royalpassage.v1.RoyalPassageService/GetAdminStats": Endpoint.unary(
                     method=MethodInfo(
@@ -1351,6 +1377,46 @@ class RoyalPassageServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def pause_host_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.BookingSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="PauseHostBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.BookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def resume_host_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.BookingSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ResumeHostBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.BookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
     async def get_admin_stats(
         self,
         request: google_dot_protobuf_dot_empty__pb2.Empty,
@@ -1778,6 +1844,10 @@ class RoyalPassageServiceSync(Protocol):
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def complete_host_booking(self, request: royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.BookingSummary:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def pause_host_booking(self, request: royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.BookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def resume_host_booking(self, request: royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.BookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def get_admin_stats(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminStats:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def list_admin_bookings(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListAdminBookingsResponse:
@@ -2137,6 +2207,26 @@ class RoyalPassageServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.complete_host_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/PauseHostBooking": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="PauseHostBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.BookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.pause_host_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ResumeHostBooking": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ResumeHostBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.BookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.resume_host_booking,
                 ),
                 "/royalpassage.v1.RoyalPassageService/GetAdminStats": EndpointSync.unary(
                     method=MethodInfo(
@@ -2987,6 +3077,46 @@ class RoyalPassageServiceClientSync(ConnectClientSync):
             request=request,
             method=MethodInfo(
                 name="CompleteHostBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.BookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def pause_host_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.BookingSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="PauseHostBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.BookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def resume_host_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.BookingSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ResumeHostBooking",
                 service_name="royalpassage.v1.RoyalPassageService",
                 input=royalpassage_dot_v1_dot_service__pb2.HostBookingActionRequest,
                 output=royalpassage_dot_v1_dot_types__pb2.BookingSummary,

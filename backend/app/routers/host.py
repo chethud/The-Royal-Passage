@@ -35,7 +35,9 @@ from app.services.host_bookings import (
     list_host_bookings,
     list_host_reviews,
     mark_host_booking_paid,
+    pause_host_booking,
     reject_host_booking,
+    resume_host_booking,
 )
 
 router = APIRouter(prefix="/api/v1/host", tags=["host"])
@@ -230,5 +232,25 @@ def host_complete_booking(booking_id: str, _auth=Depends(require_host)):
         raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
     try:
         return complete_host_booking(booking_id, _auth)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/bookings/{booking_id}/pause", response_model=BookingSummary)
+def host_pause_booking(booking_id: str, _auth=Depends(require_host)):
+    if not settings.supabase_configured:
+        raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
+    try:
+        return pause_host_booking(booking_id, _auth)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/bookings/{booking_id}/resume", response_model=BookingSummary)
+def host_resume_booking(booking_id: str, _auth=Depends(require_host)):
+    if not settings.supabase_configured:
+        raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
+    try:
+        return resume_host_booking(booking_id, _auth)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

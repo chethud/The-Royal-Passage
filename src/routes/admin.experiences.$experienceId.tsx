@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { AdminExperienceReview } from "@/components/admin/AdminExperienceReview";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import {
@@ -105,9 +106,6 @@ function AdminExperienceReviewPage() {
     }
   };
 
-  const btn =
-    "rounded-sm border px-4 py-2 text-sm disabled:opacity-50 hover:border-ember/50";
-
   if (loading || !user || role !== "admin" || !accessToken) {
     return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
   }
@@ -121,16 +119,20 @@ function AdminExperienceReviewPage() {
       role="admin"
       title={experience?.title ?? "Review experience"}
       subtitle="Check every detail below — photos, host info, description, and slots — then approve to go live."
+      showRoleDescription={false}
     >
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <Link to="/admin/experiences" className="text-sm text-ember hover:underline">
+        <Link
+          to="/admin/experiences"
+          className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
+        >
           ← Back to pending list
         </Link>
         {isPublished && experience.slug ? (
           <Link
             to="/experiences/$slug"
             params={{ slug: experience.slug }}
-            className="text-sm font-medium text-ember hover:underline"
+            className="luxury-panel-link text-sm font-medium hover:underline"
           >
             View live listing →
           </Link>
@@ -138,51 +140,87 @@ function AdminExperienceReviewPage() {
       </div>
 
       {justPublished && isPublished && experience?.slug ? (
-        <div className="mb-6 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-5 py-4">
-          <p className="font-display text-lg text-emerald-200">Approved and live on the marketplace</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+        <LuxuryCheckoutPanel className="mb-6">
+          <p className="luxury-panel-heading font-display text-lg">Approved and live on the marketplace</p>
+          <p className="luxury-panel-body mt-1 text-sm">
             Guests can now browse and book this experience on the public site.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
               to="/experiences/$slug"
               params={{ slug: experience.slug }}
-              className={`${btn} border-ember/50 bg-ember/10 text-ember`}
+              className="luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
             >
               Open live page
             </Link>
-            <Link to="/admin/experiences" className={`${btn} border-[oklch(0.88_0.08_86_/_0.35)]`}>
+            <Link
+              to="/admin/experiences"
+              className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
+            >
               Back to pending list
             </Link>
           </div>
-        </div>
+        </LuxuryCheckoutPanel>
       ) : null}
 
       {pageLoading ? (
-        <p className="text-sm text-muted-foreground">Loading full experience details…</p>
+        <LuxuryCheckoutPanel>
+          <p className="luxury-panel-body py-8 text-sm">Loading full experience details…</p>
+        </LuxuryCheckoutPanel>
       ) : pageError && !experience ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {pageError}
-        </p>
+        <LuxuryCheckoutPanel>
+          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {pageError}
+          </p>
+        </LuxuryCheckoutPanel>
       ) : experience ? (
         <div className="space-y-6">
           {pageError ? (
-            <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {pageError}
-            </p>
+            <LuxuryCheckoutPanel>
+              <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {pageError}
+              </p>
+            </LuxuryCheckoutPanel>
           ) : null}
 
           {isPending ? (
-            <div className="sticky top-[calc(var(--header-height)+0.75rem)] z-20 flex flex-wrap items-center justify-between gap-3 rounded-md border border-ember/30 bg-[oklch(0.14_0.06_22_/_0.95)] px-4 py-3 backdrop-blur-sm">
-              <p className="text-sm text-muted-foreground">
-                Review all sections, then approve to publish for guest bookings.
-              </p>
-              <div className="flex flex-wrap gap-2">
+            <LuxuryCheckoutPanel className="sticky top-[calc(var(--header-height)+0.75rem)] z-20">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="luxury-panel-body text-sm">
+                  Review all sections, then approve to publish for guest bookings.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={busy || !canPublish}
+                    title={!canPublish ? "Host must add at least one bookable slot" : undefined}
+                    className="luxury-btn-sm luxury-btn-primary disabled:opacity-50"
+                    onClick={() => void runAction("publish")}
+                  >
+                    Approve & publish live
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    className="luxury-btn-sm luxury-btn-panel-danger disabled:opacity-50"
+                    onClick={() => void runAction("reject")}
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            </LuxuryCheckoutPanel>
+          ) : null}
+
+          <AdminExperienceReview experience={experience} />
+
+          {isPending ? (
+            <LuxuryCheckoutPanel>
+              <div className="flex flex-wrap gap-3">
                 <button
                   type="button"
                   disabled={busy || !canPublish}
-                  title={!canPublish ? "Host must add at least one bookable slot" : undefined}
-                  className={`${btn} bg-ember text-primary-foreground border-ember/70`}
+                  className="luxury-btn-sm luxury-btn-primary disabled:opacity-50"
                   onClick={() => void runAction("publish")}
                 >
                   Approve & publish live
@@ -190,56 +228,33 @@ function AdminExperienceReviewPage() {
                 <button
                   type="button"
                   disabled={busy}
-                  className={`${btn} border-destructive/40 text-destructive`}
+                  className="luxury-btn-sm luxury-btn-panel-danger disabled:opacity-50"
                   onClick={() => void runAction("reject")}
                 >
-                  Reject
+                  Reject submission
                 </button>
               </div>
-            </div>
-          ) : null}
-
-          <AdminExperienceReview experience={experience} />
-
-          {isPending ? (
-            <div className="flex flex-wrap gap-3 border-t border-[oklch(0.88_0.08_86_/_0.15)] pt-6">
-              <button
-                type="button"
-                disabled={busy || !canPublish}
-                className={`${btn} bg-ember text-primary-foreground border-ember/70`}
-                onClick={() => void runAction("publish")}
-              >
-                Approve & publish live
-              </button>
-              <button
-                type="button"
-                disabled={busy}
-                className={`${btn} border-destructive/40 text-destructive`}
-                onClick={() => void runAction("reject")}
-              >
-                Reject submission
-              </button>
               {!canPublish ? (
-                <p className="w-full text-xs text-amber-200/80">
+                <p className="luxury-panel-body mt-3 w-full text-xs">
                   Add at least one bookable slot before this experience can go live.
                 </p>
               ) : null}
-            </div>
+            </LuxuryCheckoutPanel>
           ) : isPublished ? (
-            <div className="space-y-3 border-t border-[oklch(0.88_0.08_86_/_0.15)] pt-6">
-              <p className="text-sm text-emerald-300/90">
+            <LuxuryCheckoutPanel>
+              <p className="luxury-panel-body text-sm">
                 This experience is approved and live. Guests can book it on the public site.
               </p>
               {experience.slug ? (
                 <Link
                   to="/experiences/$slug"
                   params={{ slug: experience.slug }}
-                  className={`${btn} inline-flex border-ember/50 text-ember`}
+                  className="luxury-btn-sm luxury-btn-panel-outline mt-4 inline-flex items-center no-underline"
                 >
                   View live listing →
                 </Link>
               ) : null}
-            </div>
+            </LuxuryCheckoutPanel>
           ) : null}
         </div>
       ) : null}

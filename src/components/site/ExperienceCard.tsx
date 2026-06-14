@@ -32,9 +32,12 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
         <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent" />
 
         <div className="absolute left-3.5 top-3.5 z-20">
-          <span className="inline-flex items-center gap-1.5 text-[0.62rem] font-medium uppercase tracking-[0.12em] text-[#F7F1E8] drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]">
-            <CategoryIcon className="h-3 w-3 text-[#D4AF6A]" strokeWidth={1.75} />
-            {exp.category}
+          <span
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-[#D4AF6A] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
+            aria-label={exp.category}
+            title={exp.category}
+          >
+            <CategoryIcon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
           </span>
         </div>
 

@@ -54,8 +54,12 @@ function AdminHostsPage() {
       role="admin"
       title="Host accounts"
       subtitle="Create login credentials for new hosts and view all platform users."
+      showRoleDescription={false}
     >
-      <Link to="/admin" className="mb-5 inline-block text-sm text-ember hover:underline">
+      <Link
+        to="/admin"
+        className="luxury-btn-sm luxury-btn-panel-outline mb-5 inline-flex items-center no-underline"
+      >
         ← Overview
       </Link>
 

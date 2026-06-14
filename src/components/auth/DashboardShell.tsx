@@ -9,9 +9,17 @@ type DashboardShellProps = {
   title: string;
   subtitle: string;
   children: ReactNode;
+  /** Hide the default role description under the subtitle. */
+  showRoleDescription?: boolean;
 };
 
-export function DashboardShell({ role, title, subtitle, children }: DashboardShellProps) {
+export function DashboardShell({
+  role,
+  title,
+  subtitle,
+  children,
+  showRoleDescription = true,
+}: DashboardShellProps) {
   return (
     <div className="pt-[var(--header-height)] text-foreground">
       <Header />
@@ -22,7 +30,9 @@ export function DashboardShell({ role, title, subtitle, children }: DashboardShe
         </div>
         <h1 className="font-display text-3xl tracking-tight md:text-4xl">{title}</h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">{subtitle}</p>
-        <p className="mt-1 max-w-2xl text-xs text-muted-foreground/90">{ROLE_DESCRIPTIONS[role]}</p>
+        {showRoleDescription ? (
+          <p className="mt-1 max-w-2xl text-xs text-muted-foreground/90">{ROLE_DESCRIPTIONS[role]}</p>
+        ) : null}
         <div className="mt-8">{children}</div>
       </section>
       <Footer />

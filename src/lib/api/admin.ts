@@ -149,6 +149,7 @@ export type AdminBookingRow = {
   platformFeeMinor: number;
   hostPayoutMinor: number;
   hostName: string | null;
+  isPaused?: boolean;
 };
 
 export type AuditLogEntry = {

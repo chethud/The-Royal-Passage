@@ -8,8 +8,6 @@ import { ExperiencesHero } from "@/components/experiences/ExperiencesHero";
 import { ExperiencesFilterSidebar } from "@/components/experiences/ExperiencesFilterSidebar";
 import { ExperiencesEmptyState } from "@/components/experiences/ExperiencesEmptyState";
 import { ExperienceCardSkeleton } from "@/components/experiences/ExperienceCardSkeleton";
-import { useAuthUser } from "@/lib/auth-user";
-import { isGuestAccount } from "@/lib/roles";
 import { listCities } from "@/lib/city-fns";
 import {
   filterExperiences,
@@ -84,8 +82,6 @@ function ExperiencesPage() {
   const { experiences, categories, cityOptions } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  const { user, role } = useAuthUser();
-  const showWishlistHeart = !user || isGuestAccount(role);
   const [pending, startTransition] = useTransition();
 
   const filtered = useMemo(
@@ -121,8 +117,6 @@ function ExperiencesPage() {
       <Header />
 
       <ExperiencesHero
-        signedIn={Boolean(user)}
-        showWishlistHeart={showWishlistHeart}
         searchValue={search.q ?? ""}
         onSearchChange={(q) => updateSearch({ q: q || undefined, page: 1 })}
       />
@@ -138,9 +132,11 @@ function ExperiencesPage() {
               Handpicked journeys from verified hosts
             </p>
           </div>
-          <p className="text-[0.65rem] uppercase tracking-[0.14em] text-[#D6C8B5]/80">
-            Page {Math.min(page, pages)} of {pages}
-          </p>
+          {pages > 1 ? (
+            <p className="text-[0.65rem] uppercase tracking-[0.14em] text-[#D6C8B5]/80">
+              Page {Math.min(page, pages)} of {pages}
+            </p>
+          ) : null}
         </div>
 
         <div className="flex flex-col items-start gap-8 lg:flex-row lg:gap-12">

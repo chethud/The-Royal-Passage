@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { AdminActivityFeed } from "@/components/admin/AdminActivityFeed";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import { fetchAdminActivity, type AuditLogEntry } from "@/lib/api/admin";
@@ -79,14 +80,18 @@ function AdminActivityPage() {
       role="admin"
       title="Activity log"
       subtitle="Recent platform actions and audit events."
+      showRoleDescription={false}
     >
-      <Link to="/admin" className="mb-5 inline-block text-sm text-ember hover:underline">
+      <Link
+        to="/admin"
+        className="luxury-btn-sm luxury-btn-panel-outline mb-5 inline-flex items-center no-underline"
+      >
         ← Overview
       </Link>
 
-      <section className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-5 sm:p-6">
+      <LuxuryCheckoutPanel>
         {pageLoading ? (
-          <p className="text-sm text-muted-foreground">Loading activity…</p>
+          <p className="luxury-panel-body py-8 text-sm">Loading activity…</p>
         ) : pageError ? (
           <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {pageError}
@@ -94,7 +99,7 @@ function AdminActivityPage() {
         ) : (
           <AdminActivityFeed entries={activity} />
         )}
-      </section>
+      </LuxuryCheckoutPanel>
     </DashboardShell>
   );
 }

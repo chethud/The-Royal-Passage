@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { RoleBadge } from "@/components/auth/RoleBadge";
 import { fetchManagedUsers, type ManagedUser } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
@@ -8,6 +9,10 @@ type ManagedUsersPanelProps = {
   accessToken: string;
   refreshKey: number;
 };
+
+function filterBtnClass(active: boolean) {
+  return active ? "luxury-btn-sm luxury-btn-primary" : "luxury-btn-sm luxury-btn-panel-outline";
+}
 
 export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanelProps) {
   const [users, setUsers] = useState<ManagedUser[]>([]);
@@ -38,11 +43,11 @@ export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanel
   const filtered = users.filter((user) => filter === "all" || user.role === filter);
 
   return (
-    <section className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6">
+    <LuxuryCheckoutPanel>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="font-display text-2xl">Users & logins</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <h2 className="luxury-panel-heading font-display text-2xl">Users & logins</h2>
+          <p className="luxury-panel-body mt-2 text-sm">
             Guests sign up themselves. Hosts and admins are created here and sign in with email and
             password.
           </p>
@@ -53,11 +58,7 @@ export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanel
               key={value}
               type="button"
               onClick={() => setFilter(value)}
-              className={`rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] transition-colors ${
-                filter === value
-                  ? "border-ember/70 bg-ember/10 text-ember"
-                  : "border-[oklch(0.88_0.08_86_/_0.35)] text-foreground/80 hover:border-ember/40"
-              }`}
+              className={filterBtnClass(filter === value)}
             >
               {value === "all" ? "All" : ROLE_LABELS[value]}
             </button>
@@ -66,18 +67,18 @@ export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanel
       </div>
 
       {loading ? (
-        <p className="mt-6 text-sm text-muted-foreground">Loading accounts...</p>
+        <p className="luxury-panel-body mt-6 text-sm">Loading accounts...</p>
       ) : error ? (
         <p className="mt-6 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {error}
         </p>
       ) : filtered.length === 0 ? (
-        <p className="mt-6 text-sm text-muted-foreground">No accounts in this view yet.</p>
+        <p className="luxury-panel-body mt-6 text-sm">No accounts in this view yet.</p>
       ) : (
         <div className="mt-6 overflow-x-auto">
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead>
-              <tr className="border-b border-[oklch(0.88_0.08_86_/_0.2)] text-xs uppercase tracking-[0.14em] text-muted-foreground">
+              <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
                 <th className="px-3 py-2 font-medium">Name</th>
                 <th className="px-3 py-2 font-medium">Email</th>
                 <th className="px-3 py-2 font-medium">Role</th>
@@ -86,22 +87,19 @@ export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanel
             </thead>
             <tbody>
               {filtered.map((user) => (
-                <tr
-                  key={user.id}
-                  className="border-b border-[oklch(0.88_0.08_86_/_0.1)] last:border-0"
-                >
-                  <td className="px-3 py-3">{user.fullName ?? "—"}</td>
-                  <td className="px-3 py-3 text-muted-foreground">{user.email ?? "—"}</td>
+                <tr key={user.id} className="border-b luxury-panel-divider last:border-0">
+                  <td className="luxury-panel-heading px-3 py-3">{user.fullName ?? "—"}</td>
+                  <td className="luxury-panel-body px-3 py-3">{user.email ?? "—"}</td>
                   <td className="px-3 py-3">
                     <RoleBadge role={user.role} />
                   </td>
-                  <td className="px-3 py-3 text-muted-foreground">{user.phone ?? "—"}</td>
+                  <td className="luxury-panel-body px-3 py-3">{user.phone ?? "—"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
-    </section>
+    </LuxuryCheckoutPanel>
   );
 }

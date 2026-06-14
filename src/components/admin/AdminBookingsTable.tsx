@@ -15,6 +15,10 @@ type AdminBookingsTableProps = {
   initialDateView?: BookingDateView;
 };
 
+function filterBtn(active: boolean) {
+  return active ? "luxury-btn-sm luxury-btn-primary" : "luxury-btn-sm luxury-btn-panel-outline";
+}
+
 function filterAdminBookings(
   bookings: AdminBookingRow[],
   status: BookingListStatus,
@@ -67,7 +71,7 @@ export function AdminBookingsTable({
   );
 
   if (bookings.length === 0) {
-    return <p className="text-sm text-muted-foreground">No bookings yet.</p>;
+    return <p className="luxury-panel-body py-8 text-sm">No bookings yet.</p>;
   }
 
   const dateViewButtons: { value: BookingDateView; label: string }[] = [
@@ -92,11 +96,7 @@ export function AdminBookingsTable({
             key={value}
             type="button"
             onClick={() => setDateView(value)}
-            className={`rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] ${
-              dateView === value
-                ? "border-ember/70 bg-ember/10 text-ember"
-                : "border-[oklch(0.88_0.08_86_/_0.35)] text-foreground/80"
-            }`}
+            className={filterBtn(dateView === value)}
           >
             {label}
           </button>
@@ -112,11 +112,7 @@ export function AdminBookingsTable({
               setStatusFilter(value);
               if (value !== "confirmed") setPaymentFilter("all");
             }}
-            className={`rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] ${
-              statusFilter === value && paymentFilter === "all"
-                ? "border-ember/70 bg-ember/10 text-ember"
-                : "border-[oklch(0.88_0.08_86_/_0.35)] text-foreground/80"
-            }`}
+            className={filterBtn(statusFilter === value && paymentFilter === "all")}
           >
             {value}
           </button>
@@ -127,11 +123,7 @@ export function AdminBookingsTable({
             setStatusFilter("confirmed");
             setPaymentFilter("cod-pending");
           }}
-          className={`rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] ${
-            paymentFilter === "cod-pending"
-              ? "border-ember/70 bg-ember/10 text-ember"
-              : "border-[oklch(0.88_0.08_86_/_0.35)] text-foreground/80"
-          }`}
+          className={filterBtn(paymentFilter === "cod-pending")}
         >
           COD pending
         </button>
@@ -141,76 +133,74 @@ export function AdminBookingsTable({
             setStatusFilter("all");
             setPaymentFilter("collected");
           }}
-          className={`rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] ${
-            paymentFilter === "collected"
-              ? "border-ember/70 bg-ember/10 text-ember"
-              : "border-[oklch(0.88_0.08_86_/_0.35)] text-foreground/80"
-          }`}
+          className={filterBtn(paymentFilter === "collected")}
         >
           Collected
         </button>
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No bookings in this view.</p>
+        <p className="luxury-panel-body py-8 text-sm">No bookings in this view.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1100px] text-left text-sm">
             <thead>
-              <tr className="border-b border-[oklch(0.88_0.08_86_/_0.2)] text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                <th className="px-3 py-2">Guest</th>
-                <th className="px-3 py-2">Experience</th>
-                <th className="px-3 py-2">Host</th>
-                <th className="px-3 py-2">Session</th>
-                <th className="px-3 py-2">Booked</th>
-                <th className="px-3 py-2">Total</th>
-                <th className="px-3 py-2">Platform ({commissionPercent}%)</th>
-                <th className="px-3 py-2">Host payout</th>
-                <th className="px-3 py-2">Status</th>
+              <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
+                <th className="px-3 py-2 font-normal">Guest</th>
+                <th className="px-3 py-2 font-normal">Experience</th>
+                <th className="px-3 py-2 font-normal">Host</th>
+                <th className="px-3 py-2 font-normal">Session</th>
+                <th className="px-3 py-2 font-normal">Booked</th>
+                <th className="px-3 py-2 font-normal">Total</th>
+                <th className="px-3 py-2 font-normal">Platform ({commissionPercent}%)</th>
+                <th className="px-3 py-2 font-normal">Host payout</th>
+                <th className="px-3 py-2 font-normal">Status</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((booking) => (
-                <tr key={booking.id} className="border-b border-[oklch(0.88_0.08_86_/_0.1)]">
+                <tr key={booking.id} className="border-b border-[rgb(74_0_0/0.12)] last:border-0">
                   <td className="px-3 py-3">
                     <Link
                       to="/admin/bookings/$bookingId"
                       params={{ bookingId: booking.id }}
-                      className="block hover:text-ember"
+                      className="luxury-panel-link block hover:underline"
                     >
-                      <div>{booking.guestName ?? "Guest"}</div>
-                      <div className="text-xs text-muted-foreground">{booking.guestEmail}</div>
+                      <div className="luxury-panel-heading">{booking.guestName ?? "Guest"}</div>
+                      <div className="luxury-panel-body text-xs">{booking.guestEmail}</div>
                     </Link>
                   </td>
                   <td className="px-3 py-3">
                     <Link
                       to="/admin/bookings/$bookingId"
                       params={{ bookingId: booking.id }}
-                      className="hover:text-ember"
+                      className="luxury-panel-link hover:underline"
                     >
                       {booking.experienceTitle}
                     </Link>
                   </td>
-                  <td className="px-3 py-3">{booking.hostName ?? "—"}</td>
-                  <td className="px-3 py-3 text-muted-foreground">
+                  <td className="luxury-panel-body px-3 py-3">{booking.hostName ?? "—"}</td>
+                  <td className="luxury-panel-body px-3 py-3">
                     {formatDateLong(booking.slotDate)}
                   </td>
-                  <td className="px-3 py-3 text-muted-foreground">
+                  <td className="luxury-panel-body px-3 py-3">
                     {formatDateLong(booking.createdAt.slice(0, 10))}
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="luxury-panel-heading px-3 py-3">
                     {formatMoney(booking.totalAmount, booking.currencySymbol)}
                   </td>
-                  <td className="px-3 py-3 text-ember">
+                  <td className="luxury-panel-body px-3 py-3">
                     {formatMoney(booking.platformFeeMinor, booking.currencySymbol)}
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="luxury-panel-body px-3 py-3">
                     {formatMoney(booking.hostPayoutMinor, booking.currencySymbol)}
                   </td>
                   <td className="px-3 py-3">
                     <BookingStatusChip
                       bookingStatus={booking.bookingStatus}
                       paymentStatus={booking.paymentStatus}
+                      isPaused={booking.isPaused}
+                      surface="light"
                     />
                   </td>
                 </tr>

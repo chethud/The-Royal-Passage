@@ -34,30 +34,39 @@ export function AdminExperienceQueue({ accessToken, refreshKey = 0 }: AdminExper
     void load();
   }, [load, refreshKey]);
 
+  if (loading) {
+    return <p className="luxury-panel-body py-8 text-sm">Loading submissions…</p>;
+  }
+
+  if (error) {
+    return (
+      <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        {error}
+      </p>
+    );
+  }
+
+  if (rows.length === 0) {
+    return (
+      <div className="py-8 text-center">
+        <p className="luxury-panel-body text-sm">No experiences awaiting review.</p>
+        <Link
+          to="/experiences"
+          className="luxury-panel-link mt-3 inline-block text-sm font-medium hover:underline"
+        >
+          Browse live catalog →
+        </Link>
+      </div>
+    );
+  }
+
   return (
-    <section className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-5 sm:p-6">
-      {loading ? (
-        <p className="text-sm text-muted-foreground">Loading submissions…</p>
-      ) : error ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {error}
-        </p>
-      ) : rows.length === 0 ? (
-        <div className="py-6 text-center">
-          <p className="text-sm text-muted-foreground">No experiences awaiting review.</p>
-          <Link to="/experiences" className="mt-3 inline-block text-sm text-ember hover:underline">
-            Browse live catalog →
-          </Link>
-        </div>
-      ) : (
-        <ul className="space-y-3">
-          {rows.map((row) => (
-            <li key={row.id}>
-              <AdminExperienceApprovalRow row={row} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+    <ul className="divide-y divide-[rgb(74_0_0/0.12)]">
+      {rows.map((row) => (
+        <li key={row.id} className="py-4 first:pt-0 last:pb-0">
+          <AdminExperienceApprovalRow row={row} />
+        </li>
+      ))}
+    </ul>
   );
 }

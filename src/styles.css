@@ -388,6 +388,32 @@
   opacity: 0.55;
 }
 
+.luxury-btn-panel-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgb(74 0 0 / 0.32);
+  background: rgb(255 255 255 / 0.25);
+  padding: 0.5rem 1rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #4a0000;
+  text-decoration: none;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.luxury-btn-panel-outline:hover {
+  border-color: #4a0000;
+  background: rgb(74 0 0 / 0.05);
+  color: #2d0000;
+}
+
 /* Premium cream-white panels for checkout & cart (on burgundy page background) */
 .luxury-checkout-panel {
   position: relative;

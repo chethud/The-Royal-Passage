@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { PayAtVenueBadge } from "@/components/booking/PayAtVenueBadge";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
@@ -83,11 +84,16 @@ function BookingDetailPage() {
     return (
       <div className="min-h-screen pt-[var(--header-height)] text-foreground">
         <Header />
-        <div className="container-page py-20">
-          <p className="text-destructive">{loadError ?? "Booking not found."}</p>
-          <Link to="/dashboard/history" className="mt-4 inline-block text-ember hover:underline">
-            View booking history
-          </Link>
+        <div className="container-page max-w-3xl py-20">
+          <LuxuryCheckoutPanel>
+            <p className="text-destructive">{loadError ?? "Booking not found."}</p>
+            <Link
+              to="/dashboard/history"
+              className="luxury-btn-sm luxury-btn-panel-outline mt-4 inline-flex items-center no-underline"
+            >
+              View booking history
+            </Link>
+          </LuxuryCheckoutPanel>
         </div>
         <Footer />
       </div>
@@ -100,69 +106,83 @@ function BookingDetailPage() {
     <div className="min-h-screen pt-[var(--header-height)] text-foreground">
       <Header />
 
-      <section className="container-page py-12 sm:py-16 max-w-3xl">
+      <section className="container-page max-w-3xl py-12 sm:py-16">
         {confirmed ? (
-          <div className="mb-8 rounded-sm border border-ember/30 bg-ember/10 px-5 py-4">
-            <div className="eyebrow text-ember">Booking requested</div>
-            <p className="mt-1 text-sm text-muted-foreground">
+          <LuxuryCheckoutPanel className="mb-8">
+            <div className="eyebrow luxury-panel-label">Booking requested</div>
+            <p className="luxury-panel-body mt-2 text-sm leading-relaxed">
               Your request has been sent. The host will confirm shortly. Pay at the venue on
               arrival.
             </p>
-          </div>
+          </LuxuryCheckoutPanel>
         ) : null}
 
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="eyebrow mb-2 text-muted-foreground">Booking reference</div>
-            <h1 className="font-display text-3xl sm:text-4xl">{booking.experience.title}</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Ref: {booking.id.slice(0, 8).toUpperCase()}
+        <LuxuryCheckoutPanel>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0">
+              <div className="eyebrow luxury-panel-label">Booking reference</div>
+              <h1 className="luxury-panel-heading mt-2 font-display text-2xl uppercase leading-tight tracking-[0.05em] sm:text-3xl">
+                {booking.experience.title}
+              </h1>
+              <p className="luxury-panel-body mt-2 text-sm">
+                Ref: {booking.id.slice(0, 8).toUpperCase()}
+              </p>
+            </div>
+            <BookingStatusChip
+              bookingStatus={booking.bookingStatus}
+              paymentStatus={booking.paymentStatus}
+              isPaused={booking.isPaused}
+              surface="light"
+            />
+          </div>
+
+          {booking.isPaused ? (
+            <p className="luxury-panel-body mt-6 rounded-sm border border-[rgb(74_0_0/0.18)] bg-[rgb(74_0_0/0.04)] px-4 py-3 text-sm">
+              Your host temporarily paused this booking. They will notify you when it resumes.
             </p>
-          </div>
-          <BookingStatusChip
-            bookingStatus={booking.bookingStatus}
-            paymentStatus={booking.paymentStatus}
-          />
-        </div>
+          ) : null}
 
-        {booking.experience.image ? (
-          <img
-            src={booking.experience.image}
-            alt=""
-            className="mt-8 aspect-[16/7] w-full rounded-md object-cover"
-          />
-        ) : null}
+          {booking.experience.image ? (
+            <div className="luxury-panel-image mt-8">
+              <img
+                src={booking.experience.image}
+                alt=""
+                className="aspect-[16/7] w-full object-cover"
+              />
+            </div>
+          ) : null}
 
-        <div className="glass-strong mt-8 rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8">
-          <dl className="grid gap-5 sm:grid-cols-2 text-sm">
+          <dl className="mt-8 grid gap-5 border-t text-sm luxury-panel-divider pt-8 sm:grid-cols-2">
             <div>
-              <dt className="eyebrow text-muted-foreground">When</dt>
-              <dd className="mt-1 font-display text-lg">
+              <dt className="eyebrow luxury-panel-label">When</dt>
+              <dd className="luxury-panel-heading mt-1 font-display text-lg">
                 {formatDateWeekdayShort(booking.slot.date)}, {booking.slot.start}
               </dd>
-              <dd className="text-xs text-muted-foreground">{formatDateLong(booking.slot.date)}</dd>
+              <dd className="luxury-panel-body text-xs">{formatDateLong(booking.slot.date)}</dd>
             </div>
             <div>
-              <dt className="eyebrow text-muted-foreground">Where</dt>
-              <dd className="mt-1">{booking.experience.address || booking.experience.city}</dd>
+              <dt className="eyebrow luxury-panel-label">Where</dt>
+              <dd className="luxury-panel-body mt-1">
+                {booking.experience.address || booking.experience.city}
+              </dd>
             </div>
             <div>
-              <dt className="eyebrow text-muted-foreground">Host</dt>
-              <dd className="mt-1">{booking.experience.hostName}</dd>
+              <dt className="eyebrow luxury-panel-label">Host</dt>
+              <dd className="luxury-panel-body mt-1">{booking.experience.hostName}</dd>
             </div>
             <div>
-              <dt className="eyebrow text-muted-foreground">Guests</dt>
-              <dd className="mt-1">{booking.participantCount}</dd>
+              <dt className="eyebrow luxury-panel-label">Guests</dt>
+              <dd className="luxury-panel-body mt-1">{booking.participantCount}</dd>
             </div>
             <div>
-              <dt className="eyebrow text-muted-foreground">Total</dt>
-              <dd className="mt-1 font-display text-2xl">
+              <dt className="eyebrow luxury-panel-label">Total</dt>
+              <dd className="luxury-panel-heading mt-1 font-display text-2xl">
                 {formatMoney(booking.totalAmount, booking.currencySymbol)}
               </dd>
             </div>
             <div>
-              <dt className="eyebrow text-muted-foreground">Payment</dt>
-              <dd className="mt-1 capitalize">
+              <dt className="eyebrow luxury-panel-label">Payment</dt>
+              <dd className="luxury-panel-body mt-1 capitalize">
                 {booking.paymentMethod === "cod" ? "Pay at venue" : booking.paymentMethod}
                 {booking.paymentStatus === "paid" ? " · Paid" : " · Pending"}
               </dd>
@@ -170,37 +190,37 @@ function BookingDetailPage() {
           </dl>
 
           {booking.notes ? (
-            <div className="mt-6 border-t border-[oklch(0.88_0.08_86_/_0.15)] pt-5">
-              <div className="eyebrow text-muted-foreground">Your notes</div>
-              <p className="mt-2 text-sm">{booking.notes}</p>
+            <div className="mt-6 border-t luxury-panel-divider pt-5">
+              <div className="eyebrow luxury-panel-label">Your notes</div>
+              <p className="luxury-panel-body mt-2 text-sm">{booking.notes}</p>
             </div>
           ) : null}
 
-          <div className="mt-6">
-            <PayAtVenueBadge />
+          <div className="mt-6 border-t luxury-panel-divider pt-6">
+            <PayAtVenueBadge surface="light" />
           </div>
-        </div>
+        </LuxuryCheckoutPanel>
 
-        <div className="mt-8 flex flex-wrap gap-4">
+        <div className="mt-8 flex flex-wrap items-center gap-3">
           {booking.bookingStatus === "completed" ? (
             <Link
               to="/bookings/$bookingId/review"
               params={{ bookingId: booking.id }}
-              className="rounded-sm bg-ember px-5 py-3 text-sm font-medium text-primary-foreground shadow-[var(--shadow-gold)]"
+              className="luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
             >
               Leave a review
             </Link>
           ) : null}
           <Link
             to="/dashboard/history"
-            className="rounded-sm bg-ember px-5 py-3 text-sm font-medium text-primary-foreground shadow-[var(--shadow-gold)]"
+            className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
           >
             Booking history
           </Link>
           <Link
             to="/experiences/$slug"
             params={{ slug: booking.experience.slug }}
-            className="rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-5 py-3 text-sm hover:border-ember/50"
+            className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
           >
             View experience
           </Link>
@@ -209,7 +229,7 @@ function BookingDetailPage() {
               type="button"
               disabled={cancelling}
               onClick={() => void handleCancel()}
-              className="rounded-sm border border-destructive/40 px-5 py-3 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-60"
+              className="luxury-btn-sm luxury-btn-panel-danger"
             >
               {cancelling ? "Cancelling…" : "Cancel booking"}
             </button>

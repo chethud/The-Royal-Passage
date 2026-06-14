@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { HostBookingTable } from "@/components/host/HostBookingTable";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import type { BookingSummary } from "@/lib/api/bookings";
@@ -8,7 +9,9 @@ import {
   confirmHostBooking,
   fetchHostBookings,
   markHostBookingPaid,
+  pauseHostBooking,
   rejectHostBooking,
+  resumeHostBooking,
 } from "@/lib/api/host";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { parseBookingListSearch } from "@/lib/dashboard-booking-filters";
@@ -80,26 +83,34 @@ function HostBookingsPage() {
   return (
     <HostDashboardShell
       title="Bookings"
-      subtitle="Accept or reject requests, mark pay-at-venue payments, and complete sessions."
+      subtitle="Accept or reject requests, pause when needed, mark pay-at-venue payments, and complete sessions."
     >
       {pageLoading ? (
-        <p className="text-sm text-muted-foreground">Loading bookings…</p>
+        <LuxuryCheckoutPanel>
+          <p className="luxury-panel-body py-8 text-sm">Loading bookings…</p>
+        </LuxuryCheckoutPanel>
       ) : pageError ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {pageError}
-        </p>
+        <LuxuryCheckoutPanel>
+          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {pageError}
+          </p>
+        </LuxuryCheckoutPanel>
       ) : (
-        <HostBookingTable
-          bookings={bookings}
-          busyId={busyId}
-          initialStatus={status ?? "all"}
-          initialPayment={payment ?? "all"}
-          initialDateView={dateView ?? "week"}
-          onConfirm={(id) => void runAction(id, confirmHostBooking)}
-          onReject={(id) => void runAction(id, rejectHostBooking)}
-          onMarkPaid={(id) => void runAction(id, markHostBookingPaid)}
-          onComplete={(id) => void runAction(id, completeHostBooking)}
-        />
+        <LuxuryCheckoutPanel>
+          <HostBookingTable
+            bookings={bookings}
+            busyId={busyId}
+            initialStatus={status ?? "all"}
+            initialPayment={payment ?? "all"}
+            initialDateView={dateView ?? "week"}
+            onConfirm={(id) => void runAction(id, confirmHostBooking)}
+            onReject={(id) => void runAction(id, rejectHostBooking)}
+            onMarkPaid={(id) => void runAction(id, markHostBookingPaid)}
+            onComplete={(id) => void runAction(id, completeHostBooking)}
+            onPause={(id) => void runAction(id, pauseHostBooking)}
+            onResume={(id) => void runAction(id, resumeHostBooking)}
+          />
+        </LuxuryCheckoutPanel>
       )}
     </HostDashboardShell>
   );

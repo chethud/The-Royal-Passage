@@ -18,10 +18,16 @@ type HostBookingTableProps = {
   onReject: (id: string) => void;
   onMarkPaid: (id: string) => void;
   onComplete: (id: string) => void;
+  onPause: (id: string) => void;
+  onResume: (id: string) => void;
 };
 
 type StatusFilter = BookingListStatus;
 type PaymentFilter = BookingPaymentFilter;
+
+function filterBtn(active: boolean) {
+  return active ? "luxury-btn-sm luxury-btn-primary" : "luxury-btn-sm luxury-btn-panel-outline";
+}
 
 function filterBookings(
   bookings: BookingSummary[],
@@ -64,6 +70,8 @@ export function HostBookingTable({
   onReject,
   onMarkPaid,
   onComplete,
+  onPause,
+  onResume,
 }: HostBookingTableProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialStatus);
   const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>(initialPayment);
@@ -102,18 +110,14 @@ export function HostBookingTable({
   ];
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-5">
       <div className="flex flex-wrap gap-2">
         {dateViewButtons.map(({ value, label }) => (
           <button
             key={value}
             type="button"
             onClick={() => setDateView(value)}
-            className={`rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] ${
-              dateView === value
-                ? "border-ember/70 bg-ember/10 text-ember"
-                : "border-[oklch(0.88_0.08_86_/_0.35)] text-foreground/80"
-            }`}
+            className={filterBtn(dateView === value)}
           >
             {label}
           </button>
@@ -129,11 +133,7 @@ export function HostBookingTable({
               setStatusFilter(value);
               if (value !== "confirmed") setPaymentFilter("all");
             }}
-            className={`rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] ${
-              statusFilter === value && paymentFilter === "all"
-                ? "border-ember/70 bg-ember/10 text-ember"
-                : "border-[oklch(0.88_0.08_86_/_0.35)] text-foreground/80"
-            }`}
+            className={filterBtn(statusFilter === value && paymentFilter === "all")}
           >
             {value}
           </button>
@@ -144,80 +144,81 @@ export function HostBookingTable({
             setStatusFilter("confirmed");
             setPaymentFilter("cod-pending");
           }}
-          className={`rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] ${
-            paymentFilter === "cod-pending"
-              ? "border-ember/70 bg-ember/10 text-ember"
-              : "border-[oklch(0.88_0.08_86_/_0.35)] text-foreground/80"
-          }`}
+          className={filterBtn(paymentFilter === "cod-pending")}
         >
           COD pending
         </button>
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No bookings in this view.</p>
+        <p className="luxury-panel-body py-8 text-sm">No bookings in this view.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] text-left text-sm">
             <thead>
-              <tr className="border-b border-[oklch(0.88_0.08_86_/_0.2)] text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                <th className="px-3 py-2">Guest</th>
-                <th className="px-3 py-2">Experience</th>
-                <th className="px-3 py-2">When</th>
-                <th className="px-3 py-2">Guests</th>
-                <th className="px-3 py-2">Total</th>
-                <th className="px-3 py-2">Status</th>
-                <th className="px-3 py-2">Actions</th>
+              <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
+                <th className="px-3 py-2 font-normal">Guest</th>
+                <th className="px-3 py-2 font-normal">Experience</th>
+                <th className="px-3 py-2 font-normal">When</th>
+                <th className="px-3 py-2 font-normal">Guests</th>
+                <th className="px-3 py-2 font-normal">Total</th>
+                <th className="px-3 py-2 font-normal">Status</th>
+                <th className="px-3 py-2 font-normal">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((booking) => (
                 <tr
                   key={booking.id}
-                  className="border-b border-[oklch(0.88_0.08_86_/_0.1)] last:border-0"
+                  className="border-b border-[rgb(74_0_0/0.12)] last:border-0"
                 >
                   <td className="px-3 py-3">
                     <Link
                       to="/host/bookings/$bookingId"
                       params={{ bookingId: booking.id }}
-                      className="block hover:text-ember"
+                      className="luxury-panel-link block hover:underline"
                     >
-                      <div>{booking.guestName ?? "Guest"}</div>
-                      <div className="text-xs text-muted-foreground">{booking.guestEmail}</div>
+                      <div className="luxury-panel-heading">{booking.guestName ?? "Guest"}</div>
+                      <div className="luxury-panel-body text-xs">{booking.guestEmail}</div>
                     </Link>
                   </td>
                   <td className="px-3 py-3">
                     <Link
                       to="/host/bookings/$bookingId"
                       params={{ bookingId: booking.id }}
-                      className="hover:text-ember"
+                      className="luxury-panel-link hover:underline"
                     >
                       {booking.experience.title}
                     </Link>
                   </td>
-                  <td className="px-3 py-3 text-muted-foreground">
+                  <td className="luxury-panel-body px-3 py-3">
                     {formatDateLong(booking.slot.date)}
                     <br />
                     <span className="text-xs">{booking.slot.start}</span>
                   </td>
-                  <td className="px-3 py-3">{booking.participantCount}</td>
-                  <td className="px-3 py-3 font-display text-lg">
+                  <td className="luxury-panel-body px-3 py-3">{booking.participantCount}</td>
+                  <td className="luxury-panel-heading px-3 py-3 font-display text-lg">
                     {formatMoney(booking.totalAmount, booking.currencySymbol)}
                   </td>
                   <td className="px-3 py-3">
                     <BookingStatusChip
                       bookingStatus={booking.bookingStatus}
                       paymentStatus={booking.paymentStatus}
+                      isPaused={booking.isPaused}
+                      surface="light"
                     />
                   </td>
                   <td className="px-3 py-3">
                     <HostBookingActions
                       booking={booking}
                       busy={busyId === booking.id}
+                      surface="light"
                       onConfirm={onConfirm}
                       onReject={onReject}
                       onMarkPaid={onMarkPaid}
                       onComplete={onComplete}
+                      onPause={onPause}
+                      onResume={onResume}
                     />
                   </td>
                 </tr>

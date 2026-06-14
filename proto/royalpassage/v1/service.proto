@@ -104,6 +104,10 @@ service RoyalPassageService {
 
   rpc CompleteHostBooking(HostBookingActionRequest) returns (BookingSummary);
 
+  rpc PauseHostBooking(HostBookingActionRequest) returns (BookingSummary);
+
+  rpc ResumeHostBooking(HostBookingActionRequest) returns (BookingSummary);
+
   rpc GetAdminStats(google.protobuf.Empty) returns (AdminStats) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }

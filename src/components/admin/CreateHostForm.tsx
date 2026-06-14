@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from "react";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { createHost } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 
 const inputClass =
-  "w-full rounded-sm border border-input bg-background/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+  "w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
 
 type CreateHostFormProps = {
   accessToken: string;
@@ -52,108 +53,107 @@ export function CreateHostForm({ accessToken, onCreated }: CreateHostFormProps) 
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="glass-strong space-y-4 rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6"
-    >
-      <div>
-        <h2 className="font-display text-2xl">Add experience provider (host)</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Create a login for artisans, chefs, guides, and other hosts. They sign in on the same page
-          using the Host tab — they cannot sign up themselves.
-        </p>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
+    <LuxuryCheckoutPanel>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="host-display-name" className="eyebrow mb-2 block text-foreground/90">
-            Display name
+          <h2 className="luxury-panel-heading font-display text-2xl">Add experience provider (host)</h2>
+          <p className="luxury-panel-body mt-2 text-sm">
+            Create a login for artisans, chefs, guides, and other hosts. They sign in on the same page
+            using the Host tab — they cannot sign up themselves.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="host-display-name" className="eyebrow luxury-panel-label mb-2 block">
+              Display name
+            </label>
+            <input
+              id="host-display-name"
+              required
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Heritage Clay Studio"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label htmlFor="host-email" className="eyebrow luxury-panel-label mb-2 block">
+              Login email
+            </label>
+            <input
+              id="host-email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="studio@example.com"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label htmlFor="host-password" className="eyebrow luxury-panel-label mb-2 block">
+              Temporary password
+            </label>
+            <input
+              id="host-password"
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Min. 8 characters"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label htmlFor="host-phone" className="eyebrow luxury-panel-label mb-2 block">
+              Phone
+            </label>
+            <input
+              id="host-phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+91 98XXXXXXX"
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="host-bio" className="eyebrow luxury-panel-label mb-2 block">
+            Short bio
           </label>
-          <input
-            id="host-display-name"
-            required
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            placeholder="Heritage Clay Studio"
+          <textarea
+            id="host-bio"
+            rows={3}
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            placeholder="Third-generation potters hosting intimate wheel sessions."
             className={inputClass}
           />
         </div>
-        <div>
-          <label htmlFor="host-email" className="eyebrow mb-2 block text-foreground/90">
-            Login email
-          </label>
-          <input
-            id="host-email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="studio@example.com"
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label htmlFor="host-password" className="eyebrow mb-2 block text-foreground/90">
-            Temporary password
-          </label>
-          <input
-            id="host-password"
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Min. 8 characters"
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label htmlFor="host-phone" className="eyebrow mb-2 block text-foreground/90">
-            Phone
-          </label>
-          <input
-            id="host-phone"
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+91 98XXXXXXX"
-            className={inputClass}
-          />
-        </div>
-      </div>
 
-      <div>
-        <label htmlFor="host-bio" className="eyebrow mb-2 block text-foreground/90">
-          Short bio
-        </label>
-        <textarea
-          id="host-bio"
-          rows={3}
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          placeholder="Third-generation potters hosting intimate wheel sessions."
-          className={inputClass}
-        />
-      </div>
+        <button
+          type="submit"
+          disabled={busy}
+          className="luxury-btn-sm luxury-btn-primary disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {busy ? "Creating host login..." : "Create host login"}
+        </button>
 
-      <button
-        type="submit"
-        disabled={busy}
-        className="rounded-sm bg-ember px-6 py-3 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
-      >
-        {busy ? "Creating host login..." : "Create host login"}
-      </button>
-
-      {error ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
-      {notice ? (
-        <p className="rounded-sm border border-ember/25 bg-ember/10 px-4 py-3 text-sm text-foreground">
-          {notice}
-        </p>
-      ) : null}
-    </form>
+        {error ? (
+          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
+        {notice ? (
+          <p className="rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.45)] px-4 py-3 text-sm luxury-panel-body">
+            {notice}
+          </p>
+        ) : null}
+      </form>
+    </LuxuryCheckoutPanel>
   );
 }

@@ -8,21 +8,23 @@ type ExperiencesSearchBarProps = {
 
 export function ExperiencesSearchBar({ value, onChange, className = "" }: ExperiencesSearchBarProps) {
   return (
-    <div className={`relative ${className}`}>
-      <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#C8A25A]" />
+    <div
+      className={`relative overflow-hidden rounded-full border border-[rgb(74_0_0/0.14)] bg-[var(--cream-white)] shadow-[0_8px_24px_-12px_rgb(0_0_0/0.35)] ${className}`}
+    >
+      <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4A0000]" />
       <input
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search experiences, cities, categories…"
-        className="w-full border-0 border-b border-[#C8A25A]/25 bg-transparent py-2.5 pl-10 pr-10 text-sm text-[#F7F1E8] placeholder:text-[#D6C8B5]/55 transition-colors focus:border-[#C8A25A]/55 focus:outline-none focus:ring-0"
+        className="w-full border-0 bg-transparent py-3 pl-11 pr-10 text-sm text-[#3A0000] placeholder:text-[rgb(58_0_0/0.45)] focus:outline-none focus:ring-0"
       />
       {value ? (
         <button
           type="button"
           aria-label="Clear search"
           onClick={() => onChange("")}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#D6C8B5] hover:text-[#F7F1E8]"
+          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[rgb(58_0_0/0.55)] transition-colors hover:text-[#4A0000]"
         >
           <X className="h-3.5 w-3.5" />
         </button>

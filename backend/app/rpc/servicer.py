@@ -36,7 +36,9 @@ from app.services.host_bookings import (
     list_host_bookings,
     list_host_reviews,
     mark_host_booking_paid,
+    pause_host_booking,
     reject_host_booking,
+    resume_host_booking,
 )
 from app.services.host_experiences import (
     create_host_experience,
@@ -368,6 +370,22 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         _ensure_supabase()
         auth = require_host(ctx)
         return pydantic_to_proto(complete_host_booking(request.booking_id, auth), types_pb2.BookingSummary)
+
+    @_rpc
+    async def pause_host_booking(
+        self, request: service_pb2.HostBookingActionRequest, ctx: RequestContext
+    ) -> types_pb2.BookingSummary:
+        _ensure_supabase()
+        auth = require_host(ctx)
+        return pydantic_to_proto(pause_host_booking(request.booking_id, auth), types_pb2.BookingSummary)
+
+    @_rpc
+    async def resume_host_booking(
+        self, request: service_pb2.HostBookingActionRequest, ctx: RequestContext
+    ) -> types_pb2.BookingSummary:
+        _ensure_supabase()
+        auth = require_host(ctx)
+        return pydantic_to_proto(resume_host_booking(request.booking_id, auth), types_pb2.BookingSummary)
 
     @_rpc
     async def get_admin_stats(self, _request: empty_pb2.Empty, _ctx: RequestContext) -> types_pb2.AdminStats:

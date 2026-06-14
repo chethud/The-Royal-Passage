@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { StarRating } from "@/components/reviews/StarRating";
 import { fetchAdminReviews, hideAdminReview, type ReviewSummary } from "@/lib/api/reviews";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
@@ -46,30 +47,32 @@ export function AdminReviewsPanel({ accessToken }: AdminReviewsPanelProps) {
   };
 
   return (
-    <section className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6">
-      <h2 className="font-display text-2xl">Reviews moderation</h2>
-      <p className="mt-1 text-sm text-muted-foreground">Hide inappropriate reviews from public pages.</p>
+    <LuxuryCheckoutPanel>
+      <h2 className="luxury-panel-heading font-display text-2xl">Reviews moderation</h2>
+      <p className="luxury-panel-body mt-1 text-sm">Hide inappropriate reviews from public pages.</p>
 
       {loading ? (
-        <p className="mt-6 text-sm text-muted-foreground">Loading reviews…</p>
+        <p className="luxury-panel-body mt-6 text-sm">Loading reviews…</p>
       ) : error ? (
         <p className="mt-6 text-sm text-destructive">{error}</p>
       ) : reviews.length === 0 ? (
-        <p className="mt-6 text-sm text-muted-foreground">No reviews yet.</p>
+        <p className="luxury-panel-body mt-6 text-sm">No reviews yet.</p>
       ) : (
         <ul className="mt-6 space-y-4">
           {reviews.map((review) => (
             <li
               key={review.id}
-              className="flex flex-wrap items-start justify-between gap-4 rounded-sm border border-[oklch(0.88_0.08_86_/_0.15)] p-4"
+              className="flex flex-wrap items-start justify-between gap-4 rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4"
             >
               <div>
-                <div className="font-display text-lg">{review.reviewerDisplayName ?? "Guest"}</div>
+                <div className="luxury-panel-heading font-display text-lg">
+                  {review.reviewerDisplayName ?? "Guest"}
+                </div>
                 <StarRating value={review.rating} size="sm" />
                 {review.comment ? (
-                  <p className="mt-2 text-sm text-muted-foreground">{review.comment}</p>
+                  <p className="luxury-panel-body mt-2 text-sm">{review.comment}</p>
                 ) : null}
-                <div className="mt-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                <div className="luxury-panel-label mt-1 text-xs uppercase tracking-[0.12em]">
                   {review.status}
                 </div>
               </div>
@@ -78,7 +81,7 @@ export function AdminReviewsPanel({ accessToken }: AdminReviewsPanelProps) {
                   type="button"
                   disabled={busyId === review.id}
                   onClick={() => void handleHide(review.id)}
-                  className="rounded-sm border border-destructive/40 px-3 py-1.5 text-xs text-destructive disabled:opacity-50"
+                  className="luxury-btn-sm luxury-btn-panel-danger disabled:opacity-50"
                 >
                   Hide
                 </button>
@@ -87,6 +90,6 @@ export function AdminReviewsPanel({ accessToken }: AdminReviewsPanelProps) {
           ))}
         </ul>
       )}
-    </section>
+    </LuxuryCheckoutPanel>
   );
 }
