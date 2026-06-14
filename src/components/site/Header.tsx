@@ -47,11 +47,8 @@ function navItemsForUser(role: UserRole | null | undefined, signedIn: boolean): 
 const navLinkClass =
   "header-nav-link rounded-sm px-1 py-1 text-ink/80 transition-colors hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60";
 
-function getSheetLinkClass(ivory: boolean) {
-  return ivory
-    ? "rounded-sm px-3 py-2.5 text-sm uppercase tracking-[0.16em] text-[rgb(58_0_0/0.78)] hover:bg-[rgb(74_0_0/0.06)] hover:text-[#4A0000]"
-    : "rounded-sm px-3 py-2.5 text-sm uppercase tracking-[0.16em] text-ink/85 hover:bg-white/5 hover:text-ember";
-}
+const sheetLinkClass =
+  "rounded-sm px-3 py-2.5 text-sm uppercase tracking-[0.16em] text-ink/85 hover:bg-white/5 hover:text-ember";
 
 function isHeaderNavItemActive(
   role: UserRole | null | undefined,
@@ -66,10 +63,6 @@ function isHeaderNavItemActive(
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
-function isIvoryHeaderPath(pathname: string): boolean {
-  return /^\/(host|admin|dashboard|account)(\/|$)/.test(pathname);
-}
-
 export function Header() {
   const [elevated, setElevated] = useState(false);
   const { displayName, user, role } = useAuthUser();
@@ -77,7 +70,6 @@ export function Header() {
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const isIvoryHeader = isIvoryHeaderPath(pathname);
   const navItems = navItemsForUser(role, Boolean(user));
   const isGuest = role === "guest";
   const showGuestCart = Boolean(user) && isGuestAccount(role);
@@ -111,7 +103,7 @@ export function Header() {
   return (
     <header
       data-elevated={elevated ? "true" : "false"}
-      className={`site-header fixed inset-x-0 top-0 z-50 w-full transition-[background-color,backdrop-filter,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]${isIvoryHeader ? " site-header--ivory" : ""}`}
+      className="site-header fixed inset-x-0 top-0 z-50 w-full transition-[background-color,backdrop-filter,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
     >
       <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-3 sm:gap-6">
         <Link
@@ -249,11 +241,7 @@ export function Header() {
           </SheetTrigger>
           <SheetContent
             side="right"
-            className={
-              isIvoryHeader
-                ? "w-[88vw] border-[rgb(74_0_0/0.14)] bg-[var(--cream-white)] text-[#3A0000] sm:max-w-md"
-                : "w-[88vw] border-[oklch(0.72_0.09_78_/_0.22)] bg-[oklch(0.14_0.05_22)] text-foreground sm:max-w-md"
-            }
+            className="w-[88vw] border-[oklch(0.72_0.09_78_/_0.22)] bg-[oklch(0.14_0.05_22)] text-foreground sm:max-w-md"
           >
             <SheetHeader>
               <SheetTitle className="font-display text-xl">The Royal Passage</SheetTitle>
@@ -266,7 +254,7 @@ export function Header() {
                   <SheetClose asChild key={`${item.to}-${item.label}`}>
                     <Link
                       to={item.to as "/experiences"}
-                      className={`${getSheetLinkClass(isIvoryHeader)}${active ? " text-ember header-nav-link--active" : ""}`}
+                      className={`${sheetLinkClass}${active ? " text-ember header-nav-link--active" : ""}`}
                     >
                       {item.label}
                     </Link>
@@ -276,21 +264,21 @@ export function Header() {
 
               {showBookExperience ? (
                 <SheetClose asChild>
-                  <Link to="/experiences" className={getSheetLinkClass(isIvoryHeader)}>
+                  <Link to="/experiences" className={sheetLinkClass}>
                     Book an Experience
                   </Link>
                 </SheetClose>
               ) : null}
               {showGuestCart ? (
                 <SheetClose asChild>
-                  <Link to="/dashboard/cart" className={getSheetLinkClass(isIvoryHeader)}>
+                  <Link to="/dashboard/cart" className={sheetLinkClass}>
                     Cart{cartCount > 0 ? ` (${cartCount})` : ""}
                   </Link>
                 </SheetClose>
               ) : null}
               {showSignIn ? (
                 <SheetClose asChild>
-                  <Link to="/sign-in" className={getSheetLinkClass(isIvoryHeader)}>
+                  <Link to="/sign-in" className={sheetLinkClass}>
                     Sign in
                   </Link>
                 </SheetClose>
@@ -300,36 +288,36 @@ export function Header() {
                   {isGuest ? (
                     <>
                       <SheetClose asChild>
-                        <Link to="/" className={getSheetLinkClass(isIvoryHeader)}>
+                        <Link to="/" className={sheetLinkClass}>
                           Home
                         </Link>
                       </SheetClose>
                       <SheetClose asChild>
-                        <Link to="/dashboard/history" className={getSheetLinkClass(isIvoryHeader)}>
+                        <Link to="/dashboard/history" className={sheetLinkClass}>
                           History
                         </Link>
                       </SheetClose>
                       <SheetClose asChild>
-                        <Link to="/dashboard/cart" className={getSheetLinkClass(isIvoryHeader)}>
+                        <Link to="/dashboard/cart" className={sheetLinkClass}>
                           Cart
                         </Link>
                       </SheetClose>
                     </>
                   ) : (
                     <SheetClose asChild>
-                      <Link to={dashboardPath} className={getSheetLinkClass(isIvoryHeader)}>
+                      <Link to={dashboardPath} className={sheetLinkClass}>
                         {displayName ?? "Account"}
                       </Link>
                     </SheetClose>
                   )}
                   <SheetClose asChild>
-                    <Link to="/account/profile" className={getSheetLinkClass(isIvoryHeader)}>
+                    <Link to="/account/profile" className={sheetLinkClass}>
                       Profile
                     </Link>
                   </SheetClose>
                   {isGuest ? (
                     <SheetClose asChild>
-                      <Link to="/experiences" className={getSheetLinkClass(isIvoryHeader)}>
+                      <Link to="/experiences" className={sheetLinkClass}>
                         Browse experiences
                       </Link>
                     </SheetClose>
