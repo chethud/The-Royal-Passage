@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { BookingCheckoutWizard } from "@/components/booking/BookingCheckoutWizard";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
+import { BookingRequestHeader } from "@/components/booking/BookingRequestHeader";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { useAuthUser } from "@/lib/auth-user";
@@ -79,15 +79,13 @@ function BookExperiencePage() {
           ← Back to experience
         </Link>
 
-        <LuxuryCheckoutPanel className="mt-6">
-          <div className="eyebrow luxury-panel-label">Book your seats</div>
-          <h1 className="luxury-panel-heading mt-2 font-display text-3xl uppercase tracking-[0.05em] sm:text-4xl">
-            {exp.title}
-          </h1>
-          <p className="luxury-panel-body mt-2 text-sm">
-            {exp.city} · {exp.hostName}
-          </p>
-        </LuxuryCheckoutPanel>
+        <BookingRequestHeader
+          className="mt-6"
+          label="Book your seats"
+          title={exp.title}
+          meta={`${exp.city} · ${exp.hostName}`}
+          titleAs="h1"
+        />
 
         <BookingCheckoutWizard
           exp={exp}

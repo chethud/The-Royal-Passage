@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { BookingCheckoutWizard } from "@/components/booking/BookingCheckoutWizard";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
+import { BookingRequestHeader } from "@/components/booking/BookingRequestHeader";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
 import { parseBookSearch } from "@/lib/booking-url";
@@ -77,15 +77,12 @@ function CartCheckoutPage() {
         ← Back to cart
       </Link>
 
-      <LuxuryCheckoutPanel className="mt-6">
-        <div className="eyebrow luxury-panel-label">Booking request</div>
-        <h2 className="luxury-panel-heading mt-2 font-display text-2xl uppercase tracking-[0.05em] sm:text-3xl">
-          {exp.title}
-        </h2>
-        <p className="luxury-panel-body mt-2 text-sm">
-          {exp.city} · {exp.hostName}
-        </p>
-      </LuxuryCheckoutPanel>
+      <BookingRequestHeader
+        className="mt-6"
+        label="Booking request"
+        title={exp.title}
+        meta={`${exp.city} · ${exp.hostName}`}
+      />
 
       <BookingCheckoutWizard
         exp={exp}
