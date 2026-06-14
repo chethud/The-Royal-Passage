@@ -54,12 +54,18 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   full_name text,
   phone text,
+  avatar_url text,
+  date_of_birth date,
   role text not null default 'guest'
     check (role in ('guest', 'host', 'admin', 'editor')),
   host_id uuid,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.profiles
+  add column if not exists avatar_url text,
+  add column if not exists date_of_birth date;
 
 drop trigger if exists trg_profiles_updated on public.profiles;
 create trigger trg_profiles_updated

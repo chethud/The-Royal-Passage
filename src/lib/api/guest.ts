@@ -9,11 +9,15 @@ export type GuestProfile = {
   phone: string | null;
   role: string;
   createdAt: string;
+  avatarUrl: string | null;
+  dateOfBirth: string | null;
 };
 
 export type UpdateGuestProfilePayload = {
   fullName?: string;
   phone?: string;
+  avatarUrl?: string;
+  dateOfBirth?: string;
 };
 
 function normalizeGuestProfile(raw: {
@@ -23,6 +27,8 @@ function normalizeGuestProfile(raw: {
   phone?: string | null;
   role?: string;
   createdAt?: string;
+  avatarUrl?: string | null;
+  dateOfBirth?: string | null;
 }): GuestProfile {
   return {
     id: String(raw.id ?? ""),
@@ -31,6 +37,9 @@ function normalizeGuestProfile(raw: {
     phone: raw.phone != null ? String(raw.phone) : null,
     role: String(raw.role ?? "guest"),
     createdAt: String(raw.createdAt ?? ""),
+    avatarUrl: raw.avatarUrl != null && String(raw.avatarUrl).trim() ? String(raw.avatarUrl) : null,
+    dateOfBirth:
+      raw.dateOfBirth != null && String(raw.dateOfBirth).trim() ? String(raw.dateOfBirth) : null,
   };
 }
 

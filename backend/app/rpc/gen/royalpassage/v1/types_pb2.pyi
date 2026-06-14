@@ -336,28 +336,36 @@ class CreateHostResponse(_message.Message):
     def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., display_name: _Optional[str] = ..., host_id: _Optional[str] = ...) -> None: ...
 
 class GuestProfile(_message.Message):
-    __slots__ = ("id", "email", "full_name", "phone", "role", "created_at")
+    __slots__ = ("id", "email", "full_name", "phone", "role", "created_at", "avatar_url", "date_of_birth")
     ID_FIELD_NUMBER: _ClassVar[int]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
     FULL_NAME_FIELD_NUMBER: _ClassVar[int]
     PHONE_FIELD_NUMBER: _ClassVar[int]
     ROLE_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    AVATAR_URL_FIELD_NUMBER: _ClassVar[int]
+    DATE_OF_BIRTH_FIELD_NUMBER: _ClassVar[int]
     id: str
     email: str
     full_name: str
     phone: str
     role: str
     created_at: str
-    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., phone: _Optional[str] = ..., role: _Optional[str] = ..., created_at: _Optional[str] = ...) -> None: ...
+    avatar_url: str
+    date_of_birth: str
+    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., phone: _Optional[str] = ..., role: _Optional[str] = ..., created_at: _Optional[str] = ..., avatar_url: _Optional[str] = ..., date_of_birth: _Optional[str] = ...) -> None: ...
 
 class UpdateGuestProfileRequest(_message.Message):
-    __slots__ = ("full_name", "phone")
+    __slots__ = ("full_name", "phone", "avatar_url", "date_of_birth")
     FULL_NAME_FIELD_NUMBER: _ClassVar[int]
     PHONE_FIELD_NUMBER: _ClassVar[int]
+    AVATAR_URL_FIELD_NUMBER: _ClassVar[int]
+    DATE_OF_BIRTH_FIELD_NUMBER: _ClassVar[int]
     full_name: str
     phone: str
-    def __init__(self, full_name: _Optional[str] = ..., phone: _Optional[str] = ...) -> None: ...
+    avatar_url: str
+    date_of_birth: str
+    def __init__(self, full_name: _Optional[str] = ..., phone: _Optional[str] = ..., avatar_url: _Optional[str] = ..., date_of_birth: _Optional[str] = ...) -> None: ...
 
 class WishlistExperienceSummary(_message.Message):
     __slots__ = ("id", "slug", "title", "tagline", "city", "image", "price_per_person", "rating", "reviews_count", "currency_symbol", "host_name")

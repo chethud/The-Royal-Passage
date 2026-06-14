@@ -191,11 +191,15 @@ class GuestProfile(BaseModel):
     phone: str | None
     role: str
     createdAt: str
+    avatarUrl: str | None = None
+    dateOfBirth: str | None = None
 
 
 class UpdateGuestProfileRequest(BaseModel):
     fullName: str | None = Field(default=None, min_length=1, max_length=120)
     phone: str | None = Field(default=None, max_length=30)
+    avatarUrl: str | None = Field(default=None, max_length=2048)
+    dateOfBirth: str | None = Field(default=None, max_length=10)
 
 
 class WishlistExperienceSummary(BaseModel):

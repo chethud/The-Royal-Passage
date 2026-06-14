@@ -24,6 +24,8 @@ export const patchGuestProfile = createServerFn({ method: "POST" })
     tokenSchema.extend({
       fullName: z.string().min(1).max(120).optional(),
       phone: z.string().max(30).optional(),
+      avatarUrl: z.string().max(2048).optional(),
+      dateOfBirth: z.string().max(10).optional(),
     }),
   )
   .handler(async ({ data }): Promise<GuestProfile> => {
@@ -31,5 +33,7 @@ export const patchGuestProfile = createServerFn({ method: "POST" })
     const payload: UpdateGuestProfilePayload = {};
     if (data.fullName !== undefined) payload.fullName = data.fullName;
     if (data.phone !== undefined) payload.phone = data.phone;
+    if (data.avatarUrl !== undefined) payload.avatarUrl = data.avatarUrl;
+    if (data.dateOfBirth !== undefined) payload.dateOfBirth = data.dateOfBirth;
     return updateGuestProfile(data.accessToken, payload);
   });
