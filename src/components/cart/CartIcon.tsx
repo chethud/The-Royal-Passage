@@ -14,8 +14,8 @@ export function CartIcon({ size = 18, className = "" }: CartIconProps) {
       aria-hidden
       width={Math.round(size * 1.35)}
       height={size}
-      className={`inline-block shrink-0 object-contain ${className}`}
-      style={{ height: size, width: "auto", maxWidth: size * 1.6 }}
+      className={`inline-block shrink-0 object-contain bg-transparent ${className}`}
+      style={{ height: size, width: "auto", maxWidth: size * 1.6, background: "transparent" }}
     />
   );
 }
