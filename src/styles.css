@@ -104,11 +104,11 @@
   --chart-5: oklch(0.45 0.04 300);
 
   /* Cream-white surfaces (checkout, cart) on burgundy pages */
-  --cream-white: #fcfbf8;
-  --cream-surface: #f7f1e8;
-  --cream-warm: #f3ede6;
-  --cream-border: rgb(200 162 90 / 0.36);
-  --cream-shadow: rgb(26 0 0 / 0.42);
+  --cream-white: #fffcf8;
+  --cream-surface: #faf6f0;
+  --cream-warm: #f7f2ea;
+  --cream-border: rgb(200 162 90 / 0.28);
+  --cream-shadow: rgb(26 0 0 / 0.38);
 }
 
 @media (min-width: 640px) {
@@ -365,34 +365,34 @@
   border: 1px solid var(--cream-border);
   border-radius: var(--radius-md);
   background: linear-gradient(
-    175deg,
+    180deg,
     #ffffff 0%,
-    var(--cream-white) 20%,
-    var(--cream-surface) 58%,
+    var(--cream-white) 28%,
+    var(--cream-surface) 72%,
     var(--cream-warm) 100%
   );
+  background-color: var(--cream-white);
   color: #4a0000;
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.92),
-    inset 0 -1px 0 rgb(200 162 90 / 0.06),
-    0 1px 0 rgb(255 255 255 / 0.04),
-    0 22px 50px -26px var(--cream-shadow),
-    0 10px 28px -14px rgb(200 162 90 / 0.14);
+    inset 0 1px 0 rgb(255 255 255 / 0.98),
+    inset 0 0 0 1px rgb(255 255 255 / 0.45),
+    0 20px 48px -26px var(--cream-shadow),
+    0 8px 24px -12px rgb(200 162 90 / 0.1);
 }
 
 .luxury-checkout-panel::before {
   content: "";
   position: absolute;
   top: 0;
-  left: 8%;
-  right: 8%;
+  left: 10%;
+  right: 10%;
   height: 1px;
   background: linear-gradient(
     90deg,
     transparent,
-    rgb(200 162 90 / 0.55) 20%,
-    rgb(212 175 106 / 0.65) 50%,
-    rgb(200 162 90 / 0.55) 80%,
+    rgb(200 162 90 / 0.35) 25%,
+    rgb(212 175 106 / 0.45) 50%,
+    rgb(200 162 90 / 0.35) 75%,
     transparent
   );
   pointer-events: none;
@@ -430,9 +430,10 @@
 }
 
 .luxury-panel-step-active {
-  border: 1px solid rgb(200 162 90 / 0.52);
-  background: rgb(200 162 90 / 0.11);
+  border: 1px solid rgb(200 162 90 / 0.42);
+  background: rgb(255 252 248);
   color: #3a0000;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.8);
 }
 
 .luxury-panel-step-done {
