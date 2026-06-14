@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { GuestProfile } from "@/lib/api/guest";
-import { patchGuestProfile } from "@/lib/guest-fns";
+import { updateGuestProfile } from "@/lib/api/guest";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 
 type GuestProfileFormProps = {
   profile: GuestProfile;
@@ -21,17 +22,17 @@ export function GuestProfileForm({ profile, accessToken, onUpdated }: GuestProfi
     setError(null);
     setSaved(false);
     try {
-      const updated = await patchGuestProfile({
-        data: {
-          accessToken,
-          fullName: fullName.trim() || undefined,
-          phone: phone.trim() || undefined,
-        },
+      if (!isApiConfigured()) {
+        throw new Error("Profile API is not configured for this deployment.");
+      }
+      const updated = await updateGuestProfile(accessToken, {
+        fullName: fullName.trim() || undefined,
+        phone: phone.trim() || undefined,
       });
       onUpdated(updated);
       setSaved(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update profile.");
+      setError(toErrorMessage(err, "Failed to update profile."));
     } finally {
       setSaving(false);
     }

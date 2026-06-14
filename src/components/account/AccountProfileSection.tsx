@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { GuestProfileForm } from "@/components/guest/GuestProfileForm";
-import { getGuestProfile, type GuestProfile } from "@/lib/guest-fns";
+import { fetchGuestProfile, type GuestProfile } from "@/lib/api/guest";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 
 type AccountProfileSectionProps = {
   accessToken: string;
@@ -17,10 +18,13 @@ export function AccountProfileSection({ accessToken, ready }: AccountProfileSect
     setPageLoading(true);
     setPageError(null);
     try {
-      const row = await getGuestProfile({ data: { accessToken } });
+      if (!isApiConfigured()) {
+        throw new Error("Profile API is not configured for this deployment.");
+      }
+      const row = await fetchGuestProfile(accessToken);
       setProfile(row);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Failed to load profile.");
+      setPageError(toErrorMessage(err, "Failed to load profile."));
     } finally {
       setPageLoading(false);
     }

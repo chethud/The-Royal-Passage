@@ -28,7 +28,7 @@ export const ROLE_PROFILE_PATH: Record<UserRole, string> = {
   guest: "/dashboard/profile",
   host: "/host/profile",
   admin: "/admin/profile",
-  editor: "/",
+  editor: "/account/profile",
 };
 
 const INTENDED_ROLE_KEY = "rp_intended_role_v1";

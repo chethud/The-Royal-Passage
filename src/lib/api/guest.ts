@@ -16,14 +16,36 @@ export type UpdateGuestProfilePayload = {
   phone?: string;
 };
 
+function normalizeGuestProfile(raw: {
+  id?: string;
+  email?: string | null;
+  fullName?: string | null;
+  phone?: string | null;
+  role?: string;
+  createdAt?: string;
+}): GuestProfile {
+  return {
+    id: String(raw.id ?? ""),
+    email: raw.email != null ? String(raw.email) : null,
+    fullName: raw.fullName != null ? String(raw.fullName) : null,
+    phone: raw.phone != null ? String(raw.phone) : null,
+    role: String(raw.role ?? "guest"),
+    createdAt: String(raw.createdAt ?? ""),
+  };
+}
+
 export function fetchGuestProfile(accessToken: string) {
   const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() => client.getGuestProfile({})) as Promise<GuestProfile>;
+  return rpcCall(async () => {
+    const result = await client.getGuestProfile({});
+    return normalizeGuestProfile(result);
+  });
 }
 
 export function updateGuestProfile(accessToken: string, payload: UpdateGuestProfilePayload) {
   const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() =>
-    client.updateGuestProfile(create(UpdateGuestProfileRequestSchema, payload)),
-  ) as Promise<GuestProfile>;
+  return rpcCall(async () => {
+    const result = await client.updateGuestProfile(create(UpdateGuestProfileRequestSchema, payload));
+    return normalizeGuestProfile(result);
+  });
 }

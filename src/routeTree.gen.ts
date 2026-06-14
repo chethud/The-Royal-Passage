@@ -38,6 +38,7 @@ import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
 import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookingId'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
+import { Route as AccountProfileRouteImport } from './routes/account.profile'
 import { Route as HostExperiencesIndexRouteImport } from './routes/host.experiences.index'
 import { Route as HostBookingsIndexRouteImport } from './routes/host.bookings.index'
 import { Route as ExperiencesSlugIndexRouteImport } from './routes/experiences.$slug.index'
@@ -201,6 +202,11 @@ const AdminProfileRoute = AdminProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AdminRoute,
 } as any)
+const AccountProfileRoute = AccountProfileRouteImport.update({
+  id: '/account/profile',
+  path: '/account/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HostExperiencesIndexRoute = HostExperiencesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -301,6 +307,7 @@ export interface FileRoutesByFullPath {
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/account/profile': typeof AccountProfileRoute
   '/admin/profile': typeof AdminProfileRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -347,6 +354,7 @@ export interface FileRoutesByTo {
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/account/profile': typeof AccountProfileRoute
   '/admin/profile': typeof AdminProfileRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -392,6 +400,7 @@ export interface FileRoutesById {
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/account/profile': typeof AccountProfileRoute
   '/admin/profile': typeof AdminProfileRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -442,6 +451,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/sign-in'
     | '/sign-up'
+    | '/account/profile'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -488,6 +498,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/sign-in'
     | '/sign-up'
+    | '/account/profile'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -532,6 +543,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/sign-in'
     | '/sign-up'
+    | '/account/profile'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -581,6 +593,7 @@ export interface RootRouteChildren {
   JournalRoute: typeof JournalRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
+  AccountProfileRoute: typeof AccountProfileRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BookingsBookingIdRoute: typeof BookingsBookingIdRouteWithChildren
   HostBookingsRoute: typeof HostBookingsRouteWithChildren
@@ -795,6 +808,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/profile'
       preLoaderRoute: typeof AdminProfileRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/account/profile': {
+      id: '/account/profile'
+      path: '/account/profile'
+      fullPath: '/account/profile'
+      preLoaderRoute: typeof AccountProfileRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/host/experiences/': {
       id: '/host/experiences/'
@@ -1071,6 +1091,7 @@ const rootRouteChildren: RootRouteChildren = {
   JournalRoute: JournalRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
+  AccountProfileRoute: AccountProfileRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BookingsBookingIdRoute: BookingsBookingIdRouteWithChildren,
   HostBookingsRoute: HostBookingsRouteWithChildren,
