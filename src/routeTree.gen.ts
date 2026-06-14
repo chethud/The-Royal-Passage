@@ -19,6 +19,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CitiesRouteImport } from './routes/cities'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExperiencesIndexRouteImport } from './routes/experiences.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as HostReviewsRouteImport } from './routes/host.reviews'
@@ -109,6 +110,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ExperiencesIndexRoute = ExperiencesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ExperiencesRoute,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
@@ -347,6 +353,7 @@ export interface FileRoutesByFullPath {
   '/host/reviews': typeof HostReviewsRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/experiences/': typeof ExperiencesIndexRoute
   '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
@@ -371,7 +378,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cities': typeof CitiesRouteWithChildren
   '/contact': typeof ContactRoute
-  '/experiences': typeof ExperiencesRouteWithChildren
   '/hosts': typeof HostsRoute
   '/journal': typeof JournalRoute
   '/sign-in': typeof SignInRoute
@@ -392,6 +398,7 @@ export interface FileRoutesByTo {
   '/host/reviews': typeof HostReviewsRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/experiences': typeof ExperiencesIndexRoute
   '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
@@ -445,6 +452,7 @@ export interface FileRoutesById {
   '/host/reviews': typeof HostReviewsRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/experiences/': typeof ExperiencesIndexRoute
   '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
@@ -499,6 +507,7 @@ export interface FileRouteTypes {
     | '/host/reviews'
     | '/admin/'
     | '/dashboard/'
+    | '/experiences/'
     | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
     | '/admin/profile/homepage-photos'
@@ -523,7 +532,6 @@ export interface FileRouteTypes {
     | '/'
     | '/cities'
     | '/contact'
-    | '/experiences'
     | '/hosts'
     | '/journal'
     | '/sign-in'
@@ -544,6 +552,7 @@ export interface FileRouteTypes {
     | '/host/reviews'
     | '/admin'
     | '/dashboard'
+    | '/experiences'
     | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
     | '/admin/profile/homepage-photos'
@@ -596,6 +605,7 @@ export interface FileRouteTypes {
     | '/host/reviews'
     | '/admin/'
     | '/dashboard/'
+    | '/experiences/'
     | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
     | '/admin/profile/homepage-photos'
@@ -710,6 +720,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/experiences/': {
+      id: '/experiences/'
+      path: '/'
+      fullPath: '/experiences/'
+      preLoaderRoute: typeof ExperiencesIndexRouteImport
+      parentRoute: typeof ExperiencesRoute
     }
     '/dashboard/': {
       id: '/dashboard/'
@@ -1101,10 +1118,12 @@ const ExperiencesSlugRouteWithChildren = ExperiencesSlugRoute._addFileChildren(
 
 interface ExperiencesRouteChildren {
   ExperiencesSlugRoute: typeof ExperiencesSlugRouteWithChildren
+  ExperiencesIndexRoute: typeof ExperiencesIndexRoute
 }
 
 const ExperiencesRouteChildren: ExperiencesRouteChildren = {
   ExperiencesSlugRoute: ExperiencesSlugRouteWithChildren,
+  ExperiencesIndexRoute: ExperiencesIndexRoute,
 }
 
 const ExperiencesRouteWithChildren = ExperiencesRoute._addFileChildren(

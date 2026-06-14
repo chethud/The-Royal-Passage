@@ -20,6 +20,7 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
       <Link
         to={detailTo}
         params={{ slug: exp.slug }}
+        search={{}}
         className="absolute inset-0 z-10 block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A] focus-visible:ring-inset"
       >
         <img
