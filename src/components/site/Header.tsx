@@ -3,6 +3,7 @@ import { LogOut, Menu, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
 import { CartIcon } from "@/components/cart/CartIcon";
+import { ProfileNavIcon } from "@/components/account/ProfileNavIcon";
 import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav";
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
@@ -169,11 +170,21 @@ export function Header() {
           {showAccountMenu ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button type="button" className={navLinkClass}>
-                    {displayName ?? "Account"}
+                  <button
+                    type="button"
+                    className={`${navLinkClass} group inline-flex p-0.5`}
+                    aria-label={displayName ? `${displayName} account menu` : "Account menu"}
+                  >
+                    <ProfileNavIcon size={32} />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="z-[100] w-52">
+                  <div className="flex items-center gap-3 border-b border-border/60 px-2 py-3">
+                    <ProfileNavIcon size={36} />
+                    <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Account
+                    </span>
+                  </div>
                   {isGuest ? (
                     <>
                       <DropdownMenuItem asChild>
@@ -295,6 +306,12 @@ export function Header() {
               ) : null}
               {showAccountMenu ? (
                 <>
+                  <div className="mt-4 flex items-center gap-3 border-t border-white/10 px-3 pt-6">
+                    <ProfileNavIcon size={36} />
+                    <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-ink/55">
+                      Account
+                    </span>
+                  </div>
                   {isGuest ? (
                     <>
                       <SheetClose asChild>
@@ -316,7 +333,7 @@ export function Header() {
                   ) : (
                     <SheetClose asChild>
                       <Link to={dashboardPath} className={sheetLinkClass}>
-                        {displayName ?? "Account"}
+                        Dashboard
                       </Link>
                     </SheetClose>
                   )}
