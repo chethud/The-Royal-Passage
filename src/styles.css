@@ -411,11 +411,11 @@
 }
 
 .luxury-panel-divider {
-  border-color: rgb(200 162 90 / 0.22);
+  border-color: rgb(74 0 0 / 0.18);
 }
 
 .luxury-panel-divider-bg {
-  background-color: rgb(200 162 90 / 0.22);
+  background-color: rgb(74 0 0 / 0.18);
 }
 
 .luxury-panel-link {
@@ -452,7 +452,7 @@
 }
 
 .luxury-checkout-panel .hairline {
-  background: linear-gradient(90deg, transparent, rgb(200 162 90 / 0.32), transparent);
+  background: linear-gradient(90deg, transparent, rgb(74 0 0 / 0.22), transparent);
 }
 
 .luxury-range {

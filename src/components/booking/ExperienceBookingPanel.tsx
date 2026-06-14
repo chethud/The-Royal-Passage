@@ -36,16 +36,16 @@ function panelTone(surface: "light" | "dark") {
     return {
       eyebrow: "luxury-panel-label",
       muted: "luxury-panel-body",
-      slotActive: "border-[#C8A25A] text-[#4A0000]",
+      slotActive: "border-[#4A0000] text-[#4A0000]",
       slotIdle:
-        "border-transparent text-[#4A0000]/75 hover:border-[#C8A25A]/40 hover:text-[#4A0000]",
-      slotHover: "group-hover:text-[#9A7228]",
-      seats: "text-[#9A7228]",
-      guestBtn: "text-[#9A7228] hover:text-[#4A0000]",
+        "border-transparent text-[#4A0000]/75 hover:border-[#4A0000]/50 hover:text-[#4A0000]",
+      slotHover: "group-hover:text-[#4A0000]",
+      seats: "text-[#4A0000]",
+      guestBtn: "text-[#4A0000]/80 hover:text-[#4A0000]",
       guestCount: "text-[#4A0000]",
       total: "text-[#4A0000]",
       textarea:
-        "border-[#C8A25A]/35 text-[#4A0000] placeholder:text-[#5B0000]/45 focus:border-[#C8A25A]/65",
+        "border-[#4A0000]/25 text-[#4A0000] placeholder:text-[#5B0000]/45 focus:border-[#4A0000]/55",
     };
   }
 
@@ -125,7 +125,7 @@ export function ExperienceBookingPanel({
                 disabled={sold}
                 aria-pressed={active}
                 onClick={() => onSelectSlot(slot)}
-                className={`group flex w-full items-center justify-between border-l-2 py-3.5 pl-4 pr-2 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]/40 ${
+                className={`group flex w-full items-center justify-between border-l-[3px] py-3.5 pl-4 pr-2 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A0000]/25 ${
                   active ? tone.slotActive : sold ? "cursor-not-allowed border-transparent opacity-40" : tone.slotIdle
                 }`}
               >
