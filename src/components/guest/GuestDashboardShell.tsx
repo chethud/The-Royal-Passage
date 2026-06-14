@@ -10,9 +10,17 @@ type GuestDashboardShellProps = {
   children: ReactNode;
   /** Wider content area for multi-column flows like checkout. */
   wide?: boolean;
+  /** Hide the default guest role description under the subtitle. */
+  showRoleDescription?: boolean;
 };
 
-export function GuestDashboardShell({ title, subtitle, children, wide = false }: GuestDashboardShellProps) {
+export function GuestDashboardShell({
+  title,
+  subtitle,
+  children,
+  wide = false,
+  showRoleDescription = true,
+}: GuestDashboardShellProps) {
   return (
     <div className="pt-[var(--header-height)] text-foreground">
       <Header />
@@ -24,7 +32,9 @@ export function GuestDashboardShell({ title, subtitle, children, wide = false }:
           </div>
           <h1 className="font-display text-3xl tracking-tight md:text-4xl">{title}</h1>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">{subtitle}</p>
-          <p className="mt-1 max-w-xl text-xs text-muted-foreground/90">{ROLE_DESCRIPTIONS.guest}</p>
+          {showRoleDescription ? (
+            <p className="mt-1 max-w-xl text-xs text-muted-foreground/90">{ROLE_DESCRIPTIONS.guest}</p>
+          ) : null}
 
           <div className="mt-8">{children}</div>
         </div>

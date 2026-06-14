@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, ShoppingCart, Trash2 } from "lucide-react";
+import { ArrowRight, Heart, ShoppingCart, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { WishlistItem } from "@/lib/api/wishlist";
 import type { CartItem } from "@/lib/cart-storage";
@@ -13,21 +13,25 @@ type CartItemsSectionProps = {
 export function CartItemsSection({ items, removingId, onRemove }: CartItemsSectionProps) {
   if (items.length === 0) {
     return (
-      <div className="rounded-md border border-dashed border-[oklch(0.88_0.08_86_/_0.2)] bg-background/20 px-5 py-8 text-center">
-        <ShoppingCart className="mx-auto h-6 w-6 text-muted-foreground/60" />
-        <p className="mt-2 font-display text-base text-foreground">Your cart is empty</p>
-        <p className="mt-1 text-xs text-muted-foreground">
+      <div className="py-14 text-center">
+        <ShoppingCart className="mx-auto h-7 w-7 text-[#D4AF6A]/45" strokeWidth={1.5} />
+        <p className="mt-4 font-display text-lg tracking-wide text-foreground">Your cart is empty</p>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground/90">
           Tap the cart icon on any experience to save it here before booking.
         </p>
-        <Link to="/experiences" className="luxury-btn-sm luxury-btn-primary mt-4 inline-flex">
+        <Link
+          to="/experiences"
+          className="luxury-btn-sm luxury-btn-primary mt-6 inline-flex items-center gap-2"
+        >
           Browse experiences
+          <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
     );
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="divide-y divide-[#C8A25A]/12">
       {items.map((item) => (
         <li key={item.experienceId}>
           <CartRow
@@ -39,13 +43,12 @@ export function CartItemsSection({ items, removingId, onRemove }: CartItemsSecti
                 to="/dashboard/cart/checkout/$slug"
                 params={{ slug: item.slug }}
                 search={
-                  item.slotId
-                    ? { slotId: item.slotId, guests: item.guests ?? 1 }
-                    : undefined
+                  item.slotId ? { slotId: item.slotId, guests: item.guests ?? 1 } : undefined
                 }
-                className="luxury-btn-sm luxury-btn-primary"
+                className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2"
               >
                 Buy
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             }
           />
@@ -74,10 +77,10 @@ export function WishlistCartSection({
 }: WishlistCartSectionProps) {
   if (items.length === 0) {
     return (
-      <div className="rounded-md border border-dashed border-[oklch(0.88_0.08_86_/_0.2)] bg-background/20 px-5 py-8 text-center">
-        <Heart className="mx-auto h-6 w-6 text-muted-foreground/60" />
-        <p className="mt-2 font-display text-base text-foreground">No saved experiences yet</p>
-        <p className="mt-1 text-xs text-muted-foreground">
+      <div className="py-14 text-center">
+        <Heart className="mx-auto h-7 w-7 text-[#D4AF6A]/45" strokeWidth={1.5} />
+        <p className="mt-4 font-display text-lg tracking-wide text-foreground">No saved experiences yet</p>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground/90">
           Use the heart on any experience to build your wishlist.
         </p>
       </div>
@@ -85,7 +88,7 @@ export function WishlistCartSection({
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="divide-y divide-[#C8A25A]/12">
       {items.map((item) => {
         const inCart = cartExperienceIds.has(item.experienceId);
         return (
@@ -105,13 +108,13 @@ export function WishlistCartSection({
               removing={removingId === item.experienceId}
               onRemove={() => onRemove(item.experienceId)}
               removeLabel="Remove from wishlist"
-              removeIcon={<Heart className="h-3.5 w-3.5 fill-current text-ember" />}
+              removeIcon={<Heart className="h-4 w-4 fill-current text-[#D4AF6A]" strokeWidth={1.5} />}
               primaryAction={
                 <button
                   type="button"
                   disabled={inCart || addingId === item.experienceId}
                   onClick={() => onAddToCart(item)}
-                  className="luxury-btn-sm luxury-btn-secondary disabled:opacity-50"
+                  className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-45"
                 >
                   {inCart ? "In cart" : "Add to cart"}
                 </button>
@@ -139,51 +142,60 @@ function CartRow({
   onRemove,
   primaryAction,
   removeLabel = "Remove from cart",
-  removeIcon = <Trash2 className="h-3.5 w-3.5" />,
+  removeIcon = <Trash2 className="h-4 w-4" strokeWidth={1.5} />,
 }: CartRowProps) {
   return (
-    <article className="glass-strong flex gap-3 overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-3 sm:gap-4 sm:p-4">
-      <Link
-        to="/experiences/$slug"
-        params={{ slug: item.slug }}
-        className="relative h-16 w-20 shrink-0 overflow-hidden rounded-sm bg-muted sm:h-[4.5rem] sm:w-24"
-      >
-        {item.image ? (
-          <img src={item.image} alt="" className="h-full w-full object-cover" />
-        ) : null}
-      </Link>
-
-      <div className="flex min-w-0 flex-1 flex-col justify-between gap-2">
-        <div className="min-w-0">
-          <div className="text-[0.65rem] uppercase tracking-wider text-muted-foreground">{item.city}</div>
-          <Link
-            to="/experiences/$slug"
-            params={{ slug: item.slug }}
-            className="mt-0.5 block truncate font-display text-base leading-snug hover:text-ember sm:text-lg"
-          >
-            {item.title}
-          </Link>
-          {item.tagline ? (
-            <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{item.tagline}</p>
+    <article className="group py-6 sm:py-7">
+      <div className="flex gap-5 sm:gap-7">
+        <Link
+          to="/experiences/$slug"
+          params={{ slug: item.slug }}
+          className="relative h-[5.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-sm sm:h-28 sm:w-[6.5rem]"
+        >
+          {item.image ? (
+            <img
+              src={item.image}
+              alt=""
+              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+            />
           ) : null}
-        </div>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
+        </Link>
 
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-xs sm:text-sm">
-            From {item.currencySymbol}
-            {item.pricePerPerson.toLocaleString("en-IN")}
-          </span>
-          <div className="flex items-center gap-2">
-            {primaryAction}
-            <button
-              type="button"
-              disabled={removing}
-              onClick={onRemove}
-              className="rounded-full border border-ember/35 bg-background/60 p-1.5 text-foreground transition-colors hover:border-ember/60 disabled:opacity-50"
-              aria-label={removeLabel}
+        <div className="flex min-w-0 flex-1 flex-col justify-between gap-4">
+          <div className="min-w-0">
+            <div className="eyebrow text-[0.62rem] text-[#D4AF6A]/85">{item.city}</div>
+            <Link
+              to="/experiences/$slug"
+              params={{ slug: item.slug }}
+              className="mt-1 block font-display text-base uppercase leading-snug tracking-[0.05em] text-[#F7F1E8] transition-colors hover:text-[#D4AF6A] sm:text-lg"
             >
-              {removeIcon}
-            </button>
+              {item.title}
+            </Link>
+            {item.tagline ? (
+              <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground/90">
+                {item.tagline}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <span className="font-display text-xl tracking-tight text-[#F7F1E8] sm:text-2xl">
+              From {item.currencySymbol}
+              {item.pricePerPerson.toLocaleString("en-IN")}
+            </span>
+            <div className="flex items-center gap-4">
+              {primaryAction}
+              <button
+                type="button"
+                disabled={removing}
+                onClick={onRemove}
+                className="inline-flex items-center justify-center text-muted-foreground/70 transition-colors hover:text-[#D4AF6A] disabled:opacity-40"
+                aria-label={removeLabel}
+              >
+                {removeIcon}
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { CartItemsSection, WishlistCartSection } from "@/components/cart/CartPageSections";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
@@ -82,23 +82,22 @@ function GuestCartPage() {
   return (
     <GuestDashboardShell
       title="Cart"
-      subtitle="Review experiences ready to book, then move saved wishlist items into your cart when you are ready."
+      subtitle="Your selected experiences, ready to reserve."
+      showRoleDescription={false}
     >
-      {pageError ? (
-        <p className="mb-6 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {pageError}
-        </p>
-      ) : null}
+      {pageError ? <p className="mb-6 text-sm text-destructive">{pageError}</p> : null}
 
-      <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <ShoppingCart className="h-4 w-4 text-ember" />
-          <h2 className="font-display text-lg text-foreground">Cart items</h2>
-          <span className="text-xs text-muted-foreground">({cartItems.length})</span>
+      <section>
+        <div className="mb-6 flex items-baseline justify-between gap-4 border-b border-[#C8A25A]/12 pb-4">
+          <div className="flex items-center gap-2.5">
+            <ShoppingCart className="h-4 w-4 text-[#D4AF6A]" strokeWidth={1.5} />
+            <h2 className="font-display text-xl tracking-wide text-[#F7F1E8]">Cart items</h2>
+          </div>
+          <span className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground/80">
+            {cartItems.length} {cartItems.length === 1 ? "item" : "items"}
+          </span>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Use <strong className="text-foreground">Buy</strong> to continue to checkout.
-        </p>
+
         <CartItemsSection
           items={cartItems}
           removingId={removingCartId}
@@ -106,19 +105,19 @@ function GuestCartPage() {
         />
       </section>
 
-      <section className="mt-10 space-y-3 border-t border-[oklch(0.88_0.08_86_/_0.12)] pt-8">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-ember">♥</span>
-          <h2 className="font-display text-lg text-foreground">Wishlist</h2>
-          <span className="text-xs text-muted-foreground">
-            ({pageLoading ? "…" : wishlistItems.length})
+      <section className="mt-14">
+        <div className="mb-6 flex items-baseline justify-between gap-4 border-b border-[#C8A25A]/12 pb-4">
+          <div className="flex items-center gap-2.5">
+            <Heart className="h-4 w-4 text-[#D4AF6A]" strokeWidth={1.5} />
+            <h2 className="font-display text-xl tracking-wide text-[#F7F1E8]">Wishlist</h2>
+          </div>
+          <span className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground/80">
+            {pageLoading ? "…" : `${wishlistItems.length} saved`}
           </span>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Use <strong className="text-foreground">Add to cart</strong> when you want to book.
-        </p>
+
         {pageLoading ? (
-          <p className="text-sm text-muted-foreground">Loading wishlist…</p>
+          <p className="py-8 text-sm text-muted-foreground/80">Loading wishlist…</p>
         ) : (
           <WishlistCartSection
             items={wishlistItems}
