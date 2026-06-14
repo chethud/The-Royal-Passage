@@ -1,5 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { LogOut, Menu, UserRound } from "lucide-react";
+import { LogOut, Menu, Pencil, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
 import { CartIcon } from "@/components/cart/CartIcon";
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/sheet";
 import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
-import { dashboardPathForRole, isGuestAccount, profilePathForRole, type UserRole } from "@/lib/roles";
+import { dashboardPathForRole, isAdminRole, isGuestAccount, profilePathForRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 type NavItem = { label: string; to: string };
@@ -74,6 +74,7 @@ export function Header() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const navItems = navItemsForUser(role, Boolean(user));
   const isGuest = role === "guest";
+  const isAdmin = isAdminRole(role);
   const showGuestCart = Boolean(user) && isGuestAccount(role);
   const { count: cartCount } = useExperienceCart();
   const showBookExperience = !user || isGuest;
@@ -208,6 +209,14 @@ export function Header() {
                       </Link>
                     </DropdownMenuItem>
                   )}
+                  {isAdmin ? (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/homepage-edit" className="cursor-pointer">
+                        <Pencil className="h-4 w-4" />
+                        Edit
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : null}
                   <DropdownMenuItem onSelect={goToProfile} className="cursor-pointer">
                     <UserRound className="h-4 w-4" />
                     Profile
@@ -325,6 +334,13 @@ export function Header() {
                       </Link>
                     </SheetClose>
                   )}
+                  {isAdmin ? (
+                    <SheetClose asChild>
+                      <Link to="/admin/homepage-edit" className={sheetLinkClass}>
+                        Edit
+                      </Link>
+                    </SheetClose>
+                  ) : null}
                   <SheetClose asChild>
                     <Link to={profilePathForRole(role)} className={sheetLinkClass}>
                       Profile
