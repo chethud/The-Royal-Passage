@@ -31,8 +31,12 @@ function AccountProfilePage() {
     if (loading) return;
     if (!user && !hasCachedSession) {
       void navigate({ to: "/sign-in", search: { redirect: "/account/profile" } });
+      return;
     }
-  }, [hasCachedSession, loading, navigate, user]);
+    if (user && role === "admin") {
+      void navigate({ to: "/admin/profile" });
+    }
+  }, [hasCachedSession, loading, navigate, role, user]);
 
   if (loading || (!user && hasCachedSession)) {
     return <ProfileLoadingShell />;
@@ -47,13 +51,15 @@ function AccountProfilePage() {
   const subtitle =
     resolvedRole === "host"
       ? "Your contact details for host communications and payouts."
-      : resolvedRole === "admin"
-        ? "Your admin account details."
-        : resolvedRole === "editor"
-          ? "Your editor account details."
-          : "Your contact details for bookings and host communication.";
+      : resolvedRole === "editor"
+        ? "Your editor account details."
+        : "Your contact details for bookings and host communication.";
 
   const content = <AccountProfileSection />;
+
+  if (resolvedRole === "admin") {
+    return <ProfileLoadingShell />;
+  }
 
   if (resolvedRole === "host") {
     return (
@@ -63,7 +69,7 @@ function AccountProfilePage() {
     );
   }
 
-  if (resolvedRole === "admin" || resolvedRole === "editor") {
+  if (resolvedRole === "editor") {
     return (
       <DashboardShell role={resolvedRole} title="Profile" subtitle={subtitle}>
         {content}

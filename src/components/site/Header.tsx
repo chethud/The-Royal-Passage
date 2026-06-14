@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/sheet";
 import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
-import { dashboardPathForRole, isGuestAccount, type UserRole } from "@/lib/roles";
+import { dashboardPathForRole, isGuestAccount, profilePathForRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 type NavItem = { label: string; to: string };
@@ -99,7 +99,7 @@ export function Header() {
   };
 
   const goToProfile = () => {
-    void router.navigate({ to: "/account/profile" });
+    void router.navigate({ to: profilePathForRole(role) });
   };
 
   return (
@@ -326,7 +326,7 @@ export function Header() {
                     </SheetClose>
                   )}
                   <SheetClose asChild>
-                    <Link to="/account/profile" className={sheetLinkClass}>
+                    <Link to={profilePathForRole(role)} className={sheetLinkClass}>
                       Profile
                     </Link>
                   </SheetClose>
