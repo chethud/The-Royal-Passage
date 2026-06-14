@@ -54,17 +54,36 @@ export type BookingSummary = {
   guestPhone?: string | null;
 };
 
+function normalizeCreateBookingResult(result: {
+  bookingId: string;
+  totalAmount: number;
+  currencyCode: string;
+  bookingStatus: string;
+  paymentStatus: string;
+  paymentMethod: string;
+}): CreateBookingResult {
+  return {
+    bookingId: result.bookingId,
+    totalAmount: result.totalAmount,
+    currencyCode: result.currencyCode,
+    bookingStatus: result.bookingStatus,
+    paymentStatus: result.paymentStatus,
+    paymentMethod: result.paymentMethod,
+  };
+}
+
 export function createBooking(accessToken: string, payload: CreateBookingPayload) {
   const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() =>
-    client.createBooking(
+  return rpcCall(async () => {
+    const result = await client.createBooking(
       create(CreateBookingRequestSchema, {
         slotId: payload.slotId,
         guestCount: payload.guestCount,
         notes: payload.notes,
       }),
-    ),
-  );
+    );
+    return normalizeCreateBookingResult(result);
+  });
 }
 
 export function fetchMyBookings(accessToken: string, status?: "upcoming" | "past" | "cancelled") {

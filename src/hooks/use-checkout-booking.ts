@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Experience, Slot } from "@/data/experiences";
+import { createBooking } from "@/lib/api/bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { fetchGuestProfile } from "@/lib/api/guest";
-import { submitBooking } from "@/lib/booking-fns";
 import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
 import { guestBookingLimits } from "@/lib/booking-url";
 import { removeCartItem } from "@/lib/cart-storage";
@@ -69,7 +69,7 @@ export function useCheckoutBooking({
           await fetchGuestProfile(token);
         }
       } catch {
-        // submitBooking will surface clearer errors.
+        // createBooking will surface clearer errors on submit.
       } finally {
         if (!cancelled) setProfileReady(true);
       }
@@ -111,13 +111,10 @@ export function useCheckoutBooking({
       const token = sessionData.session?.access_token;
       if (!token) throw new Error("Please sign in again to complete your booking.");
 
-      const result = await submitBooking({
-        data: {
-          accessToken: token,
-          slotId: selectedSlot.id,
-          guestCount: guests,
-          notes: notes.trim() || undefined,
-        },
+      const result = await createBooking(token, {
+        slotId: selectedSlot.id,
+        guestCount: guests,
+        notes: notes.trim() || undefined,
       });
 
       removeCartItem(exp.id);

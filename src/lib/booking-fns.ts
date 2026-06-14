@@ -6,6 +6,7 @@ import {
   fetchBookingById,
   fetchMyBookings,
   type BookingSummary,
+  type CreateBookingResult,
 } from "@/lib/api/bookings";
 import { isApiConfigured } from "@/lib/api/client";
 
@@ -21,7 +22,7 @@ const createBookingSchema = tokenSchema.extend({
 
 export const submitBooking = createServerFn({ method: "POST" })
   .inputValidator(createBookingSchema)
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<CreateBookingResult> => {
     if (!isApiConfigured()) {
       throw new Error("Booking API is not configured. Set VITE_API_BASE_URL.");
     }
