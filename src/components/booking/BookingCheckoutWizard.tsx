@@ -95,8 +95,8 @@ export function BookingCheckoutWizard({
                         active
                           ? "luxury-panel-heading font-semibold"
                           : done
-                            ? "luxury-panel-label"
-                            : "text-[#3A0000]/32"
+                            ? "luxury-panel-heading"
+                            : "luxury-panel-step-text-idle"
                       }`}
                     >
                       <span
@@ -113,7 +113,10 @@ export function BookingCheckoutWizard({
                       <span>{item.label}</span>
                     </span>
                     {index < STEPS.length - 1 ? (
-                      <span className="luxury-panel-divider-bg hidden h-px w-10 sm:block" aria-hidden />
+                      <span
+                        className="luxury-panel-step-connector hidden h-0.5 w-10 sm:block"
+                        aria-hidden
+                      />
                     ) : null}
                   </li>
                 );
@@ -266,7 +269,7 @@ export function BookingCheckoutWizard({
           <div className="luxury-panel-divider-bg my-5 h-px" />
 
           <div className="flex items-baseline justify-between gap-4">
-            <span className="eyebrow luxury-panel-body">Estimated total</span>
+            <span className="eyebrow luxury-panel-label">Estimated total</span>
             <span className="luxury-panel-heading font-display text-3xl tracking-[0.02em]">
               {selectedSlot ? formatMoney(totalMinor, sym) : "—"}
             </span>
@@ -293,7 +296,7 @@ function SummaryRow({
 }) {
   return (
     <div className="flex justify-between gap-4">
-      <dt className="luxury-panel-body shrink-0">{label}</dt>
+      <dt className="luxury-panel-label shrink-0 normal-case tracking-normal">{label}</dt>
       <dd className={`luxury-panel-heading min-w-0 ${align === "right" ? "text-right" : ""}`}>
         {value}
       </dd>

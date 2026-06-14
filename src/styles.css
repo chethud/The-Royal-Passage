@@ -406,42 +406,52 @@
 }
 
 .luxury-panel-label {
-  color: #8b6914;
+  color: #4a0000;
   letter-spacing: 0.18em;
 }
 
 .luxury-panel-divider {
-  border-color: rgb(74 0 0 / 0.18);
+  border-color: rgb(74 0 0 / 0.22);
 }
 
 .luxury-panel-divider-bg {
-  background-color: rgb(74 0 0 / 0.18);
+  background-color: rgb(74 0 0 / 0.22);
 }
 
 .luxury-panel-link {
-  color: #8b6914;
+  color: #4a0000;
   transition: color 0.2s ease;
 }
 
 .luxury-panel-link:hover {
-  color: #3a0000;
+  color: #2d0000;
 }
 
 .luxury-panel-step-active {
-  border: 1px solid rgb(200 162 90 / 0.42);
+  border: 2px solid #4a0000;
   background: var(--cream-white);
-  color: #3a0000;
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.35);
+  color: #4a0000;
+  font-weight: 600;
 }
 
 .luxury-panel-step-done {
-  border: 1px solid rgb(200 162 90 / 0.38);
-  color: #8b6914;
+  border: 2px solid #4a0000;
+  color: #4a0000;
+  background: transparent;
 }
 
 .luxury-panel-step-idle {
-  border: 1px solid rgb(58 0 0 / 0.12);
-  color: rgb(58 0 0 / 0.32);
+  border: 2px solid rgb(74 0 0 / 0.38);
+  color: rgb(74 0 0 / 0.48);
+  background: transparent;
+}
+
+.luxury-panel-step-text-idle {
+  color: rgb(74 0 0 / 0.48);
+}
+
+.luxury-panel-step-connector {
+  background-color: rgb(74 0 0 / 0.42);
 }
 
 .luxury-panel-image {
@@ -452,7 +462,7 @@
 }
 
 .luxury-checkout-panel .hairline {
-  background: linear-gradient(90deg, transparent, rgb(74 0 0 / 0.22), transparent);
+  background: linear-gradient(90deg, transparent, rgb(74 0 0 / 0.28), transparent);
 }
 
 .luxury-range {

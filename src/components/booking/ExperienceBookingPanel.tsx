@@ -144,7 +144,7 @@ export function ExperienceBookingPanel({
                     </span>
                   ) : (
                     <>
-                      <div className={`eyebrow ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground/80"}`}>
+                      <div className={`eyebrow ${surface === "light" ? "luxury-panel-label opacity-75" : "text-muted-foreground/80"}`}>
                         Seats
                       </div>
                       <div className={`font-display text-lg ${tone.seats}`}>
@@ -210,7 +210,7 @@ export function ExperienceBookingPanel({
 
           <div className="flex items-end justify-between gap-4">
             <div>
-              <div className={`eyebrow ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
+              <div className={`eyebrow ${surface === "light" ? "luxury-panel-label" : "text-muted-foreground"}`}>
                 Estimated total
               </div>
               <div className={`mt-1 text-xs ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
