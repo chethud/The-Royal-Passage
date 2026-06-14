@@ -102,6 +102,11 @@ export function Header() {
     void router.navigate({ to: "/account/profile" });
   };
 
+  const profileSectionTitle =
+    role === "admin" ? "Royal Steward" : role === "host" ? "Royal Host" : "Royal Guest";
+  const profileSectionSubtitle =
+    role === "admin" ? "Command" : role === "host" ? "Your court" : "Your passage";
+
   return (
     <header
       data-elevated={elevated ? "true" : "false"}
@@ -154,7 +159,7 @@ export function Header() {
               activeProps={{ className: "text-ember" }}
               aria-label={cartCount > 0 ? `Cart (${cartCount} items)` : "Cart"}
             >
-              <CartIcon size={32} />
+              <CartIcon size={46} />
               {cartCount > 0 ? (
                 <span className="rounded-full bg-ember px-1.5 py-0.5 text-[0.6rem] font-semibold text-primary-foreground">
                   {cartCount}
@@ -175,16 +180,18 @@ export function Header() {
                     className={`${navLinkClass} group inline-flex p-0.5`}
                     aria-label={displayName ? `${displayName} account menu` : "Account menu"}
                   >
-                    <ProfileNavIcon size={32} />
+                    <ProfileNavIcon size={40} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="z-[100] w-52">
-                  <div className="flex items-center gap-3 border-b border-border/60 px-2 py-3">
-                    <ProfileNavIcon size={36} />
-                    <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      Account
-                    </span>
+                <DropdownMenuContent align="end" className="z-[100] w-56 overflow-hidden p-0">
+                  <div className="header-profile-section">
+                    <ProfileNavIcon size={44} variant="section" />
+                    <div>
+                      <p className="header-profile-section__title">{profileSectionTitle}</p>
+                      <p className="header-profile-section__subtitle">{profileSectionSubtitle}</p>
+                    </div>
                   </div>
+                  <div className="p-1">
                   {isGuest ? (
                     <>
                       <DropdownMenuItem asChild>
@@ -236,6 +243,7 @@ export function Header() {
                     <LogOut className="h-4 w-4" />
                     {loggingOut ? "Logging out..." : "Logout"}
                   </DropdownMenuItem>
+                  </div>
                 </DropdownMenuContent>
               </DropdownMenu>
           ) : null}
@@ -288,7 +296,7 @@ export function Header() {
                     className={`${sheetLinkClass} inline-flex items-center gap-2`}
                     aria-label={cartCount > 0 ? `Cart (${cartCount} items)` : "Cart"}
                   >
-                    <CartIcon size={28} />
+                    <CartIcon size={38} />
                     {cartCount > 0 ? (
                       <span className="rounded-full bg-ember px-1.5 py-0.5 text-[0.6rem] font-semibold text-primary-foreground">
                         {cartCount}
@@ -306,11 +314,12 @@ export function Header() {
               ) : null}
               {showAccountMenu ? (
                 <>
-                  <div className="mt-4 flex items-center gap-3 border-t border-white/10 px-3 pt-6">
-                    <ProfileNavIcon size={36} />
-                    <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-ink/55">
-                      Account
-                    </span>
+                  <div className="header-profile-section mt-4 border-t-0 px-3">
+                    <ProfileNavIcon size={44} variant="section" />
+                    <div>
+                      <p className="header-profile-section__title">{profileSectionTitle}</p>
+                      <p className="header-profile-section__subtitle">{profileSectionSubtitle}</p>
+                    </div>
                   </div>
                   {isGuest ? (
                     <>

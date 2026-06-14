@@ -302,6 +302,83 @@
   box-shadow: 0 0 12px #c8a25a66;
 }
 
+/* Royal profile medallion — nav account trigger */
+.header-profile-medallion {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid #c9a227;
+  background:
+    radial-gradient(circle at 32% 26%, #f8f4e84d 0%, transparent 40%),
+    radial-gradient(circle at 68% 76%, #00000044 0%, transparent 52%),
+    linear-gradient(145deg, #8b6914 0%, #c9a227 35%, #d4af37 55%, #7a5c10 100%);
+  color: #2a0a0a;
+  box-shadow:
+    0 4px 16px #00000066,
+    0 0 24px #d4af3755,
+    inset 0 2px 4px #f8f4e866,
+    inset 0 -4px 8px #00000055;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+.header-profile-medallion::before {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border: 1px dashed #5c401099;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.header-profile-medallion::after {
+  content: "";
+  position: absolute;
+  inset: 28%;
+  border: 1px solid #5c401066;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.group:hover .header-profile-medallion,
+.header-profile-medallion:hover {
+  transform: translateY(-1px) scale(1.04);
+  box-shadow:
+    0 6px 20px #00000077,
+    0 0 36px #d4af3788,
+    inset 0 2px 4px #f8f4e888,
+    inset 0 -4px 8px #00000055;
+}
+
+.header-profile-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 0.75rem;
+  border-bottom: 1px solid oklch(0.72 0.09 78 / 0.22);
+  background: linear-gradient(135deg, oklch(0.18 0.06 22 / 0.95) 0%, oklch(0.14 0.05 22) 100%);
+}
+
+.header-profile-section__title {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #d4af6a;
+}
+
+.header-profile-section__subtitle {
+  margin-top: 0.15rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: oklch(0.72 0.09 78 / 0.55);
+}
+
 .luxury-btn-primary {
   display: inline-flex;
   align-items: center;

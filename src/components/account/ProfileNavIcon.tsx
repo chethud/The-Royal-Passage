@@ -1,21 +1,27 @@
-import { UserRound } from "lucide-react";
+import { Crown } from "lucide-react";
 
 type ProfileNavIconProps = {
-  /** Outer circle diameter in pixels. */
+  /** Outer medallion diameter in pixels. */
   size?: number;
   className?: string;
+  /** Larger medallion styling for dropdown / mobile account headers. */
+  variant?: "nav" | "section";
 };
 
-export function ProfileNavIcon({ size = 32, className = "" }: ProfileNavIconProps) {
-  const iconSize = Math.round(size * 0.52);
+export function ProfileNavIcon({ size = 40, className = "", variant = "nav" }: ProfileNavIconProps) {
+  const iconSize = Math.round(size * (variant === "section" ? 0.38 : 0.42));
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-full border border-[#C8A25A]/60 bg-[#C8A25A]/12 text-[#D4AF6A] shadow-[0_0_22px_-8px_#c8a25a66] transition-colors group-hover:border-[#D4AF6A]/85 group-hover:bg-[#C8A25A]/22 ${className}`}
+      className={`header-profile-medallion shrink-0 ${className}`}
       style={{ width: size, height: size }}
       aria-hidden
     >
-      <UserRound style={{ width: iconSize, height: iconSize }} strokeWidth={1.75} />
+      <Crown
+        style={{ width: iconSize, height: iconSize }}
+        strokeWidth={1.85}
+        className="relative z-[1] drop-shadow-[0_1px_0_#f8f4e866]"
+      />
     </span>
   );
 }
