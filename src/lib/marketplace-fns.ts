@@ -40,6 +40,10 @@ function hostVisibleInCatalog(host: ExperienceRow["hosts"]): boolean {
   return status !== "rejected" && status !== "suspended";
 }
 
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
 async function loadExperienceFromDbBySlug(slug: string): Promise<Experience | null> {
   const supabase = getSupabaseAdmin();
   const { data: row, error } = await supabase
@@ -52,6 +56,36 @@ async function loadExperienceFromDbBySlug(slug: string): Promise<Experience | nu
     `,
     )
     .eq("slug", slug)
+    .eq("status", "published")
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!row) return null;
+  const exp = row as ExperienceRow;
+  if (!hostVisibleInCatalog(exp.hosts)) return null;
+
+  const { data: slotRows, error: e2 } = await supabase
+    .from("experience_slots")
+    .select("*")
+    .eq("experience_id", exp.id)
+    .order("slot_date", { ascending: true });
+  if (e2) throw new Error(e2.message);
+
+  return withGuestBookableSlots(mapRowToExperience(exp, (slotRows ?? []) as SlotRow[]));
+}
+
+async function loadExperienceFromDbById(id: string): Promise<Experience | null> {
+  const supabase = getSupabaseAdmin();
+  const { data: row, error } = await supabase
+    .from("experiences")
+    .select(
+      `
+      *,
+      hosts ( display_name, bio, verified, approval_status ),
+      experience_categories ( label )
+    `,
+    )
+    .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
 
@@ -139,7 +173,7 @@ export const getExperienceForDetail = createServerFn({ method: "GET" })
     return { slug: input.slug.trim() };
   })
   .handler(async ({ data }): Promise<{ exp: Experience; source: "live" | "static" } | null> => {
-    if (isApiConfigured()) {
+    if (isApiConfigured() && !isUuid(data.slug)) {
       try {
         return await fetchExperienceBySlug(data.slug);
       } catch {
@@ -152,7 +186,14 @@ export const getExperienceForDetail = createServerFn({ method: "GET" })
         const fromDb = await getOrSetServerCache(
           `experience:${data.slug}:v1`,
           60,
-          async () => await loadExperienceFromDbBySlug(data.slug),
+          async () => {
+            const bySlug = await loadExperienceFromDbBySlug(data.slug);
+            if (bySlug) return bySlug;
+            if (isUuid(data.slug)) {
+              return loadExperienceFromDbById(data.slug);
+            }
+            return null;
+          },
         );
         if (fromDb) return { exp: fromDb, source: "live" };
       } catch {

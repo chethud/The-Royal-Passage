@@ -1,6 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
 import type { BookingSummary } from "@/lib/api/bookings";
+import {
+  formatBookingExperienceLocation,
+  hasExperienceDetailLink,
+} from "@/lib/booking-normalize";
+import { experienceDetailSlug } from "@/lib/experience-path";
 import { formatMoney } from "@/lib/money";
 import { formatDateLong } from "@/lib/date-format";
 
@@ -21,6 +26,8 @@ export function BookingCard({
 }: BookingCardProps) {
   const canCancel = ["pending", "confirmed"].includes(booking.bookingStatus);
   const isLight = surface === "light";
+  const experienceSlug = experienceDetailSlug(booking.experience);
+  const canViewExperience = hasExperienceDetailLink(booking.experience);
 
   return (
     <article className={isLight ? "group py-6 sm:py-7" : "glass-strong overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.15)]"}>
@@ -52,7 +59,17 @@ export function BookingCard({
                   isLight ? "luxury-panel-heading text-base sm:text-lg" : "text-lg"
                 }`}
               >
-                {booking.experience.title}
+                {canViewExperience && experienceSlug ? (
+                  <Link
+                    to="/experiences/$slug"
+                    params={{ slug: experienceSlug }}
+                    className="transition-colors hover:text-ember"
+                  >
+                    {booking.experience.title}
+                  </Link>
+                ) : (
+                  booking.experience.title
+                )}
               </h3>
               <p className={`mt-1 text-xs ${isLight ? "luxury-panel-body" : "text-muted-foreground"}`}>
                 {booking.experience.city} · {booking.experience.hostName}
@@ -86,16 +103,29 @@ export function BookingCard({
           </dl>
 
           <div className={`flex flex-wrap items-center gap-3 ${isLight ? "mt-1" : "mt-5"}`}>
+            {canViewExperience && experienceSlug ? (
+              <Link
+                to="/experiences/$slug"
+                params={{ slug: experienceSlug }}
+                className={
+                  isLight
+                    ? "luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
+                    : "text-sm text-ember underline-offset-4 hover:underline"
+                }
+              >
+                View experience
+              </Link>
+            ) : null}
             <Link
               to="/bookings/$bookingId"
               params={{ bookingId: booking.id }}
               className={
                 isLight
-                  ? "luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
+                  ? "luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
                   : "text-sm text-ember underline-offset-4 hover:underline"
               }
             >
-              View details
+              Booking details
             </Link>
             {booking.bookingStatus === "completed" ? (
               <Link

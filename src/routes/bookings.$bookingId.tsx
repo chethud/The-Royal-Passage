@@ -8,7 +8,9 @@ import { Header } from "@/components/site/Header";
 import { useAuthUser } from "@/lib/auth-user";
 import { cancelBooking, fetchBookingById, type BookingSummary } from "@/lib/api/bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
+import { formatBookingExperienceLocation } from "@/lib/booking-normalize";
 import { formatDateLong, formatDateWeekdayShort } from "@/lib/date-format";
+import { experienceDetailSlug } from "@/lib/experience-path";
 import { formatMoney } from "@/lib/money";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
@@ -101,6 +103,7 @@ function BookingDetailPage() {
   }
 
   const canCancel = ["pending", "confirmed"].includes(booking.bookingStatus);
+  const experienceSlug = experienceDetailSlug(booking.experience);
 
   return (
     <div className="min-h-screen pt-[var(--header-height)] text-foreground">
@@ -163,7 +166,7 @@ function BookingDetailPage() {
             <div>
               <dt className="eyebrow luxury-panel-label">Where</dt>
               <dd className="luxury-panel-body mt-1">
-                {booking.experience.address || booking.experience.city}
+                {formatBookingExperienceLocation(booking.experience)}
               </dd>
             </div>
             <div>
@@ -217,13 +220,15 @@ function BookingDetailPage() {
           >
             Booking history
           </Link>
-          <Link
-            to="/experiences/$slug"
-            params={{ slug: booking.experience.slug }}
-            className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
-          >
-            View experience
-          </Link>
+          {experienceSlug ? (
+            <Link
+              to="/experiences/$slug"
+              params={{ slug: experienceSlug }}
+              className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
+            >
+              View experience
+            </Link>
+          ) : null}
           {canCancel ? (
             <button
               type="button"

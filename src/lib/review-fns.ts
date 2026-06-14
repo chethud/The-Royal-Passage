@@ -9,14 +9,31 @@ import {
   submitReview,
   type ReviewSummary,
 } from "@/lib/api/reviews";
+import { isSupabaseConfigured } from "@/lib/env.server";
+import {
+  createGuestReviewInDb,
+  hostReplyToReviewInDb,
+  loadPublishedReviewsForSlug,
+} from "@/lib/reviews-db.server";
 
 export type { ReviewSummary };
 
-export const getExperienceReviews = createServerFn({ method: "POST" })
+export const getExperienceReviews = createServerFn({ method: "GET" })
   .inputValidator(z.object({ slug: z.string().min(1) }))
   .handler(async ({ data }): Promise<ReviewSummary[]> => {
-    if (!isApiConfigured()) return [];
-    return fetchExperienceReviews(data.slug);
+    if (isApiConfigured()) {
+      try {
+        return await fetchExperienceReviews(data.slug);
+      } catch {
+        // Fall through to Supabase.
+      }
+    }
+
+    if (isSupabaseConfigured()) {
+      return loadPublishedReviewsForSlug(data.slug);
+    }
+
+    return [];
   });
 
 export const createReview = createServerFn({ method: "POST" })
@@ -29,8 +46,23 @@ export const createReview = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }): Promise<ReviewSummary> => {
-    if (!isApiConfigured()) throw new Error("API is not configured.");
-    return submitReview(data.accessToken, {
+    if (isApiConfigured()) {
+      try {
+        return await submitReview(data.accessToken, {
+          bookingId: data.bookingId,
+          rating: data.rating,
+          comment: data.comment,
+        });
+      } catch {
+        // Fall through to Supabase when API is stale or unreachable.
+      }
+    }
+
+    if (!isSupabaseConfigured()) {
+      throw new Error("Reviews are not configured for this deployment.");
+    }
+
+    return createGuestReviewInDb(data.accessToken, {
       bookingId: data.bookingId,
       rating: data.rating,
       comment: data.comment,
@@ -46,8 +78,19 @@ export const replyToReview = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }): Promise<ReviewSummary> => {
-    if (!isApiConfigured()) throw new Error("API is not configured.");
-    return hostReplyReview(data.accessToken, data.reviewId, data.reply);
+    if (isApiConfigured()) {
+      try {
+        return await hostReplyReview(data.accessToken, data.reviewId, data.reply);
+      } catch {
+        // Fall through to Supabase.
+      }
+    }
+
+    if (!isSupabaseConfigured()) {
+      throw new Error("Reviews are not configured for this deployment.");
+    }
+
+    return hostReplyToReviewInDb(data.accessToken, data.reviewId, data.reply);
   });
 
 export const listAdminReviews = createServerFn({ method: "POST" })

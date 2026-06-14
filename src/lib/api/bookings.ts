@@ -6,6 +6,8 @@ import {
   ListMyBookingsRequestSchema,
 } from "@/gen/royalpassage/v1/service_pb";
 import { CreateBookingRequestSchema } from "@/gen/royalpassage/v1/types_pb";
+import { normalizeBookingSummary } from "@/lib/booking-normalize";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 export type CreateBookingPayload = {
   slotId: string;
@@ -74,6 +76,39 @@ function normalizeCreateBookingResult(result: {
   };
 }
 
+async function hydrateBookingExperienceSlug(booking: BookingSummary): Promise<BookingSummary> {
+  const normalized = normalizeBookingSummary(booking);
+  if (normalized.experience.slug || !normalized.experience.id) {
+    return normalized;
+  }
+
+  if (typeof window === "undefined") {
+    return normalized;
+  }
+
+  try {
+    const { data } = await getSupabaseBrowser()
+      .from("experiences")
+      .select("slug")
+      .eq("id", normalized.experience.id)
+      .maybeSingle();
+    if (data?.slug) {
+      return {
+        ...normalized,
+        experience: { ...normalized.experience, slug: data.slug },
+      };
+    }
+  } catch {
+    // Keep booking usable even if slug lookup fails.
+  }
+
+  return normalized;
+}
+
+async function mapBookings(rows: BookingSummary[]): Promise<BookingSummary[]> {
+  return Promise.all(rows.map((row) => hydrateBookingExperienceSlug(row)));
+}
+
 export function createBooking(accessToken: string, payload: CreateBookingPayload) {
   const client = createRoyalPassageClient(accessToken);
   return rpcCall(async () => {
@@ -94,20 +129,26 @@ export function fetchMyBookings(accessToken: string, status?: "upcoming" | "past
     const response = await client.listMyBookings(
       create(ListMyBookingsRequestSchema, status ? { status } : {}),
     );
-    return response.bookings as BookingSummary[];
+    return mapBookings(response.bookings as BookingSummary[]);
   });
 }
 
 export function fetchBookingById(accessToken: string, bookingId: string) {
   const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() =>
-    client.getBooking(create(GetBookingRequestSchema, { bookingId })),
-  ) as Promise<BookingSummary>;
+  return rpcCall(async () => {
+    const row = (await client.getBooking(
+      create(GetBookingRequestSchema, { bookingId }),
+    )) as BookingSummary;
+    return hydrateBookingExperienceSlug(row);
+  });
 }
 
 export function cancelBooking(accessToken: string, bookingId: string) {
   const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() =>
-    client.cancelBooking(create(CancelBookingRequestSchema, { bookingId })),
-  ) as Promise<BookingSummary>;
+  return rpcCall(async () => {
+    const row = (await client.cancelBooking(
+      create(CancelBookingRequestSchema, { bookingId }),
+    )) as BookingSummary;
+    return hydrateBookingExperienceSlug(row);
+  });
 }

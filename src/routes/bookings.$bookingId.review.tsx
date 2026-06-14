@@ -7,6 +7,7 @@ import { useAuthUser } from "@/lib/auth-user";
 import { fetchBookingById, type BookingSummary } from "@/lib/api/bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { createReview } from "@/lib/review-fns";
+import { experienceDetailSlug } from "@/lib/experience-path";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 export const Route = createFileRoute("/bookings/$bookingId/review")({
@@ -110,7 +111,9 @@ function BookingReviewPage() {
             <div className="mt-5 flex flex-wrap gap-3">
               <Link
                 to="/experiences/$slug"
-                params={{ slug: booking.experience.slug }}
+                params={{
+                  slug: experienceDetailSlug(booking.experience) ?? booking.experience.id,
+                }}
                 className="text-sm text-ember hover:underline"
               >
                 View experience
