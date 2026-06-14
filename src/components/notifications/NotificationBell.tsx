@@ -7,34 +7,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthUser } from "@/lib/auth-user";
+import { isApiConfigured } from "@/lib/api/client";
 import {
-  listNotifications,
-  readAllNotifications,
-  readNotification,
+  fetchNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
   type NotificationSummary,
-} from "@/lib/notification-fns";
-import { getSupabaseBrowser } from "@/lib/supabase/browser";
+} from "@/lib/api/notifications";
 
 export function NotificationBell() {
-  const { user } = useAuthUser();
+  const { user, accessToken } = useAuthUser();
   const [items, setItems] = useState<NotificationSummary[]>([]);
   const [loading, setLoading] = useState(false);
 
   const load = useCallback(async () => {
-    if (!user) return;
+    if (!user || !accessToken || !isApiConfigured()) return;
     setLoading(true);
     try {
-      const { data } = await getSupabaseBrowser().auth.getSession();
-      const token = data.session?.access_token;
-      if (!token) return;
-      const rows = await listNotifications({ data: { accessToken: token } });
+      const rows = await fetchNotifications(accessToken);
       setItems(rows);
     } catch {
       // optional UI
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [accessToken, user?.id]);
 
   useEffect(() => {
     void load();
@@ -49,18 +46,14 @@ export function NotificationBell() {
   };
 
   const markRead = async (id: string) => {
-    const { data } = await getSupabaseBrowser().auth.getSession();
-    const token = data.session?.access_token;
-    if (!token) return;
-    await readNotification({ data: { accessToken: token, notificationId: id } });
+    if (!accessToken) return;
+    await markNotificationRead(accessToken, id);
     await load();
   };
 
   const markAll = async () => {
-    const { data } = await getSupabaseBrowser().auth.getSession();
-    const token = data.session?.access_token;
-    if (!token) return;
-    await readAllNotifications({ data: { accessToken: token } });
+    if (!accessToken) return;
+    await markAllNotificationsRead(accessToken);
     await load();
   };
 

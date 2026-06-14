@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AccountProfileSection } from "@/components/account/AccountProfileSection";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
@@ -15,19 +15,40 @@ export const Route = createFileRoute("/account/profile")({
   component: AccountProfilePage,
 });
 
+function ProfileLoadingShell() {
+  return (
+    <GuestDashboardShell title="Profile" subtitle="Your account details.">
+      <p className="text-sm text-muted-foreground">Loading profile…</p>
+    </GuestDashboardShell>
+  );
+}
+
 function AccountProfilePage() {
   const navigate = useNavigate();
   const { user, role, loading, accessToken } = useAuthUser();
+  const [clientReady, setClientReady] = useState(false);
 
   useEffect(() => {
-    if (loading) return;
+    setClientReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!clientReady || loading) return;
     if (!user) {
       void navigate({ to: "/sign-in", search: { redirect: "/account/profile" } });
     }
-  }, [loading, navigate, user]);
+  }, [clientReady, loading, navigate, user]);
+
+  if (!clientReady || loading) {
+    return <ProfileLoadingShell />;
+  }
+
+  if (!user) {
+    return <ProfileLoadingShell />;
+  }
 
   const resolvedRole: UserRole = isUserRole(role) ? role : "guest";
-  const ready = !loading && Boolean(user) && Boolean(accessToken);
+  const ready = Boolean(accessToken);
 
   const subtitle =
     resolvedRole === "host"
@@ -38,12 +59,11 @@ function AccountProfilePage() {
           ? "Your editor account details."
           : "Your contact details for bookings and host communication.";
 
-  const content =
-    !ready || !accessToken ? (
-      <p className="text-sm text-muted-foreground">Loading profile…</p>
-    ) : (
-      <AccountProfileSection accessToken={accessToken} ready={ready} />
-    );
+  const content = !ready ? (
+    <p className="text-sm text-muted-foreground">Loading profile…</p>
+  ) : (
+    <AccountProfileSection accessToken={accessToken!} ready={ready} />
+  );
 
   if (resolvedRole === "host") {
     return (

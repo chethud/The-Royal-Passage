@@ -139,7 +139,7 @@ export function Footer() {
       </div>
 
       <div className="container-page relative z-10 flex flex-wrap items-center justify-between gap-3 border-t border-[oklch(0.88_0.08_86_/_0.12)] py-6 text-xs text-muted-foreground">
-        <span>© {new Date().getFullYear()} The Royal Passage. All rights reserved.</span>
+        <span suppressHydrationWarning>© {new Date().getFullYear()} The Royal Passage. All rights reserved.</span>
         <span className="text-ember/70">Crafted with intention.</span>
       </div>
 

@@ -53,8 +53,9 @@ export const Route = createFileRoute("/experiences")({
   },
   validateSearch: parseSearch,
   head: ({ search }) => {
-    const cityLabel = search.city
-      ? search.city.charAt(0).toUpperCase() + search.city.slice(1)
+    const citySlug = search?.city;
+    const cityLabel = citySlug
+      ? citySlug.charAt(0).toUpperCase() + citySlug.slice(1)
       : null;
     const title = cityLabel
       ? `${cityLabel} experiences — The Royal Passage`

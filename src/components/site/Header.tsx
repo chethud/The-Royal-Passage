@@ -24,7 +24,7 @@ import {
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
-import { dashboardPathForRole, isGuestAccount, profilePathForRole } from "@/lib/roles";
+import { dashboardPathForRole, isGuestAccount, profilePathForRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 type NavItem = { label: string; to: string };
