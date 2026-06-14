@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { History } from "lucide-react";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { GuestBookingsList } from "@/components/guest/GuestBookingsList";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { GuestEmptyState } from "@/components/guest/GuestEmptyState";
@@ -87,61 +88,77 @@ function GuestHistoryPage() {
     <GuestDashboardShell
       title="History"
       subtitle="Active requests, completed journeys, and cancelled bookings in one place."
+      showRoleDescription={false}
     >
       {bookingNotice ? (
-        <p className="mb-6 rounded-sm border border-ember/35 bg-ember/10 px-4 py-3 text-sm text-foreground">
-          {bookingNotice}
-          {confirmedBookingId ? (
-            <>
-              {" "}
-              <Link
-                to="/bookings/$bookingId"
-                params={{ bookingId: confirmedBookingId }}
-                className="text-ember underline-offset-4 hover:underline"
-              >
-                View booking details
-              </Link>
-            </>
-          ) : null}
-        </p>
-      ) : null}
-
-      {!pageLoading && bookings.length > 0 ? (
-        <p className="mb-6 text-sm text-muted-foreground">
-          {completedCount} completed · {cancelledCount} cancelled
-        </p>
+        <LuxuryCheckoutPanel className="mb-8">
+          <p className="luxury-panel-body text-sm">
+            {bookingNotice}
+            {confirmedBookingId ? (
+              <>
+                {" "}
+                <Link
+                  to="/bookings/$bookingId"
+                  params={{ bookingId: confirmedBookingId }}
+                  className="luxury-panel-link font-medium underline-offset-4 hover:underline"
+                >
+                  View booking details
+                </Link>
+              </>
+            ) : null}
+          </p>
+        </LuxuryCheckoutPanel>
       ) : null}
 
       {pageLoading ? (
-        <p className="text-sm text-muted-foreground">Loading history…</p>
+        <LuxuryCheckoutPanel>
+          <p className="luxury-panel-body py-8 text-sm">Loading history…</p>
+        </LuxuryCheckoutPanel>
       ) : pageError ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {pageError}
-        </p>
+        <LuxuryCheckoutPanel>
+          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {pageError}
+          </p>
+        </LuxuryCheckoutPanel>
       ) : activeBookings.length === 0 && bookings.length === 0 ? (
-        <GuestEmptyState
-          icon={<History className="h-8 w-8" />}
-          title="No bookings yet"
-          description="Your active requests and past journeys will appear here."
-        />
+        <LuxuryCheckoutPanel>
+          <GuestEmptyState
+            icon={<History className="h-8 w-8" strokeWidth={1.5} />}
+            title="No bookings yet"
+            description="Your active requests and past journeys will appear here."
+            surface="light"
+          />
+        </LuxuryCheckoutPanel>
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-8">
           {activeBookings.length > 0 ? (
-            <section>
-              <h2 className="mb-4 font-display text-xl tracking-tight">Active bookings</h2>
+            <LuxuryCheckoutPanel>
+              <div className="mb-6 flex items-baseline justify-between gap-4 border-b luxury-panel-divider pb-5">
+                <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Active bookings</h2>
+                <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
+                  {activeBookings.length} active
+                </span>
+              </div>
               <GuestBookingsList
                 bookings={activeBookings}
                 accessToken={accessToken}
                 allowCancel
                 onUpdated={() => void loadBookings()}
+                surface="light"
               />
-            </section>
+            </LuxuryCheckoutPanel>
           ) : null}
+
           {bookings.length > 0 ? (
-            <section>
-              <h2 className="mb-4 font-display text-xl tracking-tight">Past & cancelled</h2>
-              <GuestBookingsList bookings={bookings} accessToken={accessToken} />
-            </section>
+            <LuxuryCheckoutPanel>
+              <div className="mb-6 flex flex-wrap items-baseline justify-between gap-4 border-b luxury-panel-divider pb-5">
+                <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Past & cancelled</h2>
+                <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
+                  {completedCount} completed · {cancelledCount} cancelled
+                </span>
+              </div>
+              <GuestBookingsList bookings={bookings} accessToken={accessToken} surface="light" />
+            </LuxuryCheckoutPanel>
           ) : null}
         </div>
       )}

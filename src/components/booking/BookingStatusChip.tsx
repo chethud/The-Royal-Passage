@@ -1,6 +1,7 @@
 type BookingStatusChipProps = {
   bookingStatus: string;
   paymentStatus?: string;
+  surface?: "light" | "dark";
 };
 
 const BOOKING_LABELS: Record<string, string> = {
@@ -10,8 +11,25 @@ const BOOKING_LABELS: Record<string, string> = {
   cancelled: "Cancelled",
 };
 
-export function BookingStatusChip({ bookingStatus, paymentStatus }: BookingStatusChipProps) {
+export function BookingStatusChip({
+  bookingStatus,
+  paymentStatus,
+  surface = "dark",
+}: BookingStatusChipProps) {
   const label = BOOKING_LABELS[bookingStatus] ?? bookingStatus;
+  const isLight = surface === "light";
+
+  if (isLight) {
+    return (
+      <span className="inline-flex max-w-[12rem] flex-col items-end gap-0.5 border-l-[3px] border-[#4A0000] pl-2.5 text-right">
+        <span className="eyebrow luxury-panel-label text-[0.62rem] leading-snug">{label}</span>
+        {bookingStatus === "confirmed" && paymentStatus === "pending" ? (
+          <span className="luxury-panel-body text-[0.62rem] normal-case tracking-normal">Pay at venue</span>
+        ) : null}
+      </span>
+    );
+  }
+
   const tone =
     bookingStatus === "confirmed"
       ? "border-ember/50 bg-ember/10 text-ember"

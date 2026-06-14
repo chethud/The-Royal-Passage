@@ -465,56 +465,27 @@
   background: linear-gradient(90deg, transparent, rgb(74 0 0 / 0.28), transparent);
 }
 
-.royal-checkout-header__ornament {
+.royal-checkout-header {
+  min-height: 7.5rem;
+}
+
+.royal-checkout-header__watermark {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  right: clamp(0.75rem, 4vw, 2rem);
+  width: min(46%, 15.5rem);
+  max-height: 88%;
+  transform: translateY(-50%);
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 55% 80% at 92% 38%, rgb(200 162 90 / 0.1), transparent 68%),
-    radial-gradient(ellipse 40% 50% at 8% 88%, rgb(74 0 0 / 0.04), transparent 70%);
+  opacity: 0.88;
+  filter: drop-shadow(0 6px 14px rgb(74 0 0 / 0.06));
 }
 
-.royal-checkout-header__ornament::before,
-.royal-checkout-header__ornament::after {
-  content: "";
-  position: absolute;
-  width: 88px;
-  height: 88px;
-  border: 1px solid rgb(200 162 90 / 0.16);
-  border-radius: 999px;
-  opacity: 0.85;
-}
-
-.royal-checkout-header__ornament::before {
-  top: -28px;
-  right: 18%;
-}
-
-.royal-checkout-header__ornament::after {
-  bottom: -36px;
-  right: 8%;
-  width: 64px;
-  height: 64px;
-  border-color: rgb(74 0 0 / 0.08);
-}
-
-.royal-checkout-header__emblem-wrap {
-  position: relative;
-  padding: 0.35rem;
-}
-
-.royal-checkout-header__emblem-wrap::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border: 1px solid rgb(200 162 90 / 0.22);
-  border-radius: 999px;
-  transform: scale(1.08);
-}
-
-.royal-checkout-header__emblem {
-  display: block;
-  filter: drop-shadow(0 8px 18px rgb(74 0 0 / 0.12));
+@media (max-width: 639px) {
+  .royal-checkout-header__watermark {
+    width: min(52%, 10.5rem);
+    opacity: 0.72;
+  }
 }
 
 .luxury-range {

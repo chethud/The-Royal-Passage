@@ -9,6 +9,7 @@ type GuestBookingsListProps = {
   accessToken: string;
   allowCancel?: boolean;
   onUpdated?: () => void;
+  surface?: "light" | "dark";
 };
 
 export function GuestBookingsList({
@@ -16,9 +17,11 @@ export function GuestBookingsList({
   accessToken,
   allowCancel = false,
   onUpdated,
+  surface = "dark",
 }: GuestBookingsListProps) {
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const isLight = surface === "light";
 
   const handleCancel = async (bookingId: string) => {
     setCancellingId(bookingId);
@@ -34,21 +37,25 @@ export function GuestBookingsList({
   };
 
   return (
-    <div className="space-y-4">
+    <div>
       {error ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <p className="mb-4 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {error}
         </p>
       ) : null}
-      {bookings.map((booking) => (
-        <BookingCard
-          key={booking.id}
-          booking={booking}
-          showActions={allowCancel}
-          cancelling={cancellingId === booking.id}
-          onCancel={allowCancel ? (id) => void handleCancel(id) : undefined}
-        />
-      ))}
+      <ul className={isLight ? "divide-y divide-[rgb(74_0_0/0.15)]" : "space-y-4"}>
+        {bookings.map((booking) => (
+          <li key={booking.id}>
+            <BookingCard
+              booking={booking}
+              showActions={allowCancel}
+              cancelling={cancellingId === booking.id}
+              onCancel={allowCancel ? (id) => void handleCancel(id) : undefined}
+              surface={surface}
+            />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

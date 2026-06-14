@@ -21,21 +21,15 @@ export function BookingRequestHeader({
 }: BookingRequestHeaderProps) {
   return (
     <LuxuryCheckoutPanel className={`royal-checkout-header relative overflow-hidden ${className}`}>
-      <div className="royal-checkout-header__ornament" aria-hidden />
+      <RoyalCheckoutEmblem className="royal-checkout-header__watermark" />
 
-      <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 flex-1">
-          <div className="eyebrow luxury-panel-label">{label}</div>
-          <TitleTag className="luxury-panel-heading mt-2 font-display text-2xl uppercase leading-tight tracking-[0.05em] sm:text-3xl">
-            {title}
-          </TitleTag>
-          <p className="luxury-panel-body mt-2 text-sm">{meta}</p>
-          {children}
-        </div>
-
-        <div className="royal-checkout-header__emblem-wrap shrink-0 self-center sm:self-start">
-          <RoyalCheckoutEmblem className="royal-checkout-header__emblem h-32 w-28 sm:h-40 sm:w-36" />
-        </div>
+      <div className="relative z-10 max-w-[62%] sm:max-w-[58%]">
+        <div className="eyebrow luxury-panel-label">{label}</div>
+        <TitleTag className="luxury-panel-heading mt-2 font-display text-2xl uppercase leading-tight tracking-[0.05em] sm:text-3xl">
+          {title}
+        </TitleTag>
+        <p className="luxury-panel-body mt-2 text-sm">{meta}</p>
+        {children}
       </div>
     </LuxuryCheckoutPanel>
   );

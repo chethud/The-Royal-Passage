@@ -4,16 +4,31 @@ type RoyalCheckoutEmblemProps = {
   className?: string;
 };
 
-/** Ornamental royal crest for cream checkout panels. */
+const ROSETTE_COUNT = 5;
+
+function archRosettes(cx: number, cy: number, rx: number, ry: number) {
+  return Array.from({ length: ROSETTE_COUNT }, (_, i) => {
+    const t = Math.PI - (Math.PI * (i + 1)) / (ROSETTE_COUNT + 1);
+    return {
+      id: i,
+      x: cx + rx * Math.cos(t),
+      y: cy - ry * Math.sin(t),
+    };
+  });
+}
+
+/** Editorial palace-arch ornament for cream checkout panels. */
 export function RoyalCheckoutEmblem({ className = "" }: RoyalCheckoutEmblemProps) {
   const uid = useId().replace(/:/g, "");
   const gold = `#rp-gold-${uid}`;
   const maroon = `#rp-maroon-${uid}`;
-  const glow = `#rp-glow-${uid}`;
+  const wash = `#rp-wash-${uid}`;
+
+  const rosettes = archRosettes(120, 78, 88, 62);
 
   return (
     <svg
-      viewBox="0 0 160 180"
+      viewBox="0 0 240 108"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
@@ -21,105 +36,97 @@ export function RoyalCheckoutEmblem({ className = "" }: RoyalCheckoutEmblemProps
     >
       <defs>
         <linearGradient id={gold} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#E8C872" />
-          <stop offset="50%" stopColor="#C8A25A" />
-          <stop offset="100%" stopColor="#9A7228" />
+          <stop offset="0%" stopColor="#E8C872" stopOpacity="0.95" />
+          <stop offset="50%" stopColor="#C8A25A" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#9A7228" stopOpacity="0.85" />
         </linearGradient>
         <linearGradient id={maroon} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#5B0000" />
-          <stop offset="100%" stopColor="#3A0000" />
+          <stop offset="0%" stopColor="#5B0000" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#3A0000" stopOpacity="0.72" />
         </linearGradient>
-        <radialGradient id={glow} cx="50%" cy="42%" r="55%">
-          <stop offset="0%" stopColor="#C8A25A" stopOpacity="0.18" />
+        <radialGradient id={wash} cx="50%" cy="42%" r="58%">
+          <stop offset="0%" stopColor="#C8A25A" stopOpacity="0.1" />
           <stop offset="100%" stopColor="#C8A25A" stopOpacity="0" />
         </radialGradient>
       </defs>
 
-      <circle cx="80" cy="88" r="72" fill={`url(#${glow})`} />
+      <ellipse cx="120" cy="52" rx="98" ry="46" fill={`url(#${wash})`} />
 
-      {/* Outer rings */}
-      <circle cx="80" cy="88" r="68" stroke={`url(#${gold})`} strokeWidth="1.2" opacity="0.55" />
-      <circle cx="80" cy="88" r="58" stroke="#4A0000" strokeWidth="1.5" opacity="0.35" />
-
-      {/* Side flourishes */}
+      {/* Cusped arch — primary motif */}
       <path
-        d="M12 88 C 24 72, 34 68, 44 72 M12 88 C 24 104, 34 108, 44 104"
+        d="M18 96 L18 54 Q18 16 120 10 Q222 16 222 54 L222 96"
         stroke={`url(#${gold})`}
-        strokeWidth="1"
-        opacity="0.65"
-        strokeLinecap="round"
+        strokeWidth="1.1"
+        strokeOpacity="0.72"
       />
       <path
-        d="M148 88 C 136 72, 126 68, 116 72 M148 88 C 136 104, 126 108, 116 104"
-        stroke={`url(#${gold})`}
-        strokeWidth="1"
-        opacity="0.65"
-        strokeLinecap="round"
+        d="M34 96 L34 56 Q34 26 120 22 Q206 26 206 56 L206 96"
+        stroke={`url(#${maroon})`}
+        strokeWidth="0.85"
+        strokeOpacity="0.42"
       />
 
-      {/* Crown */}
-      <path
-        d="M52 42 L58 28 L68 36 L80 22 L92 36 L102 28 L108 42 Z"
-        fill={`url(#${maroon})`}
-        stroke={`url(#${gold})`}
-        strokeWidth="1.2"
-        strokeLinejoin="round"
-      />
-      <circle cx="58" cy="30" r="2" fill={`url(#${gold})`} />
-      <circle cx="80" cy="24" r="2.5" fill={`url(#${gold})`} />
-      <circle cx="102" cy="30" r="2" fill={`url(#${gold})`} />
+      {/* Pilaster lines */}
+      <path d="M18 96 L18 38" stroke={`url(#${maroon})`} strokeWidth="0.7" strokeOpacity="0.28" />
+      <path d="M222 96 L222 38" stroke={`url(#${maroon})`} strokeWidth="0.7" strokeOpacity="0.28" />
+      <path d="M34 96 L34 44" stroke={`url(#${gold})`} strokeWidth="0.55" strokeOpacity="0.35" />
+      <path d="M206 96 L206 44" stroke={`url(#${gold})`} strokeWidth="0.55" strokeOpacity="0.35" />
 
-      {/* Shield */}
-      <path
-        d="M80 48 L108 62 L108 98 C108 118 96 132 80 138 C64 132 52 118 52 98 L52 62 Z"
-        fill={`url(#${maroon})`}
-        stroke={`url(#${gold})`}
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
+      {/* Arch rosettes */}
+      {rosettes.map((r) => (
+        <g key={`rosette-${r.id}`} transform={`translate(${r.x.toFixed(1)} ${r.y.toFixed(1)})`}>
+          <circle r="7.5" stroke={`url(#${gold})`} strokeWidth="0.85" strokeOpacity="0.55" />
+          <circle r="3.6" fill={`url(#${gold})`} fillOpacity="0.22" />
+          <circle r="1.2" fill={`url(#${gold})`} fillOpacity="0.55" />
+        </g>
+      ))}
 
-      {/* Inner shield detail */}
+      {/* Central medallion — outlined compass star */}
+      <circle cx="120" cy="18" r="11" stroke={`url(#${gold})`} strokeWidth="0.9" strokeOpacity="0.65" />
+      <circle cx="120" cy="18" r="6.5" stroke={`url(#${maroon})`} strokeWidth="0.65" strokeOpacity="0.45" />
       <path
-        d="M80 56 L100 67 L100 97 C100 112 92 123 80 128 C68 123 60 112 60 97 L60 67 Z"
+        d="M120 10 L123 18 L131 18 L125 23 L127 31 L120 26 L113 31 L115 23 L109 18 L117 18 Z"
         stroke={`url(#${gold})`}
-        strokeWidth="0.8"
-        opacity="0.55"
-        fill="none"
-      />
-
-      {/* Royal star */}
-      <path
-        d="M80 72 L83.5 82 L94 82 L85.5 88.5 L89 99 L80 92.5 L71 99 L74.5 88.5 L66 82 L76.5 82 Z"
+        strokeWidth="0.75"
+        strokeOpacity="0.7"
         fill={`url(#${gold})`}
+        fillOpacity="0.14"
+        strokeLinejoin="round"
       />
 
-      {/* Monogram */}
-      <text
-        x="80"
-        y="118"
-        textAnchor="middle"
-        fill="#F7F1E8"
-        fontSize="11"
-        fontFamily="Cinzel, ui-serif, Georgia, serif"
-        letterSpacing="0.22em"
-      >
-        RP
-      </text>
-
-      {/* Bottom ribbon */}
+      {/* Side filigree brackets */}
       <path
-        d="M48 148 Q 80 158 112 148"
+        d="M8 72 L8 48 C8 38 14 32 24 32 L42 32"
         stroke={`url(#${gold})`}
-        strokeWidth="1"
-        opacity="0.7"
-        fill="none"
+        strokeWidth="0.75"
+        strokeOpacity="0.5"
+        strokeLinecap="round"
       />
-      <path d="M48 148 L44 154 L48 152 M112 148 L116 154 L112 152" stroke={`url(#${gold})`} strokeWidth="0.9" opacity="0.7" />
+      <path
+        d="M232 72 L232 48 C232 38 226 32 216 32 L198 32"
+        stroke={`url(#${gold})`}
+        strokeWidth="0.75"
+        strokeOpacity="0.5"
+        strokeLinecap="round"
+      />
+      <circle cx="24" cy="36" r="1.4" fill={`url(#${gold})`} fillOpacity="0.55" />
+      <circle cx="216" cy="36" r="1.4" fill={`url(#${gold})`} fillOpacity="0.55" />
 
-      {/* Corner dots */}
-      <circle cx="80" cy="14" r="2" fill={`url(#${gold})`} opacity="0.8" />
-      <circle cx="28" cy="88" r="1.5" fill="#4A0000" opacity="0.25" />
-      <circle cx="132" cy="88" r="1.5" fill="#4A0000" opacity="0.25" />
+      {/* Base rule with diamond */}
+      <path d="M52 96 H188" stroke={`url(#${gold})`} strokeWidth="0.8" strokeOpacity="0.45" />
+      <path
+        d="M120 90 L124 96 L120 102 L116 96 Z"
+        stroke={`url(#${maroon})`}
+        strokeWidth="0.7"
+        strokeOpacity="0.5"
+        fill={`url(#${gold})`}
+        fillOpacity="0.12"
+        strokeLinejoin="round"
+      />
+
+      {/* Delicate inner axis */}
+      <path d="M120 28 L120 88" stroke={`url(#${maroon})`} strokeWidth="0.45" strokeOpacity="0.18" />
+      <path d="M72 68 L168 68" stroke={`url(#${maroon})`} strokeWidth="0.45" strokeOpacity="0.14" />
     </svg>
   );
 }
