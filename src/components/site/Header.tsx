@@ -1,5 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { LogOut, Menu, Pencil, UserRound } from "lucide-react";
+import { LogOut, Menu, Pencil, UserRound, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
 import { CartIcon } from "@/components/cart/CartIcon";
@@ -210,12 +210,20 @@ export function Header() {
                     </DropdownMenuItem>
                   )}
                   {isAdmin ? (
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin/homepage-edit" className="cursor-pointer">
-                        <Pencil className="h-4 w-4" />
-                        Edit
-                      </Link>
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/homepage-edit" className="cursor-pointer">
+                          <Pencil className="h-4 w-4" />
+                          Edit
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/hosts" className="cursor-pointer">
+                          <Users className="h-4 w-4" />
+                          Host accounts
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
                   ) : null}
                   <DropdownMenuItem onSelect={goToProfile} className="cursor-pointer">
                     <UserRound className="h-4 w-4" />
@@ -335,11 +343,18 @@ export function Header() {
                     </SheetClose>
                   )}
                   {isAdmin ? (
-                    <SheetClose asChild>
-                      <Link to="/admin/homepage-edit" className={sheetLinkClass}>
-                        Edit
-                      </Link>
-                    </SheetClose>
+                    <>
+                      <SheetClose asChild>
+                        <Link to="/admin/homepage-edit" className={sheetLinkClass}>
+                          Edit
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link to="/admin/hosts" className={sheetLinkClass}>
+                          Host accounts
+                        </Link>
+                      </SheetClose>
+                    </>
                   ) : null}
                   <SheetClose asChild>
                     <Link to={profilePathForRole(role)} className={sheetLinkClass}>
