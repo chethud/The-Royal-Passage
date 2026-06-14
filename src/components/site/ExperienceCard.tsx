@@ -34,11 +34,6 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
             <CategoryIcon className="h-3 w-3 text-[#D4AF6A]" strokeWidth={1.75} />
             {exp.category}
           </span>
-          {exp.verifiedHost ? (
-            <span className="rounded-sm bg-[#C8A25A] px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.1em] text-[#4A0000]">
-              Verified
-            </span>
-          ) : null}
         </div>
 
         <div className="absolute right-2.5 top-2.5 z-30 flex items-center gap-1.5">
