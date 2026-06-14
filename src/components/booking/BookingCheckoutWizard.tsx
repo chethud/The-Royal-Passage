@@ -96,16 +96,16 @@ export function BookingCheckoutWizard({
                           ? "luxury-panel-heading font-semibold"
                           : done
                             ? "luxury-panel-label"
-                            : "text-[#4A0000]/35"
+                            : "text-[#3A0000]/32"
                       }`}
                     >
                       <span
-                        className={`flex h-7 w-7 items-center justify-center rounded-full border font-display text-xs transition-colors ${
+                        className={`flex h-8 w-8 items-center justify-center rounded-full border font-display text-xs transition-colors ${
                           active
-                            ? "border-[#C8A25A]/55 bg-[#C8A25A]/12 luxury-panel-heading"
+                            ? "luxury-panel-step-active"
                             : done
-                              ? "border-[#C8A25A]/45 luxury-panel-label"
-                              : "border-[#4A0000]/15 text-[#4A0000]/35"
+                              ? "luxury-panel-step-done"
+                              : "luxury-panel-step-idle"
                         }`}
                       >
                         {String(item.id).padStart(2, "0")}
@@ -124,7 +124,7 @@ export function BookingCheckoutWizard({
 
         {step === 1 ? (
           <LuxuryCheckoutPanel>
-            <h2 className="luxury-panel-heading font-display text-2xl tracking-tight md:text-3xl">
+            <h2 className="luxury-panel-heading font-display text-2xl tracking-[0.02em] md:text-3xl">
               Choose your date & slot
             </h2>
             <p className="luxury-panel-body mt-2 max-w-xl text-sm leading-relaxed">
@@ -168,7 +168,7 @@ export function BookingCheckoutWizard({
 
         {step === 2 ? (
           <LuxuryCheckoutPanel>
-            <h2 className="luxury-panel-heading font-display text-2xl tracking-tight md:text-3xl">
+            <h2 className="luxury-panel-heading font-display text-2xl tracking-[0.02em] md:text-3xl">
               Payment method
             </h2>
             <p className="luxury-panel-body mt-2 max-w-xl text-sm leading-relaxed">
@@ -199,7 +199,7 @@ export function BookingCheckoutWizard({
 
         {step === 3 ? (
           <LuxuryCheckoutPanel>
-            <h2 className="luxury-panel-heading font-display text-2xl tracking-tight md:text-3xl">
+            <h2 className="luxury-panel-heading font-display text-2xl tracking-[0.02em] md:text-3xl">
               Confirm your request
             </h2>
             <p className="luxury-panel-body mt-2 max-w-xl text-sm leading-relaxed">
@@ -240,12 +240,12 @@ export function BookingCheckoutWizard({
       <aside className="h-fit lg:sticky lg:top-[calc(var(--header-height)+1rem)]">
         <LuxuryCheckoutPanel>
           {exp.image ? (
-            <div className="mb-5 overflow-hidden rounded-sm border border-[#C8A25A]/25">
+            <div className="luxury-panel-image mb-6">
               <img src={exp.image} alt="" className="aspect-[16/10] w-full object-cover" />
             </div>
           ) : null}
 
-          <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Booking summary</h2>
+          <h2 className="luxury-panel-heading font-display text-xl tracking-[0.04em]">Booking summary</h2>
           <div className="luxury-panel-divider-bg my-5 h-px" />
 
           <dl className="space-y-3.5 text-sm">
@@ -267,7 +267,7 @@ export function BookingCheckoutWizard({
 
           <div className="flex items-baseline justify-between gap-4">
             <span className="eyebrow luxury-panel-body">Estimated total</span>
-            <span className="luxury-panel-heading font-display text-3xl tracking-tight">
+            <span className="luxury-panel-heading font-display text-3xl tracking-[0.02em]">
               {selectedSlot ? formatMoney(totalMinor, sym) : "—"}
             </span>
           </div>

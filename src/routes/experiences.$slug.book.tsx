@@ -81,7 +81,7 @@ function BookExperiencePage() {
 
         <LuxuryCheckoutPanel className="mt-6">
           <div className="eyebrow luxury-panel-label">Book your seats</div>
-          <h1 className="luxury-panel-heading mt-2 font-display text-3xl uppercase tracking-[0.04em] sm:text-4xl">
+          <h1 className="luxury-panel-heading mt-2 font-display text-3xl uppercase tracking-[0.05em] sm:text-4xl">
             {exp.title}
           </h1>
           <p className="luxury-panel-body mt-2 text-sm">

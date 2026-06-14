@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Heart, ShoppingCart } from "lucide-react";
 import { CartItemsSection, WishlistCartSection } from "@/components/cart/CartPageSections";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
 import type { WishlistItem } from "@/lib/api/wishlist";
@@ -87,13 +88,13 @@ function GuestCartPage() {
     >
       {pageError ? <p className="mb-6 text-sm text-destructive">{pageError}</p> : null}
 
-      <section>
-        <div className="mb-6 flex items-baseline justify-between gap-4 border-b border-[#C8A25A]/12 pb-4">
+      <LuxuryCheckoutPanel>
+        <div className="mb-6 flex items-baseline justify-between gap-4 luxury-panel-divider border-b pb-5">
           <div className="flex items-center gap-2.5">
-            <ShoppingCart className="h-4 w-4 text-[#D4AF6A]" strokeWidth={1.5} />
-            <h2 className="font-display text-xl tracking-wide text-[#F7F1E8]">Cart items</h2>
+            <ShoppingCart className="luxury-panel-label h-4 w-4" strokeWidth={1.5} />
+            <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Cart items</h2>
           </div>
-          <span className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground/80">
+          <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
             {cartItems.length} {cartItems.length === 1 ? "item" : "items"}
           </span>
         </div>
@@ -102,22 +103,23 @@ function GuestCartPage() {
           items={cartItems}
           removingId={removingCartId}
           onRemove={handleRemoveCart}
+          surface="light"
         />
-      </section>
+      </LuxuryCheckoutPanel>
 
-      <section className="mt-14">
-        <div className="mb-6 flex items-baseline justify-between gap-4 border-b border-[#C8A25A]/12 pb-4">
+      <LuxuryCheckoutPanel className="mt-8">
+        <div className="mb-6 flex items-baseline justify-between gap-4 luxury-panel-divider border-b pb-5">
           <div className="flex items-center gap-2.5">
-            <Heart className="h-4 w-4 text-[#D4AF6A]" strokeWidth={1.5} />
-            <h2 className="font-display text-xl tracking-wide text-[#F7F1E8]">Wishlist</h2>
+            <Heart className="luxury-panel-label h-4 w-4" strokeWidth={1.5} />
+            <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Wishlist</h2>
           </div>
-          <span className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground/80">
+          <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
             {pageLoading ? "…" : `${wishlistItems.length} saved`}
           </span>
         </div>
 
         {pageLoading ? (
-          <p className="py-8 text-sm text-muted-foreground/80">Loading wishlist…</p>
+          <p className="luxury-panel-body py-8 text-sm">Loading wishlist…</p>
         ) : (
           <WishlistCartSection
             items={wishlistItems}
@@ -126,9 +128,10 @@ function GuestCartPage() {
             addingId={addingWishlistId}
             onRemove={(id) => void handleRemoveWishlist(id)}
             onAddToCart={handleAddWishlistToCart}
+            surface="light"
           />
         )}
-      </section>
+      </LuxuryCheckoutPanel>
     </GuestDashboardShell>
   );
 }

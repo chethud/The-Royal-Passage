@@ -102,6 +102,13 @@
   --chart-3: oklch(0.55 0.06 220);
   --chart-4: oklch(0.7 0.1 80);
   --chart-5: oklch(0.45 0.04 300);
+
+  /* Cream-white surfaces (checkout, cart) on burgundy pages */
+  --cream-white: #fcfbf8;
+  --cream-surface: #f7f1e8;
+  --cream-warm: #f3ede6;
+  --cream-border: rgb(200 162 90 / 0.36);
+  --cream-shadow: rgb(26 0 0 / 0.42);
 }
 
 @media (min-width: 640px) {
@@ -351,53 +358,102 @@
   letter-spacing: 0.1em;
 }
 
-/* Premium cream panels for checkout (on burgundy page background) */
+/* Premium cream-white panels for checkout & cart (on burgundy page background) */
 .luxury-checkout-panel {
-  border: 1px solid oklch(0.72 0.1 78 / 0.42);
-  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-md);
   background: linear-gradient(
-    168deg,
-    oklch(0.985 0.006 88) 0%,
-    oklch(0.965 0.01 86) 52%,
-    oklch(0.948 0.014 84) 100%
+    175deg,
+    #ffffff 0%,
+    var(--cream-white) 20%,
+    var(--cream-surface) 58%,
+    var(--cream-warm) 100%
   );
-  color: oklch(0.22 0.09 22);
+  color: #4a0000;
   box-shadow:
-    inset 0 1px 0 oklch(1 0 0 / 0.75),
-    0 26px 52px -28px oklch(0.06 0.03 22 / 0.68);
+    inset 0 1px 0 rgb(255 255 255 / 0.92),
+    inset 0 -1px 0 rgb(200 162 90 / 0.06),
+    0 1px 0 rgb(255 255 255 / 0.04),
+    0 22px 50px -26px var(--cream-shadow),
+    0 10px 28px -14px rgb(200 162 90 / 0.14);
+}
+
+.luxury-checkout-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(200 162 90 / 0.55) 20%,
+    rgb(212 175 106 / 0.65) 50%,
+    rgb(200 162 90 / 0.55) 80%,
+    transparent
+  );
+  pointer-events: none;
 }
 
 .luxury-panel-heading {
-  color: oklch(0.18 0.09 22);
+  color: #3a0000;
+  letter-spacing: 0.02em;
 }
 
 .luxury-panel-body {
-  color: oklch(0.38 0.06 24);
+  color: rgb(58 0 0 / 0.58);
 }
 
 .luxury-panel-label {
-  color: oklch(0.48 0.09 72);
+  color: #8b6914;
+  letter-spacing: 0.18em;
 }
 
 .luxury-panel-divider {
-  border-color: oklch(0.72 0.1 78 / 0.28);
+  border-color: rgb(200 162 90 / 0.22);
 }
 
 .luxury-panel-divider-bg {
-  background-color: oklch(0.72 0.1 78 / 0.28);
+  background-color: rgb(200 162 90 / 0.22);
 }
 
 .luxury-panel-link {
-  color: oklch(0.48 0.09 72);
+  color: #8b6914;
   transition: color 0.2s ease;
 }
 
 .luxury-panel-link:hover {
-  color: oklch(0.22 0.09 22);
+  color: #3a0000;
+}
+
+.luxury-panel-step-active {
+  border: 1px solid rgb(200 162 90 / 0.52);
+  background: rgb(200 162 90 / 0.11);
+  color: #3a0000;
+}
+
+.luxury-panel-step-done {
+  border: 1px solid rgb(200 162 90 / 0.38);
+  color: #8b6914;
+}
+
+.luxury-panel-step-idle {
+  border: 1px solid rgb(58 0 0 / 0.12);
+  color: rgb(58 0 0 / 0.32);
+}
+
+.luxury-panel-image {
+  overflow: hidden;
+  border: 1px solid rgb(200 162 90 / 0.28);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 10px 28px -14px rgb(58 0 0 / 0.18);
 }
 
 .luxury-checkout-panel .hairline {
-  background: linear-gradient(90deg, transparent, oklch(0.72 0.1 78 / 0.38), transparent);
+  background: linear-gradient(90deg, transparent, rgb(200 162 90 / 0.32), transparent);
 }
 
 .luxury-range {

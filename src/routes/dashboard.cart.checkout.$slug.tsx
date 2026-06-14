@@ -79,7 +79,7 @@ function CartCheckoutPage() {
 
       <LuxuryCheckoutPanel className="mt-6">
         <div className="eyebrow luxury-panel-label">Booking request</div>
-        <h2 className="luxury-panel-heading mt-2 font-display text-2xl uppercase tracking-[0.04em] sm:text-3xl">
+        <h2 className="luxury-panel-heading mt-2 font-display text-2xl uppercase tracking-[0.05em] sm:text-3xl">
           {exp.title}
         </h2>
         <p className="luxury-panel-body mt-2 text-sm">
