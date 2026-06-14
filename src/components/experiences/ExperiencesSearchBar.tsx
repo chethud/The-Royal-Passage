@@ -15,7 +15,7 @@ export function ExperiencesSearchBar({ value, onChange, className = "" }: Experi
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search experiences, cities, categories…"
-        className="w-full rounded-lg border border-[#C8A25A]/22 bg-[#4A0000]/50 py-2.5 pl-10 pr-10 text-sm text-[#F7F1E8] placeholder:text-[#D6C8B5]/60 backdrop-blur-sm transition-colors focus:border-[#C8A25A]/45 focus:outline-none focus:ring-1 focus:ring-[#C8A25A]/25"
+        className="w-full border-0 border-b border-[#C8A25A]/25 bg-transparent py-2.5 pl-10 pr-10 text-sm text-[#F7F1E8] placeholder:text-[#D6C8B5]/55 transition-colors focus:border-[#C8A25A]/55 focus:outline-none focus:ring-0"
       />
       {value ? (
         <button

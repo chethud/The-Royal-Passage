@@ -128,22 +128,22 @@ function ExperiencesPage() {
       />
 
       <section id="experiences-grid" className="container-page pb-16 pt-8">
-        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3 border-b border-[#C8A25A]/12 pb-4">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="eyebrow text-[0.65rem] text-[#D4AF6A]">Curated collection</p>
-            <h2 className="mt-1 font-display text-2xl text-[#F7F1E8]">
+            <h2 className="mt-1 font-display text-2xl tracking-tight text-[#F7F1E8] md:text-3xl">
               {filtered.length} experience{filtered.length === 1 ? "" : "s"}
             </h2>
-            <p className="mt-1 text-xs text-[#D6C8B5]">
+            <p className="mt-1.5 text-xs tracking-wide text-[#D6C8B5]/90">
               Handpicked journeys from verified hosts
             </p>
           </div>
-          <p className="text-xs text-[#D6C8B5]">
+          <p className="text-[0.65rem] uppercase tracking-[0.14em] text-[#D6C8B5]/80">
             Page {Math.min(page, pages)} of {pages}
           </p>
         </div>
 
-        <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-8">
+        <div className="flex flex-col items-start gap-8 lg:flex-row lg:gap-12">
           <ExperiencesFilterSidebar
             search={search}
             categories={categories}
@@ -159,7 +159,7 @@ function ExperiencesPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
+                  className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
                 >
                   {Array.from({ length: 3 }).map((_, i) => (
                     <ExperienceCardSkeleton key={i} />
@@ -175,7 +175,7 @@ function ExperiencesPage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.35 }}
-                  className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
+                  className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
                 >
                   {paged.map((e) => (
                     <ExperienceCard key={e.id} exp={e} />
@@ -185,23 +185,23 @@ function ExperiencesPage() {
             </AnimatePresence>
 
             {filtered.length > PAGE_SIZE ? (
-              <div className="mt-8 flex items-center justify-center gap-2">
+              <div className="mt-10 flex items-center justify-center gap-4">
                 <button
                   type="button"
                   disabled={page <= 1}
                   onClick={() => updateSearch({ page: Math.max(1, page - 1) })}
-                  className="luxury-btn-sm luxury-btn-secondary disabled:opacity-40"
+                  className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
                 >
                   Previous
                 </button>
-                <span className="px-3 text-xs text-[#D6C8B5]">
+                <span className="text-[0.65rem] uppercase tracking-[0.12em] text-[#D6C8B5]/75">
                   {page} / {pages}
                 </span>
                 <button
                   type="button"
                   disabled={page >= pages}
                   onClick={() => updateSearch({ page: Math.min(pages, page + 1) })}
-                  className="luxury-btn-sm luxury-btn-secondary disabled:opacity-40"
+                  className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
                 >
                   Next
                 </button>

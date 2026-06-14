@@ -39,9 +39,9 @@ export function ExperiencesFilterSidebar({
   onReset,
 }: ExperiencesFilterSidebarProps) {
   return (
-    <aside className="w-full shrink-0 lg:w-[240px] xl:w-[260px]">
-      <div className="sticky top-[calc(var(--header-height)+1rem)] space-y-6 rounded-lg border border-[#C8A25A]/14 bg-[linear-gradient(165deg,#4A0000_0%,#3a0000_55%,#2d0000_100%)] p-5 shadow-[0_24px_48px_-32px_rgba(0,0,0,0.65)] backdrop-blur-md">
-        <div className="flex items-center justify-between gap-2 border-b border-[#C8A25A]/12 pb-3">
+    <aside className="w-full shrink-0 lg:w-[220px] xl:w-[240px]">
+      <div className="sticky top-[calc(var(--header-height)+1rem)] space-y-8 py-2">
+        <div className="flex items-center justify-between gap-2">
           <h2 className="font-display text-base tracking-wide text-[#F7F1E8]">Refine</h2>
           <button
             type="button"
@@ -114,8 +114,8 @@ export function ExperiencesFilterSidebar({
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="eyebrow mb-2.5 text-[0.62rem] tracking-[0.2em] text-[#D4AF6A]/90">{title}</h3>
-      <div className="flex flex-col gap-1">{children}</div>
+      <h3 className="eyebrow mb-3 text-[0.62rem] tracking-[0.2em] text-[#D4AF6A]/90">{title}</h3>
+      <div className="flex flex-col gap-0.5">{children}</div>
     </div>
   );
 }
@@ -141,21 +141,18 @@ function FilterOption({
       aria-label={label}
       aria-pressed={active}
       onClick={onClick}
-      className={`group flex w-full items-center gap-3 rounded-md px-2 py-2 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#3a0000] ${
+      className={`group flex w-full items-center gap-2.5 border-l-2 py-2 pl-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]/50 ${
         active
-          ? "bg-[#C8A25A]/12 text-[#F7F1E8]"
-          : "text-[#F7F1E8]/72 hover:bg-[#C8A25A]/06 hover:text-[#F7F1E8]"
+          ? "border-[#D4AF6A] text-[#F7F1E8]"
+          : "border-transparent text-[#F7F1E8]/65 hover:border-[#C8A25A]/35 hover:text-[#F7F1E8]"
       }`}
     >
-      <span
-        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
-          active
-            ? "bg-[#C8A25A]/20 text-[#E8C872] shadow-[0_0_18px_oklch(0.72_0.12_86_/_0.22)]"
-            : "bg-[#F7F1E8]/06 text-[#D4AF6A]/75 group-hover:bg-[#C8A25A]/10 group-hover:text-[#D4AF6A]"
+      <Icon
+        strokeWidth={1.5}
+        className={`h-4 w-4 shrink-0 transition-colors ${
+          active ? "text-[#D4AF6A]" : "text-[#D4AF6A]/70 group-hover:text-[#D4AF6A]"
         }`}
-      >
-        <Icon strokeWidth={1.5} className="h-[1.05rem] w-[1.05rem]" />
-      </span>
+      />
       <span className="min-w-0 text-[0.72rem] font-medium leading-snug tracking-[0.04em]">{text}</span>
     </button>
   );

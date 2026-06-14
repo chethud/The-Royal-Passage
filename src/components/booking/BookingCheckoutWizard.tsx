@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPanel";
 import { PaymentMethodSelector } from "@/components/booking/PaymentMethodSelector";
 import type { Experience } from "@/data/experiences";
@@ -69,43 +70,55 @@ export function BookingCheckoutWizard({
   };
 
   return (
-    <div className="mt-6 grid gap-8 xl:grid-cols-[1fr_320px]">
+    <div className="mt-8 grid gap-10 xl:grid-cols-[minmax(0,1fr)_280px] xl:gap-14">
       <div>
         {!isLiveExperience ? (
-          <div className="mb-6 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <p className="mb-6 text-sm text-destructive">
             This listing is preview-only and cannot be booked online. Please choose a live experience.
-          </div>
+          </p>
         ) : null}
 
-        <ol className="mb-8 flex flex-wrap gap-2 sm:gap-4">
-          {STEPS.map((item) => {
-            const active = step === item.id;
-            const done = step > item.id;
-            return (
-              <li
-                key={item.id}
-                className={`flex items-center gap-2 rounded-sm border px-3 py-2 text-xs uppercase tracking-[0.14em] ${
-                  active
-                    ? "border-ember bg-ember/15 text-ember"
-                    : done
-                      ? "border-ember/35 text-foreground"
-                      : "border-[oklch(0.72_0.09_78_/_0.22)] text-muted-foreground"
-                }`}
-              >
-                <span className="font-semibold">{item.id}</span>
-                <span>{item.label}</span>
-              </li>
-            );
-          })}
-        </ol>
+        <nav aria-label="Booking progress" className="mb-10 border-b border-[#C8A25A]/15 pb-6">
+          <ol className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            {STEPS.map((item, index) => {
+              const active = step === item.id;
+              const done = step > item.id;
+              return (
+                <li key={item.id} className="flex items-center gap-6">
+                  <span
+                    className={`flex items-center gap-2.5 text-[0.65rem] uppercase tracking-[0.16em] transition-colors ${
+                      active
+                        ? "text-[#D4AF6A]"
+                        : done
+                          ? "text-foreground/80"
+                          : "text-muted-foreground/45"
+                    }`}
+                  >
+                    <span
+                      className={`font-display text-sm ${
+                        active ? "text-[#D4AF6A]" : done ? "text-foreground/70" : "text-muted-foreground/40"
+                      }`}
+                    >
+                      {String(item.id).padStart(2, "0")}
+                    </span>
+                    <span className={active ? "font-semibold" : ""}>{item.label}</span>
+                  </span>
+                  {index < STEPS.length - 1 ? (
+                    <span className="hidden h-px w-8 bg-[#C8A25A]/20 sm:block" aria-hidden />
+                  ) : null}
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
 
         {step === 1 ? (
           <div>
-            <h2 className="font-display text-2xl">Choose your date & slot</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <h2 className="font-display text-2xl tracking-tight md:text-3xl">Choose your date & slot</h2>
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
               Pick an available session in the next 7 days and set how many guests are joining.
             </p>
-            <div className="mt-6">
+            <div className="mt-8">
               <ExperienceBookingPanel
                 exp={exp}
                 selectedSlot={selectedSlot}
@@ -118,12 +131,12 @@ export function BookingCheckoutWizard({
                 hideActions
               />
             </div>
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap items-center gap-6">
               <Link
                 to={backLink.to}
                 params={backLink.params}
                 hash={backLink.hash}
-                className="luxury-btn-sm luxury-btn-secondary"
+                className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
               >
                 {backLink.label}
               </Link>
@@ -131,9 +144,10 @@ export function BookingCheckoutWizard({
                 type="button"
                 disabled={!selectedSlot}
                 onClick={goNext}
-                className="luxury-btn-sm luxury-btn-primary disabled:opacity-50"
+                className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
               >
                 Continue to payment
+                <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
@@ -141,19 +155,28 @@ export function BookingCheckoutWizard({
 
         {step === 2 ? (
           <div>
-            <h2 className="font-display text-2xl">Payment method</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <h2 className="font-display text-2xl tracking-tight md:text-3xl">Payment method</h2>
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
               Your booking request goes to the host for approval. Payment is collected at the venue.
             </p>
-            <div className="mt-6 glass rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] p-6">
+            <div className="mt-8">
               <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
             </div>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button type="button" onClick={goBack} className="luxury-btn-sm luxury-btn-secondary">
+            <div className="mt-8 flex flex-wrap items-center gap-6">
+              <button
+                type="button"
+                onClick={goBack}
+                className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
+              >
                 Back
               </button>
-              <button type="button" onClick={goNext} className="luxury-btn-sm luxury-btn-primary">
+              <button
+                type="button"
+                onClick={goNext}
+                className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2"
+              >
                 Review booking
+                <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
@@ -161,12 +184,12 @@ export function BookingCheckoutWizard({
 
         {step === 3 ? (
           <div>
-            <h2 className="font-display text-2xl">Confirm your request</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <h2 className="font-display text-2xl tracking-tight md:text-3xl">Confirm your request</h2>
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
               We will notify your host. They can accept or decline. You pay at the venue after they
               confirm.
             </p>
-            <div className="mt-6">
+            <div className="mt-8">
               <ExperienceBookingPanel
                 exp={exp}
                 selectedSlot={selectedSlot}
@@ -183,8 +206,12 @@ export function BookingCheckoutWizard({
                 error={error}
               />
             </div>
-            <div className="mt-4">
-              <button type="button" onClick={goBack} className="luxury-btn-sm luxury-btn-secondary">
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={goBack}
+                className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
+              >
                 Back
               </button>
             </div>
@@ -192,51 +219,51 @@ export function BookingCheckoutWizard({
         ) : null}
       </div>
 
-      <aside className="glass-strong h-fit rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 lg:sticky lg:top-[calc(var(--header-height)+1rem)]">
-        <h2 className="font-display text-2xl">Booking summary</h2>
+      <aside className="h-fit border-t border-[#C8A25A]/12 pt-8 xl:border-l xl:border-t-0 xl:pl-10 xl:pt-0 lg:sticky lg:top-[calc(var(--header-height)+1rem)]">
+        <h2 className="font-display text-xl tracking-wide text-[#F7F1E8]">Booking summary</h2>
         <div className="hairline my-5" />
 
-        <dl className="space-y-3 text-sm">
+        <dl className="space-y-3.5 text-sm">
           <div className="flex justify-between gap-4">
             <dt className="text-muted-foreground">Experience</dt>
-            <dd className="text-right">{exp.title}</dd>
+            <dd className="text-right text-foreground/90">{exp.title}</dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-muted-foreground">Host</dt>
-            <dd className="text-right">{exp.hostName}</dd>
+            <dd className="text-right text-foreground/90">{exp.hostName}</dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-muted-foreground">Date</dt>
-            <dd className="text-right">
+            <dd className="text-right text-foreground/90">
               {selectedSlot ? formatDateLong(selectedSlot.date) : "—"}
             </dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-muted-foreground">Time</dt>
-            <dd className="text-right">
+            <dd className="text-right text-foreground/90">
               {selectedSlot ? `${selectedSlot.start}–${selectedSlot.end}` : "—"}
             </dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-muted-foreground">Guests</dt>
-            <dd>{guests}</dd>
+            <dd className="text-foreground/90">{guests}</dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-muted-foreground">Payment</dt>
-            <dd className="text-right">{step >= 2 ? "Pay at venue" : "—"}</dd>
+            <dd className="text-right text-foreground/90">{step >= 2 ? "Pay at venue" : "—"}</dd>
           </div>
         </dl>
 
         <div className="hairline my-5" />
 
-        <div className="flex items-baseline justify-between">
+        <div className="flex items-baseline justify-between gap-4">
           <span className="eyebrow text-muted-foreground">Estimated total</span>
-          <span className="font-display text-3xl">
+          <span className="font-display text-3xl tracking-tight text-[#F7F1E8]">
             {selectedSlot ? formatMoney(totalMinor, sym) : "—"}
           </span>
         </div>
 
-        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+        <p className="mt-5 text-xs leading-relaxed text-muted-foreground/90">
           After you submit, your host receives the request and can approve or decline. You will see
           the status in your booking history.
         </p>

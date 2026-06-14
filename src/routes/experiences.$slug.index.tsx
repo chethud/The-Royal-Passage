@@ -281,19 +281,17 @@ function ExperienceDetail() {
         </section>
       ) : (
         <section className="container-page py-12 sm:py-16">
-          <div className="glass rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] px-6 py-8 text-center sm:px-10">
-            <p className="font-display text-2xl">Booking opens soon</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              There are no available sessions in the next 7 days. Check back later or browse other
-              experiences.
-            </p>
-            <Link
-              to="/experiences"
-              className="mt-6 inline-flex text-sm text-ember underline-offset-4 hover:underline"
-            >
-              Browse the library →
-            </Link>
-          </div>
+          <p className="font-display text-2xl">Booking opens soon</p>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            There are no available sessions in the next 7 days. Check back later or browse other
+            experiences.
+          </p>
+          <Link
+            to="/experiences"
+            className="mt-6 inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
+          >
+            Browse the library →
+          </Link>
         </section>
       )}
 

@@ -62,7 +62,7 @@ export function ExperiencesHero({
               signedIn ? (
                 <Link
                   to="/dashboard/cart"
-                  className="inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-lg border border-[#C8A25A]/22 bg-[#4A0000]/50 text-[#D4AF6A] backdrop-blur-sm transition-colors hover:border-[#C8A25A]/45 hover:bg-[#5B0000]/60 hover:text-[#F7F1E8] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A25A]/25"
+                  className="inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center text-[#D4AF6A] transition-colors hover:text-[#F7F1E8] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A25A]/25"
                   aria-label="View cart and wishlist"
                 >
                   <ShoppingCart className="h-4 w-4" />
@@ -71,7 +71,7 @@ export function ExperiencesHero({
                 <Link
                   to="/sign-in"
                   search={{ redirect: "/experiences" }}
-                  className="inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-lg border border-[#C8A25A]/22 bg-[#4A0000]/50 text-[#D4AF6A] backdrop-blur-sm transition-colors hover:border-[#C8A25A]/45 hover:bg-[#5B0000]/60 hover:text-[#F7F1E8] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A25A]/25"
+                  className="inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center text-[#D4AF6A] transition-colors hover:text-[#F7F1E8] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C8A25A]/25"
                   aria-label="Sign in to use cart and wishlist"
                 >
                   <ShoppingCart className="h-4 w-4" />
