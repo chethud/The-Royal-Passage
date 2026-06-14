@@ -38,6 +38,7 @@ import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
 import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookingId'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
+import { Route as AdminHomepageEditRouteImport } from './routes/admin.homepage-edit'
 import { Route as AccountProfileRouteImport } from './routes/account.profile'
 import { Route as HostExperiencesIndexRouteImport } from './routes/host.experiences.index'
 import { Route as HostBookingsIndexRouteImport } from './routes/host.bookings.index'
@@ -204,6 +205,11 @@ const AdminProfileRoute = AdminProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHomepageEditRoute = AdminHomepageEditRouteImport.update({
+  id: '/homepage-edit',
+  path: '/homepage-edit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AccountProfileRoute = AccountProfileRouteImport.update({
   id: '/account/profile',
   path: '/account/profile',
@@ -321,6 +327,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/account/profile': typeof AccountProfileRoute
+  '/admin/homepage-edit': typeof AdminHomepageEditRoute
   '/admin/profile': typeof AdminProfileRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -370,6 +377,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/account/profile': typeof AccountProfileRoute
+  '/admin/homepage-edit': typeof AdminHomepageEditRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
   '/cities/$slug': typeof CitiesSlugRoute
@@ -417,6 +425,7 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/account/profile': typeof AccountProfileRoute
+  '/admin/homepage-edit': typeof AdminHomepageEditRoute
   '/admin/profile': typeof AdminProfileRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -470,6 +479,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/account/profile'
+    | '/admin/homepage-edit'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -519,6 +529,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/account/profile'
+    | '/admin/homepage-edit'
     | '/auth/callback'
     | '/bookings/$bookingId'
     | '/cities/$slug'
@@ -565,6 +576,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/account/profile'
+    | '/admin/homepage-edit'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -832,6 +844,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProfileRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/homepage-edit': {
+      id: '/admin/homepage-edit'
+      path: '/homepage-edit'
+      fullPath: '/admin/homepage-edit'
+      preLoaderRoute: typeof AdminHomepageEditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/account/profile': {
       id: '/account/profile'
       path: '/account/profile'
@@ -990,6 +1009,7 @@ const AdminProfileRouteWithChildren = AdminProfileRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminHomepageEditRoute: typeof AdminHomepageEditRoute
   AdminProfileRoute: typeof AdminProfileRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBookingsBookingIdRoute: typeof AdminBookingsBookingIdRoute
@@ -1002,6 +1022,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminHomepageEditRoute: AdminHomepageEditRoute,
   AdminProfileRoute: AdminProfileRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   AdminBookingsBookingIdRoute: AdminBookingsBookingIdRoute,
