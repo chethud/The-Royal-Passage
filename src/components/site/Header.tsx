@@ -102,11 +102,6 @@ export function Header() {
     void router.navigate({ to: "/account/profile" });
   };
 
-  const profileSectionTitle =
-    role === "admin" ? "Royal Steward" : role === "host" ? "Royal Host" : "Royal Guest";
-  const profileSectionSubtitle =
-    role === "admin" ? "Command" : role === "host" ? "Your court" : "Your passage";
-
   return (
     <header
       data-elevated={elevated ? "true" : "false"}
@@ -183,15 +178,7 @@ export function Header() {
                     <ProfileNavIcon size={40} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="z-[100] w-56 overflow-hidden p-0">
-                  <div className="header-profile-section">
-                    <ProfileNavIcon size={44} variant="section" />
-                    <div>
-                      <p className="header-profile-section__title">{profileSectionTitle}</p>
-                      <p className="header-profile-section__subtitle">{profileSectionSubtitle}</p>
-                    </div>
-                  </div>
-                  <div className="p-1">
+                <DropdownMenuContent align="end" className="z-[100] w-52">
                   {isGuest ? (
                     <>
                       <DropdownMenuItem asChild>
@@ -243,7 +230,6 @@ export function Header() {
                     <LogOut className="h-4 w-4" />
                     {loggingOut ? "Logging out..." : "Logout"}
                   </DropdownMenuItem>
-                  </div>
                 </DropdownMenuContent>
               </DropdownMenu>
           ) : null}
@@ -314,13 +300,6 @@ export function Header() {
               ) : null}
               {showAccountMenu ? (
                 <>
-                  <div className="header-profile-section mt-4 border-t-0 px-3">
-                    <ProfileNavIcon size={44} variant="section" />
-                    <div>
-                      <p className="header-profile-section__title">{profileSectionTitle}</p>
-                      <p className="header-profile-section__subtitle">{profileSectionSubtitle}</p>
-                    </div>
-                  </div>
                   {isGuest ? (
                     <>
                       <SheetClose asChild>
