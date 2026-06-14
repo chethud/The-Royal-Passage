@@ -1,7 +1,8 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { LogOut, Menu, ShoppingCart, UserRound } from "lucide-react";
+import { LogOut, Menu, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
+import { CartIcon } from "@/components/cart/CartIcon";
 import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav";
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
@@ -148,11 +149,11 @@ export function Header() {
           {showGuestCart ? (
             <Link
               to="/dashboard/cart"
-              className={`${navLinkClass} inline-flex items-center gap-1.5`}
+              className={`${navLinkClass} inline-flex items-center gap-1`}
               activeProps={{ className: "text-ember" }}
+              aria-label={cartCount > 0 ? `Cart (${cartCount} items)` : "Cart"}
             >
-              <ShoppingCart className="h-3.5 w-3.5" />
-              Cart
+              <CartIcon size={32} />
               {cartCount > 0 ? (
                 <span className="rounded-full bg-ember px-1.5 py-0.5 text-[0.6rem] font-semibold text-primary-foreground">
                   {cartCount}
@@ -271,8 +272,17 @@ export function Header() {
               ) : null}
               {showGuestCart ? (
                 <SheetClose asChild>
-                  <Link to="/dashboard/cart" className={sheetLinkClass}>
-                    Cart{cartCount > 0 ? ` (${cartCount})` : ""}
+                  <Link
+                    to="/dashboard/cart"
+                    className={`${sheetLinkClass} inline-flex items-center gap-2`}
+                    aria-label={cartCount > 0 ? `Cart (${cartCount} items)` : "Cart"}
+                  >
+                    <CartIcon size={28} />
+                    {cartCount > 0 ? (
+                      <span className="rounded-full bg-ember px-1.5 py-0.5 text-[0.6rem] font-semibold text-primary-foreground">
+                        {cartCount}
+                      </span>
+                    ) : null}
                   </Link>
                 </SheetClose>
               ) : null}
