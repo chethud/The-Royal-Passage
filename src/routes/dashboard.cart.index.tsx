@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart } from "lucide-react";
+import { CartIcon } from "@/components/cart/CartIcon";
 import { CartItemsSection, WishlistCartSection } from "@/components/cart/CartPageSections";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
@@ -91,7 +92,7 @@ function GuestCartPage() {
       <LuxuryCheckoutPanel>
         <div className="mb-6 flex items-baseline justify-between gap-4 luxury-panel-divider border-b pb-5">
           <div className="flex items-center gap-2.5">
-            <ShoppingCart className="luxury-panel-label h-4 w-4" strokeWidth={1.5} />
+            <CartIcon size={18} />
             <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Cart items</h2>
           </div>
           <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">

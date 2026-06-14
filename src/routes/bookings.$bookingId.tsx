@@ -213,14 +213,14 @@ function BookingDetailPage() {
           ) : null}
           <Link
             to="/dashboard/history"
-            className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
+            className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
           >
             Booking history
           </Link>
           <Link
             to="/experiences/$slug"
             params={{ slug: booking.experience.slug }}
-            className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
+            className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
           >
             View experience
           </Link>

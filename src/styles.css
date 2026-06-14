@@ -414,6 +414,46 @@
   color: #2d0000;
 }
 
+/* Pill buttons and links on dark dashboard backgrounds (outside ivory panels) */
+.dashboard-chrome-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid oklch(0.76 0.1 78 / 0.48);
+  background: oklch(0.18 0.06 22 / 0.65);
+  padding: 0.5rem 1rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #d4af6a;
+  text-decoration: none;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.dashboard-chrome-btn:hover {
+  border-color: #c8a25a;
+  background: oklch(0.22 0.07 22 / 0.85);
+  color: #f7f1e8;
+}
+
+.dashboard-chrome-link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #d4af6a;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.dashboard-chrome-link:hover {
+  color: #f7f1e8;
+  text-decoration: underline;
+}
+
 /* Premium cream-white panels for checkout & cart (on burgundy page background) */
 .luxury-checkout-panel {
   position: relative;

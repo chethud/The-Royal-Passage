@@ -60,13 +60,13 @@ function AdminExperiencesPage() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <Link
           to="/admin"
-          className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
+          className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
         >
           ← Overview
         </Link>
         <Link
           to="/experiences"
-          className="luxury-panel-link text-sm font-medium hover:underline"
+          className="dashboard-chrome-link"
         >
           View live catalog →
         </Link>

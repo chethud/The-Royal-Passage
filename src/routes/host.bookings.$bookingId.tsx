@@ -185,7 +185,7 @@ function HostBookingDetailPage() {
         />
         <Link
           to="/host/bookings"
-          className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
+          className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
         >
           Back to bookings
         </Link>

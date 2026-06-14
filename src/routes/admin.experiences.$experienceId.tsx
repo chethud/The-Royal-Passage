@@ -124,7 +124,7 @@ function AdminExperienceReviewPage() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
           to="/admin/experiences"
-          className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
+          className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
         >
           ← Back to pending list
         </Link>
@@ -132,7 +132,7 @@ function AdminExperienceReviewPage() {
           <Link
             to="/experiences/$slug"
             params={{ slug: experience.slug }}
-            className="luxury-panel-link text-sm font-medium hover:underline"
+            className="dashboard-chrome-link"
           >
             View live listing →
           </Link>

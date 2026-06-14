@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Heart, ShoppingCart, Trash2 } from "lucide-react";
+import { ArrowRight, Heart, Trash2 } from "lucide-react";
+import { CartIcon } from "@/components/cart/CartIcon";
 import type { ReactNode } from "react";
 import type { WishlistItem } from "@/lib/api/wishlist";
 import type { CartItem } from "@/lib/cart-storage";
@@ -24,10 +25,7 @@ export function CartItemsSection({
   if (items.length === 0) {
     return (
       <div className="py-14 text-center">
-        <ShoppingCart
-          className={`mx-auto h-7 w-7 ${isLight ? "text-[#C8A25A]/70" : "text-[#D4AF6A]/45"}`}
-          strokeWidth={1.5}
-        />
+        <CartIcon size={28} className="mx-auto opacity-80" />
         <p className={`mt-4 font-display text-lg tracking-wide ${isLight ? "luxury-panel-heading" : "text-foreground"}`}>
           Your cart is empty
         </p>

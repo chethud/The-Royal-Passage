@@ -1,4 +1,4 @@
-import { ShoppingCart } from "lucide-react";
+import { CartIcon } from "@/components/cart/CartIcon";
 import { useState, type MouseEvent } from "react";
 import type { Experience } from "@/data/experiences";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
@@ -47,7 +47,7 @@ export function AddToCartButton({ exp, className = "", showLabel = false }: AddT
       aria-pressed={inCart}
     >
       <span className="flex items-center gap-1.5">
-        <ShoppingCart className={`h-4 w-4 ${inCart ? "text-ember" : ""}`} />
+        <CartIcon size={16} className={inCart ? "brightness-110" : "opacity-90"} />
         {showLabel ? (
           <span className="text-[0.65rem] font-semibold uppercase tracking-[0.12em]">
             {inCart ? "In cart" : "Add to cart"}

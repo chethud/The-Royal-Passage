@@ -1,7 +1,8 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { LogOut, Menu, ShoppingCart, UserRound } from "lucide-react";
+import { LogOut, Menu, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
+import { CartIcon } from "@/components/cart/CartIcon";
 import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav";
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
@@ -151,7 +152,7 @@ export function Header() {
               className={`${navLinkClass} inline-flex items-center gap-1.5`}
               activeProps={{ className: "text-ember" }}
             >
-              <ShoppingCart className="h-3.5 w-3.5" />
+              <CartIcon size={16} />
               Cart
               {cartCount > 0 ? (
                 <span className="rounded-full bg-ember px-1.5 py-0.5 text-[0.6rem] font-semibold text-primary-foreground">

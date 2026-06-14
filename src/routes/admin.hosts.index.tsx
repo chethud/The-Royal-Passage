@@ -58,7 +58,7 @@ function AdminHostsPage() {
     >
       <Link
         to="/admin"
-        className="luxury-btn-sm luxury-btn-panel-outline mb-5 inline-flex items-center no-underline"
+        className="luxury-btn-sm dashboard-chrome-btn mb-5 inline-flex items-center no-underline"
       >
         ← Overview
       </Link>

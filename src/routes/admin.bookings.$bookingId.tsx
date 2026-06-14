@@ -186,7 +186,7 @@ function AdminBookingDetailPage() {
 
       <Link
         to="/admin/bookings"
-        className="luxury-btn-sm luxury-btn-panel-outline mt-8 inline-flex items-center no-underline"
+        className="luxury-btn-sm dashboard-chrome-btn mt-8 inline-flex items-center no-underline"
       >
         Back to bookings
       </Link>
