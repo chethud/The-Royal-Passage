@@ -25,9 +25,9 @@ export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
 };
 
 export const ROLE_PROFILE_PATH: Record<UserRole, string> = {
-  guest: "/dashboard/profile",
-  host: "/host/profile",
-  admin: "/admin/profile",
+  guest: "/account/profile",
+  host: "/account/profile",
+  admin: "/account/profile",
   editor: "/account/profile",
 };
 

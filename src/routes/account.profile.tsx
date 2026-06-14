@@ -22,7 +22,7 @@ function AccountProfilePage() {
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      void navigate({ to: "/sign-in" });
+      void navigate({ to: "/sign-in", search: { redirect: "/account/profile" } });
     }
   }, [loading, navigate, user]);
 

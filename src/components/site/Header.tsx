@@ -24,7 +24,7 @@ import {
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
-import { dashboardPathForRole, isGuestAccount, type UserRole } from "@/lib/roles";
+import { dashboardPathForRole, isGuestAccount, profilePathForRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 type NavItem = { label: string; to: string };
@@ -64,43 +64,11 @@ function isHeaderNavItemActive(
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
-function ProfileNavLink({ role, className }: { role: UserRole; className: string }) {
-  if (role === "guest") {
-    return (
-      <Link to="/dashboard/profile" className={className}>
-        <UserRound className="h-4 w-4" />
-        Profile
-      </Link>
-    );
-  }
-  if (role === "host") {
-    return (
-      <Link to="/host/profile" className={className}>
-        <UserRound className="h-4 w-4" />
-        Profile
-      </Link>
-    );
-  }
-  if (role === "admin") {
-    return (
-      <Link to="/admin/profile" className={className}>
-        <UserRound className="h-4 w-4" />
-        Profile
-      </Link>
-    );
-  }
-  return (
-    <Link to="/account/profile" className={className}>
-      <UserRound className="h-4 w-4" />
-      Profile
-    </Link>
-  );
-}
-
 export function Header() {
   const [elevated, setElevated] = useState(false);
   const { displayName, user, role } = useAuthUser();
   const dashboardPath = role ? dashboardPathForRole(role) : "/sign-in";
+  const profilePath = user ? profilePathForRole(role ?? "guest") : "/sign-in";
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -251,14 +219,10 @@ export function Header() {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem asChild>
-                    {role ? (
-                      <ProfileNavLink role={role} className="cursor-pointer" />
-                    ) : (
-                      <Link to="/sign-in" className="cursor-pointer">
-                        <UserRound className="h-4 w-4" />
-                        Profile
-                      </Link>
-                    )}
+                    <Link to={profilePath} className="cursor-pointer">
+                      <UserRound className="h-4 w-4" />
+                      Profile
+                    </Link>
                   </DropdownMenuItem>
                   {isGuest ? (
                     <DropdownMenuItem asChild>
@@ -372,13 +336,9 @@ export function Header() {
                     </SheetClose>
                   )}
                   <SheetClose asChild>
-                    {role ? (
-                      <ProfileNavLink role={role} className={sheetLinkClass} />
-                    ) : (
-                      <Link to="/sign-in" className={sheetLinkClass}>
-                        Profile
-                      </Link>
-                    )}
+                    <Link to={profilePath} className={sheetLinkClass}>
+                      Profile
+                    </Link>
                   </SheetClose>
                   {isGuest ? (
                     <SheetClose asChild>
