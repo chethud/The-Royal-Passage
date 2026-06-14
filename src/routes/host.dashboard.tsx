@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { CreateExperienceCta } from "@/components/host/CreateExperienceCta";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import { HostStatsGrid } from "@/components/host/HostStatsGrid";
@@ -70,33 +71,40 @@ function HostOverviewPage() {
     <HostDashboardShell
       title="Overview"
       subtitle="Today's sessions, pending confirmations, and your week ahead."
+      showRoleDescription={false}
     >
       {pageLoading ? (
-        <p className="text-sm text-muted-foreground">Loading overview…</p>
+        <LuxuryCheckoutPanel>
+          <p className="luxury-panel-body py-8 text-sm">Loading overview…</p>
+        </LuxuryCheckoutPanel>
       ) : pageError ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {pageError}
-        </p>
+        <LuxuryCheckoutPanel>
+          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {pageError}
+          </p>
+        </LuxuryCheckoutPanel>
       ) : (
-        <div className="space-y-10">
-          {stats ? <HostStatsGrid stats={stats} /> : null}
-
-          {stats && stats.publishedExperiences === 0 ? (
-            <CreateExperienceCta />
+        <div className="space-y-8">
+          {stats ? (
+            <LuxuryCheckoutPanel>
+              <HostStatsGrid stats={stats} />
+            </LuxuryCheckoutPanel>
           ) : null}
 
-          <section>
+          {stats && stats.publishedExperiences === 0 ? <CreateExperienceCta /> : null}
+
+          <LuxuryCheckoutPanel>
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 className="font-display text-2xl">Today&apos;s sessions</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <h2 className="luxury-panel-heading font-display text-2xl">Today&apos;s sessions</h2>
+                <p className="luxury-panel-body mt-1 text-sm">
                   Confirmed and pending bookings happening today.
                 </p>
               </div>
               <Link
                 to="/host/bookings"
                 search={{ status: "today" }}
-                className="text-sm text-ember hover:underline"
+                className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
               >
                 View all bookings
               </Link>
@@ -104,32 +112,32 @@ function HostOverviewPage() {
             <div className="mt-6">
               <HostTodayBookings bookings={todayBookings} />
             </div>
-          </section>
+          </LuxuryCheckoutPanel>
 
-          <section>
+          <LuxuryCheckoutPanel>
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 className="font-display text-2xl">Pending confirmations</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <h2 className="luxury-panel-heading font-display text-2xl">Pending confirmations</h2>
+                <p className="luxury-panel-body mt-1 text-sm">
                   Guest requests waiting for your response.
                 </p>
               </div>
               <Link
                 to="/host/bookings"
                 search={{ status: "pending" }}
-                className="text-sm text-ember hover:underline"
+                className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
               >
                 Manage bookings
               </Link>
             </div>
             <div className="mt-6">
               {pendingBookings.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No pending requests right now.</p>
+                <p className="luxury-panel-body text-sm">No pending requests right now.</p>
               ) : (
                 <HostTodayBookings bookings={pendingBookings.slice(0, 5)} />
               )}
             </div>
-          </section>
+          </LuxuryCheckoutPanel>
         </div>
       )}
     </HostDashboardShell>

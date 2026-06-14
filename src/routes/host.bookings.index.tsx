@@ -84,6 +84,7 @@ function HostBookingsPage() {
     <HostDashboardShell
       title="Bookings"
       subtitle="Accept or reject requests, pause when needed, mark pay-at-venue payments, and complete sessions."
+      showRoleDescription={false}
     >
       {pageLoading ? (
         <LuxuryCheckoutPanel>

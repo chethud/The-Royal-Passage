@@ -9,27 +9,22 @@ type HostTodayBookingsProps = {
 
 export function HostTodayBookings({ bookings }: HostTodayBookingsProps) {
   if (bookings.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">No sessions scheduled for today.</p>
-    );
+    return <p className="luxury-panel-body py-4 text-sm">No sessions scheduled for today.</p>;
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="divide-y divide-[rgb(74_0_0/0.12)]">
       {bookings.map((booking) => (
-        <li
-          key={booking.id}
-          className="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-[oklch(0.88_0.08_86_/_0.2)] px-4 py-3"
-        >
+        <li key={booking.id} className="flex flex-wrap items-center justify-between gap-3 py-4 first:pt-0 last:pb-0">
           <div>
             <Link
               to="/host/bookings/$bookingId"
               params={{ bookingId: booking.id }}
-              className="font-display text-lg hover:text-ember"
+              className="luxury-panel-link font-display text-lg hover:underline"
             >
               {booking.experience.title}
             </Link>
-            <div className="mt-1 text-sm text-muted-foreground">
+            <div className="luxury-panel-body mt-1 text-sm">
               {booking.guestName ?? "Guest"} · {booking.slot.start} · {booking.participantCount}{" "}
               guests · {formatMoney(booking.totalAmount, booking.currencySymbol)}
             </div>
@@ -37,6 +32,8 @@ export function HostTodayBookings({ bookings }: HostTodayBookingsProps) {
           <BookingStatusChip
             bookingStatus={booking.bookingStatus}
             paymentStatus={booking.paymentStatus}
+            isPaused={booking.isPaused}
+            surface="light"
           />
         </li>
       ))}

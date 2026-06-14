@@ -82,37 +82,39 @@ function AdminOverviewPage() {
       subtitle="Key metrics at a glance. Open each section from the header menu for full details."
       showRoleDescription={false}
     >
-      <LuxuryCheckoutPanel>
-        {analyticsLoading ? (
-          <p className="luxury-panel-body py-8 text-sm">Loading platform analytics…</p>
-        ) : analyticsError ? (
-          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {analyticsError}
-          </p>
-        ) : stats ? (
-          <AdminStatsGrid stats={stats} />
-        ) : null}
-      </LuxuryCheckoutPanel>
-
-      {stats ? (
-        <LuxuryCheckoutPanel className="mt-8">
-          <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Quick links</h2>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <QuickLink
-              to="/admin/experiences"
-              label="Review experiences"
-              detail={
-                stats.pendingExperienceReviews
-                  ? `${stats.pendingExperienceReviews} awaiting approval`
-                  : "No pending submissions"
-              }
-            />
-            <QuickLink to="/admin/bookings" label="All bookings" detail="Guest reservations & payouts" />
-            <QuickLink to="/admin/hosts" label="Host accounts" detail="Create login credentials" />
-            <QuickLink to="/admin/activity" label="Activity log" detail="Recent platform events" />
-          </div>
+      <div className="space-y-8">
+        <LuxuryCheckoutPanel>
+          {analyticsLoading ? (
+            <p className="luxury-panel-body py-8 text-sm">Loading platform analytics…</p>
+          ) : analyticsError ? (
+            <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {analyticsError}
+            </p>
+          ) : stats ? (
+            <AdminStatsGrid stats={stats} />
+          ) : null}
         </LuxuryCheckoutPanel>
-      ) : null}
+
+        {stats ? (
+          <LuxuryCheckoutPanel>
+            <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Quick links</h2>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <QuickLink
+                to="/admin/experiences"
+                label="Review experiences"
+                detail={
+                  stats.pendingExperienceReviews
+                    ? `${stats.pendingExperienceReviews} awaiting approval`
+                    : "No pending submissions"
+                }
+              />
+              <QuickLink to="/admin/bookings" label="All bookings" detail="Guest reservations & payouts" />
+              <QuickLink to="/admin/hosts" label="Host accounts" detail="Create login credentials" />
+              <QuickLink to="/admin/activity" label="Activity log" detail="Recent platform events" />
+            </div>
+          </LuxuryCheckoutPanel>
+        ) : null}
+      </div>
     </DashboardShell>
   );
 }

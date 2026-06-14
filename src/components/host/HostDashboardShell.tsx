@@ -8,9 +8,16 @@ type HostDashboardShellProps = {
   title: string;
   subtitle: string;
   children: ReactNode;
+  /** Hide the default role description under the subtitle. */
+  showRoleDescription?: boolean;
 };
 
-export function HostDashboardShell({ title, subtitle, children }: HostDashboardShellProps) {
+export function HostDashboardShell({
+  title,
+  subtitle,
+  children,
+  showRoleDescription = true,
+}: HostDashboardShellProps) {
   return (
     <div className="pt-[var(--header-height)] text-foreground">
       <Header />
@@ -21,7 +28,9 @@ export function HostDashboardShell({ title, subtitle, children }: HostDashboardS
         </div>
         <h1 className="font-display text-4xl tracking-tight md:text-5xl">{title}</h1>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">{subtitle}</p>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground/90">{ROLE_DESCRIPTIONS.host}</p>
+        {showRoleDescription ? (
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground/90">{ROLE_DESCRIPTIONS.host}</p>
+        ) : null}
         <div className="mt-10">{children}</div>
       </section>
       <Footer />

@@ -65,6 +65,7 @@ export function HostStatsGrid({ stats }: HostStatsGridProps) {
           value={item.value}
           to={item.to}
           search={item.search}
+          surface="light"
         />
       ))}
     </div>
