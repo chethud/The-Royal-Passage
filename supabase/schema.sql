@@ -670,8 +670,8 @@ create policy "profiles_insert_own"
 
 create policy "profiles_update_own"
   on public.profiles for update to authenticated
-  using (auth.uid() = id and role = 'guest')
-  with check (auth.uid() = id and role = 'guest');
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
 
 create policy "hosts_select_all"
   on public.hosts for select to anon, authenticated

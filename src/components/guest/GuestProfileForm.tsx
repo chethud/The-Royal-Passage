@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
 import type { GuestProfile } from "@/lib/api/guest";
-import { updateGuestProfile } from "@/lib/api/guest";
-import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
+import { updateAccountProfile } from "@/lib/profile-browser";
+import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
+import { toErrorMessage } from "@/lib/api/client";
 import { uploadProfilePhoto } from "@/lib/profile-photo-upload";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type GuestProfileFormProps = {
   profile: GuestProfile;
-  accessToken: string;
   onUpdated: (profile: GuestProfile) => void;
 };
 
@@ -20,7 +20,7 @@ function profileInitials(fullName: string | null, email: string | null): string 
   return source.slice(0, 2).toUpperCase();
 }
 
-export function GuestProfileForm({ profile, accessToken, onUpdated }: GuestProfileFormProps) {
+export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fullName, setFullName] = useState(profile.fullName ?? "");
   const [phone, setPhone] = useState(profile.phone ?? "");
@@ -60,10 +60,10 @@ export function GuestProfileForm({ profile, accessToken, onUpdated }: GuestProfi
     setError(null);
     setSaved(false);
     try {
-      if (!isApiConfigured()) {
-        throw new Error("Profile API is not configured for this deployment.");
+      if (!isSupabaseBrowserConfigured()) {
+        throw new Error("Supabase is not configured for this deployment.");
       }
-      const updated = await updateGuestProfile(accessToken, {
+      const updated = await updateAccountProfile({
         fullName: fullName.trim() || undefined,
         phone: phone.trim() || undefined,
         avatarUrl,

@@ -53,8 +53,12 @@ export function fetchGuestProfile(accessToken: string) {
 
 export function updateGuestProfile(accessToken: string, payload: UpdateGuestProfilePayload) {
   const client = createRoyalPassageClient(accessToken);
+  // Connect RPC on older deployed backends only accepts fullName and phone.
+  const rpcPayload: Pick<UpdateGuestProfilePayload, "fullName" | "phone"> = {};
+  if (payload.fullName !== undefined) rpcPayload.fullName = payload.fullName;
+  if (payload.phone !== undefined) rpcPayload.phone = payload.phone;
   return rpcCall(async () => {
-    const result = await client.updateGuestProfile(create(UpdateGuestProfileRequestSchema, payload));
+    const result = await client.updateGuestProfile(create(UpdateGuestProfileRequestSchema, rpcPayload));
     return normalizeGuestProfile(result);
   });
 }

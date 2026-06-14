@@ -25,7 +25,7 @@ function ProfileLoadingShell() {
 
 function AccountProfilePage() {
   const navigate = useNavigate();
-  const { user, role, loading, accessToken, hasCachedSession } = useAuthUser();
+  const { user, role, loading, hasCachedSession } = useAuthUser();
 
   useEffect(() => {
     if (loading) return;
@@ -43,7 +43,6 @@ function AccountProfilePage() {
   }
 
   const resolvedRole: UserRole = isUserRole(role) ? role : "guest";
-  const ready = Boolean(accessToken);
 
   const subtitle =
     resolvedRole === "host"
@@ -54,11 +53,7 @@ function AccountProfilePage() {
           ? "Your editor account details."
           : "Your contact details for bookings and host communication.";
 
-  const content = !ready ? (
-    <p className="text-sm text-muted-foreground">Loading profile…</p>
-  ) : (
-    <AccountProfileSection accessToken={accessToken!} ready={ready} />
-  );
+  const content = <AccountProfileSection />;
 
   if (resolvedRole === "host") {
     return (
