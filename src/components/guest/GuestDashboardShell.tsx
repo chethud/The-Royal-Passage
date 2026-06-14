@@ -25,7 +25,7 @@ export function GuestDashboardShell({
     <div className="pt-[var(--header-height)] text-foreground">
       <Header />
       <section className="container-page py-8 sm:py-12 md:py-14">
-        <div className={`mx-auto ${wide ? "max-w-4xl" : "max-w-3xl"}`}>
+        <div className={`mx-auto ${wide ? "max-w-6xl" : "max-w-3xl"}`}>
           <div className="mb-6 flex flex-wrap items-center gap-3">
             <RoleBadge role="guest" />
             <span className="text-xs text-muted-foreground">{ROLE_LABELS.guest} dashboard</span>
