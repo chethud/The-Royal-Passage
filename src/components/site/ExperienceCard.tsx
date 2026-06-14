@@ -1,13 +1,16 @@
 import { Link } from "@tanstack/react-router";
+import { Clock, MapPin } from "lucide-react";
 import { motion } from "motion/react";
 import type { Experience } from "@/data/experiences";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { categoryIconForLabel } from "@/lib/experience-category-icons";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 export function ExperienceCard({ exp }: { exp: Experience }) {
   const reduceMotion = usePrefersReducedMotion();
   const detailTo = "/experiences/$slug" as const;
+  const CategoryIcon = categoryIconForLabel(exp.category);
 
   const card = (
     <article className="group flex aspect-[19/26] w-full flex-col overflow-hidden rounded-lg border border-[#C8A25A]/20 bg-[#4A0000]/40 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-[#C8A25A]/40 hover:shadow-[0_0_24px_-10px_#C8A25A44]">
@@ -27,7 +30,8 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
         </Link>
 
         <div className="absolute left-2.5 top-2.5 z-20 flex flex-wrap gap-1.5">
-          <span className="rounded-sm border border-[#C8A25A]/30 bg-[#4A0000]/80 px-2 py-0.5 text-[0.6rem] font-medium uppercase tracking-[0.12em] text-[#F7F1E8] backdrop-blur-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-sm border border-[#C8A25A]/30 bg-[#4A0000]/80 px-2 py-0.5 text-[0.6rem] font-medium uppercase tracking-[0.1em] text-[#F7F1E8] backdrop-blur-sm">
+            <CategoryIcon className="h-3 w-3 text-[#D4AF6A]" strokeWidth={1.75} />
             {exp.category}
           </span>
           {exp.verifiedHost ? (
@@ -52,6 +56,16 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
           <h3 className="line-clamp-2 font-display text-lg leading-snug text-[#F7F1E8] transition-colors group-hover:text-[#D4AF6A]">
             {exp.title}
           </h3>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.68rem] text-[#D6C8B5]">
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]/85" strokeWidth={1.75} />
+              {exp.durationHours}h
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]/85" strokeWidth={1.75} />
+              {exp.city}
+            </span>
+          </div>
         </Link>
 
         <div className="mt-auto border-t border-[#C8A25A]/12 pt-3">
