@@ -171,8 +171,23 @@ export function fetchAdminBookings(accessToken: string) {
   const client = createRoyalPassageClient(accessToken);
   return rpcCall(async () => {
     const response = await client.listAdminBookings({});
-    return response.bookings as AdminBookingRow[];
+    return (response.bookings as AdminBookingRow[]).map(normalizeAdminBookingRow);
   });
+}
+
+function normalizeAdminBookingRow(raw: AdminBookingRow): AdminBookingRow {
+  const createdAt = String(raw.createdAt ?? "");
+  const slotDate = raw.slotDate?.trim() || createdAt.slice(0, 10);
+
+  return {
+    ...raw,
+    createdAt,
+    slotDate,
+    platformFeeMinor: raw.platformFeeMinor ?? 0,
+    hostPayoutMinor: raw.hostPayoutMinor ?? 0,
+    isPaused: raw.isPaused ?? false,
+    currencySymbol: raw.currencySymbol || "₹",
+  };
 }
 
 export function fetchAdminBooking(accessToken: string, bookingId: string) {

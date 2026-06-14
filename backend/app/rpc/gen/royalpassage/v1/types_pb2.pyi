@@ -826,7 +826,7 @@ class AdminStats(_message.Message):
     def __init__(self, total_guests: _Optional[int] = ..., total_hosts: _Optional[int] = ..., published_experiences: _Optional[int] = ..., total_bookings: _Optional[int] = ..., revenue_collected_minor: _Optional[int] = ..., pending_experience_reviews: _Optional[int] = ..., currency_symbol: _Optional[str] = ..., confirmed_bookings: _Optional[int] = ..., pending_bookings: _Optional[int] = ..., completed_bookings: _Optional[int] = ..., cancelled_bookings: _Optional[int] = ..., gross_booking_value_minor: _Optional[int] = ..., platform_revenue_minor: _Optional[int] = ..., host_payout_due_minor: _Optional[int] = ..., cod_pending_collection_minor: _Optional[int] = ..., commission_percent: _Optional[float] = ...) -> None: ...
 
 class AdminBookingRow(_message.Message):
-    __slots__ = ("id", "guest_name", "guest_email", "experience_title", "booking_status", "payment_status", "total_amount", "currency_symbol", "created_at", "platform_fee_minor", "host_payout_minor", "host_name", "is_paused")
+    __slots__ = ("id", "guest_name", "guest_email", "experience_title", "booking_status", "payment_status", "total_amount", "currency_symbol", "created_at", "platform_fee_minor", "host_payout_minor", "host_name", "is_paused", "slot_date")
     ID_FIELD_NUMBER: _ClassVar[int]
     GUEST_NAME_FIELD_NUMBER: _ClassVar[int]
     GUEST_EMAIL_FIELD_NUMBER: _ClassVar[int]
@@ -840,6 +840,7 @@ class AdminBookingRow(_message.Message):
     HOST_PAYOUT_MINOR_FIELD_NUMBER: _ClassVar[int]
     HOST_NAME_FIELD_NUMBER: _ClassVar[int]
     IS_PAUSED_FIELD_NUMBER: _ClassVar[int]
+    SLOT_DATE_FIELD_NUMBER: _ClassVar[int]
     id: str
     guest_name: str
     guest_email: str
@@ -853,7 +854,8 @@ class AdminBookingRow(_message.Message):
     host_payout_minor: int
     host_name: str
     is_paused: bool
-    def __init__(self, id: _Optional[str] = ..., guest_name: _Optional[str] = ..., guest_email: _Optional[str] = ..., experience_title: _Optional[str] = ..., booking_status: _Optional[str] = ..., payment_status: _Optional[str] = ..., total_amount: _Optional[int] = ..., currency_symbol: _Optional[str] = ..., created_at: _Optional[str] = ..., platform_fee_minor: _Optional[int] = ..., host_payout_minor: _Optional[int] = ..., host_name: _Optional[str] = ..., is_paused: _Optional[bool] = ...) -> None: ...
+    slot_date: str
+    def __init__(self, id: _Optional[str] = ..., guest_name: _Optional[str] = ..., guest_email: _Optional[str] = ..., experience_title: _Optional[str] = ..., booking_status: _Optional[str] = ..., payment_status: _Optional[str] = ..., total_amount: _Optional[int] = ..., currency_symbol: _Optional[str] = ..., created_at: _Optional[str] = ..., platform_fee_minor: _Optional[int] = ..., host_payout_minor: _Optional[int] = ..., host_name: _Optional[str] = ..., is_paused: _Optional[bool] = ..., slot_date: _Optional[str] = ...) -> None: ...
 
 class OkResponse(_message.Message):
     __slots__ = ("ok",)

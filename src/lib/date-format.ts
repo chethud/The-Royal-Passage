@@ -11,7 +11,8 @@ export function formatDateShort(dateIso: string): string {
   }).format(parseIsoDateAsUtc(dateIso));
 }
 
-export function formatDateLong(dateIso: string): string {
+export function formatDateLong(dateIso: string | undefined | null): string {
+  if (!dateIso?.trim()) return "—";
   return new Intl.DateTimeFormat("en-US", {
     weekday: "long",
     month: "long",

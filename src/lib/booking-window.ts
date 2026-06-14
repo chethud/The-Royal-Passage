@@ -49,7 +49,8 @@ export function withGuestBookableSlots<T extends { slots: { date: string }[] }>(
   };
 }
 
-export function bookingMatchesDateView(slotDateIso: string, view: BookingDateView): boolean {
+export function bookingMatchesDateView(slotDateIso: string | undefined, view: BookingDateView): boolean {
+  if (!slotDateIso?.trim()) return view === "all";
   if (view === "all") return true;
   if (view === "week") return isWithinBookingWindow(slotDateIso);
   return isBeforeToday(slotDateIso);

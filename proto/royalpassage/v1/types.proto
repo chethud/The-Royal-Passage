@@ -464,6 +464,7 @@ message AdminBookingRow {
   int32 host_payout_minor = 11;
   optional string host_name = 12;
   bool is_paused = 13;
+  string slot_date = 14;
 }
 
 message OkResponse {
