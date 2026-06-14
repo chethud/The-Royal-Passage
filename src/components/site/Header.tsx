@@ -21,10 +21,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
-import { dashboardPathForRole, isGuestAccount, profilePathForRole, type UserRole } from "@/lib/roles";
+import { dashboardPathForRole, isGuestAccount, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 type NavItem = { label: string; to: string };
@@ -68,7 +67,6 @@ export function Header() {
   const [elevated, setElevated] = useState(false);
   const { displayName, user, role } = useAuthUser();
   const dashboardPath = role ? dashboardPathForRole(role) : "/sign-in";
-  const profilePath = user ? profilePathForRole(role ?? "guest") : "/sign-in";
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -96,6 +94,10 @@ export function Header() {
     } finally {
       setLoggingOut(false);
     }
+  };
+
+  const goToProfile = () => {
+    void router.navigate({ to: "/account/profile" });
   };
 
   return (
@@ -180,15 +182,13 @@ export function Header() {
             </Link>
           ) : null}
           {showAccountMenu ? (
-            <>
-              <NotificationBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button type="button" className={navLinkClass}>
                     {displayName ?? "Account"}
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuContent align="end" className="z-[100] w-52">
                   {isGuest ? (
                     <>
                       <DropdownMenuItem asChild>
@@ -218,11 +218,9 @@ export function Header() {
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem asChild>
-                    <Link to={profilePath} className="cursor-pointer">
-                      <UserRound className="h-4 w-4" />
-                      Profile
-                    </Link>
+                  <DropdownMenuItem onSelect={goToProfile} className="cursor-pointer">
+                    <UserRound className="h-4 w-4" />
+                    Profile
                   </DropdownMenuItem>
                   {isGuest ? (
                     <DropdownMenuItem asChild>
@@ -244,7 +242,6 @@ export function Header() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </>
           ) : null}
         </nav>
 
@@ -336,7 +333,7 @@ export function Header() {
                     </SheetClose>
                   )}
                   <SheetClose asChild>
-                    <Link to={profilePath} className={sheetLinkClass}>
+                    <Link to="/account/profile" className={sheetLinkClass}>
                       Profile
                     </Link>
                   </SheetClose>

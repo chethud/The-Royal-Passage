@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import type { User } from "@supabase/supabase-js";
 import { isApiConfigured } from "@/lib/api/client";
 import { fetchGuestProfile } from "@/lib/api/guest";
@@ -15,6 +22,19 @@ type CachedUser = {
   phone?: string;
   role?: UserRole;
 };
+
+export type AuthUserState = {
+  user: User | null;
+  profile: UserProfile | null;
+  role: UserRole | null;
+  loading: boolean;
+  configured: boolean;
+  displayName: string | null;
+  accessToken: string | null;
+  hasCachedSession: boolean;
+};
+
+const AuthContext = createContext<AuthUserState | null>(null);
 
 function readCachedUser(): CachedUser | null {
   if (typeof window === "undefined") return null;
@@ -44,7 +64,11 @@ function writeCachedUser(user: User | null, role?: UserRole | null) {
   window.localStorage.setItem(USER_CACHE_KEY, JSON.stringify(payload));
 }
 
-function userDisplayName(user: User | null, profile: UserProfile | null, cachedUser: CachedUser | null): string | null {
+function userDisplayName(
+  user: User | null,
+  profile: UserProfile | null,
+  cachedUser: CachedUser | null,
+): string | null {
   if (profile?.fullName?.trim()) return profile.fullName.trim();
   if (user) {
     const meta = user.user_metadata ?? {};
@@ -89,7 +113,7 @@ async function loadProfileForUser(user: User, accessToken?: string | null): Prom
   return profile;
 }
 
-export function useAuthUser() {
+function useAuthUserState(): AuthUserState {
   const configured = isSupabaseBrowserConfigured();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -159,5 +183,27 @@ export function useAuthUser() {
 
   const role = profile?.role ?? (user ? cachedUser?.role : null) ?? null;
 
-  return { user, profile, role, loading, configured, displayName, accessToken };
+  return {
+    user,
+    profile,
+    role,
+    loading,
+    configured,
+    displayName,
+    accessToken,
+    hasCachedSession: Boolean(cachedUser?.id),
+  };
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const value = useAuthUserState();
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuthUser(): AuthUserState {
+  const value = useContext(AuthContext);
+  if (!value) {
+    throw new Error("useAuthUser must be used within AuthProvider.");
+  }
+  return value;
 }

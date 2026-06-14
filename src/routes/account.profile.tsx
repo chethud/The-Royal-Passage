@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AccountProfileSection } from "@/components/account/AccountProfileSection";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
@@ -25,21 +25,16 @@ function ProfileLoadingShell() {
 
 function AccountProfilePage() {
   const navigate = useNavigate();
-  const { user, role, loading, accessToken } = useAuthUser();
-  const [clientReady, setClientReady] = useState(false);
+  const { user, role, loading, accessToken, hasCachedSession } = useAuthUser();
 
   useEffect(() => {
-    setClientReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!clientReady || loading) return;
-    if (!user) {
+    if (loading) return;
+    if (!user && !hasCachedSession) {
       void navigate({ to: "/sign-in", search: { redirect: "/account/profile" } });
     }
-  }, [clientReady, loading, navigate, user]);
+  }, [hasCachedSession, loading, navigate, user]);
 
-  if (!clientReady || loading) {
+  if (loading || (!user && hasCachedSession)) {
     return <ProfileLoadingShell />;
   }
 
