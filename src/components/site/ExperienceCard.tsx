@@ -30,7 +30,7 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
         </Link>
 
         <div className="absolute left-2.5 top-2.5 z-20 flex flex-wrap gap-1.5">
-          <span className="inline-flex items-center gap-1.5 rounded-sm border border-[#C8A25A]/30 bg-[#4A0000]/80 px-2 py-0.5 text-[0.6rem] font-medium uppercase tracking-[0.1em] text-[#F7F1E8] backdrop-blur-sm">
+          <span className="inline-flex items-center gap-1.5 text-[0.6rem] font-medium uppercase tracking-[0.1em] text-[#F7F1E8] drop-shadow-[0_1px_3px_rgba(0,0,0,0.75)]">
             <CategoryIcon className="h-3 w-3 text-[#D4AF6A]" strokeWidth={1.75} />
             {exp.category}
           </span>
