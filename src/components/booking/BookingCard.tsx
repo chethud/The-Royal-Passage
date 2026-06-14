@@ -84,13 +84,15 @@ export function BookingCard({
             </div>
           </dl>
 
-          <div className={`flex flex-wrap gap-3 ${isLight ? "mt-1" : "mt-5"}`}>
+          <div className={`flex flex-wrap items-center gap-3 ${isLight ? "mt-1" : "mt-5"}`}>
             <Link
               to="/bookings/$bookingId"
               params={{ bookingId: booking.id }}
-              className={`text-sm underline-offset-4 hover:underline ${
-                isLight ? "luxury-panel-link font-medium" : "text-ember"
-              }`}
+              className={
+                isLight
+                  ? "luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
+                  : "text-sm text-ember underline-offset-4 hover:underline"
+              }
             >
               View details
             </Link>
@@ -98,9 +100,11 @@ export function BookingCard({
               <Link
                 to="/bookings/$bookingId/review"
                 params={{ bookingId: booking.id }}
-                className={`text-sm underline-offset-4 hover:underline ${
-                  isLight ? "luxury-panel-link font-medium" : "text-ember"
-                }`}
+                className={
+                  isLight
+                    ? "luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
+                    : "text-sm text-ember underline-offset-4 hover:underline"
+                }
               >
                 Leave a review
               </Link>
@@ -110,7 +114,11 @@ export function BookingCard({
                 type="button"
                 disabled={cancelling}
                 onClick={() => onCancel(booking.id)}
-                className="text-sm text-destructive underline-offset-4 hover:underline disabled:opacity-60"
+                className={
+                  isLight
+                    ? "luxury-btn-sm luxury-btn-panel-danger"
+                    : "text-sm text-destructive underline-offset-4 hover:underline disabled:opacity-60"
+                }
               >
                 {cancelling ? "Cancelling…" : "Cancel booking"}
               </button>

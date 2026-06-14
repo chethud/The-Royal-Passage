@@ -358,6 +358,36 @@
   letter-spacing: 0.1em;
 }
 
+.luxury-btn-panel-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgb(185 28 28 / 0.42);
+  background: rgb(255 255 255 / 0.2);
+  padding: 0.5rem 1rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #b91c1c;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.luxury-btn-panel-danger:hover:not(:disabled) {
+  border-color: #b91c1c;
+  background: rgb(185 28 28 / 0.06);
+  color: #991b1b;
+}
+
+.luxury-btn-panel-danger:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 /* Premium cream-white panels for checkout & cart (on burgundy page background) */
 .luxury-checkout-panel {
   position: relative;
