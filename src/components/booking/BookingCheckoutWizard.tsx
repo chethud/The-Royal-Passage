@@ -93,27 +93,27 @@ export function BookingCheckoutWizard({
                     <span
                       className={`flex items-center gap-2.5 text-[0.65rem] uppercase tracking-[0.18em] transition-colors ${
                         active
-                          ? "text-[#F7F1E8]"
+                          ? "luxury-panel-heading font-semibold"
                           : done
-                            ? "text-[#D4AF6A]/85"
-                            : "text-muted-foreground/40"
+                            ? "luxury-panel-label"
+                            : "text-[#4A0000]/35"
                       }`}
                     >
                       <span
                         className={`flex h-7 w-7 items-center justify-center rounded-full border font-display text-xs transition-colors ${
                           active
-                            ? "border-[#F7F1E8]/35 bg-[#F7F1E8]/10 text-[#F7F1E8]"
+                            ? "border-[#C8A25A]/55 bg-[#C8A25A]/12 luxury-panel-heading"
                             : done
-                              ? "border-[#D4AF6A]/35 text-[#D4AF6A]"
-                              : "border-[#F7F1E8]/12 text-muted-foreground/40"
+                              ? "border-[#C8A25A]/45 luxury-panel-label"
+                              : "border-[#4A0000]/15 text-[#4A0000]/35"
                         }`}
                       >
                         {String(item.id).padStart(2, "0")}
                       </span>
-                      <span className={active ? "font-semibold" : ""}>{item.label}</span>
+                      <span>{item.label}</span>
                     </span>
                     {index < STEPS.length - 1 ? (
-                      <span className="hidden h-px w-10 bg-[#F7F1E8]/12 sm:block" aria-hidden />
+                      <span className="luxury-panel-divider-bg hidden h-px w-10 sm:block" aria-hidden />
                     ) : null}
                   </li>
                 );
@@ -124,13 +124,13 @@ export function BookingCheckoutWizard({
 
         {step === 1 ? (
           <LuxuryCheckoutPanel>
-            <h2 className="font-display text-2xl tracking-tight text-[#F7F1E8] md:text-3xl">
+            <h2 className="luxury-panel-heading font-display text-2xl tracking-tight md:text-3xl">
               Choose your date & slot
             </h2>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground/90">
+            <p className="luxury-panel-body mt-2 max-w-xl text-sm leading-relaxed">
               Pick an available session in the next 7 days and set how many guests are joining.
             </p>
-            <div className="mt-8 border-t border-[#F7F1E8]/10 pt-8">
+            <div className="luxury-panel-divider mt-8 border-t pt-8">
               <ExperienceBookingPanel
                 exp={exp}
                 selectedSlot={selectedSlot}
@@ -141,14 +141,15 @@ export function BookingCheckoutWizard({
                 signedIn
                 userRole={userRole}
                 hideActions
+                surface="light"
               />
             </div>
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-[#F7F1E8]/10 pt-6">
+            <div className="luxury-panel-divider mt-8 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
               <Link
                 to={backLink.to}
                 params={backLink.params}
                 hash={backLink.hash}
-                className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
+                className="luxury-panel-link text-[0.65rem] font-semibold uppercase tracking-[0.14em]"
               >
                 {backLink.label}
               </Link>
@@ -167,20 +168,20 @@ export function BookingCheckoutWizard({
 
         {step === 2 ? (
           <LuxuryCheckoutPanel>
-            <h2 className="font-display text-2xl tracking-tight text-[#F7F1E8] md:text-3xl">
+            <h2 className="luxury-panel-heading font-display text-2xl tracking-tight md:text-3xl">
               Payment method
             </h2>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground/90">
+            <p className="luxury-panel-body mt-2 max-w-xl text-sm leading-relaxed">
               Your booking request goes to the host for approval. Payment is collected at the venue.
             </p>
-            <div className="mt-8 border-t border-[#F7F1E8]/10 pt-8">
-              <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
+            <div className="luxury-panel-divider mt-8 border-t pt-8">
+              <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} surface="light" />
             </div>
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-[#F7F1E8]/10 pt-6">
+            <div className="luxury-panel-divider mt-8 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
               <button
                 type="button"
                 onClick={goBack}
-                className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
+                className="luxury-panel-link text-[0.65rem] font-semibold uppercase tracking-[0.14em]"
               >
                 Back
               </button>
@@ -198,14 +199,14 @@ export function BookingCheckoutWizard({
 
         {step === 3 ? (
           <LuxuryCheckoutPanel>
-            <h2 className="font-display text-2xl tracking-tight text-[#F7F1E8] md:text-3xl">
+            <h2 className="luxury-panel-heading font-display text-2xl tracking-tight md:text-3xl">
               Confirm your request
             </h2>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground/90">
+            <p className="luxury-panel-body mt-2 max-w-xl text-sm leading-relaxed">
               We will notify your host. They can accept or decline. You pay at the venue after they
               confirm.
             </p>
-            <div className="mt-8 border-t border-[#F7F1E8]/10 pt-8">
+            <div className="luxury-panel-divider mt-8 border-t pt-8">
               <ExperienceBookingPanel
                 exp={exp}
                 selectedSlot={selectedSlot}
@@ -220,13 +221,14 @@ export function BookingCheckoutWizard({
                 onConfirm={() => void handleSubmit()}
                 busy={busy}
                 error={error}
+                surface="light"
               />
             </div>
-            <div className="mt-6 border-t border-[#F7F1E8]/10 pt-6">
+            <div className="luxury-panel-divider mt-6 border-t pt-6">
               <button
                 type="button"
                 onClick={goBack}
-                className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
+                className="luxury-panel-link text-[0.65rem] font-semibold uppercase tracking-[0.14em]"
               >
                 Back
               </button>
@@ -238,13 +240,13 @@ export function BookingCheckoutWizard({
       <aside className="h-fit lg:sticky lg:top-[calc(var(--header-height)+1rem)]">
         <LuxuryCheckoutPanel>
           {exp.image ? (
-            <div className="mb-5 overflow-hidden rounded-sm border border-[#F7F1E8]/10">
+            <div className="mb-5 overflow-hidden rounded-sm border border-[#C8A25A]/25">
               <img src={exp.image} alt="" className="aspect-[16/10] w-full object-cover" />
             </div>
           ) : null}
 
-          <h2 className="font-display text-xl tracking-wide text-[#F7F1E8]">Booking summary</h2>
-          <div className="my-5 h-px bg-[#F7F1E8]/10" />
+          <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Booking summary</h2>
+          <div className="luxury-panel-divider-bg my-5 h-px" />
 
           <dl className="space-y-3.5 text-sm">
             <SummaryRow label="Experience" value={exp.title} />
@@ -261,16 +263,16 @@ export function BookingCheckoutWizard({
             <SummaryRow label="Payment" value={step >= 2 ? "Pay at venue" : "—"} />
           </dl>
 
-          <div className="my-5 h-px bg-[#F7F1E8]/10" />
+          <div className="luxury-panel-divider-bg my-5 h-px" />
 
           <div className="flex items-baseline justify-between gap-4">
-            <span className="eyebrow text-muted-foreground">Estimated total</span>
-            <span className="font-display text-3xl tracking-tight text-[#F7F1E8]">
+            <span className="eyebrow luxury-panel-body">Estimated total</span>
+            <span className="luxury-panel-heading font-display text-3xl tracking-tight">
               {selectedSlot ? formatMoney(totalMinor, sym) : "—"}
             </span>
           </div>
 
-          <p className="mt-5 text-xs leading-relaxed text-muted-foreground/85">
+          <p className="luxury-panel-body mt-5 text-xs leading-relaxed">
             After you submit, your host receives the request and can approve or decline. You will
             see the status in your booking history.
           </p>
@@ -291,8 +293,8 @@ function SummaryRow({
 }) {
   return (
     <div className="flex justify-between gap-4">
-      <dt className="shrink-0 text-muted-foreground">{label}</dt>
-      <dd className={`min-w-0 text-foreground/90 ${align === "right" ? "text-right" : ""}`}>
+      <dt className="luxury-panel-body shrink-0">{label}</dt>
+      <dd className={`luxury-panel-heading min-w-0 ${align === "right" ? "text-right" : ""}`}>
         {value}
       </dd>
     </div>

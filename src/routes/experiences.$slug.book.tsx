@@ -80,11 +80,11 @@ function BookExperiencePage() {
         </Link>
 
         <LuxuryCheckoutPanel className="mt-6">
-          <div className="eyebrow text-[#D4AF6A]/90">Book your seats</div>
-          <h1 className="mt-2 font-display text-3xl uppercase tracking-[0.04em] text-[#F7F1E8] sm:text-4xl">
+          <div className="eyebrow luxury-panel-label">Book your seats</div>
+          <h1 className="luxury-panel-heading mt-2 font-display text-3xl uppercase tracking-[0.04em] sm:text-4xl">
             {exp.title}
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground/90">
+          <p className="luxury-panel-body mt-2 text-sm">
             {exp.city} · {exp.hostName}
           </p>
         </LuxuryCheckoutPanel>

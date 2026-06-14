@@ -27,7 +27,42 @@ type ExperienceBookingPanelProps = {
   error?: string | null;
   /** Hide sign-in / continue / confirm buttons (used inside multi-step checkout). */
   hideActions?: boolean;
+  /** Cream checkout panel vs dark experience detail page. */
+  surface?: "light" | "dark";
 };
+
+function panelTone(surface: "light" | "dark") {
+  if (surface === "light") {
+    return {
+      eyebrow: "luxury-panel-label",
+      muted: "luxury-panel-body",
+      slotActive: "border-[#C8A25A] text-[#4A0000]",
+      slotIdle:
+        "border-transparent text-[#4A0000]/75 hover:border-[#C8A25A]/40 hover:text-[#4A0000]",
+      slotHover: "group-hover:text-[#9A7228]",
+      seats: "text-[#9A7228]",
+      guestBtn: "text-[#9A7228] hover:text-[#4A0000]",
+      guestCount: "text-[#4A0000]",
+      total: "text-[#4A0000]",
+      textarea:
+        "border-[#C8A25A]/35 text-[#4A0000] placeholder:text-[#5B0000]/45 focus:border-[#C8A25A]/65",
+    };
+  }
+
+  return {
+    eyebrow: "text-[#D4AF6A]/90",
+    muted: "text-muted-foreground/90",
+    slotActive: "border-[#D4AF6A] text-foreground",
+    slotIdle: "border-transparent text-foreground/75 hover:border-[#C8A25A]/35 hover:text-foreground",
+    slotHover: "group-hover:text-[#D4AF6A]",
+    seats: "text-[#D4AF6A]",
+    guestBtn: "text-[#D4AF6A] hover:text-[#F7F1E8]",
+    guestCount: "text-foreground",
+    total: "text-[#F7F1E8]",
+    textarea:
+      "border-[#C8A25A]/25 text-foreground placeholder:text-muted-foreground/55 focus:border-[#C8A25A]/55",
+  };
+}
 
 export function ExperienceBookingPanel({
   exp,
@@ -44,8 +79,10 @@ export function ExperienceBookingPanel({
   busy = false,
   error = null,
   hideActions = false,
+  surface = "dark",
 }: ExperienceBookingPanelProps) {
   const sym = exp.currencySymbol ?? "₹";
+  const tone = panelTone(surface);
   const visibleSlots = filterSlotsWithinBookingWindow(exp.slots);
   const availableSlots = visibleSlots.filter((s) => s.available > 0);
   const limits = selectedSlot
@@ -62,18 +99,18 @@ export function ExperienceBookingPanel({
   return (
     <div className="space-y-8">
       <div>
-        <div className="eyebrow mb-2 text-[#D4AF6A]/90">Available slots</div>
-        <p className="text-xs leading-relaxed text-muted-foreground/90">
+        <div className={`eyebrow mb-2 ${tone.eyebrow}`}>Available slots</div>
+        <p className={`text-xs leading-relaxed ${tone.muted}`}>
           Showing the next 7 days from today. New dates are added by hosts on a rolling weekly basis.
         </p>
       </div>
 
       {visibleSlots.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
+        <p className={`text-sm ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
           No bookable dates in the next 7 days. Check back soon or contact Royal Passage.
         </p>
       ) : availableSlots.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
+        <p className={`text-sm ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
           All upcoming sessions are sold out. Browse other experiences or try again later.
         </p>
       ) : (
@@ -89,28 +126,28 @@ export function ExperienceBookingPanel({
                 aria-pressed={active}
                 onClick={() => onSelectSlot(slot)}
                 className={`group flex w-full items-center justify-between border-l-2 py-3.5 pl-4 pr-2 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]/40 ${
-                  active
-                    ? "border-[#D4AF6A] text-foreground"
-                    : sold
-                      ? "cursor-not-allowed border-transparent opacity-40"
-                      : "border-transparent text-foreground/75 hover:border-[#C8A25A]/35 hover:text-foreground"
+                  active ? tone.slotActive : sold ? "cursor-not-allowed border-transparent opacity-40" : tone.slotIdle
                 }`}
               >
                 <div>
-                  <div className="font-display text-lg tracking-wide transition-colors group-hover:text-[#D4AF6A]">
+                  <div className={`font-display text-lg tracking-wide transition-colors ${tone.slotHover}`}>
                     {formatDateLong(slot.date)}
                   </div>
-                  <div className="mt-0.5 text-xs text-muted-foreground">
+                  <div className={`mt-0.5 text-xs ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
                     {slot.start}–{slot.end}
                   </div>
                 </div>
                 <div className="text-right text-xs">
                   {sold ? (
-                    <span className="eyebrow text-muted-foreground">Sold out</span>
+                    <span className={`eyebrow ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
+                      Sold out
+                    </span>
                   ) : (
                     <>
-                      <div className="eyebrow text-muted-foreground/80">Seats</div>
-                      <div className="font-display text-lg text-[#D4AF6A]">
+                      <div className={`eyebrow ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground/80"}`}>
+                        Seats
+                      </div>
+                      <div className={`font-display text-lg ${tone.seats}`}>
                         {slot.available}/{slot.capacity}
                       </div>
                     </>
@@ -128,8 +165,8 @@ export function ExperienceBookingPanel({
 
           <div className="flex items-center justify-between gap-6">
             <div>
-              <div className="eyebrow text-[#D4AF6A]/90">Guests</div>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <div className={`eyebrow ${tone.eyebrow}`}>Guests</div>
+              <p className={`mt-1 text-xs ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
                 {limits.min}–{limits.max} per booking
               </p>
             </div>
@@ -139,17 +176,17 @@ export function ExperienceBookingPanel({
                 aria-label="Decrease guest count"
                 disabled={!selectedSlot || guests <= limits.min}
                 onClick={() => onGuestsChange(Math.max(limits.min, guests - 1))}
-                className="inline-flex h-9 w-9 items-center justify-center text-[#D4AF6A] transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
+                className={`inline-flex h-9 w-9 items-center justify-center transition-colors disabled:cursor-default disabled:opacity-35 ${tone.guestBtn}`}
               >
                 <Minus className="h-4 w-4" strokeWidth={1.75} />
               </button>
-              <span className="w-8 text-center font-display text-2xl">{guests}</span>
+              <span className={`w-8 text-center font-display text-2xl ${tone.guestCount}`}>{guests}</span>
               <button
                 type="button"
                 aria-label="Increase guest count"
                 disabled={!selectedSlot || guests >= limits.max}
                 onClick={() => onGuestsChange(Math.min(limits.max, guests + 1))}
-                className="inline-flex h-9 w-9 items-center justify-center text-[#D4AF6A] transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
+                className={`inline-flex h-9 w-9 items-center justify-center transition-colors disabled:cursor-default disabled:opacity-35 ${tone.guestBtn}`}
               >
                 <Plus className="h-4 w-4" strokeWidth={1.75} />
               </button>
@@ -158,13 +195,13 @@ export function ExperienceBookingPanel({
 
           {variant === "checkout" && onNotesChange ? (
             <div>
-              <h2 className="eyebrow mb-3 text-[#D4AF6A]/90">Notes (optional)</h2>
+              <h2 className={`eyebrow mb-3 ${tone.eyebrow}`}>Notes (optional)</h2>
               <textarea
                 value={notes}
                 onChange={(e) => onNotesChange(e.target.value)}
                 rows={3}
                 placeholder="Dietary needs, accessibility requests, or questions for your host…"
-                className="w-full resize-none border-0 border-b border-[#C8A25A]/25 bg-transparent px-0 py-3 text-sm text-foreground placeholder:text-muted-foreground/55 focus:border-[#C8A25A]/55 focus:outline-none focus:ring-0"
+                className={`w-full resize-none border-0 border-b bg-transparent px-0 py-3 text-sm focus:outline-none focus:ring-0 ${tone.textarea}`}
               />
             </div>
           ) : null}
@@ -173,18 +210,20 @@ export function ExperienceBookingPanel({
 
           <div className="flex items-end justify-between gap-4">
             <div>
-              <div className="eyebrow text-muted-foreground">Estimated total</div>
-              <div className="mt-1 text-xs text-muted-foreground">
+              <div className={`eyebrow ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
+                Estimated total
+              </div>
+              <div className={`mt-1 text-xs ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
                 {sym}
                 {exp.pricePerPerson} × {guests} guest{guests > 1 ? "s" : ""}
               </div>
             </div>
-            <div className="font-display text-3xl tracking-tight text-[#F7F1E8]">
+            <div className={`font-display text-3xl tracking-tight ${tone.total}`}>
               {selectedSlot ? formatMoney(totalMinor, sym) : "—"}
             </div>
           </div>
 
-          <PayAtVenueBadge />
+          <PayAtVenueBadge surface={surface} />
 
           {error && !hideActions ? (
             <p className="text-sm text-destructive">{error}</p>
@@ -193,7 +232,11 @@ export function ExperienceBookingPanel({
           {hideActions ? null : variant === "select" ? (
             <>
               {!selectedSlot ? (
-                <span className="inline-flex w-full items-center justify-center py-3 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground/60">
+                <span
+                  className={`inline-flex w-full items-center justify-center py-3 text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${
+                    surface === "light" ? "luxury-panel-body opacity-70" : "text-muted-foreground/60"
+                  }`}
+                >
                   Select a slot
                 </span>
               ) : needsSignIn ? (
@@ -206,11 +249,11 @@ export function ExperienceBookingPanel({
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               ) : staffSignedIn ? (
-                <p className="text-center text-sm text-muted-foreground">
+                <p className={`text-center text-sm ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
                   Host and admin accounts cannot book experiences. Sign in with a guest account.
                 </p>
               ) : !canBookAsGuest ? (
-                <p className="text-center text-sm text-muted-foreground">
+                <p className={`text-center text-sm ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
                   Sign in with a guest account to book this experience.
                 </p>
               ) : (
@@ -224,14 +267,18 @@ export function ExperienceBookingPanel({
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               )}
-              <p className="text-center text-[0.65rem] tracking-wide text-muted-foreground/80">
+              <p
+                className={`text-center text-[0.65rem] tracking-wide ${
+                  surface === "light" ? "luxury-panel-body" : "text-muted-foreground/80"
+                }`}
+              >
                 Pay at venue on arrival · Host confirms your booking
               </p>
             </>
           ) : (
             <>
               {!selectedSlot ? (
-                <p className="text-center text-sm text-muted-foreground">
+                <p className={`text-center text-sm ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
                   Select an available date to continue.
                 </p>
               ) : null}
@@ -243,7 +290,11 @@ export function ExperienceBookingPanel({
               >
                 {busy ? "Submitting…" : "Request booking"}
               </button>
-              <p className="text-center text-[0.65rem] tracking-wide text-muted-foreground/80">
+              <p
+                className={`text-center text-[0.65rem] tracking-wide ${
+                  surface === "light" ? "luxury-panel-body" : "text-muted-foreground/80"
+                }`}
+              >
                 Your host will confirm. Pay at the venue on arrival.
               </p>
             </>

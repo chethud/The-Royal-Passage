@@ -78,11 +78,11 @@ function CartCheckoutPage() {
       </Link>
 
       <LuxuryCheckoutPanel className="mt-6">
-        <div className="eyebrow text-[#D4AF6A]/90">Booking request</div>
-        <h2 className="mt-2 font-display text-2xl uppercase tracking-[0.04em] text-[#F7F1E8] sm:text-3xl">
+        <div className="eyebrow luxury-panel-label">Booking request</div>
+        <h2 className="luxury-panel-heading mt-2 font-display text-2xl uppercase tracking-[0.04em] sm:text-3xl">
           {exp.title}
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground/90">
+        <p className="luxury-panel-body mt-2 text-sm">
           {exp.city} · {exp.hostName}
         </p>
       </LuxuryCheckoutPanel>
