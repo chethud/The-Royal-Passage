@@ -12,35 +12,35 @@ export function HostExperienceTable({ experiences }: HostExperienceTableProps) {
     <div className="overflow-x-auto">
       <table className="w-full min-w-[800px] text-left text-sm">
         <thead>
-          <tr className="border-b border-[oklch(0.88_0.08_86_/_0.2)] text-xs uppercase tracking-[0.14em] text-muted-foreground">
-            <th className="px-3 py-2">Experience</th>
-            <th className="px-3 py-2">City</th>
-            <th className="px-3 py-2">Price</th>
-            <th className="px-3 py-2">Slots</th>
-            <th className="px-3 py-2">Status</th>
-            <th className="px-3 py-2">Actions</th>
+          <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
+            <th className="px-3 py-2 font-medium">Experience</th>
+            <th className="px-3 py-2 font-medium">City</th>
+            <th className="px-3 py-2 font-medium">Price</th>
+            <th className="px-3 py-2 font-medium">Slots</th>
+            <th className="px-3 py-2 font-medium">Status</th>
+            <th className="px-3 py-2 font-medium">Actions</th>
           </tr>
         </thead>
         <tbody>
           {experiences.map((exp) => (
-            <tr key={exp.id} className="border-b border-[oklch(0.88_0.08_86_/_0.1)]">
+            <tr key={exp.id} className="border-b luxury-panel-divider">
               <td className="px-3 py-3">
-                <div className="font-display text-lg">{exp.title}</div>
-                <div className="text-xs text-muted-foreground">{exp.slug}</div>
+                <div className="luxury-panel-heading font-display text-lg">{exp.title}</div>
+                <div className="luxury-panel-body text-xs">{exp.slug}</div>
               </td>
-              <td className="px-3 py-3">{exp.city}</td>
-              <td className="px-3 py-3">
+              <td className="luxury-panel-body px-3 py-3">{exp.city}</td>
+              <td className="luxury-panel-body px-3 py-3">
                 {formatMoney(exp.pricePerPersonMinor, exp.currencySymbol)}
               </td>
-              <td className="px-3 py-3">{exp.slotCount}</td>
+              <td className="luxury-panel-body px-3 py-3">{exp.slotCount}</td>
               <td className="px-3 py-3">
-                <ExperienceStatusBadge status={exp.status} />
+                <ExperienceStatusBadge status={exp.status} surface="light" />
               </td>
               <td className="px-3 py-3">
                 <Link
                   to="/host/experiences/$experienceId"
                   params={{ experienceId: exp.id }}
-                  className="text-ember hover:underline"
+                  className="luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
                 >
                   Manage
                 </Link>

@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { CreateExperienceWizard } from "@/components/experience/CreateExperienceWizard";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import { createHostExperience, createHostSlot } from "@/lib/api/host-experiences";
@@ -73,8 +74,11 @@ function HostNewExperiencePage() {
       <HostDashboardShell
         title="New experience"
         subtitle="Step through basics, pricing, photos, bookable slots, and submit for Royal Passage review."
+        showRoleDescription={false}
       >
-        <p className="text-sm text-muted-foreground">Preparing your workspace…</p>
+        <LuxuryCheckoutPanel>
+          <p className="luxury-panel-body py-8 text-sm">Preparing your workspace…</p>
+        </LuxuryCheckoutPanel>
       </HostDashboardShell>
     );
   }
@@ -83,18 +87,21 @@ function HostNewExperiencePage() {
     <HostDashboardShell
       title="New experience"
       subtitle="Step through basics, pricing, photos, bookable slots, and submit for Royal Passage review."
+      showRoleDescription={false}
     >
-      {pageError ? (
-        <p className="mb-6 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {pageError}
-        </p>
-      ) : null}
-      <CreateExperienceWizard
-        categories={categories}
-        cities={cities}
-        saving={saving}
-        onSubmit={(payload) => void handleSubmit(payload)}
-      />
+      <LuxuryCheckoutPanel>
+        {pageError ? (
+          <p className="mb-6 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {pageError}
+          </p>
+        ) : null}
+        <CreateExperienceWizard
+          categories={categories}
+          cities={cities}
+          saving={saving}
+          onSubmit={(payload) => void handleSubmit(payload)}
+        />
+      </LuxuryCheckoutPanel>
     </HostDashboardShell>
   );
 }

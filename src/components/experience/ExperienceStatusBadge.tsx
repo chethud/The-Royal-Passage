@@ -6,7 +6,7 @@ const STATUS_LABELS: Record<string, string> = {
   archived: "Archived",
 };
 
-const STATUS_STYLES: Record<string, string> = {
+const STATUS_STYLES_DARK: Record<string, string> = {
   draft: "border-muted-foreground/30 text-muted-foreground",
   pending_review: "border-amber-500/40 bg-amber-500/10 text-amber-200",
   published: "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
@@ -14,15 +14,26 @@ const STATUS_STYLES: Record<string, string> = {
   archived: "border-muted-foreground/20 text-muted-foreground",
 };
 
-type ExperienceStatusBadgeProps = {
-  status: string;
+const STATUS_STYLES_LIGHT: Record<string, string> = {
+  draft: "border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.45)] text-[rgb(58_0_0/0.65)]",
+  pending_review: "border-amber-700/30 bg-amber-50 text-amber-900",
+  published: "border-emerald-700/30 bg-emerald-50 text-emerald-900",
+  rejected: "border-destructive/40 bg-destructive/10 text-destructive",
+  archived: "border-[rgb(74_0_0/0.2)] text-[rgb(58_0_0/0.55)]",
 };
 
-export function ExperienceStatusBadge({ status }: ExperienceStatusBadgeProps) {
+type ExperienceStatusBadgeProps = {
+  status: string;
+  surface?: "light" | "dark";
+};
+
+export function ExperienceStatusBadge({ status, surface = "dark" }: ExperienceStatusBadgeProps) {
+  const styles = surface === "light" ? STATUS_STYLES_LIGHT : STATUS_STYLES_DARK;
+
   return (
     <span
       className={`inline-flex rounded-sm border px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.12em] ${
-        STATUS_STYLES[status] ?? STATUS_STYLES.draft
+        styles[status] ?? styles.draft
       }`}
     >
       {STATUS_LABELS[status] ?? status}

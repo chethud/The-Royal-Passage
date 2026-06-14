@@ -51,7 +51,11 @@ const STEPS = [
 ] as const;
 
 const inputClass =
-  "mt-1 w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/50 px-3 py-2 text-sm";
+  "mt-1 w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-3 py-2 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
+
+const labelClass = "eyebrow luxury-panel-label";
+const hintClass = "luxury-panel-body mt-1 block text-xs";
+const sectionTitleClass = "luxury-panel-heading font-display text-xl";
 
 function splitLines(value: string) {
   return value
@@ -237,12 +241,12 @@ export function CreateExperienceWizard({
           return (
             <div
               key={item.id}
-              className={`rounded-sm border px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] ${
+              className={`rounded-sm px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] ${
                 active
-                  ? "border-ember/70 bg-ember/10 text-ember"
+                  ? "luxury-panel-step-active"
                   : done
-                    ? "border-ember/30 text-ember/80"
-                    : "border-[oklch(0.88_0.08_86_/_0.25)] text-muted-foreground"
+                    ? "luxury-panel-step-done"
+                    : "luxury-panel-step-idle"
               }`}
             >
               <span className="mr-1.5 opacity-70">{item.id}.</span>
@@ -259,14 +263,14 @@ export function CreateExperienceWizard({
       ) : null}
 
       {step === 1 ? (
-        <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8 space-y-5">
-          <h3 className="font-display text-xl">Basics</h3>
-          <p className="text-sm text-muted-foreground">
+        <div className="space-y-5 border-t luxury-panel-divider pt-6">
+          <h3 className={sectionTitleClass}>Basics</h3>
+          <p className="luxury-panel-body text-sm">
             Give your experience a clear title and description. Guests see this on the listing page.
           </p>
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="sm:col-span-2 text-sm">
-              <span className="eyebrow text-muted-foreground">Title</span>
+              <span className="eyebrow luxury-panel-label">Title</span>
               <input
                 required
                 value={title}
@@ -275,7 +279,7 @@ export function CreateExperienceWizard({
               />
             </label>
             <label className="text-sm">
-              <span className="eyebrow text-muted-foreground">URL slug</span>
+              <span className="eyebrow luxury-panel-label">URL slug</span>
               <input
                 value={slug}
                 onChange={(e) => {
@@ -287,7 +291,7 @@ export function CreateExperienceWizard({
               />
             </label>
             <label className="text-sm">
-              <span className="eyebrow text-muted-foreground">Category</span>
+              <span className="eyebrow luxury-panel-label">Category</span>
               <select
                 required
                 value={categorySlug}
@@ -302,11 +306,11 @@ export function CreateExperienceWizard({
               </select>
             </label>
             <label className="sm:col-span-2 text-sm">
-              <span className="eyebrow text-muted-foreground">Tagline</span>
+              <span className="eyebrow luxury-panel-label">Tagline</span>
               <input value={tagline} onChange={(e) => setTagline(e.target.value)} className={inputClass} />
             </label>
             <label className="sm:col-span-2 text-sm">
-              <span className="eyebrow text-muted-foreground">Description</span>
+              <span className="eyebrow luxury-panel-label">Description</span>
               <textarea
                 required
                 rows={6}
@@ -314,7 +318,7 @@ export function CreateExperienceWizard({
                 onChange={(e) => setDescription(e.target.value)}
                 className={inputClass}
               />
-              <span className="mt-1 block text-xs text-muted-foreground">
+              <span className={hintClass}>
                 {description.trim().length}/50 characters minimum
               </span>
             </label>
@@ -323,30 +327,30 @@ export function CreateExperienceWizard({
       ) : null}
 
       {step === 2 ? (
-        <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8 space-y-5">
-          <h3 className="font-display text-xl">Location & pricing</h3>
+        <div className="space-y-5 border-t luxury-panel-divider pt-6">
+          <h3 className={sectionTitleClass}>Location & pricing</h3>
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="text-sm">
-              <span className="eyebrow text-muted-foreground">City</span>
+              <span className="eyebrow luxury-panel-label">City</span>
               <input
                 readOnly
                 value={cityName}
-                className={`${inputClass} bg-muted/30 text-muted-foreground`}
+                className={`${inputClass} bg-[rgb(255_255_255/0.35)]`}
               />
-              <span className="mt-1 block text-xs text-muted-foreground">
+              <span className={hintClass}>
                 The Royal Passage currently lists experiences in Mysuru only.
               </span>
             </label>
             <label className="text-sm">
-              <span className="eyebrow text-muted-foreground">Region</span>
+              <span className="eyebrow luxury-panel-label">Region</span>
               <input value={region} onChange={(e) => setRegion(e.target.value)} className={inputClass} />
             </label>
             <label className="sm:col-span-2 text-sm">
-              <span className="eyebrow text-muted-foreground">Address</span>
+              <span className="eyebrow luxury-panel-label">Address</span>
               <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputClass} />
             </label>
             <label className="text-sm">
-              <span className="eyebrow text-muted-foreground">Duration (minutes)</span>
+              <span className="eyebrow luxury-panel-label">Duration (minutes)</span>
               <input
                 type="number"
                 min={30}
@@ -357,7 +361,7 @@ export function CreateExperienceWizard({
               />
             </label>
             <label className="text-sm">
-              <span className="eyebrow text-muted-foreground">Price per person (₹)</span>
+              <span className="eyebrow luxury-panel-label">Price per person (₹)</span>
               <RupeeAmountInput
                 value={priceMajor}
                 onChange={setPriceMajor}
@@ -365,7 +369,7 @@ export function CreateExperienceWizard({
               />
             </label>
             <label className="text-sm">
-              <span className="eyebrow text-muted-foreground">Min guests / booking</span>
+              <span className="eyebrow luxury-panel-label">Min guests / booking</span>
               <input
                 type="number"
                 min={1}
@@ -376,7 +380,7 @@ export function CreateExperienceWizard({
               />
             </label>
             <label className="text-sm">
-              <span className="eyebrow text-muted-foreground">Max guests / booking</span>
+              <span className="eyebrow luxury-panel-label">Max guests / booking</span>
               <input
                 type="number"
                 min={1}
@@ -391,15 +395,15 @@ export function CreateExperienceWizard({
       ) : null}
 
       {step === 3 ? (
-        <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8 space-y-5">
-          <h3 className="font-display text-xl">Photos & details</h3>
+        <div className="space-y-5 border-t luxury-panel-divider pt-6">
+          <h3 className={sectionTitleClass}>Photos & details</h3>
           <ExperiencePhotoGallery
             photoUrls={photoUrls}
             onChange={setPhotoUrls}
             inputClass={inputClass}
           />
           <label className="block text-sm">
-            <span className="eyebrow text-muted-foreground">Inclusions (one per line)</span>
+            <span className="eyebrow luxury-panel-label">Inclusions (one per line)</span>
             <textarea
               rows={4}
               value={inclusions}
@@ -408,7 +412,7 @@ export function CreateExperienceWizard({
             />
           </label>
           <label className="block text-sm">
-            <span className="eyebrow text-muted-foreground">Exclusions (one per line)</span>
+            <span className="eyebrow luxury-panel-label">Exclusions (one per line)</span>
             <textarea
               rows={3}
               value={exclusions}
@@ -417,7 +421,7 @@ export function CreateExperienceWizard({
             />
           </label>
           <label className="block text-sm">
-            <span className="eyebrow text-muted-foreground">Requirements (one per line)</span>
+            <span className="eyebrow luxury-panel-label">Requirements (one per line)</span>
             <textarea
               rows={3}
               value={requirements}
@@ -426,7 +430,7 @@ export function CreateExperienceWizard({
             />
           </label>
           <label className="block text-sm">
-            <span className="eyebrow text-muted-foreground">Cancellation policy</span>
+            <span className="eyebrow luxury-panel-label">Cancellation policy</span>
             <textarea
               rows={3}
               value={cancellationPolicy}
@@ -439,9 +443,9 @@ export function CreateExperienceWizard({
 
       {step === 4 ? (
         <div className="space-y-6">
-          <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8 space-y-5">
-            <h3 className="font-display text-xl">Bookable slots</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="space-y-5 border-t luxury-panel-divider pt-6">
+            <h3 className={sectionTitleClass}>Bookable slots</h3>
+            <p className="luxury-panel-body text-sm">
               Create when guests can book your experience: choose weekdays, a date range, session
               times, and capacity. You can skip this step and add schedules later from your
               experience page.
@@ -450,17 +454,17 @@ export function CreateExperienceWizard({
           </div>
 
           {sortedDraftSlots.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
+            <p className="luxury-panel-body text-sm">
               No sessions added yet — optional for now. Use the builder above to generate your
               weekly schedule.
             </p>
           ) : (
             <div>
-              <p className="mb-3 text-sm font-medium text-ink">
+              <p className="luxury-panel-heading mb-3 text-sm font-medium">
                 {sortedDraftSlots.length} session{sortedDraftSlots.length === 1 ? "" : "s"} ready to
                 publish
               </p>
-              <ul className="max-h-72 divide-y divide-[oklch(0.88_0.08_86_/_0.15)] overflow-y-auto rounded-md border border-[oklch(0.88_0.08_86_/_0.15)]">
+              <ul className="max-h-72 divide-y divide-[rgb(74_0_0/0.12)] overflow-y-auto rounded-md border border-[rgb(74_0_0/0.14)]">
                 {sortedDraftSlots.map((slot) => (
                   <li
                     key={slot.key}
@@ -487,9 +491,9 @@ export function CreateExperienceWizard({
       ) : null}
 
       {step === 5 ? (
-        <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8 space-y-6">
-          <h3 className="font-display text-xl">Review & submit</h3>
-          <p className="text-sm text-muted-foreground">
+        <div className="space-y-6 border-t luxury-panel-divider pt-6">
+          <h3 className={sectionTitleClass}>Review & submit</h3>
+          <p className="luxury-panel-body text-sm">
             Check everything below. Your listing is saved as a draft unless you submit for Royal
             Passage review.
           </p>
@@ -499,7 +503,7 @@ export function CreateExperienceWizard({
               {reviewPhotos.slice(0, 3).map((url) => (
                 <div
                   key={url}
-                  className="overflow-hidden rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)]"
+                  className="luxury-panel-image overflow-hidden rounded-sm"
                 >
                   <img src={url} alt={title} className="aspect-[4/3] w-full object-cover" />
                 </div>
@@ -509,40 +513,40 @@ export function CreateExperienceWizard({
 
           <dl className="grid gap-4 text-sm sm:grid-cols-2">
             <div>
-              <dt className="eyebrow text-muted-foreground">Title</dt>
+              <dt className="eyebrow luxury-panel-label">Title</dt>
               <dd className="mt-1 font-medium">{title || "—"}</dd>
             </div>
             <div>
-              <dt className="eyebrow text-muted-foreground">Category</dt>
+              <dt className="eyebrow luxury-panel-label">Category</dt>
               <dd className="mt-1">{categoryLabel}</dd>
             </div>
             <div className="sm:col-span-2">
-              <dt className="eyebrow text-muted-foreground">Description</dt>
-              <dd className="mt-1 whitespace-pre-wrap text-muted-foreground">{description}</dd>
+              <dt className="eyebrow luxury-panel-label">Description</dt>
+              <dd className="luxury-panel-body mt-1 whitespace-pre-wrap">{description}</dd>
             </div>
             <div>
-              <dt className="eyebrow text-muted-foreground">Location</dt>
+              <dt className="eyebrow luxury-panel-label">Location</dt>
               <dd className="mt-1">
                 {cityName}
                 {region ? `, ${region}` : ""}
               </dd>
             </div>
             <div>
-              <dt className="eyebrow text-muted-foreground">Price</dt>
+              <dt className="eyebrow luxury-panel-label">Price</dt>
               <dd className="mt-1">{formatMoney(priceMajor * 100)} per person</dd>
             </div>
             <div>
-              <dt className="eyebrow text-muted-foreground">Duration</dt>
+              <dt className="eyebrow luxury-panel-label">Duration</dt>
               <dd className="mt-1">{durationMinutes} minutes</dd>
             </div>
             <div>
-              <dt className="eyebrow text-muted-foreground">Guests per booking</dt>
+              <dt className="eyebrow luxury-panel-label">Guests per booking</dt>
               <dd className="mt-1">
                 {minGuests}–{maxGuests}
               </dd>
             </div>
             <div className="sm:col-span-2">
-              <dt className="eyebrow text-muted-foreground">Photos</dt>
+              <dt className="eyebrow luxury-panel-label">Photos</dt>
               <dd className="mt-1">
                 {validPhotoUrls.length === 0
                   ? "None added"
@@ -550,7 +554,7 @@ export function CreateExperienceWizard({
               </dd>
             </div>
             <div className="sm:col-span-2">
-              <dt className="eyebrow text-muted-foreground">Bookable slots</dt>
+              <dt className="eyebrow luxury-panel-label">Bookable slots</dt>
               <dd className="mt-1">
                 {sortedDraftSlots.length === 0
                   ? "None — add later from your experience page"
@@ -559,7 +563,7 @@ export function CreateExperienceWizard({
             </div>
           </dl>
 
-          <label className="flex items-start gap-3 rounded-sm border border-ember/30 bg-ember/5 p-4 text-sm">
+          <label className="flex items-start gap-3 rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4 text-sm">
             <input
               type="checkbox"
               className="mt-0.5"
@@ -567,8 +571,8 @@ export function CreateExperienceWizard({
               onChange={(e) => setSubmitForReview(e.target.checked)}
             />
             <span>
-              <strong className="font-medium">Submit for admin review</strong>
-              <span className="mt-1 block text-muted-foreground">
+              <strong className="luxury-panel-heading font-medium">Submit for admin review</strong>
+              <span className={hintClass}>
                 Royal Passage will review your listing before it goes live on the marketplace.
               </span>
             </span>
@@ -582,7 +586,7 @@ export function CreateExperienceWizard({
             type="button"
             onClick={goBack}
             disabled={saving}
-            className="rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-5 py-3 text-sm disabled:opacity-60"
+            className="luxury-btn-sm luxury-btn-panel-outline disabled:opacity-60"
           >
             Back
           </button>
@@ -591,7 +595,7 @@ export function CreateExperienceWizard({
           <button
             type="button"
             onClick={goNext}
-            className="rounded-sm bg-ember px-5 py-3 text-sm font-medium text-primary-foreground shadow-[var(--shadow-gold)]"
+            className="luxury-btn-sm luxury-btn-primary"
           >
             Continue
           </button>
@@ -600,7 +604,7 @@ export function CreateExperienceWizard({
             type="button"
             disabled={saving}
             onClick={handleFinalSubmit}
-            className="rounded-sm bg-ember px-5 py-3 text-sm font-medium text-primary-foreground shadow-[var(--shadow-gold)] disabled:opacity-60"
+            className="luxury-btn-sm luxury-btn-primary disabled:opacity-60"
           >
             {saving
               ? "Creating…"

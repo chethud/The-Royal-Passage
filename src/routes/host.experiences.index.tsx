@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { HostExperienceTable } from "@/components/experience/HostExperienceTable";
 import { CreateExperienceCta } from "@/components/host/CreateExperienceCta";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
@@ -47,8 +48,11 @@ function HostExperiencesPage() {
       <HostDashboardShell
         title="My experiences"
         subtitle="Create listings, manage slots, and submit for admin review."
+        showRoleDescription={false}
       >
-        <p className="text-sm text-muted-foreground">Loading your experiences…</p>
+        <LuxuryCheckoutPanel>
+          <p className="luxury-panel-body py-8 text-sm">Loading your experiences…</p>
+        </LuxuryCheckoutPanel>
       </HostDashboardShell>
     );
   }
@@ -57,25 +61,35 @@ function HostExperiencesPage() {
     <HostDashboardShell
       title="My experiences"
       subtitle="Create listings, manage slots, and submit for admin review."
+      showRoleDescription={false}
     >
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          Draft listings, add slots, and submit for Royal Passage review.
-        </p>
-        <CreateExperienceCta variant="inline" />
-      </div>
+      <LuxuryCheckoutPanel>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="luxury-panel-body text-sm">
+            Draft listings, add slots, and submit for Royal Passage review.
+          </p>
+          <CreateExperienceCta variant="inline" />
+        </div>
 
-      {pageLoading ? (
-        <p className="text-sm text-muted-foreground">Loading experiences…</p>
-      ) : pageError ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {pageError}
-        </p>
-      ) : experiences.length === 0 ? (
-        <CreateExperienceCta />
-      ) : (
-        <HostExperienceTable experiences={experiences} />
-      )}
+        <div className="mt-6">
+          {pageLoading ? (
+            <p className="luxury-panel-body py-8 text-sm">Loading experiences…</p>
+          ) : pageError ? (
+            <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {pageError}
+            </p>
+          ) : experiences.length === 0 ? (
+            <div className="py-4 text-center">
+              <p className="luxury-panel-body text-sm">No experiences yet.</p>
+              <div className="mt-4">
+                <CreateExperienceCta variant="inline" />
+              </div>
+            </div>
+          ) : (
+            <HostExperienceTable experiences={experiences} />
+          )}
+        </div>
+      </LuxuryCheckoutPanel>
     </HostDashboardShell>
   );
 }
