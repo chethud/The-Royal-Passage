@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ChevronDown, Minus, Plus } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Minus, Plus } from "lucide-react";
 import { PayAtVenueBadge } from "@/components/booking/PayAtVenueBadge";
 import type { Experience, Slot } from "@/data/experiences";
 import {
@@ -120,12 +120,12 @@ function DateSlotPicker({
       : "border-[#C8A25A]/30 bg-[#1f0d0d]/70";
   const slotRowIdle =
     surface === "light"
-      ? "border border-transparent bg-white/70 text-[#4A0000]/80 hover:border-[#4A0000]/20 hover:bg-white"
+      ? "border border-[#4A0000]/8 bg-white/70 text-[#4A0000]/80 hover:border-[#4A0000]/25 hover:bg-white"
       : "border border-transparent bg-black/20 text-foreground/80 hover:border-[#C8A25A]/25 hover:bg-black/30";
   const slotRowActive =
     surface === "light"
-      ? "border-[#4A0000]/35 bg-white text-[#4A0000] shadow-sm"
-      : "border-[#C8A25A]/40 bg-black/35 text-foreground";
+      ? "border-2 border-[#4A0000] bg-[#FFF4E8] text-[#4A0000] shadow-[0_8px_24px_-12px_rgb(74_0_0/0.35)] ring-2 ring-[#4A0000]/12"
+      : "border-2 border-[#D4AF6A] bg-[#2a1212] text-foreground shadow-[0_8px_24px_-12px_rgb(0_0_0/0.55)] ring-2 ring-[#D4AF6A]/20";
 
   return (
     <div className="space-y-3">
@@ -199,21 +199,53 @@ function DateSlotPicker({
                       type="button"
                       disabled={sold}
                       aria-pressed={active}
+                      aria-label={
+                        sold
+                          ? `${formatTime12h(slot.start)} to ${formatTime12h(slot.end)}, sold out`
+                          : active
+                            ? `${formatTime12h(slot.start)} to ${formatTime12h(slot.end)}, selected`
+                            : `${formatTime12h(slot.start)} to ${formatTime12h(slot.end)}, select session`
+                      }
                       onClick={() => onSelectSlot(slot)}
-                      className={`flex w-full items-center justify-between gap-3 rounded-lg px-3.5 py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A0000]/25 ${
-                        active ? slotRowActive : sold ? "cursor-not-allowed opacity-40" : slotRowIdle
+                      className={`relative flex w-full items-center justify-between gap-3 rounded-lg py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A0000]/25 ${
+                        active ? `pl-5 pr-3.5 ${slotRowActive}` : sold ? "cursor-not-allowed px-3.5 opacity-40" : `px-3.5 ${slotRowIdle}`
                       }`}
                     >
-                      <div>
-                        <div className={`text-sm font-medium ${active ? tone.seats : ""}`}>
+                      {active ? (
+                        <span
+                          className={`absolute bottom-2.5 left-2 top-2.5 w-1 rounded-full ${
+                            surface === "light" ? "bg-[#4A0000]" : "bg-[#D4AF6A]"
+                          }`}
+                          aria-hidden
+                        />
+                      ) : null}
+                      <div className="min-w-0 flex-1">
+                        <div className={`text-sm font-semibold ${active ? tone.seats : ""}`}>
                           {formatTime12h(slot.start)} – {formatTime12h(slot.end)}
                         </div>
-                        <div className={`mt-0.5 text-[0.65rem] uppercase tracking-[0.12em] ${tone.muted}`}>
-                          {sold ? "Sold out" : "Select session"}
+                        <div
+                          className={`mt-0.5 flex items-center gap-1.5 text-[0.65rem] uppercase tracking-[0.12em] ${
+                            active
+                              ? surface === "light"
+                                ? "font-semibold text-[#4A0000]"
+                                : "font-semibold text-[#D4AF6A]"
+                              : tone.muted
+                          }`}
+                        >
+                          {active ? (
+                            <>
+                              <Check className="h-3 w-3 shrink-0" strokeWidth={2.5} aria-hidden />
+                              Selected
+                            </>
+                          ) : sold ? (
+                            "Sold out"
+                          ) : (
+                            "Select session"
+                          )}
                         </div>
                       </div>
                       {!sold ? (
-                        <div className="text-right">
+                        <div className="shrink-0 text-right">
                           <div className={`eyebrow text-[0.6rem] ${tone.muted}`}>Seats</div>
                           <div className={`font-display text-lg ${tone.seats}`}>
                             {slot.available}/{slot.capacity}
