@@ -3,10 +3,12 @@ import { LogOut, Menu, Pencil, ScrollText, Star, UserRound, Users } from "lucide
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
 import { CartIcon } from "@/components/cart/CartIcon";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { ProfileNavIcon } from "@/components/account/ProfileNavIcon";
 import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav";
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
+import { useNavBadges } from "@/hooks/use-nav-badges";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +54,15 @@ const navLinkClass =
 const sheetLinkClass =
   "rounded-sm px-3 py-2.5 text-sm uppercase tracking-[0.16em] text-ink/85 hover:bg-white/5 hover:text-ember";
 
+function NavCountBadge({ count }: { count?: number }) {
+  if (!count || count <= 0) return null;
+  return (
+    <span className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-ember px-1 text-[0.55rem] font-bold leading-none text-primary-foreground">
+      {count > 9 ? "9+" : count}
+    </span>
+  );
+}
+
 function isHeaderNavItemActive(
   role: UserRole | null | undefined,
   pathname: string,
@@ -75,6 +86,9 @@ export function Header() {
   const navItems = navItemsForUser(role, Boolean(user));
   const isGuest = role === "guest";
   const isAdmin = isAdminRole(role);
+  const isHost = role === "host";
+  const showStaffNotifications = Boolean(user) && (isAdmin || isHost);
+  const navBadges = useNavBadges();
   const showGuestCart = Boolean(user) && isGuestAccount(role);
   const { count: cartCount } = useExperienceCart();
   const showBookExperience = !user || isGuest;
@@ -135,6 +149,7 @@ export function Header() {
                 className={`${navLinkClass}${active ? " text-ember header-nav-link--active" : ""}`}
               >
                 {item.label}
+                <NavCountBadge count={navBadges[item.to]} />
               </Link>
             );
           })}
@@ -163,6 +178,7 @@ export function Header() {
               ) : null}
             </Link>
           ) : null}
+          {showStaffNotifications ? <NotificationBell /> : null}
           {showSignIn ? (
             <Link to="/sign-in" className={navLinkClass} activeProps={{ className: "text-ember" }}>
               Sign in
@@ -292,6 +308,7 @@ export function Header() {
                       className={`${sheetLinkClass}${active ? " text-ember header-nav-link--active" : ""}`}
                     >
                       {item.label}
+                      <NavCountBadge count={navBadges[item.to]} />
                     </Link>
                   </SheetClose>
                 );

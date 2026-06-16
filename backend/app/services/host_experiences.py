@@ -22,6 +22,18 @@ HOST_EXP_SELECT = """
 """
 
 
+def _notify_admins_experience_submitted(
+    supabase, experience_id: str, title: str, host_id: str
+) -> None:
+    from app.services.notifications import notify_admins_new_experience_review
+
+    host_result = (
+        supabase.table("hosts").select("display_name").eq("id", host_id).maybe_single().execute()
+    )
+    host_name = ((host_result.data if host_result else None) or {}).get("display_name") or "A host"
+    notify_admins_new_experience_review(experience_id, title, host_name)
+
+
 def _currency_symbol(code: str) -> str:
     if code == "INR":
         return "₹"
@@ -267,6 +279,9 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
     if not row:
         raise ValueError("Failed to create experience.")
 
+    if status == "pending_review":
+        _notify_admins_experience_submitted(supabase, row["id"], payload.title.strip(), host_id)
+
     return get_host_experience(auth, row["id"])
 
 
@@ -347,6 +362,9 @@ def update_host_experience(
 
     if updates:
         supabase.table("experiences").update(updates).eq("id", experience_id).execute()
+        if updates.get("status") == "pending_review":
+            title = updates.get("title") or row.get("title") or "Experience"
+            _notify_admins_experience_submitted(supabase, experience_id, title, host_id)
 
     return get_host_experience(auth, experience_id)
 

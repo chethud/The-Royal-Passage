@@ -7,6 +7,7 @@ import type { Experience } from "@/data/experiences";
 import { useCheckoutBooking } from "@/hooks/use-checkout-booking";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
+import { formatTime12h } from "@/lib/weekday-slots";
 
 type BookingCheckoutWizardProps = {
   exp: Experience;
@@ -71,18 +72,17 @@ export function BookingCheckoutWizard({
   };
 
   return (
-    <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_300px] xl:gap-8">
-      <div className="space-y-6">
-        {!isLiveExperience ? (
-          <LuxuryCheckoutPanel>
-            <p className="text-sm text-destructive">
-              This listing is preview-only and cannot be booked online. Please choose a live
-              experience.
-            </p>
-          </LuxuryCheckoutPanel>
-        ) : null}
+    <div className="mt-6 space-y-6">
+      {!isLiveExperience ? (
+        <LuxuryCheckoutPanel>
+          <p className="text-sm text-destructive">
+            This listing is preview-only and cannot be booked online. Please choose a live
+            experience.
+          </p>
+        </LuxuryCheckoutPanel>
+      ) : null}
 
-        <LuxuryCheckoutPanel className="py-5 sm:py-6">
+      <LuxuryCheckoutPanel className="py-5 sm:py-6">
           <nav aria-label="Booking progress">
             <ol className="flex flex-wrap items-center gap-x-8 gap-y-3">
               {STEPS.map((item, index) => {
@@ -238,49 +238,52 @@ export function BookingCheckoutWizard({
             </div>
           </LuxuryCheckoutPanel>
         ) : null}
-      </div>
 
-      <aside className="h-fit lg:sticky lg:top-[calc(var(--header-height)+1rem)]">
-        <LuxuryCheckoutPanel>
+      <LuxuryCheckoutPanel>
+        <div className="flex gap-4 sm:gap-5">
           {exp.image ? (
-            <div className="luxury-panel-image mb-6">
-              <img src={exp.image} alt="" className="aspect-[16/10] w-full object-cover" />
+            <div className="luxury-panel-image w-20 shrink-0 overflow-hidden rounded-lg sm:w-24">
+              <img src={exp.image} alt="" className="aspect-square h-full w-full object-cover" />
             </div>
           ) : null}
 
-          <h2 className="luxury-panel-heading font-display text-xl tracking-[0.04em]">Booking summary</h2>
-          <div className="luxury-panel-divider-bg my-5 h-px" />
-
-          <dl className="space-y-3.5 text-sm">
-            <SummaryRow label="Experience" value={exp.title} />
-            <SummaryRow label="Host" value={exp.hostName} />
-            <SummaryRow
-              label="Date"
-              value={selectedSlot ? formatDateLong(selectedSlot.date) : "—"}
-            />
-            <SummaryRow
-              label="Time"
-              value={selectedSlot ? `${selectedSlot.start}–${selectedSlot.end}` : "—"}
-            />
-            <SummaryRow label="Guests" value={String(guests)} align="left" />
-            <SummaryRow label="Payment" value={step >= 2 ? "Pay at venue" : "—"} />
-          </dl>
-
-          <div className="luxury-panel-divider-bg my-5 h-px" />
-
-          <div className="flex items-baseline justify-between gap-4">
-            <span className="eyebrow luxury-panel-label">Estimated total</span>
-            <span className="luxury-panel-heading font-display text-3xl tracking-[0.02em]">
-              {selectedSlot ? formatMoney(totalMinor, sym) : "—"}
-            </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="luxury-panel-heading font-display text-lg tracking-[0.04em] sm:text-xl">
+              Booking summary
+            </h2>
+            <p className="luxury-panel-body mt-1 truncate text-sm">{exp.title}</p>
+            <p className="luxury-panel-body text-xs">{exp.city} · {exp.hostName}</p>
           </div>
 
-          <p className="luxury-panel-body mt-5 text-xs leading-relaxed">
-            After you submit, your host receives the request and can approve or decline. You will
-            see the status in your booking history.
-          </p>
-        </LuxuryCheckoutPanel>
-      </aside>
+          <div className="shrink-0 text-right">
+            <div className="eyebrow luxury-panel-label">Total</div>
+            <div className="luxury-panel-heading font-display text-2xl tracking-[0.02em]">
+              {selectedSlot ? formatMoney(totalMinor, sym) : "—"}
+            </div>
+          </div>
+        </div>
+
+        <div className="luxury-panel-divider-bg my-5 h-px" />
+
+        <dl className="grid gap-3 text-sm sm:grid-cols-2">
+          <SummaryRow label="Date" value={selectedSlot ? formatDateLong(selectedSlot.date) : "—"} />
+          <SummaryRow
+            label="Time"
+            value={
+              selectedSlot
+                ? `${formatTime12h(selectedSlot.start)} – ${formatTime12h(selectedSlot.end)}`
+                : "—"
+            }
+          />
+          <SummaryRow label="Guests" value={String(guests)} align="left" />
+          <SummaryRow label="Payment" value={step >= 2 ? "Pay at venue" : "—"} />
+        </dl>
+
+        <p className="luxury-panel-body mt-5 text-xs leading-relaxed">
+          After you submit, your host receives the request and can approve or decline. You will see
+          the status in your booking history.
+        </p>
+      </LuxuryCheckoutPanel>
     </div>
   );
 }

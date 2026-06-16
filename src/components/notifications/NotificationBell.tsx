@@ -35,6 +35,8 @@ export function NotificationBell() {
 
   useEffect(() => {
     void load();
+    const id = window.setInterval(() => void load(), 60_000);
+    return () => window.clearInterval(id);
   }, [load]);
 
   if (!user) return null;

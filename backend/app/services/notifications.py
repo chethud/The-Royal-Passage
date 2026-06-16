@@ -21,6 +21,54 @@ def create_notification(
     ).execute()
 
 
+def list_admin_user_ids() -> list[str]:
+    supabase = get_supabase_admin()
+    result = supabase.table("profiles").select("id").eq("role", "admin").execute()
+    return [row["id"] for row in (result.data or [])]
+
+
+def notify_admins_new_experience_review(experience_id: str, title: str, host_name: str) -> None:
+    for admin_id in list_admin_user_ids():
+        create_notification(
+            admin_id,
+            "experience_submitted",
+            "New experience to review",
+            f'{host_name} submitted "{title}" for approval.',
+            {"experienceId": experience_id},
+        )
+
+
+def mark_experience_review_notifications_read(experience_id: str) -> None:
+    from datetime import datetime, timezone
+
+    supabase = get_supabase_admin()
+    now = datetime.now(timezone.utc).isoformat()
+    (
+        supabase.table("notifications")
+        .update({"read_at": now})
+        .eq("type", "experience_submitted")
+        .is_("read_at", "null")
+        .contains("metadata", {"experienceId": experience_id})
+        .execute()
+    )
+
+
+def mark_booking_request_notifications_read(user_id: str, booking_id: str) -> None:
+    from datetime import datetime, timezone
+
+    supabase = get_supabase_admin()
+    now = datetime.now(timezone.utc).isoformat()
+    (
+        supabase.table("notifications")
+        .update({"read_at": now})
+        .eq("user_id", user_id)
+        .eq("type", "booking_created")
+        .is_("read_at", "null")
+        .contains("metadata", {"bookingId": booking_id})
+        .execute()
+    )
+
+
 def list_user_notifications(auth: dict, limit: int = 30) -> list[NotificationSummary]:
     supabase = get_supabase_admin()
     user_id = auth["user"].id

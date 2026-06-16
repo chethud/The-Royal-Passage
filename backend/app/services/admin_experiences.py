@@ -93,6 +93,10 @@ def publish_experience(experience_id: str) -> AdminExperienceSummary:
 
     supabase.table("experiences").update({"status": "published"}).eq("id", experience_id).execute()
 
+    from app.services.notifications import mark_experience_review_notifications_read
+
+    mark_experience_review_notifications_read(experience_id)
+
     # Catalog only lists experiences from approved hosts; approving the experience
     # should also approve the host so it appears on the public marketplace.
     host_id = row.get("host_id")
@@ -129,6 +133,10 @@ def reject_experience(experience_id: str) -> AdminExperienceSummary:
         raise ValueError("Only experiences pending review can be rejected.")
 
     supabase.table("experiences").update({"status": "rejected"}).eq("id", experience_id).execute()
+
+    from app.services.notifications import mark_experience_review_notifications_read
+
+    mark_experience_review_notifications_read(experience_id)
     return AdminExperienceSummary(
         id=row["id"],
         slug=row["slug"],

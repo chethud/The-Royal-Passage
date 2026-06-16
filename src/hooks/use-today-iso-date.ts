@@ -18,3 +18,23 @@ export function useTodayIsoDate(): string {
 
   return today;
 }
+
+/** Local calendar date + clock, refreshed every minute for slot time filtering. */
+export function useBookingClock(): { today: string; now: Date } {
+  const [clock, setClock] = useState(() => ({
+    today: todayIsoDate(),
+    now: new Date(),
+  }));
+
+  useEffect(() => {
+    const sync = () => {
+      setClock({ today: todayIsoDate(), now: new Date() });
+    };
+
+    sync();
+    const id = window.setInterval(sync, 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return clock;
+}

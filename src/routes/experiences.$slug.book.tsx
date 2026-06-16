@@ -69,43 +69,45 @@ function BookExperiencePage() {
     <div className="pt-[var(--header-height)] text-foreground">
       <Header />
 
-      <section className="container-page max-w-6xl py-10 sm:py-14">
-        <Link
-          to="/experiences/$slug"
-          params={{ slug: exp.slug }}
-          hash="book"
-          className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
-        >
-          ← Back to experience
-        </Link>
+      <section className="container-page py-10 sm:py-14">
+        <div className="mx-auto max-w-2xl">
+          <Link
+            to="/experiences/$slug"
+            params={{ slug: exp.slug }}
+            hash="book"
+            className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
+          >
+            ← Back to experience
+          </Link>
 
-        <BookingRequestHeader
-          className="mt-6"
-          label="Book your seats"
-          title={exp.title}
-          meta={`${exp.city} · ${exp.hostName}`}
-          titleAs="h1"
-        />
+          <BookingRequestHeader
+            className="mt-6"
+            label="Book your seats"
+            title={exp.title}
+            meta={`${exp.city} · ${exp.hostName}`}
+            titleAs="h1"
+          />
 
-        <BookingCheckoutWizard
-          exp={exp}
-          source={source}
-          initialSlotId={search.slotId}
-          initialGuests={search.guests}
-          backLink={{
-            to: "/experiences/$slug",
-            params: { slug: exp.slug },
-            hash: "book",
-            label: "Back to experience",
-          }}
-          userRole={role ?? "guest"}
-          onSuccess={(bookingId) => {
-            void navigate({
-              to: "/dashboard/history",
-              search: { booked: bookingId },
-            });
-          }}
-        />
+          <BookingCheckoutWizard
+            exp={exp}
+            source={source}
+            initialSlotId={search.slotId}
+            initialGuests={search.guests}
+            backLink={{
+              to: "/experiences/$slug",
+              params: { slug: exp.slug },
+              hash: "book",
+              label: "Back to experience",
+            }}
+            userRole={role ?? "guest"}
+            onSuccess={(bookingId) => {
+              void navigate({
+                to: "/dashboard/history",
+                search: { booked: bookingId },
+              });
+            }}
+          />
+        </div>
       </section>
 
       <Footer />

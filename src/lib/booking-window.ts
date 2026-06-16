@@ -31,6 +31,33 @@ export function isWithinBookingWindow(isoDate: string, referenceToday = todayIso
   return day >= start && day <= end;
 }
 
+function parseTimeToMinutes(time24: string | undefined): number {
+  if (!time24?.trim()) return 0;
+  const [hourPart, minutePart] = time24.slice(0, 5).split(":");
+  const hour = Number.parseInt(hourPart ?? "0", 10);
+  const minute = Number.parseInt(minutePart ?? "0", 10);
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return 0;
+  return hour * 60 + minute;
+}
+
+/** True when the slot is inside the 7-day window and has not started yet (same-day past times excluded). */
+export function isGuestBookableSlot(
+  slot: { date: string; start?: string },
+  referenceToday = todayIsoDate(),
+  now = new Date(),
+): boolean {
+  if (!isWithinBookingWindow(slot.date, referenceToday)) return false;
+  if (!slot.start?.trim()) return true;
+
+  const day = normalizeIsoDate(slot.date);
+  const today = normalizeIsoDate(referenceToday);
+  if (day > today) return true;
+  if (day < today) return false;
+
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  return parseTimeToMinutes(slot.start) > nowMinutes;
+}
+
 export function isBeforeToday(isoDate: string, referenceToday = todayIsoDate()): boolean {
   return normalizeIsoDate(isoDate) < normalizeIsoDate(referenceToday);
 }
@@ -39,11 +66,12 @@ export function isAfterBookingWindow(isoDate: string, referenceToday = todayIsoD
   return normalizeIsoDate(isoDate) > bookingWindowEndIso(referenceToday);
 }
 
-export function filterSlotsWithinBookingWindow<T extends { date: string }>(
+export function filterSlotsWithinBookingWindow<T extends { date: string; start?: string }>(
   slots: T[],
   referenceToday = todayIsoDate(),
+  now = new Date(),
 ): T[] {
-  return slots.filter((slot) => isWithinBookingWindow(slot.date, referenceToday));
+  return slots.filter((slot) => isGuestBookableSlot(slot, referenceToday, now));
 }
 
 export function bookingWindowRange(referenceToday = todayIsoDate()) {

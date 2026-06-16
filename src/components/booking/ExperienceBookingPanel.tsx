@@ -12,7 +12,7 @@ import { bookExperiencePath, guestBookingLimits } from "@/lib/booking-url";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 import { isGuestAccount, isStaffRole } from "@/lib/roles";
-import { useTodayIsoDate } from "@/hooks/use-today-iso-date";
+import { useTodayIsoDate, useBookingClock } from "@/hooks/use-today-iso-date";
 import { formatTime12h } from "@/lib/weekday-slots";
 
 type ExperienceBookingPanelProps = {
@@ -251,10 +251,10 @@ export function ExperienceBookingPanel({
 }: ExperienceBookingPanelProps) {
   const sym = exp.currencySymbol ?? "₹";
   const tone = panelTone(surface);
-  const today = useTodayIsoDate();
+  const { today, now } = useBookingClock();
   const visibleSlots = useMemo(
-    () => filterSlotsWithinBookingWindow(exp.slots, today),
-    [exp.slots, today],
+    () => filterSlotsWithinBookingWindow(exp.slots, today, now),
+    [exp.slots, today, now],
   );
   const windowLabel = useMemo(() => formatBookingWindowRange(today), [today]);
   const availableSlots = visibleSlots.filter((s) => s.available > 0);

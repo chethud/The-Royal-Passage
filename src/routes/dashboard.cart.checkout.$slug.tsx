@@ -65,11 +65,11 @@ function CartCheckoutPage() {
 
   return (
     <GuestDashboardShell
-      wide
       title="Checkout"
       subtitle="Choose your date, payment method, and send a booking request to your host."
       showRoleDescription={false}
     >
+      <div className="mx-auto max-w-2xl">
       <Link
         to="/dashboard/cart"
         className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
@@ -98,6 +98,7 @@ function CartCheckoutPage() {
           });
         }}
       />
+      </div>
     </GuestDashboardShell>
   );
 }

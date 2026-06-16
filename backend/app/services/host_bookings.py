@@ -336,6 +336,9 @@ def confirm_host_booking(booking_id: str, auth: dict) -> BookingSummary:
             "Your host confirmed your booking. Pay at the venue on arrival.",
             {"bookingId": booking_id},
         )
+    from app.services.notifications import mark_booking_request_notifications_read
+
+    mark_booking_request_notifications_read(auth["user"].id, booking_id)
     return updated
 
 
@@ -371,6 +374,9 @@ def reject_host_booking(booking_id: str, auth: dict) -> BookingSummary:
             "The host could not accept your booking request.",
             {"bookingId": booking_id},
         )
+    from app.services.notifications import mark_booking_request_notifications_read
+
+    mark_booking_request_notifications_read(auth["user"].id, booking_id)
     return updated
 
 
