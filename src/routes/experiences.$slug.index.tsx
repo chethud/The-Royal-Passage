@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MapPin } from "lucide-react";
 import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPanel";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { ExperienceDetailGallery } from "@/components/experiences/ExperienceDetailGallery";
 import { ExperienceReviewsSection } from "@/components/reviews/ExperienceReviewsSection";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
@@ -48,24 +49,24 @@ export const Route = createFileRoute("/experiences/$slug/")({
     };
   },
   notFoundComponent: () => (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-16">
-      <div className="glass-strong max-w-md rounded-md px-10 py-12 text-center">
-        <p className="eyebrow mb-4 text-ember/90">The library</p>
-        <h1 className="font-display text-3xl tracking-tight md:text-4xl">
+    <div className="experience-detail-page flex min-h-screen items-center justify-center px-4 py-16">
+      <LuxuryCheckoutPanel className="max-w-md text-center">
+        <p className="eyebrow luxury-panel-label mb-4">The library</p>
+        <h1 className="luxury-panel-heading font-display text-3xl tracking-tight md:text-4xl">
           This experience has retired.
         </h1>
         <Link
           to="/experiences"
-          className="mt-8 inline-flex text-sm text-ember underline-offset-4 transition-colors hover:text-foreground"
+          className="luxury-panel-link mt-8 inline-flex text-sm underline-offset-4 hover:underline"
         >
           Browse the library →
         </Link>
-      </div>
+      </LuxuryCheckoutPanel>
     </div>
   ),
   errorComponent: ({ error }) => (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <p className="text-sm text-destructive">{error.message}</p>
+    <div className="experience-detail-page flex min-h-screen items-center justify-center p-6">
+      <p className="text-sm text-[#F7F1E8]/90">{error.message}</p>
     </div>
   ),
   component: ExperienceDetail,
@@ -84,19 +85,19 @@ function ExperienceDetailList({
     if (!emptyMessage) return null;
     return (
       <div>
-        <div className="eyebrow mb-4">{label}</div>
-        <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+        <div className="eyebrow luxury-panel-label mb-4">{label}</div>
+        <p className="luxury-panel-body text-sm">{emptyMessage}</p>
       </div>
     );
   }
 
   return (
     <div>
-      <div className="eyebrow mb-4">{label}</div>
-      <ul className="space-y-2">
+      <div className="eyebrow luxury-panel-label mb-4">{label}</div>
+      <ul className="space-y-2.5">
         {items.map((item) => (
-          <li key={item} className="flex gap-3 text-sm">
-            <span className="text-ember">—</span>
+          <li key={item} className="luxury-panel-body flex gap-3 text-sm leading-relaxed">
+            <span className="text-[#8B6914]">—</span>
             {item}
           </li>
         ))}
@@ -128,7 +129,7 @@ function ExperienceDetail() {
   const canBook = hasBookableSlot(exp);
 
   return (
-    <div className="pt-[var(--header-height)] text-foreground">
+    <div className="experience-detail-page min-h-screen pt-[var(--header-height)] text-[#F7F1E8]">
       <Header />
       <script
         type="application/ld+json"
@@ -138,160 +139,209 @@ function ExperienceDetail() {
       <section className="container-page pt-8 pb-6">
         <Link
           to="/experiences"
-          className="text-xs eyebrow text-muted-foreground hover:text-foreground"
+          search={{}}
+          className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
         >
           ← Back to library
         </Link>
       </section>
 
-      <section className="container-page grid md:grid-cols-12 gap-8 md:gap-10">
+      <section className="container-page grid gap-10 pb-14 md:grid-cols-12 md:gap-12">
         <div className="md:col-span-7">
           <ExperienceDetailGallery exp={exp} />
         </div>
-        <div className="md:col-span-5 md:pt-4">
-          <div className="flex gap-2 mb-5">
-            <span className="text-[0.65rem] eyebrow border border-[oklch(0.88_0.08_86_/_0.25)] bg-background/30 px-2.5 py-1 backdrop-blur-sm">
+
+        <div className="md:col-span-5 md:pt-2">
+          <div className="mb-5 flex flex-wrap gap-2">
+            <span className="border border-[rgb(200_162_90/0.45)] px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#F7F1E8]">
               {exp.category}
             </span>
-            {exp.verifiedHost && (
-              <span className="text-[0.65rem] eyebrow bg-foreground text-background px-2.5 py-1">
+            {exp.verifiedHost ? (
+              <span className="bg-[#F7F1E8] px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#4A0000]">
                 Verified host
               </span>
-            )}
+            ) : null}
           </div>
+
           {locationLine || exp.address ? (
-            <div className="flex items-start gap-2 text-sm text-muted-foreground">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-ember" aria-hidden />
+            <div className="flex items-start gap-2 text-sm text-[#D6C8B5]/90">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF6A]" aria-hidden />
               <div>
                 {locationLine ? <div>{locationLine}</div> : null}
-                {exp.address ? <div className="mt-0.5">{exp.address}</div> : null}
+                {exp.address ? (
+                  <div className="mt-0.5 text-[#D6C8B5]/75">{exp.address}</div>
+                ) : null}
               </div>
             </div>
           ) : null}
-          <div className="mt-2 flex items-start justify-between gap-4">
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl leading-tight">
+
+          <div className="mt-5 flex items-start justify-between gap-4">
+            <h1 className="font-display text-3xl uppercase leading-[1.08] tracking-[0.04em] text-[#F7F1E8] sm:text-4xl md:text-[2.65rem]">
               {exp.title}
             </h1>
-            <div className="flex shrink-0 items-center gap-2">
-              <AddToCartButton exp={exp} showLabel />
-              <WishlistButton experienceId={exp.id} />
+            <div className="flex shrink-0 items-center gap-2 pt-1">
+              <AddToCartButton
+                exp={exp}
+                showLabel
+                className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
+              />
+              <WishlistButton
+                experienceId={exp.id}
+                className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
+              />
             </div>
           </div>
-          <p className="mt-4 text-base sm:text-lg italic text-muted-foreground">{exp.tagline}</p>
 
-          <div className="hairline my-6" />
+          {exp.tagline ? (
+            <p className="mt-4 font-display text-base italic leading-relaxed text-[#D6C8B5]/90 sm:text-lg">
+              {exp.tagline}
+            </p>
+          ) : null}
 
-          <dl className="grid grid-cols-3 gap-4 text-sm">
-            <div>
-              <dt className="eyebrow text-muted-foreground">Duration</dt>
-              <dd className="mt-1 font-display text-lg">{exp.durationHours}h</dd>
+          <div className="my-7 h-px bg-gradient-to-r from-transparent via-[rgb(200_162_90/0.35)] to-transparent" />
+
+          <dl className="grid grid-cols-3 divide-x divide-[rgb(200_162_90/0.28)] text-center sm:text-left">
+            <div className="px-2 first:pl-0 sm:px-5">
+              <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
+                Duration
+              </dt>
+              <dd className="mt-1.5 font-display text-xl uppercase tracking-[0.02em] text-[#F7F1E8]">
+                {exp.durationHours}h
+              </dd>
             </div>
-            <div>
-              <dt className="eyebrow text-muted-foreground">From</dt>
-              <dd className="mt-1 font-display text-lg">
+            <div className="px-2 sm:px-5">
+              <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
+                From
+              </dt>
+              <dd className="mt-1.5 font-display text-xl uppercase tracking-[0.02em] text-[#F7F1E8]">
                 {sym}
                 {exp.pricePerPerson}
               </dd>
             </div>
-            <div>
-              <dt className="eyebrow text-muted-foreground">Rating</dt>
-              <dd className="mt-1 font-display text-lg text-ember">
+            <div className="px-2 last:pr-0 sm:px-5">
+              <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
+                Rating
+              </dt>
+              <dd className="mt-1.5 font-display text-xl text-[#D4AF6A]">
                 ★ {exp.rating}
-                <span className="text-xs text-muted-foreground ml-1">({exp.reviewsCount})</span>
+                <span className="ml-1 text-xs text-[#D6C8B5]/75">({exp.reviewsCount})</span>
               </dd>
             </div>
           </dl>
-
-          <div className="hairline my-6" />
-
-          <div className="space-y-4">
-            <div className="eyebrow">About this experience</div>
-            <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
-              {exp.description}
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <div className="eyebrow mb-2">Hosted by</div>
-            <div className="font-display text-xl">{exp.hostName}</div>
-            <p className="mt-1 text-sm text-muted-foreground">{exp.hostBio}</p>
-          </div>
         </div>
       </section>
 
-      <section className="container-page py-12 sm:py-16 grid md:grid-cols-2 gap-8 md:gap-10">
-        <ExperienceDetailList label="What's included" items={exp.inclusions} />
-        <ExperienceDetailList
-          label="Not included"
-          items={exp.exclusions ?? []}
-          emptyMessage="All essentials are covered in this experience."
-        />
-      </section>
+      <section className="container-page space-y-6 pb-10">
+        <LuxuryCheckoutPanel>
+          <div className="eyebrow luxury-panel-label mb-3">About this experience</div>
+          <p className="luxury-panel-body text-sm leading-relaxed whitespace-pre-line sm:text-base">
+            {exp.description}
+          </p>
 
-      {(exp.requirements?.length ?? 0) > 0 ? (
-        <section className="container-page pb-12 sm:pb-16">
-          <ExperienceDetailList label="What to bring & know" items={exp.requirements ?? []} />
-        </section>
-      ) : null}
+          <div className="my-7 h-px luxury-panel-divider-bg" />
 
-      <section className="container-page pb-12 sm:pb-16">
-        <div className="eyebrow mb-4">Cancellation policy</div>
-        <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{exp.cancellation}</p>
-      </section>
+          <div className="eyebrow luxury-panel-label mb-2">Hosted by</div>
+          <div className="luxury-panel-heading font-display text-xl uppercase tracking-[0.04em]">
+            {exp.hostName}
+          </div>
+          {exp.hostBio ? (
+            <p className="luxury-panel-body mt-2 text-sm leading-relaxed">{exp.hostBio}</p>
+          ) : null}
+        </LuxuryCheckoutPanel>
 
-      <section className="container-page py-12 sm:py-16">
-        <div className="eyebrow mb-3">Guest voices</div>
-        <h2 className="font-display text-3xl sm:text-4xl">
-          What travellers <em className="italic text-ember">remember</em>
-        </h2>
-        <div className="mt-8">
-          <ExperienceReviewsSection reviews={reviews} />
+        <div className="grid gap-6 md:grid-cols-2">
+          <LuxuryCheckoutPanel>
+            <ExperienceDetailList label="What's included" items={exp.inclusions} />
+          </LuxuryCheckoutPanel>
+          <LuxuryCheckoutPanel>
+            <ExperienceDetailList
+              label="Not included"
+              items={exp.exclusions ?? []}
+              emptyMessage="All essentials are covered in this experience."
+            />
+          </LuxuryCheckoutPanel>
         </div>
+
+        {(exp.requirements?.length ?? 0) > 0 ? (
+          <LuxuryCheckoutPanel>
+            <ExperienceDetailList
+              label="What to bring & know"
+              items={exp.requirements ?? []}
+            />
+          </LuxuryCheckoutPanel>
+        ) : null}
+
+        <LuxuryCheckoutPanel>
+          <div className="eyebrow luxury-panel-label mb-3">Cancellation policy</div>
+          <p className="luxury-panel-body max-w-3xl text-sm leading-relaxed sm:text-base">
+            {exp.cancellation}
+          </p>
+        </LuxuryCheckoutPanel>
+
+        <LuxuryCheckoutPanel>
+          <div className="eyebrow luxury-panel-label mb-3">Guest voices</div>
+          <h2 className="luxury-panel-heading font-display text-2xl uppercase tracking-[0.03em] sm:text-3xl">
+            What travellers <em className="italic normal-case text-[#8B6914]">remember</em>
+          </h2>
+          <div className="mt-8">
+            <ExperienceReviewsSection reviews={reviews} surface="light" />
+          </div>
+        </LuxuryCheckoutPanel>
       </section>
 
       {canBook ? (
-        <section id="book" className="glass-strong border-y border-[oklch(0.88_0.08_86_/_0.1)]">
-          <div className="container-page py-14 sm:py-20 grid md:grid-cols-12 gap-8 md:gap-10">
-            <div className="md:col-span-5">
-              <div className="eyebrow mb-3">Reserve your seats</div>
-              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl leading-tight">
-                Choose a date.
-                <br />
-                <em className="italic text-ember">Hold your moment.</em>
-              </h2>
-              <p className="mt-5 max-w-sm text-sm text-muted-foreground">
-                Seats are released on a first-come basis and held for 10 minutes during checkout to
-                ensure no one is double-booked.
-              </p>
-            </div>
+        <section id="book" className="border-t border-[rgb(200_162_90/0.18)] pb-16 pt-4">
+          <div className="container-page py-8 sm:py-10">
+            <LuxuryCheckoutPanel>
+              <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+                <div className="lg:col-span-5">
+                  <div className="eyebrow luxury-panel-label mb-3">Reserve your seats</div>
+                  <h2 className="luxury-panel-heading font-display text-3xl uppercase leading-tight tracking-[0.03em] sm:text-4xl">
+                    Choose a date.
+                    <br />
+                    <em className="italic normal-case text-[#8B6914]">Hold your moment.</em>
+                  </h2>
+                  <p className="luxury-panel-body mt-5 max-w-sm text-sm leading-relaxed">
+                    Seats are released on a first-come basis and held for 10 minutes during
+                    checkout to ensure no one is double-booked.
+                  </p>
+                </div>
 
-            <div className="md:col-span-7">
-              <ExperienceBookingPanel
-                exp={exp}
-                selectedSlot={selectedSlot}
-                onSelectSlot={setSelectedSlot}
-                guests={guests}
-                onGuestsChange={setGuests}
-                variant="select"
-                signedIn={Boolean(user)}
-                userRole={user ? (role ?? "guest") : null}
-              />
-            </div>
+                <div className="lg:col-span-7">
+                  <ExperienceBookingPanel
+                    exp={exp}
+                    selectedSlot={selectedSlot}
+                    onSelectSlot={setSelectedSlot}
+                    guests={guests}
+                    onGuestsChange={setGuests}
+                    variant="select"
+                    signedIn={Boolean(user)}
+                    userRole={user ? (role ?? "guest") : null}
+                    surface="light"
+                  />
+                </div>
+              </div>
+            </LuxuryCheckoutPanel>
           </div>
         </section>
       ) : (
-        <section className="container-page py-12 sm:py-16">
-          <p className="font-display text-2xl">Booking opens soon</p>
-          <p className="mt-2 max-w-md text-sm text-muted-foreground">
-            There are no available sessions in the next 7 days. Check back later or browse other
-            experiences.
-          </p>
-          <Link
-            to="/experiences"
-            className="mt-6 inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
-          >
-            Browse the library →
-          </Link>
+        <section className="container-page pb-16 pt-2">
+          <LuxuryCheckoutPanel className="text-center sm:text-left">
+            <p className="luxury-panel-heading font-display text-2xl uppercase tracking-[0.03em]">
+              Booking opens soon
+            </p>
+            <p className="luxury-panel-body mt-2 max-w-md text-sm">
+              There are no available sessions in the next 7 days. Check back later or browse other
+              experiences.
+            </p>
+            <Link
+              to="/experiences"
+              search={{}}
+              className="luxury-btn-sm luxury-btn-panel-outline mt-6 inline-flex items-center no-underline"
+            >
+              Browse the library →
+            </Link>
+          </LuxuryCheckoutPanel>
         </section>
       )}
 

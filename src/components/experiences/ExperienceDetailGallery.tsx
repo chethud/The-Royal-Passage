@@ -15,11 +15,11 @@ export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
 
   return (
     <div className="space-y-4">
-      <div className="aspect-[4/5] overflow-hidden rounded-md bg-muted ring-1 ring-[oklch(0.78_0.1_78_/_0.35)] ring-offset-2 ring-offset-background">
+      <div className="experience-detail-gallery-main overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]">
         <img
           src={active}
           alt={exp.title}
-          className="h-full w-full object-cover"
+          className="aspect-[4/5] h-full w-full object-cover"
           width={1200}
           height={1500}
           decoding="async"
@@ -35,8 +35,8 @@ export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
               onClick={() => setActiveIndex(index)}
               className={`aspect-square overflow-hidden rounded-sm border transition-colors ${
                 index === activeIndex
-                  ? "border-ember ring-1 ring-ember/40"
-                  : "border-[oklch(0.88_0.08_86_/_0.2)] hover:border-ember/50"
+                  ? "border-[#D4AF6A] ring-1 ring-[#D4AF6A]/35"
+                  : "border-[rgb(200_162_90/0.22)] hover:border-[#D4AF6A]/50"
               }`}
               aria-label={`Show photo ${index + 1} of ${gallery.length}`}
               aria-pressed={index === activeIndex}
