@@ -1,6 +1,10 @@
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import AdminBookingRow, AdminStats
 from app.services.audit import list_recent_audit_logs
+from app.services.booking_auto_complete import (
+    auto_complete_booking_if_due,
+    auto_complete_due_confirmed_bookings,
+)
 from app.services.bookings import BOOKING_SELECT, _map_booking_row
 
 
@@ -124,6 +128,7 @@ def get_admin_stats() -> AdminStats:
 
 def list_admin_bookings(limit: int = 500) -> list[AdminBookingRow]:
     supabase = get_supabase_admin()
+    auto_complete_due_confirmed_bookings(supabase)
     result = (
         supabase.table("bookings")
         .select(BOOKING_SELECT)
@@ -171,6 +176,7 @@ def get_admin_booking_by_id(booking_id: str):
     row = result.data if result else None
     if not row:
         raise ValueError("Booking not found.")
+    auto_complete_booking_if_due(supabase, row)
     return _map_booking_row(row)
 
 

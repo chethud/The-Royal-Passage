@@ -584,6 +584,7 @@
   box-shadow:
     inset 0 1px 0 rgb(200 162 90 / 0.12),
     0 24px 56px -28px rgb(0 0 0 / 0.65);
+  animation: experience-gallery-frame-float 7s ease-in-out infinite;
 }
 
 .experience-detail-gallery__frame {
@@ -595,7 +596,7 @@
 .experience-detail-gallery__slide {
   position: relative;
   width: 100%;
-  animation: experience-gallery-enter-next 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: experience-gallery-enter-next 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .experience-detail-gallery__slide--prev {
@@ -604,45 +605,70 @@
 
 .experience-detail-gallery__image {
   display: block;
-  transform-origin: center center;
-  animation: experience-gallery-ken-burns 18s ease-out both;
+  transform-origin: center 42%;
+  will-change: transform;
+  animation: experience-gallery-float-zoom 16s ease-in-out infinite alternate;
+}
+
+.experience-detail-gallery-main:hover .experience-detail-gallery__image {
+  animation-duration: 11s;
+}
+
+@keyframes experience-gallery-frame-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
 }
 
 @keyframes experience-gallery-enter-next {
   from {
     opacity: 0;
-    transform: translateX(3.5%);
+    transform: translateX(4%) scale(1.03);
   }
 
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
   }
 }
 
 @keyframes experience-gallery-enter-prev {
   from {
     opacity: 0;
-    transform: translateX(-3.5%);
+    transform: translateX(-4%) scale(1.03);
   }
 
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
   }
 }
 
-@keyframes experience-gallery-ken-burns {
-  from {
-    transform: scale(1);
+@keyframes experience-gallery-float-zoom {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0);
   }
 
-  to {
-    transform: scale(1.06);
+  35% {
+    transform: scale(1.05) translate3d(0, -8px, 0);
+  }
+
+  70% {
+    transform: scale(1.1) translate3d(0, -4px, 0);
+  }
+
+  100% {
+    transform: scale(1.07) translate3d(0, -12px, 0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .experience-detail-gallery-main,
   .experience-detail-gallery__slide,
   .experience-detail-gallery__image {
     animation: none !important;

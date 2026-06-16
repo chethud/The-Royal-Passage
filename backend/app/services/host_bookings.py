@@ -8,6 +8,10 @@ from app.models.schemas import (
     HostRevenueSummary,
     HostReviewSummary,
 )
+from app.services.booking_auto_complete import (
+    auto_complete_booking_if_due,
+    auto_complete_due_confirmed_bookings,
+)
 from app.services.bookings import BOOKING_SELECT, _map_booking_row, _release_seats
 
 
@@ -78,6 +82,9 @@ def get_host_dashboard(auth: dict) -> HostDashboardStats:
     supabase = get_supabase_admin()
     host_id = _resolve_host_id(auth)
     experience_ids = _host_experience_ids(supabase, host_id)
+
+    if experience_ids:
+        auto_complete_due_confirmed_bookings(supabase, experience_ids=experience_ids)
 
     if not experience_ids:
         return HostDashboardStats(
@@ -161,6 +168,8 @@ def list_host_bookings(auth: dict, status_filter: str | None = None) -> list[Boo
     if not experience_ids:
         return []
 
+    auto_complete_due_confirmed_bookings(supabase, experience_ids=experience_ids)
+
     query = (
         supabase.table("bookings")
         .select(BOOKING_SELECT)
@@ -195,6 +204,7 @@ def get_host_booking_by_id(booking_id: str, auth: dict) -> BookingSummary:
     supabase = get_supabase_admin()
     host_id = _resolve_host_id(auth)
     row = _fetch_host_booking_row(supabase, booking_id, host_id)
+    auto_complete_booking_if_due(supabase, row)
     return _map_booking_row(row)
 
 

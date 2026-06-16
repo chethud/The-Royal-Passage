@@ -2,6 +2,10 @@ from datetime import date, datetime, timezone
 
 from app.booking_window import assert_slot_still_bookable
 from app.dependencies.supabase import get_supabase_admin
+from app.services.booking_auto_complete import (
+    auto_complete_booking_if_due,
+    auto_complete_due_confirmed_bookings,
+)
 from app.models.schemas import (
     BookingExperienceSummary,
     BookingSlotSummary,
@@ -259,6 +263,8 @@ def list_guest_bookings(auth: dict, status_filter: str | None = None) -> list[Bo
     supabase = get_supabase_admin()
     user_id = auth["user"].id
 
+    auto_complete_due_confirmed_bookings(supabase, guest_id=user_id)
+
     query = (
         supabase.table("bookings")
         .select(
@@ -320,6 +326,8 @@ def get_booking_by_id(booking_id: str, auth: dict) -> BookingSummary:
     row = result.data if result else None
     if not row:
         raise ValueError("Booking not found.")
+
+    auto_complete_booking_if_due(supabase, row)
 
     if row.get("guest_id") != user_id:
         role = auth.get("profile", {}).get("role")
