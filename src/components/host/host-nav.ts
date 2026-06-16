@@ -6,5 +6,4 @@ export const HOST_NAV_ITEMS = [
   { to: "/host/experiences/new", label: "Add experience" },
   { to: "/host/revenue", label: "Revenue" },
   { to: "/host/reviews", label: "Reviews" },
-  { to: "/host/profile", label: "Profile" },
 ] as const;

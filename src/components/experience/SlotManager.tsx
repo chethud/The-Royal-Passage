@@ -119,7 +119,7 @@ export function SlotManager({
           <div>
             <h3 className="font-display text-xl text-ink">Add sessions</h3>
             <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-              Pick the days, time, and guest count. Sessions are created for the next 7 days only.
+              Choose dates and weekdays, add one or more session times per day, then confirm.
             </p>
           </div>
           <button

@@ -9,7 +9,8 @@ import { fetchBookingById, type BookingSummary } from "@/lib/api/bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { submitReview } from "@/lib/api/reviews";
 import { experienceDetailSlug } from "@/lib/experience-path";
-import { createGuestReviewFallback, getReviewForBooking } from "@/lib/review-fns";
+import { submitGuestReviewFallback } from "@/lib/guest-review-submit";
+import { getReviewForBooking } from "@/lib/review-fns";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 export const Route = createFileRoute("/bookings/$bookingId/review")({
@@ -71,6 +72,8 @@ function BookingReviewPage() {
       const token = sessionData.session?.access_token;
       if (!token) throw new Error("Please sign in again.");
 
+      let apiError: string | null = null;
+
       if (isApiConfigured()) {
         try {
           await submitReview(token, {
@@ -80,20 +83,22 @@ function BookingReviewPage() {
           });
           setSubmitted(true);
           return;
-        } catch {
-          // Fall through to Supabase when the API is stale or unreachable.
+        } catch (err) {
+          apiError = toErrorMessage(err, "Review API unavailable.");
         }
       }
 
-      await createGuestReviewFallback({
-        data: {
-          accessToken: token,
+      try {
+        await submitGuestReviewFallback(token, {
           bookingId,
           rating: payload.rating,
           comment: payload.comment || undefined,
-        },
-      });
-      setSubmitted(true);
+        });
+        setSubmitted(true);
+      } catch (err) {
+        const fallbackMessage = toErrorMessage(err, "Failed to submit review.");
+        throw new Error(apiError ? `${fallbackMessage} (${apiError})` : fallbackMessage);
+      }
     } catch (err) {
       throw err instanceof Error ? err : new Error(toErrorMessage(err, "Failed to submit review."));
     } finally {

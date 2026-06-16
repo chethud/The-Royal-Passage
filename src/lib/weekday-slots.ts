@@ -40,12 +40,38 @@ export function expandWeekdaySlots(params: {
   endTime: string;
   capacity: number;
 }): CreateHostSlotPayload[] {
+  return expandWeekdaySchedule({
+    weekdays: params.weekdays,
+    fromDate: params.fromDate,
+    toDate: params.toDate,
+    sessions: [
+      {
+        startTime: params.startTime,
+        endTime: params.endTime,
+        capacity: params.capacity,
+      },
+    ],
+  });
+}
+
+export type SessionBlockInput = {
+  startTime: string;
+  endTime: string;
+  capacity: number;
+};
+
+export function expandWeekdaySchedule(params: {
+  weekdays: WeekdayKey[];
+  fromDate: string;
+  toDate: string;
+  sessions: SessionBlockInput[];
+}): CreateHostSlotPayload[] {
   const jsDays = new Set(
     params.weekdays.map((key) => WEEKDAY_OPTIONS.find((d) => d.key === key)?.jsDay).filter(
       (day): day is number => day !== undefined,
     ),
   );
-  if (jsDays.size === 0) return [];
+  if (jsDays.size === 0 || params.sessions.length === 0) return [];
 
   const start = parseLocalDate(params.fromDate);
   const end = parseLocalDate(params.toDate);
@@ -54,12 +80,15 @@ export function expandWeekdaySlots(params: {
   const slots: CreateHostSlotPayload[] = [];
   for (let cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
     if (!jsDays.has(cursor.getDay())) continue;
-    slots.push({
-      slotDate: formatLocalDate(cursor),
-      startTime: params.startTime,
-      endTime: params.endTime,
-      capacity: params.capacity,
-    });
+    const slotDate = formatLocalDate(cursor);
+    for (const session of params.sessions) {
+      slots.push({
+        slotDate,
+        startTime: session.startTime,
+        endTime: session.endTime,
+        capacity: session.capacity,
+      });
+    }
   }
   return slots;
 }
@@ -134,12 +163,15 @@ export function buildSchedulePreview(params: {
   weekdays: WeekdayKey[];
   fromDate: string;
   toDate: string;
-  startTime: string;
-  endTime: string;
-  capacity: number;
+  sessions: SessionBlockInput[];
 }): SchedulePreview {
   const weekdayLabel = formatWeekdayLabels(params.weekdays);
-  const timeLabel = `${formatTime12h(params.startTime)} – ${formatTime12h(params.endTime)}`;
+  const timeLabel = params.sessions
+    .map(
+      (session) =>
+        `${formatTime12h(session.startTime)} – ${formatTime12h(session.endTime)} (${session.capacity} guests)`,
+    )
+    .join(" · ");
   const dateRangeLabel =
     params.fromDate && params.toDate
       ? `${formatDateReadable(params.fromDate)} → ${formatDateReadable(params.toDate)}`
@@ -163,7 +195,7 @@ export function buildSchedulePreview(params: {
       timeLabel,
       dateRangeLabel,
       isValid: false,
-      validationMessage: "Choose the first and last bookable dates.",
+      validationMessage: "Choose the first and last dates.",
     };
   }
   if (params.fromDate > params.toDate) {
@@ -176,28 +208,41 @@ export function buildSchedulePreview(params: {
       validationMessage: "Last date must be on or after the first date.",
     };
   }
-  if (params.startTime >= params.endTime) {
+  if (params.sessions.length === 0) {
     return {
       count: 0,
       weekdayLabel,
       timeLabel,
       dateRangeLabel,
       isValid: false,
-      validationMessage: "Session end time must be after the start time.",
-    };
-  }
-  if (params.capacity < 1) {
-    return {
-      count: 0,
-      weekdayLabel,
-      timeLabel,
-      dateRangeLabel,
-      isValid: false,
-      validationMessage: "Capacity must be at least 1 guest.",
+      validationMessage: "Add at least one session time.",
     };
   }
 
-  const slots = expandWeekdaySlots(params);
+  for (const session of params.sessions) {
+    if (session.startTime >= session.endTime) {
+      return {
+        count: 0,
+        weekdayLabel,
+        timeLabel,
+        dateRangeLabel,
+        isValid: false,
+        validationMessage: "Each session must end after it starts.",
+      };
+    }
+    if (session.capacity < 1) {
+      return {
+        count: 0,
+        weekdayLabel,
+        timeLabel,
+        dateRangeLabel,
+        isValid: false,
+        validationMessage: "Capacity must be at least 1 guest per session.",
+      };
+    }
+  }
+
+  const slots = expandWeekdaySchedule(params);
   if (slots.length === 0) {
     return {
       count: 0,
@@ -214,7 +259,10 @@ export function buildSchedulePreview(params: {
     weekdayLabel,
     timeLabel,
     dateRangeLabel,
-    sampleDates: slots.slice(0, 4).map((slot) => formatDateReadable(slot.slotDate)),
+    sampleDates: slots.slice(0, 4).map((slot) => {
+      const time = `${formatTime12h(slot.startTime)} – ${formatTime12h(slot.endTime)}`;
+      return `${formatDateReadable(slot.slotDate)} · ${time}`;
+    }),
     isValid: true,
     validationMessage: null,
   };

@@ -12,11 +12,16 @@
     "api/homepage-photo.ts": {
       "maxDuration": 30,
       "includeFiles": "dist/server/homepage-photo-api.js"
+    },
+    "api/guest-review.ts": {
+      "maxDuration": 30,
+      "includeFiles": "dist/server/guest-review-api.js"
     }
   },
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/api/homepage-photo", "destination": "/api/homepage-photo" },
+    { "source": "/api/guest-review", "destination": "/api/guest-review" },
     { "source": "/(.*)", "destination": "/api/server" }
   ],
   "headers": [

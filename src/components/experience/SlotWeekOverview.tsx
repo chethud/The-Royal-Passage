@@ -37,7 +37,7 @@ export function SlotWeekOverview({ days, selectedIso, onSelectDay }: SlotWeekOve
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
         {days.map((day) => {
           const selected = selectedIso === day.iso;
-          const primary = day.slots.find((slot) => !slot.isBlocked) ?? day.slots[0];
+          const activeSlots = day.slots.filter((slot) => !slot.isBlocked);
 
           return (
             <button
@@ -62,14 +62,17 @@ export function SlotWeekOverview({ days, selectedIso, onSelectDay }: SlotWeekOve
               </div>
               <div className="mt-1 font-display text-2xl leading-none text-ink">{day.dayNumber}</div>
 
-              {day.hasSessions && primary ? (
-                <div className="mt-2 space-y-0.5 text-[0.68rem] leading-snug text-ink/90">
-                  <p>
-                    {formatTime12h(primary.start)} – {formatTime12h(primary.end)}
-                  </p>
+              {day.hasSessions ? (
+                <div className="mt-2 space-y-1 text-[0.68rem] leading-snug text-ink/90">
+                  {activeSlots.slice(0, 2).map((slot) => (
+                      <p key={slot.id}>
+                        {formatTime12h(slot.start)} – {formatTime12h(slot.end)}
+                      </p>
+                    ))}
                   <p className="text-muted-foreground">
-                    {primary.available} spot{primary.available === 1 ? "" : "s"} left
-                    {day.slots.length > 1 ? ` · ${day.slots.length} sessions` : ""}
+                    {activeSlots.length > 1
+                      ? `${activeSlots.length} sessions`
+                      : `${activeSlots[0]?.available ?? 0} spots left`}
                   </p>
                 </div>
               ) : day.isBlockedOnly ? (
