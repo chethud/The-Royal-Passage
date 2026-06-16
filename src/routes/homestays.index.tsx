@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { MarketplaceModuleNav } from "@/components/site/MarketplaceModuleNav";
 import { HomestayCard } from "@/components/homestays/HomestayCard";
 import { HomestaysHero } from "@/components/homestays/HomestaysHero";
 import { HOMESTAY_PROPERTY_TYPES } from "@/data/homestays";
@@ -51,11 +50,6 @@ function HomestaysPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      <div className="sticky top-[var(--header-height)] z-40 border-b border-[oklch(0.72_0.09_78_/_0.15)] bg-background/95 backdrop-blur-md">
-        <div className="container-page py-3">
-          <MarketplaceModuleNav />
-        </div>
-      </div>
 
       <HomestaysHero searchValue={query} onSearchChange={setQuery} />
 

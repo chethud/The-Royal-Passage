@@ -5,7 +5,6 @@ import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { HomestayBookingPanel } from "@/components/homestays/HomestayBookingPanel";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
-import { MarketplaceModuleNav } from "@/components/site/MarketplaceModuleNav";
 import type { Experience } from "@/data/experiences";
 import { useAuthUser } from "@/lib/auth-user";
 import { bookHomestayPath } from "@/lib/homestay-booking-url";
@@ -65,11 +64,6 @@ function HomestayDetailPage() {
   return (
     <div className="experience-detail-page min-h-screen pt-[var(--header-height)] text-[#F7F1E8]">
       <Header />
-      <div className="sticky top-[var(--header-height)] z-40 border-b border-[oklch(0.72_0.09_78_/_0.15)] bg-background/95 backdrop-blur-md">
-        <div className="container-page py-3">
-          <MarketplaceModuleNav />
-        </div>
-      </div>
 
       <section className="container-page pt-8 pb-6">
         <Link

@@ -3,7 +3,6 @@ import { useMemo, useTransition } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { MarketplaceModuleNav } from "@/components/site/MarketplaceModuleNav";
 import { ExperienceCard } from "@/components/site/ExperienceCard";
 import { ExperiencesHero } from "@/components/experiences/ExperiencesHero";
 import { ExperiencesFilterSidebar } from "@/components/experiences/ExperiencesFilterSidebar";
@@ -116,12 +115,6 @@ function ExperiencesPage() {
   return (
     <div className="text-foreground">
       <Header />
-
-      <div className="sticky top-[var(--header-height)] z-40 border-b border-[oklch(0.72_0.09_78_/_0.15)] bg-background/95 backdrop-blur-md">
-        <div className="container-page py-3">
-          <MarketplaceModuleNav />
-        </div>
-      </div>
 
       <ExperiencesHero
         searchValue={search.q ?? ""}

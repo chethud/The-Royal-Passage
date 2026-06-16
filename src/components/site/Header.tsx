@@ -36,7 +36,6 @@ type NavItem = { label: string; to: string };
 
 const publicNavItems: NavItem[] = [
   { label: "Experiences", to: "/experiences" },
-  { label: "Homestays", to: "/homestays" },
   { label: "About Us", to: "/hosts" },
   { label: "Journal", to: "/journal" },
 ];
@@ -176,7 +175,7 @@ export function Header() {
                 className={navLinkClass}
                 activeProps={{ className: "text-ember" }}
               >
-                Book a Homestay
+                Homestays
               </Link>
             </>
           ) : null}
@@ -347,7 +346,7 @@ export function Header() {
                   </SheetClose>
                   <SheetClose asChild>
                     <Link to="/homestays" className={sheetLinkClass}>
-                      Book a Homestay
+                      Homestays
                     </Link>
                   </SheetClose>
                 </>

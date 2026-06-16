@@ -193,8 +193,8 @@ create policy "Public read published homestay reviews"
 -- Seed homestay owners + published properties (safe to re-run)
 -- ---------------------------------------------------------------------------
 insert into public.homestay_owners (id, full_name, email, phone, address, approval_status, verified) values
-  ('h0000001-0000-0000-0000-000000000001', 'Royal Heritage Stays', 'heritage@royalpassage.demo', '+91 9000000001', 'Mysuru, Karnataka', 'approved', true),
-  ('h0000002-0000-0000-0000-000000000002', 'Coorg Retreats Collective', 'coorg@royalpassage.demo', '+91 9000000002', 'Madikeri, Coorg', 'approved', true)
+  ('a0000001-0000-4000-8000-000000000001', 'Royal Heritage Stays', 'heritage@royalpassage.demo', '+91 9000000001', 'Mysuru, Karnataka', 'approved', true),
+  ('a0000002-0000-4000-8000-000000000002', 'Coorg Retreats Collective', 'coorg@royalpassage.demo', '+91 9000000002', 'Madikeri, Coorg', 'approved', true)
 on conflict (id) do nothing;
 
 insert into public.homestays (
@@ -203,8 +203,8 @@ insert into public.homestays (
   price_per_night_minor, currency_code, bedrooms, bathrooms, max_guests, rating_avg, reviews_count, status
 ) values
   (
-    's0000001-0000-0000-0000-000000000001',
-    'h0000001-0000-0000-0000-000000000001',
+    'b0000001-0000-4000-8000-000000000001',
+    'a0000001-0000-4000-8000-000000000001',
     'heritage-haveli-mysuru',
     'Heritage Haveli Mysuru',
     'Wake to palace views and courtyard chai',
@@ -221,8 +221,8 @@ insert into public.homestays (
     450000, 'INR', 3, 2, 6, 4.80, 56, 'published'
   ),
   (
-    's0000002-0000-0000-0000-000000000002',
-    'h0000002-0000-0000-0000-000000000002',
+    'b0000002-0000-4000-8000-000000000002',
+    'a0000002-0000-4000-8000-000000000002',
     'coorg-cloud-cottage',
     'Coorg Cloud Cottage',
     'Mist, coffee estates, and slow mornings',
@@ -239,8 +239,8 @@ insert into public.homestays (
     620000, 'INR', 2, 2, 4, 4.90, 41, 'published'
   ),
   (
-    's0000003-0000-0000-0000-000000000003',
-    'h0000001-0000-0000-0000-000000000001',
+    'b0000003-0000-4000-8000-000000000003',
+    'a0000001-0000-4000-8000-000000000001',
     'royal-passage-guest-house',
     'Royal Passage Guest House',
     'Boutique rooms curated for discerning travellers',
@@ -262,7 +262,7 @@ on conflict (id) do update set
   price_per_night_minor = excluded.price_per_night_minor;
 
 insert into public.homestay_rooms (id, homestay_id, name, category, capacity, price_per_night_minor, total_units, sort_order) values
-  ('r0000001-0000-0000-0000-000000000001', 's0000001-0000-0000-0000-000000000001', 'Courtyard Suite', 'Suite', 2, 450000, 2, 0),
-  ('r0000002-0000-0000-0000-000000000002', 's0000002-0000-0000-0000-000000000002', 'Mist View Room', 'Standard', 2, 620000, 3, 0),
-  ('r0000003-0000-0000-0000-000000000003', 's0000003-0000-0000-0000-000000000003', 'Deluxe Double', 'Deluxe', 2, 380000, 4, 0)
+  ('c0000001-0000-4000-8000-000000000001', 'b0000001-0000-4000-8000-000000000001', 'Courtyard Suite', 'Suite', 2, 450000, 2, 0),
+  ('c0000002-0000-4000-8000-000000000002', 'b0000002-0000-4000-8000-000000000002', 'Mist View Room', 'Standard', 2, 620000, 3, 0),
+  ('c0000003-0000-4000-8000-000000000003', 'b0000003-0000-4000-8000-000000000003', 'Deluxe Double', 'Deluxe', 2, 380000, 4, 0)
 on conflict (id) do nothing;

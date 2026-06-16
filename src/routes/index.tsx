@@ -3,8 +3,6 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { HomeHero } from "@/components/site/HomeHero";
 import { ExperiencesShowcase } from "@/components/site/ExperiencesShowcase";
-import { HomestaysShowcase } from "@/components/site/HomestaysShowcase";
-import { MarketplaceModuleNav } from "@/components/site/MarketplaceModuleNav";
 import { JourneysSplit } from "@/components/site/JourneysSplit";
 import { PillarsRow } from "@/components/site/PillarsRow";
 import { JournalPreview } from "@/components/site/JournalPreview";
@@ -58,12 +56,6 @@ function Index() {
     <div className="overflow-x-hidden bg-background text-foreground">
       <Header />
 
-      <div className="sticky top-[var(--header-height)] z-40 border-b border-[oklch(0.72_0.09_78_/_0.15)] bg-background/95 backdrop-blur-md">
-        <div className="container-page py-3">
-          <MarketplaceModuleNav variant="home" />
-        </div>
-      </div>
-
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
@@ -71,7 +63,6 @@ function Index() {
 
       <HomeHero slides={publicContent.hero} imageVersion={publicContent.version} />
       <ExperiencesShowcase items={publicContent.showcase} imageVersion={publicContent.version} />
-      <HomestaysShowcase />
       <JourneysSplit slides={publicContent.journeys} />
       <PillarsRow />
       <JournalPreview items={publicContent.journal} imageVersion={publicContent.version} />
