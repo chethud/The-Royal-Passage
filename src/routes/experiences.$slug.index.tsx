@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MapPin, Navigation } from "lucide-react";
 import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPanel";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
@@ -12,7 +12,8 @@ import { Footer } from "@/components/site/Footer";
 import type { Slot } from "@/data/experiences";
 import { useAuthUser } from "@/lib/auth-user";
 import { guestBookingLimits } from "@/lib/booking-url";
-import { hasBookableSlot } from "@/lib/experience-filters";
+import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
+import { useTodayIsoDate } from "@/hooks/use-today-iso-date";
 import { getExperienceForDetail } from "@/lib/marketplace-fns";
 import { getExperienceReviews } from "@/lib/review-fns";
 import { categoryIconForLabel } from "@/lib/experience-category-icons";
@@ -104,8 +105,13 @@ function ExperienceDetailList({
 function ExperienceDetail() {
   const { exp, reviews } = Route.useLoaderData();
   const { user, role } = useAuthUser();
+  const today = useTodayIsoDate();
+  const bookableSlots = useMemo(
+    () => filterSlotsWithinBookingWindow(exp.slots, today),
+    [exp.slots, today],
+  );
   const sym = exp.currencySymbol ?? "€";
-  const firstAvailable = exp.slots.find((s) => s.available > 0) ?? null;
+  const firstAvailable = bookableSlots.find((s) => s.available > 0) ?? null;
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(firstAvailable);
   const [guests, setGuests] = useState(() => {
     if (!firstAvailable) return 1;
@@ -121,7 +127,7 @@ function ExperienceDetail() {
 
   const ldJson = buildExperienceJsonLd(exp, reviews);
   const locationLine = [exp.region, exp.city].filter(Boolean).join(" · ");
-  const canBook = hasBookableSlot(exp);
+  const canBook = bookableSlots.some((slot) => slot.available > 0);
   const CategoryIcon = categoryIconForLabel(exp.category);
 
   return (

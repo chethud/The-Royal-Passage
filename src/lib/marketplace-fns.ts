@@ -10,7 +10,7 @@ import {
 } from "@/data/experiences";
 import { isSupabaseConfigured } from "@/lib/env.server";
 import { getOrSetServerCache } from "@/lib/cache.server";
-import { withGuestBookableSlots } from "@/lib/booking-window";
+import { todayIsoDate, withGuestBookableSlots } from "@/lib/booking-window";
 import { buildCatalogMeta, filterBookableExperiences } from "@/lib/experience-filters";
 import { mapRowToExperience, type ExperienceRow, type SlotRow } from "@/lib/experience-db";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -156,7 +156,12 @@ export const getCatalogForUi = createServerFn({ method: "GET" }).handler(async (
     return fallbackCatalog();
   }
   try {
-    const list = await getOrSetServerCache("catalog:published:v1", 60, loadPublishedWithSlots);
+    const windowDay = todayIsoDate();
+    const list = await getOrSetServerCache(
+      `catalog:published:${windowDay}:v1`,
+      60,
+      loadPublishedWithSlots,
+    );
     return toBookableCatalog("live", list);
   } catch {
     // Network / DNS errors should not white-screen the app.
@@ -173,9 +178,17 @@ export const getExperienceForDetail = createServerFn({ method: "GET" })
     return { slug: input.slug.trim() };
   })
   .handler(async ({ data }): Promise<{ exp: Experience; source: "live" | "static" } | null> => {
+    const windowDay = todayIsoDate();
+
     if (isApiConfigured() && !isUuid(data.slug)) {
       try {
-        return await fetchExperienceBySlug(data.slug);
+        const row = await fetchExperienceBySlug(data.slug);
+        if (row) {
+          return {
+            exp: withGuestBookableSlots(row.exp, windowDay),
+            source: row.source,
+          };
+        }
       } catch {
         // Fall through to Supabase/static fallback.
       }
@@ -184,7 +197,7 @@ export const getExperienceForDetail = createServerFn({ method: "GET" })
     if (isSupabaseConfigured()) {
       try {
         const fromDb = await getOrSetServerCache(
-          `experience:${data.slug}:v1`,
+          `experience:${data.slug}:${windowDay}:v1`,
           60,
           async () => {
             const bySlug = await loadExperienceFromDbBySlug(data.slug);
@@ -195,13 +208,13 @@ export const getExperienceForDetail = createServerFn({ method: "GET" })
             return null;
           },
         );
-        if (fromDb) return { exp: fromDb, source: "live" };
+        if (fromDb) return { exp: withGuestBookableSlots(fromDb, windowDay), source: "live" };
       } catch {
         // Fallback to static listing when DB is temporarily unreachable.
       }
     }
     const stat = getStaticExperience(data.slug);
-    if (stat) return { exp: stat, source: "static" };
+    if (stat) return { exp: withGuestBookableSlots(stat, windowDay), source: "static" };
     return null;
   });
 

@@ -1,5 +1,6 @@
 import { addDays } from "@/lib/weekday-slots";
 import type { BookingDateView } from "@/lib/dashboard-booking-filters";
+import { formatDateShort } from "@/lib/date-format";
 
 /** Guests may book sessions within this many calendar days starting today (inclusive). */
 export const BOOKING_WINDOW_DAYS = 7;
@@ -38,14 +39,31 @@ export function isAfterBookingWindow(isoDate: string, referenceToday = todayIsoD
   return normalizeIsoDate(isoDate) > bookingWindowEndIso(referenceToday);
 }
 
-export function filterSlotsWithinBookingWindow<T extends { date: string }>(slots: T[]): T[] {
-  return slots.filter((slot) => isWithinBookingWindow(slot.date));
+export function filterSlotsWithinBookingWindow<T extends { date: string }>(
+  slots: T[],
+  referenceToday = todayIsoDate(),
+): T[] {
+  return slots.filter((slot) => isWithinBookingWindow(slot.date, referenceToday));
 }
 
-export function withGuestBookableSlots<T extends { slots: { date: string }[] }>(experience: T): T {
+export function bookingWindowRange(referenceToday = todayIsoDate()) {
+  const start = normalizeIsoDate(referenceToday);
+  const end = bookingWindowEndIso(start);
+  return { start, end };
+}
+
+export function formatBookingWindowRange(referenceToday = todayIsoDate()): string {
+  const { start, end } = bookingWindowRange(referenceToday);
+  return `${formatDateShort(start)} – ${formatDateShort(end)}`;
+}
+
+export function withGuestBookableSlots<T extends { slots: { date: string }[] }>(
+  experience: T,
+  referenceToday = todayIsoDate(),
+): T {
   return {
     ...experience,
-    slots: filterSlotsWithinBookingWindow(experience.slots),
+    slots: filterSlotsWithinBookingWindow(experience.slots, referenceToday),
   };
 }
 

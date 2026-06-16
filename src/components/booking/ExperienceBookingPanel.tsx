@@ -1,12 +1,18 @@
+import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Minus, Plus } from "lucide-react";
 import { PayAtVenueBadge } from "@/components/booking/PayAtVenueBadge";
 import type { Experience, Slot } from "@/data/experiences";
-import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
+import {
+  BOOKING_WINDOW_DAYS,
+  filterSlotsWithinBookingWindow,
+  formatBookingWindowRange,
+} from "@/lib/booking-window";
 import { bookExperiencePath, guestBookingLimits } from "@/lib/booking-url";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 import { isGuestAccount, isStaffRole } from "@/lib/roles";
+import { useTodayIsoDate } from "@/hooks/use-today-iso-date";
 
 type ExperienceBookingPanelProps = {
   exp: Pick<
@@ -83,7 +89,12 @@ export function ExperienceBookingPanel({
 }: ExperienceBookingPanelProps) {
   const sym = exp.currencySymbol ?? "₹";
   const tone = panelTone(surface);
-  const visibleSlots = filterSlotsWithinBookingWindow(exp.slots);
+  const today = useTodayIsoDate();
+  const visibleSlots = useMemo(
+    () => filterSlotsWithinBookingWindow(exp.slots, today),
+    [exp.slots, today],
+  );
+  const windowLabel = useMemo(() => formatBookingWindowRange(today), [today]);
   const availableSlots = visibleSlots.filter((s) => s.available > 0);
   const limits = selectedSlot
     ? guestBookingLimits(exp, selectedSlot.available)
@@ -101,7 +112,8 @@ export function ExperienceBookingPanel({
       <div>
         <div className={`eyebrow mb-2 ${tone.eyebrow}`}>Available slots</div>
         <p className={`text-xs leading-relaxed ${tone.muted}`}>
-          Showing the next 7 days from today. New dates are added by hosts on a rolling weekly basis.
+          Showing {BOOKING_WINDOW_DAYS} days from today ({windowLabel}). New dates are added by
+          hosts on a rolling weekly basis.
         </p>
       </div>
 

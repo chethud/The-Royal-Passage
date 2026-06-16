@@ -4,6 +4,7 @@ import { createBooking } from "@/lib/api/bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { fetchGuestProfile } from "@/lib/api/guest";
 import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
+import { useTodayIsoDate } from "@/hooks/use-today-iso-date";
 import { guestBookingLimits } from "@/lib/booking-url";
 import { removeCartItem } from "@/lib/cart-storage";
 import type { PaymentMethod } from "@/components/booking/PaymentMethodSelector";
@@ -22,7 +23,11 @@ export function useCheckoutBooking({
   initialSlotId,
   initialGuests,
 }: UseCheckoutBookingOptions) {
-  const bookableSlots = useMemo(() => filterSlotsWithinBookingWindow(exp.slots), [exp.slots]);
+  const today = useTodayIsoDate();
+  const bookableSlots = useMemo(
+    () => filterSlotsWithinBookingWindow(exp.slots, today),
+    [exp.slots, today],
+  );
 
   const initialSlot = useMemo(() => {
     const fromInitial = initialSlotId

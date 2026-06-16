@@ -1,10 +1,16 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 BOOKING_WINDOW_DAYS = 7
+BOOKING_WINDOW_TZ = ZoneInfo("Asia/Kolkata")
+
+
+def booking_today() -> date:
+    return datetime.now(BOOKING_WINDOW_TZ).date()
 
 
 def booking_window_end(from_day: date | None = None) -> date:
-    start = from_day or date.today()
+    start = from_day or booking_today()
     return start + timedelta(days=BOOKING_WINDOW_DAYS - 1)
 
 
@@ -16,7 +22,7 @@ def _parse_slot_date(value: date | str) -> date:
 
 def is_within_booking_window(slot_date: date | str, reference: date | None = None) -> bool:
     day = _parse_slot_date(slot_date)
-    start = reference or date.today()
+    start = reference or booking_today()
     end = booking_window_end(start)
     return start <= day <= end
 
