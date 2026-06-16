@@ -112,20 +112,20 @@ function DateSlotPicker({
 }) {
   const dateCard =
     surface === "light"
-      ? "border border-[#4A0000]/10 bg-[#FFFBF5]/60"
+      ? "luxury-slot-date"
       : "border border-[#C8A25A]/15 bg-[#1a0a0a]/40";
   const dateCardActive =
     surface === "light"
-      ? "border-[#4A0000]/25 bg-[#FFF8EE] shadow-sm"
+      ? "luxury-slot-date luxury-slot-date--active"
       : "border-[#C8A25A]/30 bg-[#1f0d0d]/70";
   const slotRowIdle =
     surface === "light"
-      ? "border border-[#4A0000]/8 bg-white/70 text-[#4A0000]/80 hover:border-[#4A0000]/25 hover:bg-white"
+      ? "luxury-slot-row"
       : "border border-transparent bg-black/20 text-foreground/80 hover:border-[#C8A25A]/25 hover:bg-black/30";
   const slotRowActive =
     surface === "light"
-      ? "border-2 border-[#4A0000] bg-[#FFF4E8] text-[#4A0000] shadow-[0_8px_24px_-12px_rgb(74_0_0/0.35)] ring-2 ring-[#4A0000]/12"
-      : "border-2 border-[#D4AF6A] bg-[#2a1212] text-foreground shadow-[0_8px_24px_-12px_rgb(0_0_0/0.55)] ring-2 ring-[#D4AF6A]/20";
+      ? "luxury-slot-row luxury-slot-row--selected"
+      : "border border-[#D4AF6A]/55 bg-[#2a1212] text-foreground shadow-[0_6px_18px_-12px_rgb(0_0_0/0.55)]";
 
   return (
     <div className="space-y-3">
@@ -145,7 +145,7 @@ function DateSlotPicker({
               aria-expanded={open}
               disabled={soldOut}
               onClick={() => onExpandedDateChange(open ? null : group.date)}
-              className={`flex w-full items-center gap-4 px-4 py-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A0000]/25 disabled:cursor-not-allowed ${
+              className={`flex w-full items-center gap-4 px-4 py-4 text-left transition-colors luxury-slot-focus disabled:cursor-not-allowed ${
                 soldOut ? "opacity-45" : ""
               }`}
             >
@@ -153,17 +153,17 @@ function DateSlotPicker({
                 className={`h-12 w-1 shrink-0 rounded-full transition-colors ${
                   hasSelected || open
                     ? surface === "light"
-                      ? "bg-[#4A0000]"
+                      ? "luxury-slot-date__rail--active"
                       : "bg-[#D4AF6A]"
                     : surface === "light"
-                      ? "bg-[#4A0000]/20"
+                      ? "luxury-slot-date__rail"
                       : "bg-[#C8A25A]/25"
                 }`}
               />
               <div className="min-w-0 flex-1">
                 <div
                   className={`font-display text-base tracking-wide sm:text-lg ${
-                    surface === "light" ? "text-[#4A0000]" : "text-foreground"
+                    surface === "light" ? "luxury-panel-heading" : "text-foreground"
                   }`}
                 >
                   {formatDateLong(group.date)}
@@ -178,7 +178,7 @@ function DateSlotPicker({
                 <ChevronDown
                   className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
                     open ? "rotate-180" : ""
-                  } ${surface === "light" ? "text-[#4A0000]/70" : "text-[#D4AF6A]/90"}`}
+                  } ${surface === "light" ? "text-[#8B6914]/85" : "text-[#D4AF6A]/90"}`}
                   strokeWidth={1.75}
                 />
               ) : null}
@@ -187,7 +187,7 @@ function DateSlotPicker({
             {open && !soldOut ? (
               <div
                 className={`space-y-2 border-t px-4 pb-4 pt-3 ${
-                  surface === "light" ? "border-[#4A0000]/10" : "border-[#C8A25A]/15"
+                  surface === "light" ? "luxury-slot-date__divider" : "border-[#C8A25A]/15"
                 }`}
               >
                 {group.slots.map((slot) => {
@@ -207,27 +207,27 @@ function DateSlotPicker({
                             : `${formatTime12h(slot.start)} to ${formatTime12h(slot.end)}, select session`
                       }
                       onClick={() => onSelectSlot(slot)}
-                      className={`relative flex w-full items-center justify-between gap-3 rounded-lg py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A0000]/25 ${
+                      className={`relative flex w-full items-center justify-between gap-3 rounded-lg py-3 text-left transition-all duration-200 luxury-slot-focus ${
                         active ? `pl-5 pr-3.5 ${slotRowActive}` : sold ? "cursor-not-allowed px-3.5 opacity-40" : `px-3.5 ${slotRowIdle}`
                       }`}
                     >
                       {active ? (
                         <span
                           className={`absolute bottom-2.5 left-2 top-2.5 w-1 rounded-full ${
-                            surface === "light" ? "bg-[#4A0000]" : "bg-[#D4AF6A]"
+                            surface === "light" ? "luxury-slot-row__rail" : "bg-[#D4AF6A]"
                           }`}
                           aria-hidden
                         />
                       ) : null}
                       <div className="min-w-0 flex-1">
-                        <div className={`text-sm font-semibold ${active ? tone.seats : ""}`}>
+                        <div className={`text-sm font-semibold ${active && surface === "light" ? "luxury-panel-heading" : active ? tone.seats : ""}`}>
                           {formatTime12h(slot.start)} – {formatTime12h(slot.end)}
                         </div>
                         <div
                           className={`mt-0.5 flex items-center gap-1.5 text-[0.65rem] uppercase tracking-[0.12em] ${
                             active
                               ? surface === "light"
-                                ? "font-semibold text-[#4A0000]"
+                                ? "luxury-slot-row__selected-label"
                                 : "font-semibold text-[#D4AF6A]"
                               : tone.muted
                           }`}
@@ -247,7 +247,7 @@ function DateSlotPicker({
                       {!sold ? (
                         <div className="shrink-0 text-right">
                           <div className={`eyebrow text-[0.6rem] ${tone.muted}`}>Seats</div>
-                          <div className={`font-display text-lg ${tone.seats}`}>
+                          <div className={`font-display text-lg ${surface === "light" ? "luxury-panel-heading" : tone.seats}`}>
                             {slot.available}/{slot.capacity}
                           </div>
                         </div>
