@@ -40,7 +40,7 @@ class CitySummary(_message.Message):
     def __init__(self, slug: _Optional[str] = ..., name: _Optional[str] = ..., region: _Optional[str] = ..., state: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ...) -> None: ...
 
 class Experience(_message.Message):
-    __slots__ = ("id", "slug", "title", "tagline", "description", "category", "city", "city_slug", "address", "duration_hours", "host_name", "host_bio", "verified_host", "price_per_person", "rating", "reviews_count", "image", "inclusions", "cancellation", "slots", "currency_symbol", "min_guests_per_booking", "max_guests_per_booking", "gallery_urls", "exclusions", "requirements", "region")
+    __slots__ = ("id", "slug", "title", "tagline", "description", "category", "city", "city_slug", "address", "duration_hours", "host_name", "host_bio", "verified_host", "price_per_person", "rating", "reviews_count", "image", "inclusions", "cancellation", "slots", "currency_symbol", "min_guests_per_booking", "max_guests_per_booking", "gallery_urls", "exclusions", "requirements", "region", "map_link")
     ID_FIELD_NUMBER: _ClassVar[int]
     SLUG_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
@@ -68,6 +68,7 @@ class Experience(_message.Message):
     EXCLUSIONS_FIELD_NUMBER: _ClassVar[int]
     REQUIREMENTS_FIELD_NUMBER: _ClassVar[int]
     REGION_FIELD_NUMBER: _ClassVar[int]
+    MAP_LINK_FIELD_NUMBER: _ClassVar[int]
     id: str
     slug: str
     title: str
@@ -95,7 +96,8 @@ class Experience(_message.Message):
     exclusions: _containers.RepeatedScalarFieldContainer[str]
     requirements: _containers.RepeatedScalarFieldContainer[str]
     region: str
-    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., category: _Optional[str] = ..., city: _Optional[str] = ..., city_slug: _Optional[str] = ..., address: _Optional[str] = ..., duration_hours: _Optional[float] = ..., host_name: _Optional[str] = ..., host_bio: _Optional[str] = ..., verified_host: _Optional[bool] = ..., price_per_person: _Optional[int] = ..., rating: _Optional[float] = ..., reviews_count: _Optional[int] = ..., image: _Optional[str] = ..., inclusions: _Optional[_Iterable[str]] = ..., cancellation: _Optional[str] = ..., slots: _Optional[_Iterable[_Union[Slot, _Mapping]]] = ..., currency_symbol: _Optional[str] = ..., min_guests_per_booking: _Optional[int] = ..., max_guests_per_booking: _Optional[int] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., exclusions: _Optional[_Iterable[str]] = ..., requirements: _Optional[_Iterable[str]] = ..., region: _Optional[str] = ...) -> None: ...
+    map_link: str
+    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., category: _Optional[str] = ..., city: _Optional[str] = ..., city_slug: _Optional[str] = ..., address: _Optional[str] = ..., duration_hours: _Optional[float] = ..., host_name: _Optional[str] = ..., host_bio: _Optional[str] = ..., verified_host: _Optional[bool] = ..., price_per_person: _Optional[int] = ..., rating: _Optional[float] = ..., reviews_count: _Optional[int] = ..., image: _Optional[str] = ..., inclusions: _Optional[_Iterable[str]] = ..., cancellation: _Optional[str] = ..., slots: _Optional[_Iterable[_Union[Slot, _Mapping]]] = ..., currency_symbol: _Optional[str] = ..., min_guests_per_booking: _Optional[int] = ..., max_guests_per_booking: _Optional[int] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., exclusions: _Optional[_Iterable[str]] = ..., requirements: _Optional[_Iterable[str]] = ..., region: _Optional[str] = ..., map_link: _Optional[str] = ...) -> None: ...
 
 class CatalogResponse(_message.Message):
     __slots__ = ("mode", "experiences", "categories", "cities", "city_slugs")
@@ -454,7 +456,7 @@ class HostExperienceSummary(_message.Message):
     def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., city: _Optional[str] = ..., status: _Optional[str] = ..., price_per_person_minor: _Optional[int] = ..., currency_symbol: _Optional[str] = ..., slot_count: _Optional[int] = ..., image: _Optional[str] = ...) -> None: ...
 
 class HostExperienceDetail(_message.Message):
-    __slots__ = ("id", "slug", "title", "tagline", "description", "category_slug", "category_label", "city", "city_slug", "region", "address", "duration_minutes", "price_per_person_minor", "status", "hero_image_url", "inclusions", "exclusions", "requirements", "cancellation_policy", "min_guests_per_booking", "max_guests_per_booking", "currency_code", "currency_symbol", "slots", "created_at", "updated_at", "gallery_urls")
+    __slots__ = ("id", "slug", "title", "tagline", "description", "category_slug", "category_label", "city", "city_slug", "region", "address", "duration_minutes", "price_per_person_minor", "status", "hero_image_url", "inclusions", "exclusions", "requirements", "cancellation_policy", "min_guests_per_booking", "max_guests_per_booking", "currency_code", "currency_symbol", "slots", "created_at", "updated_at", "gallery_urls", "map_link")
     ID_FIELD_NUMBER: _ClassVar[int]
     SLUG_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
@@ -482,6 +484,7 @@ class HostExperienceDetail(_message.Message):
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
     GALLERY_URLS_FIELD_NUMBER: _ClassVar[int]
+    MAP_LINK_FIELD_NUMBER: _ClassVar[int]
     id: str
     slug: str
     title: str
@@ -509,10 +512,11 @@ class HostExperienceDetail(_message.Message):
     created_at: str
     updated_at: str
     gallery_urls: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., category_slug: _Optional[str] = ..., category_label: _Optional[str] = ..., city: _Optional[str] = ..., city_slug: _Optional[str] = ..., region: _Optional[str] = ..., address: _Optional[str] = ..., duration_minutes: _Optional[int] = ..., price_per_person_minor: _Optional[int] = ..., status: _Optional[str] = ..., hero_image_url: _Optional[str] = ..., inclusions: _Optional[_Iterable[str]] = ..., exclusions: _Optional[_Iterable[str]] = ..., requirements: _Optional[_Iterable[str]] = ..., cancellation_policy: _Optional[str] = ..., min_guests_per_booking: _Optional[int] = ..., max_guests_per_booking: _Optional[int] = ..., currency_code: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., slots: _Optional[_Iterable[_Union[HostSlotDetail, _Mapping]]] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ...) -> None: ...
+    map_link: str
+    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., category_slug: _Optional[str] = ..., category_label: _Optional[str] = ..., city: _Optional[str] = ..., city_slug: _Optional[str] = ..., region: _Optional[str] = ..., address: _Optional[str] = ..., duration_minutes: _Optional[int] = ..., price_per_person_minor: _Optional[int] = ..., status: _Optional[str] = ..., hero_image_url: _Optional[str] = ..., inclusions: _Optional[_Iterable[str]] = ..., exclusions: _Optional[_Iterable[str]] = ..., requirements: _Optional[_Iterable[str]] = ..., cancellation_policy: _Optional[str] = ..., min_guests_per_booking: _Optional[int] = ..., max_guests_per_booking: _Optional[int] = ..., currency_code: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., slots: _Optional[_Iterable[_Union[HostSlotDetail, _Mapping]]] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., map_link: _Optional[str] = ...) -> None: ...
 
 class CreateHostExperienceRequest(_message.Message):
-    __slots__ = ("title", "slug", "tagline", "description", "category_slug", "city_slug", "city", "region", "address", "duration_minutes", "price_per_person_minor", "hero_image_url", "inclusions", "exclusions", "requirements", "cancellation_policy", "min_guests_per_booking", "max_guests_per_booking", "submit_for_review", "gallery_urls")
+    __slots__ = ("title", "slug", "tagline", "description", "category_slug", "city_slug", "city", "region", "address", "duration_minutes", "price_per_person_minor", "hero_image_url", "inclusions", "exclusions", "requirements", "cancellation_policy", "min_guests_per_booking", "max_guests_per_booking", "submit_for_review", "gallery_urls", "map_link")
     TITLE_FIELD_NUMBER: _ClassVar[int]
     SLUG_FIELD_NUMBER: _ClassVar[int]
     TAGLINE_FIELD_NUMBER: _ClassVar[int]
@@ -533,6 +537,7 @@ class CreateHostExperienceRequest(_message.Message):
     MAX_GUESTS_PER_BOOKING_FIELD_NUMBER: _ClassVar[int]
     SUBMIT_FOR_REVIEW_FIELD_NUMBER: _ClassVar[int]
     GALLERY_URLS_FIELD_NUMBER: _ClassVar[int]
+    MAP_LINK_FIELD_NUMBER: _ClassVar[int]
     title: str
     slug: str
     tagline: str
@@ -553,10 +558,11 @@ class CreateHostExperienceRequest(_message.Message):
     max_guests_per_booking: int
     submit_for_review: bool
     gallery_urls: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, title: _Optional[str] = ..., slug: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., category_slug: _Optional[str] = ..., city_slug: _Optional[str] = ..., city: _Optional[str] = ..., region: _Optional[str] = ..., address: _Optional[str] = ..., duration_minutes: _Optional[int] = ..., price_per_person_minor: _Optional[int] = ..., hero_image_url: _Optional[str] = ..., inclusions: _Optional[_Iterable[str]] = ..., exclusions: _Optional[_Iterable[str]] = ..., requirements: _Optional[_Iterable[str]] = ..., cancellation_policy: _Optional[str] = ..., min_guests_per_booking: _Optional[int] = ..., max_guests_per_booking: _Optional[int] = ..., submit_for_review: _Optional[bool] = ..., gallery_urls: _Optional[_Iterable[str]] = ...) -> None: ...
+    map_link: str
+    def __init__(self, title: _Optional[str] = ..., slug: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., category_slug: _Optional[str] = ..., city_slug: _Optional[str] = ..., city: _Optional[str] = ..., region: _Optional[str] = ..., address: _Optional[str] = ..., duration_minutes: _Optional[int] = ..., price_per_person_minor: _Optional[int] = ..., hero_image_url: _Optional[str] = ..., inclusions: _Optional[_Iterable[str]] = ..., exclusions: _Optional[_Iterable[str]] = ..., requirements: _Optional[_Iterable[str]] = ..., cancellation_policy: _Optional[str] = ..., min_guests_per_booking: _Optional[int] = ..., max_guests_per_booking: _Optional[int] = ..., submit_for_review: _Optional[bool] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., map_link: _Optional[str] = ...) -> None: ...
 
 class UpdateHostExperienceRequest(_message.Message):
-    __slots__ = ("title", "slug", "tagline", "description", "category_slug", "city_slug", "city", "region", "address", "duration_minutes", "price_per_person_minor", "hero_image_url", "inclusions", "exclusions", "requirements", "cancellation_policy", "min_guests_per_booking", "max_guests_per_booking", "submit_for_review", "gallery_urls")
+    __slots__ = ("title", "slug", "tagline", "description", "category_slug", "city_slug", "city", "region", "address", "duration_minutes", "price_per_person_minor", "hero_image_url", "inclusions", "exclusions", "requirements", "cancellation_policy", "min_guests_per_booking", "max_guests_per_booking", "submit_for_review", "gallery_urls", "map_link")
     TITLE_FIELD_NUMBER: _ClassVar[int]
     SLUG_FIELD_NUMBER: _ClassVar[int]
     TAGLINE_FIELD_NUMBER: _ClassVar[int]
@@ -577,6 +583,7 @@ class UpdateHostExperienceRequest(_message.Message):
     MAX_GUESTS_PER_BOOKING_FIELD_NUMBER: _ClassVar[int]
     SUBMIT_FOR_REVIEW_FIELD_NUMBER: _ClassVar[int]
     GALLERY_URLS_FIELD_NUMBER: _ClassVar[int]
+    MAP_LINK_FIELD_NUMBER: _ClassVar[int]
     title: str
     slug: str
     tagline: str
@@ -597,7 +604,8 @@ class UpdateHostExperienceRequest(_message.Message):
     max_guests_per_booking: int
     submit_for_review: bool
     gallery_urls: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, title: _Optional[str] = ..., slug: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., category_slug: _Optional[str] = ..., city_slug: _Optional[str] = ..., city: _Optional[str] = ..., region: _Optional[str] = ..., address: _Optional[str] = ..., duration_minutes: _Optional[int] = ..., price_per_person_minor: _Optional[int] = ..., hero_image_url: _Optional[str] = ..., inclusions: _Optional[_Iterable[str]] = ..., exclusions: _Optional[_Iterable[str]] = ..., requirements: _Optional[_Iterable[str]] = ..., cancellation_policy: _Optional[str] = ..., min_guests_per_booking: _Optional[int] = ..., max_guests_per_booking: _Optional[int] = ..., submit_for_review: _Optional[bool] = ..., gallery_urls: _Optional[_Iterable[str]] = ...) -> None: ...
+    map_link: str
+    def __init__(self, title: _Optional[str] = ..., slug: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., category_slug: _Optional[str] = ..., city_slug: _Optional[str] = ..., city: _Optional[str] = ..., region: _Optional[str] = ..., address: _Optional[str] = ..., duration_minutes: _Optional[int] = ..., price_per_person_minor: _Optional[int] = ..., hero_image_url: _Optional[str] = ..., inclusions: _Optional[_Iterable[str]] = ..., exclusions: _Optional[_Iterable[str]] = ..., requirements: _Optional[_Iterable[str]] = ..., cancellation_policy: _Optional[str] = ..., min_guests_per_booking: _Optional[int] = ..., max_guests_per_booking: _Optional[int] = ..., submit_for_review: _Optional[bool] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., map_link: _Optional[str] = ...) -> None: ...
 
 class CreateHostSlotRequest(_message.Message):
     __slots__ = ("slot_date", "start_time", "end_time", "capacity")
@@ -644,7 +652,7 @@ class AdminExperienceSummary(_message.Message):
     def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., city: _Optional[str] = ..., status: _Optional[str] = ..., host_name: _Optional[str] = ..., created_at: _Optional[str] = ...) -> None: ...
 
 class AdminExperienceDetail(_message.Message):
-    __slots__ = ("id", "slug", "title", "tagline", "description", "category_slug", "category_label", "city", "city_slug", "region", "address", "duration_minutes", "price_per_person_minor", "status", "hero_image_url", "inclusions", "exclusions", "requirements", "cancellation_policy", "min_guests_per_booking", "max_guests_per_booking", "currency_code", "currency_symbol", "slots", "created_at", "updated_at", "gallery_urls", "host_name", "host_email", "host_phone", "host_bio", "host_verified")
+    __slots__ = ("id", "slug", "title", "tagline", "description", "category_slug", "category_label", "city", "city_slug", "region", "address", "duration_minutes", "price_per_person_minor", "status", "hero_image_url", "inclusions", "exclusions", "requirements", "cancellation_policy", "min_guests_per_booking", "max_guests_per_booking", "currency_code", "currency_symbol", "slots", "created_at", "updated_at", "gallery_urls", "map_link", "host_name", "host_email", "host_phone", "host_bio", "host_verified")
     ID_FIELD_NUMBER: _ClassVar[int]
     SLUG_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
@@ -672,6 +680,7 @@ class AdminExperienceDetail(_message.Message):
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
     GALLERY_URLS_FIELD_NUMBER: _ClassVar[int]
+    MAP_LINK_FIELD_NUMBER: _ClassVar[int]
     HOST_NAME_FIELD_NUMBER: _ClassVar[int]
     HOST_EMAIL_FIELD_NUMBER: _ClassVar[int]
     HOST_PHONE_FIELD_NUMBER: _ClassVar[int]
@@ -704,12 +713,13 @@ class AdminExperienceDetail(_message.Message):
     created_at: str
     updated_at: str
     gallery_urls: _containers.RepeatedScalarFieldContainer[str]
+    map_link: str
     host_name: str
     host_email: str
     host_phone: str
     host_bio: str
     host_verified: bool
-    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., category_slug: _Optional[str] = ..., category_label: _Optional[str] = ..., city: _Optional[str] = ..., city_slug: _Optional[str] = ..., region: _Optional[str] = ..., address: _Optional[str] = ..., duration_minutes: _Optional[int] = ..., price_per_person_minor: _Optional[int] = ..., status: _Optional[str] = ..., hero_image_url: _Optional[str] = ..., inclusions: _Optional[_Iterable[str]] = ..., exclusions: _Optional[_Iterable[str]] = ..., requirements: _Optional[_Iterable[str]] = ..., cancellation_policy: _Optional[str] = ..., min_guests_per_booking: _Optional[int] = ..., max_guests_per_booking: _Optional[int] = ..., currency_code: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., slots: _Optional[_Iterable[_Union[HostSlotDetail, _Mapping]]] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., host_name: _Optional[str] = ..., host_email: _Optional[str] = ..., host_phone: _Optional[str] = ..., host_bio: _Optional[str] = ..., host_verified: _Optional[bool] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., category_slug: _Optional[str] = ..., category_label: _Optional[str] = ..., city: _Optional[str] = ..., city_slug: _Optional[str] = ..., region: _Optional[str] = ..., address: _Optional[str] = ..., duration_minutes: _Optional[int] = ..., price_per_person_minor: _Optional[int] = ..., status: _Optional[str] = ..., hero_image_url: _Optional[str] = ..., inclusions: _Optional[_Iterable[str]] = ..., exclusions: _Optional[_Iterable[str]] = ..., requirements: _Optional[_Iterable[str]] = ..., cancellation_policy: _Optional[str] = ..., min_guests_per_booking: _Optional[int] = ..., max_guests_per_booking: _Optional[int] = ..., currency_code: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., slots: _Optional[_Iterable[_Union[HostSlotDetail, _Mapping]]] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., map_link: _Optional[str] = ..., host_name: _Optional[str] = ..., host_email: _Optional[str] = ..., host_phone: _Optional[str] = ..., host_bio: _Optional[str] = ..., host_verified: _Optional[bool] = ...) -> None: ...
 
 class ReviewSummary(_message.Message):
     __slots__ = ("id", "experience_id", "booking_id", "rating", "comment", "reviewer_display_name", "host_reply", "host_replied_at", "is_verified", "status", "created_at")

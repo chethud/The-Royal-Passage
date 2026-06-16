@@ -20,6 +20,7 @@ type HostExperienceFormProps = {
     citySlug: string;
     region?: string;
     address?: string;
+    mapLink?: string;
     durationMinutes: number;
     pricePerPersonMinor: number;
     heroImageUrl?: string;
@@ -61,6 +62,7 @@ export function HostExperienceForm({
   const [citySlug] = useState(initial?.citySlug ?? HOST_CITY_SLUG);
   const [region, setRegion] = useState(initial?.region ?? "Karnataka");
   const [address, setAddress] = useState(initial?.address ?? "");
+  const [mapLink, setMapLink] = useState(initial?.mapLink ?? "");
   const [durationMinutes, setDurationMinutes] = useState(initial?.durationMinutes ?? 120);
   const [priceMajor, setPriceMajor] = useState(
     initial ? Math.round(initial.pricePerPersonMinor / 100) : 0,
@@ -101,6 +103,7 @@ export function HostExperienceForm({
       citySlug,
       region: region.trim() || undefined,
       address: address.trim() || undefined,
+      mapLink: mapLink.trim() || undefined,
       durationMinutes,
       pricePerPersonMinor: priceMajor * 100,
       heroImageUrl: galleryUrls[0],
@@ -208,6 +211,20 @@ export function HostExperienceForm({
               className={inputClass}
             />
           </label>
+          <label className="sm:col-span-2 text-sm">
+            <span className="eyebrow text-muted-foreground">Map link</span>
+            <input
+              type="url"
+              disabled={readOnly}
+              value={mapLink}
+              onChange={(e) => setMapLink(e.target.value)}
+              placeholder="https://maps.google.com/..."
+              className={inputClass}
+            />
+            <span className="mt-1 block text-xs text-muted-foreground">
+              Google Maps or Apple Maps link so guests can get directions.
+            </span>
+          </label>
           <label className="text-sm">
             <span className="eyebrow text-muted-foreground">Duration (minutes)</span>
             <input
@@ -253,15 +270,21 @@ export function HostExperienceForm({
               className={inputClass}
             />
           </label>
-          <div className="sm:col-span-2">
-            <ExperiencePhotoGallery
-              photoUrls={photoUrls}
-              onChange={setPhotoUrls}
-              readOnly={readOnly}
-              inputClass={inputClass}
-            />
-          </div>
         </div>
+      </div>
+
+      <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8 space-y-5">
+        <h3 className="font-display text-xl">Photos</h3>
+        <p className="text-sm text-muted-foreground">
+          Upload multiple images. The first photo is the cover; guests can browse all photos on the
+          experience page.
+        </p>
+        <ExperiencePhotoGallery
+          photoUrls={photoUrls}
+          onChange={setPhotoUrls}
+          readOnly={readOnly}
+          inputClass={inputClass}
+        />
       </div>
 
       <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8 space-y-5">

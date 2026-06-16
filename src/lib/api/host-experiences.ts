@@ -52,6 +52,7 @@ export type HostExperienceDetail = {
   citySlug: string | null;
   region: string | null;
   address: string | null;
+  mapLink: string | null;
   durationMinutes: number;
   pricePerPersonMinor: number;
   status: string;
@@ -80,6 +81,7 @@ export type CreateHostExperiencePayload = {
   city?: string;
   region?: string;
   address?: string;
+  mapLink?: string;
   durationMinutes: number;
   pricePerPersonMinor: number;
   heroImageUrl?: string;

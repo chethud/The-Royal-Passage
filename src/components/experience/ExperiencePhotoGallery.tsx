@@ -83,7 +83,7 @@ export function ExperiencePhotoGallery({
       <div>
         <span className="eyebrow text-muted-foreground">Experience photos</span>
         <p className="mt-1 text-xs text-muted-foreground">
-          Browse and upload images from your device. The first photo becomes the cover image.
+          Browse and upload multiple images from your device. The first photo becomes the cover image.
         </p>
 
         {!readOnly ? (

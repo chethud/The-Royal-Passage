@@ -23,6 +23,7 @@ export type ExperienceRow = {
   city_slug: string | null;
   region: string | null;
   address: string | null;
+  map_link: string | null;
   duration_minutes: number;
   price_per_person_minor: number;
   hero_image_url: string | null;
@@ -93,6 +94,7 @@ export function mapRowToExperience(exp: ExperienceRow, slots: SlotRow[]): Experi
     city: exp.city,
     citySlug: exp.city_slug ?? undefined,
     address: exp.address ?? "",
+    mapLink: exp.map_link ?? undefined,
     durationHours: exp.duration_minutes / 60,
     hostName: host?.display_name ?? "Host",
     hostBio: host?.bio ?? "",

@@ -25,6 +25,7 @@ export type Experience = {
   city: string;
   citySlug?: string;
   address: string;
+  mapLink?: string;
   durationHours: number;
   hostName: string;
   hostBio: string;

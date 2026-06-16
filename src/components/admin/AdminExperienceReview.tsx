@@ -121,6 +121,18 @@ export function AdminExperienceReview({ experience }: AdminExperienceReviewProps
             {experience.address ? (
               <DetailBlock label="Address">{experience.address}</DetailBlock>
             ) : null}
+            {experience.mapLink ? (
+              <DetailBlock label="Map link">
+                <a
+                  href={experience.mapLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="luxury-panel-link break-all underline-offset-4 hover:underline"
+                >
+                  Open in maps
+                </a>
+              </DetailBlock>
+            ) : null}
             <DetailBlock label="Guests per booking">
               {experience.minGuestsPerBooking}–{experience.maxGuestsPerBooking}
             </DetailBlock>

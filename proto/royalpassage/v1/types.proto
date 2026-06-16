@@ -50,6 +50,7 @@ message Experience {
   repeated string exclusions = 25;
   repeated string requirements = 26;
   optional string region = 27;
+  optional string map_link = 28;
 }
 
 message CatalogResponse {
@@ -279,6 +280,7 @@ message HostExperienceDetail {
   string created_at = 25;
   string updated_at = 26;
   repeated string gallery_urls = 27;
+  optional string map_link = 28;
 }
 
 message CreateHostExperienceRequest {
@@ -302,6 +304,7 @@ message CreateHostExperienceRequest {
   int32 max_guests_per_booking = 18;
   bool submit_for_review = 19;
   repeated string gallery_urls = 20;
+  optional string map_link = 21;
 }
 
 message UpdateHostExperienceRequest {
@@ -325,6 +328,7 @@ message UpdateHostExperienceRequest {
   optional int32 max_guests_per_booking = 18;
   bool submit_for_review = 19;
   repeated string gallery_urls = 20;
+  optional string map_link = 21;
 }
 
 message CreateHostSlotRequest {
@@ -380,11 +384,12 @@ message AdminExperienceDetail {
   string created_at = 25;
   string updated_at = 26;
   repeated string gallery_urls = 27;
-  string host_name = 28;
-  optional string host_email = 29;
-  optional string host_phone = 30;
-  optional string host_bio = 31;
-  bool host_verified = 32;
+  optional string map_link = 28;
+  string host_name = 29;
+  optional string host_email = 30;
+  optional string host_phone = 31;
+  optional string host_bio = 32;
+  bool host_verified = 33;
 }
 
 message ReviewSummary {

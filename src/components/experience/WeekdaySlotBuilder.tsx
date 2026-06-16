@@ -2,13 +2,13 @@ import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { CreateHostSlotPayload } from "@/lib/api/host-experiences";
 import { BOOKING_WINDOW_DAYS, bookingWindowEndIso } from "@/lib/booking-window";
+import { Time12hField } from "@/components/experience/Time12hField";
 import { isoToWeekdayKey } from "@/lib/slot-week-overview";
 import {
   buildSchedulePreview,
   DEFAULT_WEEKDAYS,
   expandWeekdaySchedule,
   formatDateReadable,
-  formatTime12h,
   WEEKDAY_OPTIONS,
   type SessionBlockInput,
   type WeekdayKey,
@@ -266,29 +266,23 @@ export function WeekdaySlotBuilder({
               <div className="grid gap-4 sm:grid-cols-3">
                 <label className="block text-sm">
                   <span className="eyebrow text-muted-foreground">Starts</span>
-                  <input
-                    type="time"
-                    value={row.startTime}
-                    disabled={busy}
-                    onChange={(e) => updateSession(row.key, { startTime: e.target.value })}
-                    className={fieldClass}
-                  />
-                  <span className="mt-1 block text-[0.68rem] text-muted-foreground">
-                    {formatTime12h(row.startTime)}
-                  </span>
+                  <div className="mt-1.5">
+                    <Time12hField
+                      value={row.startTime}
+                      disabled={busy}
+                      onChange={(next) => updateSession(row.key, { startTime: next })}
+                    />
+                  </div>
                 </label>
                 <label className="block text-sm">
                   <span className="eyebrow text-muted-foreground">Ends</span>
-                  <input
-                    type="time"
-                    value={row.endTime}
-                    disabled={busy}
-                    onChange={(e) => updateSession(row.key, { endTime: e.target.value })}
-                    className={fieldClass}
-                  />
-                  <span className="mt-1 block text-[0.68rem] text-muted-foreground">
-                    {formatTime12h(row.endTime)}
-                  </span>
+                  <div className="mt-1.5">
+                    <Time12hField
+                      value={row.endTime}
+                      disabled={busy}
+                      onChange={(next) => updateSession(row.key, { endTime: next })}
+                    />
+                  </div>
                 </label>
                 <label className="block text-sm">
                   <span className="eyebrow text-muted-foreground">Guests</span>

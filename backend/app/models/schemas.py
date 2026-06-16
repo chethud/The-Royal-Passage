@@ -44,6 +44,7 @@ class Experience(BaseModel):
     exclusions: list[str] = Field(default_factory=list)
     requirements: list[str] = Field(default_factory=list)
     region: str | None = None
+    mapLink: str | None = None
     cancellation: str
     slots: list[Slot]
     currencySymbol: str | None = "₹"
@@ -262,6 +263,7 @@ class HostExperienceDetail(BaseModel):
     citySlug: str | None = None
     region: str | None
     address: str | None
+    mapLink: str | None = None
     durationMinutes: int
     pricePerPersonMinor: int
     status: str
@@ -289,8 +291,9 @@ class CreateHostExperienceRequest(BaseModel):
     citySlug: str = Field(min_length=2, max_length=64, pattern=r"^[a-z0-9-]+$")
     city: str | None = Field(default=None, min_length=2, max_length=80)
     region: str | None = Field(default=None, max_length=80)
-    address: str | None = Field(default=None, max_length=200)
-    durationMinutes: int = Field(ge=30, le=480)
+  address: str | None = Field(default=None, max_length=200)
+  mapLink: str | None = Field(default=None, max_length=500)
+  durationMinutes: int = Field(ge=30, le=480)
     pricePerPersonMinor: int = Field(ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] = Field(default_factory=list)
@@ -312,8 +315,9 @@ class UpdateHostExperienceRequest(BaseModel):
     citySlug: str | None = Field(default=None, min_length=2, max_length=64, pattern=r"^[a-z0-9-]+$")
     city: str | None = Field(default=None, min_length=2, max_length=80)
     region: str | None = Field(default=None, max_length=80)
-    address: str | None = Field(default=None, max_length=200)
-    durationMinutes: int | None = Field(default=None, ge=30, le=480)
+  address: str | None = Field(default=None, max_length=200)
+  mapLink: str | None = Field(default=None, max_length=500)
+  durationMinutes: int | None = Field(default=None, ge=30, le=480)
     pricePerPersonMinor: int | None = Field(default=None, ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] | None = None
@@ -363,6 +367,7 @@ class AdminExperienceDetail(BaseModel):
     citySlug: str | None = None
     region: str | None
     address: str | None
+    mapLink: str | None = None
     durationMinutes: int
     pricePerPersonMinor: int
     status: str

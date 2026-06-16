@@ -62,6 +62,7 @@ def map_row_to_experience(row: dict, slots: list[dict]) -> Experience:
         exclusions=row.get("exclusions") or [],
         requirements=row.get("requirements") or [],
         region=row.get("region"),
+        mapLink=row.get("map_link"),
         cancellation=row.get("cancellation_policy") or "",
         slots=ui_slots,
         currencySymbol=_currency_symbol(row.get("currency_code") or "INR"),

@@ -1,15 +1,22 @@
 -- =============================================================================
--- The Royal Passage — COMPLETE database schema (single file)
+-- The Royal Passage — COMPLETE database schema (single file — run all of this)
 -- =============================================================================
--- Run this ONE file only in: Supabase Dashboard → SQL Editor → New query → Run
+-- HOW TO USE (fresh or existing Supabase project):
+--   1. Supabase Dashboard → SQL Editor → New query
+--   2. Paste this ENTIRE file → Run once
+--   3. No separate migration files needed — everything is below.
 --
--- Includes everything from supabase/migrations/* and fix-missing-profiles.sql:
+-- Includes (consolidated from supabase/migrations/* and fix-missing-profiles.sql):
 --   • profiles, hosts, cities, categories, experiences, slots
---   • COD bookings (10% platform / 90% host payout)
+--   • experience map_link, gallery_urls (multi-photo), requirements
+--   • COD bookings (10% platform / 90% host payout), booking pause
 --   • wishlist, reviews, notifications, audit_logs, platform_settings
 --   • RLS policies, auth triggers, seat reservation functions
+--   • storage bucket + policies for host experience photo uploads
 --   • profile backfill + booking guest FK repair
 --   • seed hosts, experiences, slots (dates refresh on re-run), reviews
+--
+-- Also available at repo root: FULL_SCHEMA.sql (same content — keep in sync)
 --
 -- Safe to re-run on EXISTING databases:
 --   IF NOT EXISTS, ADD COLUMN IF NOT EXISTS, ON CONFLICT, DROP POLICY IF EXISTS
@@ -157,6 +164,7 @@ create table if not exists public.experiences (
   city text not null,
   region text,
   address text,
+  map_link text,
   duration_minutes int not null check (duration_minutes > 0),
   experience_format text not null default 'slot_based'
     check (experience_format in ('fixed', 'slot_based', 'on_demand')),
@@ -198,7 +206,8 @@ alter table public.experiences
   add column if not exists city_slug text,
   add column if not exists requirements text[] default '{}',
   add column if not exists min_guests_per_booking int default 1,
-  add column if not exists max_guests_per_booking int default 10;
+  add column if not exists max_guests_per_booking int default 10,
+  add column if not exists map_link text;
 
 -- FK for city_slug (idempotent)
 do $$

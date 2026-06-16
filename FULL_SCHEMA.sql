@@ -1,23 +1,22 @@
 -- =============================================================================
--- THE ROYAL PASSAGE — FULL SCHEMA (ONE FILE — RUN ALL OF THIS)
+-- The Royal Passage — COMPLETE database schema (single file — run all of this)
 -- =============================================================================
--- HOW TO USE:
---   1. Select ALL (Ctrl+A) → Copy (Ctrl+C)
---   2. Supabase Dashboard → SQL Editor → New query
---   3. Paste → Run
+-- HOW TO USE (fresh or existing Supabase project):
+--   1. Supabase Dashboard → SQL Editor → New query
+--   2. Paste this ENTIRE file → Run once
+--   3. No separate migration files needed — everything is below.
 --
--- Safe to re-run on existing databases (uses IF NOT EXISTS / ON CONFLICT).
--- Same content as supabase/schema.sql — keep both in sync when editing.
--- =============================================================================
--- Run this ONE file only in: Supabase Dashboard → SQL Editor → New query → Run
---
--- Includes everything from supabase/migrations/* and fix-missing-profiles.sql:
+-- Includes (consolidated from supabase/migrations/* and fix-missing-profiles.sql):
 --   • profiles, hosts, cities, categories, experiences, slots
---   • COD bookings (10% platform / 90% host payout)
+--   • experience map_link, gallery_urls (multi-photo), requirements
+--   • COD bookings (10% platform / 90% host payout), booking pause
 --   • wishlist, reviews, notifications, audit_logs, platform_settings
 --   • RLS policies, auth triggers, seat reservation functions
+--   • storage bucket + policies for host experience photo uploads
 --   • profile backfill + booking guest FK repair
 --   • seed hosts, experiences, slots (dates refresh on re-run), reviews
+--
+-- Also available at repo root: FULL_SCHEMA.sql (same content — keep in sync)
 --
 -- Safe to re-run on EXISTING databases:
 --   IF NOT EXISTS, ADD COLUMN IF NOT EXISTS, ON CONFLICT, DROP POLICY IF EXISTS
@@ -31,7 +30,7 @@
 -- Editor account (homepage CMS) — Auth user MUST be created in Dashboard first:
 --   See supabase/create-editor-login.sql  OR  npm run setup:editor
 --   Email: edit@gmail.com   Password: Edit@123
---   (FULL_SCHEMA.sql does NOT create auth passwords — only tables/data.)
+--   (schema.sql does NOT create auth passwords — only tables/data.)
 --
 -- RLS: broad read for anon/authenticated; writes via service role (backend API).
 -- =============================================================================
@@ -62,12 +61,18 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   full_name text,
   phone text,
+  avatar_url text,
+  date_of_birth date,
   role text not null default 'guest'
     check (role in ('guest', 'host', 'admin', 'editor')),
   host_id uuid,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.profiles
+  add column if not exists avatar_url text,
+  add column if not exists date_of_birth date;
 
 drop trigger if exists trg_profiles_updated on public.profiles;
 create trigger trg_profiles_updated
@@ -159,6 +164,7 @@ create table if not exists public.experiences (
   city text not null,
   region text,
   address text,
+  map_link text,
   duration_minutes int not null check (duration_minutes > 0),
   experience_format text not null default 'slot_based'
     check (experience_format in ('fixed', 'slot_based', 'on_demand')),
@@ -200,7 +206,8 @@ alter table public.experiences
   add column if not exists city_slug text,
   add column if not exists requirements text[] default '{}',
   add column if not exists min_guests_per_booking int default 1,
-  add column if not exists max_guests_per_booking int default 10;
+  add column if not exists max_guests_per_booking int default 10,
+  add column if not exists map_link text;
 
 -- FK for city_slug (idempotent)
 do $$
@@ -274,6 +281,8 @@ create table if not exists public.bookings (
   completed_at timestamptz,
   cancelled_at timestamptz,
   cancelled_by text check (cancelled_by is null or cancelled_by in ('guest', 'host', 'admin')),
+  is_paused boolean not null default false,
+  paused_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -291,7 +300,9 @@ alter table public.bookings
   add column if not exists confirmed_at timestamptz,
   add column if not exists completed_at timestamptz,
   add column if not exists cancelled_at timestamptz,
-  add column if not exists cancelled_by text;
+  add column if not exists cancelled_by text,
+  add column if not exists is_paused boolean not null default false,
+  add column if not exists paused_at timestamptz;
 
 do $$
 begin
@@ -668,8 +679,8 @@ create policy "profiles_insert_own"
 
 create policy "profiles_update_own"
   on public.profiles for update to authenticated
-  using (auth.uid() = id and role = 'guest')
-  with check (auth.uid() = id and role = 'guest');
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
 
 create policy "hosts_select_all"
   on public.hosts for select to anon, authenticated
@@ -1113,4 +1124,3 @@ create policy "Hosts delete own experience photos"
 -- left join public.profiles p on p.id = u.id
 -- order by u.created_at desc
 -- limit 20;
-

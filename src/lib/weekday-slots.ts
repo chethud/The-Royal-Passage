@@ -139,6 +139,31 @@ export function formatTime12h(time24: string): string {
   return `${hour12}:${String(minute).padStart(2, "0")} ${period}`;
 }
 
+export type Time12hParts = {
+  hour12: number;
+  minute: number;
+  period: "AM" | "PM";
+};
+
+export function parseTime24h(time24: string): Time12hParts {
+  const [hourPart, minutePart] = time24.split(":");
+  const hour24 = Number.parseInt(hourPart ?? "0", 10);
+  const minute = Number.parseInt(minutePart ?? "0", 10);
+  const safeHour = Number.isFinite(hour24) ? hour24 : 0;
+  const safeMinute = Number.isFinite(minute) ? Math.min(59, Math.max(0, minute)) : 0;
+  const period = safeHour >= 12 ? "PM" : "AM";
+  const hour12 = safeHour % 12 || 12;
+  return { hour12, minute: safeMinute, period };
+}
+
+export function toTime24h(hour12: number, minute: number, period: "AM" | "PM"): string {
+  const safeHour12 = Math.min(12, Math.max(1, hour12));
+  const safeMinute = Math.min(59, Math.max(0, minute));
+  let hour24 = safeHour12 % 12;
+  if (period === "PM") hour24 += 12;
+  return `${String(hour24).padStart(2, "0")}:${String(safeMinute).padStart(2, "0")}`;
+}
+
 export function formatDateReadable(isoDate: string): string {
   const date = parseLocalDate(isoDate);
   return new Intl.DateTimeFormat("en-IN", {

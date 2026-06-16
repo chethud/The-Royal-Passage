@@ -24,6 +24,7 @@ type CreateExperienceWizardProps = {
       citySlug: string;
       region?: string;
       address?: string;
+      mapLink?: string;
       durationMinutes: number;
       pricePerPersonMinor: number;
       heroImageUrl?: string;
@@ -90,6 +91,7 @@ export function CreateExperienceWizard({
   const citySlug = HOST_CITY_SLUG;
   const [region, setRegion] = useState("Karnataka");
   const [address, setAddress] = useState("");
+  const [mapLink, setMapLink] = useState("");
   const [durationMinutes, setDurationMinutes] = useState(120);
   const [priceMajor, setPriceMajor] = useState(0);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
@@ -140,6 +142,17 @@ export function CreateExperienceWizard({
     }
     if (current === 2) {
       if (!citySlug) return "Select a city.";
+      const trimmedMapLink = mapLink.trim();
+      if (trimmedMapLink) {
+        try {
+          const url = new URL(trimmedMapLink);
+          if (url.protocol !== "http:" && url.protocol !== "https:") {
+            return "Map link must start with http:// or https://.";
+          }
+        } catch {
+          return "Map link must be a valid URL (e.g. Google Maps share link).";
+        }
+      }
       if (durationMinutes < 30) return "Duration must be at least 30 minutes.";
       if (priceMajor < 0) return "Price cannot be negative.";
       if (minGuests < 1) return "Minimum guests must be at least 1.";
@@ -211,6 +224,7 @@ export function CreateExperienceWizard({
         citySlug,
         region: region.trim() || undefined,
         address: address.trim() || undefined,
+        mapLink: mapLink.trim() || undefined,
         durationMinutes,
         pricePerPersonMinor: priceMajor * 100,
         heroImageUrl: galleryUrls[0],
@@ -349,6 +363,19 @@ export function CreateExperienceWizard({
               <span className="eyebrow luxury-panel-label">Address</span>
               <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputClass} />
             </label>
+            <label className="sm:col-span-2 text-sm">
+              <span className="eyebrow luxury-panel-label">Map link</span>
+              <input
+                type="url"
+                value={mapLink}
+                onChange={(e) => setMapLink(e.target.value)}
+                placeholder="https://maps.google.com/..."
+                className={inputClass}
+              />
+              <span className={hintClass}>
+                Paste a Google Maps or Apple Maps link so guests can navigate to your meeting point.
+              </span>
+            </label>
             <label className="text-sm">
               <span className="eyebrow luxury-panel-label">Duration (minutes)</span>
               <input
@@ -397,6 +424,10 @@ export function CreateExperienceWizard({
       {step === 3 ? (
         <div className="space-y-5 border-t luxury-panel-divider pt-6">
           <h3 className={sectionTitleClass}>Photos & details</h3>
+          <p className="luxury-panel-body text-sm">
+            Add multiple photos — the first image becomes the cover. Guests can browse the full
+            gallery on your experience page.
+          </p>
           <ExperiencePhotoGallery
             photoUrls={photoUrls}
             onChange={setPhotoUrls}

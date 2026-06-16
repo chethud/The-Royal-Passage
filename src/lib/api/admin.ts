@@ -59,6 +59,7 @@ export type AdminExperienceDetail = {
   citySlug: string | null;
   region: string | null;
   address: string | null;
+  mapLink: string | null;
   durationMinutes: number;
   pricePerPersonMinor: number;
   status: string;

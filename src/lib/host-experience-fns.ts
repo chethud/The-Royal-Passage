@@ -30,6 +30,7 @@ const experiencePayloadSchema = z.object({
   city: z.string().min(2).max(80).optional(),
   region: z.string().max(80).optional(),
   address: z.string().max(200).optional(),
+  mapLink: z.union([z.literal(""), z.string().url().max(500)]).optional(),
   durationMinutes: z.number().int().min(30).max(480),
   pricePerPersonMinor: z.number().int().min(0),
   heroImageUrl: z.string().max(500).optional(),

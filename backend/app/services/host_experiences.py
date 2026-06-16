@@ -114,6 +114,7 @@ def _map_host_experience(row: dict, slots: list[dict]) -> HostExperienceDetail:
         citySlug=row.get("city_slug"),
         region=row.get("region"),
         address=row.get("address"),
+        mapLink=row.get("map_link"),
         durationMinutes=int(row.get("duration_minutes") or 60),
         pricePerPersonMinor=int(row.get("price_per_person_minor") or 0),
         status=row.get("status") or "draft",
@@ -244,6 +245,7 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
         "city": city_name,
         "region": payload.region,
         "address": payload.address,
+        "map_link": payload.mapLink,
         "duration_minutes": payload.durationMinutes,
         "price_per_person_minor": payload.pricePerPersonMinor,
         "hero_image_url": hero_image_url,
@@ -310,6 +312,8 @@ def update_host_experience(
         updates["region"] = payload.region
     if payload.address is not None:
         updates["address"] = payload.address
+    if payload.mapLink is not None:
+        updates["map_link"] = payload.mapLink.strip() or None
     if payload.durationMinutes is not None:
         updates["duration_minutes"] = payload.durationMinutes
     if payload.pricePerPersonMinor is not None:

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { MapPin } from "lucide-react";
+import { MapPin, Navigation } from "lucide-react";
 import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPanel";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { ExperienceDetailGallery } from "@/components/experiences/ExperienceDetailGallery";
@@ -76,33 +76,27 @@ export const Route = createFileRoute("/experiences/$slug/")({
 function ExperienceDetailList({
   label,
   items,
-  emptyMessage,
+  emptyMessage = "Your host will confirm full details when you book.",
 }: {
   label: string;
   items: string[];
   emptyMessage?: string;
 }) {
-  if (items.length === 0) {
-    if (!emptyMessage) return null;
-    return (
-      <div>
-        <div className="eyebrow luxury-panel-label mb-4">{label}</div>
-        <p className="luxury-panel-body text-sm">{emptyMessage}</p>
-      </div>
-    );
-  }
-
   return (
     <div>
       <div className="eyebrow luxury-panel-label mb-4">{label}</div>
-      <ul className="space-y-2.5">
-        {items.map((item) => (
-          <li key={item} className="luxury-panel-body flex gap-3 text-sm leading-relaxed">
-            <span className="text-[#8B6914]">—</span>
-            {item}
-          </li>
-        ))}
-      </ul>
+      {items.length === 0 ? (
+        <p className="luxury-panel-body text-sm">{emptyMessage}</p>
+      ) : (
+        <ul className="space-y-2.5">
+          {items.map((item) => (
+            <li key={item} className="luxury-panel-body flex gap-3 text-sm leading-relaxed">
+              <span className="text-[#8B6914]">—</span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -159,13 +153,24 @@ function ExperienceDetail() {
             {exp.category}
           </div>
 
-          {locationLine || exp.address ? (
+          {locationLine || exp.address || exp.mapLink ? (
             <div className="flex items-start gap-2 text-sm text-[#D6C8B5]/90">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF6A]" aria-hidden />
               <div>
                 {locationLine ? <div>{locationLine}</div> : null}
                 {exp.address ? (
                   <div className="mt-0.5 text-[#D6C8B5]/75">{exp.address}</div>
+                ) : null}
+                {exp.mapLink ? (
+                  <a
+                    href={exp.mapLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
+                  >
+                    <Navigation className="h-3.5 w-3.5" aria-hidden />
+                    Get directions
+                  </a>
                 ) : null}
               </div>
             </div>
@@ -285,7 +290,8 @@ function ExperienceDetail() {
         <LuxuryCheckoutPanel>
           <div className="eyebrow luxury-panel-label mb-3">Cancellation policy</div>
           <p className="luxury-panel-body max-w-3xl text-sm leading-relaxed sm:text-base">
-            {exp.cancellation}
+            {exp.cancellation?.trim() ||
+              "Standard cancellation terms apply. Your host will confirm the full policy in your booking confirmation."}
           </p>
         </LuxuryCheckoutPanel>
 
