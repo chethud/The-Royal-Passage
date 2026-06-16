@@ -10,19 +10,22 @@ type ExperienceDetailGalleryProps = {
 export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
   const gallery = exp.galleryUrls?.length ? exp.galleryUrls : exp.image ? [exp.image] : [];
   const [activeIndex, setActiveIndex] = useState(0);
+  const [direction, setDirection] = useState<"next" | "prev">("next");
   const CategoryIcon = categoryIconForLabel(exp.category);
 
   const goTo = useCallback(
-    (index: number) => {
+    (index: number, slideDirection: "next" | "prev") => {
       if (gallery.length === 0) return;
       const wrapped = ((index % gallery.length) + gallery.length) % gallery.length;
+      if (wrapped === activeIndex) return;
+      setDirection(slideDirection);
       setActiveIndex(wrapped);
     },
-    [gallery.length],
+    [activeIndex, gallery.length],
   );
 
-  const goPrev = useCallback(() => goTo(activeIndex - 1), [activeIndex, goTo]);
-  const goNext = useCallback(() => goTo(activeIndex + 1), [activeIndex, goTo]);
+  const goPrev = useCallback(() => goTo(activeIndex - 1, "prev"), [activeIndex, goTo]);
+  const goNext = useCallback(() => goTo(activeIndex + 1, "next"), [activeIndex, goTo]);
 
   useEffect(() => {
     if (activeIndex >= gallery.length) {
@@ -51,15 +54,22 @@ export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
       aria-roledescription="carousel"
       aria-label={`${exp.title} photo gallery`}
     >
-      <img
-        src={active}
-        alt={`${exp.title} — photo ${activeIndex + 1} of ${gallery.length}`}
-        className="aspect-[4/5] w-full object-cover md:aspect-auto md:h-[min(70vh,640px)]"
-        width={1200}
-        height={1500}
-        decoding="async"
-        fetchPriority="high"
-      />
+      <div className="experience-detail-gallery__frame">
+        <div
+          key={activeIndex}
+          className={`experience-detail-gallery__slide experience-detail-gallery__slide--${direction}`}
+        >
+          <img
+            src={active}
+            alt={`${exp.title} — photo ${activeIndex + 1} of ${gallery.length}`}
+            className="experience-detail-gallery__image aspect-[4/5] w-full object-cover md:aspect-auto md:h-[min(70vh,640px)]"
+            width={1200}
+            height={1500}
+            decoding="async"
+            fetchPriority={activeIndex === 0 ? "high" : "auto"}
+          />
+        </div>
+      </div>
 
       <div className="absolute left-3.5 top-3.5 z-10">
         <span
