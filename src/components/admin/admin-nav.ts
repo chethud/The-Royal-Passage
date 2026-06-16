@@ -5,5 +5,4 @@ export const ADMIN_NAV_ITEMS = [
   { to: "/admin/reviews", label: "Reviews" },
   { to: "/admin/activity", label: "Activity" },
   { to: "/experiences", label: "Live catalog" },
-  { to: "/admin/profile", label: "Profile" },
 ] as const;
