@@ -238,7 +238,7 @@ function HostExperienceDetailPage() {
       <section className="mt-12">
         <h2 className="font-display text-2xl">Slots</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add session dates guests can book. Block slots instead of deleting when bookings exist.
+          See which days have sessions at a glance, then add or manage slots for the next 7 days.
         </p>
         <div className="mt-6">
           <SlotManager

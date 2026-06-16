@@ -58,12 +58,20 @@ function AdminExperiencesPage() {
       showRoleDescription={false}
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Link
-          to="/admin"
-          className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
-        >
-          ← Overview
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/admin"
+            className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
+          >
+            ← Overview
+          </Link>
+          <Link
+            to="/admin/hosts"
+            className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
+          >
+            Host accounts
+          </Link>
+        </div>
         <Link
           to="/experiences"
           className="dashboard-chrome-link"
