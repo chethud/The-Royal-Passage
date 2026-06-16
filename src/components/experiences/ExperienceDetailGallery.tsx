@@ -15,11 +15,11 @@ export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
 
   return (
     <div className="space-y-4">
-      <div className="experience-detail-gallery-main overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]">
+      <div className="experience-detail-gallery-main aspect-[4/5] max-h-[min(72vh,720px)] overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]">
         <img
           src={active}
           alt={exp.title}
-          className="aspect-[4/5] h-full w-full object-cover"
+          className="h-full w-full object-cover"
           width={1200}
           height={1500}
           decoding="async"

@@ -6,7 +6,6 @@ import {
   hostReplyReview,
   hideAdminReview,
   fetchAdminReviews,
-  submitReview,
   type ReviewSummary,
 } from "@/lib/api/reviews";
 import { isSupabaseConfigured } from "@/lib/env.server";
@@ -45,7 +44,8 @@ export const getReviewForBooking = createServerFn({ method: "GET" })
     return loadReviewForBookingId(data.bookingId);
   });
 
-export const createReview = createServerFn({ method: "POST" })
+/** Supabase-only fallback when the Connect API is unavailable from the browser. */
+export const createGuestReviewFallback = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({
       accessToken: z.string().min(1),
@@ -55,18 +55,6 @@ export const createReview = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }): Promise<ReviewSummary> => {
-    if (isApiConfigured()) {
-      try {
-        return await submitReview(data.accessToken, {
-          bookingId: data.bookingId,
-          rating: data.rating,
-          comment: data.comment,
-        });
-      } catch {
-        // Fall through to Supabase when API is stale or unreachable.
-      }
-    }
-
     if (!isSupabaseConfigured()) {
       throw new Error("Reviews are not configured for this deployment.");
     }

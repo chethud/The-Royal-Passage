@@ -146,12 +146,12 @@ function ExperienceDetail() {
         </Link>
       </section>
 
-      <section className="container-page grid gap-10 pb-14 md:grid-cols-12 md:gap-12">
-        <div className="md:col-span-7">
+      <section className="container-page grid gap-10 pb-14 md:grid-cols-12 md:items-start md:gap-12">
+        <div className="md:col-span-7 md:sticky md:top-[calc(var(--header-height)+1.5rem)]">
           <ExperienceDetailGallery exp={exp} />
         </div>
 
-        <div className="md:col-span-5 md:pt-2">
+        <div className="flex flex-col md:col-span-5 md:pt-2">
           <div className="mb-5 flex flex-wrap gap-2">
             <span className="border border-[rgb(200_162_90/0.45)] px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#F7F1E8]">
               {exp.category}
@@ -228,27 +228,42 @@ function ExperienceDetail() {
               </dd>
             </div>
           </dl>
+
+          <div className="mt-8 space-y-6">
+            <div>
+              <div className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
+                About this experience
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-[#D6C8B5]/92 whitespace-pre-line sm:text-[0.9375rem]">
+                {exp.description}
+              </p>
+            </div>
+
+            <div>
+              <div className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
+                Hosted by
+              </div>
+              <div className="mt-2 font-display text-lg uppercase tracking-[0.04em] text-[#F7F1E8]">
+                {exp.hostName}
+              </div>
+              {exp.hostBio ? (
+                <p className="mt-2 text-sm leading-relaxed text-[#D6C8B5]/85">{exp.hostBio}</p>
+              ) : null}
+            </div>
+
+            {canBook ? (
+              <a
+                href="#book"
+                className="luxury-btn-sm luxury-btn-primary inline-flex w-fit items-center no-underline"
+              >
+                Check availability
+              </a>
+            ) : null}
+          </div>
         </div>
       </section>
 
       <section className="container-page space-y-6 pb-10">
-        <LuxuryCheckoutPanel>
-          <div className="eyebrow luxury-panel-label mb-3">About this experience</div>
-          <p className="luxury-panel-body text-sm leading-relaxed whitespace-pre-line sm:text-base">
-            {exp.description}
-          </p>
-
-          <div className="my-7 h-px luxury-panel-divider-bg" />
-
-          <div className="eyebrow luxury-panel-label mb-2">Hosted by</div>
-          <div className="luxury-panel-heading font-display text-xl uppercase tracking-[0.04em]">
-            {exp.hostName}
-          </div>
-          {exp.hostBio ? (
-            <p className="luxury-panel-body mt-2 text-sm leading-relaxed">{exp.hostBio}</p>
-          ) : null}
-        </LuxuryCheckoutPanel>
-
         <div className="grid gap-6 md:grid-cols-2">
           <LuxuryCheckoutPanel>
             <ExperienceDetailList label="What's included" items={exp.inclusions} />

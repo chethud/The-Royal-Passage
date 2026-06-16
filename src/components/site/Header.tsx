@@ -1,5 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { LogOut, Menu, Pencil, UserRound, Users } from "lucide-react";
+import { LogOut, Menu, Pencil, ScrollText, Star, UserRound, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
 import { CartIcon } from "@/components/cart/CartIcon";
@@ -223,6 +223,18 @@ export function Header() {
                           Host accounts
                         </Link>
                       </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/reviews" className="cursor-pointer">
+                          <Star className="h-4 w-4" />
+                          Reviews
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/activity" className="cursor-pointer">
+                          <ScrollText className="h-4 w-4" />
+                          Activity log
+                        </Link>
+                      </DropdownMenuItem>
                     </>
                   ) : null}
                   <DropdownMenuItem onSelect={goToProfile} className="cursor-pointer">
@@ -352,6 +364,16 @@ export function Header() {
                       <SheetClose asChild>
                         <Link to="/admin/hosts" className={sheetLinkClass}>
                           Host accounts
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link to="/admin/reviews" className={sheetLinkClass}>
+                          Reviews
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link to="/admin/activity" className={sheetLinkClass}>
+                          Activity log
                         </Link>
                       </SheetClose>
                     </>
