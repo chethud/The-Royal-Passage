@@ -506,6 +506,18 @@
   letter-spacing: 0.18em;
 }
 
+/* Plain number fields — no browser up/down spinners */
+.input-no-spin::-webkit-outer-spin-button,
+.input-no-spin::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input-no-spin {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .luxury-panel-divider {
   border-color: rgb(74 0 0 / 0.22);
 }

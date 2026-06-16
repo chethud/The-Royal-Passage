@@ -53,6 +53,7 @@ const STEPS = [
 
 const inputClass =
   "mt-1 w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-3 py-2 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
+const numberInputClass = `${inputClass} input-no-spin`;
 
 const labelClass = "eyebrow luxury-panel-label";
 const hintClass = "luxury-panel-body mt-1 block text-xs";
@@ -384,7 +385,7 @@ export function CreateExperienceWizard({
                 max={480}
                 value={durationMinutes}
                 onChange={(e) => setDurationMinutes(Number(e.target.value))}
-                className={inputClass}
+                className={numberInputClass}
               />
             </label>
             <label className="text-sm">
@@ -403,7 +404,7 @@ export function CreateExperienceWizard({
                 max={50}
                 value={minGuests}
                 onChange={(e) => setMinGuests(Number(e.target.value))}
-                className={inputClass}
+                className={numberInputClass}
               />
             </label>
             <label className="text-sm">
@@ -414,7 +415,7 @@ export function CreateExperienceWizard({
                 max={50}
                 value={maxGuests}
                 onChange={(e) => setMaxGuests(Number(e.target.value))}
-                className={inputClass}
+                className={numberInputClass}
               />
             </label>
           </div>
@@ -481,7 +482,7 @@ export function CreateExperienceWizard({
               times, and capacity. You can skip this step and add schedules later from your
               experience page.
             </p>
-            <WeekdaySlotBuilder onAddSlots={addWeeklySlots} />
+            <WeekdaySlotBuilder surface="light" onAddSlots={addWeeklySlots} />
           </div>
 
           {sortedDraftSlots.length === 0 ? (
@@ -499,7 +500,7 @@ export function CreateExperienceWizard({
                 {sortedDraftSlots.map((slot) => (
                   <li
                     key={slot.key}
-                    className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm"
+                    className="luxury-panel-body flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm"
                   >
                     <span>
                       {formatDateLong(slot.slotDate)} · {formatTime12h(slot.startTime)} –{" "}

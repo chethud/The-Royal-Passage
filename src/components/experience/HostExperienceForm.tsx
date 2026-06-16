@@ -90,6 +90,7 @@ export function HostExperienceForm({
 
   const inputClass =
     "mt-1 w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/50 px-3 py-2 text-sm";
+  const numberInputClass = `${inputClass} input-no-spin`;
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -234,7 +235,7 @@ export function HostExperienceForm({
               disabled={readOnly}
               value={durationMinutes}
               onChange={(e) => setDurationMinutes(Number(e.target.value))}
-              className={inputClass}
+              className={numberInputClass}
             />
           </label>
           <label className="text-sm">
@@ -255,7 +256,7 @@ export function HostExperienceForm({
               disabled={readOnly}
               value={minGuests}
               onChange={(e) => setMinGuests(Number(e.target.value))}
-              className={inputClass}
+              className={numberInputClass}
             />
           </label>
           <label className="text-sm">
@@ -267,7 +268,7 @@ export function HostExperienceForm({
               disabled={readOnly}
               value={maxGuests}
               onChange={(e) => setMaxGuests(Number(e.target.value))}
-              className={inputClass}
+              className={numberInputClass}
             />
           </label>
         </div>

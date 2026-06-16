@@ -18,12 +18,37 @@ type WeekdaySlotBuilderProps = {
   busy?: boolean;
   focusDateIso?: string | null;
   onAddSlots: (slots: CreateHostSlotPayload[]) => void;
+  /** Light ivory panels (create wizard) vs dark glass (slot manager). */
+  surface?: "light" | "dark";
 };
 
 type SessionRow = SessionBlockInput & { key: string };
 
 const fieldClass =
   "mt-1.5 w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.45)] bg-[oklch(0.14_0.05_22_/_0.85)] px-3 py-2.5 text-sm text-ink [color-scheme:dark]";
+const numberFieldClass = `${fieldClass} input-no-spin`;
+
+function panelStyles(surface: "light" | "dark") {
+  const light = surface === "light";
+  return {
+    heading: light ? "text-sm font-medium luxury-panel-heading" : "text-sm font-medium text-ink",
+    muted: light ? "luxury-panel-body" : "text-muted-foreground",
+    mutedXs: light ? "text-xs luxury-panel-body" : "text-xs text-muted-foreground",
+    previewBox: light
+      ? "rounded-md border border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.45)] px-4 py-3 text-sm"
+      : "rounded-md border border-ember/30 bg-ember/8 px-4 py-3 text-sm",
+    previewCount: light ? "font-display text-lg text-[#8B6914]" : "font-display text-lg text-ember",
+    previewList: light
+      ? "mt-3 space-y-1 border-t border-[rgb(74_0_0/0.12)] pt-3 text-xs luxury-panel-body"
+      : "mt-3 space-y-1 border-t border-ember/20 pt-3 text-xs text-ink/90",
+    previewMore: light ? "text-[rgb(58_0_0/0.5)]" : "text-muted-foreground",
+    sessionCard: light
+      ? "rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4"
+      : "rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] bg-background/10 p-4",
+    success: light ? "text-sm text-[#2d6a4f]" : "text-sm text-emerald-300/90",
+    label: light ? "eyebrow luxury-panel-label" : "eyebrow text-muted-foreground",
+  };
+}
 
 const WEEKDAY_PRESETS: { label: string; days: WeekdayKey[] }[] = [
   { label: "Mon–Fri", days: ["mon", "tue", "wed", "thu", "fri"] },
@@ -52,7 +77,9 @@ export function WeekdaySlotBuilder({
   busy = false,
   focusDateIso = null,
   onAddSlots,
+  surface = "dark",
 }: WeekdaySlotBuilderProps) {
+  const ui = panelStyles(surface);
   const today = useMemo(() => formatToday(), []);
   const windowEnd = useMemo(() => bookingWindowEndIso(today), [today]);
   const [weekdays, setWeekdays] = useState<WeekdayKey[]>(DEFAULT_WEEKDAYS);
@@ -149,7 +176,7 @@ export function WeekdaySlotBuilder({
     <div className="space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-sm">
-          <span className="eyebrow text-muted-foreground">From date</span>
+          <span className={ui.label}>From date</span>
           <input
             type="date"
             value={fromDate}
@@ -166,7 +193,7 @@ export function WeekdaySlotBuilder({
           />
         </label>
         <label className="block text-sm">
-          <span className="eyebrow text-muted-foreground">To date</span>
+          <span className={ui.label}>To date</span>
           <input
             type="date"
             value={toDate}
@@ -181,13 +208,13 @@ export function WeekdaySlotBuilder({
           />
         </label>
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className={ui.mutedXs}>
         Guests can book within the next {BOOKING_WINDOW_DAYS} days ({formatDateReadable(today)} –{" "}
         {formatDateReadable(windowEnd)}).
       </p>
 
       <div>
-        <p className="text-sm font-medium text-ink">Which weekdays?</p>
+        <p className={ui.heading}>Which weekdays?</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {WEEKDAY_PRESETS.map((preset) => (
             <button
@@ -213,7 +240,9 @@ export function WeekdaySlotBuilder({
                 className={`min-w-[3.25rem] rounded-sm border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] disabled:opacity-50 ${
                   active
                     ? "border-ember/70 bg-ember/15 text-ember"
-                    : "border-[oklch(0.88_0.08_86_/_0.3)] text-muted-foreground hover:border-ember/35"
+                    : surface === "light"
+                      ? "border-[rgb(74_0_0/0.2)] luxury-panel-body hover:border-ember/35"
+                      : "border-[oklch(0.88_0.08_86_/_0.3)] text-muted-foreground hover:border-ember/35"
                 }`}
               >
                 {day.label}
@@ -225,7 +254,7 @@ export function WeekdaySlotBuilder({
 
       <div>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-medium text-ink">Session times</p>
+          <p className={ui.heading}>Session times</p>
           <button
             type="button"
             disabled={busy}
@@ -236,7 +265,7 @@ export function WeekdaySlotBuilder({
             Add another session
           </button>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">
+        <p className={`mt-1 ${ui.mutedXs}`}>
           Add multiple times to run more than one session on the same day (e.g. morning and
           afternoon).
         </p>
@@ -245,10 +274,10 @@ export function WeekdaySlotBuilder({
           {sessions.map((row, index) => (
             <li
               key={row.key}
-              className="rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] bg-background/10 p-4"
+              className={ui.sessionCard}
             >
               <div className="mb-3 flex items-center justify-between gap-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <span className={`text-xs font-semibold uppercase tracking-[0.14em] ${ui.muted}`}>
                   Session {index + 1}
                 </span>
                 {sessions.length > 1 ? (
@@ -265,7 +294,7 @@ export function WeekdaySlotBuilder({
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
                 <label className="block text-sm">
-                  <span className="eyebrow text-muted-foreground">Starts</span>
+                  <span className={ui.label}>Starts</span>
                   <div className="mt-1.5">
                     <Time12hField
                       value={row.startTime}
@@ -275,7 +304,7 @@ export function WeekdaySlotBuilder({
                   </div>
                 </label>
                 <label className="block text-sm">
-                  <span className="eyebrow text-muted-foreground">Ends</span>
+                  <span className={ui.label}>Ends</span>
                   <div className="mt-1.5">
                     <Time12hField
                       value={row.endTime}
@@ -285,7 +314,7 @@ export function WeekdaySlotBuilder({
                   </div>
                 </label>
                 <label className="block text-sm">
-                  <span className="eyebrow text-muted-foreground">Guests</span>
+                  <span className={ui.label}>Guests</span>
                   <input
                     type="number"
                     min={1}
@@ -295,7 +324,7 @@ export function WeekdaySlotBuilder({
                     onChange={(e) =>
                       updateSession(row.key, { capacity: Number(e.target.value) })
                     }
-                    className={fieldClass}
+                    className={numberFieldClass}
                   />
                 </label>
               </div>
@@ -304,22 +333,22 @@ export function WeekdaySlotBuilder({
         </ul>
       </div>
 
-      <div className="rounded-md border border-ember/30 bg-ember/8 px-4 py-3 text-sm">
-        <span className="text-muted-foreground">Will create </span>
-        <span className="font-display text-lg text-ember">
+      <div className={ui.previewBox}>
+        <span className={ui.muted}>Will create </span>
+        <span className={ui.previewCount}>
           {preview.count > 0 ? preview.count : "—"}
         </span>
-        <span className="text-muted-foreground">
+        <span className={ui.muted}>
           {" "}
           session{preview.count === 1 ? "" : "s"} · {preview.weekdayLabel} · {preview.dateRangeLabel}
         </span>
         {preview.sampleDates.length > 0 ? (
-          <ul className="mt-3 space-y-1 border-t border-ember/20 pt-3 text-xs text-ink/90">
+          <ul className={ui.previewList}>
             {preview.sampleDates.map((line) => (
               <li key={line}>{line}</li>
             ))}
             {preview.count > preview.sampleDates.length ? (
-              <li className="text-muted-foreground">
+              <li className={ui.previewMore}>
                 …and {preview.count - preview.sampleDates.length} more
               </li>
             ) : null}
@@ -328,7 +357,7 @@ export function WeekdaySlotBuilder({
       </div>
 
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
-      {success ? <p className="text-sm text-emerald-300/90">{success}</p> : null}
+      {success ? <p className={ui.success}>{success}</p> : null}
 
       <button
         type="button"
