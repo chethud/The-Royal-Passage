@@ -50,20 +50,30 @@ function HostNewExperiencePage() {
     experience,
     slots,
   }: Parameters<React.ComponentProps<typeof CreateExperienceWizard>["onSubmit"]>[0]) => {
-    if (!accessToken) return;
+    if (!accessToken) {
+      throw new Error("Please sign in again to create an experience.");
+    }
+    if (!isApiConfigured()) {
+      throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
+    }
     setSaving(true);
     setPageError(null);
     try {
       const created = await createHostExperience(accessToken, experience);
-      for (const slot of slots) {
-        await createHostSlot(accessToken, created.id, slot);
+      if (!created?.id) {
+        throw new Error("Experience was created but no ID was returned. Please refresh and try again.");
       }
+      await Promise.all(
+        slots.map((slot) => createHostSlot(accessToken, created.id, slot)),
+      );
       void navigate({
         to: "/host/experiences/$experienceId",
         params: { experienceId: created.id },
       });
     } catch (err) {
-      setPageError(toErrorMessage(err, "Failed to create experience."));
+      const message = toErrorMessage(err, "Failed to create experience.");
+      setPageError(message);
+      throw new Error(message);
     } finally {
       setSaving(false);
     }
@@ -99,7 +109,7 @@ function HostNewExperiencePage() {
           categories={categories}
           cities={cities}
           saving={saving}
-          onSubmit={(payload) => void handleSubmit(payload)}
+          onSubmit={(payload) => handleSubmit(payload)}
         />
       </LuxuryCheckoutPanel>
     </HostDashboardShell>

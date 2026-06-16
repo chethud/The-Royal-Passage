@@ -245,7 +245,6 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
         "city": city_name,
         "region": payload.region,
         "address": payload.address,
-        "map_link": payload.mapLink,
         "duration_minutes": payload.durationMinutes,
         "price_per_person_minor": payload.pricePerPersonMinor,
         "hero_image_url": hero_image_url,
@@ -259,6 +258,8 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
         "status": status,
         "currency_code": "INR",
     }
+    if payload.mapLink and payload.mapLink.strip():
+        insert_row["map_link"] = payload.mapLink.strip()
 
     result = supabase.table("experiences").insert(insert_row).select("id").execute()
     rows = result.data or []

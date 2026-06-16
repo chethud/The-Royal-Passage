@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
 import { WeekdaySlotBuilder } from "@/components/experience/WeekdaySlotBuilder";
 import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
@@ -8,6 +8,7 @@ import { isPublicImageUrl } from "@/lib/experience-photo-upload";
 import { HOST_CITY_SLUG } from "@/lib/host-form-data";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
+import { toErrorMessage } from "@/lib/api/client";
 import { mergeUniqueSlots, formatTime12h } from "@/lib/weekday-slots";
 
 type CreateExperienceWizardProps = {
@@ -38,7 +39,7 @@ type CreateExperienceWizardProps = {
       submitForReview: boolean;
     };
     slots: CreateHostSlotPayload[];
-  }) => void;
+  }) => void | Promise<void>;
 };
 
 type DraftSlot = CreateHostSlotPayload & { key: string };
@@ -82,6 +83,7 @@ export function CreateExperienceWizard({
 }: CreateExperienceWizardProps) {
   const [step, setStep] = useState(1);
   const [stepError, setStepError] = useState<string | null>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
 
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -154,10 +156,14 @@ export function CreateExperienceWizard({
           return "Map link must be a valid URL (e.g. Google Maps share link).";
         }
       }
-      if (durationMinutes < 30) return "Duration must be at least 30 minutes.";
-      if (priceMajor < 0) return "Price cannot be negative.";
-      if (minGuests < 1) return "Minimum guests must be at least 1.";
-      if (maxGuests < minGuests) return "Max guests must be at least the minimum.";
+      if (durationMinutes < 30 || !Number.isFinite(durationMinutes)) {
+        return "Duration must be at least 30 minutes.";
+      }
+      if (priceMajor < 0 || !Number.isFinite(priceMajor)) return "Price cannot be negative.";
+      if (minGuests < 1 || !Number.isFinite(minGuests)) return "Minimum guests must be at least 1.";
+      if (maxGuests < minGuests || !Number.isFinite(maxGuests)) {
+        return "Max guests must be at least the minimum.";
+      }
       return null;
     }
     if (current === 3) {
@@ -169,10 +175,28 @@ export function CreateExperienceWizard({
     return null;
   };
 
+  const validateAll = (): string | null =>
+    validateStep(1) ?? validateStep(2) ?? validateStep(3) ?? validateSlug();
+
+  const validateSlug = (): string | null => {
+    const normalized = slug.trim();
+    if (normalized && !/^[a-z0-9-]+$/.test(normalized)) {
+      return "URL slug can only use lowercase letters, numbers, and hyphens.";
+    }
+    return null;
+  };
+
+  const showError = (message: string) => {
+    setStepError(message);
+    requestAnimationFrame(() => {
+      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  };
+
   const goNext = () => {
     const error = validateStep(step);
     if (error) {
-      setStepError(error);
+      showError(error);
       return;
     }
     setStepError(null);
@@ -207,44 +231,48 @@ export function CreateExperienceWizard({
     setDraftSlots((prev) => prev.filter((slot) => slot.key !== key));
   };
 
-  const handleFinalSubmit = () => {
-    const error = validateStep(1) ?? validateStep(2) ?? validateStep(3);
+  const handleFinalSubmit = async () => {
+    const error = validateAll();
     if (error) {
-      setStepError(error);
+      showError(error);
       return;
     }
     setStepError(null);
     const galleryUrls = validPhotoUrls.filter(isPublicImageUrl);
-    onSubmit({
-      experience: {
-        title: title.trim(),
-        slug: slug.trim() || undefined,
-        tagline: tagline.trim() || undefined,
-        description: description.trim(),
-        categorySlug,
-        citySlug,
-        region: region.trim() || undefined,
-        address: address.trim() || undefined,
-        mapLink: mapLink.trim() || undefined,
-        durationMinutes,
-        pricePerPersonMinor: priceMajor * 100,
-        heroImageUrl: galleryUrls[0],
-        galleryUrls,
-        inclusions: splitLines(inclusions),
-        exclusions: splitLines(exclusions),
-        requirements: splitLines(requirements),
-        cancellationPolicy: cancellationPolicy.trim() || undefined,
-        minGuestsPerBooking: minGuests,
-        maxGuestsPerBooking: maxGuests,
-        submitForReview,
-      },
-      slots: draftSlots.map(({ slotDate: d, startTime: s, endTime: e, capacity }) => ({
-        slotDate: d,
-        startTime: s,
-        endTime: e,
-        capacity,
-      })),
-    });
+    try {
+      await onSubmit({
+        experience: {
+          title: title.trim(),
+          slug: slug.trim() || undefined,
+          tagline: tagline.trim() || undefined,
+          description: description.trim(),
+          categorySlug,
+          citySlug,
+          region: region.trim() || undefined,
+          address: address.trim() || undefined,
+          mapLink: mapLink.trim() || undefined,
+          durationMinutes,
+          pricePerPersonMinor: priceMajor * 100,
+          heroImageUrl: galleryUrls[0],
+          galleryUrls,
+          inclusions: splitLines(inclusions),
+          exclusions: splitLines(exclusions),
+          requirements: splitLines(requirements),
+          cancellationPolicy: cancellationPolicy.trim() || undefined,
+          minGuestsPerBooking: minGuests,
+          maxGuestsPerBooking: maxGuests,
+          submitForReview,
+        },
+        slots: draftSlots.map(({ slotDate: d, startTime: s, endTime: e, capacity }) => ({
+          slotDate: d,
+          startTime: s,
+          endTime: e,
+          capacity,
+        })),
+      });
+    } catch (err) {
+      showError(toErrorMessage(err, "Failed to create experience."));
+    }
   };
 
   return (
@@ -271,7 +299,7 @@ export function CreateExperienceWizard({
         })}
       </nav>
 
-      {stepError ? (
+      {stepError && step < 5 ? (
         <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {stepError}
         </p>
@@ -613,6 +641,14 @@ export function CreateExperienceWizard({
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
+        {step === 5 && stepError ? (
+          <p
+            ref={errorRef}
+            className="w-full rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
+            {stepError}
+          </p>
+        ) : null}
         {step > 1 ? (
           <button
             type="button"
@@ -635,7 +671,7 @@ export function CreateExperienceWizard({
           <button
             type="button"
             disabled={saving}
-            onClick={handleFinalSubmit}
+            onClick={() => void handleFinalSubmit()}
             className="luxury-btn-sm luxury-btn-primary disabled:opacity-60"
           >
             {saving

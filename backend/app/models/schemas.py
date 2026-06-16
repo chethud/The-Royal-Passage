@@ -111,11 +111,11 @@ class BookingSummary(BaseModel):
     notes: str | None
     createdAt: str
     confirmedAt: str | None = None
-  guestName: str | None = None
-  guestEmail: str | None = None
-  guestPhone: str | None = None
-  isPaused: bool = False
-  pausedAt: str | None = None
+    guestName: str | None = None
+    guestEmail: str | None = None
+    guestPhone: str | None = None
+    isPaused: bool = False
+    pausedAt: str | None = None
 
 
 class HostDashboardStats(BaseModel):
@@ -291,9 +291,9 @@ class CreateHostExperienceRequest(BaseModel):
     citySlug: str = Field(min_length=2, max_length=64, pattern=r"^[a-z0-9-]+$")
     city: str | None = Field(default=None, min_length=2, max_length=80)
     region: str | None = Field(default=None, max_length=80)
-  address: str | None = Field(default=None, max_length=200)
-  mapLink: str | None = Field(default=None, max_length=500)
-  durationMinutes: int = Field(ge=30, le=480)
+    address: str | None = Field(default=None, max_length=200)
+    mapLink: str | None = Field(default=None, max_length=500)
+    durationMinutes: int = Field(ge=30, le=480)
     pricePerPersonMinor: int = Field(ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] = Field(default_factory=list)
@@ -315,9 +315,9 @@ class UpdateHostExperienceRequest(BaseModel):
     citySlug: str | None = Field(default=None, min_length=2, max_length=64, pattern=r"^[a-z0-9-]+$")
     city: str | None = Field(default=None, min_length=2, max_length=80)
     region: str | None = Field(default=None, max_length=80)
-  address: str | None = Field(default=None, max_length=200)
-  mapLink: str | None = Field(default=None, max_length=500)
-  durationMinutes: int | None = Field(default=None, ge=30, le=480)
+    address: str | None = Field(default=None, max_length=200)
+    mapLink: str | None = Field(default=None, max_length=500)
+    durationMinutes: int | None = Field(default=None, ge=30, le=480)
     pricePerPersonMinor: int | None = Field(default=None, ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] | None = None
