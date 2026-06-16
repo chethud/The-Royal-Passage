@@ -1,7 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import type { Experience } from "@/data/experiences";
-import { categoryIconForLabel } from "@/lib/experience-category-icons";
 
 type ExperienceDetailGalleryProps = {
   exp: Experience;
@@ -10,7 +9,6 @@ type ExperienceDetailGalleryProps = {
 export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
   const gallery = exp.galleryUrls?.length ? exp.galleryUrls : exp.image ? [exp.image] : [];
   const [activeIndex, setActiveIndex] = useState(0);
-  const CategoryIcon = categoryIconForLabel(exp.category);
 
   const goTo = useCallback(
     (index: number) => {
@@ -46,55 +44,57 @@ export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
   const hasMultiple = gallery.length > 1;
 
   return (
-    <div
-      className="experience-detail-gallery-main group relative w-full overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]"
+    <figure
+      className="experience-detail-gallery"
       aria-roledescription="carousel"
       aria-label={`${exp.title} photo gallery`}
     >
-      <img
-        src={active}
-        alt={`${exp.title} — photo ${activeIndex + 1} of ${gallery.length}`}
-        className="aspect-[4/5] w-full object-cover md:aspect-auto md:h-[min(70vh,640px)]"
-        width={1200}
-        height={1500}
-        decoding="async"
-        fetchPriority="high"
-      />
+      <div className="experience-detail-gallery__frame group">
+        <div className="experience-detail-gallery__inner">
+          <img
+            key={active}
+            src={active}
+            alt={`${exp.title} — photo ${activeIndex + 1} of ${gallery.length}`}
+            className="experience-detail-gallery__image"
+            width={1200}
+            height={1500}
+            decoding="async"
+            fetchPriority="high"
+          />
+          <div className="experience-detail-gallery__vignette" aria-hidden />
 
-      <div className="absolute left-3.5 top-3.5 z-10">
-        <span
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/35 text-[#D4AF6A] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
-          aria-label={exp.category}
-          title={exp.category}
-        >
-          <CategoryIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-        </span>
+          {hasMultiple ? (
+            <>
+              <button
+                type="button"
+                onClick={goPrev}
+                className="experience-detail-gallery__nav experience-detail-gallery__nav--prev"
+                aria-label="Previous photo"
+              >
+                <ChevronLeft className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                className="experience-detail-gallery__nav experience-detail-gallery__nav--next"
+                aria-label="Next photo"
+              >
+                <ChevronRight className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+              </button>
+            </>
+          ) : null}
+        </div>
+
+        {hasMultiple ? (
+          <figcaption className="experience-detail-gallery__caption">
+            <span className="experience-detail-gallery__index">
+              {String(activeIndex + 1).padStart(2, "0")}
+              <span className="experience-detail-gallery__index-sep"> / </span>
+              {String(gallery.length).padStart(2, "0")}
+            </span>
+          </figcaption>
+        ) : null}
       </div>
-
-      {hasMultiple ? (
-        <>
-          <button
-            type="button"
-            onClick={goPrev}
-            className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[rgb(200_162_90/0.35)] bg-black/45 text-[#F7F1E8] backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF6A]/50"
-            aria-label="Previous photo"
-          >
-            <ChevronLeft className="h-5 w-5" aria-hidden />
-          </button>
-          <button
-            type="button"
-            onClick={goNext}
-            className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[rgb(200_162_90/0.35)] bg-black/45 text-[#F7F1E8] backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF6A]/50"
-            aria-label="Next photo"
-          >
-            <ChevronRight className="h-5 w-5" aria-hidden />
-          </button>
-
-          <span className="absolute bottom-3 right-3 z-10 rounded-full bg-black/45 px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-[#F7F1E8]/85 backdrop-blur-sm">
-            {activeIndex + 1}/{gallery.length}
-          </span>
-        </>
-      ) : null}
-    </div>
+    </figure>
   );
 }
