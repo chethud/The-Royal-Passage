@@ -34,6 +34,23 @@ function mapReviewRow(row: ReviewRow): ReviewSummary {
   };
 }
 
+async function loadPublishedReviewsForExperienceId(
+  experienceId: string,
+  limit = 20,
+): Promise<ReviewSummary[]> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("reviews")
+    .select("*")
+    .eq("experience_id", experienceId)
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((row) => mapReviewRow(row as ReviewRow));
+}
+
 export async function loadPublishedReviewsForSlug(
   slug: string,
   limit = 20,
@@ -45,22 +62,26 @@ export async function loadPublishedReviewsForSlug(
     .from("experiences")
     .select("id")
     .eq("slug", slug)
-    .eq("status", "published")
     .maybeSingle();
 
   if (expError) throw new Error(expError.message);
   if (!exp) return [];
 
+  return loadPublishedReviewsForExperienceId(exp.id, limit);
+}
+
+export async function loadReviewForBookingId(bookingId: string): Promise<ReviewSummary | null> {
+  if (!isSupabaseConfigured()) return null;
+
+  const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from("reviews")
     .select("*")
-    .eq("experience_id", exp.id)
-    .eq("status", "published")
-    .order("created_at", { ascending: false })
-    .limit(limit);
+    .eq("booking_id", bookingId)
+    .maybeSingle();
 
   if (error) throw new Error(error.message);
-  return (data ?? []).map((row) => mapReviewRow(row as ReviewRow));
+  return data ? mapReviewRow(data as ReviewRow) : null;
 }
 
 export async function createGuestReviewInDb(

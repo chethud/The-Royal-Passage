@@ -14,6 +14,7 @@ import {
   createGuestReviewInDb,
   hostReplyToReviewInDb,
   loadPublishedReviewsForSlug,
+  loadReviewForBookingId,
 } from "@/lib/reviews-db.server";
 
 export type { ReviewSummary };
@@ -23,7 +24,8 @@ export const getExperienceReviews = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<ReviewSummary[]> => {
     if (isApiConfigured()) {
       try {
-        return await fetchExperienceReviews(data.slug);
+        const fromApi = await fetchExperienceReviews(data.slug);
+        if (fromApi.length > 0) return fromApi;
       } catch {
         // Fall through to Supabase.
       }
@@ -34,6 +36,13 @@ export const getExperienceReviews = createServerFn({ method: "GET" })
     }
 
     return [];
+  });
+
+export const getReviewForBooking = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ bookingId: z.string().min(1) }))
+  .handler(async ({ data }): Promise<ReviewSummary | null> => {
+    if (!isSupabaseConfigured()) return null;
+    return loadReviewForBookingId(data.bookingId);
   });
 
 export const createReview = createServerFn({ method: "POST" })

@@ -1,13 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { useAuthUser } from "@/lib/auth-user";
 import { fetchBookingById, type BookingSummary } from "@/lib/api/bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
-import { createReview } from "@/lib/review-fns";
 import { experienceDetailSlug } from "@/lib/experience-path";
+import { createReview, getReviewForBooking } from "@/lib/review-fns";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 export const Route = createFileRoute("/bookings/$bookingId/review")({
@@ -25,11 +26,12 @@ function BookingReviewPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [alreadyReviewed, setAlreadyReviewed] = useState(false);
 
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      void navigate({ to: "/sign-in" });
+      void navigate({ to: "/sign-in", search: { redirect: `/bookings/${bookingId}/review` } });
       return;
     }
 
@@ -42,10 +44,17 @@ function BookingReviewPage() {
         if (!isApiConfigured()) {
           throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
         }
-        const row = await fetchBookingById(token, bookingId);
+
+        const [row, existing] = await Promise.all([
+          fetchBookingById(token, bookingId),
+          getReviewForBooking({ data: { bookingId } }),
+        ]);
+
         if (row.bookingStatus !== "completed") {
           throw new Error("Only completed bookings can be reviewed.");
         }
+
+        setAlreadyReviewed(Boolean(existing));
         setBooking(row);
       } catch (err) {
         setLoadError(toErrorMessage(err, "Failed to load booking."));
@@ -70,10 +79,14 @@ function BookingReviewPage() {
         },
       });
       setSubmitted(true);
+    } catch (err) {
+      throw err instanceof Error ? err : new Error("Failed to submit review.");
     } finally {
       setSubmitting(false);
     }
   };
+
+  const experienceSlug = booking ? experienceDetailSlug(booking.experience) : null;
 
   if (loading || (!booking && !loadError)) {
     return <div className="min-h-screen pt-[var(--header-height)]" />;
@@ -83,11 +96,16 @@ function BookingReviewPage() {
     return (
       <div className="min-h-screen pt-[var(--header-height)] text-foreground">
         <Header />
-        <div className="container-page py-20 max-w-lg">
-          <p className="text-destructive">{loadError ?? "Booking not found."}</p>
-          <Link to="/dashboard/history" className="mt-4 inline-block text-ember hover:underline">
-            Back to past bookings
-          </Link>
+        <div className="container-page max-w-lg py-20">
+          <LuxuryCheckoutPanel>
+            <p className="text-destructive">{loadError ?? "Booking not found."}</p>
+            <Link
+              to="/dashboard/history"
+              className="luxury-btn-sm luxury-btn-panel-outline mt-4 inline-flex items-center no-underline"
+            >
+              Back to past bookings
+            </Link>
+          </LuxuryCheckoutPanel>
         </div>
         <Footer />
       </div>
@@ -98,36 +116,71 @@ function BookingReviewPage() {
     <div className="min-h-screen pt-[var(--header-height)] text-foreground">
       <Header />
 
-      <section className="container-page py-12 sm:py-16 max-w-lg">
-        <div className="eyebrow mb-2 text-muted-foreground">Share your experience</div>
-        <h1 className="font-display text-3xl sm:text-4xl">{booking.experience.title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Your review helps other travellers discover authentic Mysuru experiences.
-        </p>
+      <section className="container-page max-w-2xl py-12 sm:py-16">
+        <Link
+          to="/bookings/$bookingId"
+          params={{ bookingId }}
+          className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
+        >
+          ← Back to booking
+        </Link>
 
-        {submitted ? (
-          <div className="glass-strong mt-8 rounded-md border border-ember/30 bg-ember/10 p-6">
-            <p className="text-sm">Thank you — your review has been published.</p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <Link
-                to="/experiences/$slug"
-                params={{
-                  slug: experienceDetailSlug(booking.experience) ?? booking.experience.id,
-                }}
-                className="text-sm text-ember hover:underline"
-              >
-                View experience
-              </Link>
-              <Link to="/dashboard/history" className="text-sm text-ember hover:underline">
-                Booking history
-              </Link>
+        <LuxuryCheckoutPanel className="mt-6">
+          <div className="eyebrow luxury-panel-label mb-2">Share your experience</div>
+          <h1 className="luxury-panel-heading font-display text-2xl uppercase leading-tight tracking-[0.04em] sm:text-3xl">
+            {booking.experience.title}
+          </h1>
+          <p className="luxury-panel-body mt-2 text-sm leading-relaxed">
+            Your review helps other travellers discover authentic experiences. It will appear on
+            the experience page for everyone to read.
+          </p>
+
+          {submitted ? (
+            <div className="mt-8 rounded-sm border border-[rgb(200_162_90/0.35)] bg-[rgb(200_162_90/0.12)] p-6">
+              <p className="luxury-panel-body text-sm">
+                Thank you — your review has been published.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                {experienceSlug ? (
+                  <Link
+                    to="/experiences/$slug"
+                    params={{ slug: experienceSlug }}
+                    search={{}}
+                    className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
+                  >
+                    View experience
+                  </Link>
+                ) : null}
+                <Link
+                  to="/dashboard/history"
+                  className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
+                >
+                  Booking history
+                </Link>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="glass-strong mt-8 rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8">
-            <ReviewForm onSubmit={handleSubmit} submitting={submitting} />
-          </div>
-        )}
+          ) : alreadyReviewed ? (
+            <div className="mt-8 rounded-sm border border-[rgb(74_0_0/0.15)] bg-[rgb(74_0_0/0.04)] p-6">
+              <p className="luxury-panel-body text-sm">
+                You have already reviewed this booking.
+              </p>
+              {experienceSlug ? (
+                <Link
+                  to="/experiences/$slug"
+                  params={{ slug: experienceSlug }}
+                  search={{}}
+                  className="luxury-btn-sm luxury-btn-panel-outline mt-4 inline-flex items-center no-underline"
+                >
+                  See reviews on experience page
+                </Link>
+              ) : null}
+            </div>
+          ) : (
+            <div className="mt-8 border-t luxury-panel-divider pt-8">
+              <ReviewForm onSubmit={handleSubmit} submitting={submitting} surface="light" />
+            </div>
+          )}
+        </LuxuryCheckoutPanel>
       </section>
 
       <Footer />
