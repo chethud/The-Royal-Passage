@@ -15,6 +15,7 @@ import { guestBookingLimits } from "@/lib/booking-url";
 import { hasBookableSlot } from "@/lib/experience-filters";
 import { getExperienceForDetail } from "@/lib/marketplace-fns";
 import { getExperienceReviews } from "@/lib/review-fns";
+import { categoryIconForLabel } from "@/lib/experience-category-icons";
 import { buildExperienceJsonLd, SITE_URL } from "@/lib/seo";
 import { canonicalLink } from "@/lib/seo-helpers";
 
@@ -127,6 +128,7 @@ function ExperienceDetail() {
   const ldJson = buildExperienceJsonLd(exp, reviews);
   const locationLine = [exp.region, exp.city].filter(Boolean).join(" · ");
   const canBook = hasBookableSlot(exp);
+  const CategoryIcon = categoryIconForLabel(exp.category);
 
   return (
     <div className="experience-detail-page min-h-screen pt-[var(--header-height)] text-[#F7F1E8]">
@@ -146,21 +148,15 @@ function ExperienceDetail() {
         </Link>
       </section>
 
-      <section className="container-page grid gap-10 pb-14 md:grid-cols-12 md:items-start md:gap-12">
-        <div className="md:col-span-7 md:sticky md:top-[calc(var(--header-height)+1.5rem)]">
+      <section className="container-page grid gap-8 pb-14 md:grid-cols-2 md:items-start md:gap-8 lg:gap-10">
+        <div className="w-full md:sticky md:top-[calc(var(--header-height)+1.5rem)]">
           <ExperienceDetailGallery exp={exp} />
         </div>
 
-        <div className="flex flex-col md:col-span-5 md:pt-2">
-          <div className="mb-5 flex flex-wrap gap-2">
-            <span className="border border-[rgb(200_162_90/0.45)] px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#F7F1E8]">
-              {exp.category}
-            </span>
-            {exp.verifiedHost ? (
-              <span className="bg-[#F7F1E8] px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#4A0000]">
-                Verified host
-              </span>
-            ) : null}
+        <div className="flex w-full min-w-0 flex-col md:pt-2">
+          <div className="mb-5 inline-flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]">
+            <CategoryIcon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+            {exp.category}
           </div>
 
           {locationLine || exp.address ? (
