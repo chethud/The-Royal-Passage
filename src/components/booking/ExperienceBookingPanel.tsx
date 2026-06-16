@@ -1,6 +1,6 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Minus, Plus } from "lucide-react";
+import { ArrowRight, ChevronDown, Minus, Plus } from "lucide-react";
 import { PayAtVenueBadge } from "@/components/booking/PayAtVenueBadge";
 import type { Experience, Slot } from "@/data/experiences";
 import {
@@ -13,6 +13,7 @@ import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 import { isGuestAccount, isStaffRole } from "@/lib/roles";
 import { useTodayIsoDate } from "@/hooks/use-today-iso-date";
+import { formatTime12h } from "@/lib/weekday-slots";
 
 type ExperienceBookingPanelProps = {
   exp: Pick<
@@ -70,6 +71,167 @@ function panelTone(surface: "light" | "dark") {
   };
 }
 
+function groupSlotsByDate(slots: Slot[]): { date: string; slots: Slot[] }[] {
+  const groups = new Map<string, Slot[]>();
+  for (const slot of slots) {
+    const day = slot.date.slice(0, 10);
+    const list = groups.get(day) ?? [];
+    list.push(slot);
+    groups.set(day, list);
+  }
+
+  return [...groups.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, daySlots]) => ({
+      date,
+      slots: [...daySlots].sort((a, b) => a.start.localeCompare(b.start)),
+    }));
+}
+
+function firstBookableDate(groups: { date: string; slots: Slot[] }[]): string | null {
+  const match = groups.find((group) => group.slots.some((slot) => slot.available > 0));
+  return match?.date ?? groups[0]?.date ?? null;
+}
+
+function DateSlotPicker({
+  groups,
+  selectedSlot,
+  onSelectSlot,
+  expandedDate,
+  onExpandedDateChange,
+  surface,
+  tone,
+}: {
+  groups: { date: string; slots: Slot[] }[];
+  selectedSlot: Slot | null;
+  onSelectSlot: (slot: Slot) => void;
+  expandedDate: string | null;
+  onExpandedDateChange: (date: string | null) => void;
+  surface: "light" | "dark";
+  tone: ReturnType<typeof panelTone>;
+}) {
+  const dateCard =
+    surface === "light"
+      ? "border border-[#4A0000]/10 bg-[#FFFBF5]/60"
+      : "border border-[#C8A25A]/15 bg-[#1a0a0a]/40";
+  const dateCardActive =
+    surface === "light"
+      ? "border-[#4A0000]/25 bg-[#FFF8EE] shadow-sm"
+      : "border-[#C8A25A]/30 bg-[#1f0d0d]/70";
+  const slotRowIdle =
+    surface === "light"
+      ? "border border-transparent bg-white/70 text-[#4A0000]/80 hover:border-[#4A0000]/20 hover:bg-white"
+      : "border border-transparent bg-black/20 text-foreground/80 hover:border-[#C8A25A]/25 hover:bg-black/30";
+  const slotRowActive =
+    surface === "light"
+      ? "border-[#4A0000]/35 bg-white text-[#4A0000] shadow-sm"
+      : "border-[#C8A25A]/40 bg-black/35 text-foreground";
+
+  return (
+    <div className="space-y-3">
+      {groups.map((group) => {
+        const open = expandedDate === group.date;
+        const availableCount = group.slots.filter((slot) => slot.available > 0).length;
+        const soldOut = availableCount === 0;
+        const hasSelected = selectedSlot?.date.slice(0, 10) === group.date;
+
+        return (
+          <div
+            key={group.date}
+            className={`overflow-hidden rounded-xl transition-all duration-200 ${open || hasSelected ? dateCardActive : dateCard}`}
+          >
+            <button
+              type="button"
+              aria-expanded={open}
+              disabled={soldOut}
+              onClick={() => onExpandedDateChange(open ? null : group.date)}
+              className={`flex w-full items-center gap-4 px-4 py-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A0000]/25 disabled:cursor-not-allowed ${
+                soldOut ? "opacity-45" : ""
+              }`}
+            >
+              <div
+                className={`h-12 w-1 shrink-0 rounded-full transition-colors ${
+                  hasSelected || open
+                    ? surface === "light"
+                      ? "bg-[#4A0000]"
+                      : "bg-[#D4AF6A]"
+                    : surface === "light"
+                      ? "bg-[#4A0000]/20"
+                      : "bg-[#C8A25A]/25"
+                }`}
+              />
+              <div className="min-w-0 flex-1">
+                <div
+                  className={`font-display text-base tracking-wide sm:text-lg ${
+                    surface === "light" ? "text-[#4A0000]" : "text-foreground"
+                  }`}
+                >
+                  {formatDateLong(group.date)}
+                </div>
+                <p className={`mt-1 text-xs ${tone.muted}`}>
+                  {soldOut
+                    ? "Sold out"
+                    : `${availableCount} session${availableCount === 1 ? "" : "s"} available`}
+                </p>
+              </div>
+              {!soldOut ? (
+                <ChevronDown
+                  className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
+                    open ? "rotate-180" : ""
+                  } ${surface === "light" ? "text-[#4A0000]/70" : "text-[#D4AF6A]/90"}`}
+                  strokeWidth={1.75}
+                />
+              ) : null}
+            </button>
+
+            {open && !soldOut ? (
+              <div
+                className={`space-y-2 border-t px-4 pb-4 pt-3 ${
+                  surface === "light" ? "border-[#4A0000]/10" : "border-[#C8A25A]/15"
+                }`}
+              >
+                {group.slots.map((slot) => {
+                  const sold = slot.available === 0;
+                  const active = selectedSlot?.id === slot.id;
+                  return (
+                    <button
+                      key={slot.id}
+                      type="button"
+                      disabled={sold}
+                      aria-pressed={active}
+                      onClick={() => onSelectSlot(slot)}
+                      className={`flex w-full items-center justify-between gap-3 rounded-lg px-3.5 py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A0000]/25 ${
+                        active ? slotRowActive : sold ? "cursor-not-allowed opacity-40" : slotRowIdle
+                      }`}
+                    >
+                      <div>
+                        <div className={`text-sm font-medium ${active ? tone.seats : ""}`}>
+                          {formatTime12h(slot.start)} – {formatTime12h(slot.end)}
+                        </div>
+                        <div className={`mt-0.5 text-[0.65rem] uppercase tracking-[0.12em] ${tone.muted}`}>
+                          {sold ? "Sold out" : "Select session"}
+                        </div>
+                      </div>
+                      {!sold ? (
+                        <div className="text-right">
+                          <div className={`eyebrow text-[0.6rem] ${tone.muted}`}>Seats</div>
+                          <div className={`font-display text-lg ${tone.seats}`}>
+                            {slot.available}/{slot.capacity}
+                          </div>
+                        </div>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ExperienceBookingPanel({
   exp,
   selectedSlot,
@@ -96,6 +258,25 @@ export function ExperienceBookingPanel({
   );
   const windowLabel = useMemo(() => formatBookingWindowRange(today), [today]);
   const availableSlots = visibleSlots.filter((s) => s.available > 0);
+  const slotGroups = useMemo(() => groupSlotsByDate(visibleSlots), [visibleSlots]);
+  const [expandedDate, setExpandedDate] = useState<string | null>(() => firstBookableDate(slotGroups));
+
+  useEffect(() => {
+    if (selectedSlot) {
+      setExpandedDate(selectedSlot.date.slice(0, 10));
+    }
+  }, [selectedSlot?.id, selectedSlot?.date]);
+
+  useEffect(() => {
+    if (slotGroups.length === 0) {
+      setExpandedDate(null);
+      return;
+    }
+    setExpandedDate((current) => {
+      if (current && slotGroups.some((group) => group.date === current)) return current;
+      return firstBookableDate(slotGroups);
+    });
+  }, [slotGroups]);
   const limits = selectedSlot
     ? guestBookingLimits(exp, selectedSlot.available)
     : { min: exp.minGuestsPerBooking ?? 1, max: exp.maxGuestsPerBooking ?? 10 };
@@ -126,49 +307,21 @@ export function ExperienceBookingPanel({
           All upcoming sessions are sold out. Browse other experiences or try again later.
         </p>
       ) : (
-        <div className="space-y-1">
-          {visibleSlots.map((slot) => {
-            const sold = slot.available === 0;
-            const active = selectedSlot?.id === slot.id;
-            return (
-              <button
-                key={slot.id}
-                type="button"
-                disabled={sold}
-                aria-pressed={active}
-                onClick={() => onSelectSlot(slot)}
-                className={`group flex w-full items-center justify-between border-l-[3px] py-3.5 pl-4 pr-2 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A0000]/25 ${
-                  active ? tone.slotActive : sold ? "cursor-not-allowed border-transparent opacity-40" : tone.slotIdle
-                }`}
-              >
-                <div>
-                  <div className={`font-display text-lg tracking-wide transition-colors ${tone.slotHover}`}>
-                    {formatDateLong(slot.date)}
-                  </div>
-                  <div className={`mt-0.5 text-xs ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
-                    {slot.start}–{slot.end}
-                  </div>
-                </div>
-                <div className="text-right text-xs">
-                  {sold ? (
-                    <span className={`eyebrow ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
-                      Sold out
-                    </span>
-                  ) : (
-                    <>
-                      <div className={`eyebrow ${surface === "light" ? "luxury-panel-label opacity-75" : "text-muted-foreground/80"}`}>
-                        Seats
-                      </div>
-                      <div className={`font-display text-lg ${tone.seats}`}>
-                        {slot.available}/{slot.capacity}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
+        <DateSlotPicker
+          groups={slotGroups}
+          selectedSlot={selectedSlot}
+          onSelectSlot={onSelectSlot}
+          expandedDate={expandedDate}
+          onExpandedDateChange={(date) => {
+            setExpandedDate(date);
+            if (!date) return;
+            const group = slotGroups.find((entry) => entry.date === date);
+            const openSlots = group?.slots.filter((slot) => slot.available > 0) ?? [];
+            if (openSlots.length === 1) onSelectSlot(openSlots[0]!);
+          }}
+          surface={surface}
+          tone={tone}
+        />
       )}
 
       {availableSlots.length > 0 ? (
@@ -249,7 +402,7 @@ export function ExperienceBookingPanel({
                     surface === "light" ? "luxury-panel-body opacity-70" : "text-muted-foreground/60"
                   }`}
                 >
-                  Select a slot
+                  Select a date and session
                 </span>
               ) : needsSignIn ? (
                 <Link
@@ -291,7 +444,7 @@ export function ExperienceBookingPanel({
             <>
               {!selectedSlot ? (
                 <p className={`text-center text-sm ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
-                  Select an available date to continue.
+                  Select a date, then choose your session to continue.
                 </p>
               ) : null}
               <button
