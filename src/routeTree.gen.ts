@@ -19,15 +19,21 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CitiesRouteImport } from './routes/cities'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HomestaysIndexRouteImport } from './routes/homestays.index'
 import { Route as ExperiencesIndexRouteImport } from './routes/experiences.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as StaysBookingIdRouteImport } from './routes/stays.$bookingId'
 import { Route as HostReviewsRouteImport } from './routes/host.reviews'
 import { Route as HostRevenueRouteImport } from './routes/host.revenue'
 import { Route as HostProfileRouteImport } from './routes/host.profile'
 import { Route as HostExperiencesRouteImport } from './routes/host.experiences'
 import { Route as HostDashboardRouteImport } from './routes/host.dashboard'
 import { Route as HostBookingsRouteImport } from './routes/host.bookings'
+import { Route as HomestaysSlugRouteImport } from './routes/homestays.$slug'
+import { Route as HomestayPropertiesRouteImport } from './routes/homestay.properties'
+import { Route as HomestayDashboardRouteImport } from './routes/homestay.dashboard'
+import { Route as HomestayBookingsRouteImport } from './routes/homestay.bookings'
 import { Route as ExperiencesSlugRouteImport } from './routes/experiences.$slug'
 import { Route as DashboardWishlistRouteImport } from './routes/dashboard.wishlist'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
@@ -43,21 +49,30 @@ import { Route as AdminHomepageEditRouteImport } from './routes/admin.homepage-e
 import { Route as AccountProfileRouteImport } from './routes/account.profile'
 import { Route as HostExperiencesIndexRouteImport } from './routes/host.experiences.index'
 import { Route as HostBookingsIndexRouteImport } from './routes/host.bookings.index'
+import { Route as HomestaysSlugIndexRouteImport } from './routes/homestays.$slug.index'
+import { Route as HomestayPropertiesIndexRouteImport } from './routes/homestay.properties.index'
+import { Route as HomestayBookingsIndexRouteImport } from './routes/homestay.bookings.index'
 import { Route as ExperiencesSlugIndexRouteImport } from './routes/experiences.$slug.index'
 import { Route as DashboardCartIndexRouteImport } from './routes/dashboard.cart.index'
 import { Route as BookingsBookingIdIndexRouteImport } from './routes/bookings.$bookingId.index'
 import { Route as AdminReviewsIndexRouteImport } from './routes/admin.reviews.index'
 import { Route as AdminProfileIndexRouteImport } from './routes/admin.profile.index'
 import { Route as AdminHostsIndexRouteImport } from './routes/admin.hosts.index'
+import { Route as AdminHomestaysIndexRouteImport } from './routes/admin.homestays.index'
+import { Route as AdminHomestayOwnersIndexRouteImport } from './routes/admin.homestay-owners.index'
 import { Route as AdminExperiencesIndexRouteImport } from './routes/admin.experiences.index'
 import { Route as AdminBookingsIndexRouteImport } from './routes/admin.bookings.index'
 import { Route as AdminActivityIndexRouteImport } from './routes/admin.activity.index'
 import { Route as HostExperiencesNewRouteImport } from './routes/host.experiences.new'
 import { Route as HostExperiencesExperienceIdRouteImport } from './routes/host.experiences.$experienceId'
 import { Route as HostBookingsBookingIdRouteImport } from './routes/host.bookings.$bookingId'
+import { Route as HomestaysSlugBookRouteImport } from './routes/homestays.$slug.book'
+import { Route as HomestayPropertiesNewRouteImport } from './routes/homestay.properties.new'
+import { Route as HomestayPropertiesHomestayIdRouteImport } from './routes/homestay.properties.$homestayId'
 import { Route as ExperiencesSlugBookRouteImport } from './routes/experiences.$slug.book'
 import { Route as BookingsBookingIdReviewRouteImport } from './routes/bookings.$bookingId.review'
 import { Route as AdminProfileHomepagePhotosRouteImport } from './routes/admin.profile.homepage-photos'
+import { Route as AdminHomestaysHomestayIdRouteImport } from './routes/admin.homestays.$homestayId'
 import { Route as AdminExperiencesExperienceIdRouteImport } from './routes/admin.experiences.$experienceId'
 import { Route as AdminBookingsBookingIdRouteImport } from './routes/admin.bookings.$bookingId'
 import { Route as DashboardCartCheckoutSlugRouteImport } from './routes/dashboard.cart.checkout.$slug'
@@ -112,6 +127,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HomestaysIndexRoute = HomestaysIndexRouteImport.update({
+  id: '/homestays/',
+  path: '/homestays/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExperiencesIndexRoute = ExperiencesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -126,6 +146,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const StaysBookingIdRoute = StaysBookingIdRouteImport.update({
+  id: '/stays/$bookingId',
+  path: '/stays/$bookingId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const HostReviewsRoute = HostReviewsRouteImport.update({
   id: '/host/reviews',
@@ -155,6 +180,26 @@ const HostDashboardRoute = HostDashboardRouteImport.update({
 const HostBookingsRoute = HostBookingsRouteImport.update({
   id: '/host/bookings',
   path: '/host/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomestaysSlugRoute = HomestaysSlugRouteImport.update({
+  id: '/homestays/$slug',
+  path: '/homestays/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomestayPropertiesRoute = HomestayPropertiesRouteImport.update({
+  id: '/homestay/properties',
+  path: '/homestay/properties',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomestayDashboardRoute = HomestayDashboardRouteImport.update({
+  id: '/homestay/dashboard',
+  path: '/homestay/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomestayBookingsRoute = HomestayBookingsRouteImport.update({
+  id: '/homestay/bookings',
+  path: '/homestay/bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExperiencesSlugRoute = ExperiencesSlugRouteImport.update({
@@ -232,6 +277,21 @@ const HostBookingsIndexRoute = HostBookingsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => HostBookingsRoute,
 } as any)
+const HomestaysSlugIndexRoute = HomestaysSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HomestaysSlugRoute,
+} as any)
+const HomestayPropertiesIndexRoute = HomestayPropertiesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HomestayPropertiesRoute,
+} as any)
+const HomestayBookingsIndexRoute = HomestayBookingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HomestayBookingsRoute,
+} as any)
 const ExperiencesSlugIndexRoute = ExperiencesSlugIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -262,6 +322,17 @@ const AdminHostsIndexRoute = AdminHostsIndexRouteImport.update({
   path: '/hosts/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHomestaysIndexRoute = AdminHomestaysIndexRouteImport.update({
+  id: '/homestays/',
+  path: '/homestays/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHomestayOwnersIndexRoute =
+  AdminHomestayOwnersIndexRouteImport.update({
+    id: '/homestay-owners/',
+    path: '/homestay-owners/',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminExperiencesIndexRoute = AdminExperiencesIndexRouteImport.update({
   id: '/experiences/',
   path: '/experiences/',
@@ -293,6 +364,22 @@ const HostBookingsBookingIdRoute = HostBookingsBookingIdRouteImport.update({
   path: '/$bookingId',
   getParentRoute: () => HostBookingsRoute,
 } as any)
+const HomestaysSlugBookRoute = HomestaysSlugBookRouteImport.update({
+  id: '/book',
+  path: '/book',
+  getParentRoute: () => HomestaysSlugRoute,
+} as any)
+const HomestayPropertiesNewRoute = HomestayPropertiesNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => HomestayPropertiesRoute,
+} as any)
+const HomestayPropertiesHomestayIdRoute =
+  HomestayPropertiesHomestayIdRouteImport.update({
+    id: '/$homestayId',
+    path: '/$homestayId',
+    getParentRoute: () => HomestayPropertiesRoute,
+  } as any)
 const ExperiencesSlugBookRoute = ExperiencesSlugBookRouteImport.update({
   id: '/book',
   path: '/book',
@@ -308,6 +395,12 @@ const AdminProfileHomepagePhotosRoute =
     id: '/homepage-photos',
     path: '/homepage-photos',
     getParentRoute: () => AdminProfileRoute,
+  } as any)
+const AdminHomestaysHomestayIdRoute =
+  AdminHomestaysHomestayIdRouteImport.update({
+    id: '/homestays/$homestayId',
+    path: '/homestays/$homestayId',
+    getParentRoute: () => AdminRoute,
   } as any)
 const AdminExperiencesExperienceIdRoute =
   AdminExperiencesExperienceIdRouteImport.update({
@@ -351,32 +444,47 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
   '/experiences/$slug': typeof ExperiencesSlugRouteWithChildren
+  '/homestay/bookings': typeof HomestayBookingsRouteWithChildren
+  '/homestay/dashboard': typeof HomestayDashboardRoute
+  '/homestay/properties': typeof HomestayPropertiesRouteWithChildren
+  '/homestays/$slug': typeof HomestaysSlugRouteWithChildren
   '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
   '/host/experiences': typeof HostExperiencesRouteWithChildren
   '/host/profile': typeof HostProfileRoute
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
+  '/stays/$bookingId': typeof StaysBookingIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
+  '/homestays/': typeof HomestaysIndexRoute
   '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
+  '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
+  '/homestay/properties/$homestayId': typeof HomestayPropertiesHomestayIdRoute
+  '/homestay/properties/new': typeof HomestayPropertiesNewRoute
+  '/homestays/$slug/book': typeof HomestaysSlugBookRoute
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
   '/admin/activity/': typeof AdminActivityIndexRoute
   '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
+  '/admin/homestay-owners/': typeof AdminHomestayOwnersIndexRoute
+  '/admin/homestays/': typeof AdminHomestaysIndexRoute
   '/admin/hosts/': typeof AdminHostsIndexRoute
   '/admin/profile/': typeof AdminProfileIndexRoute
   '/admin/reviews/': typeof AdminReviewsIndexRoute
   '/bookings/$bookingId/': typeof BookingsBookingIdIndexRoute
   '/dashboard/cart/': typeof DashboardCartIndexRoute
   '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
+  '/homestay/bookings/': typeof HomestayBookingsIndexRoute
+  '/homestay/properties/': typeof HomestayPropertiesIndexRoute
+  '/homestays/$slug/': typeof HomestaysSlugIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
   '/host/experiences/': typeof HostExperiencesIndexRoute
   '/dashboard/cart/checkout/$slug': typeof DashboardCartCheckoutSlugRoute
@@ -398,30 +506,42 @@ export interface FileRoutesByTo {
   '/dashboard/past': typeof DashboardPastRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
+  '/homestay/dashboard': typeof HomestayDashboardRoute
   '/host/dashboard': typeof HostDashboardRoute
   '/host/profile': typeof HostProfileRoute
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
+  '/stays/$bookingId': typeof StaysBookingIdRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/experiences': typeof ExperiencesIndexRoute
+  '/homestays': typeof HomestaysIndexRoute
   '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
+  '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
+  '/homestay/properties/$homestayId': typeof HomestayPropertiesHomestayIdRoute
+  '/homestay/properties/new': typeof HomestayPropertiesNewRoute
+  '/homestays/$slug/book': typeof HomestaysSlugBookRoute
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
   '/admin/activity': typeof AdminActivityIndexRoute
   '/admin/bookings': typeof AdminBookingsIndexRoute
   '/admin/experiences': typeof AdminExperiencesIndexRoute
+  '/admin/homestay-owners': typeof AdminHomestayOwnersIndexRoute
+  '/admin/homestays': typeof AdminHomestaysIndexRoute
   '/admin/hosts': typeof AdminHostsIndexRoute
   '/admin/profile': typeof AdminProfileIndexRoute
   '/admin/reviews': typeof AdminReviewsIndexRoute
   '/bookings/$bookingId': typeof BookingsBookingIdIndexRoute
   '/dashboard/cart': typeof DashboardCartIndexRoute
   '/experiences/$slug': typeof ExperiencesSlugIndexRoute
+  '/homestay/bookings': typeof HomestayBookingsIndexRoute
+  '/homestay/properties': typeof HomestayPropertiesIndexRoute
+  '/homestays/$slug': typeof HomestaysSlugIndexRoute
   '/host/bookings': typeof HostBookingsIndexRoute
   '/host/experiences': typeof HostExperiencesIndexRoute
   '/dashboard/cart/checkout/$slug': typeof DashboardCartCheckoutSlugRoute
@@ -451,32 +571,47 @@ export interface FileRoutesById {
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
   '/experiences/$slug': typeof ExperiencesSlugRouteWithChildren
+  '/homestay/bookings': typeof HomestayBookingsRouteWithChildren
+  '/homestay/dashboard': typeof HomestayDashboardRoute
+  '/homestay/properties': typeof HomestayPropertiesRouteWithChildren
+  '/homestays/$slug': typeof HomestaysSlugRouteWithChildren
   '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
   '/host/experiences': typeof HostExperiencesRouteWithChildren
   '/host/profile': typeof HostProfileRoute
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
+  '/stays/$bookingId': typeof StaysBookingIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
+  '/homestays/': typeof HomestaysIndexRoute
   '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
+  '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
+  '/homestay/properties/$homestayId': typeof HomestayPropertiesHomestayIdRoute
+  '/homestay/properties/new': typeof HomestayPropertiesNewRoute
+  '/homestays/$slug/book': typeof HomestaysSlugBookRoute
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
   '/admin/activity/': typeof AdminActivityIndexRoute
   '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
+  '/admin/homestay-owners/': typeof AdminHomestayOwnersIndexRoute
+  '/admin/homestays/': typeof AdminHomestaysIndexRoute
   '/admin/hosts/': typeof AdminHostsIndexRoute
   '/admin/profile/': typeof AdminProfileIndexRoute
   '/admin/reviews/': typeof AdminReviewsIndexRoute
   '/bookings/$bookingId/': typeof BookingsBookingIdIndexRoute
   '/dashboard/cart/': typeof DashboardCartIndexRoute
   '/experiences/$slug/': typeof ExperiencesSlugIndexRoute
+  '/homestay/bookings/': typeof HomestayBookingsIndexRoute
+  '/homestay/properties/': typeof HomestayPropertiesIndexRoute
+  '/homestays/$slug/': typeof HomestaysSlugIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
   '/host/experiences/': typeof HostExperiencesIndexRoute
   '/dashboard/cart/checkout/$slug': typeof DashboardCartCheckoutSlugRoute
@@ -507,32 +642,47 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/wishlist'
     | '/experiences/$slug'
+    | '/homestay/bookings'
+    | '/homestay/dashboard'
+    | '/homestay/properties'
+    | '/homestays/$slug'
     | '/host/bookings'
     | '/host/dashboard'
     | '/host/experiences'
     | '/host/profile'
     | '/host/revenue'
     | '/host/reviews'
+    | '/stays/$bookingId'
     | '/admin/'
     | '/dashboard/'
     | '/experiences/'
+    | '/homestays/'
     | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
+    | '/admin/homestays/$homestayId'
     | '/admin/profile/homepage-photos'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
+    | '/homestay/properties/$homestayId'
+    | '/homestay/properties/new'
+    | '/homestays/$slug/book'
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
     | '/admin/activity/'
     | '/admin/bookings/'
     | '/admin/experiences/'
+    | '/admin/homestay-owners/'
+    | '/admin/homestays/'
     | '/admin/hosts/'
     | '/admin/profile/'
     | '/admin/reviews/'
     | '/bookings/$bookingId/'
     | '/dashboard/cart/'
     | '/experiences/$slug/'
+    | '/homestay/bookings/'
+    | '/homestay/properties/'
+    | '/homestays/$slug/'
     | '/host/bookings/'
     | '/host/experiences/'
     | '/dashboard/cart/checkout/$slug'
@@ -554,30 +704,42 @@ export interface FileRouteTypes {
     | '/dashboard/past'
     | '/dashboard/profile'
     | '/dashboard/wishlist'
+    | '/homestay/dashboard'
     | '/host/dashboard'
     | '/host/profile'
     | '/host/revenue'
     | '/host/reviews'
+    | '/stays/$bookingId'
     | '/admin'
     | '/dashboard'
     | '/experiences'
+    | '/homestays'
     | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
+    | '/admin/homestays/$homestayId'
     | '/admin/profile/homepage-photos'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
+    | '/homestay/properties/$homestayId'
+    | '/homestay/properties/new'
+    | '/homestays/$slug/book'
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
     | '/admin/activity'
     | '/admin/bookings'
     | '/admin/experiences'
+    | '/admin/homestay-owners'
+    | '/admin/homestays'
     | '/admin/hosts'
     | '/admin/profile'
     | '/admin/reviews'
     | '/bookings/$bookingId'
     | '/dashboard/cart'
     | '/experiences/$slug'
+    | '/homestay/bookings'
+    | '/homestay/properties'
+    | '/homestays/$slug'
     | '/host/bookings'
     | '/host/experiences'
     | '/dashboard/cart/checkout/$slug'
@@ -606,32 +768,47 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/wishlist'
     | '/experiences/$slug'
+    | '/homestay/bookings'
+    | '/homestay/dashboard'
+    | '/homestay/properties'
+    | '/homestays/$slug'
     | '/host/bookings'
     | '/host/dashboard'
     | '/host/experiences'
     | '/host/profile'
     | '/host/revenue'
     | '/host/reviews'
+    | '/stays/$bookingId'
     | '/admin/'
     | '/dashboard/'
     | '/experiences/'
+    | '/homestays/'
     | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
+    | '/admin/homestays/$homestayId'
     | '/admin/profile/homepage-photos'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
+    | '/homestay/properties/$homestayId'
+    | '/homestay/properties/new'
+    | '/homestays/$slug/book'
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
     | '/admin/activity/'
     | '/admin/bookings/'
     | '/admin/experiences/'
+    | '/admin/homestay-owners/'
+    | '/admin/homestays/'
     | '/admin/hosts/'
     | '/admin/profile/'
     | '/admin/reviews/'
     | '/bookings/$bookingId/'
     | '/dashboard/cart/'
     | '/experiences/$slug/'
+    | '/homestay/bookings/'
+    | '/homestay/properties/'
+    | '/homestays/$slug/'
     | '/host/bookings/'
     | '/host/experiences/'
     | '/dashboard/cart/checkout/$slug'
@@ -651,12 +828,18 @@ export interface RootRouteChildren {
   AccountProfileRoute: typeof AccountProfileRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BookingsBookingIdRoute: typeof BookingsBookingIdRouteWithChildren
+  HomestayBookingsRoute: typeof HomestayBookingsRouteWithChildren
+  HomestayDashboardRoute: typeof HomestayDashboardRoute
+  HomestayPropertiesRoute: typeof HomestayPropertiesRouteWithChildren
+  HomestaysSlugRoute: typeof HomestaysSlugRouteWithChildren
   HostBookingsRoute: typeof HostBookingsRouteWithChildren
   HostDashboardRoute: typeof HostDashboardRoute
   HostExperiencesRoute: typeof HostExperiencesRouteWithChildren
   HostProfileRoute: typeof HostProfileRoute
   HostRevenueRoute: typeof HostRevenueRoute
   HostReviewsRoute: typeof HostReviewsRoute
+  StaysBookingIdRoute: typeof StaysBookingIdRoute
+  HomestaysIndexRoute: typeof HomestaysIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -731,6 +914,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/homestays/': {
+      id: '/homestays/'
+      path: '/homestays'
+      fullPath: '/homestays/'
+      preLoaderRoute: typeof HomestaysIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/experiences/': {
       id: '/experiences/'
       path: '/'
@@ -751,6 +941,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/stays/$bookingId': {
+      id: '/stays/$bookingId'
+      path: '/stays/$bookingId'
+      fullPath: '/stays/$bookingId'
+      preLoaderRoute: typeof StaysBookingIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/host/reviews': {
       id: '/host/reviews'
@@ -792,6 +989,34 @@ declare module '@tanstack/react-router' {
       path: '/host/bookings'
       fullPath: '/host/bookings'
       preLoaderRoute: typeof HostBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/homestays/$slug': {
+      id: '/homestays/$slug'
+      path: '/homestays/$slug'
+      fullPath: '/homestays/$slug'
+      preLoaderRoute: typeof HomestaysSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/homestay/properties': {
+      id: '/homestay/properties'
+      path: '/homestay/properties'
+      fullPath: '/homestay/properties'
+      preLoaderRoute: typeof HomestayPropertiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/homestay/dashboard': {
+      id: '/homestay/dashboard'
+      path: '/homestay/dashboard'
+      fullPath: '/homestay/dashboard'
+      preLoaderRoute: typeof HomestayDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/homestay/bookings': {
+      id: '/homestay/bookings'
+      path: '/homestay/bookings'
+      fullPath: '/homestay/bookings'
+      preLoaderRoute: typeof HomestayBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/experiences/$slug': {
@@ -899,6 +1124,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HostBookingsIndexRouteImport
       parentRoute: typeof HostBookingsRoute
     }
+    '/homestays/$slug/': {
+      id: '/homestays/$slug/'
+      path: '/'
+      fullPath: '/homestays/$slug/'
+      preLoaderRoute: typeof HomestaysSlugIndexRouteImport
+      parentRoute: typeof HomestaysSlugRoute
+    }
+    '/homestay/properties/': {
+      id: '/homestay/properties/'
+      path: '/'
+      fullPath: '/homestay/properties/'
+      preLoaderRoute: typeof HomestayPropertiesIndexRouteImport
+      parentRoute: typeof HomestayPropertiesRoute
+    }
+    '/homestay/bookings/': {
+      id: '/homestay/bookings/'
+      path: '/'
+      fullPath: '/homestay/bookings/'
+      preLoaderRoute: typeof HomestayBookingsIndexRouteImport
+      parentRoute: typeof HomestayBookingsRoute
+    }
     '/experiences/$slug/': {
       id: '/experiences/$slug/'
       path: '/'
@@ -939,6 +1185,20 @@ declare module '@tanstack/react-router' {
       path: '/hosts'
       fullPath: '/admin/hosts/'
       preLoaderRoute: typeof AdminHostsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/homestays/': {
+      id: '/admin/homestays/'
+      path: '/homestays'
+      fullPath: '/admin/homestays/'
+      preLoaderRoute: typeof AdminHomestaysIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/homestay-owners/': {
+      id: '/admin/homestay-owners/'
+      path: '/homestay-owners'
+      fullPath: '/admin/homestay-owners/'
+      preLoaderRoute: typeof AdminHomestayOwnersIndexRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/experiences/': {
@@ -983,6 +1243,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HostBookingsBookingIdRouteImport
       parentRoute: typeof HostBookingsRoute
     }
+    '/homestays/$slug/book': {
+      id: '/homestays/$slug/book'
+      path: '/book'
+      fullPath: '/homestays/$slug/book'
+      preLoaderRoute: typeof HomestaysSlugBookRouteImport
+      parentRoute: typeof HomestaysSlugRoute
+    }
+    '/homestay/properties/new': {
+      id: '/homestay/properties/new'
+      path: '/new'
+      fullPath: '/homestay/properties/new'
+      preLoaderRoute: typeof HomestayPropertiesNewRouteImport
+      parentRoute: typeof HomestayPropertiesRoute
+    }
+    '/homestay/properties/$homestayId': {
+      id: '/homestay/properties/$homestayId'
+      path: '/$homestayId'
+      fullPath: '/homestay/properties/$homestayId'
+      preLoaderRoute: typeof HomestayPropertiesHomestayIdRouteImport
+      parentRoute: typeof HomestayPropertiesRoute
+    }
     '/experiences/$slug/book': {
       id: '/experiences/$slug/book'
       path: '/book'
@@ -1003,6 +1284,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/profile/homepage-photos'
       preLoaderRoute: typeof AdminProfileHomepagePhotosRouteImport
       parentRoute: typeof AdminProfileRoute
+    }
+    '/admin/homestays/$homestayId': {
+      id: '/admin/homestays/$homestayId'
+      path: '/homestays/$homestayId'
+      fullPath: '/admin/homestays/$homestayId'
+      preLoaderRoute: typeof AdminHomestaysHomestayIdRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/experiences/$experienceId': {
       id: '/admin/experiences/$experienceId'
@@ -1048,9 +1336,12 @@ interface AdminRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBookingsBookingIdRoute: typeof AdminBookingsBookingIdRoute
   AdminExperiencesExperienceIdRoute: typeof AdminExperiencesExperienceIdRoute
+  AdminHomestaysHomestayIdRoute: typeof AdminHomestaysHomestayIdRoute
   AdminActivityIndexRoute: typeof AdminActivityIndexRoute
   AdminBookingsIndexRoute: typeof AdminBookingsIndexRoute
   AdminExperiencesIndexRoute: typeof AdminExperiencesIndexRoute
+  AdminHomestayOwnersIndexRoute: typeof AdminHomestayOwnersIndexRoute
+  AdminHomestaysIndexRoute: typeof AdminHomestaysIndexRoute
   AdminHostsIndexRoute: typeof AdminHostsIndexRoute
   AdminReviewsIndexRoute: typeof AdminReviewsIndexRoute
 }
@@ -1061,9 +1352,12 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminBookingsBookingIdRoute: AdminBookingsBookingIdRoute,
   AdminExperiencesExperienceIdRoute: AdminExperiencesExperienceIdRoute,
+  AdminHomestaysHomestayIdRoute: AdminHomestaysHomestayIdRoute,
   AdminActivityIndexRoute: AdminActivityIndexRoute,
   AdminBookingsIndexRoute: AdminBookingsIndexRoute,
   AdminExperiencesIndexRoute: AdminExperiencesIndexRoute,
+  AdminHomestayOwnersIndexRoute: AdminHomestayOwnersIndexRoute,
+  AdminHomestaysIndexRoute: AdminHomestaysIndexRoute,
   AdminHostsIndexRoute: AdminHostsIndexRoute,
   AdminReviewsIndexRoute: AdminReviewsIndexRoute,
 }
@@ -1160,6 +1454,46 @@ const BookingsBookingIdRouteChildren: BookingsBookingIdRouteChildren = {
 const BookingsBookingIdRouteWithChildren =
   BookingsBookingIdRoute._addFileChildren(BookingsBookingIdRouteChildren)
 
+interface HomestayBookingsRouteChildren {
+  HomestayBookingsIndexRoute: typeof HomestayBookingsIndexRoute
+}
+
+const HomestayBookingsRouteChildren: HomestayBookingsRouteChildren = {
+  HomestayBookingsIndexRoute: HomestayBookingsIndexRoute,
+}
+
+const HomestayBookingsRouteWithChildren =
+  HomestayBookingsRoute._addFileChildren(HomestayBookingsRouteChildren)
+
+interface HomestayPropertiesRouteChildren {
+  HomestayPropertiesHomestayIdRoute: typeof HomestayPropertiesHomestayIdRoute
+  HomestayPropertiesNewRoute: typeof HomestayPropertiesNewRoute
+  HomestayPropertiesIndexRoute: typeof HomestayPropertiesIndexRoute
+}
+
+const HomestayPropertiesRouteChildren: HomestayPropertiesRouteChildren = {
+  HomestayPropertiesHomestayIdRoute: HomestayPropertiesHomestayIdRoute,
+  HomestayPropertiesNewRoute: HomestayPropertiesNewRoute,
+  HomestayPropertiesIndexRoute: HomestayPropertiesIndexRoute,
+}
+
+const HomestayPropertiesRouteWithChildren =
+  HomestayPropertiesRoute._addFileChildren(HomestayPropertiesRouteChildren)
+
+interface HomestaysSlugRouteChildren {
+  HomestaysSlugBookRoute: typeof HomestaysSlugBookRoute
+  HomestaysSlugIndexRoute: typeof HomestaysSlugIndexRoute
+}
+
+const HomestaysSlugRouteChildren: HomestaysSlugRouteChildren = {
+  HomestaysSlugBookRoute: HomestaysSlugBookRoute,
+  HomestaysSlugIndexRoute: HomestaysSlugIndexRoute,
+}
+
+const HomestaysSlugRouteWithChildren = HomestaysSlugRoute._addFileChildren(
+  HomestaysSlugRouteChildren,
+)
+
 interface HostBookingsRouteChildren {
   HostBookingsBookingIdRoute: typeof HostBookingsBookingIdRoute
   HostBookingsIndexRoute: typeof HostBookingsIndexRoute
@@ -1204,12 +1538,18 @@ const rootRouteChildren: RootRouteChildren = {
   AccountProfileRoute: AccountProfileRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BookingsBookingIdRoute: BookingsBookingIdRouteWithChildren,
+  HomestayBookingsRoute: HomestayBookingsRouteWithChildren,
+  HomestayDashboardRoute: HomestayDashboardRoute,
+  HomestayPropertiesRoute: HomestayPropertiesRouteWithChildren,
+  HomestaysSlugRoute: HomestaysSlugRouteWithChildren,
   HostBookingsRoute: HostBookingsRouteWithChildren,
   HostDashboardRoute: HostDashboardRoute,
   HostExperiencesRoute: HostExperiencesRouteWithChildren,
   HostProfileRoute: HostProfileRoute,
   HostRevenueRoute: HostRevenueRoute,
   HostReviewsRoute: HostReviewsRoute,
+  StaysBookingIdRoute: StaysBookingIdRoute,
+  HomestaysIndexRoute: HomestaysIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -49,3 +49,10 @@ def require_host(ctx: RequestContext) -> dict:
     if auth["profile"].get("role") != "host":
         raise ConnectError(Code.PERMISSION_DENIED, "Host access required.")
     return auth
+
+
+def require_homestay_owner(ctx: RequestContext) -> dict:
+    auth = resolve_current_user(ctx)
+    if auth["profile"].get("role") != "homestay_owner":
+        raise ConnectError(Code.PERMISSION_DENIED, "Homestay owner access required.")
+    return auth

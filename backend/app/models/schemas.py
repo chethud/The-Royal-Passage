@@ -65,6 +65,322 @@ class ExperienceDetailResponse(BaseModel):
     source: Literal["live", "static"]
 
 
+class HomestayRoom(BaseModel):
+    id: str
+    name: str
+    category: str | None = None
+    capacity: int
+    pricePerNight: int
+    totalUnits: int = 1
+    amenities: list[str] = Field(default_factory=list)
+
+
+class Homestay(BaseModel):
+    id: str
+    slug: str
+    title: str
+    tagline: str
+    description: str
+    propertyType: str
+    city: str
+    citySlug: str | None = None
+    address: str
+    region: str | None = None
+    mapLink: str | None = None
+    pricePerNight: int
+    rating: float
+    reviewsCount: int
+    image: str
+    galleryUrls: list[str] = Field(default_factory=list)
+    amenities: list[str] = Field(default_factory=list)
+    houseRules: list[str] = Field(default_factory=list)
+    bedrooms: int = 1
+    bathrooms: int = 1
+    maxGuests: int = 2
+    checkInTime: str = "14:00"
+    checkOutTime: str = "11:00"
+    currencySymbol: str | None = "₹"
+    ownerName: str = "Host"
+    rooms: list[HomestayRoom] = Field(default_factory=list)
+
+
+class ListHomestaysResponse(BaseModel):
+    mode: Literal["live", "static"]
+    homestays: list[Homestay]
+    propertyTypes: list[str]
+    cities: list[str]
+
+
+class HomestayDetailResponse(BaseModel):
+    homestay: Homestay
+    source: Literal["live", "static"]
+
+
+class CreateHomestayOwnerRequest(BaseModel):
+    fullName: str = Field(min_length=2, max_length=120)
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
+    phone: str | None = Field(default=None, max_length=32)
+    address: str | None = Field(default=None, max_length=500)
+
+
+class CreateHomestayOwnerResponse(BaseModel):
+    id: str
+    email: EmailStr
+    fullName: str
+    homestayOwnerId: str
+
+
+class CreateHomestayBookingRequest(BaseModel):
+    homestayId: str
+    roomId: str | None = None
+    checkIn: str
+    checkOut: str
+    guestCount: int = Field(ge=1, le=50)
+    notes: str | None = Field(default=None, max_length=500)
+
+
+class CreateHomestayBookingResponse(BaseModel):
+    bookingId: str
+    totalAmount: int
+    currencyCode: str
+    bookingStatus: str
+    paymentStatus: str
+    nights: int
+
+
+class OwnerHomestayAvailability(BaseModel):
+    id: str
+    date: str
+    roomId: str | None = None
+    isBlocked: bool = False
+    priceOverrideMinor: int | None = None
+    minNights: int | None = None
+    note: str | None = None
+
+
+class OwnerHomestayRoom(BaseModel):
+    id: str
+    name: str
+    category: str | None = None
+    capacity: int
+    pricePerNightMinor: int
+    totalUnits: int = 1
+    amenities: list[str] = Field(default_factory=list)
+    sortOrder: int = 0
+    isActive: bool = True
+
+
+class OwnerHomestaySummary(BaseModel):
+    id: str
+    slug: str
+    title: str
+    city: str
+    status: str
+    pricePerNightMinor: int
+    currencySymbol: str
+    roomCount: int
+    image: str | None = None
+
+
+class OwnerHomestayDetail(BaseModel):
+    id: str
+    slug: str
+    title: str
+    tagline: str | None = None
+    description: str | None = None
+    propertyType: str
+    city: str
+    citySlug: str | None = None
+    region: str | None = None
+    address: str | None = None
+    mapLink: str | None = None
+    pricePerNightMinor: int
+    status: str
+    heroImageUrl: str | None = None
+    galleryUrls: list[str] = Field(default_factory=list)
+    amenities: list[str] = Field(default_factory=list)
+    houseRules: list[str] = Field(default_factory=list)
+    bedrooms: int = 1
+    bathrooms: int = 1
+    maxGuests: int = 2
+    checkInTime: str = "14:00"
+    checkOutTime: str = "11:00"
+    currencyCode: str = "INR"
+    currencySymbol: str = "₹"
+    rooms: list[OwnerHomestayRoom] = Field(default_factory=list)
+    availability: list[OwnerHomestayAvailability] = Field(default_factory=list)
+    createdAt: str
+    updatedAt: str
+
+
+class CreateOwnerHomestayRequest(BaseModel):
+    title: str = Field(min_length=5, max_length=120)
+    slug: str | None = Field(default=None, max_length=120, pattern=r"^[a-z0-9-]+$")
+    tagline: str | None = Field(default=None, max_length=200)
+    description: str = Field(min_length=50, max_length=5000)
+    propertyType: str
+    citySlug: str = Field(min_length=2, max_length=64, pattern=r"^[a-z0-9-]+$")
+    city: str | None = Field(default=None, min_length=2, max_length=80)
+    region: str | None = Field(default=None, max_length=80)
+    address: str | None = Field(default=None, max_length=200)
+    mapLink: str | None = Field(default=None, max_length=500)
+    pricePerNightMinor: int = Field(ge=0)
+    heroImageUrl: str | None = Field(default=None, max_length=500)
+    galleryUrls: list[str] = Field(default_factory=list)
+    amenities: list[str] = Field(default_factory=list)
+    houseRules: list[str] = Field(default_factory=list)
+    bedrooms: int = Field(default=1, ge=1, le=20)
+    bathrooms: int = Field(default=1, ge=1, le=20)
+    maxGuests: int = Field(default=2, ge=1, le=50)
+    checkInTime: str | None = Field(default=None, max_length=8)
+    checkOutTime: str | None = Field(default=None, max_length=8)
+    submitForReview: bool = False
+
+
+class UpdateOwnerHomestayRequest(BaseModel):
+    title: str | None = Field(default=None, min_length=5, max_length=120)
+    slug: str | None = Field(default=None, max_length=120, pattern=r"^[a-z0-9-]+$")
+    tagline: str | None = Field(default=None, max_length=200)
+    description: str | None = Field(default=None, min_length=50, max_length=5000)
+    propertyType: str | None = None
+    citySlug: str | None = Field(default=None, min_length=2, max_length=64, pattern=r"^[a-z0-9-]+$")
+    city: str | None = Field(default=None, min_length=2, max_length=80)
+    region: str | None = Field(default=None, max_length=80)
+    address: str | None = Field(default=None, max_length=200)
+    mapLink: str | None = Field(default=None, max_length=500)
+    pricePerNightMinor: int | None = Field(default=None, ge=0)
+    heroImageUrl: str | None = Field(default=None, max_length=500)
+    galleryUrls: list[str] | None = None
+    amenities: list[str] | None = None
+    houseRules: list[str] | None = None
+    bedrooms: int | None = Field(default=None, ge=1, le=20)
+    bathrooms: int | None = Field(default=None, ge=1, le=20)
+    maxGuests: int | None = Field(default=None, ge=1, le=50)
+    checkInTime: str | None = Field(default=None, max_length=8)
+    checkOutTime: str | None = Field(default=None, max_length=8)
+    submitForReview: bool = False
+
+
+class CreateOwnerHomestayRoomRequest(BaseModel):
+    name: str = Field(min_length=2, max_length=80)
+    category: str | None = Field(default=None, max_length=40)
+    capacity: int = Field(ge=1, le=20)
+    pricePerNightMinor: int = Field(ge=0)
+    totalUnits: int = Field(default=1, ge=1, le=20)
+    amenities: list[str] = Field(default_factory=list)
+    sortOrder: int = 0
+
+
+class UpdateOwnerHomestayRoomRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=2, max_length=80)
+    category: str | None = Field(default=None, max_length=40)
+    capacity: int | None = Field(default=None, ge=1, le=20)
+    pricePerNightMinor: int | None = Field(default=None, ge=0)
+    totalUnits: int | None = Field(default=None, ge=1, le=20)
+    amenities: list[str] | None = None
+    sortOrder: int | None = None
+    isActive: bool | None = None
+
+
+class UpsertOwnerAvailabilityRequest(BaseModel):
+    date: str
+    roomId: str | None = None
+    isBlocked: bool = False
+    priceOverrideMinor: int | None = Field(default=None, ge=0)
+    minNights: int | None = Field(default=None, ge=1)
+    note: str | None = Field(default=None, max_length=200)
+
+
+class OwnerDashboardStats(BaseModel):
+    pendingBookings: int
+    confirmedBookings: int
+    completedBookings: int
+    revenueCollectedMinor: int
+    revenuePendingMinor: int
+    upcomingBookings: int
+    checkInToday: int
+    publishedHomestays: int
+    currencySymbol: str = "₹"
+    totalBookings: int
+
+
+class HomestayBookingSummary(BaseModel):
+    id: str
+    homestayId: str
+    homestayTitle: str
+    homestaySlug: str
+    roomName: str | None = None
+    checkIn: str
+    checkOut: str
+    nights: int
+    guestCount: int
+    totalAmount: int
+    currencyCode: str
+    currencySymbol: str
+    bookingStatus: str
+    paymentStatus: str
+    paymentMethod: str
+    guestName: str | None = None
+    notes: str | None = None
+    createdAt: str
+    checkInTime: str | None = None
+    checkOutTime: str | None = None
+    homestayAddress: str | None = None
+
+
+class ListHomestayBookingsResponse(BaseModel):
+    bookings: list[HomestayBookingSummary]
+
+
+class AdminHomestaySummary(BaseModel):
+    id: str
+    slug: str
+    title: str
+    city: str
+    status: str
+    ownerName: str
+    createdAt: str
+
+
+class AdminHomestayDetail(BaseModel):
+    id: str
+    slug: str
+    title: str
+    tagline: str | None = None
+    description: str | None = None
+    propertyType: str
+    city: str
+    citySlug: str | None = None
+    region: str | None = None
+    address: str | None = None
+    mapLink: str | None = None
+    pricePerNightMinor: int
+    status: str
+    heroImageUrl: str | None = None
+    galleryUrls: list[str] = Field(default_factory=list)
+    amenities: list[str] = Field(default_factory=list)
+    houseRules: list[str] = Field(default_factory=list)
+    bedrooms: int = 1
+    bathrooms: int = 1
+    maxGuests: int = 2
+    checkInTime: str = "14:00"
+    checkOutTime: str = "11:00"
+    currencyCode: str = "INR"
+    currencySymbol: str = "₹"
+    rooms: list[OwnerHomestayRoom] = Field(default_factory=list)
+    createdAt: str
+    updatedAt: str
+    ownerName: str
+    ownerEmail: str | None = None
+    ownerPhone: str | None = None
+    ownerVerified: bool = False
+
+
+class ListAdminHomestaysResponse(BaseModel):
+    homestays: list[AdminHomestaySummary]
+
+
 class CreateBookingRequest(BaseModel):
     slotId: str
     guestCount: int = Field(ge=1, le=50)

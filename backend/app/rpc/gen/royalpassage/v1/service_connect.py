@@ -35,6 +35,75 @@ class RoyalPassageService(Protocol):
     async def get_experience_by_slug(self, request: royalpassage_dot_v1_dot_service__pb2.GetExperienceBySlugRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ExperienceDetailResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def list_homestays(self, request: royalpassage_dot_v1_dot_service__pb2.ListHomestaysRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListHomestaysResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def get_homestay_by_slug(self, request: royalpassage_dot_v1_dot_service__pb2.GetHomestayBySlugRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayDetailResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def create_homestay_booking(self, request: royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def list_guest_homestay_bookings(self, request: royalpassage_dot_v1_dot_service__pb2.ListGuestHomestayBookingsRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def get_guest_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.GetGuestHomestayBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def cancel_guest_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.CancelGuestHomestayBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def get_owner_dashboard(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerDashboardStats:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def list_owner_homestays(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListOwnerHomestaysResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def create_owner_homestay(self, request: royalpassage_dot_v1_dot_types__pb2.CreateOwnerHomestayRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def get_owner_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def update_owner_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayInput, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def delete_owner_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OkResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def create_owner_homestay_room(self, request: royalpassage_dot_v1_dot_service__pb2.CreateOwnerHomestayRoomInput, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def update_owner_homestay_room(self, request: royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayRoomInput, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def delete_owner_homestay_room(self, request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRoomRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def upsert_owner_availability(self, request: royalpassage_dot_v1_dot_service__pb2.UpsertOwnerAvailabilityInput, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def delete_owner_availability(self, request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerAvailabilityRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def list_owner_homestay_bookings(self, request: royalpassage_dot_v1_dot_service__pb2.ListOwnerHomestayBookingsRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def get_owner_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def confirm_owner_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def reject_owner_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def mark_owner_homestay_booking_paid(self, request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def complete_owner_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
     async def create_booking(self, request: royalpassage_dot_v1_dot_types__pb2.CreateBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateBookingResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
@@ -137,6 +206,9 @@ class RoyalPassageService(Protocol):
     async def create_host(self, request: royalpassage_dot_v1_dot_types__pb2.CreateHostRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateHostResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def create_homestay_owner(self, request: royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
     async def list_admin_experiences(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListAdminExperiencesResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
@@ -147,6 +219,18 @@ class RoyalPassageService(Protocol):
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
     async def reject_experience(self, request: royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminExperienceSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def list_admin_homestays(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListAdminHomestaysResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def get_admin_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def publish_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def reject_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
     async def list_experience_reviews(self, request: royalpassage_dot_v1_dot_service__pb2.ListExperienceReviewsRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListExperienceReviewsResponse:
@@ -228,6 +312,236 @@ class RoyalPassageServiceASGIApplication(ConnectASGIApplication[RoyalPassageServ
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get_experience_by_slug,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListHomestays": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ListHomestays",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.ListHomestaysRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListHomestaysResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.list_homestays,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetHomestayBySlug": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetHomestayBySlug",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.GetHomestayBySlugRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayDetailResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_homestay_by_slug,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CreateHomestayBooking": Endpoint.unary(
+                    method=MethodInfo(
+                        name="CreateHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.create_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListGuestHomestayBookings": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ListGuestHomestayBookings",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.ListGuestHomestayBookingsRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.list_guest_homestay_bookings,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetGuestHomestayBooking": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetGuestHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.GetGuestHomestayBookingRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_guest_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CancelGuestHomestayBooking": Endpoint.unary(
+                    method=MethodInfo(
+                        name="CancelGuestHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.CancelGuestHomestayBookingRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.cancel_guest_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetOwnerDashboard": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetOwnerDashboard",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerDashboardStats,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_owner_dashboard,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListOwnerHomestays": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ListOwnerHomestays",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListOwnerHomestaysResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.list_owner_homestays,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CreateOwnerHomestay": Endpoint.unary(
+                    method=MethodInfo(
+                        name="CreateOwnerHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.CreateOwnerHomestayRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.create_owner_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetOwnerHomestay": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetOwnerHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_owner_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/UpdateOwnerHomestay": Endpoint.unary(
+                    method=MethodInfo(
+                        name="UpdateOwnerHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayInput,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.update_owner_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/DeleteOwnerHomestay": Endpoint.unary(
+                    method=MethodInfo(
+                        name="DeleteOwnerHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.OkResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.delete_owner_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CreateOwnerHomestayRoom": Endpoint.unary(
+                    method=MethodInfo(
+                        name="CreateOwnerHomestayRoom",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.CreateOwnerHomestayRoomInput,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.create_owner_homestay_room,
+                ),
+                "/royalpassage.v1.RoyalPassageService/UpdateOwnerHomestayRoom": Endpoint.unary(
+                    method=MethodInfo(
+                        name="UpdateOwnerHomestayRoom",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayRoomInput,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.update_owner_homestay_room,
+                ),
+                "/royalpassage.v1.RoyalPassageService/DeleteOwnerHomestayRoom": Endpoint.unary(
+                    method=MethodInfo(
+                        name="DeleteOwnerHomestayRoom",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRoomRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.delete_owner_homestay_room,
+                ),
+                "/royalpassage.v1.RoyalPassageService/UpsertOwnerAvailability": Endpoint.unary(
+                    method=MethodInfo(
+                        name="UpsertOwnerAvailability",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.UpsertOwnerAvailabilityInput,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.upsert_owner_availability,
+                ),
+                "/royalpassage.v1.RoyalPassageService/DeleteOwnerAvailability": Endpoint.unary(
+                    method=MethodInfo(
+                        name="DeleteOwnerAvailability",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerAvailabilityRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.delete_owner_availability,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListOwnerHomestayBookings": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ListOwnerHomestayBookings",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.ListOwnerHomestayBookingsRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.list_owner_homestay_bookings,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetOwnerHomestayBooking": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetOwnerHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayBookingRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_owner_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ConfirmOwnerHomestayBooking": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ConfirmOwnerHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.confirm_owner_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/RejectOwnerHomestayBooking": Endpoint.unary(
+                    method=MethodInfo(
+                        name="RejectOwnerHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.reject_owner_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/MarkOwnerHomestayBookingPaid": Endpoint.unary(
+                    method=MethodInfo(
+                        name="MarkOwnerHomestayBookingPaid",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.mark_owner_homestay_booking_paid,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CompleteOwnerHomestayBooking": Endpoint.unary(
+                    method=MethodInfo(
+                        name="CompleteOwnerHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.complete_owner_homestay_booking,
                 ),
                 "/royalpassage.v1.RoyalPassageService/CreateBooking": Endpoint.unary(
                     method=MethodInfo(
@@ -569,6 +883,16 @@ class RoyalPassageServiceASGIApplication(ConnectASGIApplication[RoyalPassageServ
                     ),
                     function=svc.create_host,
                 ),
+                "/royalpassage.v1.RoyalPassageService/CreateHomestayOwner": Endpoint.unary(
+                    method=MethodInfo(
+                        name="CreateHomestayOwner",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.create_homestay_owner,
+                ),
                 "/royalpassage.v1.RoyalPassageService/ListAdminExperiences": Endpoint.unary(
                     method=MethodInfo(
                         name="ListAdminExperiences",
@@ -608,6 +932,46 @@ class RoyalPassageServiceASGIApplication(ConnectASGIApplication[RoyalPassageServ
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.reject_experience,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListAdminHomestays": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ListAdminHomestays",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListAdminHomestaysResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.list_admin_homestays,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetAdminHomestay": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetAdminHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.AdminHomestayDetail,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_admin_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/PublishHomestay": Endpoint.unary(
+                    method=MethodInfo(
+                        name="PublishHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.publish_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/RejectHomestay": Endpoint.unary(
+                    method=MethodInfo(
+                        name="RejectHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.reject_homestay,
                 ),
                 "/royalpassage.v1.RoyalPassageService/ListExperienceReviews": Endpoint.unary(
                     method=MethodInfo(
@@ -811,6 +1175,484 @@ class RoyalPassageServiceClient(ConnectClient):
             headers=headers,
             timeout_ms=timeout_ms,
             use_get=use_get,
+        )
+
+    async def list_homestays(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.ListHomestaysRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListHomestaysResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListHomestays",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.ListHomestaysRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.ListHomestaysResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def get_homestay_by_slug(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.GetHomestayBySlugRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayDetailResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetHomestayBySlug",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.GetHomestayBySlugRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayDetailResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def create_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreateHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def list_guest_homestay_bookings(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.ListGuestHomestayBookingsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListGuestHomestayBookings",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.ListGuestHomestayBookingsRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def get_guest_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.GetGuestHomestayBookingRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetGuestHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.GetGuestHomestayBookingRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def cancel_guest_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.CancelGuestHomestayBookingRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CancelGuestHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.CancelGuestHomestayBookingRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def get_owner_dashboard(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerDashboardStats:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetOwnerDashboard",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerDashboardStats,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def list_owner_homestays(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListOwnerHomestaysResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListOwnerHomestays",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.ListOwnerHomestaysResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def create_owner_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.CreateOwnerHomestayRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreateOwnerHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.CreateOwnerHomestayRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def get_owner_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetOwnerHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def update_owner_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayInput,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="UpdateOwnerHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayInput,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def delete_owner_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OkResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="DeleteOwnerHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.OkResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def create_owner_homestay_room(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.CreateOwnerHomestayRoomInput,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreateOwnerHomestayRoom",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.CreateOwnerHomestayRoomInput,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def update_owner_homestay_room(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayRoomInput,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="UpdateOwnerHomestayRoom",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayRoomInput,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def delete_owner_homestay_room(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRoomRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="DeleteOwnerHomestayRoom",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRoomRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def upsert_owner_availability(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.UpsertOwnerAvailabilityInput,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="UpsertOwnerAvailability",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.UpsertOwnerAvailabilityInput,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def delete_owner_availability(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerAvailabilityRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="DeleteOwnerAvailability",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerAvailabilityRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def list_owner_homestay_bookings(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.ListOwnerHomestayBookingsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListOwnerHomestayBookings",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.ListOwnerHomestayBookingsRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def get_owner_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayBookingRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetOwnerHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayBookingRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def confirm_owner_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ConfirmOwnerHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def reject_owner_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="RejectOwnerHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def mark_owner_homestay_booking_paid(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="MarkOwnerHomestayBookingPaid",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def complete_owner_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CompleteOwnerHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
         )
 
     async def create_booking(
@@ -1525,6 +2367,26 @@ class RoyalPassageServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def create_homestay_owner(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreateHomestayOwner",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
     async def list_admin_experiences(
         self,
         request: google_dot_protobuf_dot_empty__pb2.Empty,
@@ -1603,6 +2465,90 @@ class RoyalPassageServiceClient(ConnectClient):
                 service_name="royalpassage.v1.RoyalPassageService",
                 input=royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest,
                 output=royalpassage_dot_v1_dot_types__pb2.AdminExperienceSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def list_admin_homestays(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListAdminHomestaysResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListAdminHomestays",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.ListAdminHomestaysResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def get_admin_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestayDetail:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetAdminHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.AdminHomestayDetail,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def publish_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="PublishHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def reject_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="RejectHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,
@@ -1790,6 +2736,52 @@ class RoyalPassageServiceSync(Protocol):
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def get_experience_by_slug(self, request: royalpassage_dot_v1_dot_service__pb2.GetExperienceBySlugRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ExperienceDetailResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def list_homestays(self, request: royalpassage_dot_v1_dot_service__pb2.ListHomestaysRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListHomestaysResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_homestay_by_slug(self, request: royalpassage_dot_v1_dot_service__pb2.GetHomestayBySlugRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayDetailResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def create_homestay_booking(self, request: royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def list_guest_homestay_bookings(self, request: royalpassage_dot_v1_dot_service__pb2.ListGuestHomestayBookingsRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_guest_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.GetGuestHomestayBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def cancel_guest_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.CancelGuestHomestayBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_owner_dashboard(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerDashboardStats:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def list_owner_homestays(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListOwnerHomestaysResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def create_owner_homestay(self, request: royalpassage_dot_v1_dot_types__pb2.CreateOwnerHomestayRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_owner_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def update_owner_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayInput, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def delete_owner_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OkResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def create_owner_homestay_room(self, request: royalpassage_dot_v1_dot_service__pb2.CreateOwnerHomestayRoomInput, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def update_owner_homestay_room(self, request: royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayRoomInput, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def delete_owner_homestay_room(self, request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRoomRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def upsert_owner_availability(self, request: royalpassage_dot_v1_dot_service__pb2.UpsertOwnerAvailabilityInput, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def delete_owner_availability(self, request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerAvailabilityRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def list_owner_homestay_bookings(self, request: royalpassage_dot_v1_dot_service__pb2.ListOwnerHomestayBookingsRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_owner_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def confirm_owner_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def reject_owner_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def mark_owner_homestay_booking_paid(self, request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def complete_owner_homestay_booking(self, request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def create_booking(self, request: royalpassage_dot_v1_dot_types__pb2.CreateBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateBookingResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def list_my_bookings(self, request: royalpassage_dot_v1_dot_service__pb2.ListMyBookingsRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListBookingsResponse:
@@ -1858,6 +2850,8 @@ class RoyalPassageServiceSync(Protocol):
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def create_host(self, request: royalpassage_dot_v1_dot_types__pb2.CreateHostRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateHostResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def create_homestay_owner(self, request: royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def list_admin_experiences(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListAdminExperiencesResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def get_admin_experience(self, request: royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminExperienceDetail:
@@ -1865,6 +2859,14 @@ class RoyalPassageServiceSync(Protocol):
     def publish_experience(self, request: royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminExperienceSummary:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def reject_experience(self, request: royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminExperienceSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def list_admin_homestays(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListAdminHomestaysResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_admin_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestayDetail:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def publish_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def reject_homestay(self, request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def list_experience_reviews(self, request: royalpassage_dot_v1_dot_service__pb2.ListExperienceReviewsRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListExperienceReviewsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
@@ -1937,6 +2939,236 @@ class RoyalPassageServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get_experience_by_slug,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListHomestays": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ListHomestays",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.ListHomestaysRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListHomestaysResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.list_homestays,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetHomestayBySlug": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetHomestayBySlug",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.GetHomestayBySlugRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayDetailResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_homestay_by_slug,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CreateHomestayBooking": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="CreateHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.create_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListGuestHomestayBookings": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ListGuestHomestayBookings",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.ListGuestHomestayBookingsRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.list_guest_homestay_bookings,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetGuestHomestayBooking": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetGuestHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.GetGuestHomestayBookingRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_guest_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CancelGuestHomestayBooking": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="CancelGuestHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.CancelGuestHomestayBookingRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.cancel_guest_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetOwnerDashboard": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetOwnerDashboard",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerDashboardStats,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_owner_dashboard,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListOwnerHomestays": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ListOwnerHomestays",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListOwnerHomestaysResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.list_owner_homestays,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CreateOwnerHomestay": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="CreateOwnerHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.CreateOwnerHomestayRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.create_owner_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetOwnerHomestay": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetOwnerHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_owner_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/UpdateOwnerHomestay": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="UpdateOwnerHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayInput,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.update_owner_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/DeleteOwnerHomestay": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="DeleteOwnerHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.OkResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.delete_owner_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CreateOwnerHomestayRoom": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="CreateOwnerHomestayRoom",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.CreateOwnerHomestayRoomInput,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.create_owner_homestay_room,
+                ),
+                "/royalpassage.v1.RoyalPassageService/UpdateOwnerHomestayRoom": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="UpdateOwnerHomestayRoom",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayRoomInput,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.update_owner_homestay_room,
+                ),
+                "/royalpassage.v1.RoyalPassageService/DeleteOwnerHomestayRoom": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="DeleteOwnerHomestayRoom",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRoomRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.delete_owner_homestay_room,
+                ),
+                "/royalpassage.v1.RoyalPassageService/UpsertOwnerAvailability": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="UpsertOwnerAvailability",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.UpsertOwnerAvailabilityInput,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.upsert_owner_availability,
+                ),
+                "/royalpassage.v1.RoyalPassageService/DeleteOwnerAvailability": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="DeleteOwnerAvailability",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerAvailabilityRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.delete_owner_availability,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListOwnerHomestayBookings": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ListOwnerHomestayBookings",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.ListOwnerHomestayBookingsRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.list_owner_homestay_bookings,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetOwnerHomestayBooking": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetOwnerHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayBookingRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_owner_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ConfirmOwnerHomestayBooking": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ConfirmOwnerHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.confirm_owner_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/RejectOwnerHomestayBooking": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="RejectOwnerHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.reject_owner_homestay_booking,
+                ),
+                "/royalpassage.v1.RoyalPassageService/MarkOwnerHomestayBookingPaid": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="MarkOwnerHomestayBookingPaid",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.mark_owner_homestay_booking_paid,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CompleteOwnerHomestayBooking": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="CompleteOwnerHomestayBooking",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.complete_owner_homestay_booking,
                 ),
                 "/royalpassage.v1.RoyalPassageService/CreateBooking": EndpointSync.unary(
                     method=MethodInfo(
@@ -2278,6 +3510,16 @@ class RoyalPassageServiceWSGIApplication(ConnectWSGIApplication):
                     ),
                     function=service.create_host,
                 ),
+                "/royalpassage.v1.RoyalPassageService/CreateHomestayOwner": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="CreateHomestayOwner",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.create_homestay_owner,
+                ),
                 "/royalpassage.v1.RoyalPassageService/ListAdminExperiences": EndpointSync.unary(
                     method=MethodInfo(
                         name="ListAdminExperiences",
@@ -2317,6 +3559,46 @@ class RoyalPassageServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.reject_experience,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListAdminHomestays": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ListAdminHomestays",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListAdminHomestaysResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.list_admin_homestays,
+                ),
+                "/royalpassage.v1.RoyalPassageService/GetAdminHomestay": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetAdminHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.AdminHomestayDetail,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_admin_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/PublishHomestay": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="PublishHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.publish_homestay,
+                ),
+                "/royalpassage.v1.RoyalPassageService/RejectHomestay": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="RejectHomestay",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.reject_homestay,
                 ),
                 "/royalpassage.v1.RoyalPassageService/ListExperienceReviews": EndpointSync.unary(
                     method=MethodInfo(
@@ -2520,6 +3802,484 @@ class RoyalPassageServiceClientSync(ConnectClientSync):
             headers=headers,
             timeout_ms=timeout_ms,
             use_get=use_get,
+        )
+
+    def list_homestays(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.ListHomestaysRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListHomestaysResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListHomestays",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.ListHomestaysRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.ListHomestaysResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def get_homestay_by_slug(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.GetHomestayBySlugRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayDetailResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetHomestayBySlug",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.GetHomestayBySlugRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayDetailResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def create_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreateHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.CreateHomestayBookingResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def list_guest_homestay_bookings(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.ListGuestHomestayBookingsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListGuestHomestayBookings",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.ListGuestHomestayBookingsRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def get_guest_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.GetGuestHomestayBookingRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetGuestHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.GetGuestHomestayBookingRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def cancel_guest_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.CancelGuestHomestayBookingRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CancelGuestHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.CancelGuestHomestayBookingRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def get_owner_dashboard(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerDashboardStats:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetOwnerDashboard",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerDashboardStats,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def list_owner_homestays(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListOwnerHomestaysResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListOwnerHomestays",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.ListOwnerHomestaysResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def create_owner_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.CreateOwnerHomestayRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreateOwnerHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.CreateOwnerHomestayRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def get_owner_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetOwnerHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def update_owner_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayInput,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="UpdateOwnerHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayInput,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def delete_owner_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OkResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="DeleteOwnerHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.OkResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def create_owner_homestay_room(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.CreateOwnerHomestayRoomInput,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreateOwnerHomestayRoom",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.CreateOwnerHomestayRoomInput,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def update_owner_homestay_room(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayRoomInput,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="UpdateOwnerHomestayRoom",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.UpdateOwnerHomestayRoomInput,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def delete_owner_homestay_room(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRoomRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="DeleteOwnerHomestayRoom",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerHomestayRoomRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def upsert_owner_availability(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.UpsertOwnerAvailabilityInput,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="UpsertOwnerAvailability",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.UpsertOwnerAvailabilityInput,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def delete_owner_availability(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.DeleteOwnerAvailabilityRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="DeleteOwnerAvailability",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.DeleteOwnerAvailabilityRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.OwnerHomestayDetail,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def list_owner_homestay_bookings(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.ListOwnerHomestayBookingsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListOwnerHomestayBookings",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.ListOwnerHomestayBookingsRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.ListHomestayBookingsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def get_owner_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayBookingRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetOwnerHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.GetOwnerHomestayBookingRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def confirm_owner_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ConfirmOwnerHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def reject_owner_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="RejectOwnerHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def mark_owner_homestay_booking_paid(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="MarkOwnerHomestayBookingPaid",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def complete_owner_homestay_booking(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CompleteOwnerHomestayBooking",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.OwnerHomestayBookingActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.HomestayBookingSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
         )
 
     def create_booking(
@@ -3234,6 +4994,26 @@ class RoyalPassageServiceClientSync(ConnectClientSync):
             timeout_ms=timeout_ms,
         )
 
+    def create_homestay_owner(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreateHomestayOwner",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
     def list_admin_experiences(
         self,
         request: google_dot_protobuf_dot_empty__pb2.Empty,
@@ -3312,6 +5092,90 @@ class RoyalPassageServiceClientSync(ConnectClientSync):
                 service_name="royalpassage.v1.RoyalPassageService",
                 input=royalpassage_dot_v1_dot_service__pb2.AdminExperienceActionRequest,
                 output=royalpassage_dot_v1_dot_types__pb2.AdminExperienceSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def list_admin_homestays(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListAdminHomestaysResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListAdminHomestays",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.ListAdminHomestaysResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def get_admin_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestayDetail:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetAdminHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.AdminHomestayDetail,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def publish_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="PublishHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def reject_homestay(
+        self,
+        request: royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="RejectHomestay",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_service__pb2.AdminHomestayActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.AdminHomestaySummary,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,

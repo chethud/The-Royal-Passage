@@ -13,9 +13,15 @@ from royalpassage.v1.service_connect import RoyalPassageService
 
 from app.config import settings
 from app.models import schemas as s
-from app.rpc.auth import require_admin, require_guest, require_host, resolve_current_user
+from app.rpc.auth import require_admin, require_guest, require_host, require_homestay_owner, resolve_current_user
 from app.rpc.converters import proto_to_pydantic, pydantic_to_proto
 from app.services.admin_analytics import get_admin_stats, list_admin_activity, list_admin_bookings
+from app.services.admin_homestays import (
+    get_admin_homestay,
+    list_admin_homestays,
+    publish_homestay,
+    reject_homestay,
+)
 from app.services.admin_experiences import (
     get_admin_experience,
     list_pending_experiences,
@@ -23,6 +29,35 @@ from app.services.admin_experiences import (
     reject_experience,
 )
 from app.services.admin_users import create_host_account, list_managed_users
+from app.services.homestay_bookings import (
+    cancel_guest_homestay_booking,
+    create_homestay_booking,
+    get_guest_homestay_booking,
+    list_guest_homestay_bookings,
+)
+from app.services.homestay_owners import create_homestay_owner_account
+from app.services.owner_homestay_bookings import (
+    complete_owner_homestay_booking,
+    confirm_owner_homestay_booking,
+    get_owner_dashboard,
+    get_owner_homestay_booking,
+    list_owner_homestay_bookings,
+    mark_owner_homestay_booking_paid,
+    reject_owner_homestay_booking,
+)
+from app.services.owner_homestays import (
+    create_owner_homestay,
+    create_owner_homestay_room,
+    delete_owner_availability,
+    delete_owner_homestay,
+    delete_owner_homestay_room,
+    get_owner_homestay,
+    list_owner_homestays,
+    update_owner_homestay,
+    update_owner_homestay_room,
+    upsert_owner_availability,
+)
+from app.services.homestays import get_homestay_detail, list_homestays
 from app.services.audit import log_audit
 from app.services.bookings import cancel_guest_booking, create_cod_booking, get_booking_by_id, list_guest_bookings
 from app.services.cities import get_city_by_slug, list_active_cities
@@ -121,6 +156,239 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         if not detail:
             raise ConnectError(Code.NOT_FOUND, "Experience not found.")
         return pydantic_to_proto(detail, types_pb2.ExperienceDetailResponse)
+
+    @_rpc
+    async def list_homestays(
+        self, request: service_pb2.ListHomestaysRequest, _ctx: RequestContext
+    ) -> types_pb2.ListHomestaysResponse:
+        _ensure_supabase()
+        city_slug = request.city_slug if request.HasField("city_slug") else None
+        return pydantic_to_proto(list_homestays(city_slug), types_pb2.ListHomestaysResponse)
+
+    @_rpc
+    async def get_homestay_by_slug(
+        self, request: service_pb2.GetHomestayBySlugRequest, _ctx: RequestContext
+    ) -> types_pb2.HomestayDetailResponse:
+        _ensure_supabase()
+        detail = get_homestay_detail(request.slug)
+        if not detail:
+            raise ConnectError(Code.NOT_FOUND, "Homestay not found.")
+        return pydantic_to_proto(detail, types_pb2.HomestayDetailResponse)
+
+    @_rpc
+    async def create_homestay_booking(
+        self, request: types_pb2.CreateHomestayBookingRequest, ctx: RequestContext
+    ) -> types_pb2.CreateHomestayBookingResponse:
+        _ensure_supabase()
+        auth = require_guest(ctx)
+        payload = proto_to_pydantic(request, s.CreateHomestayBookingRequest)
+        return pydantic_to_proto(create_homestay_booking(payload, auth), types_pb2.CreateHomestayBookingResponse)
+
+    @_rpc
+    async def list_guest_homestay_bookings(
+        self, request: service_pb2.ListGuestHomestayBookingsRequest, ctx: RequestContext
+    ) -> types_pb2.ListHomestayBookingsResponse:
+        _ensure_supabase()
+        auth = require_guest(ctx)
+        status = request.status if request.HasField("status") else None
+        result = list_guest_homestay_bookings(auth, status)
+        return types_pb2.ListHomestayBookingsResponse(
+            bookings=[pydantic_to_proto(b, types_pb2.HomestayBookingSummary) for b in result.bookings]
+        )
+
+    @_rpc
+    async def get_guest_homestay_booking(
+        self, request: service_pb2.GetGuestHomestayBookingRequest, ctx: RequestContext
+    ) -> types_pb2.HomestayBookingSummary:
+        _ensure_supabase()
+        auth = require_guest(ctx)
+        return pydantic_to_proto(
+            get_guest_homestay_booking(auth, request.booking_id), types_pb2.HomestayBookingSummary
+        )
+
+    @_rpc
+    async def cancel_guest_homestay_booking(
+        self, request: service_pb2.CancelGuestHomestayBookingRequest, ctx: RequestContext
+    ) -> types_pb2.HomestayBookingSummary:
+        _ensure_supabase()
+        auth = require_guest(ctx)
+        return pydantic_to_proto(
+            cancel_guest_homestay_booking(auth, request.booking_id), types_pb2.HomestayBookingSummary
+        )
+
+    @_rpc
+    async def get_owner_dashboard(
+        self, _request: empty_pb2.Empty, ctx: RequestContext
+    ) -> types_pb2.OwnerDashboardStats:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        return pydantic_to_proto(get_owner_dashboard(auth), types_pb2.OwnerDashboardStats)
+
+    @_rpc
+    async def list_owner_homestays(
+        self, _request: empty_pb2.Empty, ctx: RequestContext
+    ) -> types_pb2.ListOwnerHomestaysResponse:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        homestays = list_owner_homestays(auth)
+        return types_pb2.ListOwnerHomestaysResponse(
+            homestays=[pydantic_to_proto(h, types_pb2.OwnerHomestaySummary) for h in homestays]
+        )
+
+    @_rpc
+    async def create_owner_homestay(
+        self, request: types_pb2.CreateOwnerHomestayRequest, ctx: RequestContext
+    ) -> types_pb2.OwnerHomestayDetail:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        payload = proto_to_pydantic(request, s.CreateOwnerHomestayRequest)
+        return pydantic_to_proto(create_owner_homestay(auth, payload), types_pb2.OwnerHomestayDetail)
+
+    @_rpc
+    async def get_owner_homestay(
+        self, request: service_pb2.GetOwnerHomestayRequest, ctx: RequestContext
+    ) -> types_pb2.OwnerHomestayDetail:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        return pydantic_to_proto(get_owner_homestay(auth, request.homestay_id), types_pb2.OwnerHomestayDetail)
+
+    @_rpc
+    async def update_owner_homestay(
+        self, request: service_pb2.UpdateOwnerHomestayInput, ctx: RequestContext
+    ) -> types_pb2.OwnerHomestayDetail:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        payload = proto_to_pydantic(request.homestay, s.UpdateOwnerHomestayRequest)
+        return pydantic_to_proto(
+            update_owner_homestay(auth, request.homestay_id, payload), types_pb2.OwnerHomestayDetail
+        )
+
+    @_rpc
+    async def delete_owner_homestay(
+        self, request: service_pb2.DeleteOwnerHomestayRequest, ctx: RequestContext
+    ) -> types_pb2.OkResponse:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        delete_owner_homestay(auth, request.homestay_id)
+        return types_pb2.OkResponse(ok=True)
+
+    @_rpc
+    async def create_owner_homestay_room(
+        self, request: service_pb2.CreateOwnerHomestayRoomInput, ctx: RequestContext
+    ) -> types_pb2.OwnerHomestayDetail:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        payload = proto_to_pydantic(request.room, s.CreateOwnerHomestayRoomRequest)
+        return pydantic_to_proto(
+            create_owner_homestay_room(auth, request.homestay_id, payload), types_pb2.OwnerHomestayDetail
+        )
+
+    @_rpc
+    async def update_owner_homestay_room(
+        self, request: service_pb2.UpdateOwnerHomestayRoomInput, ctx: RequestContext
+    ) -> types_pb2.OwnerHomestayDetail:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        payload = proto_to_pydantic(request.room, s.UpdateOwnerHomestayRoomRequest)
+        return pydantic_to_proto(
+            update_owner_homestay_room(auth, request.homestay_id, request.room_id, payload),
+            types_pb2.OwnerHomestayDetail,
+        )
+
+    @_rpc
+    async def delete_owner_homestay_room(
+        self, request: service_pb2.DeleteOwnerHomestayRoomRequest, ctx: RequestContext
+    ) -> types_pb2.OwnerHomestayDetail:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        return pydantic_to_proto(
+            delete_owner_homestay_room(auth, request.homestay_id, request.room_id),
+            types_pb2.OwnerHomestayDetail,
+        )
+
+    @_rpc
+    async def upsert_owner_availability(
+        self, request: service_pb2.UpsertOwnerAvailabilityInput, ctx: RequestContext
+    ) -> types_pb2.OwnerHomestayDetail:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        payload = proto_to_pydantic(request.availability, s.UpsertOwnerAvailabilityRequest)
+        return pydantic_to_proto(
+            upsert_owner_availability(auth, request.homestay_id, payload), types_pb2.OwnerHomestayDetail
+        )
+
+    @_rpc
+    async def delete_owner_availability(
+        self, request: service_pb2.DeleteOwnerAvailabilityRequest, ctx: RequestContext
+    ) -> types_pb2.OwnerHomestayDetail:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        return pydantic_to_proto(
+            delete_owner_availability(auth, request.homestay_id, request.availability_id),
+            types_pb2.OwnerHomestayDetail,
+        )
+
+    @_rpc
+    async def list_owner_homestay_bookings(
+        self, request: service_pb2.ListOwnerHomestayBookingsRequest, ctx: RequestContext
+    ) -> types_pb2.ListHomestayBookingsResponse:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        status = request.status if request.HasField("status") else None
+        result = list_owner_homestay_bookings(auth, status)
+        return types_pb2.ListHomestayBookingsResponse(
+            bookings=[pydantic_to_proto(b, types_pb2.HomestayBookingSummary) for b in result.bookings]
+        )
+
+    @_rpc
+    async def get_owner_homestay_booking(
+        self, request: service_pb2.GetOwnerHomestayBookingRequest, ctx: RequestContext
+    ) -> types_pb2.HomestayBookingSummary:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        return pydantic_to_proto(
+            get_owner_homestay_booking(auth, request.booking_id), types_pb2.HomestayBookingSummary
+        )
+
+    @_rpc
+    async def confirm_owner_homestay_booking(
+        self, request: service_pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext
+    ) -> types_pb2.HomestayBookingSummary:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        return pydantic_to_proto(
+            confirm_owner_homestay_booking(request.booking_id, auth), types_pb2.HomestayBookingSummary
+        )
+
+    @_rpc
+    async def reject_owner_homestay_booking(
+        self, request: service_pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext
+    ) -> types_pb2.HomestayBookingSummary:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        return pydantic_to_proto(
+            reject_owner_homestay_booking(request.booking_id, auth), types_pb2.HomestayBookingSummary
+        )
+
+    @_rpc
+    async def mark_owner_homestay_booking_paid(
+        self, request: service_pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext
+    ) -> types_pb2.HomestayBookingSummary:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        return pydantic_to_proto(
+            mark_owner_homestay_booking_paid(request.booking_id, auth), types_pb2.HomestayBookingSummary
+        )
+
+    @_rpc
+    async def complete_owner_homestay_booking(
+        self, request: service_pb2.OwnerHomestayBookingActionRequest, ctx: RequestContext
+    ) -> types_pb2.HomestayBookingSummary:
+        _ensure_supabase()
+        auth = require_homestay_owner(ctx)
+        return pydantic_to_proto(
+            complete_owner_homestay_booking(request.booking_id, auth), types_pb2.HomestayBookingSummary
+        )
 
     @_rpc
     async def create_booking(
@@ -436,6 +704,18 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         return pydantic_to_proto(create_host_account(payload), types_pb2.CreateHostResponse)
 
     @_rpc
+    async def create_homestay_owner(
+        self, request: types_pb2.CreateHomestayOwnerRequest, ctx: RequestContext
+    ) -> types_pb2.CreateHomestayOwnerResponse:
+        _ensure_supabase()
+        require_admin(ctx)
+        payload = proto_to_pydantic(request, s.CreateHomestayOwnerRequest)
+        return pydantic_to_proto(
+            create_homestay_owner_account(payload),
+            types_pb2.CreateHomestayOwnerResponse,
+        )
+
+    @_rpc
     async def list_admin_experiences(
         self, _request: empty_pb2.Empty, ctx: RequestContext
     ) -> types_pb2.ListAdminExperiencesResponse:
@@ -472,6 +752,43 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         _ensure_supabase()
         require_admin(ctx)
         return pydantic_to_proto(reject_experience(request.experience_id), types_pb2.AdminExperienceSummary)
+
+    @_rpc
+    async def list_admin_homestays(
+        self, _request: empty_pb2.Empty, ctx: RequestContext
+    ) -> types_pb2.ListAdminHomestaysResponse:
+        _ensure_supabase()
+        require_admin(ctx)
+        result = list_admin_homestays()
+        return types_pb2.ListAdminHomestaysResponse(
+            homestays=[pydantic_to_proto(h, types_pb2.AdminHomestaySummary) for h in result.homestays]
+        )
+
+    @_rpc
+    async def get_admin_homestay(
+        self, request: service_pb2.AdminHomestayActionRequest, ctx: RequestContext
+    ) -> types_pb2.AdminHomestayDetail:
+        _ensure_supabase()
+        require_admin(ctx)
+        return pydantic_to_proto(get_admin_homestay(request.homestay_id), types_pb2.AdminHomestayDetail)
+
+    @_rpc
+    async def publish_homestay(
+        self, request: service_pb2.AdminHomestayActionRequest, ctx: RequestContext
+    ) -> types_pb2.AdminHomestaySummary:
+        _ensure_supabase()
+        auth = require_admin(ctx)
+        result = publish_homestay(request.homestay_id)
+        log_audit(auth["user"].id, "homestay_published", "homestay", request.homestay_id, {})
+        return pydantic_to_proto(result, types_pb2.AdminHomestaySummary)
+
+    @_rpc
+    async def reject_homestay(
+        self, request: service_pb2.AdminHomestayActionRequest, ctx: RequestContext
+    ) -> types_pb2.AdminHomestaySummary:
+        _ensure_supabase()
+        require_admin(ctx)
+        return pydantic_to_proto(reject_homestay(request.homestay_id), types_pb2.AdminHomestaySummary)
 
     @_rpc
     async def list_experience_reviews(

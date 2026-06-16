@@ -3,6 +3,8 @@ type BookingStatusChipProps = {
   paymentStatus?: string;
   isPaused?: boolean;
   surface?: "light" | "dark";
+  /** Shown when confirmed and payment pending (default: Pay at venue). */
+  pendingPaymentLabel?: string;
 };
 
 const BOOKING_LABELS: Record<string, string> = {
@@ -17,6 +19,7 @@ export function BookingStatusChip({
   paymentStatus,
   isPaused = false,
   surface = "dark",
+  pendingPaymentLabel = "Pay at venue",
 }: BookingStatusChipProps) {
   const label = isPaused && bookingStatus === "confirmed" ? "Paused" : (BOOKING_LABELS[bookingStatus] ?? bookingStatus);
   const isLight = surface === "light";
@@ -26,7 +29,7 @@ export function BookingStatusChip({
       <span className="inline-flex max-w-[12rem] flex-col items-end gap-0.5 border-l-[3px] border-[#4A0000] pl-2.5 text-right">
         <span className="eyebrow luxury-panel-label text-[0.62rem] leading-snug">{label}</span>
         {!isPaused && bookingStatus === "confirmed" && paymentStatus === "pending" ? (
-          <span className="luxury-panel-body text-[0.62rem] normal-case tracking-normal">Pay at venue</span>
+          <span className="luxury-panel-body text-[0.62rem] normal-case tracking-normal">{pendingPaymentLabel}</span>
         ) : null}
         {isPaused ? (
           <span className="luxury-panel-body text-[0.62rem] normal-case tracking-normal">On hold</span>
@@ -50,7 +53,7 @@ export function BookingStatusChip({
     <span className={`inline-flex items-center gap-2 rounded-sm border px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${tone}`}>
       {label}
       {!isPaused && bookingStatus === "confirmed" && paymentStatus === "pending" ? (
-        <span className="normal-case tracking-normal text-[0.65rem] opacity-80">· Pay at venue</span>
+        <span className="normal-case tracking-normal text-[0.65rem] opacity-80">· {pendingPaymentLabel}</span>
       ) : null}
     </span>
   );

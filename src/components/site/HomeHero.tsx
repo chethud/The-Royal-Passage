@@ -72,7 +72,7 @@ export function HomeHero({
         <div className="py-14 md:py-20">
           <motion.div className="max-w-2xl" variants={revealParent} initial="hidden" animate="show">
             <motion.div variants={revealItem} className="eyebrow mb-5 text-ember/95">
-              Curated Experiences · Timeless Memories
+              Curated Experiences · Royal Homestays
             </motion.div>
             <motion.h1
               variants={revealItem}
@@ -105,8 +105,15 @@ export function HomeHero({
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
+                to="/homestays"
+                className="group inline-flex items-center gap-2 rounded-sm border border-[oklch(0.88_0.08_86_/_0.45)] bg-background/15 px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink backdrop-blur-md transition-colors hover:border-ember/70 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
+              >
+                Browse Homestays
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link
                 to="/sign-in"
-                className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.45)] bg-background/15 px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink backdrop-blur-md transition-colors hover:border-ember/70 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
+                className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-transparent px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink/85 backdrop-blur-md transition-colors hover:border-ember/55 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
               >
                 Sign in
               </Link>

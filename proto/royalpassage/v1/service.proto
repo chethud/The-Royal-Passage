@@ -26,6 +26,70 @@ service RoyalPassageService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
+  rpc ListHomestays(ListHomestaysRequest) returns (ListHomestaysResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetHomestayBySlug(GetHomestayBySlugRequest) returns (HomestayDetailResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc CreateHomestayBooking(CreateHomestayBookingRequest) returns (CreateHomestayBookingResponse);
+
+  rpc ListGuestHomestayBookings(ListGuestHomestayBookingsRequest) returns (ListHomestayBookingsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetGuestHomestayBooking(GetGuestHomestayBookingRequest) returns (HomestayBookingSummary) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc CancelGuestHomestayBooking(CancelGuestHomestayBookingRequest) returns (HomestayBookingSummary);
+
+  rpc GetOwnerDashboard(google.protobuf.Empty) returns (OwnerDashboardStats) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc ListOwnerHomestays(google.protobuf.Empty) returns (ListOwnerHomestaysResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc CreateOwnerHomestay(CreateOwnerHomestayRequest) returns (OwnerHomestayDetail);
+
+  rpc GetOwnerHomestay(GetOwnerHomestayRequest) returns (OwnerHomestayDetail) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc UpdateOwnerHomestay(UpdateOwnerHomestayInput) returns (OwnerHomestayDetail);
+
+  rpc DeleteOwnerHomestay(DeleteOwnerHomestayRequest) returns (OkResponse);
+
+  rpc CreateOwnerHomestayRoom(CreateOwnerHomestayRoomInput) returns (OwnerHomestayDetail);
+
+  rpc UpdateOwnerHomestayRoom(UpdateOwnerHomestayRoomInput) returns (OwnerHomestayDetail);
+
+  rpc DeleteOwnerHomestayRoom(DeleteOwnerHomestayRoomRequest) returns (OwnerHomestayDetail);
+
+  rpc UpsertOwnerAvailability(UpsertOwnerAvailabilityInput) returns (OwnerHomestayDetail);
+
+  rpc DeleteOwnerAvailability(DeleteOwnerAvailabilityRequest) returns (OwnerHomestayDetail);
+
+  rpc ListOwnerHomestayBookings(ListOwnerHomestayBookingsRequest) returns (ListHomestayBookingsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetOwnerHomestayBooking(GetOwnerHomestayBookingRequest) returns (HomestayBookingSummary) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc ConfirmOwnerHomestayBooking(OwnerHomestayBookingActionRequest) returns (HomestayBookingSummary);
+
+  rpc RejectOwnerHomestayBooking(OwnerHomestayBookingActionRequest) returns (HomestayBookingSummary);
+
+  rpc MarkOwnerHomestayBookingPaid(OwnerHomestayBookingActionRequest) returns (HomestayBookingSummary);
+
+  rpc CompleteOwnerHomestayBooking(OwnerHomestayBookingActionRequest) returns (HomestayBookingSummary);
+
   rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse);
 
   rpc ListMyBookings(ListMyBookingsRequest) returns (ListBookingsResponse) {
@@ -126,6 +190,8 @@ service RoyalPassageService {
 
   rpc CreateHost(CreateHostRequest) returns (CreateHostResponse);
 
+  rpc CreateHomestayOwner(CreateHomestayOwnerRequest) returns (CreateHomestayOwnerResponse);
+
   rpc ListAdminExperiences(google.protobuf.Empty) returns (ListAdminExperiencesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
@@ -137,6 +203,18 @@ service RoyalPassageService {
   rpc PublishExperience(AdminExperienceActionRequest) returns (AdminExperienceSummary);
 
   rpc RejectExperience(AdminExperienceActionRequest) returns (AdminExperienceSummary);
+
+  rpc ListAdminHomestays(google.protobuf.Empty) returns (ListAdminHomestaysResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetAdminHomestay(AdminHomestayActionRequest) returns (AdminHomestayDetail) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc PublishHomestay(AdminHomestayActionRequest) returns (AdminHomestaySummary);
+
+  rpc RejectHomestay(AdminHomestayActionRequest) returns (AdminHomestaySummary);
 
   rpc ListExperienceReviews(ListExperienceReviewsRequest) returns (ListExperienceReviewsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
@@ -170,6 +248,14 @@ message GetCatalogRequest {
 }
 
 message GetExperienceBySlugRequest {
+  string slug = 1;
+}
+
+message ListHomestaysRequest {
+  optional string city_slug = 1;
+}
+
+message GetHomestayBySlugRequest {
   string slug = 1;
 }
 
@@ -253,4 +339,71 @@ message MarkNotificationReadRequest {
 message UpdateHostExperienceInput {
   string experience_id = 1;
   UpdateHostExperienceRequest experience = 2;
+}
+
+message ListGuestHomestayBookingsRequest {
+  optional string status = 1;
+}
+
+message GetGuestHomestayBookingRequest {
+  string booking_id = 1;
+}
+
+message CancelGuestHomestayBookingRequest {
+  string booking_id = 1;
+}
+
+message GetOwnerHomestayRequest {
+  string homestay_id = 1;
+}
+
+message DeleteOwnerHomestayRequest {
+  string homestay_id = 1;
+}
+
+message UpdateOwnerHomestayInput {
+  string homestay_id = 1;
+  UpdateOwnerHomestayRequest homestay = 2;
+}
+
+message CreateOwnerHomestayRoomInput {
+  string homestay_id = 1;
+  CreateOwnerHomestayRoomRequest room = 2;
+}
+
+message UpdateOwnerHomestayRoomInput {
+  string homestay_id = 1;
+  string room_id = 2;
+  UpdateOwnerHomestayRoomRequest room = 3;
+}
+
+message DeleteOwnerHomestayRoomRequest {
+  string homestay_id = 1;
+  string room_id = 2;
+}
+
+message UpsertOwnerAvailabilityInput {
+  string homestay_id = 1;
+  UpsertOwnerAvailabilityRequest availability = 2;
+}
+
+message DeleteOwnerAvailabilityRequest {
+  string homestay_id = 1;
+  string availability_id = 2;
+}
+
+message ListOwnerHomestayBookingsRequest {
+  optional string status = 1;
+}
+
+message GetOwnerHomestayBookingRequest {
+  string booking_id = 1;
+}
+
+message OwnerHomestayBookingActionRequest {
+  string booking_id = 1;
+}
+
+message AdminHomestayActionRequest {
+  string homestay_id = 1;
 }

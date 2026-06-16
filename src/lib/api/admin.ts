@@ -3,7 +3,7 @@ import type { UserRole } from "@/lib/roles";
 import { fetchBookingById } from "@/lib/api/bookings";
 import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
 import { AdminExperienceActionRequestSchema } from "@/gen/royalpassage/v1/service_pb";
-import { CreateHostRequestSchema } from "@/gen/royalpassage/v1/types_pb";
+import { CreateHostRequestSchema, CreateHomestayOwnerRequestSchema } from "@/gen/royalpassage/v1/types_pb";
 import type { HostSlotDetail } from "@/lib/api/host-experiences";
 
 export type ManagedUser = {
@@ -35,6 +35,21 @@ export type CreateHostPayload = {
 export function createHost(accessToken: string, payload: CreateHostPayload) {
   const client = createRoyalPassageClient(accessToken);
   return rpcCall(() => client.createHost(create(CreateHostRequestSchema, payload)));
+}
+
+export type CreateHomestayOwnerPayload = {
+  fullName: string;
+  email: string;
+  password: string;
+  phone?: string;
+  address?: string;
+};
+
+export function createHomestayOwner(accessToken: string, payload: CreateHomestayOwnerPayload) {
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.createHomestayOwner(create(CreateHomestayOwnerRequestSchema, payload)),
+  );
 }
 
 export type AdminExperienceSummary = {

@@ -536,3 +536,323 @@ message ListAdminBookingsResponse {
 message ListWishlistResponse {
   repeated WishlistItem items = 1;
 }
+
+message HomestayRoom {
+  string id = 1;
+  string name = 2;
+  optional string category = 3;
+  int32 capacity = 4;
+  int32 price_per_night = 5;
+  int32 total_units = 6;
+  repeated string amenities = 7;
+}
+
+message Homestay {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  string tagline = 4;
+  string description = 5;
+  string property_type = 6;
+  string city = 7;
+  optional string city_slug = 8;
+  string address = 9;
+  optional string region = 10;
+  optional string map_link = 11;
+  int32 price_per_night = 12;
+  double rating = 13;
+  int32 reviews_count = 14;
+  string image = 15;
+  repeated string gallery_urls = 16;
+  repeated string amenities = 17;
+  repeated string house_rules = 18;
+  int32 bedrooms = 19;
+  int32 bathrooms = 20;
+  int32 max_guests = 21;
+  string check_in_time = 22;
+  string check_out_time = 23;
+  optional string currency_symbol = 24;
+  string owner_name = 25;
+  repeated HomestayRoom rooms = 26;
+}
+
+message ListHomestaysResponse {
+  string mode = 1;
+  repeated Homestay homestays = 2;
+  repeated string property_types = 3;
+  repeated string cities = 4;
+}
+
+message HomestayDetailResponse {
+  Homestay homestay = 1;
+  string source = 2;
+}
+
+message CreateHomestayOwnerRequest {
+  string full_name = 1;
+  string email = 2;
+  string password = 3;
+  optional string phone = 4;
+  optional string address = 5;
+}
+
+message CreateHomestayOwnerResponse {
+  string id = 1;
+  string email = 2;
+  string full_name = 3;
+  string homestay_owner_id = 4;
+}
+
+message CreateHomestayBookingRequest {
+  string homestay_id = 1;
+  optional string room_id = 2;
+  string check_in = 3;
+  string check_out = 4;
+  int32 guest_count = 5;
+  optional string notes = 6;
+}
+
+message CreateHomestayBookingResponse {
+  string booking_id = 1;
+  int32 total_amount = 2;
+  string currency_code = 3;
+  string booking_status = 4;
+  string payment_status = 5;
+  int32 nights = 6;
+}
+
+message OwnerHomestayAvailability {
+  string id = 1;
+  string date = 2;
+  optional string room_id = 3;
+  bool is_blocked = 4;
+  optional int32 price_override_minor = 5;
+  optional int32 min_nights = 6;
+  optional string note = 7;
+}
+
+message OwnerHomestayRoom {
+  string id = 1;
+  string name = 2;
+  optional string category = 3;
+  int32 capacity = 4;
+  int32 price_per_night_minor = 5;
+  int32 total_units = 6;
+  repeated string amenities = 7;
+  int32 sort_order = 8;
+  bool is_active = 9;
+}
+
+message OwnerHomestaySummary {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  string city = 4;
+  string status = 5;
+  int32 price_per_night_minor = 6;
+  string currency_symbol = 7;
+  int32 room_count = 8;
+  optional string image = 9;
+}
+
+message OwnerHomestayDetail {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  optional string tagline = 4;
+  optional string description = 5;
+  string property_type = 6;
+  string city = 7;
+  optional string city_slug = 8;
+  optional string region = 9;
+  optional string address = 10;
+  optional string map_link = 11;
+  int32 price_per_night_minor = 12;
+  string status = 13;
+  optional string hero_image_url = 14;
+  repeated string gallery_urls = 15;
+  repeated string amenities = 16;
+  repeated string house_rules = 17;
+  int32 bedrooms = 18;
+  int32 bathrooms = 19;
+  int32 max_guests = 20;
+  string check_in_time = 21;
+  string check_out_time = 22;
+  string currency_code = 23;
+  string currency_symbol = 24;
+  repeated OwnerHomestayRoom rooms = 25;
+  repeated OwnerHomestayAvailability availability = 26;
+  string created_at = 27;
+  string updated_at = 28;
+}
+
+message ListOwnerHomestaysResponse {
+  repeated OwnerHomestaySummary homestays = 1;
+}
+
+message CreateOwnerHomestayRequest {
+  string title = 1;
+  optional string slug = 2;
+  optional string tagline = 3;
+  string description = 4;
+  string property_type = 5;
+  string city_slug = 6;
+  optional string city = 7;
+  optional string region = 8;
+  optional string address = 9;
+  optional string map_link = 10;
+  int32 price_per_night_minor = 11;
+  optional string hero_image_url = 12;
+  repeated string gallery_urls = 13;
+  repeated string amenities = 14;
+  repeated string house_rules = 15;
+  int32 bedrooms = 16;
+  int32 bathrooms = 17;
+  int32 max_guests = 18;
+  optional string check_in_time = 19;
+  optional string check_out_time = 20;
+  bool submit_for_review = 21;
+}
+
+message UpdateOwnerHomestayRequest {
+  optional string title = 1;
+  optional string slug = 2;
+  optional string tagline = 3;
+  optional string description = 4;
+  optional string property_type = 5;
+  optional string city_slug = 6;
+  optional string city = 7;
+  optional string region = 8;
+  optional string address = 9;
+  optional string map_link = 10;
+  optional int32 price_per_night_minor = 11;
+  optional string hero_image_url = 12;
+  repeated string gallery_urls = 13;
+  repeated string amenities = 14;
+  repeated string house_rules = 15;
+  optional int32 bedrooms = 16;
+  optional int32 bathrooms = 17;
+  optional int32 max_guests = 18;
+  optional string check_in_time = 19;
+  optional string check_out_time = 20;
+  bool submit_for_review = 21;
+}
+
+message CreateOwnerHomestayRoomRequest {
+  string name = 1;
+  optional string category = 2;
+  int32 capacity = 3;
+  int32 price_per_night_minor = 4;
+  int32 total_units = 5;
+  repeated string amenities = 6;
+  int32 sort_order = 7;
+}
+
+message UpdateOwnerHomestayRoomRequest {
+  optional string name = 1;
+  optional string category = 2;
+  optional int32 capacity = 3;
+  optional int32 price_per_night_minor = 4;
+  optional int32 total_units = 5;
+  repeated string amenities = 6;
+  optional int32 sort_order = 7;
+  optional bool is_active = 8;
+}
+
+message UpsertOwnerAvailabilityRequest {
+  string date = 1;
+  optional string room_id = 2;
+  bool is_blocked = 3;
+  optional int32 price_override_minor = 4;
+  optional int32 min_nights = 5;
+  optional string note = 6;
+}
+
+message OwnerDashboardStats {
+  int32 pending_bookings = 1;
+  int32 confirmed_bookings = 2;
+  int32 completed_bookings = 3;
+  int32 revenue_collected_minor = 4;
+  int32 revenue_pending_minor = 5;
+  int32 upcoming_bookings = 6;
+  int32 check_in_today = 7;
+  int32 published_homestays = 8;
+  string currency_symbol = 9;
+  int32 total_bookings = 10;
+}
+
+message HomestayBookingSummary {
+  string id = 1;
+  string homestay_id = 2;
+  string homestay_title = 3;
+  string homestay_slug = 4;
+  optional string room_name = 5;
+  string check_in = 6;
+  string check_out = 7;
+  int32 nights = 8;
+  int32 guest_count = 9;
+  int32 total_amount = 10;
+  string currency_code = 11;
+  string currency_symbol = 12;
+  string booking_status = 13;
+  string payment_status = 14;
+  string payment_method = 15;
+  optional string guest_name = 16;
+  optional string notes = 17;
+  string created_at = 18;
+  optional string check_in_time = 19;
+  optional string check_out_time = 20;
+  optional string homestay_address = 21;
+}
+
+message ListHomestayBookingsResponse {
+  repeated HomestayBookingSummary bookings = 1;
+}
+
+message AdminHomestaySummary {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  string city = 4;
+  string status = 5;
+  string owner_name = 6;
+  string created_at = 7;
+}
+
+message AdminHomestayDetail {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  optional string tagline = 4;
+  optional string description = 5;
+  string property_type = 6;
+  string city = 7;
+  optional string city_slug = 8;
+  optional string region = 9;
+  optional string address = 10;
+  optional string map_link = 11;
+  int32 price_per_night_minor = 12;
+  string status = 13;
+  optional string hero_image_url = 14;
+  repeated string gallery_urls = 15;
+  repeated string amenities = 16;
+  repeated string house_rules = 17;
+  int32 bedrooms = 18;
+  int32 bathrooms = 19;
+  int32 max_guests = 20;
+  string check_in_time = 21;
+  string check_out_time = 22;
+  string currency_code = 23;
+  string currency_symbol = 24;
+  repeated OwnerHomestayRoom rooms = 25;
+  string created_at = 26;
+  string updated_at = 27;
+  string owner_name = 28;
+  optional string owner_email = 29;
+  optional string owner_phone = 30;
+  bool owner_verified = 31;
+}
+
+message ListAdminHomestaysResponse {
+  repeated AdminHomestaySummary homestays = 1;
+}

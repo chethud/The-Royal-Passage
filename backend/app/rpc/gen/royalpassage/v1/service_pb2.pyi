@@ -25,6 +25,18 @@ class GetExperienceBySlugRequest(_message.Message):
     slug: str
     def __init__(self, slug: _Optional[str] = ...) -> None: ...
 
+class ListHomestaysRequest(_message.Message):
+    __slots__ = ("city_slug",)
+    CITY_SLUG_FIELD_NUMBER: _ClassVar[int]
+    city_slug: str
+    def __init__(self, city_slug: _Optional[str] = ...) -> None: ...
+
+class GetHomestayBySlugRequest(_message.Message):
+    __slots__ = ("slug",)
+    SLUG_FIELD_NUMBER: _ClassVar[int]
+    slug: str
+    def __init__(self, slug: _Optional[str] = ...) -> None: ...
+
 class ListMyBookingsRequest(_message.Message):
     __slots__ = ("status",)
     STATUS_FIELD_NUMBER: _ClassVar[int]
@@ -150,3 +162,107 @@ class UpdateHostExperienceInput(_message.Message):
     experience_id: str
     experience: _types_pb2.UpdateHostExperienceRequest
     def __init__(self, experience_id: _Optional[str] = ..., experience: _Optional[_Union[_types_pb2.UpdateHostExperienceRequest, _Mapping]] = ...) -> None: ...
+
+class ListGuestHomestayBookingsRequest(_message.Message):
+    __slots__ = ("status",)
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    status: str
+    def __init__(self, status: _Optional[str] = ...) -> None: ...
+
+class GetGuestHomestayBookingRequest(_message.Message):
+    __slots__ = ("booking_id",)
+    BOOKING_ID_FIELD_NUMBER: _ClassVar[int]
+    booking_id: str
+    def __init__(self, booking_id: _Optional[str] = ...) -> None: ...
+
+class CancelGuestHomestayBookingRequest(_message.Message):
+    __slots__ = ("booking_id",)
+    BOOKING_ID_FIELD_NUMBER: _ClassVar[int]
+    booking_id: str
+    def __init__(self, booking_id: _Optional[str] = ...) -> None: ...
+
+class GetOwnerHomestayRequest(_message.Message):
+    __slots__ = ("homestay_id",)
+    HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
+    homestay_id: str
+    def __init__(self, homestay_id: _Optional[str] = ...) -> None: ...
+
+class DeleteOwnerHomestayRequest(_message.Message):
+    __slots__ = ("homestay_id",)
+    HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
+    homestay_id: str
+    def __init__(self, homestay_id: _Optional[str] = ...) -> None: ...
+
+class UpdateOwnerHomestayInput(_message.Message):
+    __slots__ = ("homestay_id", "homestay")
+    HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
+    HOMESTAY_FIELD_NUMBER: _ClassVar[int]
+    homestay_id: str
+    homestay: _types_pb2.UpdateOwnerHomestayRequest
+    def __init__(self, homestay_id: _Optional[str] = ..., homestay: _Optional[_Union[_types_pb2.UpdateOwnerHomestayRequest, _Mapping]] = ...) -> None: ...
+
+class CreateOwnerHomestayRoomInput(_message.Message):
+    __slots__ = ("homestay_id", "room")
+    HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
+    ROOM_FIELD_NUMBER: _ClassVar[int]
+    homestay_id: str
+    room: _types_pb2.CreateOwnerHomestayRoomRequest
+    def __init__(self, homestay_id: _Optional[str] = ..., room: _Optional[_Union[_types_pb2.CreateOwnerHomestayRoomRequest, _Mapping]] = ...) -> None: ...
+
+class UpdateOwnerHomestayRoomInput(_message.Message):
+    __slots__ = ("homestay_id", "room_id", "room")
+    HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
+    ROOM_ID_FIELD_NUMBER: _ClassVar[int]
+    ROOM_FIELD_NUMBER: _ClassVar[int]
+    homestay_id: str
+    room_id: str
+    room: _types_pb2.UpdateOwnerHomestayRoomRequest
+    def __init__(self, homestay_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_types_pb2.UpdateOwnerHomestayRoomRequest, _Mapping]] = ...) -> None: ...
+
+class DeleteOwnerHomestayRoomRequest(_message.Message):
+    __slots__ = ("homestay_id", "room_id")
+    HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
+    ROOM_ID_FIELD_NUMBER: _ClassVar[int]
+    homestay_id: str
+    room_id: str
+    def __init__(self, homestay_id: _Optional[str] = ..., room_id: _Optional[str] = ...) -> None: ...
+
+class UpsertOwnerAvailabilityInput(_message.Message):
+    __slots__ = ("homestay_id", "availability")
+    HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
+    AVAILABILITY_FIELD_NUMBER: _ClassVar[int]
+    homestay_id: str
+    availability: _types_pb2.UpsertOwnerAvailabilityRequest
+    def __init__(self, homestay_id: _Optional[str] = ..., availability: _Optional[_Union[_types_pb2.UpsertOwnerAvailabilityRequest, _Mapping]] = ...) -> None: ...
+
+class DeleteOwnerAvailabilityRequest(_message.Message):
+    __slots__ = ("homestay_id", "availability_id")
+    HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
+    AVAILABILITY_ID_FIELD_NUMBER: _ClassVar[int]
+    homestay_id: str
+    availability_id: str
+    def __init__(self, homestay_id: _Optional[str] = ..., availability_id: _Optional[str] = ...) -> None: ...
+
+class ListOwnerHomestayBookingsRequest(_message.Message):
+    __slots__ = ("status",)
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    status: str
+    def __init__(self, status: _Optional[str] = ...) -> None: ...
+
+class GetOwnerHomestayBookingRequest(_message.Message):
+    __slots__ = ("booking_id",)
+    BOOKING_ID_FIELD_NUMBER: _ClassVar[int]
+    booking_id: str
+    def __init__(self, booking_id: _Optional[str] = ...) -> None: ...
+
+class OwnerHomestayBookingActionRequest(_message.Message):
+    __slots__ = ("booking_id",)
+    BOOKING_ID_FIELD_NUMBER: _ClassVar[int]
+    booking_id: str
+    def __init__(self, booking_id: _Optional[str] = ...) -> None: ...
+
+class AdminHomestayActionRequest(_message.Message):
+    __slots__ = ("homestay_id",)
+    HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
+    homestay_id: str
+    def __init__(self, homestay_id: _Optional[str] = ...) -> None: ...

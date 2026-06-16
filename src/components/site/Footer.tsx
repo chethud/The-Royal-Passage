@@ -5,6 +5,7 @@ import footerPalaceImg from "@/assets/footer-palace.png";
 
 const quickLinks = [
   { label: "Experiences", to: "/experiences" },
+  { label: "Homestays", to: "/homestays" },
   { label: "Curated Journeys", to: "/experiences" },
   { label: "About Us", to: "/hosts" },
   { label: "Gallery", to: "/experiences" },

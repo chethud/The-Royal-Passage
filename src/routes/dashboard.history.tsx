@@ -6,6 +6,9 @@ import { GuestBookingsList } from "@/components/guest/GuestBookingsList";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { GuestEmptyState } from "@/components/guest/GuestEmptyState";
 import { fetchMyBookings, type BookingSummary } from "@/lib/api/bookings";
+import { fetchGuestHomestayBookings } from "@/lib/api/guest-homestay-bookings";
+import type { HomestayBookingSummary } from "@/lib/api/owner-homestay-bookings";
+import { GuestHomestayBookingsList } from "@/components/guest/GuestHomestayBookingsList";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useGuestAccess } from "@/lib/use-guest-access";
 
@@ -29,6 +32,8 @@ function GuestHistoryPage() {
   const { accessToken, ready, loading } = useGuestAccess();
   const [activeBookings, setActiveBookings] = useState<BookingSummary[]>([]);
   const [bookings, setBookings] = useState<BookingSummary[]>([]);
+  const [activeHomestayBookings, setActiveHomestayBookings] = useState<HomestayBookingSummary[]>([]);
+  const [homestayBookings, setHomestayBookings] = useState<HomestayBookingSummary[]>([]);
   const [pageError, setPageError] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
   const [bookingNotice, setBookingNotice] = useState<string | null>(null);
@@ -42,16 +47,25 @@ function GuestHistoryPage() {
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
-      const [upcoming, past, cancelled] = await Promise.all([
-        fetchMyBookings(accessToken, "upcoming"),
-        fetchMyBookings(accessToken, "past"),
-        fetchMyBookings(accessToken, "cancelled"),
-      ]);
+      const [upcoming, past, cancelled, homestayUpcoming, homestayPast, homestayCancelled] =
+        await Promise.all([
+          fetchMyBookings(accessToken, "upcoming"),
+          fetchMyBookings(accessToken, "past"),
+          fetchMyBookings(accessToken, "cancelled"),
+          fetchGuestHomestayBookings(accessToken, "upcoming"),
+          fetchGuestHomestayBookings(accessToken, "past"),
+          fetchGuestHomestayBookings(accessToken, "cancelled"),
+        ]);
       setActiveBookings(upcoming);
+      setActiveHomestayBookings(homestayUpcoming);
       const merged = [...past, ...cancelled].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
       setBookings(merged);
+      const mergedHomestays = [...homestayPast, ...homestayCancelled].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+      setHomestayBookings(mergedHomestays);
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to load booking history."));
     } finally {
@@ -66,7 +80,11 @@ function GuestHistoryPage() {
 
   useEffect(() => {
     if (!booked) return;
-    setBookingNotice("Your booking request was submitted. Your host will confirm shortly.");
+    setBookingNotice(
+      booked === "homestay"
+        ? "Your stay request was submitted. Pay in cash at check-in once the host confirms."
+        : "Your booking request was submitted. Your host will confirm shortly.",
+    );
     setConfirmedBookingId(booked);
     void navigate({ search: (prev) => ({ ...prev, booked: undefined }), replace: true });
   }, [booked, navigate]);
@@ -98,11 +116,11 @@ function GuestHistoryPage() {
               <>
                 {" "}
                 <Link
-                  to="/bookings/$bookingId"
+                  to="/stays/$bookingId"
                   params={{ bookingId: confirmedBookingId }}
                   className="luxury-panel-link font-medium underline-offset-4 hover:underline"
                 >
-                  View booking details
+                  View stay details
                 </Link>
               </>
             ) : null}
@@ -120,7 +138,10 @@ function GuestHistoryPage() {
             {pageError}
           </p>
         </LuxuryCheckoutPanel>
-      ) : activeBookings.length === 0 && bookings.length === 0 ? (
+      ) : activeBookings.length === 0 &&
+        bookings.length === 0 &&
+        activeHomestayBookings.length === 0 &&
+        homestayBookings.length === 0 ? (
         <LuxuryCheckoutPanel>
           <GuestEmptyState
             icon={<History className="h-8 w-8" strokeWidth={1.5} />}
@@ -131,6 +152,18 @@ function GuestHistoryPage() {
         </LuxuryCheckoutPanel>
       ) : (
         <div className="space-y-8">
+          {activeHomestayBookings.length > 0 ? (
+            <LuxuryCheckoutPanel>
+              <div className="mb-6 flex items-baseline justify-between gap-4 border-b luxury-panel-divider pb-5">
+                <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Active stays</h2>
+                <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
+                  {activeHomestayBookings.length} active
+                </span>
+              </div>
+              <GuestHomestayBookingsList bookings={activeHomestayBookings} surface="light" />
+            </LuxuryCheckoutPanel>
+          ) : null}
+
           {activeBookings.length > 0 ? (
             <LuxuryCheckoutPanel>
               <div className="mb-6 flex items-baseline justify-between gap-4 border-b luxury-panel-divider pb-5">
@@ -146,6 +179,15 @@ function GuestHistoryPage() {
                 onUpdated={() => void loadBookings()}
                 surface="light"
               />
+            </LuxuryCheckoutPanel>
+          ) : null}
+
+          {homestayBookings.length > 0 ? (
+            <LuxuryCheckoutPanel>
+              <div className="mb-6 flex flex-wrap items-baseline justify-between gap-4 border-b luxury-panel-divider pb-5">
+                <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Past & cancelled stays</h2>
+              </div>
+              <GuestHomestayBookingsList bookings={homestayBookings} surface="light" />
             </LuxuryCheckoutPanel>
           ) : null}
 

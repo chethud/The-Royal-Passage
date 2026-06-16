@@ -1,0 +1,142 @@
+import { createServerFn } from "@tanstack/react-start";
+import { homestays as staticHomestays } from "@/data/homestays";
+import { isApiConfigured } from "@/lib/api/client";
+import { fetchHomestayBySlug, fetchHomestays } from "@/lib/api/homestays";
+import { getOrSetServerCache } from "@/lib/cache.server";
+import { isSupabaseConfigured } from "@/lib/env.server";
+import { mapProtoHomestay } from "@/lib/homestay-db";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import type { Homestay } from "@/data/homestays";
+
+function fallbackCatalog() {
+  return {
+    mode: "static" as const,
+    homestays: staticHomestays,
+    propertyTypes: [...new Set(staticHomestays.map((stay) => stay.propertyType))],
+    cities: [...new Set(staticHomestays.map((stay) => stay.city))],
+  };
+}
+
+async function loadHomestaysFromDb(citySlug?: string): Promise<Homestay[]> {
+  const supabase = getSupabaseAdmin();
+  let query = supabase
+    .from("homestays")
+    .select(
+      `
+      *,
+      homestay_owners ( full_name, approval_status )
+    `,
+    )
+    .eq("status", "published");
+  if (citySlug) query = query.eq("city_slug", citySlug);
+  const { data: rows, error } = await query;
+  if (error) throw new Error(error.message);
+  const visible = (rows ?? []).filter((row) => {
+    const owner = row.homestay_owners as { approval_status?: string } | null;
+    return owner?.approval_status !== "rejected" && owner?.approval_status !== "suspended";
+  });
+  if (visible.length === 0) return [];
+
+  const ids = visible.map((row) => row.id as string);
+  const { data: roomRows, error: roomError } = await supabase
+    .from("homestay_rooms")
+    .select("*")
+    .in("homestay_id", ids)
+    .eq("is_active", true)
+    .order("sort_order");
+  if (roomError) throw new Error(roomError.message);
+
+  const roomsByStay = new Map<string, Record<string, unknown>[]>();
+  for (const room of roomRows ?? []) {
+    const homestayId = room.homestay_id as string;
+    const list = roomsByStay.get(homestayId) ?? [];
+    list.push(room as Record<string, unknown>);
+    roomsByStay.set(homestayId, list);
+  }
+
+  return visible.map((row) => {
+    const owner = row.homestay_owners as { full_name?: string } | null;
+    const galleryUrls = (row.gallery_urls as string[] | null) ?? [];
+    const hero = (row.hero_image_url as string | null) ?? "";
+    const rooms = roomsByStay.get(row.id as string) ?? [];
+    const baseNight = Math.round(Number(row.price_per_night_minor ?? 0) / 100);
+    return {
+      id: row.id as string,
+      slug: row.slug as string,
+      title: row.title as string,
+      tagline: (row.tagline as string | null) ?? "",
+      description: (row.description as string | null) ?? "",
+      propertyType: row.property_type as Homestay["propertyType"],
+      city: row.city as string,
+      region: (row.region as string | null) ?? undefined,
+      address: (row.address as string | null) ?? "",
+      mapLink: (row.map_link as string | null) ?? undefined,
+      pricePerNight: baseNight,
+      currencySymbol: "₹",
+      rating: Number(row.rating_avg ?? 0),
+      reviewsCount: Number(row.reviews_count ?? 0),
+      image: hero,
+      galleryUrls: galleryUrls.length ? galleryUrls : hero ? [hero] : [],
+      amenities: (row.amenities as Homestay["amenities"]) ?? [],
+      houseRules: (row.house_rules as string[] | null) ?? [],
+      bedrooms: Number(row.bedrooms ?? 1),
+      bathrooms: Number(row.bathrooms ?? 1),
+      maxGuests: Number(row.max_guests ?? 2),
+      checkInTime: String(row.check_in_time ?? "14:00").slice(0, 5),
+      checkOutTime: String(row.check_out_time ?? "11:00").slice(0, 5),
+    };
+  });
+}
+
+export const getHomestaysForUi = createServerFn({ method: "GET" }).handler(async () => {
+  const cacheKey = `homestays-catalog-${new Date().toISOString().slice(0, 10)}`;
+  return getOrSetServerCache(cacheKey, async () => {
+    if (isApiConfigured()) {
+      try {
+        return await fetchHomestays();
+      } catch {
+        /* fall through */
+      }
+    }
+    if (isSupabaseConfigured()) {
+      try {
+        const homestays = await loadHomestaysFromDb();
+        if (homestays.length > 0) {
+          return {
+            mode: "live" as const,
+            homestays,
+            propertyTypes: [...new Set(homestays.map((stay) => stay.propertyType))],
+            cities: [...new Set(homestays.map((stay) => stay.city))],
+          };
+        }
+      } catch {
+        /* fall through */
+      }
+    }
+    return fallbackCatalog();
+  });
+});
+
+export const getHomestayForDetail = createServerFn({ method: "GET" })
+  .inputValidator((data: { slug: string }) => data)
+  .handler(async ({ data }) => {
+    if (isApiConfigured()) {
+      try {
+        return await fetchHomestayBySlug(data.slug);
+      } catch {
+        /* fall through */
+      }
+    }
+    if (isSupabaseConfigured()) {
+      try {
+        const homestays = await loadHomestaysFromDb();
+        const homestay = homestays.find((stay) => stay.slug === data.slug);
+        if (homestay) return { homestay, source: "live" as const };
+      } catch {
+        /* fall through */
+      }
+    }
+    const homestay = staticHomestays.find((stay) => stay.slug === data.slug);
+    if (!homestay) return null;
+    return { homestay, source: "static" as const };
+  });

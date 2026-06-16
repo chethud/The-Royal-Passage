@@ -53,6 +53,32 @@ def mark_experience_review_notifications_read(experience_id: str) -> None:
     )
 
 
+def notify_admins_new_homestay_review(homestay_id: str, title: str, owner_name: str) -> None:
+    for admin_id in list_admin_user_ids():
+        create_notification(
+            admin_id,
+            "homestay_submitted",
+            "New homestay to review",
+            f'{owner_name} submitted "{title}" for approval.',
+            {"homestayId": homestay_id},
+        )
+
+
+def mark_homestay_review_notifications_read(homestay_id: str) -> None:
+    from datetime import datetime, timezone
+
+    supabase = get_supabase_admin()
+    now = datetime.now(timezone.utc).isoformat()
+    (
+        supabase.table("notifications")
+        .update({"read_at": now})
+        .eq("type", "homestay_submitted")
+        .is_("read_at", "null")
+        .contains("metadata", {"homestayId": homestay_id})
+        .execute()
+    )
+
+
 def mark_booking_request_notifications_read(user_id: str, booking_id: str) -> None:
     from datetime import datetime, timezone
 
