@@ -315,34 +315,40 @@ function ExperienceDetail() {
       {canBook ? (
         <section id="book" className="border-t border-[rgb(200_162_90/0.18)] pb-16 pt-4">
           <div className="container-page py-8 sm:py-10">
-            <LuxuryCheckoutPanel>
-              <div className="mx-auto max-w-2xl">
-                <div className="mb-8">
-                  <div className="eyebrow luxury-panel-label mb-3">Reserve your seats</div>
-                  <h2 className="luxury-panel-heading font-display text-3xl uppercase leading-tight tracking-[0.03em] sm:text-4xl">
-                    Choose a date.
-                    <br />
-                    <em className="italic normal-case text-[#8B6914]">Hold your moment.</em>
-                  </h2>
-                  <p className="luxury-panel-body mt-4 max-w-xl text-sm leading-relaxed">
-                    Seats are released on a first-come basis and held for 10 minutes during
-                    checkout to ensure no one is double-booked.
-                  </p>
-                </div>
-
-                <ExperienceBookingPanel
-                  exp={exp}
-                  selectedSlot={selectedSlot}
-                  onSelectSlot={setSelectedSlot}
-                  guests={guests}
-                  onGuestsChange={setGuests}
-                  variant="select"
-                  signedIn={Boolean(user)}
-                  userRole={user ? (role ?? "guest") : null}
-                  surface="light"
-                />
+            <div className="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-10">
+              <div className="hidden w-full lg:block lg:sticky lg:top-[calc(var(--header-height)+1.5rem)]">
+                <ExperienceDetailGallery exp={exp} />
               </div>
-            </LuxuryCheckoutPanel>
+
+              <LuxuryCheckoutPanel>
+                <div className="mx-auto max-w-2xl lg:max-w-none">
+                  <div className="mb-8">
+                    <div className="eyebrow luxury-panel-label mb-3">Reserve your seats</div>
+                    <h2 className="luxury-panel-heading font-display text-3xl uppercase leading-tight tracking-[0.03em] sm:text-4xl">
+                      Choose a date.
+                      <br />
+                      <em className="italic normal-case text-[#8B6914]">Hold your moment.</em>
+                    </h2>
+                    <p className="luxury-panel-body mt-4 max-w-xl text-sm leading-relaxed">
+                      Seats are released on a first-come basis and held for 10 minutes during
+                      checkout to ensure no one is double-booked.
+                    </p>
+                  </div>
+
+                  <ExperienceBookingPanel
+                    exp={exp}
+                    selectedSlot={selectedSlot}
+                    onSelectSlot={setSelectedSlot}
+                    guests={guests}
+                    onGuestsChange={setGuests}
+                    variant="select"
+                    signedIn={Boolean(user)}
+                    userRole={user ? (role ?? "guest") : null}
+                    surface="light"
+                  />
+                </div>
+              </LuxuryCheckoutPanel>
+            </div>
           </div>
         </section>
       ) : (

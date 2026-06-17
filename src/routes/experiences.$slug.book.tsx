@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { BookingCheckoutWizard } from "@/components/booking/BookingCheckoutWizard";
 import { BookingRequestHeader } from "@/components/booking/BookingRequestHeader";
+import { ExperienceDetailGallery } from "@/components/experiences/ExperienceDetailGallery";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { useAuthUser } from "@/lib/auth-user";
@@ -70,43 +71,48 @@ function BookExperiencePage() {
       <Header />
 
       <section className="container-page py-10 sm:py-14">
-        <div className="mx-auto max-w-2xl">
-          <Link
-            to="/experiences/$slug"
-            params={{ slug: exp.slug }}
-            hash="book"
-            className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
-          >
-            ← Back to experience
-          </Link>
+        <Link
+          to="/experiences/$slug"
+          params={{ slug: exp.slug }}
+          hash="book"
+          className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
+        >
+          ← Back to experience
+        </Link>
 
-          <BookingRequestHeader
-            className="mt-6"
-            label="Book your seats"
-            title={exp.title}
-            meta={`${exp.city} · ${exp.hostName}`}
-            titleAs="h1"
-          />
+        <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-10">
+          <div className="w-full lg:sticky lg:top-[calc(var(--header-height)+1.5rem)]">
+            <ExperienceDetailGallery exp={exp} />
+          </div>
 
-          <BookingCheckoutWizard
-            exp={exp}
-            source={source}
-            initialSlotId={search.slotId}
-            initialGuests={search.guests}
-            backLink={{
-              to: "/experiences/$slug",
-              params: { slug: exp.slug },
-              hash: "book",
-              label: "Back to experience",
-            }}
-            userRole={role ?? "guest"}
-            onSuccess={(bookingId) => {
-              void navigate({
-                to: "/dashboard/history",
-                search: { booked: bookingId },
-              });
-            }}
-          />
+          <div className="min-w-0">
+            <BookingRequestHeader
+              label="Book your seats"
+              title={exp.title}
+              meta={`${exp.city} · ${exp.hostName}`}
+              titleAs="h1"
+            />
+
+            <BookingCheckoutWizard
+              exp={exp}
+              source={source}
+              initialSlotId={search.slotId}
+              initialGuests={search.guests}
+              backLink={{
+                to: "/experiences/$slug",
+                params: { slug: exp.slug },
+                hash: "book",
+                label: "Back to experience",
+              }}
+              userRole={role ?? "guest"}
+              onSuccess={(bookingId) => {
+                void navigate({
+                  to: "/dashboard/history",
+                  search: { booked: bookingId },
+                });
+              }}
+            />
+          </div>
         </div>
       </section>
 

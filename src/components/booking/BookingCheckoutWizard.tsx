@@ -8,6 +8,7 @@ import { useCheckoutBooking } from "@/hooks/use-checkout-booking";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 import { formatTime12h } from "@/lib/weekday-slots";
+import { getExperienceCoverImage } from "@/lib/experience-cover-image";
 
 type BookingCheckoutWizardProps = {
   exp: Experience;
@@ -70,6 +71,8 @@ export function BookingCheckoutWizard({
     const bookingId = await submit();
     if (bookingId) onSuccess(bookingId);
   };
+
+  const coverImage = getExperienceCoverImage(exp);
 
   return (
     <div className="mt-6 space-y-6">
@@ -241,9 +244,9 @@ export function BookingCheckoutWizard({
 
       <LuxuryCheckoutPanel>
         <div className="flex gap-4 sm:gap-5">
-          {exp.image ? (
-            <div className="luxury-panel-image w-20 shrink-0 overflow-hidden rounded-lg sm:w-24">
-              <img src={exp.image} alt="" className="aspect-square h-full w-full object-cover" />
+          {coverImage ? (
+            <div className="luxury-panel-image w-20 shrink-0 overflow-hidden rounded-lg sm:w-24 lg:hidden">
+              <img src={coverImage} alt={exp.title} className="aspect-square h-full w-full object-cover" />
             </div>
           ) : null}
 

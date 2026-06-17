@@ -1,5 +1,6 @@
 import type { Experience } from "@/data/experiences";
 import { create } from "@bufbuild/protobuf";
+import { getExperienceCoverImage } from "@/lib/experience-cover-image";
 import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
 import {
   GetCatalogRequestSchema,
@@ -22,8 +23,10 @@ export type ExperienceDetailPayload = {
 function normalizeExperience(exp: Experience): Experience {
   const galleryUrls =
     exp.galleryUrls?.length ? exp.galleryUrls : exp.image ? [exp.image] : [];
+  const image = getExperienceCoverImage({ ...exp, galleryUrls });
   return {
     ...exp,
+    image,
     galleryUrls,
     exclusions: exp.exclusions ?? [],
     requirements: exp.requirements ?? [],

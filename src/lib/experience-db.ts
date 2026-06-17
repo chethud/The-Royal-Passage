@@ -1,4 +1,4 @@
-import type { Experience, Slot } from "@/data/experiences";
+import { getExperienceCoverImage } from "@/lib/experience-cover-image";
 
 type HostEmbed = {
   display_name: string;
@@ -83,6 +83,15 @@ export function mapRowToExperience(exp: ExperienceRow, slots: SlotRow[]): Experi
   }));
 
   const rupees = Math.round(exp.price_per_person_minor / 100);
+  const galleryUrls = exp.gallery_urls?.length
+    ? exp.gallery_urls
+    : exp.hero_image_url
+      ? [exp.hero_image_url]
+      : [];
+  const image = getExperienceCoverImage({
+    image: exp.hero_image_url ?? "",
+    galleryUrls,
+  });
 
   return {
     id: exp.id,
@@ -102,11 +111,11 @@ export function mapRowToExperience(exp: ExperienceRow, slots: SlotRow[]): Experi
     pricePerPerson: rupees,
     rating: Number(exp.average_rating),
     reviewsCount: exp.review_count,
-    image: exp.hero_image_url ?? "",
+    image,
     inclusions: exp.inclusions ?? [],
     exclusions: exp.exclusions ?? [],
     requirements: exp.requirements ?? [],
-    galleryUrls: exp.gallery_urls?.length ? exp.gallery_urls : exp.hero_image_url ? [exp.hero_image_url] : [],
+    galleryUrls,
     region: exp.region ?? undefined,
     cancellation: exp.cancellation_policy ?? "",
     slots: uiSlots,
