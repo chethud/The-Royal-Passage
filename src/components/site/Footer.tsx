@@ -48,7 +48,7 @@ function FooterBrandBlock({
 }) {
   if (layout === "row") {
     return (
-      <div className="flex w-full items-center gap-4 sm:gap-6 md:gap-8">
+      <div className="flex max-w-full flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-4">
         <img
           src={logoUrl}
           alt="The Royal Passage"
@@ -58,12 +58,12 @@ function FooterBrandBlock({
           decoding="async"
           className={`logo-breathe shrink-0 ${logoClassName}`}
         />
-        <p className="min-w-0 flex-1 text-xs leading-relaxed text-muted-foreground sm:text-sm md:max-w-lg lg:max-w-xl">
+        <p className="max-w-[18rem] text-xs leading-snug text-muted-foreground sm:max-w-xs sm:text-sm md:max-w-sm lg:max-w-md">
           {TAGLINE}
         </p>
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-2">
           {SOCIAL_LINKS.map(({ label, Icon, href }) => (
-            <SocialIcon key={label} label={label} Icon={Icon} href={href} />
+            <SocialIcon key={label} label={label} Icon={Icon} href={href} compact />
           ))}
         </div>
       </div>
@@ -94,11 +94,11 @@ function FooterBrandBlock({
 function FooterSimple() {
   return (
     <footer className="mt-12 border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
-      <div className="container-page py-5 sm:py-6">
-        <FooterBrandBlock layout="row" logoClassName="h-14 w-auto object-contain sm:h-16 md:h-[4.5rem]" />
+      <div className="container-page py-4 sm:py-5">
+        <FooterBrandBlock layout="row" logoClassName="h-12 w-auto object-contain sm:h-14 md:h-16" />
 
         <p
-          className="mt-4 text-center text-[0.68rem] text-muted-foreground/75 sm:text-left sm:text-xs"
+          className="mt-3 text-[0.68rem] text-muted-foreground/75 sm:text-xs"
           suppressHydrationWarning
         >
           © {new Date().getFullYear()} The Royal Passage. All rights reserved.
@@ -242,10 +242,12 @@ function SocialIcon({
   label,
   Icon,
   href,
+  compact = false,
 }: {
   label: string;
   Icon: typeof Instagram;
   href: string;
+  compact?: boolean;
 }) {
   return (
     <a
@@ -253,9 +255,11 @@ function SocialIcon({
       target="_blank"
       rel="noreferrer"
       aria-label={label}
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.32)] text-ink/80 transition-all hover:border-ember/60 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className={`flex items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.32)] text-ink/80 transition-all hover:border-ember/60 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+        compact ? "h-8 w-8" : "h-9 w-9"
+      }`}
     >
-      <Icon className="h-4 w-4" strokeWidth={1.6} />
+      <Icon className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={1.6} />
     </a>
   );
 }
