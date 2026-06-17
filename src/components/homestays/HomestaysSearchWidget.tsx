@@ -1,5 +1,5 @@
 import { Minus, Plus, Search } from "lucide-react";
-import { defaultHomestayDates, type HomestayBrowseSearch } from "@/lib/homestay-filters";
+import { defaultHomestayDates, HOMESTAY_CITY, type HomestayBrowseSearch } from "@/lib/homestay-filters";
 
 export type HomestaySearchValues = Required<
   Pick<HomestayBrowseSearch, "checkIn" | "checkOut" | "guests">
@@ -56,17 +56,20 @@ export function HomestaysSearchWidget({
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))_auto] lg:items-end">
         <label className="block sm:col-span-2 lg:col-span-1">
-          <span className="eyebrow mb-2 block text-[0.58rem] text-[#4A0000]/70">Location</span>
+          <span className="eyebrow mb-2 block text-[0.58rem] text-[#4A0000]/70">Property</span>
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4A0000]/55" />
             <input
               type="search"
               value={values.q ?? ""}
               onChange={(event) => onChange({ q: event.target.value })}
-              placeholder="City or property name…"
+              placeholder={`Search in ${HOMESTAY_CITY}…`}
               className="w-full rounded-sm border border-[rgb(74_0_0/0.14)] bg-white py-3 pl-10 pr-3 text-sm text-[#3A0000] placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/35 focus:outline-none"
             />
           </div>
+          <span className="mt-1.5 block text-[0.62rem] uppercase tracking-[0.14em] text-[#4A0000]/55">
+            {HOMESTAY_CITY} only
+          </span>
         </label>
 
         <label className="block">

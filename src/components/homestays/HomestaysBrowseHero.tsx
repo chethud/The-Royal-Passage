@@ -39,10 +39,10 @@ export function HomestaysBrowseHero({ search, onSearchChange, onSubmit }: Homest
           <p className="eyebrow text-[#D4AF6A]">Browse stays</p>
           <div className="mt-2 max-w-2xl">
             <h1 className="font-display text-3xl leading-tight tracking-tight text-[#F7F1E8] sm:text-4xl md:text-[2.75rem]">
-              Find your perfect homestay
+              Mysuru homestays
             </h1>
             <p className="mt-4 max-w-lg text-sm leading-relaxed text-[#F7F1E8]/80 sm:text-[0.95rem]">
-              Choose your dates and guests, then pick a property to request your stay.
+              Choose your dates and guests, then pick a stay in Mysuru.
             </p>
           </div>
 

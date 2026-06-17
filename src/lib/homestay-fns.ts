@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { homestays as staticHomestays } from "@/data/homestays";
+import { isMysuruHomestay } from "@/lib/homestay-filters";
 import { isApiConfigured } from "@/lib/api/client";
 import { fetchHomestayBySlug, fetchHomestays } from "@/lib/api/homestays";
 import { getOrSetServerCache } from "@/lib/cache.server";
@@ -9,15 +10,16 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { Homestay } from "@/data/homestays";
 
 function fallbackCatalog() {
+  const homestays = staticHomestays.filter(isMysuruHomestay);
   return {
     mode: "static" as const,
-    homestays: staticHomestays,
-    propertyTypes: [...new Set(staticHomestays.map((stay) => stay.propertyType))],
-    cities: [...new Set(staticHomestays.map((stay) => stay.city))],
+    homestays,
+    propertyTypes: [...new Set(homestays.map((stay) => stay.propertyType))],
+    cities: [...new Set(homestays.map((stay) => stay.city))],
   };
 }
 
-async function loadHomestaysFromDb(citySlug?: string): Promise<Homestay[]> {
+async function loadHomestaysFromDb(citySlug = "mysuru"): Promise<Homestay[]> {
   const supabase = getSupabaseAdmin();
   let query = supabase
     .from("homestays")
@@ -54,7 +56,8 @@ async function loadHomestaysFromDb(citySlug?: string): Promise<Homestay[]> {
     roomsByStay.set(homestayId, list);
   }
 
-  return visible.map((row) => {
+  return visible
+    .map((row) => {
     const owner = row.homestay_owners as { full_name?: string } | null;
     const galleryUrls = (row.gallery_urls as string[] | null) ?? [];
     const hero = (row.hero_image_url as string | null) ?? "";
@@ -85,7 +88,8 @@ async function loadHomestaysFromDb(citySlug?: string): Promise<Homestay[]> {
       checkInTime: String(row.check_in_time ?? "14:00").slice(0, 5),
       checkOutTime: String(row.check_out_time ?? "11:00").slice(0, 5),
     };
-  });
+  })
+    .filter(isMysuruHomestay);
 }
 
 export const getHomestaysForUi = createServerFn({ method: "GET" }).handler(async () => {

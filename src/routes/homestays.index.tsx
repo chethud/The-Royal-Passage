@@ -24,7 +24,7 @@ export const Route = createFileRoute("/homestays/")({
       {
         name: "description",
         content:
-          "Discover curated homestays, heritage havelis, and guest houses across Mysuru and Karnataka with Royal Passage hospitality.",
+          "Discover curated homestays, heritage havelis, and guest houses in Mysuru with Royal Passage hospitality.",
       },
       { property: "og:title", content: "Royal Homestays — The Royal Passage" },
       { property: "og:type", content: "website" },

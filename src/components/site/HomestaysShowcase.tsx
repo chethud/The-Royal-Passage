@@ -26,8 +26,8 @@ export function HomestaysShowcase({ homestays = [] }: HomestaysShowcaseProps) {
               Rest Where Stories Live
             </h2>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Heritage havelis, hill cottages, and guest houses — each vetted for warmth, location,
-              and Royal Passage hospitality.
+              Heritage havelis, villas, and guest houses in Mysuru — each vetted for warmth,
+              location, and Royal Passage hospitality.
             </p>
           </div>
           <Link

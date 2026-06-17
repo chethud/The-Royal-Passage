@@ -194,8 +194,11 @@ create policy "Public read published homestay reviews"
 -- ---------------------------------------------------------------------------
 insert into public.homestay_owners (id, full_name, email, phone, address, approval_status, verified) values
   ('a0000001-0000-4000-8000-000000000001', 'Royal Heritage Stays', 'heritage@royalpassage.demo', '+91 9000000001', 'Mysuru, Karnataka', 'approved', true),
-  ('a0000002-0000-4000-8000-000000000002', 'Coorg Retreats Collective', 'coorg@royalpassage.demo', '+91 9000000002', 'Madikeri, Coorg', 'approved', true)
-on conflict (id) do nothing;
+  ('a0000002-0000-4000-8000-000000000002', 'Mysuru Villa Collection', 'villas@royalpassage.demo', '+91 9000000002', 'Chamundi Hill Road, Mysuru', 'approved', true)
+on conflict (id) do update set
+  full_name = excluded.full_name,
+  email = excluded.email,
+  address = excluded.address;
 
 insert into public.homestays (
   id, owner_id, slug, title, tagline, description, property_type, city_slug, city, region, address,
@@ -223,12 +226,12 @@ insert into public.homestays (
   (
     'b0000002-0000-4000-8000-000000000002',
     'a0000002-0000-4000-8000-000000000002',
-    'coorg-cloud-cottage',
-    'Coorg Cloud Cottage',
-    'Mist, coffee estates, and slow mornings',
-    'Elevated cottage surrounded by arabica estates. Floor-to-ceiling windows, fireplace evenings, and guided estate walks with your host family.',
-    'Cottage', 'coorg', 'Coorg', 'Karnataka', 'Madikeri Hills, Coorg',
-    array['WiFi', 'Kitchen', 'Campfire', 'Parking', 'Breakfast', 'Pet Friendly'],
+    'chamundi-hills-villa',
+    'Chamundi Hills Villa',
+    'Palace views, gardens, and quiet mornings',
+    'A serene villa at the Chamundi foothills with terraced gardens, glimpses of the palace skyline, and hosts who know every corner of Mysuru.',
+    'Villa', 'mysuru', 'Mysuru', 'Karnataka', 'Chamundi Hill Road, Mysuru',
+    array['WiFi', 'Kitchen', 'Garden', 'Parking', 'Breakfast', 'AC'],
     array[]::text[],
     '15:00', '11:00',
     'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80',
@@ -257,12 +260,21 @@ insert into public.homestays (
     380000, 'INR', 4, 4, 8, 4.70, 29, 'published'
   )
 on conflict (id) do update set
+  slug = excluded.slug,
+  title = excluded.title,
+  tagline = excluded.tagline,
+  description = excluded.description,
+  property_type = excluded.property_type,
+  city_slug = excluded.city_slug,
+  city = excluded.city,
+  address = excluded.address,
+  amenities = excluded.amenities,
   status = excluded.status,
   hero_image_url = excluded.hero_image_url,
   price_per_night_minor = excluded.price_per_night_minor;
 
 insert into public.homestay_rooms (id, homestay_id, name, category, capacity, price_per_night_minor, total_units, sort_order) values
   ('c0000001-0000-4000-8000-000000000001', 'b0000001-0000-4000-8000-000000000001', 'Courtyard Suite', 'Suite', 2, 450000, 2, 0),
-  ('c0000002-0000-4000-8000-000000000002', 'b0000002-0000-4000-8000-000000000002', 'Mist View Room', 'Standard', 2, 620000, 3, 0),
+  ('c0000002-0000-4000-8000-000000000002', 'b0000002-0000-4000-8000-000000000002', 'Garden View Suite', 'Suite', 2, 620000, 3, 0),
   ('c0000003-0000-4000-8000-000000000003', 'b0000003-0000-4000-8000-000000000003', 'Deluxe Double', 'Deluxe', 2, 380000, 4, 0)
 on conflict (id) do nothing;

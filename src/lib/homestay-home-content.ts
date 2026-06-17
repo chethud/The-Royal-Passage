@@ -1,6 +1,36 @@
 import craft from "@/assets/exp-craft.jpg";
 import wellness from "@/assets/exp-wellness.jpg";
 import dining from "@/assets/exp-dining.jpg";
+import heroImage from "@/assets/curated-expeditions.png";
+import heroDinnerImg from "@/assets/hero.jpg";
+
+export type HomestayHeroSlide = {
+  src: string;
+  alt: string;
+};
+
+export const HOMESTAY_HERO_SLIDES: HomestayHeroSlide[] = [
+  {
+    src: heroImage,
+    alt: "Royal homestays in Mysuru",
+  },
+  {
+    src: dining,
+    alt: "Heritage haveli courtyard with warm evening light",
+  },
+  {
+    src: wellness,
+    alt: "Hill cottage surrounded by green estates",
+  },
+  {
+    src: heroDinnerImg,
+    alt: "A candlelit stay under a glasshouse at dusk",
+  },
+  {
+    src: craft,
+    alt: "Boutique guest house room with local art",
+  },
+];
 
 export type HomestayHighlightSlide = {
   id: string;
@@ -27,16 +57,16 @@ export const HOMESTAY_HIGHLIGHT_SLIDES: HomestayHighlightSlide[] = [
     theme: "heritage",
   },
   {
-    id: "hill-retreat",
-    title: "Hill & Estate Stays",
-    subtitle: "Mist, Coffee & Slow Mornings",
+    id: "palace-quarter",
+    title: "Palace Quarter Stays",
+    subtitle: "Steps from Royal Mysuru",
     lines: [
-      "Cottages tucked into Coorg and Western Ghats estates.",
-      "Floor-to-ceiling windows, campfire evenings, and guided walks with your hosts.",
-      "Trade city bustle for mist, birdsong, and arabica on the terrace.",
+      "Villas and guest houses within minutes of Mysuru Palace and Devaraja Market.",
+      "Terraced gardens, palace glimpses, and hosts who share the rhythm of the old city.",
+      "Wake to chai on the veranda as temple bells and market sounds drift in.",
     ],
     image: wellness,
-    imageAlt: "Hill cottage surrounded by green estates",
+    imageAlt: "Villa with garden views near Mysuru Palace",
     theme: "retreat",
   },
   {
@@ -70,7 +100,7 @@ export const HOMESTAY_PILLARS: HomestayPillar[] = [
   },
   {
     title: "Heritage & Local",
-    description: "Havelis, cottages, and guest houses chosen for character and neighbourhood charm.",
+    description: "Havelis, villas, and guest houses across Mysuru — chosen for character and neighbourhood charm.",
   },
   {
     title: "Host Hospitality",
@@ -88,7 +118,7 @@ export const HOMESTAY_HOW_IT_WORKS: HomestayHowItWorksStep[] = [
   {
     step: "01",
     title: "Search & compare",
-    description: "Pick your city, dates, and guest count — browse vetted stays with clear nightly rates.",
+    description: "Pick your dates and guest count — browse vetted Mysuru stays with clear nightly rates.",
   },
   {
     step: "02",

@@ -1,5 +1,8 @@
 import type { Homestay } from "@/data/homestays";
 
+export const HOMESTAY_CITY = "Mysuru";
+export const HOMESTAY_CITY_SLUG = "mysuru";
+
 export type HomestayBrowseSearch = {
   q?: string;
   propertyType?: string;
@@ -19,11 +22,16 @@ export function parseHomestayBrowseSearch(search: Record<string, unknown>): Home
   };
 }
 
+export function isMysuruHomestay(stay: Homestay): boolean {
+  return stay.city.trim().toLowerCase() === HOMESTAY_CITY.toLowerCase();
+}
+
 export function filterHomestays(homestays: Homestay[], search: HomestayBrowseSearch): Homestay[] {
   const q = search.q?.trim().toLowerCase();
   const guests = search.guests ?? 0;
 
   return homestays.filter((stay) => {
+    if (!isMysuruHomestay(stay)) return false;
     if (search.propertyType && stay.propertyType !== search.propertyType) return false;
     if (guests > 0 && stay.maxGuests < guests) return false;
     if (!q) return true;
@@ -31,7 +39,7 @@ export function filterHomestays(homestays: Homestay[], search: HomestayBrowseSea
       stay.title.toLowerCase().includes(q) ||
       stay.city.toLowerCase().includes(q) ||
       stay.propertyType.toLowerCase().includes(q) ||
-      stay.region?.toLowerCase().includes(q)
+      stay.address.toLowerCase().includes(q)
     );
   });
 }

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/homestays/browse/")({
         {
           name: "description",
           content:
-            "Search curated homestays by city, dates, and guests — heritage stays with Royal Passage hospitality.",
+            "Search curated Mysuru homestays by dates and guests — heritage stays with Royal Passage hospitality.",
         },
         { property: "og:title", content: title },
         { property: "og:type", content: "website" },
