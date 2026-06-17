@@ -89,8 +89,7 @@ async function loadHomestaysFromDb(citySlug?: string): Promise<Homestay[]> {
 }
 
 export const getHomestaysForUi = createServerFn({ method: "GET" }).handler(async () => {
-  const cacheKey = `homestays-catalog-${new Date().toISOString().slice(0, 10)}`;
-  return getOrSetServerCache(cacheKey, async () => {
+  const loadCatalog = async () => {
     if (isApiConfigured()) {
       try {
         return await fetchHomestays();
@@ -114,7 +113,14 @@ export const getHomestaysForUi = createServerFn({ method: "GET" }).handler(async
       }
     }
     return fallbackCatalog();
-  });
+  };
+
+  try {
+    const windowDay = new Date().toISOString().slice(0, 10);
+    return await getOrSetServerCache(`homestays:catalog:${windowDay}:v1`, 60, loadCatalog);
+  } catch {
+    return fallbackCatalog();
+  }
 });
 
 export const getHomestayForDetail = createServerFn({ method: "GET" })
