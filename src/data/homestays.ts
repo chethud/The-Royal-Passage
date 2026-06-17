@@ -1,6 +1,4 @@
-import craft from "@/assets/exp-craft.jpg";
-import wellness from "@/assets/exp-wellness.jpg";
-import dining from "@/assets/exp-dining.jpg";
+import { HOMESTAY_IMG } from "@/lib/homestay-home-content";
 
 export const HOMESTAY_PROPERTY_TYPES = [
   "Villa",
@@ -70,8 +68,8 @@ export const homestays: Homestay[] = [
     currencySymbol: "₹",
     rating: 4.8,
     reviewsCount: 56,
-    image: dining,
-    galleryUrls: [dining, craft],
+    image: HOMESTAY_IMG.heritageExterior,
+    galleryUrls: [HOMESTAY_IMG.heritageExterior, HOMESTAY_IMG.suiteInterior],
     amenities: ["WiFi", "Breakfast", "Garden", "Parking", "AC"],
     bedrooms: 3,
     bathrooms: 2,
@@ -95,8 +93,8 @@ export const homestays: Homestay[] = [
     currencySymbol: "₹",
     rating: 4.9,
     reviewsCount: 41,
-    image: wellness,
-    galleryUrls: [wellness, craft],
+    image: HOMESTAY_IMG.villaExterior,
+    galleryUrls: [HOMESTAY_IMG.villaExterior, HOMESTAY_IMG.bedroom],
     amenities: ["WiFi", "Kitchen", "Garden", "Parking", "Breakfast", "AC"],
     bedrooms: 2,
     bathrooms: 2,
@@ -119,8 +117,8 @@ export const homestays: Homestay[] = [
     currencySymbol: "₹",
     rating: 4.7,
     reviewsCount: 29,
-    image: craft,
-    galleryUrls: [craft, dining],
+    image: HOMESTAY_IMG.guestHouseRoom,
+    galleryUrls: [HOMESTAY_IMG.guestHouseRoom, HOMESTAY_IMG.boutiqueRoom],
     amenities: ["WiFi", "AC", "TV", "Security", "Breakfast", "Parking"],
     bedrooms: 4,
     bathrooms: 4,

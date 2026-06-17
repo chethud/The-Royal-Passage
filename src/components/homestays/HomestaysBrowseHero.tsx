@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import heroImage from "@/assets/curated-expeditions.png";
+import { HOMESTAY_HERO_SLIDES } from "@/lib/homestay-home-content";
 import {
   HomestaysSearchWidget,
   homestaySearchFromBrowse,
@@ -22,7 +22,7 @@ export function HomestaysBrowseHero({ search, onSearchChange, onSubmit }: Homest
     <section className="relative overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.15)]">
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${heroImage})` }}
+        style={{ backgroundImage: `url(${HOMESTAY_HERO_SLIDES[0]?.src ?? ""})` }}
         role="img"
         aria-label="Browse royal homestays"
       />

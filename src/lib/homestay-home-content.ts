@@ -1,8 +1,18 @@
-import craft from "@/assets/exp-craft.jpg";
-import wellness from "@/assets/exp-wellness.jpg";
-import dining from "@/assets/exp-dining.jpg";
-import heroImage from "@/assets/curated-expeditions.png";
-import heroDinnerImg from "@/assets/hero.jpg";
+/** Homestay imagery — aligned with catalog seeds in supabase/homestay-module.sql */
+const HOMESTAY_IMG = {
+  heritageExterior:
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80&auto=format&fit=crop",
+  villaExterior:
+    "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1600&q=80&auto=format&fit=crop",
+  guestHouseRoom:
+    "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1600&q=80&auto=format&fit=crop",
+  bedroom:
+    "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1600&q=80&auto=format&fit=crop",
+  suiteInterior:
+    "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1600&q=80&auto=format&fit=crop",
+  boutiqueRoom:
+    "https://images.unsplash.com/photo-1611892440507-42a788e24d32?w=1600&q=80&auto=format&fit=crop",
+} as const;
 
 export type HomestayHeroSlide = {
   src: string;
@@ -11,26 +21,28 @@ export type HomestayHeroSlide = {
 
 export const HOMESTAY_HERO_SLIDES: HomestayHeroSlide[] = [
   {
-    src: heroImage,
-    alt: "Royal homestays in Mysuru",
+    src: HOMESTAY_IMG.heritageExterior,
+    alt: "Heritage homestay with courtyard and warm evening light",
   },
   {
-    src: dining,
-    alt: "Heritage haveli courtyard with warm evening light",
+    src: HOMESTAY_IMG.villaExterior,
+    alt: "Villa with terraced gardens at the Chamundi foothills",
   },
   {
-    src: wellness,
-    alt: "Hill cottage surrounded by green estates",
+    src: HOMESTAY_IMG.guestHouseRoom,
+    alt: "Boutique guest house bedroom with premium linens",
   },
   {
-    src: heroDinnerImg,
-    alt: "A candlelit stay under a glasshouse at dusk",
+    src: HOMESTAY_IMG.bedroom,
+    alt: "Cozy homestay bedroom with soft natural light",
   },
   {
-    src: craft,
-    alt: "Boutique guest house room with local art",
+    src: HOMESTAY_IMG.suiteInterior,
+    alt: "Elegant suite interior in a Mysuru guest house",
   },
 ];
+
+export { HOMESTAY_IMG };
 
 export type HomestayHighlightSlide = {
   id: string;
@@ -52,7 +64,7 @@ export const HOMESTAY_HIGHLIGHT_SLIDES: HomestayHighlightSlide[] = [
       "Hosts share family recipes, royal stories, and the rhythm of old Mysuru.",
       "Wake to chai on the veranda as the city stirs below.",
     ],
-    image: dining,
+    image: HOMESTAY_IMG.heritageExterior,
     imageAlt: "Heritage haveli courtyard with warm evening light",
     theme: "heritage",
   },
@@ -65,7 +77,7 @@ export const HOMESTAY_HIGHLIGHT_SLIDES: HomestayHighlightSlide[] = [
       "Terraced gardens, palace glimpses, and hosts who share the rhythm of the old city.",
       "Wake to chai on the veranda as temple bells and market sounds drift in.",
     ],
-    image: wellness,
+    image: HOMESTAY_IMG.villaExterior,
     imageAlt: "Villa with garden views near Mysuru Palace",
     theme: "retreat",
   },
@@ -78,7 +90,7 @@ export const HOMESTAY_HIGHLIGHT_SLIDES: HomestayHighlightSlide[] = [
       "Premium linens, local art, and concierge support for dining and experiences.",
       "Small properties with big hearts — every stay feels personally arranged.",
     ],
-    image: craft,
+    image: HOMESTAY_IMG.boutiqueRoom,
     imageAlt: "Boutique guest house room with local art",
     theme: "boutique",
   },
