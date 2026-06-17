@@ -44,18 +44,34 @@ function FooterBrandBlock({
   layout = "inline",
 }: {
   logoClassName?: string;
-  layout?: "inline" | "stacked";
+  layout?: "inline" | "row";
 }) {
-  const stacked = layout === "stacked";
+  if (layout === "row") {
+    return (
+      <div className="flex w-full items-center gap-4 sm:gap-6 md:gap-8">
+        <img
+          src={logoUrl}
+          alt="The Royal Passage"
+          width={320}
+          height={110}
+          loading="lazy"
+          decoding="async"
+          className={`logo-breathe shrink-0 ${logoClassName}`}
+        />
+        <p className="min-w-0 flex-1 text-xs leading-relaxed text-muted-foreground sm:text-sm md:max-w-lg lg:max-w-xl">
+          {TAGLINE}
+        </p>
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          {SOCIAL_LINKS.map(({ label, Icon, href }) => (
+            <SocialIcon key={label} label={label} Icon={Icon} href={href} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={
-        stacked
-          ? "mx-auto flex max-w-md flex-col items-center text-center"
-          : "flex flex-col items-start"
-      }
-    >
+    <div className="flex flex-col items-start">
       <img
         src={logoUrl}
         alt="The Royal Passage"
@@ -65,14 +81,8 @@ function FooterBrandBlock({
         decoding="async"
         className={`logo-breathe ${logoClassName}`}
       />
-      <p
-        className={`text-sm leading-relaxed text-muted-foreground ${
-          stacked ? "mt-4 max-w-sm text-balance" : "mt-6 max-w-sm"
-        }`}
-      >
-        {TAGLINE}
-      </p>
-      <div className={`flex items-center gap-3 ${stacked ? "mt-4" : "mt-6"}`}>
+      <p className="mt-6 max-w-sm text-sm leading-relaxed text-muted-foreground">{TAGLINE}</p>
+      <div className="mt-6 flex items-center gap-3">
         {SOCIAL_LINKS.map(({ label, Icon, href }) => (
           <SocialIcon key={label} label={label} Icon={Icon} href={href} />
         ))}
@@ -84,11 +94,11 @@ function FooterBrandBlock({
 function FooterSimple() {
   return (
     <footer className="mt-12 border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
-      <div className="container-page flex flex-col items-center py-8 sm:py-10">
-        <FooterBrandBlock layout="stacked" logoClassName="h-20 w-auto object-contain sm:h-24" />
+      <div className="container-page py-5 sm:py-6">
+        <FooterBrandBlock layout="row" logoClassName="h-14 w-auto object-contain sm:h-16 md:h-[4.5rem]" />
 
         <p
-          className="mt-6 text-center text-xs text-muted-foreground/80"
+          className="mt-4 text-center text-[0.68rem] text-muted-foreground/75 sm:text-left sm:text-xs"
           suppressHydrationWarning
         >
           © {new Date().getFullYear()} The Royal Passage. All rights reserved.
