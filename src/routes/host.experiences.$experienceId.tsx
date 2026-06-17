@@ -38,6 +38,7 @@ function HostExperienceDetailPage() {
   const [pageLoading, setPageLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [slotBusy, setSlotBusy] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
 
   const loadPage = useCallback(async () => {
     if (!accessToken) return;
@@ -73,9 +74,11 @@ function HostExperienceDetailPage() {
     if (!accessToken) return;
     setSaving(true);
     setPageError(null);
+    setSaveSuccess(null);
     try {
       const updated = await updateHostExperience(accessToken, experienceId, payload);
       setExperience(updated);
+      setSaveSuccess("Experience updated successfully.");
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to save experience."));
     } finally {
@@ -147,6 +150,23 @@ function HostExperienceDetailPage() {
     }
   };
 
+  const handleUpdateSlot = async (
+    slotId: string,
+    payload: { startTime?: string; endTime?: string; capacity?: number },
+  ) => {
+    if (!accessToken) return;
+    setSlotBusy(true);
+    setPageError(null);
+    try {
+      const updated = await updateHostSlot(accessToken, experienceId, slotId, payload);
+      refreshExperience(updated);
+    } catch (err) {
+      setPageError(toErrorMessage(err, "Failed to update slot."));
+    } finally {
+      setSlotBusy(false);
+    }
+  };
+
   const handleDeleteSlot = async (slotId: string) => {
     if (!accessToken) return;
     setSlotBusy(true);
@@ -175,13 +195,12 @@ function HostExperienceDetailPage() {
     );
   }
 
-  const readOnly =
-    experience.status === "published" || experience.status === "pending_review";
+  const status = experience.status;
 
   return (
     <HostDashboardShell
       title={experience.title}
-      subtitle="Edit listing details and manage bookable slots."
+      subtitle="Edit listing details, photos, inclusions, and manage bookable slots."
     >
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <ExperienceStatusBadge status={experience.status} />
@@ -218,33 +237,52 @@ function HostExperienceDetailPage() {
         </p>
       ) : null}
 
-      {readOnly ? (
-        <p className="mb-6 text-sm text-muted-foreground">
-          {experience.status === "pending_review"
-            ? "This listing is awaiting admin review. You can still manage slots below."
-            : "Published listings cannot be edited here. Contact admin for content changes."}
+      {saveSuccess ? (
+        <p className="mb-6 rounded-sm border border-ember/35 bg-ember/10 px-4 py-3 text-sm text-ink">
+          {saveSuccess}
         </p>
-      ) : (
-        <HostExperienceForm
-          categories={categories}
-          cities={cities}
-          initial={experience}
-          readOnly={false}
-          saving={saving}
-          onSubmit={(payload) => void handleSave(payload)}
-        />
-      )}
+      ) : null}
+
+      {status === "pending_review" ? (
+        <p className="mb-6 text-sm text-muted-foreground">
+          This listing is awaiting admin review. You can still update details and slots below.
+        </p>
+      ) : null}
+
+      {status === "rejected" ? (
+        <p className="mb-6 rounded-sm border border-destructive/35 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          This listing was rejected. Update the details below and check “Submit for admin review” when
+          saving to resubmit.
+        </p>
+      ) : null}
+
+      {status === "published" ? (
+        <p className="mb-6 text-sm text-muted-foreground">
+          This experience is live. Changes you save here update the public listing immediately.
+        </p>
+      ) : null}
+
+      <HostExperienceForm
+        key={experience.updatedAt}
+        categories={categories}
+        cities={cities}
+        initial={experience}
+        saving={saving}
+        onSubmit={(payload) => void handleSave(payload)}
+      />
 
       <section className="mt-12">
-        <h2 className="font-display text-2xl">Slots</h2>
+        <h2 className="font-display text-2xl">Session timings</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          See which days have sessions at a glance, then add or manage slots for the next 7 days.
+          Add, edit, or block bookable sessions. Duration above applies to the overall experience;
+          each slot has its own start and end time.
         </p>
         <div className="mt-6">
           <SlotManager
             slots={experience.slots}
             busy={slotBusy}
             onAddMany={(payloads) => void handleAddManySlots(payloads)}
+            onUpdate={(slotId, payload) => void handleUpdateSlot(slotId, payload)}
             onToggleBlock={(slotId, isBlocked) => void handleToggleBlock(slotId, isBlocked)}
             onDelete={(slotId) => void handleDeleteSlot(slotId)}
           />

@@ -1,5 +1,4 @@
-import type { CreateHostSlotPayload } from "@/lib/api/host-experiences";
-import type { HostSlotDetail } from "@/lib/api/host-experiences";
+import type { CreateHostSlotPayload, HostSlotDetail, UpdateHostSlotPayload } from "@/lib/api/host-experiences";
 import { SlotWeekOverview } from "@/components/experience/SlotWeekOverview";
 import { WeekdaySlotBuilder } from "@/components/experience/WeekdaySlotBuilder";
 import { bookingMatchesDateView } from "@/lib/booking-window";
@@ -12,14 +11,152 @@ type SlotManagerProps = {
   slots: HostSlotDetail[];
   busy: boolean;
   onAddMany: (payloads: CreateHostSlotPayload[]) => void;
+  onUpdate: (slotId: string, payload: UpdateHostSlotPayload) => void;
   onToggleBlock: (slotId: string, isBlocked: boolean) => void;
   onDelete: (slotId: string) => void;
 };
+
+function toTimeInputValue(value: string) {
+  return value.slice(0, 5);
+}
+
+type SlotRowProps = {
+  slot: HostSlotDetail;
+  busy: boolean;
+  actionBtn: string;
+  onUpdate: SlotManagerProps["onUpdate"];
+  onToggleBlock: SlotManagerProps["onToggleBlock"];
+  onDelete: SlotManagerProps["onDelete"];
+};
+
+function SlotRow({ slot, busy, actionBtn, onUpdate, onToggleBlock, onDelete }: SlotRowProps) {
+  const [editing, setEditing] = useState(false);
+  const [startTime, setStartTime] = useState(toTimeInputValue(slot.start));
+  const [endTime, setEndTime] = useState(toTimeInputValue(slot.end));
+  const [capacity, setCapacity] = useState(slot.capacity);
+
+  useEffect(() => {
+    setStartTime(toTimeInputValue(slot.start));
+    setEndTime(toTimeInputValue(slot.end));
+    setCapacity(slot.capacity);
+  }, [slot.capacity, slot.end, slot.start]);
+
+  const canEdit = slot.seatsSold === 0;
+  const inputClass =
+    "rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/50 px-2 py-1.5 text-sm";
+
+  if (editing) {
+    return (
+      <li className="rounded-md border border-ember/35 bg-background/10 px-4 py-4">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <label className="text-xs">
+            <span className="eyebrow text-muted-foreground">Start</span>
+            <input
+              type="time"
+              value={startTime}
+              onChange={(event) => setStartTime(event.target.value)}
+              className={`${inputClass} mt-1 w-full`}
+            />
+          </label>
+          <label className="text-xs">
+            <span className="eyebrow text-muted-foreground">End</span>
+            <input
+              type="time"
+              value={endTime}
+              onChange={(event) => setEndTime(event.target.value)}
+              className={`${inputClass} mt-1 w-full`}
+            />
+          </label>
+          <label className="text-xs">
+            <span className="eyebrow text-muted-foreground">Capacity</span>
+            <input
+              type="number"
+              min={1}
+              max={100}
+              value={capacity}
+              onChange={(event) => setCapacity(Number(event.target.value))}
+              className={`${inputClass} mt-1 w-full input-no-spin`}
+            />
+          </label>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={busy}
+            className={`${actionBtn} border-ember/40 text-ember`}
+            onClick={() => {
+              onUpdate(slot.id, { startTime, endTime, capacity });
+              setEditing(false);
+            }}
+          >
+            Save timing
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            className={actionBtn}
+            onClick={() => {
+              setStartTime(toTimeInputValue(slot.start));
+              setEndTime(toTimeInputValue(slot.end));
+              setCapacity(slot.capacity);
+              setEditing(false);
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </li>
+    );
+  }
+
+  return (
+    <li className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] bg-background/10 px-4 py-3">
+      <div>
+        <p className="font-medium text-ink">
+          {formatTime12h(slot.start)} – {formatTime12h(slot.end)}
+        </p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          {slot.isBlocked
+            ? "Blocked — not bookable"
+            : `${slot.available} of ${slot.capacity} spots available · ${slot.seatsSold} booked`}
+        </p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          disabled={busy || !canEdit}
+          title={canEdit ? undefined : "Cannot edit a session with existing bookings"}
+          className={actionBtn}
+          onClick={() => setEditing(true)}
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          className={actionBtn}
+          onClick={() => onToggleBlock(slot.id, !slot.isBlocked)}
+        >
+          {slot.isBlocked ? "Unblock" : "Block"}
+        </button>
+        <button
+          type="button"
+          disabled={busy || slot.seatsSold > 0}
+          className={`${actionBtn} border-destructive/40 text-destructive`}
+          onClick={() => onDelete(slot.id)}
+        >
+          Delete
+        </button>
+      </div>
+    </li>
+  );
+}
 
 export function SlotManager({
   slots,
   busy,
   onAddMany,
+  onUpdate,
   onToggleBlock,
   onDelete,
 }: SlotManagerProps) {
@@ -74,39 +211,15 @@ export function SlotManager({
             ) : (
               <ul className="mt-4 space-y-3">
                 {selectedDay.slots.map((slot) => (
-                  <li
+                  <SlotRow
                     key={slot.id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] bg-background/10 px-4 py-3"
-                  >
-                    <div>
-                      <p className="font-medium text-ink">
-                        {formatTime12h(slot.start)} – {formatTime12h(slot.end)}
-                      </p>
-                      <p className="mt-0.5 text-xs text-muted-foreground">
-                        {slot.isBlocked
-                          ? "Blocked — not bookable"
-                          : `${slot.available} of ${slot.capacity} spots available · ${slot.seatsSold} booked`}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        disabled={busy}
-                        className={actionBtn}
-                        onClick={() => onToggleBlock(slot.id, !slot.isBlocked)}
-                      >
-                        {slot.isBlocked ? "Unblock" : "Block"}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={busy || slot.seatsSold > 0}
-                        className={`${actionBtn} border-destructive/40 text-destructive`}
-                        onClick={() => onDelete(slot.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </li>
+                    slot={slot}
+                    busy={busy}
+                    actionBtn={actionBtn}
+                    onUpdate={onUpdate}
+                    onToggleBlock={onToggleBlock}
+                    onDelete={onDelete}
+                  />
                 ))}
               </ul>
             )}

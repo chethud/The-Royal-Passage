@@ -42,7 +42,7 @@ export function HostExperienceTable({ experiences }: HostExperienceTableProps) {
                   params={{ experienceId: exp.id }}
                   className="luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
                 >
-                  Manage
+                  Edit
                 </Link>
               </td>
             </tr>

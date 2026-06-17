@@ -293,11 +293,6 @@ def update_host_experience(
     row = _fetch_host_experience_row(supabase, experience_id, host_id)
     status = row.get("status") or "draft"
 
-    if status == "published":
-        raise ValueError("Published experiences cannot be edited. Contact admin for changes.")
-    if status == "pending_review" and not payload.submitForReview:
-        raise ValueError("This experience is awaiting admin review.")
-
     updates: dict = {}
     if payload.title is not None:
         updates["title"] = payload.title.strip()

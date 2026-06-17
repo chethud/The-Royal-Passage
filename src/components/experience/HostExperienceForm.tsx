@@ -83,6 +83,9 @@ export function HostExperienceForm({
   const [maxGuests, setMaxGuests] = useState(initial?.maxGuestsPerBooking ?? 10);
   const [submitForReview, setSubmitForReview] = useState(false);
 
+  const status = initial?.status ?? "draft";
+  const canSubmitForReview = status === "draft" || status === "rejected";
+
   const cityName =
     cities.find((city) => city.slug === citySlug)?.name ??
     cities[0]?.name ??
@@ -334,14 +337,16 @@ export function HostExperienceForm({
 
       {!readOnly ? (
         <div className="flex flex-wrap items-center gap-4">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={submitForReview}
-              onChange={(e) => setSubmitForReview(e.target.checked)}
-            />
-            Submit for admin review after saving
-          </label>
+          {canSubmitForReview ? (
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={submitForReview}
+                onChange={(e) => setSubmitForReview(e.target.checked)}
+              />
+              Submit for admin review after saving
+            </label>
+          ) : null}
           <button
             type="submit"
             disabled={saving}

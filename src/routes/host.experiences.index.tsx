@@ -47,7 +47,7 @@ function HostExperiencesPage() {
     return (
       <HostDashboardShell
         title="My experiences"
-        subtitle="Create listings, manage slots, and submit for admin review."
+        subtitle="Create listings, edit details, manage slots, and submit for admin review."
         showRoleDescription={false}
       >
         <LuxuryCheckoutPanel>
@@ -60,13 +60,13 @@ function HostExperiencesPage() {
   return (
     <HostDashboardShell
       title="My experiences"
-      subtitle="Create listings, manage slots, and submit for admin review."
+      subtitle="Create listings, edit details, manage slots, and submit for admin review."
       showRoleDescription={false}
     >
       <LuxuryCheckoutPanel>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="luxury-panel-body text-sm">
-            Draft listings, add slots, and submit for Royal Passage review.
+            Draft listings, edit published experiences, add slots, and submit for Royal Passage review.
           </p>
           <CreateExperienceCta variant="inline" />
         </div>
