@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { PublicModuleNav } from "@/components/site/PublicModuleNav";
 import { HomestaysHomeHero } from "@/components/homestays/HomestaysHomeHero";
 import { HomestaysShowcase } from "@/components/site/HomestaysShowcase";
 import { JourneysSplit } from "@/components/site/JourneysSplit";
@@ -49,12 +48,6 @@ function HomestaysHomePage() {
   return (
     <div className="overflow-x-hidden bg-background text-foreground">
       <Header />
-
-      <div className="sticky top-[var(--header-height)] z-40 border-b border-[oklch(0.72_0.09_78_/_0.15)] bg-background/95 backdrop-blur-md">
-        <div className="container-page py-3">
-          <PublicModuleNav />
-        </div>
-      </div>
 
       <HomestaysHomeHero />
       <HomestaysShowcase homestays={homestays.slice(0, 3)} />
