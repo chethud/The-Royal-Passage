@@ -1,7 +1,16 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Facebook, Instagram, Mail, MapPin, MessageCircle, Phone, Youtube } from "lucide-react";
 import logoUrl from "@/assets/logo/logo.png";
 import footerPalaceImg from "@/assets/footer-palace.png";
+
+const TAGLINE =
+  "The Royal Passage is an experience-led travel company curating immersive journeys in and around Mysuru.";
+
+const SOCIAL_LINKS = [
+  { label: "Instagram", Icon: Instagram, href: "https://www.instagram.com/" },
+  { label: "Facebook", Icon: Facebook, href: "https://www.facebook.com/" },
+  { label: "YouTube", Icon: Youtube, href: "https://www.youtube.com/" },
+] as const;
 
 const quickLinks = [
   { label: "Experiences", to: "/experiences" },
@@ -20,30 +29,58 @@ const MAPS_EMBED =
 const experiences = ["Pottery Experience", "Outdoor Cooking", "Heritage Walks"];
 
 export function Footer() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isHomepage = pathname === "/";
+
+  if (!isHomepage) {
+    return <FooterSimple />;
+  }
+
+  return <FooterFull />;
+}
+
+function FooterBrandBlock({ logoClassName = "h-28 w-auto object-contain sm:h-32 md:h-40" }: { logoClassName?: string }) {
+  return (
+    <>
+      <img
+        src={logoUrl}
+        alt="The Royal Passage"
+        width={320}
+        height={110}
+        loading="lazy"
+        decoding="async"
+        className={`logo-breathe ${logoClassName}`}
+      />
+      <p className="mt-6 max-w-sm text-sm leading-relaxed text-muted-foreground">{TAGLINE}</p>
+      <div className="mt-6 flex items-center gap-3">
+        {SOCIAL_LINKS.map(({ label, Icon, href }) => (
+          <SocialIcon key={label} label={label} Icon={Icon} href={href} />
+        ))}
+      </div>
+    </>
+  );
+}
+
+function FooterSimple() {
+  return (
+    <footer className="mt-16 border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
+      <div className="container-page py-10 sm:py-12">
+        <FooterBrandBlock logoClassName="h-24 w-auto object-contain sm:h-28" />
+      </div>
+
+      <div className="container-page border-t border-[oklch(0.88_0.08_86_/_0.12)] py-5 text-xs text-muted-foreground">
+        <span suppressHydrationWarning>© {new Date().getFullYear()} The Royal Passage. All rights reserved.</span>
+      </div>
+    </footer>
+  );
+}
+
+function FooterFull() {
   return (
     <footer className="relative mt-24 overflow-hidden border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
       <div className="container-page relative z-10 grid gap-10 py-12 sm:grid-cols-2 sm:py-14 md:grid-cols-[1.5fr_1fr_1fr_1.2fr] md:gap-12 md:py-16">
         <div>
-          <div className="flex items-center gap-3">
-            <img
-              src={logoUrl}
-              alt="The Royal Passage"
-              width={320}
-              height={110}
-              loading="lazy"
-              decoding="async"
-              className="logo-breathe h-28 w-auto object-contain sm:h-32 md:h-40"
-            />
-          </div>
-          <p className="mt-6 max-w-sm text-sm leading-relaxed text-muted-foreground">
-            The Royal Passage is an experience-led travel company curating immersive journeys in and
-            around Mysuru.
-          </p>
-          <div className="mt-6 flex items-center gap-3">
-            <SocialIcon label="Instagram" Icon={Instagram} />
-            <SocialIcon label="Facebook" Icon={Facebook} />
-            <SocialIcon label="YouTube" Icon={Youtube} />
-          </div>
+          <FooterBrandBlock />
         </div>
 
         <div>
@@ -144,7 +181,6 @@ export function Footer() {
         <span className="text-ember/70">Crafted with intention.</span>
       </div>
 
-      {/* Decorative palace sketch on the right — fades into the burgundy background */}
       <img
         src={footerPalaceImg}
         alt=""
@@ -153,17 +189,14 @@ export function Footer() {
         decoding="async"
         className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[58%] select-none object-cover object-right opacity-[0.14] mix-blend-screen [-webkit-mask-image:linear-gradient(to_right,transparent_0%,black_50%,black_100%)] [mask-image:linear-gradient(to_right,transparent_0%,black_50%,black_100%)] lg:block"
       />
-      {/* Darkening gradient veil — keeps text readable over the palace */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,oklch(0.13_0.06_22)_0%,oklch(0.13_0.06_22_/_0.92)_30%,oklch(0.13_0.06_22_/_0.7)_55%,oklch(0.13_0.06_22_/_0.45)_80%,oklch(0.13_0.06_22_/_0.25)_100%)] lg:block"
       />
-      {/* Vertical edge fade (top + bottom) — softens the image into the section frame */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_bottom,oklch(0.13_0.06_22)_0%,transparent_18%,transparent_82%,oklch(0.13_0.06_22)_100%)] lg:block"
       />
-      {/* Subtle golden glow halo on the right — adds a touch of warmth without highlighting the sketch */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-y-0 right-0 hidden w-[35%] bg-[radial-gradient(ellipse_at_right,oklch(0.55_0.14_78_/_0.05)_0%,transparent_70%)] lg:block"
@@ -172,10 +205,20 @@ export function Footer() {
   );
 }
 
-function SocialIcon({ label, Icon }: { label: string; Icon: typeof Instagram }) {
+function SocialIcon({
+  label,
+  Icon,
+  href,
+}: {
+  label: string;
+  Icon: typeof Instagram;
+  href: string;
+}) {
   return (
     <a
-      href="#"
+      href={href}
+      target="_blank"
+      rel="noreferrer"
       aria-label={label}
       className="flex h-9 w-9 items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.32)] text-ink/80 transition-all hover:border-ember/60 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >

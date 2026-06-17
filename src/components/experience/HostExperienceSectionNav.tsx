@@ -23,7 +23,7 @@ export function HostExperienceSectionNav({
     <nav
       aria-label="Experience management"
       className={cn(
-        "flex flex-wrap gap-2 rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] bg-[oklch(0.98_0.02_86_/_0.5)] p-1.5",
+        "flex flex-wrap gap-2 rounded-md border border-[oklch(0.72_0.09_78_/_0.22)] bg-[oklch(0.16_0.07_22)] p-1.5",
         className,
       )}
     >
@@ -36,10 +36,10 @@ export function HostExperienceSectionNav({
             params={{ experienceId }}
             search={{ section }}
             className={cn(
-              "rounded-sm px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60",
+              "rounded-sm border px-4 py-2.5 text-sm font-medium tracking-[0.06em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60",
               isActive
-                ? "bg-ember text-primary-foreground shadow-sm"
-                : "text-[#4A0000]/80 hover:bg-white/60 hover:text-[#3A0000]",
+                ? "border-ember/45 bg-ember/10 text-ember shadow-[inset_0_1px_0_oklch(0.78_0.13_86_/_0.12)]"
+                : "border-transparent text-muted-foreground hover:border-[oklch(0.72_0.09_78_/_0.18)] hover:bg-white/5 hover:text-ink",
             )}
             aria-current={isActive ? "page" : undefined}
           >
@@ -48,7 +48,9 @@ export function HostExperienceSectionNav({
               <span
                 className={cn(
                   "ml-2 inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[0.65rem] font-semibold",
-                  isActive ? "bg-white/20 text-primary-foreground" : "bg-[#4A0000]/8 text-[#4A0000]",
+                  isActive
+                    ? "bg-ember/20 text-ember"
+                    : "border border-[oklch(0.72_0.09_78_/_0.22)] bg-background/30 text-muted-foreground",
                 )}
               >
                 {slotCount}
