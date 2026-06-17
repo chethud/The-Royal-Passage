@@ -5,7 +5,11 @@ import logoUrl from "@/assets/logo/logo.png";
 import { CartIcon } from "@/components/cart/CartIcon";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { ProfileNavIcon } from "@/components/account/ProfileNavIcon";
-import { ADMIN_NAV_ITEMS } from "@/components/admin/admin-nav";
+import {
+  adminNavItemsForModule,
+  isAdminNavItemActive,
+  resolveAdminModule,
+} from "@/components/admin/admin-nav";
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
 import { HOMESTAY_OWNER_NAV_ITEMS } from "@/components/homestay-owner/homestay-owner-nav";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
@@ -40,10 +44,14 @@ const publicNavItems: NavItem[] = [
   { label: "Journal", to: "/journal" },
 ];
 
-function navItemsForUser(role: UserRole | null | undefined, signedIn: boolean): NavItem[] {
+function navItemsForUser(
+  role: UserRole | null | undefined,
+  signedIn: boolean,
+  pathname: string,
+): NavItem[] {
   if (!signedIn || !role) return publicNavItems;
   if (role === "admin") {
-    return ADMIN_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
+    return adminNavItemsForModule(resolveAdminModule(pathname));
   }
   if (role === "host") {
     return HOST_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
@@ -77,8 +85,7 @@ function isHeaderNavItemActive(
   if (role === "host") return isHostNavItemActive(pathname, to);
   if (role === "homestay_owner") return isHomestayOwnerNavItemActive(pathname, to);
   if (role === "admin") {
-    if (to === "/admin") return pathname === "/admin";
-    return pathname === to || pathname.startsWith(`${to}/`);
+    return isAdminNavItemActive(pathname, to);
   }
   return pathname === to || pathname.startsWith(`${to}/`);
 }
@@ -90,7 +97,7 @@ export function Header() {
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const navItems = navItemsForUser(role, Boolean(user));
+  const navItems = navItemsForUser(role, Boolean(user), pathname);
   const isGuest = role === "guest";
   const isAdmin = isAdminRole(role);
   const isHost = role === "host";

@@ -57,7 +57,7 @@ function AdminHomestayOwnersPage() {
       showRoleDescription={false}
     >
       <Link
-        to="/admin"
+        to="/admin/homestay"
         className="luxury-btn-sm dashboard-chrome-btn mb-5 inline-flex items-center no-underline"
       >
         ← Overview

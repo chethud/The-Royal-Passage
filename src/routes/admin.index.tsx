@@ -79,7 +79,7 @@ function AdminOverviewPage() {
     <DashboardShell
       role="admin"
       title="Platform control"
-      subtitle="Key metrics at a glance. Open each section from the header menu for full details."
+      subtitle="Experience bookings, host approvals, and platform analytics."
       showRoleDescription={false}
     >
       <div className="space-y-8">

@@ -56,15 +56,7 @@ function AdminHomestaysPage() {
       subtitle="Pending property submissions from homestay owners."
       showRoleDescription={false}
     >
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <Link to="/admin" className="luxury-btn-sm dashboard-chrome-btn inline-flex no-underline">
-            ← Overview
-          </Link>
-          <Link to="/admin/homestay-owners" className="luxury-btn-sm dashboard-chrome-btn inline-flex no-underline">
-            Homestay owners
-          </Link>
-        </div>
+      <div className="mb-5 flex flex-wrap items-center justify-end gap-3">
         <Link to="/homestays" className="dashboard-chrome-link">
           View live catalog →
         </Link>

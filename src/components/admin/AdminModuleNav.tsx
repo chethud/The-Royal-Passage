@@ -1,0 +1,61 @@
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Compass, Home } from "lucide-react";
+import {
+  adminModuleHome,
+  resolveAdminModule,
+  type AdminModule,
+} from "@/components/admin/admin-nav";
+
+const modules: {
+  id: AdminModule;
+  label: string;
+  description: string;
+  icon: typeof Compass;
+}[] = [
+  {
+    id: "experiences",
+    label: "Experiences",
+    description: "Bookings, hosts & approvals",
+    icon: Compass,
+  },
+  {
+    id: "homestays",
+    label: "Homestays",
+    description: "Stays, owners & approvals",
+    icon: Home,
+  },
+];
+
+type AdminModuleNavProps = {
+  className?: string;
+};
+
+export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const activeModule = resolveAdminModule(pathname);
+
+  return (
+    <nav aria-label="Admin modules" className={`marketplace-module-nav ${className}`}>
+      <div className="marketplace-module-nav__inner">
+        {modules.map((module) => {
+          const active = activeModule === module.id;
+          const Icon = module.icon;
+          const to = adminModuleHome(module.id);
+
+          return (
+            <Link
+              key={module.id}
+              to={to}
+              className={`marketplace-module-nav__item${active ? " marketplace-module-nav__item--active" : ""}`}
+              aria-current={active ? "page" : undefined}
+            >
+              <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+              <span className="marketplace-module-nav__label">{module.label}</span>
+              <span className="marketplace-module-nav__hint">{module.description}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}

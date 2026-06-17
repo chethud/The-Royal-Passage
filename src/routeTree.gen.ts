@@ -59,6 +59,7 @@ import { Route as AdminReviewsIndexRouteImport } from './routes/admin.reviews.in
 import { Route as AdminProfileIndexRouteImport } from './routes/admin.profile.index'
 import { Route as AdminHostsIndexRouteImport } from './routes/admin.hosts.index'
 import { Route as AdminHomestaysIndexRouteImport } from './routes/admin.homestays.index'
+import { Route as AdminHomestayIndexRouteImport } from './routes/admin.homestay.index'
 import { Route as AdminHomestayOwnersIndexRouteImport } from './routes/admin.homestay-owners.index'
 import { Route as AdminExperiencesIndexRouteImport } from './routes/admin.experiences.index'
 import { Route as AdminBookingsIndexRouteImport } from './routes/admin.bookings.index'
@@ -327,6 +328,11 @@ const AdminHomestaysIndexRoute = AdminHomestaysIndexRouteImport.update({
   path: '/homestays/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHomestayIndexRoute = AdminHomestayIndexRouteImport.update({
+  id: '/homestay/',
+  path: '/homestay/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHomestayOwnersIndexRoute =
   AdminHomestayOwnersIndexRouteImport.update({
     id: '/homestay-owners/',
@@ -475,6 +481,7 @@ export interface FileRoutesByFullPath {
   '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
   '/admin/homestay-owners/': typeof AdminHomestayOwnersIndexRoute
+  '/admin/homestay/': typeof AdminHomestayIndexRoute
   '/admin/homestays/': typeof AdminHomestaysIndexRoute
   '/admin/hosts/': typeof AdminHostsIndexRoute
   '/admin/profile/': typeof AdminProfileIndexRoute
@@ -532,6 +539,7 @@ export interface FileRoutesByTo {
   '/admin/bookings': typeof AdminBookingsIndexRoute
   '/admin/experiences': typeof AdminExperiencesIndexRoute
   '/admin/homestay-owners': typeof AdminHomestayOwnersIndexRoute
+  '/admin/homestay': typeof AdminHomestayIndexRoute
   '/admin/homestays': typeof AdminHomestaysIndexRoute
   '/admin/hosts': typeof AdminHostsIndexRoute
   '/admin/profile': typeof AdminProfileIndexRoute
@@ -602,6 +610,7 @@ export interface FileRoutesById {
   '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
   '/admin/homestay-owners/': typeof AdminHomestayOwnersIndexRoute
+  '/admin/homestay/': typeof AdminHomestayIndexRoute
   '/admin/homestays/': typeof AdminHomestaysIndexRoute
   '/admin/hosts/': typeof AdminHostsIndexRoute
   '/admin/profile/': typeof AdminProfileIndexRoute
@@ -673,6 +682,7 @@ export interface FileRouteTypes {
     | '/admin/bookings/'
     | '/admin/experiences/'
     | '/admin/homestay-owners/'
+    | '/admin/homestay/'
     | '/admin/homestays/'
     | '/admin/hosts/'
     | '/admin/profile/'
@@ -730,6 +740,7 @@ export interface FileRouteTypes {
     | '/admin/bookings'
     | '/admin/experiences'
     | '/admin/homestay-owners'
+    | '/admin/homestay'
     | '/admin/homestays'
     | '/admin/hosts'
     | '/admin/profile'
@@ -799,6 +810,7 @@ export interface FileRouteTypes {
     | '/admin/bookings/'
     | '/admin/experiences/'
     | '/admin/homestay-owners/'
+    | '/admin/homestay/'
     | '/admin/homestays/'
     | '/admin/hosts/'
     | '/admin/profile/'
@@ -1194,6 +1206,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminHomestaysIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/homestay/': {
+      id: '/admin/homestay/'
+      path: '/homestay'
+      fullPath: '/admin/homestay/'
+      preLoaderRoute: typeof AdminHomestayIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/homestay-owners/': {
       id: '/admin/homestay-owners/'
       path: '/homestay-owners'
@@ -1341,6 +1360,7 @@ interface AdminRouteChildren {
   AdminBookingsIndexRoute: typeof AdminBookingsIndexRoute
   AdminExperiencesIndexRoute: typeof AdminExperiencesIndexRoute
   AdminHomestayOwnersIndexRoute: typeof AdminHomestayOwnersIndexRoute
+  AdminHomestayIndexRoute: typeof AdminHomestayIndexRoute
   AdminHomestaysIndexRoute: typeof AdminHomestaysIndexRoute
   AdminHostsIndexRoute: typeof AdminHostsIndexRoute
   AdminReviewsIndexRoute: typeof AdminReviewsIndexRoute
@@ -1357,6 +1377,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBookingsIndexRoute: AdminBookingsIndexRoute,
   AdminExperiencesIndexRoute: AdminExperiencesIndexRoute,
   AdminHomestayOwnersIndexRoute: AdminHomestayOwnersIndexRoute,
+  AdminHomestayIndexRoute: AdminHomestayIndexRoute,
   AdminHomestaysIndexRoute: AdminHomestaysIndexRoute,
   AdminHostsIndexRoute: AdminHostsIndexRoute,
   AdminReviewsIndexRoute: AdminReviewsIndexRoute,

@@ -1,4 +1,7 @@
 import type { ReactNode } from "react";
+import { useRouterState } from "@tanstack/react-router";
+import { AdminModuleNav } from "@/components/admin/AdminModuleNav";
+import { adminModuleLabel, resolveAdminModule } from "@/components/admin/admin-nav";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { RoleBadge } from "@/components/auth/RoleBadge";
@@ -21,6 +24,8 @@ export function DashboardShell({
   showRoleDescription = true,
 }: DashboardShellProps) {
   const isIvoryShell = role === "admin";
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const adminModule = isIvoryShell ? resolveAdminModule(pathname) : null;
 
   return (
     <div className="pt-[var(--header-height)] text-foreground">
@@ -32,9 +37,16 @@ export function DashboardShell({
             : "container-page py-10 sm:py-14 md:py-16"
         }
       >
+        {isIvoryShell ? (
+          <div className="mb-8">
+            <AdminModuleNav />
+          </div>
+        ) : null}
         <div className="mb-8 flex flex-wrap items-center gap-3">
           <RoleBadge role={role} />
-          <span className="text-sm text-muted-foreground">{ROLE_LABELS[role]} dashboard</span>
+          <span className="text-sm text-muted-foreground">
+            {adminModule ? adminModuleLabel(adminModule) : `${ROLE_LABELS[role]} dashboard`}
+          </span>
         </div>
         <h1
           className={
