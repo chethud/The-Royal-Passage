@@ -3,7 +3,7 @@ export function PayAtHomestayBadge({ surface = "dark" }: { surface?: "light" | "
 
   return (
     <div className="text-sm">
-      <div className={`eyebrow ${isLight ? "luxury-panel-label" : "text-[#D4AF6A]/90"}`}>
+      <div className={`eyebrow ${isLight ? "luxury-panel-label" : "text-gold/90"}`}>
         Pay at the homestay
       </div>
       <p className={`mt-1.5 max-w-md leading-relaxed ${isLight ? "luxury-panel-body" : "text-muted-foreground/90"}`}>

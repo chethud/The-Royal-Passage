@@ -73,7 +73,7 @@ function CartCheckoutPage() {
     >
       <Link
         to="/dashboard/cart"
-        className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
+        className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-gold/85 transition-colors hover:text-ink"
       >
         ← Back to cart
       </Link>

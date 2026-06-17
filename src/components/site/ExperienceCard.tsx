@@ -8,7 +8,7 @@ import { categoryIconForLabel } from "@/lib/experience-category-icons";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 const cardActionClass =
-  "scale-90 border-0 bg-black/35 p-2 text-[#F7F1E8] shadow-none backdrop-blur-sm hover:border-0 hover:bg-black/50";
+  "scale-90 border-0 bg-black/35 p-2 text-ink shadow-none backdrop-blur-sm hover:border-0 hover:bg-black/50";
 
 export function ExperienceCard({ exp }: { exp: Experience }) {
   const reduceMotion = usePrefersReducedMotion();
@@ -21,7 +21,7 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
         to={detailTo}
         params={{ slug: exp.slug }}
         search={{}}
-        className="absolute inset-0 z-10 block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A] focus-visible:ring-inset"
+        className="absolute inset-0 z-10 block focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-inset"
       >
         <img
           src={exp.image}
@@ -29,12 +29,12 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#120000]/95 via-[#4A0000]/40 to-[#4A0000]/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-noir/95 via-brand-maroon-deep/40 to-brand-maroon-deep/10" />
         <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent" />
 
         <div className="absolute left-3.5 top-3.5 z-20">
           <span
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-[#D4AF6A] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-gold backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
             aria-label={exp.category}
             title={exp.category}
           >
@@ -43,20 +43,20 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
         </div>
 
         <div className="absolute inset-x-0 bottom-0 z-20 p-5">
-          <h3 className="line-clamp-2 font-display text-lg uppercase leading-snug tracking-[0.06em] text-[#F7F1E8] drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] transition-colors group-hover:text-[#D4AF6A]">
+          <h3 className="line-clamp-2 font-display text-lg uppercase leading-snug tracking-[0.06em] text-ink drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] transition-colors group-hover:text-gold">
             {exp.title}
           </h3>
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[0.68rem] text-[#E8DCC8]/90">
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[0.68rem] text-brand-cotton/90">
             <span className="inline-flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]" strokeWidth={1.75} />
+              <Clock className="h-3.5 w-3.5 shrink-0 text-gold" strokeWidth={1.75} />
               {exp.durationHours}h
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]" strokeWidth={1.75} />
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-gold" strokeWidth={1.75} />
               {exp.city}
             </span>
           </div>
-          <span className="mt-3 inline-flex items-center gap-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-all duration-300 group-hover:gap-2.5">
+          <span className="mt-3 inline-flex items-center gap-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-gold transition-all duration-300 group-hover:gap-2.5">
             View details
             <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
           </span>

@@ -38,7 +38,7 @@ export function BookingCard({
             alt=""
             className={
               isLight
-                ? "h-[5.5rem] w-[4.5rem] shrink-0 rounded-sm border border-[rgb(200_162_90/0.28)] object-cover sm:h-28 sm:w-[6.5rem]"
+                ? "h-[5.5rem] w-[4.5rem] shrink-0 rounded-sm border border-[rgb(201_162_39/0.28)] object-cover sm:h-28 sm:w-[6.5rem]"
                 : "h-24 w-full object-cover sm:h-full sm:min-h-[96px]"
             }
           />
@@ -46,7 +46,7 @@ export function BookingCard({
           <div
             className={
               isLight
-                ? "h-[5.5rem] w-[4.5rem] shrink-0 rounded-sm border border-[rgb(200_162_90/0.28)] bg-[rgb(74_0_0/0.06)] sm:h-28 sm:w-[6.5rem]"
+                ? "h-[5.5rem] w-[4.5rem] shrink-0 rounded-sm border border-[rgb(201_162_39/0.28)] bg-[rgb(88_16_0/0.06)] sm:h-28 sm:w-[6.5rem]"
                 : "h-24 bg-muted sm:h-full sm:min-h-[96px]"
             }
           />

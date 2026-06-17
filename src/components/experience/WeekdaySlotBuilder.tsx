@@ -35,15 +35,15 @@ function panelStyles(surface: "light" | "dark") {
     muted: light ? "luxury-panel-body" : "text-muted-foreground",
     mutedXs: light ? "text-xs luxury-panel-body" : "text-xs text-muted-foreground",
     previewBox: light
-      ? "rounded-md border border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.45)] px-4 py-3 text-sm"
+      ? "rounded-md border border-[rgb(88_16_0/0.18)] bg-[rgb(255_255_255/0.45)] px-4 py-3 text-sm"
       : "rounded-md border border-ember/30 bg-ember/8 px-4 py-3 text-sm",
     previewCount: light ? "font-display text-lg text-[#8B6914]" : "font-display text-lg text-ember",
     previewList: light
-      ? "mt-3 space-y-1 border-t border-[rgb(74_0_0/0.12)] pt-3 text-xs luxury-panel-body"
+      ? "mt-3 space-y-1 border-t border-[rgb(88_16_0/0.12)] pt-3 text-xs luxury-panel-body"
       : "mt-3 space-y-1 border-t border-ember/20 pt-3 text-xs text-ink/90",
-    previewMore: light ? "text-[rgb(58_0_0/0.5)]" : "text-muted-foreground",
+    previewMore: light ? "text-[rgb(27_23_22/0.5)]" : "text-muted-foreground",
     sessionCard: light
-      ? "rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4"
+      ? "rounded-md border border-[rgb(88_16_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4"
       : "rounded-md border border-[oklch(0.88_0.08_86_/_0.2)] bg-background/10 p-4",
     success: light ? "text-sm text-[#2d6a4f]" : "text-sm text-emerald-300/90",
     label: light ? "eyebrow luxury-panel-label" : "eyebrow text-muted-foreground",
@@ -241,7 +241,7 @@ export function WeekdaySlotBuilder({
                   active
                     ? "border-ember/70 bg-ember/15 text-ember"
                     : surface === "light"
-                      ? "border-[rgb(74_0_0/0.2)] luxury-panel-body hover:border-ember/35"
+                      ? "border-[rgb(88_16_0/0.2)] luxury-panel-body hover:border-ember/35"
                       : "border-[oklch(0.88_0.08_86_/_0.3)] text-muted-foreground hover:border-ember/35"
                 }`}
               >

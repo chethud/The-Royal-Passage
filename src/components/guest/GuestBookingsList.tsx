@@ -43,7 +43,7 @@ export function GuestBookingsList({
           {error}
         </p>
       ) : null}
-      <ul className={isLight ? "divide-y divide-[rgb(74_0_0/0.15)]" : "space-y-4"}>
+      <ul className={isLight ? "divide-y divide-[rgb(88_16_0/0.15)]" : "space-y-4"}>
         {bookings.map((booking) => (
           <li key={booking.id}>
             <BookingCard

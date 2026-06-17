@@ -84,7 +84,7 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <Avatar className="h-24 w-24 border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40">
             {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
-            <AvatarFallback className="bg-[#C8A25A]/15 text-lg font-semibold text-[#D4AF6A]">
+            <AvatarFallback className="bg-gold/15 text-lg font-semibold text-gold">
               {profileInitials(fullName, profile.email)}
             </AvatarFallback>
           </Avatar>

@@ -121,7 +121,7 @@ function ContactPage() {
             })}
           </ul>
 
-          <div className="overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.16_0.07_22)] shadow-soft">
+          <div className="overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.18)] bg-[color-mix(in srgb, var(--brand-noir) 88%, var(--brand-maroon) 12%)] shadow-soft">
             <div className="relative aspect-[4/3] w-full sm:aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[420px]">
               <iframe
                 title="The Royal Passage — Saraswathipuram, Mysuru"

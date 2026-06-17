@@ -140,7 +140,7 @@ function BookingReviewPage() {
         <Link
           to="/bookings/$bookingId"
           params={{ bookingId }}
-          className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
+          className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-gold transition-colors hover:text-ink"
         >
           ← Back to booking
         </Link>
@@ -156,7 +156,7 @@ function BookingReviewPage() {
           </p>
 
           {submitted ? (
-            <div className="mt-8 rounded-sm border border-[rgb(200_162_90/0.35)] bg-[rgb(200_162_90/0.12)] p-6">
+            <div className="mt-8 rounded-sm border border-[rgb(201_162_39/0.35)] bg-[rgb(201_162_39/0.12)] p-6">
               <p className="luxury-panel-body text-sm">
                 Thank you — your review has been published.
               </p>
@@ -180,7 +180,7 @@ function BookingReviewPage() {
               </div>
             </div>
           ) : alreadyReviewed ? (
-            <div className="mt-8 rounded-sm border border-[rgb(74_0_0/0.15)] bg-[rgb(74_0_0/0.04)] p-6">
+            <div className="mt-8 rounded-sm border border-[rgb(88_16_0/0.15)] bg-[rgb(88_16_0/0.04)] p-6">
               <p className="luxury-panel-body text-sm">
                 You have already reviewed this booking.
               </p>

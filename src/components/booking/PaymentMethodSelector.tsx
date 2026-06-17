@@ -34,29 +34,29 @@ export function PaymentMethodSelector({
             className={`group flex w-full items-start gap-3 border-l-[3px] py-3.5 pl-4 pr-2 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A0000]/25 ${
               active
                 ? isLight
-                  ? "border-[#4A0000] text-[#4A0000]"
-                  : "border-[#D4AF6A] text-foreground"
+                  ? "border-brand-maroon-deep text-brand-maroon-deep"
+                  : "border-gold text-foreground"
                 : isLight
-                  ? "border-transparent text-[#4A0000]/75 hover:border-[#4A0000]/50 hover:text-[#4A0000]"
-                  : "border-transparent text-foreground/75 hover:border-[#C8A25A]/35 hover:text-foreground"
+                  ? "border-transparent text-brand-maroon-deep/75 hover:border-brand-maroon-deep/50 hover:text-brand-maroon-deep"
+                  : "border-transparent text-foreground/75 hover:border-gold/35 hover:text-foreground"
             }`}
           >
             <span
               className={`mt-1.5 flex h-2 w-2 shrink-0 rounded-full transition-colors ${
                 active
                   ? isLight
-                    ? "bg-[#4A0000]"
-                    : "bg-[#C8A25A]"
+                    ? "bg-brand-maroon-deep"
+                    : "bg-gold"
                   : isLight
-                    ? "bg-[#4A0000]/20 group-hover:bg-[#4A0000]/45"
-                    : "bg-muted-foreground/30 group-hover:bg-[#D4AF6A]/60"
+                    ? "bg-brand-maroon-deep/20 group-hover:bg-brand-maroon-deep/45"
+                    : "bg-muted-foreground/30 group-hover:bg-gold/60"
               }`}
               aria-hidden
             />
             <span>
               <span
                 className={`block font-display text-lg tracking-wide transition-colors ${
-                  isLight ? "group-hover:text-[#4A0000]" : "group-hover:text-[#D4AF6A]"
+                  isLight ? "group-hover:text-brand-maroon-deep" : "group-hover:text-gold"
                 }`}
               >
                 {option.title}

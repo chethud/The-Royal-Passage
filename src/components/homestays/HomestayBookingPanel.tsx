@@ -62,7 +62,7 @@ export function HomestayBookingPanel({
             min={today}
             value={checkIn}
             onChange={(event) => onCheckInChange(event.target.value)}
-            className="w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body focus:border-[#4A0000]/50 focus:outline-none"
+            className="w-full rounded-sm border border-[rgb(88_16_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body focus:border-brand-maroon-deep/50 focus:outline-none"
           />
         </label>
         <label className="block">
@@ -72,7 +72,7 @@ export function HomestayBookingPanel({
             min={checkIn}
             value={checkOut}
             onChange={(event) => onCheckOutChange(event.target.value)}
-            className="w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body focus:border-[#4A0000]/50 focus:outline-none"
+            className="w-full rounded-sm border border-[rgb(88_16_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body focus:border-brand-maroon-deep/50 focus:outline-none"
           />
         </label>
       </div>
@@ -88,17 +88,17 @@ export function HomestayBookingPanel({
             aria-label="Decrease guest count"
             disabled={guests <= 1}
             onClick={() => onGuestsChange(Math.max(1, guests - 1))}
-            className="inline-flex h-9 w-9 items-center justify-center text-[#4A0000]/80 transition-colors hover:text-[#4A0000] disabled:opacity-35"
+            className="inline-flex h-9 w-9 items-center justify-center text-brand-maroon-deep/80 transition-colors hover:text-brand-maroon-deep disabled:opacity-35"
           >
             <Minus className="h-4 w-4" strokeWidth={1.75} />
           </button>
-          <span className="w-8 text-center font-display text-2xl text-[#4A0000]">{guests}</span>
+          <span className="w-8 text-center font-display text-2xl text-brand-maroon-deep">{guests}</span>
           <button
             type="button"
             aria-label="Increase guest count"
             disabled={guests >= stay.maxGuests}
             onClick={() => onGuestsChange(Math.min(stay.maxGuests, guests + 1))}
-            className="inline-flex h-9 w-9 items-center justify-center text-[#4A0000]/80 transition-colors hover:text-[#4A0000] disabled:opacity-35"
+            className="inline-flex h-9 w-9 items-center justify-center text-brand-maroon-deep/80 transition-colors hover:text-brand-maroon-deep disabled:opacity-35"
           >
             <Plus className="h-4 w-4" strokeWidth={1.75} />
           </button>
@@ -112,7 +112,7 @@ export function HomestayBookingPanel({
           onChange={(event) => onNotesChange(event.target.value)}
           rows={3}
           placeholder="Arrival time, dietary needs, or special requests…"
-          className="w-full resize-none rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none"
+          className="w-full resize-none rounded-sm border border-[rgb(88_16_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body placeholder:text-[rgb(27_23_22/0.4)] focus:border-brand-maroon-deep/50 focus:outline-none"
         />
       </div>
 
@@ -131,7 +131,7 @@ export function HomestayBookingPanel({
             </div>
           ) : null}
         </div>
-        <div className="font-display text-3xl tracking-tight text-[#4A0000]">
+        <div className="font-display text-3xl tracking-tight text-brand-maroon-deep">
           {formatMoney(totalMinor, sym)}
         </div>
       </div>
@@ -139,7 +139,7 @@ export function HomestayBookingPanel({
       <PayAtHomestayBadge surface="light" />
 
       {!bookable ? (
-        <p className="rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.45)] px-4 py-3 text-sm luxury-panel-body">
+        <p className="rounded-sm border border-[rgb(88_16_0/0.2)] bg-[rgb(255_255_255/0.45)] px-4 py-3 text-sm luxury-panel-body">
           Live booking opens once homestay listings are published in the database. Browse the property
           details below for now.
         </p>

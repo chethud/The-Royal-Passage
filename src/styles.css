@@ -41,12 +41,23 @@
   --color-gold-dim: var(--gold-dim);
   --color-burgundy: var(--burgundy);
 
-  --shadow-soft: 0 1px 0 oklch(0.78 0.09 78 / 0.14), 0 10px 36px -8px oklch(0.08 0.04 22 / 0.65);
+  --color-brand-noir: var(--brand-noir);
+  --color-brand-maroon: var(--brand-maroon);
+  --color-brand-maroon-deep: var(--brand-maroon-deep);
+  --color-brand-cherry: var(--brand-cherry);
+  --color-brand-ivory: var(--brand-ivory);
+  --color-brand-cotton: var(--brand-cotton);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-light: var(--brand-gold-light);
+
+  --shadow-soft: 0 1px 0 color-mix(in srgb, var(--brand-gold) 14%, transparent), 0 10px 36px -8px color-mix(in srgb, var(--brand-noir) 65%, transparent);
   --shadow-lift:
-    0 1px 0 oklch(0.82 0.1 78 / 0.18), 0 22px 48px -14px oklch(0.06 0.03 22 / 0.55),
-    0 0 48px -16px oklch(0.72 0.12 78 / 0.22);
+    0 1px 0 color-mix(in srgb, var(--brand-gold-light) 18%, transparent),
+    0 22px 48px -14px color-mix(in srgb, var(--brand-noir) 55%, transparent),
+    0 0 48px -16px color-mix(in srgb, var(--brand-gold) 22%, transparent);
   --shadow-gold:
-    0 0 42px -10px oklch(0.72 0.14 78 / 0.55), inset 0 1px 0 oklch(0.92 0.06 82 / 0.25);
+    0 0 42px -10px color-mix(in srgb, var(--brand-gold) 55%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--brand-ivory) 25%, transparent);
 }
 
 :root {
@@ -54,41 +65,52 @@
   /* Header is shorter on mobile so the fixed bar doesn't eat the viewport. */
   --header-height: 4.5rem;
 
-  --burgundy: oklch(0.21 0.1 22);
-  --burgundy-deep: oklch(0.15 0.08 20);
+  /* Royal Passage brand palette */
+  --brand-noir: #1b1716;
+  --brand-maroon: #630102;
+  --brand-maroon-deep: #581000;
+  --brand-cherry: #810100;
+  --brand-cotton: #EDEBDE;
+  --brand-ivory: #f3eee6;
+  --brand-gold: #c9a227;
+  --brand-gold-light: #d4af37;
+  --brand-gold-dim: #9a7b1c;
 
-  --background: oklch(0.19 0.09 22);
-  --foreground: oklch(0.96 0.012 85);
-  --ink: oklch(0.97 0.01 88);
-  --ink-soft: oklch(0.74 0.04 78);
+  --burgundy: var(--brand-maroon);
+  --burgundy-deep: var(--brand-maroon-deep);
 
-  --gold: oklch(0.76 0.11 78);
-  --gold-dim: oklch(0.58 0.09 72);
-  --ember: var(--gold);
-  --ember-soft: oklch(0.42 0.07 72 / 0.35);
-  --cream: oklch(0.55 0.1 75 / 0.12);
+  --background: var(--brand-noir);
+  --foreground: var(--brand-ivory);
+  --ink: var(--brand-ivory);
+  --ink-soft: color-mix(in srgb, var(--brand-cotton) 82%, var(--brand-gold) 18%);
 
-  --card: oklch(0.26 0.09 24 / 0.42);
+  --gold: var(--brand-gold);
+  --gold-dim: var(--brand-gold-dim);
+  --ember: var(--brand-gold);
+  --ember-soft: color-mix(in srgb, var(--brand-gold) 35%, transparent);
+  --cream: color-mix(in srgb, var(--brand-gold) 12%, transparent);
+
+  --card: color-mix(in srgb, var(--brand-maroon) 38%, var(--brand-noir) 62%);
   --card-foreground: var(--ink);
-  --popover: oklch(0.17 0.07 22 / 0.94);
+  --popover: color-mix(in srgb, var(--brand-noir) 94%, var(--brand-maroon) 6%);
   --popover-foreground: var(--ink);
 
-  --primary: oklch(0.76 0.11 78);
-  --primary-foreground: oklch(0.14 0.06 22);
-  --secondary: oklch(0.28 0.08 24 / 0.55);
+  --primary: var(--brand-gold);
+  --primary-foreground: var(--brand-noir);
+  --secondary: color-mix(in srgb, var(--brand-maroon) 55%, var(--brand-noir) 45%);
   --secondary-foreground: var(--ink);
-  --muted: oklch(0.3 0.07 24 / 0.45);
-  --muted-foreground: oklch(0.68 0.04 78);
-  --accent: oklch(0.68 0.1 76);
-  --accent-foreground: oklch(0.14 0.06 22);
-  --destructive: oklch(0.52 0.18 25);
-  --destructive-foreground: oklch(0.98 0.01 90);
+  --muted: color-mix(in srgb, var(--brand-maroon) 45%, var(--brand-noir) 55%);
+  --muted-foreground: color-mix(in srgb, var(--brand-cotton) 72%, var(--brand-gold) 28%);
+  --accent: var(--brand-gold-light);
+  --accent-foreground: var(--brand-noir);
+  --destructive: var(--brand-cherry);
+  --destructive-foreground: var(--brand-ivory);
 
-  --border: oklch(0.72 0.1 78 / 0.28);
-  --input: oklch(0.72 0.09 78 / 0.22);
-  --ring: oklch(0.76 0.11 78);
+  --border: color-mix(in srgb, var(--brand-gold) 28%, transparent);
+  --input: color-mix(in srgb, var(--brand-gold) 22%, transparent);
+  --ring: var(--brand-gold);
 
-  --sidebar: oklch(0.17 0.08 22);
+  --sidebar: color-mix(in srgb, var(--brand-noir) 92%, var(--brand-maroon) 8%);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
@@ -97,18 +119,26 @@
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
 
-  --chart-1: oklch(0.76 0.11 78);
-  --chart-2: oklch(0.62 0.08 72);
-  --chart-3: oklch(0.55 0.06 220);
-  --chart-4: oklch(0.7 0.1 80);
-  --chart-5: oklch(0.45 0.04 300);
+  --chart-1: var(--brand-gold);
+  --chart-2: var(--brand-gold-dim);
+  --chart-3: color-mix(in srgb, var(--brand-cotton) 70%, var(--brand-maroon) 30%);
+  --chart-4: var(--brand-gold-light);
+  --chart-5: var(--brand-maroon);
 
-  /* Cream-white surfaces (checkout, cart) — warm ivory like #FEF9E7 */
-  --cream-white: #fef9e7;
-  --cream-surface: #fef6df;
-  --cream-warm: #fdf3d8;
-  --cream-border: rgb(210 180 120 / 0.32);
-  --cream-shadow: rgb(26 0 0 / 0.36);
+  /* Cream-white surfaces (checkout, cart, host panels) */
+  --cream-white: var(--brand-ivory);
+  --cream-surface: var(--brand-cotton);
+  --cream-warm: #f0ebe3;
+  --cream-border: color-mix(in srgb, var(--brand-gold) 32%, transparent);
+  --cream-shadow: color-mix(in srgb, var(--brand-noir) 36%, transparent);
+
+  /* Text on ivory/cotton panels */
+  --panel-heading: var(--brand-maroon-deep);
+  --panel-body: color-mix(in srgb, var(--brand-maroon-deep) 58%, var(--brand-noir) 42%);
+  --panel-label: var(--brand-maroon-deep);
+  --panel-link: var(--brand-maroon-deep);
+  --panel-link-hover: var(--brand-noir);
+  --panel-divider: color-mix(in srgb, var(--brand-maroon-deep) 22%, transparent);
 }
 
 @media (min-width: 640px) {
@@ -149,10 +179,10 @@
     font-feature-settings: "ss01", "cv11";
     background-color: var(--color-background);
     background-image:
-      radial-gradient(ellipse 90% 55% at 50% -18%, oklch(0.42 0.12 78 / 0.22), transparent 58%),
-      radial-gradient(ellipse 55% 45% at 100% 15%, oklch(0.35 0.1 75 / 0.14), transparent 52%),
-      radial-gradient(ellipse 45% 40% at 0% 85%, oklch(0.28 0.12 22 / 0.35), transparent 48%),
-      linear-gradient(180deg, oklch(0.2 0.09 22) 0%, oklch(0.14 0.07 20) 100%);
+      radial-gradient(ellipse 90% 55% at 50% -18%, color-mix(in srgb, var(--brand-gold) 22%, transparent), transparent 58%),
+      radial-gradient(ellipse 55% 45% at 100% 15%, color-mix(in srgb, var(--brand-maroon) 14%, transparent), transparent 52%),
+      radial-gradient(ellipse 45% 40% at 0% 85%, color-mix(in srgb, var(--brand-maroon-deep) 35%, transparent), transparent 48%),
+      linear-gradient(180deg, var(--brand-noir) 0%, color-mix(in srgb, var(--brand-noir) 88%, var(--brand-maroon-deep) 12%) 100%);
     background-attachment: fixed;
   }
   h1,
@@ -164,7 +194,7 @@
     letter-spacing: 0.02em;
   }
   ::selection {
-    background-color: oklch(0.62 0.1 78 / 0.45);
+    background-color: color-mix(in srgb, var(--brand-gold) 45%, transparent);
     color: var(--color-foreground);
   }
 }
@@ -188,21 +218,21 @@
 
 /* Header — SSR-safe (no Framer Motion inline styles, no hydration mismatch) */
 .site-header {
-  background-color: oklch(0.15 0.07 22 / 0.45);
+  background-color: color-mix(in srgb, var(--brand-noir) 45%, transparent);
   backdrop-filter: blur(14px) saturate(1.1);
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
-  border-bottom: 1px solid oklch(0.72 0.09 78 / 0.14);
+  border-bottom: 1px solid color-mix(in srgb, var(--brand-gold) 14%, transparent);
   box-shadow: 0 0 0 transparent;
 }
 .site-header[data-elevated="true"] {
-  background-color: oklch(0.17 0.08 22 / 0.92);
+  background-color: color-mix(in srgb, var(--brand-noir) 92%, var(--brand-maroon) 8%);
   backdrop-filter: blur(22px) saturate(1.35);
   -webkit-backdrop-filter: blur(22px) saturate(1.35);
-  border-bottom-color: oklch(0.76 0.1 78 / 0.38);
+  border-bottom-color: color-mix(in srgb, var(--brand-gold) 38%, transparent);
   box-shadow:
-    0 1px 0 oklch(0.78 0.1 78 / 0.18),
-    inset 0 1px 0 oklch(0.92 0.05 82 / 0.08),
-    0 20px 50px -24px oklch(0.05 0.04 18 / 0.55);
+    0 1px 0 color-mix(in srgb, var(--brand-gold-light) 18%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--brand-ivory) 8%, transparent),
+    0 20px 50px -24px color-mix(in srgb, var(--brand-noir) 55%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -247,25 +277,29 @@
 @utility glass {
   background: linear-gradient(
     155deg,
-    oklch(0.32 0.1 24 / 0.38) 0%,
-    oklch(0.18 0.06 22 / 0.42) 100%
+    color-mix(in srgb, var(--brand-maroon) 38%, transparent) 0%,
+    color-mix(in srgb, var(--brand-noir) 42%, transparent) 100%
   );
-  border: 1px solid oklch(0.78 0.1 78 / 0.22);
+  border: 1px solid color-mix(in srgb, var(--brand-gold-light) 22%, transparent);
   box-shadow:
-    inset 0 1px 0 0 oklch(0.9 0.06 82 / 0.12),
-    0 10px 40px -12px oklch(0.05 0.03 18 / 0.65),
-    0 0 0 1px oklch(0.08 0.04 22 / 0.45);
+    inset 0 1px 0 0 color-mix(in srgb, var(--brand-ivory) 12%, transparent),
+    0 10px 40px -12px color-mix(in srgb, var(--brand-noir) 65%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--brand-noir) 45%, transparent);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
 
 @utility glass-strong {
-  background: linear-gradient(165deg, oklch(0.36 0.1 25 / 0.48) 0%, oklch(0.2 0.07 22 / 0.45) 100%);
-  border: 1px solid oklch(0.8 0.11 78 / 0.32);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--brand-maroon) 48%, transparent) 0%,
+    color-mix(in srgb, var(--brand-noir) 45%, transparent) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--brand-gold-light) 32%, transparent);
   box-shadow:
-    inset 0 1px 0 0 oklch(0.92 0.05 85 / 0.14),
-    0 14px 44px -14px oklch(0.06 0.04 20 / 0.6),
-    0 0 72px -20px oklch(0.7 0.12 78 / 0.18);
+    inset 0 1px 0 0 color-mix(in srgb, var(--brand-ivory) 14%, transparent),
+    0 14px 44px -14px color-mix(in srgb, var(--brand-noir) 60%, transparent),
+    0 0 72px -20px color-mix(in srgb, var(--brand-gold) 18%, transparent);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
 }
@@ -467,11 +501,11 @@
     var(--cream-surface) 55%,
     var(--cream-warm) 100%
   );
-  color: #4a0000;
+  color: var(--panel-heading);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.35),
     0 18px 44px -24px var(--cream-shadow),
-    0 6px 20px -10px rgb(200 162 90 / 0.08);
+    0 6px 20px -10px color-mix(in srgb, var(--brand-gold) 8%, transparent);
 }
 
 .luxury-checkout-panel::before {
@@ -484,25 +518,25 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgb(200 162 90 / 0.35) 25%,
-    rgb(212 175 106 / 0.45) 50%,
-    rgb(200 162 90 / 0.35) 75%,
+    color-mix(in srgb, var(--brand-gold) 35%, transparent) 25%,
+    color-mix(in srgb, var(--brand-gold-light) 45%, transparent) 50%,
+    color-mix(in srgb, var(--brand-gold) 35%, transparent) 75%,
     transparent
   );
   pointer-events: none;
 }
 
 .luxury-panel-heading {
-  color: #3a0000;
+  color: var(--panel-heading);
   letter-spacing: 0.02em;
 }
 
 .luxury-panel-body {
-  color: rgb(58 0 0 / 0.58);
+  color: var(--panel-body);
 }
 
 .luxury-panel-label {
-  color: #4a0000;
+  color: var(--panel-label);
   letter-spacing: 0.18em;
 }
 
@@ -519,58 +553,58 @@
 }
 
 .luxury-panel-divider {
-  border-color: rgb(74 0 0 / 0.22);
+  border-color: var(--panel-divider);
 }
 
 .luxury-panel-divider-bg {
-  background-color: rgb(74 0 0 / 0.22);
+  background-color: var(--panel-divider);
 }
 
 .luxury-panel-link {
-  color: #4a0000;
+  color: var(--panel-link);
   transition: color 0.2s ease;
 }
 
 .luxury-panel-link:hover {
-  color: #2d0000;
+  color: var(--panel-link-hover);
 }
 
 .luxury-panel-step-active {
-  border: 2px solid #4a0000;
+  border: 2px solid var(--panel-label);
   background: var(--cream-white);
-  color: #4a0000;
+  color: var(--panel-label);
   font-weight: 600;
 }
 
 .luxury-panel-step-done {
-  border: 2px solid #4a0000;
-  color: #4a0000;
+  border: 2px solid var(--panel-label);
+  color: var(--panel-label);
   background: transparent;
 }
 
 .luxury-panel-step-idle {
-  border: 2px solid rgb(74 0 0 / 0.38);
-  color: rgb(74 0 0 / 0.48);
+  border: 2px solid color-mix(in srgb, var(--panel-label) 38%, transparent);
+  color: color-mix(in srgb, var(--panel-label) 48%, transparent);
   background: transparent;
 }
 
 .luxury-panel-step-text-idle {
-  color: rgb(74 0 0 / 0.48);
+  color: color-mix(in srgb, var(--panel-label) 48%, transparent);
 }
 
 .luxury-panel-step-connector {
-  background-color: rgb(74 0 0 / 0.42);
+  background-color: color-mix(in srgb, var(--panel-label) 42%, transparent);
 }
 
 .luxury-panel-image {
   overflow: hidden;
-  border: 1px solid rgb(200 162 90 / 0.28);
+  border: 1px solid color-mix(in srgb, var(--brand-gold) 28%, transparent);
   border-radius: var(--radius-sm);
-  box-shadow: 0 10px 28px -14px rgb(58 0 0 / 0.18);
+  box-shadow: 0 10px 28px -14px color-mix(in srgb, var(--brand-maroon-deep) 18%, transparent);
 }
 
 .luxury-checkout-panel .hairline {
-  background: linear-gradient(90deg, transparent, rgb(74 0 0 / 0.28), transparent);
+  background: linear-gradient(90deg, transparent, var(--panel-divider), transparent);
 }
 
 /* Date & session picker — matches cream panel + gold trim */

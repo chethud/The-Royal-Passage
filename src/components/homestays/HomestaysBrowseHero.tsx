@@ -26,8 +26,8 @@ export function HomestaysBrowseHero({ search, onSearchChange, onSubmit }: Homest
         role="img"
         aria-label="Browse royal homestays"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#4A0000]/94 via-[#4A0000]/82 to-[#5B0000]/72" />
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-[#4A0000]/35" />
+      <div className="absolute inset-0 bg-gradient-to-r from-brand-maroon-deep/94 via-brand-maroon-deep/82 to-brand-maroon/72" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-brand-maroon-deep/35" />
 
       <div className="container-page relative z-10 pb-8 pt-[calc(var(--header-height)+1rem)] sm:pb-10 sm:pt-[calc(var(--header-height)+1.25rem)] md:pb-12">
         <motion.div
@@ -36,12 +36,12 @@ export function HomestaysBrowseHero({ search, onSearchChange, onSubmit }: Homest
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="w-full"
         >
-          <p className="eyebrow text-[#D4AF6A]">Browse stays</p>
+          <p className="eyebrow text-gold">Browse stays</p>
           <div className="mt-2 max-w-2xl">
-            <h1 className="font-display text-3xl leading-tight tracking-tight text-[#F7F1E8] sm:text-4xl md:text-[2.75rem]">
+            <h1 className="font-display text-3xl leading-tight tracking-tight text-ink sm:text-4xl md:text-[2.75rem]">
               Mysuru homestays
             </h1>
-            <p className="mt-4 max-w-lg text-sm leading-relaxed text-[#F7F1E8]/80 sm:text-[0.95rem]">
+            <p className="mt-4 max-w-lg text-sm leading-relaxed text-ink/80 sm:text-[0.95rem]">
               Choose your dates and guests, then pick a stay in Mysuru.
             </p>
           </div>

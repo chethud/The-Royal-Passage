@@ -53,7 +53,7 @@ const STEPS = [
 ] as const;
 
 const inputClass =
-  "mt-1 w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-3 py-2 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
+  "mt-1 w-full rounded-sm border border-[rgb(88_16_0/0.2)] bg-[rgb(255_255_255/0.55)] px-3 py-2 text-sm luxury-panel-body placeholder:text-[rgb(27_23_22/0.4)] focus:border-brand-maroon-deep/50 focus:outline-none focus:ring-1 focus:ring-brand-maroon-deep/25";
 const numberInputClass = `${inputClass} input-no-spin`;
 
 const labelClass = "eyebrow luxury-panel-label";
@@ -524,7 +524,7 @@ export function CreateExperienceWizard({
                 {sortedDraftSlots.length} session{sortedDraftSlots.length === 1 ? "" : "s"} ready to
                 publish
               </p>
-              <ul className="max-h-72 divide-y divide-[rgb(74_0_0/0.12)] overflow-y-auto rounded-md border border-[rgb(74_0_0/0.14)]">
+              <ul className="max-h-72 divide-y divide-[rgb(88_16_0/0.12)] overflow-y-auto rounded-md border border-[rgb(88_16_0/0.14)]">
                 {sortedDraftSlots.map((slot) => (
                   <li
                     key={slot.key}
@@ -623,7 +623,7 @@ export function CreateExperienceWizard({
             </div>
           </dl>
 
-          <label className="flex items-start gap-3 rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4 text-sm">
+          <label className="flex items-start gap-3 rounded-md border border-[rgb(88_16_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4 text-sm">
             <input
               type="checkbox"
               className="mt-0.5"

@@ -43,31 +43,31 @@ function panelTone(surface: "light" | "dark") {
     return {
       eyebrow: "luxury-panel-label",
       muted: "luxury-panel-body",
-      slotActive: "border-[#4A0000] text-[#4A0000]",
+      slotActive: "border-brand-maroon-deep text-brand-maroon-deep",
       slotIdle:
-        "border-transparent text-[#4A0000]/75 hover:border-[#4A0000]/50 hover:text-[#4A0000]",
-      slotHover: "group-hover:text-[#4A0000]",
-      seats: "text-[#4A0000]",
-      guestBtn: "text-[#4A0000]/80 hover:text-[#4A0000]",
-      guestCount: "text-[#4A0000]",
-      total: "text-[#4A0000]",
+        "border-transparent text-brand-maroon-deep/75 hover:border-brand-maroon-deep/50 hover:text-brand-maroon-deep",
+      slotHover: "group-hover:text-brand-maroon-deep",
+      seats: "text-brand-maroon-deep",
+      guestBtn: "text-brand-maroon-deep/80 hover:text-brand-maroon-deep",
+      guestCount: "text-brand-maroon-deep",
+      total: "text-brand-maroon-deep",
       textarea:
-        "border-[#4A0000]/25 text-[#4A0000] placeholder:text-[#5B0000]/45 focus:border-[#4A0000]/55",
+        "border-brand-maroon-deep/25 text-brand-maroon-deep placeholder:text-[#5B0000]/45 focus:border-brand-maroon-deep/55",
     };
   }
 
   return {
-    eyebrow: "text-[#D4AF6A]/90",
+    eyebrow: "text-gold/90",
     muted: "text-muted-foreground/90",
-    slotActive: "border-[#D4AF6A] text-foreground",
-    slotIdle: "border-transparent text-foreground/75 hover:border-[#C8A25A]/35 hover:text-foreground",
-    slotHover: "group-hover:text-[#D4AF6A]",
-    seats: "text-[#D4AF6A]",
-    guestBtn: "text-[#D4AF6A] hover:text-[#F7F1E8]",
+    slotActive: "border-gold text-foreground",
+    slotIdle: "border-transparent text-foreground/75 hover:border-gold/35 hover:text-foreground",
+    slotHover: "group-hover:text-gold",
+    seats: "text-gold",
+    guestBtn: "text-gold hover:text-ink",
     guestCount: "text-foreground",
-    total: "text-[#F7F1E8]",
+    total: "text-ink",
     textarea:
-      "border-[#C8A25A]/25 text-foreground placeholder:text-muted-foreground/55 focus:border-[#C8A25A]/55",
+      "border-gold/25 text-foreground placeholder:text-muted-foreground/55 focus:border-gold/55",
   };
 }
 
@@ -113,19 +113,19 @@ function DateSlotPicker({
   const dateCard =
     surface === "light"
       ? "luxury-slot-date"
-      : "border border-[#C8A25A]/15 bg-[#1a0a0a]/40";
+      : "border border-gold/15 bg-brand-noir/40";
   const dateCardActive =
     surface === "light"
       ? "luxury-slot-date luxury-slot-date--active"
-      : "border-[#C8A25A]/30 bg-[#1f0d0d]/70";
+      : "border-gold/30 bg-brand-noir/70";
   const slotRowIdle =
     surface === "light"
       ? "luxury-slot-row"
-      : "border border-transparent bg-black/20 text-foreground/80 hover:border-[#C8A25A]/25 hover:bg-black/30";
+      : "border border-transparent bg-black/20 text-foreground/80 hover:border-gold/25 hover:bg-black/30";
   const slotRowActive =
     surface === "light"
       ? "luxury-slot-row luxury-slot-row--selected"
-      : "border border-[#D4AF6A]/55 bg-[#2a1212] text-foreground shadow-[0_6px_18px_-12px_rgb(0_0_0/0.55)]";
+      : "border border-gold/55 bg-brand-maroon-deep text-foreground shadow-[0_6px_18px_-12px_rgb(0_0_0/0.55)]";
 
   return (
     <div className="space-y-3">
@@ -154,10 +154,10 @@ function DateSlotPicker({
                   hasSelected || open
                     ? surface === "light"
                       ? "luxury-slot-date__rail--active"
-                      : "bg-[#D4AF6A]"
+                      : "bg-gold"
                     : surface === "light"
                       ? "luxury-slot-date__rail"
-                      : "bg-[#C8A25A]/25"
+                      : "bg-gold/25"
                 }`}
               />
               <div className="min-w-0 flex-1">
@@ -178,7 +178,7 @@ function DateSlotPicker({
                 <ChevronDown
                   className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
                     open ? "rotate-180" : ""
-                  } ${surface === "light" ? "text-[#8B6914]/85" : "text-[#D4AF6A]/90"}`}
+                  } ${surface === "light" ? "text-[#8B6914]/85" : "text-gold/90"}`}
                   strokeWidth={1.75}
                 />
               ) : null}
@@ -187,7 +187,7 @@ function DateSlotPicker({
             {open && !soldOut ? (
               <div
                 className={`space-y-2 border-t px-4 pb-4 pt-3 ${
-                  surface === "light" ? "luxury-slot-date__divider" : "border-[#C8A25A]/15"
+                  surface === "light" ? "luxury-slot-date__divider" : "border-gold/15"
                 }`}
               >
                 {group.slots.map((slot) => {
@@ -214,7 +214,7 @@ function DateSlotPicker({
                       {active ? (
                         <span
                           className={`absolute bottom-2.5 left-2 top-2.5 w-1 rounded-full ${
-                            surface === "light" ? "luxury-slot-row__rail" : "bg-[#D4AF6A]"
+                            surface === "light" ? "luxury-slot-row__rail" : "bg-gold"
                           }`}
                           aria-hidden
                         />
@@ -228,7 +228,7 @@ function DateSlotPicker({
                             active
                               ? surface === "light"
                                 ? "luxury-slot-row__selected-label"
-                                : "font-semibold text-[#D4AF6A]"
+                                : "font-semibold text-gold"
                               : tone.muted
                           }`}
                         >

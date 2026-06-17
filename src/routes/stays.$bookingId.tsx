@@ -93,13 +93,13 @@ function StayBookingDetailPage() {
         <div className="mx-auto max-w-2xl">
           <Link
             to="/dashboard/history"
-            className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 hover:text-[#F7F1E8]"
+            className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-gold/85 hover:text-ink"
           >
             ← Booking history
           </Link>
 
           {confirmed ? (
-            <p className="mt-6 rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.08)] px-4 py-3 text-sm text-muted-foreground">
+            <p className="mt-6 rounded-sm border border-[rgb(88_16_0/0.2)] bg-[rgb(255_255_255/0.08)] px-4 py-3 text-sm text-muted-foreground">
               Your stay request was submitted. The host will confirm shortly.
             </p>
           ) : null}
@@ -151,7 +151,7 @@ function StayBookingDetailPage() {
                 </div>
                 <div className="flex justify-between gap-4">
                   <dt>Total</dt>
-                  <dd className="font-display text-xl text-[#4A0000]">{formatMoney(booking.totalAmount, sym)}</dd>
+                  <dd className="font-display text-xl text-brand-maroon-deep">{formatMoney(booking.totalAmount, sym)}</dd>
                 </div>
                 {booking.homestayAddress ? (
                   <div className="flex justify-between gap-4">

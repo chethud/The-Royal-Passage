@@ -10,7 +10,7 @@ const pillarIcons: IconComponent[] = [ShieldCheck, Banknote, Home, HeartHandshak
 
 export function HomestayPillarsRow() {
   return (
-    <section className="border-t border-[oklch(0.88_0.08_86_/_0.12)] bg-[oklch(0.16_0.07_22)] py-12 sm:py-14 md:py-16">
+    <section className="border-t border-[oklch(0.88_0.08_86_/_0.12)] bg-[color-mix(in srgb, var(--brand-noir) 88%, var(--brand-maroon) 12%)] py-12 sm:py-14 md:py-16">
       <div className="container-page">
         <div className="mb-10 text-center">
           <p className="eyebrow text-ember/90">Why Royal Homestays</p>
@@ -32,7 +32,7 @@ export function HomestayPillarsRow() {
                 className={cn(
                   "relative flex flex-col items-center px-4 text-center",
                   "before:pointer-events-none before:absolute before:left-0 before:top-1/2 before:hidden before:h-[72%] before:w-px before:-translate-y-1/2 before:bg-gradient-to-b before:from-transparent before:via-ember/55 before:to-transparent",
-                  "after:pointer-events-none after:absolute after:left-0 after:top-1/2 after:hidden after:h-1.5 after:w-1.5 after:-translate-x-1/2 after:-translate-y-1/2 after:rotate-45 after:border after:border-ember/55 after:bg-[oklch(0.16_0.07_22)] after:shadow-[0_0_10px_oklch(0.78_0.13_86_/_0.45)]",
+                  "after:pointer-events-none after:absolute after:left-0 after:top-1/2 after:hidden after:h-1.5 after:w-1.5 after:-translate-x-1/2 after:-translate-y-1/2 after:rotate-45 after:border after:border-ember/55 after:bg-[color-mix(in srgb, var(--brand-noir) 88%, var(--brand-maroon) 12%)] after:shadow-[0_0_10px_oklch(0.78_0.13_86_/_0.45)]",
                   idx % 2 === 1 && "sm:before:block sm:after:block",
                   idx > 0 && "md:before:block md:after:block",
                 )}

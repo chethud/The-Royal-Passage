@@ -194,7 +194,7 @@ export function HomestayCheckoutWizard({
             </div>
             <div className="flex justify-between gap-4 border-b luxury-panel-divider pb-3">
               <dt>Total (cash at check-in)</dt>
-              <dd className="font-display text-xl text-[#4A0000]">{formatMoney(checkout.totalMinor, sym)}</dd>
+              <dd className="font-display text-xl text-brand-maroon-deep">{formatMoney(checkout.totalMinor, sym)}</dd>
             </div>
             <div className="flex justify-between gap-4 pb-3">
               <dt>Payment</dt>

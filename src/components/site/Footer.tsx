@@ -63,12 +63,12 @@ function FooterBrandBlock({ logoClassName = "h-28 w-auto object-contain sm:h-32 
 
 function FooterSimple() {
   return (
-    <footer className="mt-16 border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
+    <footer className="mt-16 border-t border-gold/20 bg-brand-noir">
       <div className="container-page py-10 sm:py-12">
         <FooterBrandBlock logoClassName="h-24 w-auto object-contain sm:h-28" />
       </div>
 
-      <div className="container-page border-t border-[oklch(0.88_0.08_86_/_0.12)] py-5 text-xs text-muted-foreground">
+      <div className="container-page border-t border-gold/15 py-5 text-xs text-muted-foreground">
         <span suppressHydrationWarning>© {new Date().getFullYear()} The Royal Passage. All rights reserved.</span>
       </div>
     </footer>
@@ -77,7 +77,7 @@ function FooterSimple() {
 
 function FooterFull() {
   return (
-    <footer className="relative mt-24 overflow-hidden border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
+    <footer className="relative mt-24 overflow-hidden border-t border-gold/20 bg-brand-noir">
       <div className="container-page relative z-10 grid gap-10 py-12 sm:grid-cols-2 sm:py-14 md:grid-cols-[1.5fr_1fr_1fr_1.2fr] md:gap-12 md:py-16">
         <div>
           <FooterBrandBlock />
@@ -191,11 +191,11 @@ function FooterFull() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,oklch(0.13_0.06_22)_0%,oklch(0.13_0.06_22_/_0.92)_30%,oklch(0.13_0.06_22_/_0.7)_55%,oklch(0.13_0.06_22_/_0.45)_80%,oklch(0.13_0.06_22_/_0.25)_100%)] lg:block"
+        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,var(--brand-noir)_0%,oklch(0.13_0.06_22_/_0.92)_30%,oklch(0.13_0.06_22_/_0.7)_55%,oklch(0.13_0.06_22_/_0.45)_80%,oklch(0.13_0.06_22_/_0.25)_100%)] lg:block"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_bottom,oklch(0.13_0.06_22)_0%,transparent_18%,transparent_82%,oklch(0.13_0.06_22)_100%)] lg:block"
+        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_bottom,var(--brand-noir)_0%,transparent_18%,transparent_82%,var(--brand-noir)_100%)] lg:block"
       />
       <div
         aria-hidden
