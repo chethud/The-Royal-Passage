@@ -66,6 +66,12 @@ function FooterBrandBlock({
             <SocialIcon key={label} label={label} Icon={Icon} href={href} compact />
           ))}
         </div>
+        <p
+          className="shrink-0 text-[0.65rem] text-muted-foreground/75 sm:text-[0.68rem]"
+          suppressHydrationWarning
+        >
+          © {new Date().getFullYear()} The Royal Passage. All rights reserved.
+        </p>
       </div>
     );
   }
@@ -96,13 +102,6 @@ function FooterSimple() {
     <footer className="mt-12 border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
       <div className="container-page py-4 sm:py-5">
         <FooterBrandBlock layout="row" logoClassName="h-12 w-auto object-contain sm:h-14 md:h-16" />
-
-        <p
-          className="mt-3 text-[0.68rem] text-muted-foreground/75 sm:text-xs"
-          suppressHydrationWarning
-        >
-          © {new Date().getFullYear()} The Royal Passage. All rights reserved.
-        </p>
       </div>
     </footer>
   );
