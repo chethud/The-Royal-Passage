@@ -7,7 +7,7 @@ import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import type { Experience } from "@/data/experiences";
 import { useAuthUser } from "@/lib/auth-user";
-import { bookHomestayPath } from "@/lib/homestay-booking-url";
+import { bookHomestayPath, parseHomestayBookSearch } from "@/lib/homestay-booking-url";
 import { getHomestayForDetail } from "@/lib/homestay-fns";
 import { SITE_URL } from "@/lib/seo";
 import { canonicalLink } from "@/lib/seo-helpers";
@@ -15,6 +15,7 @@ import { isGuestAccount } from "@/lib/roles";
 import { useHomestayCheckout } from "@/hooks/use-homestay-checkout";
 
 export const Route = createFileRoute("/homestays/$slug/")({
+  validateSearch: parseHomestayBookSearch,
   loader: async ({ params }) => {
     const row = await getHomestayForDetail({ data: { slug: params.slug } });
     if (!row) throw notFound();
@@ -42,8 +43,13 @@ export const Route = createFileRoute("/homestays/$slug/")({
 
 function HomestayDetailPage() {
   const { homestay: stay, source } = Route.useLoaderData();
+  const search = Route.useSearch();
   const { user, role } = useAuthUser();
-  const checkout = useHomestayCheckout(stay, {});
+  const checkout = useHomestayCheckout(stay, {
+    initialCheckIn: search.checkIn,
+    initialCheckOut: search.checkOut,
+    initialGuests: search.guests,
+  });
   const sym = stay.currencySymbol ?? "₹";
   const locationLine = [stay.region, stay.city].filter(Boolean).join(" · ");
   const bookable = source === "live" && !stay.id.startsWith("stay-");
@@ -67,10 +73,15 @@ function HomestayDetailPage() {
 
       <section className="container-page pt-8 pb-6">
         <Link
-          to="/homestays"
+          to="/homestays/browse"
+          search={{
+            checkIn: checkout.checkIn,
+            checkOut: checkout.checkOut,
+            guests: checkout.guests,
+          }}
           className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
         >
-          ← Back to homestays
+          ← Back to all stays
         </Link>
       </section>
 

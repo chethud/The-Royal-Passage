@@ -2,9 +2,16 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, BedDouble, MapPin, Star, Users } from "lucide-react";
 import { motion } from "motion/react";
 import type { Homestay } from "@/data/homestays";
+import type { HomestayBrowseSearch } from "@/lib/homestay-filters";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
-export function HomestayCard({ stay }: { stay: Homestay }) {
+export function HomestayCard({
+  stay,
+  search,
+}: {
+  stay: Homestay;
+  search?: HomestayBrowseSearch;
+}) {
   const reduceMotion = usePrefersReducedMotion();
   const sym = stay.currencySymbol ?? "₹";
 
@@ -19,6 +26,11 @@ export function HomestayCard({ stay }: { stay: Homestay }) {
       <Link
         to="/homestays/$slug"
         params={{ slug: stay.slug }}
+        search={{
+          checkIn: search?.checkIn,
+          checkOut: search?.checkOut,
+          guests: search?.guests,
+        }}
         className="absolute inset-0 z-10 block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A] focus-visible:ring-inset"
         aria-label={`View ${stay.title}`}
       >

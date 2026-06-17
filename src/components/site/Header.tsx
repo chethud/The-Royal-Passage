@@ -36,20 +36,20 @@ import { isHomestayOwnerNavItemActive } from "@/lib/homestay-owner-nav-active";
 import { dashboardPathForRole, isAdminRole, isGuestAccount, profilePathForRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
-type NavItem = { label: string; to: string };
+import {
+  isHomestayPublicSection,
+  isPublicNavItemActive,
+  publicNavItemsForSection,
+} from "@/lib/public-site-nav";
 
-const publicNavItems: NavItem[] = [
-  { label: "Experiences", to: "/experiences" },
-  { label: "About Us", to: "/hosts" },
-  { label: "Journal", to: "/journal" },
-];
+type NavItem = { label: string; to: string };
 
 function navItemsForUser(
   role: UserRole | null | undefined,
   signedIn: boolean,
   pathname: string,
 ): NavItem[] {
-  if (!signedIn || !role) return publicNavItems;
+  if (!signedIn || !role) return publicNavItemsForSection(pathname);
   if (role === "admin") {
     return adminNavItemsForModule(resolveAdminModule(pathname));
   }
@@ -59,7 +59,7 @@ function navItemsForUser(
   if (role === "homestay_owner") {
     return HOMESTAY_OWNER_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
-  return publicNavItems;
+  return publicNavItemsForSection(pathname);
 }
 
 const navLinkClass =
@@ -87,6 +87,9 @@ function isHeaderNavItemActive(
   if (role === "admin") {
     return isAdminNavItemActive(pathname, to);
   }
+  if (!role || role === "guest") {
+    return isPublicNavItemActive(pathname, to);
+  }
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
@@ -98,14 +101,21 @@ export function Header() {
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const navItems = navItemsForUser(role, Boolean(user), pathname);
+  const isHomestaySection = isHomestayPublicSection(pathname);
+  const logoPath =
+    user && role && role !== "guest"
+      ? dashboardPath
+      : isHomestaySection
+        ? "/homestays"
+        : "/";
   const isGuest = role === "guest";
   const isAdmin = isAdminRole(role);
   const isHost = role === "host";
   const showStaffNotifications = Boolean(user) && (isAdmin || isHost);
   const navBadges = useNavBadges();
-  const showGuestCart = Boolean(user) && isGuestAccount(role);
+  const showGuestCart = Boolean(user) && isGuestAccount(role) && !isHomestaySection;
   const { count: cartCount } = useExperienceCart();
-  const showBookExperience = !user || isGuest;
+  const showPublicBookingCtas = !user || isGuest;
   const showSignIn = !user;
   const showAccountMenu = Boolean(user);
 
@@ -121,7 +131,7 @@ export function Header() {
       setLoggingOut(true);
       await getSupabaseBrowser().auth.signOut();
       await router.invalidate();
-      void router.navigate({ to: "/" });
+      void router.navigate({ to: isHomestaySection ? "/homestays" : "/" });
     } finally {
       setLoggingOut(false);
     }
@@ -138,9 +148,15 @@ export function Header() {
     >
       <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-3 sm:gap-6">
         <Link
-          to={user ? dashboardPath : "/"}
+          to={logoPath}
           className="flex shrink-0 items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember/60"
-          aria-label={user && !isGuest ? "Go to dashboard" : "The Royal Passage — Home"}
+          aria-label={
+            isHomestaySection && (!user || role === "guest")
+              ? "The Royal Passage — Homestays home"
+              : user && role !== "guest"
+                ? "Go to dashboard"
+                : "The Royal Passage — Home"
+          }
         >
           <img
             src={logoUrl}
@@ -168,23 +184,38 @@ export function Header() {
             );
           })}
 
-          {showBookExperience ? (
-            <>
-              <Link
-                to="/experiences"
-                className={navLinkClass}
-                activeProps={{ className: "text-ember" }}
-              >
-                Book an Experience
-              </Link>
-              <Link
-                to="/homestays"
-                className={navLinkClass}
-                activeProps={{ className: "text-ember" }}
-              >
-                Homestays
-              </Link>
-            </>
+          {showPublicBookingCtas ? (
+            isHomestaySection ? (
+              <>
+                <Link
+                  to="/homestays/browse"
+                  className={navLinkClass}
+                  activeProps={{ className: "text-ember" }}
+                >
+                  Book a Homestay
+                </Link>
+                <Link to="/" className={navLinkClass} activeProps={{ className: "text-ember" }}>
+                  Experiences
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/experiences"
+                  className={navLinkClass}
+                  activeProps={{ className: "text-ember" }}
+                >
+                  Book an Experience
+                </Link>
+                <Link
+                  to="/homestays"
+                  className={navLinkClass}
+                  activeProps={{ className: "text-ember" }}
+                >
+                  Homestays
+                </Link>
+              </>
+            )
           ) : null}
           {showGuestCart ? (
             <Link
@@ -222,7 +253,7 @@ export function Header() {
                   {isGuest ? (
                     <>
                       <DropdownMenuItem asChild>
-                        <Link to="/" className="cursor-pointer">
+                        <Link to={isHomestaySection ? "/homestays" : "/"} className="cursor-pointer">
                           <UserRound className="h-4 w-4" />
                           Home
                         </Link>
@@ -230,15 +261,17 @@ export function Header() {
                       <DropdownMenuItem asChild>
                         <Link to="/dashboard/history" className="cursor-pointer">
                           <UserRound className="h-4 w-4" />
-                          History
+                          {isHomestaySection ? "My stays" : "History"}
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/dashboard/cart" className="cursor-pointer">
-                          <UserRound className="h-4 w-4" />
-                          Cart
-                        </Link>
-                      </DropdownMenuItem>
+                      {!isHomestaySection ? (
+                        <DropdownMenuItem asChild>
+                          <Link to="/dashboard/cart" className="cursor-pointer">
+                            <UserRound className="h-4 w-4" />
+                            Cart
+                          </Link>
+                        </DropdownMenuItem>
+                      ) : null}
                     </>
                   ) : (
                     <DropdownMenuItem asChild>
@@ -282,16 +315,39 @@ export function Header() {
                   </DropdownMenuItem>
                   {isGuest ? (
                     <>
-                      <DropdownMenuItem asChild>
-                        <Link to="/experiences" className="cursor-pointer">
-                          Browse experiences
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/homestays" className="cursor-pointer">
-                          Browse homestays
-                        </Link>
-                      </DropdownMenuItem>
+                      {!isHomestaySection ? (
+                        <DropdownMenuItem asChild>
+                          <Link to="/experiences" className="cursor-pointer">
+                            Browse experiences
+                          </Link>
+                        </DropdownMenuItem>
+                      ) : null}
+                      {isHomestaySection ? (
+                        <DropdownMenuItem asChild>
+                          <Link to="/homestays/browse" className="cursor-pointer">
+                            Browse homestays
+                          </Link>
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem asChild>
+                          <Link to="/homestays" className="cursor-pointer">
+                            Browse homestays
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {!isHomestaySection ? (
+                        <DropdownMenuItem asChild>
+                          <Link to="/homestays" className="cursor-pointer">
+                            Homestays home
+                          </Link>
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem asChild>
+                          <Link to="/" className="cursor-pointer">
+                            Experiences home
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
                     </>
                   ) : null}
                   <DropdownMenuSeparator />
@@ -344,19 +400,34 @@ export function Header() {
                 );
               })}
 
-              {showBookExperience ? (
-                <>
-                  <SheetClose asChild>
-                    <Link to="/experiences" className={sheetLinkClass}>
-                      Book an Experience
-                    </Link>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Link to="/homestays" className={sheetLinkClass}>
-                      Homestays
-                    </Link>
-                  </SheetClose>
-                </>
+              {showPublicBookingCtas ? (
+                isHomestaySection ? (
+                  <>
+                    <SheetClose asChild>
+                      <Link to="/homestays/browse" className={sheetLinkClass}>
+                        Book a Homestay
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link to="/" className={sheetLinkClass}>
+                        Experiences
+                      </Link>
+                    </SheetClose>
+                  </>
+                ) : (
+                  <>
+                    <SheetClose asChild>
+                      <Link to="/experiences" className={sheetLinkClass}>
+                        Book an Experience
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link to="/homestays" className={sheetLinkClass}>
+                        Homestays
+                      </Link>
+                    </SheetClose>
+                  </>
+                )
               ) : null}
               {showGuestCart ? (
                 <SheetClose asChild>
@@ -386,20 +457,22 @@ export function Header() {
                   {isGuest ? (
                     <>
                       <SheetClose asChild>
-                        <Link to="/" className={sheetLinkClass}>
+                        <Link to={isHomestaySection ? "/homestays" : "/"} className={sheetLinkClass}>
                           Home
                         </Link>
                       </SheetClose>
                       <SheetClose asChild>
                         <Link to="/dashboard/history" className={sheetLinkClass}>
-                          History
+                          {isHomestaySection ? "My stays" : "History"}
                         </Link>
                       </SheetClose>
-                      <SheetClose asChild>
-                        <Link to="/dashboard/cart" className={sheetLinkClass}>
-                          Cart
-                        </Link>
-                      </SheetClose>
+                      {!isHomestaySection ? (
+                        <SheetClose asChild>
+                          <Link to="/dashboard/cart" className={sheetLinkClass}>
+                            Cart
+                          </Link>
+                        </SheetClose>
+                      ) : null}
                     </>
                   ) : (
                     <SheetClose asChild>
@@ -439,14 +512,24 @@ export function Header() {
                   </SheetClose>
                   {isGuest ? (
                     <>
+                      {!isHomestaySection ? (
+                        <SheetClose asChild>
+                          <Link to="/experiences" className={sheetLinkClass}>
+                            Browse experiences
+                          </Link>
+                        </SheetClose>
+                      ) : null}
                       <SheetClose asChild>
-                        <Link to="/experiences" className={sheetLinkClass}>
-                          Browse experiences
+                        <Link
+                          to={isHomestaySection ? "/homestays/browse" : "/homestays"}
+                          className={sheetLinkClass}
+                        >
+                          Browse homestays
                         </Link>
                       </SheetClose>
                       <SheetClose asChild>
-                        <Link to="/homestays" className={sheetLinkClass}>
-                          Browse homestays
+                        <Link to={isHomestaySection ? "/" : "/homestays"} className={sheetLinkClass}>
+                          {isHomestaySection ? "Experiences home" : "Homestays home"}
                         </Link>
                       </SheetClose>
                     </>

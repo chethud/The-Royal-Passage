@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { PublicModuleNav } from "@/components/site/PublicModuleNav";
 import { HomeHero } from "@/components/site/HomeHero";
 import { ExperiencesShowcase } from "@/components/site/ExperiencesShowcase";
 import { JourneysSplit } from "@/components/site/JourneysSplit";
@@ -55,6 +56,12 @@ function Index() {
   return (
     <div className="overflow-x-hidden bg-background text-foreground">
       <Header />
+
+      <div className="sticky top-[var(--header-height)] z-40 border-b border-[oklch(0.72_0.09_78_/_0.15)] bg-background/95 backdrop-blur-md">
+        <div className="container-page py-3">
+          <PublicModuleNav />
+        </div>
+      </div>
 
       <script
         type="application/ld+json"

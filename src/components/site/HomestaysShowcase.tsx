@@ -2,10 +2,16 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { HomestayCard } from "@/components/homestays/HomestayCard";
-import { homestays } from "@/data/homestays";
+import type { Homestay } from "@/data/homestays";
+import type { HomestayBrowseSearch } from "@/lib/homestay-filters";
 
-export function HomestaysShowcase() {
+type HomestaysShowcaseProps = {
+  homestays?: Homestay[];
+};
+
+export function HomestaysShowcase({ homestays = [] }: HomestaysShowcaseProps) {
   const featured = homestays.slice(0, 3);
+  if (featured.length === 0) return null;
 
   return (
     <section
@@ -25,10 +31,10 @@ export function HomestaysShowcase() {
             </p>
           </div>
           <Link
-            to="/homestays"
+            to="/homestays/browse"
             className="group inline-flex items-center gap-2 self-start rounded-sm text-xs font-semibold uppercase tracking-[0.22em] text-ember transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:self-auto"
           >
-            View all homestays
+            Explore all homestays
             <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
