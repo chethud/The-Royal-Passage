@@ -36,7 +36,7 @@ function RoyalMedallion({ active, label }: { active: boolean; label: string }) {
 function SlideContent({ slide, visible }: { slide: HomestayHighlightSlide; visible: boolean }) {
   return (
     <div
-      className={`royal-slide-content relative flex flex-col justify-center px-7 py-12 sm:px-12 sm:py-16 md:px-16 md:py-20 ${visible ? "is-visible" : ""}`}
+      className={`royal-slide-content relative order-2 flex flex-col justify-center px-5 py-8 sm:px-12 sm:py-16 md:order-none md:px-16 md:py-20 ${visible ? "is-visible" : ""}`}
     >
       <PalaceArchFrame className="pointer-events-none absolute top-6 right-8 left-8 z-10 h-8 opacity-70 sm:top-8" />
 
@@ -79,7 +79,7 @@ function SlideContent({ slide, visible }: { slide: HomestayHighlightSlide; visib
 
 function SlideMedia({ slide, isActive, reducedMotion }: { slide: HomestayHighlightSlide; isActive: boolean; reducedMotion: boolean }) {
   return (
-    <div className="royal-slide-media relative min-h-[320px] overflow-hidden bg-black md:min-h-[480px]">
+    <div className="royal-slide-media relative order-1 min-h-[220px] overflow-hidden bg-black sm:min-h-[320px] md:order-none md:min-h-[480px]">
       <div
         className={`royal-slide-video absolute inset-0 z-[1] ${isActive && !reducedMotion ? "royal-slider-ken-burns" : ""}`}
       >
@@ -189,7 +189,7 @@ export function HomestayHighlightsSplit() {
             <CornerFiligree className="pointer-events-none absolute bottom-3 left-3 z-40 h-10 w-10 -rotate-90 sm:h-12 sm:w-12" />
             <CornerFiligree className="pointer-events-none absolute right-3 bottom-3 z-40 h-10 w-10 rotate-180 sm:h-12 sm:w-12" />
 
-            <div className="relative min-h-[520px] md:min-h-[480px]">
+            <div className="relative min-h-0 md:min-h-[480px]">
               {slides.map((item, index) => {
                 const isActive = index === activeIndex;
                 return (
@@ -209,18 +209,18 @@ export function HomestayHighlightsSplit() {
           </div>
         </div>
 
-        <div className="mt-10 flex items-center justify-center gap-6 sm:mt-12">
+        <div className="mt-8 flex items-center justify-center gap-3 sm:mt-12 sm:gap-6">
           <button
             type="button"
             onClick={goPrev}
             disabled={isLocked}
             aria-label="Previous stay category"
-            className="royal-nav-halo flex h-12 w-12 items-center justify-center rounded-full border border-[#D4AF37]/50 bg-[#3B0000]/85 text-[#D4AF37] disabled:opacity-40"
+            className="royal-nav-halo flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/50 bg-[#3B0000]/85 text-[#D4AF37] disabled:opacity-40 sm:h-12 sm:w-12"
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={1.6} />
           </button>
 
-          <div className="flex items-center gap-4 px-2">
+          <div className="flex items-center gap-2 px-1 sm:gap-4 sm:px-2">
             {slides.map((item, index) => (
               <button
                 key={item.id}
@@ -241,7 +241,7 @@ export function HomestayHighlightsSplit() {
             onClick={goNext}
             disabled={isLocked}
             aria-label="Next stay category"
-            className="royal-nav-halo flex h-12 w-12 items-center justify-center rounded-full border border-[#D4AF37]/50 bg-[#3B0000]/85 text-[#D4AF37] disabled:opacity-40"
+            className="royal-nav-halo flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/50 bg-[#3B0000]/85 text-[#D4AF37] disabled:opacity-40 sm:h-12 sm:w-12"
           >
             <ChevronRight className="h-4 w-4" strokeWidth={1.6} />
           </button>

@@ -95,7 +95,7 @@ function HomestaysBrowsePage() {
               </p>
             ) : null}
           </div>
-          <label className="min-w-[200px]">
+          <label className="w-full sm:min-w-[200px] sm:w-auto">
             <span className="eyebrow mb-2 block text-[0.58rem]">Property type</span>
             <select
               value={search.propertyType ?? ""}

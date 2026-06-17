@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Pencil } from "lucide-react";
+import { CalendarDays, Pencil } from "lucide-react";
 import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusBadge";
 import type { HostExperienceSummary } from "@/lib/api/host-experiences";
 import { formatMoney } from "@/lib/money";
@@ -8,10 +8,13 @@ type HostExperienceTableProps = {
   experiences: HostExperienceSummary[];
 };
 
+const actionLinkClass =
+  "inline-flex h-9 w-9 items-center justify-center rounded-full border border-[oklch(0.72_0.09_78_/_0.35)] bg-[oklch(0.78_0.13_86_/_0.22)] text-[#4A0000] no-underline transition-colors hover:border-ember/55 hover:bg-[oklch(0.78_0.13_86_/_0.35)] hover:text-[#3A0000] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60";
+
 export function HostExperienceTable({ experiences }: HostExperienceTableProps) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[800px] text-left text-sm">
+      <table className="w-full min-w-[720px] text-left text-sm">
         <thead>
           <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
             <th className="px-3 py-2 font-medium">Experience</th>
@@ -19,7 +22,8 @@ export function HostExperienceTable({ experiences }: HostExperienceTableProps) {
             <th className="px-3 py-2 font-medium">Price</th>
             <th className="px-3 py-2 font-medium">Slots</th>
             <th className="px-3 py-2 font-medium">Status</th>
-            <th className="px-3 py-2 font-medium">Actions</th>
+            <th className="px-3 py-2 font-medium">Manage</th>
+            <th className="px-3 py-2 font-medium">Edit</th>
           </tr>
         </thead>
         <tbody>
@@ -41,8 +45,22 @@ export function HostExperienceTable({ experiences }: HostExperienceTableProps) {
                 <Link
                   to="/host/experiences/$experienceId"
                   params={{ experienceId: exp.id }}
-                  aria-label={`Edit ${exp.title}`}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[oklch(0.72_0.09_78_/_0.35)] bg-[oklch(0.78_0.13_86_/_0.22)] text-[#4A0000] no-underline transition-colors hover:border-ember/55 hover:bg-[oklch(0.78_0.13_86_/_0.35)] hover:text-[#3A0000] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60"
+                  search={{ section: "sessions" }}
+                  aria-label={`Manage session timings for ${exp.title}`}
+                  title="Session timings"
+                  className={actionLinkClass}
+                >
+                  <CalendarDays className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                </Link>
+              </td>
+              <td className="px-3 py-3">
+                <Link
+                  to="/host/experiences/$experienceId"
+                  params={{ experienceId: exp.id }}
+                  search={{ section: "details" }}
+                  aria-label={`Edit listing details for ${exp.title}`}
+                  title="Listing details"
+                  className={actionLinkClass}
                 >
                   <Pencil className="h-4 w-4" strokeWidth={1.75} aria-hidden />
                 </Link>

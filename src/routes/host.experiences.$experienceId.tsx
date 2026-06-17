@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusBadge";
 import { HostExperienceForm } from "@/components/experience/HostExperienceForm";
+import { HostExperienceSectionNav } from "@/components/experience/HostExperienceSectionNav";
 import { SlotManager } from "@/components/experience/SlotManager";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import type { CitySummary } from "@/lib/cities";
@@ -19,9 +20,11 @@ import {
 } from "@/lib/api/host-experiences";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { hostOperatingCities } from "@/lib/host-form-data";
+import { parseHostExperienceSectionSearch } from "@/lib/host-experience-section";
 import { useHostAccess } from "@/lib/use-host-access";
 
 export const Route = createFileRoute("/host/experiences/$experienceId")({
+  validateSearch: parseHostExperienceSectionSearch,
   head: () => ({
     meta: [{ title: "Manage experience — The Royal Passage" }],
   }),
@@ -30,6 +33,7 @@ export const Route = createFileRoute("/host/experiences/$experienceId")({
 
 function HostExperienceDetailPage() {
   const { experienceId } = Route.useParams();
+  const { section } = Route.useSearch();
   const { accessToken, ready, loading } = useHostAccess();
   const [experience, setExperience] = useState<HostExperienceDetail | null>(null);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
@@ -196,11 +200,17 @@ function HostExperienceDetailPage() {
   }
 
   const status = experience.status;
+  const showDetails = section === "details";
+  const showSessions = section === "sessions";
 
   return (
     <HostDashboardShell
       title={experience.title}
-      subtitle="Edit listing details, photos, inclusions, and manage bookable slots."
+      subtitle={
+        showSessions
+          ? "Add, edit, or block bookable sessions for this experience."
+          : "Edit listing details, photos, inclusions, and pricing."
+      }
     >
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <ExperienceStatusBadge status={experience.status} />
@@ -231,13 +241,20 @@ function HostExperienceDetailPage() {
         </div>
       </div>
 
+      <HostExperienceSectionNav
+        experienceId={experienceId}
+        active={section}
+        slotCount={experience.slots.length}
+        className="mb-8"
+      />
+
       {pageError ? (
         <p className="mb-6 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {pageError}
         </p>
       ) : null}
 
-      {saveSuccess ? (
+      {saveSuccess && showDetails ? (
         <p className="mb-6 rounded-sm border border-ember/35 bg-ember/10 px-4 py-3 text-sm text-ink">
           {saveSuccess}
         </p>
@@ -245,49 +262,53 @@ function HostExperienceDetailPage() {
 
       {status === "pending_review" ? (
         <p className="mb-6 text-sm text-muted-foreground">
-          This listing is awaiting admin review. You can still update details and slots below.
+          This listing is awaiting admin review. You can still update details and sessions below.
         </p>
       ) : null}
 
-      {status === "rejected" ? (
+      {status === "rejected" && showDetails ? (
         <p className="mb-6 rounded-sm border border-destructive/35 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           This listing was rejected. Update the details below and check “Submit for admin review” when
           saving to resubmit.
         </p>
       ) : null}
 
-      {status === "published" ? (
+      {status === "published" && showDetails ? (
         <p className="mb-6 text-sm text-muted-foreground">
           This experience is live. Changes you save here update the public listing immediately.
         </p>
       ) : null}
 
-      <HostExperienceForm
-        key={experience.updatedAt}
-        categories={categories}
-        cities={cities}
-        initial={experience}
-        saving={saving}
-        onSubmit={(payload) => void handleSave(payload)}
-      />
+      {showDetails ? (
+        <HostExperienceForm
+          key={experience.updatedAt}
+          categories={categories}
+          cities={cities}
+          initial={experience}
+          saving={saving}
+          onSubmit={(payload) => void handleSave(payload)}
+        />
+      ) : null}
 
-      <section className="mt-12">
-        <h2 className="font-display text-2xl">Session timings</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Add, edit, or block bookable sessions. Duration above applies to the overall experience;
-          each slot has its own start and end time.
-        </p>
-        <div className="mt-6">
-          <SlotManager
-            slots={experience.slots}
-            busy={slotBusy}
-            onAddMany={(payloads) => void handleAddManySlots(payloads)}
-            onUpdate={(slotId, payload) => void handleUpdateSlot(slotId, payload)}
-            onToggleBlock={(slotId, isBlocked) => void handleToggleBlock(slotId, isBlocked)}
-            onDelete={(slotId) => void handleDeleteSlot(slotId)}
-          />
-        </div>
-      </section>
+      {showSessions ? (
+        <section id="session-timings">
+          <h2 className="font-display text-2xl">Session timings</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Add, edit, or block bookable sessions. Duration in listing details applies to the overall
+            experience; each slot has its own start and end time.
+          </p>
+          <div className="mt-6">
+            <SlotManager
+              slots={experience.slots}
+              busy={slotBusy}
+              onAddMany={(payloads) => void handleAddManySlots(payloads)}
+              onUpdate={(slotId, payload) => void handleUpdateSlot(slotId, payload)}
+              onToggleBlock={(slotId, isBlocked) => void handleToggleBlock(slotId, isBlocked)}
+              onDelete={(slotId) => void handleDeleteSlot(slotId)}
+            />
+          </div>
+        </section>
+      ) : null}
     </HostDashboardShell>
   );
 }

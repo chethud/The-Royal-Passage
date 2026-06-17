@@ -29,7 +29,7 @@ export function HomestaysBrowseHero({ search, onSearchChange, onSubmit }: Homest
       <div className="absolute inset-0 bg-gradient-to-r from-[#4A0000]/94 via-[#4A0000]/82 to-[#5B0000]/72" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-[#4A0000]/35" />
 
-      <div className="container-page relative z-10 pb-10 pt-[calc(var(--header-height)+1.25rem)] md:pb-12">
+      <div className="container-page relative z-10 pb-8 pt-[calc(var(--header-height)+1rem)] sm:pb-10 sm:pt-[calc(var(--header-height)+1.25rem)] md:pb-12">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -46,7 +46,7 @@ export function HomestaysBrowseHero({ search, onSearchChange, onSubmit }: Homest
             </p>
           </div>
 
-          <div className="mt-8 max-w-5xl">
+          <div className="mt-6 max-w-5xl sm:mt-8">
             <HomestaysSearchWidget
               values={values}
               onChange={onSearchChange}
