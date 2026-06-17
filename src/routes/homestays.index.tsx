@@ -3,25 +3,19 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { HomestaysHomeHero } from "@/components/homestays/HomestaysHomeHero";
 import { HomestaysShowcase } from "@/components/site/HomestaysShowcase";
-import { JourneysSplit } from "@/components/site/JourneysSplit";
-import { PillarsRow } from "@/components/site/PillarsRow";
-import { JournalPreview } from "@/components/site/JournalPreview";
+import { HomestayHighlightsSplit } from "@/components/homestays/HomestayHighlightsSplit";
+import { HomestayPillarsRow } from "@/components/homestays/HomestayPillarsRow";
+import { HomestayHowItWorks } from "@/components/homestays/HomestayHowItWorks";
 import { getHomestaysForUi } from "@/lib/homestay-fns";
-import { getHomepageContent } from "@/lib/homepage-content-fns";
-import { normalizeHomepageContent } from "@/lib/homepage-content";
 import { canonicalLink } from "@/lib/seo-helpers";
 import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/homestays/")({
   loader: async () => {
-    const [catalog, homepage] = await Promise.all([
-      getHomestaysForUi(),
-      getHomepageContent().catch(() => normalizeHomepageContent({})),
-    ]);
+    const catalog = await getHomestaysForUi();
     return {
       homestays: catalog.homestays ?? [],
       mode: catalog.mode,
-      homepage: normalizeHomepageContent(homepage ?? {}),
     };
   },
   head: () => ({
@@ -43,17 +37,17 @@ export const Route = createFileRoute("/homestays/")({
 });
 
 function HomestaysHomePage() {
-  const { homestays, homepage } = Route.useLoaderData();
+  const { homestays } = Route.useLoaderData();
 
   return (
     <div className="overflow-x-hidden bg-background text-foreground">
       <Header />
 
       <HomestaysHomeHero />
-      <HomestaysShowcase homestays={homestays.slice(0, 3)} />
-      <JourneysSplit slides={homepage.journeys} />
-      <PillarsRow />
-      <JournalPreview items={homepage.journal} imageVersion={homepage.version} />
+      <HomestaysShowcase homestays={homestays} />
+      <HomestayHighlightsSplit />
+      <HomestayPillarsRow />
+      <HomestayHowItWorks />
       <Footer />
     </div>
   );
