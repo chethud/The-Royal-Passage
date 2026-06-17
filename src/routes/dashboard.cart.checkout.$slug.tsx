@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { useEffect, useMemo, useState } from "react";
 import { BookingCheckoutWizard } from "@/components/booking/BookingCheckoutWizard";
 import { BookingRequestHeader } from "@/components/booking/BookingRequestHeader";
+import { ExperienceDetailGallery } from "@/components/experiences/ExperienceDetailGallery";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
 import { parseBookSearch } from "@/lib/booking-url";
@@ -65,11 +66,11 @@ function CartCheckoutPage() {
 
   return (
     <GuestDashboardShell
+      wide
       title="Checkout"
       subtitle="Choose your date, payment method, and send a booking request to your host."
       showRoleDescription={false}
     >
-      <div className="mx-auto max-w-2xl">
       <Link
         to="/dashboard/cart"
         className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
@@ -77,27 +78,34 @@ function CartCheckoutPage() {
         ← Back to cart
       </Link>
 
-      <BookingRequestHeader
-        className="mt-6"
-        label="Booking request"
-        title={exp.title}
-        meta={`${exp.city} · ${exp.hostName}`}
-      />
+      <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-10">
+        <div className="w-full lg:sticky lg:top-[calc(var(--header-height)+1.5rem)]">
+          <ExperienceDetailGallery exp={exp} />
+        </div>
 
-      <BookingCheckoutWizard
-        exp={exp}
-        source={source}
-        initialSlotId={search.slotId ?? cartItem.slotId}
-        initialGuests={search.guests ?? cartItem.guests}
-        backLink={{ to: "/dashboard/cart", label: "Back to cart" }}
-        userRole={role}
-        onSuccess={(bookingId) => {
-          void navigate({
-            to: "/dashboard/history",
-            search: { booked: bookingId },
-          });
-        }}
-      />
+        <div className="min-w-0">
+          <BookingRequestHeader
+            label="Booking request"
+            title={exp.title}
+            meta={`${exp.city} · ${exp.hostName}`}
+            titleAs="h2"
+          />
+
+          <BookingCheckoutWizard
+            exp={exp}
+            source={source}
+            initialSlotId={search.slotId ?? cartItem.slotId}
+            initialGuests={search.guests ?? cartItem.guests}
+            backLink={{ to: "/dashboard/cart", label: "Back to cart" }}
+            userRole={role}
+            onSuccess={(bookingId) => {
+              void navigate({
+                to: "/dashboard/history",
+                search: { booked: bookingId },
+              });
+            }}
+          />
+        </div>
       </div>
     </GuestDashboardShell>
   );

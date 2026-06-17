@@ -138,7 +138,7 @@ function ExperienceDetail() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
       />
 
-      <section className="container-page pt-8 pb-6">
+      <section className="container-page pt-8 pb-14">
         <Link
           to="/experiences"
           search={{}}
@@ -146,182 +146,172 @@ function ExperienceDetail() {
         >
           ← Back to library
         </Link>
-      </section>
 
-      <section className="container-page grid gap-8 pb-14 md:grid-cols-2 md:items-start md:gap-8 lg:gap-10">
-        <div className="w-full md:sticky md:top-[calc(var(--header-height)+1.5rem)]">
-          <ExperienceDetailGallery exp={exp} />
-        </div>
-
-        <div className="flex w-full min-w-0 flex-col md:pt-2">
-          <div className="mb-5 inline-flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]">
-            <CategoryIcon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
-            {exp.category}
+        <div className="mt-8 grid gap-8 md:grid-cols-2 md:items-start md:gap-8 lg:gap-10">
+          <div className="w-full md:sticky md:top-[calc(var(--header-height)+1.5rem)] md:self-start">
+            <ExperienceDetailGallery exp={exp} />
           </div>
 
-          {locationLine || exp.address || exp.mapLink ? (
-            <div className="flex items-start gap-2 text-sm text-[#D6C8B5]/90">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF6A]" aria-hidden />
-              <div>
-                {locationLine ? <div>{locationLine}</div> : null}
-                {exp.address ? (
-                  <div className="mt-0.5 text-[#D6C8B5]/75">{exp.address}</div>
-                ) : null}
-                {exp.mapLink ? (
+          <div className="flex w-full min-w-0 flex-col space-y-6 md:pt-2">
+            <div>
+              <div className="mb-5 inline-flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]">
+                <CategoryIcon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+                {exp.category}
+              </div>
+
+              {locationLine || exp.address || exp.mapLink ? (
+                <div className="flex items-start gap-2 text-sm text-[#D6C8B5]/90">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF6A]" aria-hidden />
+                  <div>
+                    {locationLine ? <div>{locationLine}</div> : null}
+                    {exp.address ? (
+                      <div className="mt-0.5 text-[#D6C8B5]/75">{exp.address}</div>
+                    ) : null}
+                    {exp.mapLink ? (
+                      <a
+                        href={exp.mapLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
+                      >
+                        <Navigation className="h-3.5 w-3.5" aria-hidden />
+                        Get directions
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="mt-5 flex items-start justify-between gap-4">
+                <h1 className="font-display text-3xl uppercase leading-[1.08] tracking-[0.04em] text-[#F7F1E8] sm:text-4xl md:text-[2.65rem]">
+                  {exp.title}
+                </h1>
+                <div className="flex shrink-0 items-center gap-2 pt-1">
+                  <AddToCartButton
+                    exp={exp}
+                    showLabel
+                    className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
+                  />
+                  <WishlistButton
+                    experienceId={exp.id}
+                    className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
+                  />
+                </div>
+              </div>
+
+              {exp.tagline ? (
+                <p className="mt-4 font-display text-base italic leading-relaxed text-[#D6C8B5]/90 sm:text-lg">
+                  {exp.tagline}
+                </p>
+              ) : null}
+
+              <div className="my-7 h-px bg-gradient-to-r from-transparent via-[rgb(200_162_90/0.35)] to-transparent" />
+
+              <dl className="grid grid-cols-3 divide-x divide-[rgb(200_162_90/0.28)] text-center sm:text-left">
+                <div className="px-2 first:pl-0 sm:px-5">
+                  <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
+                    Duration
+                  </dt>
+                  <dd className="mt-1.5 font-display text-xl uppercase tracking-[0.02em] text-[#F7F1E8]">
+                    {exp.durationHours}h
+                  </dd>
+                </div>
+                <div className="px-2 sm:px-5">
+                  <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
+                    From
+                  </dt>
+                  <dd className="mt-1.5 font-display text-xl uppercase tracking-[0.02em] text-[#F7F1E8]">
+                    {sym}
+                    {exp.pricePerPerson}
+                  </dd>
+                </div>
+                <div className="px-2 last:pr-0 sm:px-5">
+                  <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
+                    Rating
+                  </dt>
+                  <dd className="mt-1.5 font-display text-xl text-[#D4AF6A]">
+                    ★ {exp.rating}
+                    <span className="ml-1 text-xs text-[#D6C8B5]/75">({exp.reviewsCount})</span>
+                  </dd>
+                </div>
+              </dl>
+
+              <div className="mt-8 space-y-6">
+                <div>
+                  <div className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
+                    About this experience
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-[#D6C8B5]/92 whitespace-pre-line sm:text-[0.9375rem]">
+                    {exp.description}
+                  </p>
+                </div>
+
+                <div>
+                  <div className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
+                    Hosted by
+                  </div>
+                  <div className="mt-2 font-display text-lg uppercase tracking-[0.04em] text-[#F7F1E8]">
+                    {exp.hostName}
+                  </div>
+                  {exp.hostBio ? (
+                    <p className="mt-2 text-sm leading-relaxed text-[#D6C8B5]/85">{exp.hostBio}</p>
+                  ) : null}
+                </div>
+
+                {canBook ? (
                   <a
-                    href={exp.mapLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
+                    href="#book"
+                    className="luxury-btn-sm luxury-btn-primary inline-flex w-fit items-center no-underline"
                   >
-                    <Navigation className="h-3.5 w-3.5" aria-hidden />
-                    Get directions
+                    Check availability
                   </a>
                 ) : null}
               </div>
             </div>
-          ) : null}
 
-          <div className="mt-5 flex items-start justify-between gap-4">
-            <h1 className="font-display text-3xl uppercase leading-[1.08] tracking-[0.04em] text-[#F7F1E8] sm:text-4xl md:text-[2.65rem]">
-              {exp.title}
-            </h1>
-            <div className="flex shrink-0 items-center gap-2 pt-1">
-              <AddToCartButton
-                exp={exp}
-                showLabel
-                className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
-              />
-              <WishlistButton
-                experienceId={exp.id}
-                className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
-              />
+            <div className="grid gap-6 md:grid-cols-1">
+              <LuxuryCheckoutPanel>
+                <ExperienceDetailList label="What's included" items={exp.inclusions} />
+              </LuxuryCheckoutPanel>
+              <LuxuryCheckoutPanel>
+                <ExperienceDetailList
+                  label="Not included"
+                  items={exp.exclusions ?? []}
+                  emptyMessage="All essentials are covered in this experience."
+                />
+              </LuxuryCheckoutPanel>
             </div>
-          </div>
 
-          {exp.tagline ? (
-            <p className="mt-4 font-display text-base italic leading-relaxed text-[#D6C8B5]/90 sm:text-lg">
-              {exp.tagline}
-            </p>
-          ) : null}
+            {(exp.requirements?.length ?? 0) > 0 ? (
+              <LuxuryCheckoutPanel>
+                <ExperienceDetailList
+                  label="What to bring & know"
+                  items={exp.requirements ?? []}
+                />
+              </LuxuryCheckoutPanel>
+            ) : null}
 
-          <div className="my-7 h-px bg-gradient-to-r from-transparent via-[rgb(200_162_90/0.35)] to-transparent" />
-
-          <dl className="grid grid-cols-3 divide-x divide-[rgb(200_162_90/0.28)] text-center sm:text-left">
-            <div className="px-2 first:pl-0 sm:px-5">
-              <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
-                Duration
-              </dt>
-              <dd className="mt-1.5 font-display text-xl uppercase tracking-[0.02em] text-[#F7F1E8]">
-                {exp.durationHours}h
-              </dd>
-            </div>
-            <div className="px-2 sm:px-5">
-              <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
-                From
-              </dt>
-              <dd className="mt-1.5 font-display text-xl uppercase tracking-[0.02em] text-[#F7F1E8]">
-                {sym}
-                {exp.pricePerPerson}
-              </dd>
-            </div>
-            <div className="px-2 last:pr-0 sm:px-5">
-              <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
-                Rating
-              </dt>
-              <dd className="mt-1.5 font-display text-xl text-[#D4AF6A]">
-                ★ {exp.rating}
-                <span className="ml-1 text-xs text-[#D6C8B5]/75">({exp.reviewsCount})</span>
-              </dd>
-            </div>
-          </dl>
-
-          <div className="mt-8 space-y-6">
-            <div>
-              <div className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
-                About this experience
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-[#D6C8B5]/92 whitespace-pre-line sm:text-[0.9375rem]">
-                {exp.description}
+            <LuxuryCheckoutPanel>
+              <div className="eyebrow luxury-panel-label mb-3">Cancellation policy</div>
+              <p className="luxury-panel-body max-w-3xl text-sm leading-relaxed sm:text-base">
+                {exp.cancellation?.trim() ||
+                  "Standard cancellation terms apply. Your host will confirm the full policy in your booking confirmation."}
               </p>
-            </div>
+            </LuxuryCheckoutPanel>
 
-            <div>
-              <div className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
-                Hosted by
+            <LuxuryCheckoutPanel>
+              <div className="eyebrow luxury-panel-label mb-3">Guest voices</div>
+              <h2 className="luxury-panel-heading font-display text-2xl uppercase tracking-[0.03em] sm:text-3xl">
+                What travellers <em className="italic normal-case text-[#8B6914]">remember</em>
+              </h2>
+              <div className="mt-8">
+                <ExperienceReviewsSection reviews={reviews} surface="light" />
               </div>
-              <div className="mt-2 font-display text-lg uppercase tracking-[0.04em] text-[#F7F1E8]">
-                {exp.hostName}
-              </div>
-              {exp.hostBio ? (
-                <p className="mt-2 text-sm leading-relaxed text-[#D6C8B5]/85">{exp.hostBio}</p>
-              ) : null}
-            </div>
+            </LuxuryCheckoutPanel>
 
             {canBook ? (
-              <a
-                href="#book"
-                className="luxury-btn-sm luxury-btn-primary inline-flex w-fit items-center no-underline"
-              >
-                Check availability
-              </a>
-            ) : null}
-          </div>
-        </div>
-      </section>
-
-      <section className="container-page space-y-6 pb-10">
-        <div className="grid gap-6 md:grid-cols-2">
-          <LuxuryCheckoutPanel>
-            <ExperienceDetailList label="What's included" items={exp.inclusions} />
-          </LuxuryCheckoutPanel>
-          <LuxuryCheckoutPanel>
-            <ExperienceDetailList
-              label="Not included"
-              items={exp.exclusions ?? []}
-              emptyMessage="All essentials are covered in this experience."
-            />
-          </LuxuryCheckoutPanel>
-        </div>
-
-        {(exp.requirements?.length ?? 0) > 0 ? (
-          <LuxuryCheckoutPanel>
-            <ExperienceDetailList
-              label="What to bring & know"
-              items={exp.requirements ?? []}
-            />
-          </LuxuryCheckoutPanel>
-        ) : null}
-
-        <LuxuryCheckoutPanel>
-          <div className="eyebrow luxury-panel-label mb-3">Cancellation policy</div>
-          <p className="luxury-panel-body max-w-3xl text-sm leading-relaxed sm:text-base">
-            {exp.cancellation?.trim() ||
-              "Standard cancellation terms apply. Your host will confirm the full policy in your booking confirmation."}
-          </p>
-        </LuxuryCheckoutPanel>
-
-        <LuxuryCheckoutPanel>
-          <div className="eyebrow luxury-panel-label mb-3">Guest voices</div>
-          <h2 className="luxury-panel-heading font-display text-2xl uppercase tracking-[0.03em] sm:text-3xl">
-            What travellers <em className="italic normal-case text-[#8B6914]">remember</em>
-          </h2>
-          <div className="mt-8">
-            <ExperienceReviewsSection reviews={reviews} surface="light" />
-          </div>
-        </LuxuryCheckoutPanel>
-      </section>
-
-      {canBook ? (
-        <section id="book" className="border-t border-[rgb(200_162_90/0.18)] pb-16 pt-4">
-          <div className="container-page py-8 sm:py-10">
-            <div className="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-10">
-              <div className="hidden w-full lg:block lg:sticky lg:top-[calc(var(--header-height)+1.5rem)]">
-                <ExperienceDetailGallery exp={exp} />
-              </div>
-
-              <LuxuryCheckoutPanel>
-                <div className="mx-auto max-w-2xl lg:max-w-none">
+              <section id="book" className="border-t border-[rgb(200_162_90/0.18)] pt-8">
+                <LuxuryCheckoutPanel>
                   <div className="mb-8">
                     <div className="eyebrow luxury-panel-label mb-3">Reserve your seats</div>
                     <h2 className="luxury-panel-heading font-display text-3xl uppercase leading-tight tracking-[0.03em] sm:text-4xl">
@@ -346,31 +336,29 @@ function ExperienceDetail() {
                     userRole={user ? (role ?? "guest") : null}
                     surface="light"
                   />
-                </div>
+                </LuxuryCheckoutPanel>
+              </section>
+            ) : (
+              <LuxuryCheckoutPanel className="text-center sm:text-left">
+                <p className="luxury-panel-heading font-display text-2xl uppercase tracking-[0.03em]">
+                  Booking opens soon
+                </p>
+                <p className="luxury-panel-body mt-2 max-w-md text-sm">
+                  There are no available sessions in the next 7 days. Check back later or browse other
+                  experiences.
+                </p>
+                <Link
+                  to="/experiences"
+                  search={{}}
+                  className="luxury-btn-sm luxury-btn-panel-outline mt-6 inline-flex items-center no-underline"
+                >
+                  Browse the library →
+                </Link>
               </LuxuryCheckoutPanel>
-            </div>
+            )}
           </div>
-        </section>
-      ) : (
-        <section className="container-page pb-16 pt-2">
-          <LuxuryCheckoutPanel className="text-center sm:text-left">
-            <p className="luxury-panel-heading font-display text-2xl uppercase tracking-[0.03em]">
-              Booking opens soon
-            </p>
-            <p className="luxury-panel-body mt-2 max-w-md text-sm">
-              There are no available sessions in the next 7 days. Check back later or browse other
-              experiences.
-            </p>
-            <Link
-              to="/experiences"
-              search={{}}
-              className="luxury-btn-sm luxury-btn-panel-outline mt-6 inline-flex items-center no-underline"
-            >
-              Browse the library →
-            </Link>
-          </LuxuryCheckoutPanel>
-        </section>
-      )}
+        </div>
+      </section>
 
       <Footer />
     </div>

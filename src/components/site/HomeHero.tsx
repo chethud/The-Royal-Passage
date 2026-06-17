@@ -7,6 +7,7 @@ import { HeroSlideshow } from "@/components/site/HeroSlideshow";
 import type { HomepageHeroSlide } from "@/lib/homepage-content";
 import { withHomepageCacheBust } from "@/lib/homepage-content";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { useAuthUser } from "@/lib/auth-user";
 
 const softEase = [0.22, 1, 0.36, 1] as const;
 
@@ -35,6 +36,7 @@ export function HomeHero({
   uploadPhoto,
 }: HomeHeroProps) {
   const reduceMotion = usePrefersReducedMotion();
+  const { user } = useAuthUser();
   const [activeSlide, setActiveSlide] = useState(0);
 
   const heroSlides = slides.map((slide) => ({
@@ -104,12 +106,14 @@ export function HomeHero({
                 Explore Experiences
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
-              <Link
-                to="/sign-in"
-                className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-transparent px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink/85 backdrop-blur-md transition-colors hover:border-ember/55 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
-              >
-                Sign in
-              </Link>
+              {!user ? (
+                <Link
+                  to="/sign-in"
+                  className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-transparent px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink/85 backdrop-blur-md transition-colors hover:border-ember/55 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
+                >
+                  Sign in
+                </Link>
+              ) : null}
             </motion.div>
           </motion.div>
         </div>
