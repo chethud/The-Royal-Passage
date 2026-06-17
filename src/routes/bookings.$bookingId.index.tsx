@@ -140,7 +140,7 @@ function BookingDetailPage() {
           </div>
 
           {booking.isPaused ? (
-            <p className="luxury-panel-body mt-6 rounded-sm border border-[rgb(88_16_0/0.18)] bg-[rgb(88_16_0/0.04)] px-4 py-3 text-sm">
+            <p className="luxury-panel-body mt-6 rounded-sm border border-[rgb(74_0_0/0.18)] bg-[rgb(74_0_0/0.04)] px-4 py-3 text-sm">
               Your host temporarily paused this booking. They will notify you when it resumes.
             </p>
           ) : null}

@@ -11,7 +11,7 @@ type AuthPageLayoutProps = {
 /** Standalone sign-in / sign-up page — not the homepage hero. */
 export function AuthPageLayout({ title, subtitle, children }: AuthPageLayoutProps) {
   return (
-    <div className="min-h-dvh bg-[var(--brand-noir)] text-foreground">
+    <div className="min-h-dvh bg-[oklch(0.13_0.06_22)] text-foreground">
       <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-5 sm:px-6">
         <header className="flex items-center justify-between py-6 sm:py-8">
           <Link to="/" className="inline-flex" aria-label="The Royal Passage — Home">

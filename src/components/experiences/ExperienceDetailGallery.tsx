@@ -15,7 +15,7 @@ export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
 
   return (
     <div
-      className="experience-detail-gallery-main relative w-full overflow-hidden rounded-md border border-[rgb(201_162_39/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]"
+      className="experience-detail-gallery-main relative w-full overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]"
       aria-label={`${exp.title} cover photo`}
     >
       <img
@@ -30,7 +30,7 @@ export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
 
       <div className="absolute left-3.5 top-3.5 z-10">
         <span
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/35 text-gold backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/35 text-[#D4AF6A] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
           aria-label={exp.category}
           title={exp.category}
         >

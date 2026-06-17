@@ -124,16 +124,16 @@ function ExperiencesPage() {
       <section id="experiences-grid" className="container-page pb-16 pt-8">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="eyebrow text-[0.65rem] text-gold">Curated collection</p>
-            <h2 className="mt-1 font-display text-2xl tracking-tight text-ink md:text-3xl">
+            <p className="eyebrow text-[0.65rem] text-[#D4AF6A]">Curated collection</p>
+            <h2 className="mt-1 font-display text-2xl tracking-tight text-[#F7F1E8] md:text-3xl">
               {filtered.length} experience{filtered.length === 1 ? "" : "s"}
             </h2>
-            <p className="mt-1.5 text-xs tracking-wide text-brand-cotton/90">
+            <p className="mt-1.5 text-xs tracking-wide text-[#D6C8B5]/90">
               Handpicked journeys from verified hosts
             </p>
           </div>
           {pages > 1 ? (
-            <p className="text-[0.65rem] uppercase tracking-[0.14em] text-brand-cotton/80">
+            <p className="text-[0.65rem] uppercase tracking-[0.14em] text-[#D6C8B5]/80">
               Page {Math.min(page, pages)} of {pages}
             </p>
           ) : null}
@@ -186,18 +186,18 @@ function ExperiencesPage() {
                   type="button"
                   disabled={page <= 1}
                   onClick={() => updateSearch({ page: Math.max(1, page - 1) })}
-                  className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-gold/85 transition-colors hover:text-ink disabled:cursor-default disabled:opacity-35"
+                  className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
                 >
                   Previous
                 </button>
-                <span className="text-[0.65rem] uppercase tracking-[0.12em] text-brand-cotton/75">
+                <span className="text-[0.65rem] uppercase tracking-[0.12em] text-[#D6C8B5]/75">
                   {page} / {pages}
                 </span>
                 <button
                   type="button"
                   disabled={page >= pages}
                   onClick={() => updateSearch({ page: Math.min(pages, page + 1) })}
-                  className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-gold/85 transition-colors hover:text-ink disabled:cursor-default disabled:opacity-35"
+                  className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
                 >
                   Next
                 </button>

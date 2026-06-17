@@ -39,9 +39,23 @@ export function Footer() {
   return <FooterFull />;
 }
 
-function FooterBrandBlock({ logoClassName = "h-28 w-auto object-contain sm:h-32 md:h-40" }: { logoClassName?: string }) {
+function FooterBrandBlock({
+  logoClassName = "h-28 w-auto object-contain sm:h-32 md:h-40",
+  layout = "inline",
+}: {
+  logoClassName?: string;
+  layout?: "inline" | "stacked";
+}) {
+  const stacked = layout === "stacked";
+
   return (
-    <>
+    <div
+      className={
+        stacked
+          ? "mx-auto flex max-w-md flex-col items-center text-center"
+          : "flex flex-col items-start"
+      }
+    >
       <img
         src={logoUrl}
         alt="The Royal Passage"
@@ -51,25 +65,34 @@ function FooterBrandBlock({ logoClassName = "h-28 w-auto object-contain sm:h-32 
         decoding="async"
         className={`logo-breathe ${logoClassName}`}
       />
-      <p className="mt-6 max-w-sm text-sm leading-relaxed text-muted-foreground">{TAGLINE}</p>
-      <div className="mt-6 flex items-center gap-3">
+      <p
+        className={`text-sm leading-relaxed text-muted-foreground ${
+          stacked ? "mt-4 max-w-sm text-balance" : "mt-6 max-w-sm"
+        }`}
+      >
+        {TAGLINE}
+      </p>
+      <div className={`flex items-center gap-3 ${stacked ? "mt-4" : "mt-6"}`}>
         {SOCIAL_LINKS.map(({ label, Icon, href }) => (
           <SocialIcon key={label} label={label} Icon={Icon} href={href} />
         ))}
       </div>
-    </>
+    </div>
   );
 }
 
 function FooterSimple() {
   return (
-    <footer className="mt-16 border-t border-gold/20 bg-brand-noir">
-      <div className="container-page py-10 sm:py-12">
-        <FooterBrandBlock logoClassName="h-24 w-auto object-contain sm:h-28" />
-      </div>
+    <footer className="mt-12 border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
+      <div className="container-page flex flex-col items-center py-8 sm:py-10">
+        <FooterBrandBlock layout="stacked" logoClassName="h-20 w-auto object-contain sm:h-24" />
 
-      <div className="container-page border-t border-gold/15 py-5 text-xs text-muted-foreground">
-        <span suppressHydrationWarning>© {new Date().getFullYear()} The Royal Passage. All rights reserved.</span>
+        <p
+          className="mt-6 text-center text-xs text-muted-foreground/80"
+          suppressHydrationWarning
+        >
+          © {new Date().getFullYear()} The Royal Passage. All rights reserved.
+        </p>
       </div>
     </footer>
   );
@@ -77,7 +100,7 @@ function FooterSimple() {
 
 function FooterFull() {
   return (
-    <footer className="relative mt-24 overflow-hidden border-t border-gold/20 bg-brand-noir">
+    <footer className="relative mt-24 overflow-hidden border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
       <div className="container-page relative z-10 grid gap-10 py-12 sm:grid-cols-2 sm:py-14 md:grid-cols-[1.5fr_1fr_1fr_1.2fr] md:gap-12 md:py-16">
         <div>
           <FooterBrandBlock />
@@ -191,11 +214,11 @@ function FooterFull() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,var(--brand-noir)_0%,oklch(0.13_0.06_22_/_0.92)_30%,oklch(0.13_0.06_22_/_0.7)_55%,oklch(0.13_0.06_22_/_0.45)_80%,oklch(0.13_0.06_22_/_0.25)_100%)] lg:block"
+        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,oklch(0.13_0.06_22)_0%,oklch(0.13_0.06_22_/_0.92)_30%,oklch(0.13_0.06_22_/_0.7)_55%,oklch(0.13_0.06_22_/_0.45)_80%,oklch(0.13_0.06_22_/_0.25)_100%)] lg:block"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_bottom,var(--brand-noir)_0%,transparent_18%,transparent_82%,var(--brand-noir)_100%)] lg:block"
+        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_bottom,oklch(0.13_0.06_22)_0%,transparent_18%,transparent_82%,oklch(0.13_0.06_22)_100%)] lg:block"
       />
       <div
         aria-hidden

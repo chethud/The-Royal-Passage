@@ -62,7 +62,7 @@ export function AdminReviewsPanel({ accessToken }: AdminReviewsPanelProps) {
           {reviews.map((review) => (
             <li
               key={review.id}
-              className="flex flex-wrap items-start justify-between gap-4 rounded-md border border-[rgb(88_16_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4"
+              className="flex flex-wrap items-start justify-between gap-4 rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4"
             >
               <div>
                 <div className="luxury-panel-heading font-display text-lg">

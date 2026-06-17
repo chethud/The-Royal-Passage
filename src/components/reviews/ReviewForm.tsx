@@ -27,7 +27,7 @@ export function ReviewForm({ onSubmit, submitting = false, surface = "dark" }: R
   return (
     <form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
       <div>
-        <div className={`eyebrow ${isLight ? "luxury-panel-label" : "text-gold/90"}`}>
+        <div className={`eyebrow ${isLight ? "luxury-panel-label" : "text-[#D4AF6A]/90"}`}>
           Your rating
         </div>
         <div className="mt-2">
@@ -35,7 +35,7 @@ export function ReviewForm({ onSubmit, submitting = false, surface = "dark" }: R
         </div>
       </div>
       <label className="block text-sm">
-        <span className={`eyebrow ${isLight ? "luxury-panel-label" : "text-gold/90"}`}>
+        <span className={`eyebrow ${isLight ? "luxury-panel-label" : "text-[#D4AF6A]/90"}`}>
           Your review
         </span>
         <textarea
@@ -45,7 +45,7 @@ export function ReviewForm({ onSubmit, submitting = false, surface = "dark" }: R
           placeholder="Share what made this experience memorable — what stood out, what you'd tell a friend…"
           className={
             isLight
-              ? "mt-2 w-full rounded-sm border border-[rgb(88_16_0/0.22)] bg-white/60 px-3 py-2.5 text-sm text-brand-maroon-deep placeholder:text-[rgb(88_16_0/0.4)] focus:border-brand-maroon-deep/45 focus:outline-none"
+              ? "mt-2 w-full rounded-sm border border-[rgb(74_0_0/0.22)] bg-white/60 px-3 py-2.5 text-sm text-[#4A0000] placeholder:text-[rgb(74_0_0/0.4)] focus:border-[#4A0000]/45 focus:outline-none"
               : "mt-2 w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/50 px-3 py-2 text-sm focus:outline-none"
           }
         />

@@ -135,7 +135,7 @@ function SummaryCard({
   hint: string;
 }) {
   return (
-    <div className="rounded-md border border-[rgb(88_16_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4">
+    <div className="rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4">
       <p className="luxury-panel-body text-xs uppercase tracking-[0.14em]">{label}</p>
       <p className="luxury-panel-heading mt-2 font-display text-2xl">{value}</p>
       <p className="luxury-panel-body mt-1 text-xs">{hint}</p>
@@ -147,7 +147,7 @@ function QuickLink({ to, label, detail }: { to: string; label: string; detail: s
   return (
     <Link
       to={to}
-      className="block rounded-md border border-[rgb(88_16_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4 transition-colors hover:border-[rgb(88_16_0/0.28)]"
+      className="block rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4 transition-colors hover:border-[rgb(74_0_0/0.28)]"
     >
       <div className="luxury-panel-heading font-display text-lg">{label}</div>
       <p className="luxury-panel-body mt-1 text-xs">{detail}</p>

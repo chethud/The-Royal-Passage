@@ -123,7 +123,7 @@ function QuickLink({ to, label, detail }: { to: string; label: string; detail: s
   return (
     <Link
       to={to}
-      className="block rounded-md border border-[rgb(88_16_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4 transition-colors hover:border-[rgb(88_16_0/0.28)]"
+      className="block rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4 transition-colors hover:border-[rgb(74_0_0/0.28)]"
     >
       <div className="luxury-panel-heading font-display text-lg">{label}</div>
       <p className="luxury-panel-body mt-1 text-xs">{detail}</p>

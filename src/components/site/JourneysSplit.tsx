@@ -41,7 +41,7 @@ function RoyalMedallion({ active, label }: { active: boolean; label: string }) {
     <span className={`royal-medallion relative flex h-9 w-9 items-center justify-center sm:h-10 sm:w-10 ${active ? "is-active" : ""}`}>
       <span className="royal-medallion-ring absolute inset-0 rounded-full border-2 border-[#D4AF37]/35" />
       <span className="royal-medallion-inner absolute inset-1 rounded-full border border-[#D4AF37]/20" />
-      <MaharajaEmblem className="relative h-5 w-5 text-gold-light/70 sm:h-6 sm:w-6" />
+      <MaharajaEmblem className="relative h-5 w-5 text-[#D4AF37]/70 sm:h-6 sm:w-6" />
       <span className="sr-only">{label}</span>
     </span>
   );
@@ -59,13 +59,13 @@ function SlideContent({ slide, visible }: SlideContentProps) {
 
       <div className="pointer-events-none absolute top-10 right-10 opacity-30">
         {slide.theme === "manuscript" ? (
-          <HeritageCompass className="h-14 w-14 text-gold-light/40" />
+          <HeritageCompass className="h-14 w-14 text-[#D4AF37]/40" />
         ) : (
-          <MaharajaEmblem className="h-10 w-10 text-gold-light/35" />
+          <MaharajaEmblem className="h-10 w-10 text-[#D4AF37]/35" />
         )}
       </div>
 
-      <p className="royal-slide-eyebrow relative z-10 mb-4 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-gold sm:text-[0.68rem]">
+      <p className="royal-slide-eyebrow relative z-10 mb-4 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-[#C9A227] sm:text-[0.68rem]">
         {slide.subtitle}
       </p>
 
@@ -244,7 +244,7 @@ export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesCh
 
   return (
     <section
-      className={`royal-heritage-section relative overflow-hidden bg-brand-maroon-deep py-16 sm:py-20 md:py-28 ${isTransitioning ? "is-transitioning" : ""}`}
+      className={`royal-heritage-section relative overflow-hidden bg-[#2A0A0A] py-16 sm:py-20 md:py-28 ${isTransitioning ? "is-transitioning" : ""}`}
     >
       {editable && active ? (
         <div className="container-page relative z-20 mb-6">
@@ -365,7 +365,7 @@ export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesCh
             onClick={goPrev}
             disabled={isLocked}
             aria-label="Previous royal chapter"
-            className="royal-nav-halo flex h-12 w-12 items-center justify-center rounded-full border border-[#D4AF37]/50 bg-[#3B0000]/85 text-gold-light disabled:opacity-40"
+            className="royal-nav-halo flex h-12 w-12 items-center justify-center rounded-full border border-[#D4AF37]/50 bg-[#3B0000]/85 text-[#D4AF37] disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={1.6} />
           </button>
@@ -391,7 +391,7 @@ export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesCh
             onClick={goNext}
             disabled={isLocked}
             aria-label="Next royal chapter"
-            className="royal-nav-halo flex h-12 w-12 items-center justify-center rounded-full border border-[#D4AF37]/50 bg-[#3B0000]/85 text-gold-light disabled:opacity-40"
+            className="royal-nav-halo flex h-12 w-12 items-center justify-center rounded-full border border-[#D4AF37]/50 bg-[#3B0000]/85 text-[#D4AF37] disabled:opacity-40"
           >
             <ChevronRight className="h-4 w-4" strokeWidth={1.6} />
           </button>

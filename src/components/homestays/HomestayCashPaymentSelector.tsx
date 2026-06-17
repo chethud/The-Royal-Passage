@@ -21,16 +21,16 @@ export function HomestayCashPaymentSelector({
       className={`group flex w-full items-start gap-3 border-l-[3px] py-3.5 pl-4 pr-2 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A0000]/25 ${
         active
           ? isLight
-            ? "border-brand-maroon-deep text-brand-maroon-deep"
-            : "border-gold text-foreground"
+            ? "border-[#4A0000] text-[#4A0000]"
+            : "border-[#D4AF6A] text-foreground"
           : isLight
-            ? "border-transparent text-brand-maroon-deep/75"
+            ? "border-transparent text-[#4A0000]/75"
             : "border-transparent text-foreground/75"
       }`}
     >
       <span
         className={`mt-1.5 flex h-2 w-2 shrink-0 rounded-full ${
-          active ? (isLight ? "bg-brand-maroon-deep" : "bg-gold") : "bg-brand-maroon-deep/20"
+          active ? (isLight ? "bg-[#4A0000]" : "bg-[#C8A25A]") : "bg-[#4A0000]/20"
         }`}
         aria-hidden
       />

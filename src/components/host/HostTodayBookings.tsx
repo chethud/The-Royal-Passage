@@ -13,7 +13,7 @@ export function HostTodayBookings({ bookings }: HostTodayBookingsProps) {
   }
 
   return (
-    <ul className="divide-y divide-[rgb(88_16_0/0.12)]">
+    <ul className="divide-y divide-[rgb(74_0_0/0.12)]">
       {bookings.map((booking) => (
         <li key={booking.id} className="flex flex-wrap items-center justify-between gap-3 py-4 first:pt-0 last:pb-0">
           <div>

@@ -57,7 +57,7 @@ export function AdminHomestayQueue({ accessToken, refreshKey = 0 }: AdminHomesta
   }
 
   return (
-    <ul className="divide-y divide-[rgb(88_16_0/0.12)]">
+    <ul className="divide-y divide-[rgb(74_0_0/0.12)]">
       {rows.map((row) => (
         <li key={row.id} className="flex flex-wrap items-center justify-between gap-4 py-4 first:pt-0 last:pb-0">
           <div>

@@ -4,7 +4,7 @@ import { createHomestayOwner } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 
 const inputClass =
-  "w-full rounded-sm border border-[rgb(88_16_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body placeholder:text-[rgb(27_23_22/0.4)] focus:border-brand-maroon-deep/50 focus:outline-none focus:ring-1 focus:ring-brand-maroon-deep/25";
+  "w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
 
 type CreateHomestayOwnerFormProps = {
   accessToken: string;
@@ -149,7 +149,7 @@ export function CreateHomestayOwnerForm({ accessToken, onCreated }: CreateHomest
           </p>
         ) : null}
         {notice ? (
-          <p className="rounded-sm border border-[rgb(88_16_0/0.2)] bg-[rgb(255_255_255/0.45)] px-4 py-3 text-sm luxury-panel-body">
+          <p className="rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.45)] px-4 py-3 text-sm luxury-panel-body">
             {notice}
           </p>
         ) : null}

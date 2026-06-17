@@ -19,8 +19,8 @@ export function ExperiencesHero({ searchValue, onSearchChange }: ExperiencesHero
         role="img"
         aria-label="Luxury travel experiences across South India"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-brand-maroon-deep/92 via-brand-maroon-deep/78 to-brand-maroon/65" />
-      <div className="absolute inset-0 bg-gradient-to-t from-brand-maroon-deep via-transparent to-brand-maroon-deep/30" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#4A0000]/92 via-[#4A0000]/78 to-[#5B0000]/65" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#4A0000] via-transparent to-[#4A0000]/30" />
 
       <div className="container-page relative z-10 flex min-h-[28vh] flex-col justify-center pb-10 pt-[calc(var(--header-height)+1.25rem)] md:min-h-[32vh] md:pb-12">
         <motion.div
@@ -29,10 +29,10 @@ export function ExperiencesHero({ searchValue, onSearchChange }: ExperiencesHero
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="w-full"
         >
-          <p className="eyebrow text-gold">The Royal Collection</p>
+          <p className="eyebrow text-[#D4AF6A]">The Royal Collection</p>
 
           <div className="mt-2 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
-            <h1 className="min-w-0 font-display text-3xl leading-tight tracking-tight text-ink sm:text-4xl md:text-[2.75rem]">
+            <h1 className="min-w-0 font-display text-3xl leading-tight tracking-tight text-[#F7F1E8] sm:text-4xl md:text-[2.75rem]">
               Discover Extraordinary Experiences
             </h1>
             <ExperiencesSearchBar

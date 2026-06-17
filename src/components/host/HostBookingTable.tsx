@@ -170,7 +170,7 @@ export function HostBookingTable({
               {filtered.map((booking) => (
                 <tr
                   key={booking.id}
-                  className="border-b border-[rgb(88_16_0/0.12)] last:border-0"
+                  className="border-b border-[rgb(74_0_0/0.12)] last:border-0"
                 >
                   <td className="px-3 py-3">
                     <Link

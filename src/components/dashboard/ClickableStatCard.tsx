@@ -42,7 +42,7 @@ export function ClickableStatCard({
   );
 
   const className = isLight
-    ? "block rounded-md border border-[rgb(88_16_0/0.14)] bg-[rgb(255_255_255/0.35)] p-5 transition-colors hover:border-[rgb(88_16_0/0.28)]"
+    ? "block rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-5 transition-colors hover:border-[rgb(74_0_0/0.28)]"
     : "glass-strong block rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-5 transition-colors hover:border-ember/40 hover:bg-[oklch(0.88_0.08_86_/_0.04)]";
 
   if (to) {

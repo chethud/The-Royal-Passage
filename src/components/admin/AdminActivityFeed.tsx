@@ -11,7 +11,7 @@ export function AdminActivityFeed({ entries }: AdminActivityFeedProps) {
   }
 
   return (
-    <ul className="divide-y divide-[rgb(88_16_0/0.12)]">
+    <ul className="divide-y divide-[rgb(74_0_0/0.12)]">
       {entries.map((entry) => (
         <li key={entry.id} className="py-4 first:pt-0 last:pb-0 text-sm">
           <div className="luxury-panel-heading font-medium capitalize">

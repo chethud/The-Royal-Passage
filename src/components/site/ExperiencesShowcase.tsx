@@ -44,7 +44,7 @@ export function ExperiencesShowcase({
   return (
     <section
       id="experiences"
-      className="relative border-y border-[oklch(0.88_0.08_86_/_0.1)] bg-[color-mix(in srgb, var(--brand-noir) 88%, var(--brand-maroon) 12%)] py-16 sm:py-20 md:py-24"
+      className="relative border-y border-[oklch(0.88_0.08_86_/_0.1)] bg-[oklch(0.16_0.07_22)] py-16 sm:py-20 md:py-24"
     >
       <div className="container-page">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6">

@@ -36,7 +36,7 @@ export function HomestayCashPaymentNotice({ booking, surface = "light" }: Homest
 
   if (booking.bookingStatus === "confirmed" && booking.paymentStatus !== "paid") {
     return (
-      <div className={`rounded-sm border px-4 py-3 text-sm ${isLight ? "border-[rgb(88_16_0/0.2)] bg-[rgb(255_255_255/0.45)] luxury-panel-body" : "border-border bg-muted/30 text-muted-foreground"}`}>
+      <div className={`rounded-sm border px-4 py-3 text-sm ${isLight ? "border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.45)] luxury-panel-body" : "border-border bg-muted/30 text-muted-foreground"}`}>
         <div className="flex flex-wrap items-center gap-2">
           <BookingStatusChip
             bookingStatus={booking.bookingStatus}
@@ -46,7 +46,7 @@ export function HomestayCashPaymentNotice({ booking, surface = "light" }: Homest
           />
         </div>
         <p className="mt-2 leading-relaxed">
-          Pay <span className="font-display text-lg text-brand-maroon-deep">{formatMoney(booking.totalAmount, sym)}</span> in
+          Pay <span className="font-display text-lg text-[#4A0000]">{formatMoney(booking.totalAmount, sym)}</span> in
           cash when you arrive. No card or online payment required.
         </p>
       </div>

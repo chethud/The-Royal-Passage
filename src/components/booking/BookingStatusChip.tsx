@@ -26,7 +26,7 @@ export function BookingStatusChip({
 
   if (isLight) {
     return (
-      <span className="inline-flex max-w-[12rem] flex-col items-end gap-0.5 border-l-[3px] border-brand-maroon-deep pl-2.5 text-right">
+      <span className="inline-flex max-w-[12rem] flex-col items-end gap-0.5 border-l-[3px] border-[#4A0000] pl-2.5 text-right">
         <span className="eyebrow luxury-panel-label text-[0.62rem] leading-snug">{label}</span>
         {!isPaused && bookingStatus === "confirmed" && paymentStatus === "pending" ? (
           <span className="luxury-panel-body text-[0.62rem] normal-case tracking-normal">{pendingPaymentLabel}</span>

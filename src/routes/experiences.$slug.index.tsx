@@ -68,7 +68,7 @@ export const Route = createFileRoute("/experiences/$slug/")({
   ),
   errorComponent: ({ error }) => (
     <div className="experience-detail-page flex min-h-screen items-center justify-center p-6">
-      <p className="text-sm text-ink/90">{error.message}</p>
+      <p className="text-sm text-[#F7F1E8]/90">{error.message}</p>
     </div>
   ),
   component: ExperienceDetail,
@@ -131,7 +131,7 @@ function ExperienceDetail() {
   const CategoryIcon = categoryIconForLabel(exp.category);
 
   return (
-    <div className="experience-detail-page min-h-screen pt-[var(--header-height)] text-ink">
+    <div className="experience-detail-page min-h-screen pt-[var(--header-height)] text-[#F7F1E8]">
       <Header />
       <script
         type="application/ld+json"
@@ -142,7 +142,7 @@ function ExperienceDetail() {
         <Link
           to="/experiences"
           search={{}}
-          className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-gold transition-colors hover:text-ink"
+          className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
         >
           ← Back to library
         </Link>
@@ -154,25 +154,25 @@ function ExperienceDetail() {
 
           <div className="flex w-full min-w-0 flex-col space-y-6 md:pt-2">
             <div>
-              <div className="mb-5 inline-flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-gold">
+              <div className="mb-5 inline-flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]">
                 <CategoryIcon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
                 {exp.category}
               </div>
 
               {locationLine || exp.address || exp.mapLink ? (
-                <div className="flex items-start gap-2 text-sm text-brand-cotton/90">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" aria-hidden />
+                <div className="flex items-start gap-2 text-sm text-[#D6C8B5]/90">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF6A]" aria-hidden />
                   <div>
                     {locationLine ? <div>{locationLine}</div> : null}
                     {exp.address ? (
-                      <div className="mt-0.5 text-brand-cotton/75">{exp.address}</div>
+                      <div className="mt-0.5 text-[#D6C8B5]/75">{exp.address}</div>
                     ) : null}
                     {exp.mapLink ? (
                       <a
                         href={exp.mapLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-2 inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-gold transition-colors hover:text-ink"
+                        className="mt-2 inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
                       >
                         <Navigation className="h-3.5 w-3.5" aria-hidden />
                         Get directions
@@ -183,78 +183,78 @@ function ExperienceDetail() {
               ) : null}
 
               <div className="mt-5 flex items-start justify-between gap-4">
-                <h1 className="font-display text-3xl uppercase leading-[1.08] tracking-[0.04em] text-ink sm:text-4xl md:text-[2.65rem]">
+                <h1 className="font-display text-3xl uppercase leading-[1.08] tracking-[0.04em] text-[#F7F1E8] sm:text-4xl md:text-[2.65rem]">
                   {exp.title}
                 </h1>
                 <div className="flex shrink-0 items-center gap-2 pt-1">
                   <AddToCartButton
                     exp={exp}
                     showLabel
-                    className="border-[rgb(201_162_39/0.45)] bg-[rgb(0_0_0/0.25)] text-ink hover:border-gold"
+                    className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
                   />
                   <WishlistButton
                     experienceId={exp.id}
-                    className="border-[rgb(201_162_39/0.45)] bg-[rgb(0_0_0/0.25)] text-ink hover:border-gold"
+                    className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
                   />
                 </div>
               </div>
 
               {exp.tagline ? (
-                <p className="mt-4 font-display text-base italic leading-relaxed text-brand-cotton/90 sm:text-lg">
+                <p className="mt-4 font-display text-base italic leading-relaxed text-[#D6C8B5]/90 sm:text-lg">
                   {exp.tagline}
                 </p>
               ) : null}
 
-              <div className="my-7 h-px bg-gradient-to-r from-transparent via-[rgb(201_162_39/0.35)] to-transparent" />
+              <div className="my-7 h-px bg-gradient-to-r from-transparent via-[rgb(200_162_90/0.35)] to-transparent" />
 
-              <dl className="grid grid-cols-3 divide-x divide-[rgb(201_162_39/0.28)] text-center sm:text-left">
+              <dl className="grid grid-cols-3 divide-x divide-[rgb(200_162_90/0.28)] text-center sm:text-left">
                 <div className="px-2 first:pl-0 sm:px-5">
-                  <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-gold/85">
+                  <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
                     Duration
                   </dt>
-                  <dd className="mt-1.5 font-display text-xl uppercase tracking-[0.02em] text-ink">
+                  <dd className="mt-1.5 font-display text-xl uppercase tracking-[0.02em] text-[#F7F1E8]">
                     {exp.durationHours}h
                   </dd>
                 </div>
                 <div className="px-2 sm:px-5">
-                  <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-gold/85">
+                  <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
                     From
                   </dt>
-                  <dd className="mt-1.5 font-display text-xl uppercase tracking-[0.02em] text-ink">
+                  <dd className="mt-1.5 font-display text-xl uppercase tracking-[0.02em] text-[#F7F1E8]">
                     {sym}
                     {exp.pricePerPerson}
                   </dd>
                 </div>
                 <div className="px-2 last:pr-0 sm:px-5">
-                  <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-gold/85">
+                  <dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
                     Rating
                   </dt>
-                  <dd className="mt-1.5 font-display text-xl text-gold">
+                  <dd className="mt-1.5 font-display text-xl text-[#D4AF6A]">
                     ★ {exp.rating}
-                    <span className="ml-1 text-xs text-brand-cotton/75">({exp.reviewsCount})</span>
+                    <span className="ml-1 text-xs text-[#D6C8B5]/75">({exp.reviewsCount})</span>
                   </dd>
                 </div>
               </dl>
 
               <div className="mt-8 space-y-6">
                 <div>
-                  <div className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-gold/85">
+                  <div className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
                     About this experience
                   </div>
-                  <p className="mt-3 text-sm leading-relaxed text-brand-cotton/92 whitespace-pre-line sm:text-[0.9375rem]">
+                  <p className="mt-3 text-sm leading-relaxed text-[#D6C8B5]/92 whitespace-pre-line sm:text-[0.9375rem]">
                     {exp.description}
                   </p>
                 </div>
 
                 <div>
-                  <div className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-gold/85">
+                  <div className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85">
                     Hosted by
                   </div>
-                  <div className="mt-2 font-display text-lg uppercase tracking-[0.04em] text-ink">
+                  <div className="mt-2 font-display text-lg uppercase tracking-[0.04em] text-[#F7F1E8]">
                     {exp.hostName}
                   </div>
                   {exp.hostBio ? (
-                    <p className="mt-2 text-sm leading-relaxed text-brand-cotton/85">{exp.hostBio}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-[#D6C8B5]/85">{exp.hostBio}</p>
                   ) : null}
                 </div>
 
@@ -310,7 +310,7 @@ function ExperienceDetail() {
             </LuxuryCheckoutPanel>
 
             {canBook ? (
-              <section id="book" className="border-t border-[rgb(201_162_39/0.18)] pt-8">
+              <section id="book" className="border-t border-[rgb(200_162_90/0.18)] pt-8">
                 <LuxuryCheckoutPanel>
                   <div className="mb-8">
                     <div className="eyebrow luxury-panel-label mb-3">Reserve your seats</div>

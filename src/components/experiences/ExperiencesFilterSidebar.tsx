@@ -42,11 +42,11 @@ export function ExperiencesFilterSidebar({
     <aside className="w-full shrink-0 lg:w-[220px] xl:w-[240px]">
       <div className="sticky top-[calc(var(--header-height)+1rem)] space-y-8 py-2">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="font-display text-base tracking-wide text-ink">Refine</h2>
+          <h2 className="font-display text-base tracking-wide text-[#F7F1E8]">Refine</h2>
           <button
             type="button"
             onClick={onReset}
-            className="text-[0.65rem] uppercase tracking-[0.14em] text-gold/85 transition-colors hover:text-ink"
+            className="text-[0.65rem] uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
           >
             Reset
           </button>
@@ -114,7 +114,7 @@ export function ExperiencesFilterSidebar({
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="eyebrow mb-3 text-[0.62rem] tracking-[0.2em] text-gold/90">{title}</h3>
+      <h3 className="eyebrow mb-3 text-[0.62rem] tracking-[0.2em] text-[#D4AF6A]/90">{title}</h3>
       <div className="flex flex-col gap-0.5">{children}</div>
     </div>
   );
@@ -141,16 +141,16 @@ function FilterOption({
       aria-label={label}
       aria-pressed={active}
       onClick={onClick}
-      className={`group flex w-full items-center gap-2.5 border-l-2 py-2 pl-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 ${
+      className={`group flex w-full items-center gap-2.5 border-l-2 py-2 pl-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]/50 ${
         active
-          ? "border-gold text-ink"
-          : "border-transparent text-ink/65 hover:border-gold/35 hover:text-ink"
+          ? "border-[#D4AF6A] text-[#F7F1E8]"
+          : "border-transparent text-[#F7F1E8]/65 hover:border-[#C8A25A]/35 hover:text-[#F7F1E8]"
       }`}
     >
       <Icon
         strokeWidth={1.5}
         className={`h-4 w-4 shrink-0 transition-colors ${
-          active ? "text-gold" : "text-gold/70 group-hover:text-gold"
+          active ? "text-[#D4AF6A]" : "text-[#D4AF6A]/70 group-hover:text-[#D4AF6A]"
         }`}
       />
       <span className="min-w-0 text-[0.72rem] font-medium leading-snug tracking-[0.04em]">{text}</span>

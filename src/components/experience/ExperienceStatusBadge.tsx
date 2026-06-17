@@ -15,11 +15,11 @@ const STATUS_STYLES_DARK: Record<string, string> = {
 };
 
 const STATUS_STYLES_LIGHT: Record<string, string> = {
-  draft: "border-[rgb(88_16_0/0.2)] bg-[rgb(255_255_255/0.45)] text-[rgb(27_23_22/0.65)]",
+  draft: "border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.45)] text-[rgb(58_0_0/0.65)]",
   pending_review: "border-amber-700/30 bg-amber-50 text-amber-900",
   published: "border-emerald-700/30 bg-emerald-50 text-emerald-900",
   rejected: "border-destructive/40 bg-destructive/10 text-destructive",
-  archived: "border-[rgb(88_16_0/0.2)] text-[rgb(27_23_22/0.55)]",
+  archived: "border-[rgb(74_0_0/0.2)] text-[rgb(58_0_0/0.55)]",
 };
 
 type ExperienceStatusBadgeProps = {

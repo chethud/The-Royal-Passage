@@ -25,7 +25,7 @@ export function CartItemsSection({
     return (
       <div className="py-14 text-center">
         <ShoppingCart
-          className={`mx-auto h-7 w-7 ${isLight ? "text-gold/70" : "text-gold/45"}`}
+          className={`mx-auto h-7 w-7 ${isLight ? "text-[#C8A25A]/70" : "text-[#D4AF6A]/45"}`}
           strokeWidth={1.5}
         />
         <p className={`mt-4 font-display text-lg tracking-wide ${isLight ? "luxury-panel-heading" : "text-foreground"}`}>
@@ -99,7 +99,7 @@ export function WishlistCartSection({
     return (
       <div className="py-14 text-center">
         <Heart
-          className={`mx-auto h-7 w-7 ${isLight ? "text-gold/70" : "text-gold/45"}`}
+          className={`mx-auto h-7 w-7 ${isLight ? "text-[#C8A25A]/70" : "text-[#D4AF6A]/45"}`}
           strokeWidth={1.5}
         />
         <p className={`mt-4 font-display text-lg tracking-wide ${isLight ? "luxury-panel-heading" : "text-foreground"}`}>
@@ -136,7 +136,7 @@ export function WishlistCartSection({
               removeLabel="Remove from wishlist"
               removeIcon={
                 <Heart
-                  className={`h-4 w-4 fill-current ${isLight ? "text-[#9A7228]" : "text-gold"}`}
+                  className={`h-4 w-4 fill-current ${isLight ? "text-[#9A7228]" : "text-[#D4AF6A]"}`}
                   strokeWidth={1.5}
                 />
               }
@@ -147,8 +147,8 @@ export function WishlistCartSection({
                   onClick={() => onAddToCart(item)}
                   className={`text-[0.65rem] font-semibold uppercase tracking-[0.14em] transition-colors disabled:cursor-default disabled:opacity-45 ${
                     isLight
-                      ? "luxury-panel-link hover:text-brand-maroon-deep"
-                      : "text-gold/85 hover:text-ink"
+                      ? "luxury-panel-link hover:text-[#4A0000]"
+                      : "text-[#D4AF6A]/85 hover:text-[#F7F1E8]"
                   }`}
                 >
                   {inCart ? "In cart" : "Add to cart"}
@@ -189,7 +189,7 @@ function CartRow({
         <Link
           to="/experiences/$slug"
           params={{ slug: item.slug }}
-          className="relative h-[5.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-sm sm:h-28 sm:w-[6.5rem] border border-[rgb(201_162_39/0.28)]"
+          className="relative h-[5.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-sm sm:h-28 sm:w-[6.5rem] border border-[rgb(200_162_90/0.28)]"
         >
           {item.image ? (
             <img
@@ -203,7 +203,7 @@ function CartRow({
 
         <div className="flex min-w-0 flex-1 flex-col justify-between gap-4">
           <div className="min-w-0">
-            <div className={`eyebrow text-[0.62rem] ${isLight ? "luxury-panel-label" : "text-gold/85"}`}>
+            <div className={`eyebrow text-[0.62rem] ${isLight ? "luxury-panel-label" : "text-[#D4AF6A]/85"}`}>
               {item.city}
             </div>
             <Link
@@ -212,7 +212,7 @@ function CartRow({
               className={`mt-1 block font-display text-base uppercase leading-snug tracking-[0.05em] transition-colors sm:text-lg ${
                 isLight
                   ? "luxury-panel-heading hover:text-[#9A7228]"
-                  : "text-ink hover:text-gold"
+                  : "text-[#F7F1E8] hover:text-[#D4AF6A]"
               }`}
             >
               {item.title}
@@ -225,7 +225,7 @@ function CartRow({
           </div>
 
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <span className={`font-display text-xl tracking-tight sm:text-2xl ${isLight ? "luxury-panel-heading" : "text-ink"}`}>
+            <span className={`font-display text-xl tracking-tight sm:text-2xl ${isLight ? "luxury-panel-heading" : "text-[#F7F1E8]"}`}>
               From {item.currencySymbol}
               {item.pricePerPerson.toLocaleString("en-IN")}
             </span>
@@ -238,7 +238,7 @@ function CartRow({
                 className={`inline-flex items-center justify-center transition-colors disabled:opacity-40 ${
                   isLight
                     ? "luxury-panel-body hover:text-[#9A7228]"
-                    : "text-muted-foreground/70 hover:text-gold"
+                    : "text-muted-foreground/70 hover:text-[#D4AF6A]"
                 }`}
                 aria-label={removeLabel}
               >
