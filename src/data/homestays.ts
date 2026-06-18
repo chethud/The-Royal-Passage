@@ -26,6 +26,18 @@ export type HomestayAmenity =
   | "Pet Friendly"
   | "Campfire";
 
+export type HomestayRoom = {
+  id: string;
+  name: string;
+  category?: string;
+  capacity: number;
+  pricePerNight: number;
+  totalUnits: number;
+  amenities?: string[];
+  extraBedAvailable: boolean;
+  extraBedPricePerNight: number;
+};
+
 export type Homestay = {
   id: string;
   slug: string;
@@ -50,6 +62,7 @@ export type Homestay = {
   checkInTime: string;
   checkOutTime: string;
   houseRules?: string[];
+  rooms?: HomestayRoom[];
 };
 
 export const homestays: Homestay[] = [

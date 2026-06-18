@@ -49,6 +49,9 @@ function HomestayDetailPage() {
     initialCheckIn: search.checkIn,
     initialCheckOut: search.checkOut,
     initialGuests: search.guests,
+    initialRoomId: search.roomId,
+    initialRoomCount: search.roomCount,
+    initialExtraBeds: search.extraBeds,
   });
   const sym = stay.currencySymbol ?? "₹";
   const locationLine = [stay.region, stay.city].filter(Boolean).join(" · ");
@@ -65,6 +68,9 @@ function HomestayDetailPage() {
     checkIn: checkout.checkIn,
     checkOut: checkout.checkOut,
     guests: checkout.guests,
+    roomId: checkout.roomId,
+    roomCount: checkout.roomCount,
+    extraBeds: checkout.extraBedCount,
   });
 
   return (
@@ -204,12 +210,21 @@ function HomestayDetailPage() {
                 checkIn={checkout.checkIn}
                 checkOut={checkout.checkOut}
                 guests={checkout.guests}
+                roomId={checkout.roomId}
+                roomCount={checkout.roomCount}
+                extraBedCount={checkout.extraBedCount}
+                maxGuests={checkout.maxGuests}
+                maxRooms={checkout.maxRooms}
+                maxExtraBeds={checkout.maxExtra}
                 notes={checkout.notes}
                 nights={checkout.nights}
                 totalMinor={checkout.totalMinor}
                 onCheckInChange={checkout.setCheckIn}
                 onCheckOutChange={checkout.setCheckOut}
                 onGuestsChange={checkout.setGuests}
+                onRoomIdChange={checkout.setRoomId}
+                onRoomCountChange={checkout.setRoomCount}
+                onExtraBedCountChange={checkout.setExtraBedCount}
                 onNotesChange={checkout.setNotes}
                 hideActions
                 bookable={bookable}
@@ -232,6 +247,9 @@ function HomestayDetailPage() {
                       checkIn: checkout.checkIn,
                       checkOut: checkout.checkOut,
                       guests: checkout.guests,
+                      roomId: checkout.roomId,
+                      roomCount: checkout.roomCount,
+                      extraBeds: checkout.extraBedCount,
                     }}
                     className="luxury-btn-sm luxury-btn-primary mt-6 inline-flex w-full items-center justify-center"
                   >

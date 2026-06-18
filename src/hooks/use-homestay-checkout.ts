@@ -1,129 +1,211 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type { HomestayPaymentMethod } from "@/components/homestays/HomestayCashPaymentSelector";
-import type { Homestay } from "@/data/homestays";
-import { createHomestayBooking } from "@/lib/api/homestay-bookings";
-import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
-import { formatMoney } from "@/lib/money";
-import { getSupabaseBrowser } from "@/lib/supabase/browser";
-
-function addDays(iso: string, days: number) {
-  const date = new Date(`${iso}T12:00:00`);
-  date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
-}
-
-function nightsBetween(checkIn: string, checkOut: string) {
-  const start = new Date(`${checkIn}T12:00:00`);
-  const end = new Date(`${checkOut}T12:00:00`);
-  return Math.max(0, Math.round((end.getTime() - start.getTime()) / 86_400_000));
-}
-
-export function useHomestayCheckout(
-  homestay: Homestay,
-  options: {
-    initialCheckIn?: string;
-    initialCheckOut?: string;
-    initialGuests?: number;
-    initialRoomId?: string;
-  },
-) {
-  const today = new Date().toISOString().slice(0, 10);
-  const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [checkIn, setCheckIn] = useState(options.initialCheckIn ?? today);
-  const [checkOut, setCheckOut] = useState(options.initialCheckOut ?? addDays(today, 2));
-  const [guests, setGuests] = useState(options.initialGuests ?? 1);
-  const [roomId, setRoomId] = useState<string | undefined>(options.initialRoomId);
-  const [notes, setNotes] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<HomestayPaymentMethod>("cod");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (checkOut <= checkIn) {
-      setCheckOut(addDays(checkIn, 1));
-    }
-  }, [checkIn, checkOut]);
-
-  useEffect(() => {
-    setGuests((current) => Math.min(Math.max(1, current), homestay.maxGuests));
-  }, [homestay.maxGuests]);
-
-  const nights = useMemo(() => nightsBetween(checkIn, checkOut), [checkIn, checkOut]);
-  const nightlyRate = homestay.pricePerNight;
-  const totalMinor = nightlyRate * 100 * Math.max(nights, 0);
-  const sym = homestay.currencySymbol ?? "₹";
-
-  const goNext = useCallback(() => {
-    setError(null);
-    if (step === 1 && nights < 1) {
-      setError("Select at least one night.");
-      return;
-    }
-    setStep((current) => Math.min(3, current + 1) as 1 | 2 | 3);
-  }, [nights, step]);
-
-  const goBack = useCallback(() => {
-    setError(null);
-    setStep((current) => Math.max(1, current - 1) as 1 | 2 | 3);
-  }, []);
-
-  const submit = useCallback(async () => {
-    if (!isApiConfigured()) {
-      throw new Error("Booking API is not configured for this deployment.");
-    }
-    if (nights < 1) {
-      throw new Error("Select at least one night.");
-    }
-    if (paymentMethod !== "cod") {
-      throw new Error("Only cash payment at the homestay is available.");
-    }
-    const session = await getSupabaseBrowser().auth.getSession();
-    const token = session.data.session?.access_token;
-    if (!token) throw new Error("Sign in required.");
-
-    setBusy(true);
-    setError(null);
-    try {
-      const result = await createHomestayBooking(token, {
-        homestayId: homestay.id,
-        roomId,
-        checkIn,
-        checkOut,
-        guestCount: guests,
-        notes: notes.trim() || undefined,
-      });
-      return result.bookingId;
-    } catch (err) {
-      const message = toErrorMessage(err, "Failed to submit stay request.");
-      setError(message);
-      throw err;
-    } finally {
-      setBusy(false);
-    }
-  }, [checkIn, checkOut, guests, homestay.id, nights, notes, paymentMethod, roomId]);
-
-  return {
-    step,
-    goNext,
-    goBack,
-    checkIn,
-    setCheckIn,
-    checkOut,
-    setCheckOut,
-    guests,
-    setGuests,
-    roomId,
-    setRoomId,
-    notes,
-    setNotes,
-    paymentMethod,
-    setPaymentMethod,
-    nights,
-    totalMinor,
-    totalLabel: formatMoney(totalMinor, sym),
-    nightlyLabel: `${sym}${nightlyRate.toLocaleString("en-IN")}`,
-    busy,
-    error,
-    submit,
-  };
-}
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { HomestayPaymentMethod } from "@/components/homestays/HomestayCashPaymentSelector";
+import type { Homestay } from "@/data/homestays";
+import { createHomestayBooking } from "@/lib/api/homestay-bookings";
+import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
+import {
+  calculateStayTotalMinor,
+  getActiveRooms,
+  getSelectedRoom,
+  maxExtraBeds,
+  maxGuestsForSelection,
+  maxRoomCount,
+} from "@/lib/homestay-room-pricing";
+import { formatMoney } from "@/lib/money";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
+
+function addDays(iso: string, days: number) {
+  const date = new Date(`${iso}T12:00:00`);
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function nightsBetween(checkIn: string, checkOut: string) {
+  const start = new Date(`${checkIn}T12:00:00`);
+  const end = new Date(`${checkOut}T12:00:00`);
+  return Math.max(0, Math.round((end.getTime() - start.getTime()) / 86_400_000));
+}
+
+export function useHomestayCheckout(
+  homestay: Homestay,
+  options: {
+    initialCheckIn?: string;
+    initialCheckOut?: string;
+    initialGuests?: number;
+    initialRoomId?: string;
+    initialRoomCount?: number;
+    initialExtraBeds?: number;
+  },
+) {
+  const rooms = getActiveRooms(homestay);
+  const defaultRoomId =
+    options.initialRoomId ?? (rooms.length === 1 ? rooms[0]?.id : undefined);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [checkIn, setCheckIn] = useState(options.initialCheckIn ?? today);
+  const [checkOut, setCheckOut] = useState(options.initialCheckOut ?? addDays(today, 2));
+  const [guests, setGuests] = useState(options.initialGuests ?? 1);
+  const [roomId, setRoomId] = useState<string | undefined>(defaultRoomId);
+  const [roomCount, setRoomCount] = useState(options.initialRoomCount ?? 1);
+  const [extraBedCount, setExtraBedCount] = useState(options.initialExtraBeds ?? 0);
+  const [notes, setNotes] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<HomestayPaymentMethod>("cod");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const selectedRoom = useMemo(() => getSelectedRoom(homestay, roomId), [homestay, roomId]);
+  const maxRooms = maxRoomCount(selectedRoom);
+  const maxExtra = maxExtraBeds(selectedRoom, roomCount);
+  const maxGuests = maxGuestsForSelection(
+    selectedRoom,
+    roomCount,
+    extraBedCount,
+    homestay.maxGuests,
+  );
+
+  useEffect(() => {
+    if (checkOut <= checkIn) {
+      setCheckOut(addDays(checkIn, 1));
+    }
+  }, [checkIn, checkOut]);
+
+  useEffect(() => {
+    setRoomCount((current) => Math.min(Math.max(1, current), maxRooms));
+  }, [maxRooms]);
+
+  useEffect(() => {
+    setExtraBedCount((current) => Math.min(Math.max(0, current), maxExtra));
+  }, [maxExtra]);
+
+  useEffect(() => {
+    setGuests((current) => Math.min(Math.max(1, current), maxGuests));
+  }, [maxGuests]);
+
+  useEffect(() => {
+    if (!selectedRoom?.extraBedAvailable) {
+      setExtraBedCount(0);
+    }
+  }, [selectedRoom]);
+
+  const nights = useMemo(() => nightsBetween(checkIn, checkOut), [checkIn, checkOut]);
+  const pricing = useMemo(
+    () =>
+      calculateStayTotalMinor(homestay, {
+        roomId,
+        roomCount: rooms.length ? roomCount : 1,
+        extraBedCount: rooms.length ? extraBedCount : 0,
+        nights,
+      }),
+    [homestay, roomId, roomCount, extraBedCount, nights, rooms.length],
+  );
+  const sym = homestay.currencySymbol ?? "₹";
+
+  const goNext = useCallback(() => {
+    setError(null);
+    if (step === 1) {
+      if (nights < 1) {
+        setError("Select at least one night.");
+        return;
+      }
+      if (rooms.length > 1 && !roomId) {
+        setError("Select a room type.");
+        return;
+      }
+    }
+    setStep((current) => Math.min(3, current + 1) as 1 | 2 | 3);
+  }, [nights, roomId, rooms.length, step]);
+
+  const goBack = useCallback(() => {
+    setError(null);
+    setStep((current) => Math.max(1, current - 1) as 1 | 2 | 3);
+  }, []);
+
+  const submit = useCallback(async () => {
+    if (!isApiConfigured()) {
+      throw new Error("Booking API is not configured for this deployment.");
+    }
+    if (nights < 1) {
+      throw new Error("Select at least one night.");
+    }
+    if (rooms.length > 1 && !roomId) {
+      throw new Error("Select a room type.");
+    }
+    if (paymentMethod !== "cod") {
+      throw new Error("Only cash payment at the homestay is available.");
+    }
+    const session = await getSupabaseBrowser().auth.getSession();
+    const token = session.data.session?.access_token;
+    if (!token) throw new Error("Sign in required.");
+
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await createHomestayBooking(token, {
+        homestayId: homestay.id,
+        roomId: roomId ?? (rooms.length === 1 ? rooms[0]?.id : undefined),
+        checkIn,
+        checkOut,
+        guestCount: guests,
+        roomCount: rooms.length ? roomCount : undefined,
+        extraBedCount: rooms.length ? extraBedCount : undefined,
+        notes: notes.trim() || undefined,
+      });
+      return result.bookingId;
+    } catch (err) {
+      const message = toErrorMessage(err, "Failed to submit stay request.");
+      setError(message);
+      throw err;
+    } finally {
+      setBusy(false);
+    }
+  }, [
+    checkIn,
+    checkOut,
+    extraBedCount,
+    guests,
+    homestay.id,
+    nights,
+    notes,
+    paymentMethod,
+    roomCount,
+    roomId,
+    rooms,
+  ]);
+
+  return {
+    step,
+    goNext,
+    goBack,
+    checkIn,
+    setCheckIn,
+    checkOut,
+    setCheckOut,
+    guests,
+    setGuests,
+    roomId,
+    setRoomId,
+    roomCount,
+    setRoomCount,
+    extraBedCount,
+    setExtraBedCount,
+    selectedRoom,
+    maxRooms,
+    maxExtra,
+    maxGuests,
+    notes,
+    setNotes,
+    paymentMethod,
+    setPaymentMethod,
+    nights,
+    totalMinor: pricing.totalMinor,
+    totalLabel: formatMoney(pricing.totalMinor, sym),
+    nightlyLabel: `${sym}${pricing.pricePerNightMajor.toLocaleString("en-IN")}`,
+    extraBedLabel: pricing.extraBedPriceMajor
+      ? `${sym}${pricing.extraBedPriceMajor.toLocaleString("en-IN")}`
+      : null,
+    busy,
+    error,
+    submit,
+  };
+}

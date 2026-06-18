@@ -545,6 +545,8 @@ message HomestayRoom {
   int32 price_per_night = 5;
   int32 total_units = 6;
   repeated string amenities = 7;
+  bool extra_bed_available = 8;
+  int32 extra_bed_price_per_night = 9;
 }
 
 message Homestay {
@@ -610,6 +612,8 @@ message CreateHomestayBookingRequest {
   string check_out = 4;
   int32 guest_count = 5;
   optional string notes = 6;
+  int32 room_count = 7;
+  int32 extra_bed_count = 8;
 }
 
 message CreateHomestayBookingResponse {
@@ -641,6 +645,8 @@ message OwnerHomestayRoom {
   repeated string amenities = 7;
   int32 sort_order = 8;
   bool is_active = 9;
+  bool extra_bed_available = 10;
+  int32 extra_bed_price_per_night_minor = 11;
 }
 
 message OwnerHomestaySummary {
@@ -746,6 +752,8 @@ message CreateOwnerHomestayRoomRequest {
   int32 total_units = 5;
   repeated string amenities = 6;
   int32 sort_order = 7;
+  bool extra_bed_available = 8;
+  int32 extra_bed_price_per_night_minor = 9;
 }
 
 message UpdateOwnerHomestayRoomRequest {
@@ -757,6 +765,8 @@ message UpdateOwnerHomestayRoomRequest {
   repeated string amenities = 6;
   optional int32 sort_order = 7;
   optional bool is_active = 8;
+  optional bool extra_bed_available = 9;
+  optional int32 extra_bed_price_per_night_minor = 10;
 }
 
 message UpsertOwnerAvailabilityRequest {
@@ -803,6 +813,8 @@ message HomestayBookingSummary {
   optional string check_in_time = 19;
   optional string check_out_time = 20;
   optional string homestay_address = 21;
+  int32 room_count = 22;
+  int32 extra_bed_count = 23;
 }
 
 message ListHomestayBookingsResponse {

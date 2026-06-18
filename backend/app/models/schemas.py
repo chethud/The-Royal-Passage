@@ -73,6 +73,8 @@ class HomestayRoom(BaseModel):
     pricePerNight: int
     totalUnits: int = 1
     amenities: list[str] = Field(default_factory=list)
+    extraBedAvailable: bool = False
+    extraBedPricePerNight: int = 0
 
 
 class Homestay(BaseModel):
@@ -138,6 +140,8 @@ class CreateHomestayBookingRequest(BaseModel):
     checkOut: str
     guestCount: int = Field(ge=1, le=50)
     notes: str | None = Field(default=None, max_length=500)
+    roomCount: int = Field(default=1, ge=1, le=20)
+    extraBedCount: int = Field(default=0, ge=0, le=20)
 
 
 class CreateHomestayBookingResponse(BaseModel):
@@ -169,6 +173,8 @@ class OwnerHomestayRoom(BaseModel):
     amenities: list[str] = Field(default_factory=list)
     sortOrder: int = 0
     isActive: bool = True
+    extraBedAvailable: bool = False
+    extraBedPricePerNightMinor: int = 0
 
 
 class OwnerHomestaySummary(BaseModel):
@@ -270,6 +276,8 @@ class CreateOwnerHomestayRoomRequest(BaseModel):
     totalUnits: int = Field(default=1, ge=1, le=20)
     amenities: list[str] = Field(default_factory=list)
     sortOrder: int = 0
+    extraBedAvailable: bool = False
+    extraBedPricePerNightMinor: int = Field(default=0, ge=0)
 
 
 class UpdateOwnerHomestayRoomRequest(BaseModel):
@@ -281,6 +289,8 @@ class UpdateOwnerHomestayRoomRequest(BaseModel):
     amenities: list[str] | None = None
     sortOrder: int | None = None
     isActive: bool | None = None
+    extraBedAvailable: bool | None = None
+    extraBedPricePerNightMinor: int | None = Field(default=None, ge=0)
 
 
 class UpsertOwnerAvailabilityRequest(BaseModel):
@@ -327,6 +337,8 @@ class HomestayBookingSummary(BaseModel):
     checkInTime: str | None = None
     checkOutTime: str | None = None
     homestayAddress: str | None = None
+    roomCount: int = 1
+    extraBedCount: int = 0
 
 
 class ListHomestayBookingsResponse(BaseModel):

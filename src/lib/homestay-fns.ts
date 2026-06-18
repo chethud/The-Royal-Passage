@@ -7,7 +7,21 @@ import { getOrSetServerCache } from "@/lib/cache.server";
 import { isSupabaseConfigured } from "@/lib/env.server";
 import { mapProtoHomestay } from "@/lib/homestay-db";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import type { Homestay } from "@/data/homestays";
+import type { Homestay, HomestayRoom } from "@/data/homestays";
+
+function mapDbRoom(row: Record<string, unknown>): HomestayRoom {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    category: (row.category as string | null) ?? undefined,
+    capacity: Number(row.capacity ?? 2),
+    pricePerNight: Math.round(Number(row.price_per_night_minor ?? 0) / 100),
+    totalUnits: Number(row.total_units ?? 1),
+    amenities: (row.amenities as string[] | null) ?? [],
+    extraBedAvailable: Boolean(row.extra_bed_available),
+    extraBedPricePerNight: Math.round(Number(row.extra_bed_price_per_night_minor ?? 0) / 100),
+  };
+}
 
 function fallbackCatalog() {
   const homestays = staticHomestays.filter(isMysuruHomestay);
@@ -87,6 +101,7 @@ async function loadHomestaysFromDb(citySlug = "mysuru"): Promise<Homestay[]> {
       maxGuests: Number(row.max_guests ?? 2),
       checkInTime: String(row.check_in_time ?? "14:00").slice(0, 5),
       checkOutTime: String(row.check_out_time ?? "11:00").slice(0, 5),
+      rooms: rooms.length ? rooms.map(mapDbRoom) : undefined,
     };
   })
     .filter(isMysuruHomestay);

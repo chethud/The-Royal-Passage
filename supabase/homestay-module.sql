@@ -92,6 +92,8 @@ create table if not exists public.homestay_rooms (
   capacity integer not null default 2,
   price_per_night_minor integer not null,
   total_units integer not null default 1,
+  extra_bed_available boolean not null default false,
+  extra_bed_price_per_night_minor integer not null default 0,
   amenities text[] not null default '{}',
   sort_order integer not null default 0,
   is_active boolean not null default true,
@@ -125,6 +127,8 @@ create table if not exists public.homestay_bookings (
   check_in date not null,
   check_out date not null,
   guest_count integer not null default 1,
+  room_count integer not null default 1,
+  extra_bed_count integer not null default 0,
   nights integer generated always as (check_out - check_in) stored,
   subtotal_minor integer not null,
   platform_fee_minor integer not null default 0,
@@ -189,8 +193,16 @@ create policy "Public read published homestay reviews"
   on public.homestay_reviews for select
   using (status = 'published');
 
--- ---------------------------------------------------------------------------
--- Seed homestay owners + published properties (safe to re-run)
+-- Safe re-run: add room extra-bed + booking columns on existing databases
+alter table public.homestay_rooms
+  add column if not exists extra_bed_available boolean not null default false;
+alter table public.homestay_rooms
+  add column if not exists extra_bed_price_per_night_minor integer not null default 0;
+alter table public.homestay_bookings
+  add column if not exists room_count integer not null default 1;
+alter table public.homestay_bookings
+  add column if not exists extra_bed_count integer not null default 0;
+
 -- ---------------------------------------------------------------------------
 insert into public.homestay_owners (id, full_name, email, phone, address, approval_status, verified) values
   ('a0000001-0000-4000-8000-000000000001', 'Royal Heritage Stays', 'heritage@royalpassage.demo', '+91 9000000001', 'Mysuru, Karnataka', 'approved', true),
@@ -273,8 +285,13 @@ on conflict (id) do update set
   hero_image_url = excluded.hero_image_url,
   price_per_night_minor = excluded.price_per_night_minor;
 
-insert into public.homestay_rooms (id, homestay_id, name, category, capacity, price_per_night_minor, total_units, sort_order) values
-  ('c0000001-0000-4000-8000-000000000001', 'b0000001-0000-4000-8000-000000000001', 'Courtyard Suite', 'Suite', 2, 450000, 2, 0),
-  ('c0000002-0000-4000-8000-000000000002', 'b0000002-0000-4000-8000-000000000002', 'Garden View Suite', 'Suite', 2, 620000, 3, 0),
-  ('c0000003-0000-4000-8000-000000000003', 'b0000003-0000-4000-8000-000000000003', 'Deluxe Double', 'Deluxe', 2, 380000, 4, 0)
-on conflict (id) do nothing;
+insert into public.homestay_rooms (
+  id, homestay_id, name, category, capacity, price_per_night_minor, total_units,
+  extra_bed_available, extra_bed_price_per_night_minor, sort_order
+) values
+  ('c0000001-0000-4000-8000-000000000001', 'b0000001-0000-4000-8000-000000000001', 'Courtyard Suite', 'Suite', 2, 450000, 2, true, 80000, 0),
+  ('c0000002-0000-4000-8000-000000000002', 'b0000002-0000-4000-8000-000000000002', 'Garden View Suite', 'Suite', 2, 620000, 3, true, 100000, 0),
+  ('c0000003-0000-4000-8000-000000000003', 'b0000003-0000-4000-8000-000000000003', 'Deluxe Double', 'Deluxe', 2, 380000, 4, false, 0, 0)
+on conflict (id) do update set
+  extra_bed_available = excluded.extra_bed_available,
+  extra_bed_price_per_night_minor = excluded.extra_bed_price_per_night_minor;

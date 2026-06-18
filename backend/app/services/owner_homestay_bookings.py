@@ -55,6 +55,8 @@ def _map_homestay_booking(row: dict) -> HomestayBookingSummary:
         checkInTime=_format_time(stay.get("check_in_time")),
         checkOutTime=_format_time(stay.get("check_out_time")),
         homestayAddress=stay.get("address"),
+        roomCount=int(row.get("room_count") or 1),
+        extraBedCount=int(row.get("extra_bed_count") or 0),
     )
 
 

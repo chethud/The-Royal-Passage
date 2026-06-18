@@ -39,6 +39,8 @@ function BookHomestayPage() {
     checkOut: search.checkOut,
     guests: search.guests,
     roomId: search.roomId,
+    roomCount: search.roomCount,
+    extraBeds: search.extraBeds,
   });
 
   useEffect(() => {
@@ -93,6 +95,9 @@ function BookHomestayPage() {
             initialCheckIn={search.checkIn}
             initialCheckOut={search.checkOut}
             initialGuests={search.guests}
+            initialRoomId={search.roomId}
+            initialRoomCount={search.roomCount}
+            initialExtraBeds={search.extraBeds}
             backLink={{
               to: "/homestays/$slug",
               params: { slug: stay.slug },

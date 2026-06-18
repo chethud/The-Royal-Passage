@@ -146,6 +146,8 @@ def _map_room(row: dict) -> OwnerHomestayRoom:
         amenities=row.get("amenities") or [],
         sortOrder=int(row.get("sort_order") or 0),
         isActive=bool(row.get("is_active", True)),
+        extraBedAvailable=bool(row.get("extra_bed_available", False)),
+        extraBedPricePerNightMinor=int(row.get("extra_bed_price_per_night_minor") or 0),
     )
 
 
@@ -425,6 +427,8 @@ def create_owner_homestay_room(
             "total_units": payload.totalUnits,
             "amenities": payload.amenities,
             "sort_order": payload.sortOrder,
+            "extra_bed_available": payload.extraBedAvailable,
+            "extra_bed_price_per_night_minor": payload.extraBedPricePerNightMinor,
         }
     ).execute()
 
@@ -467,6 +471,10 @@ def update_owner_homestay_room(
         updates["sort_order"] = payload.sortOrder
     if payload.isActive is not None:
         updates["is_active"] = payload.isActive
+    if payload.extraBedAvailable is not None:
+        updates["extra_bed_available"] = payload.extraBedAvailable
+    if payload.extraBedPricePerNightMinor is not None:
+        updates["extra_bed_price_per_night_minor"] = payload.extraBedPricePerNightMinor
 
     if updates:
         supabase.table("homestay_rooms").update(updates).eq("id", room_id).execute()

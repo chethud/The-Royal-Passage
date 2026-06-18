@@ -29,6 +29,9 @@ type HomestayCheckoutWizardProps = {
   initialCheckOut?: string;
 
   initialGuests?: number;
+  initialRoomId?: string;
+  initialRoomCount?: number;
+  initialExtraBeds?: number;
 
   onSuccess: (bookingId: string) => void;
 
@@ -70,6 +73,12 @@ export function HomestayCheckoutWizard({
 
   initialGuests,
 
+  initialRoomId,
+
+  initialRoomCount,
+
+  initialExtraBeds,
+
   onSuccess,
 
   backLink,
@@ -83,6 +92,12 @@ export function HomestayCheckoutWizard({
     initialCheckOut,
 
     initialGuests,
+
+    initialRoomId,
+
+    initialRoomCount,
+
+    initialExtraBeds,
 
   });
 
@@ -230,6 +245,18 @@ export function HomestayCheckoutWizard({
 
               guests={checkout.guests}
 
+              roomId={checkout.roomId}
+
+              roomCount={checkout.roomCount}
+
+              extraBedCount={checkout.extraBedCount}
+
+              maxGuests={checkout.maxGuests}
+
+              maxRooms={checkout.maxRooms}
+
+              maxExtraBeds={checkout.maxExtra}
+
               notes={checkout.notes}
 
               nights={checkout.nights}
@@ -241,6 +268,12 @@ export function HomestayCheckoutWizard({
               onCheckOutChange={checkout.setCheckOut}
 
               onGuestsChange={checkout.setGuests}
+
+              onRoomIdChange={checkout.setRoomId}
+
+              onRoomCountChange={checkout.setRoomCount}
+
+              onExtraBedCountChange={checkout.setExtraBedCount}
 
               onNotesChange={checkout.setNotes}
 
@@ -385,6 +418,40 @@ export function HomestayCheckoutWizard({
               <dd>{checkout.guests}</dd>
 
             </div>
+
+            {checkout.selectedRoom ? (
+
+              <>
+
+                <div className="flex justify-between gap-4 border-b luxury-panel-divider pb-3">
+
+                  <dt>Room</dt>
+
+                  <dd className="text-right">
+
+                    {checkout.selectedRoom.name}
+
+                    {checkout.roomCount > 1 ? ` × ${checkout.roomCount}` : ""}
+
+                  </dd>
+
+                </div>
+
+                {checkout.extraBedCount > 0 ? (
+
+                  <div className="flex justify-between gap-4 border-b luxury-panel-divider pb-3">
+
+                    <dt>Extra beds</dt>
+
+                    <dd>{checkout.extraBedCount}</dd>
+
+                  </div>
+
+                ) : null}
+
+              </>
+
+            ) : null}
 
             <div className="flex justify-between gap-4 border-b luxury-panel-divider pb-3">
 

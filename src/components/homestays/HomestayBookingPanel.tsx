@@ -2,6 +2,7 @@ import { Minus, Plus } from "lucide-react";
 import { PayAtHomestayBadge } from "@/components/homestays/PayAtHomestayBadge";
 import type { Homestay } from "@/data/homestays";
 import { formatDateLong } from "@/lib/date-format";
+import { getActiveRooms } from "@/lib/homestay-room-pricing";
 import { formatMoney } from "@/lib/money";
 import { formatTime12h } from "@/lib/weekday-slots";
 
@@ -10,12 +11,21 @@ type HomestayBookingPanelProps = {
   checkIn: string;
   checkOut: string;
   guests: number;
+  roomId?: string;
+  roomCount: number;
+  extraBedCount: number;
+  maxGuests: number;
+  maxRooms: number;
+  maxExtraBeds: number;
   notes: string;
   nights: number;
   totalMinor: number;
   onCheckInChange: (value: string) => void;
   onCheckOutChange: (value: string) => void;
   onGuestsChange: (value: number) => void;
+  onRoomIdChange?: (value: string) => void;
+  onRoomCountChange?: (value: number) => void;
+  onExtraBedCountChange?: (value: number) => void;
   onNotesChange: (value: string) => void;
   onConfirm?: () => void;
   busy?: boolean;
@@ -24,17 +34,72 @@ type HomestayBookingPanelProps = {
   bookable?: boolean;
 };
 
+function Stepper({
+  label,
+  hint,
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-6">
+      <div>
+        <div className="eyebrow luxury-panel-label">{label}</div>
+        {hint ? <p className="luxury-panel-body mt-1 text-xs">{hint}</p> : null}
+      </div>
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          aria-label={`Decrease ${label.toLowerCase()}`}
+          disabled={value <= min}
+          onClick={() => onChange(Math.max(min, value - 1))}
+          className="inline-flex h-9 w-9 items-center justify-center text-[#4A0000]/80 transition-colors hover:text-[#4A0000] disabled:opacity-35"
+        >
+          <Minus className="h-4 w-4" strokeWidth={1.75} />
+        </button>
+        <span className="w-8 text-center font-display text-2xl text-[#4A0000]">{value}</span>
+        <button
+          type="button"
+          aria-label={`Increase ${label.toLowerCase()}`}
+          disabled={value >= max}
+          onClick={() => onChange(Math.min(max, value + 1))}
+          className="inline-flex h-9 w-9 items-center justify-center text-[#4A0000]/80 transition-colors hover:text-[#4A0000] disabled:opacity-35"
+        >
+          <Plus className="h-4 w-4" strokeWidth={1.75} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function HomestayBookingPanel({
   stay,
   checkIn,
   checkOut,
   guests,
+  roomId,
+  roomCount,
+  extraBedCount,
+  maxGuests,
+  maxRooms,
+  maxExtraBeds,
   notes,
   nights,
   totalMinor,
   onCheckInChange,
   onCheckOutChange,
   onGuestsChange,
+  onRoomIdChange,
+  onRoomCountChange,
+  onExtraBedCountChange,
   onNotesChange,
   onConfirm,
   busy = false,
@@ -44,6 +109,9 @@ export function HomestayBookingPanel({
 }: HomestayBookingPanelProps) {
   const sym = stay.currencySymbol ?? "₹";
   const today = new Date().toISOString().slice(0, 10);
+  const rooms = getActiveRooms(stay);
+  const selectedRoom = rooms.find((room) => room.id === roomId) ?? (rooms.length === 1 ? rooms[0] : undefined);
+  const nightlyRate = selectedRoom?.pricePerNight ?? stay.pricePerNight;
 
   return (
     <div className="space-y-8">
@@ -77,33 +145,69 @@ export function HomestayBookingPanel({
         </label>
       </div>
 
-      <div className="flex items-center justify-between gap-6">
+      {rooms.length > 1 ? (
         <div>
-          <div className="eyebrow luxury-panel-label">Guests</div>
-          <p className="luxury-panel-body mt-1 text-xs">Up to {stay.maxGuests} guests</p>
+          <div className="eyebrow luxury-panel-label mb-3">Room type</div>
+          <div className="grid gap-2">
+            {rooms.map((room) => {
+              const active = roomId === room.id;
+              return (
+                <button
+                  key={room.id}
+                  type="button"
+                  onClick={() => onRoomIdChange?.(room.id)}
+                  className={`rounded-sm border px-4 py-3 text-left text-sm transition-colors ${
+                    active
+                      ? "border-[#4A0000]/50 bg-[rgb(74_0_0/0.06)] luxury-panel-heading"
+                      : "border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.45)] luxury-panel-body hover:border-[#4A0000]/35"
+                  }`}
+                >
+                  <span className="font-medium">{room.name}</span>
+                  <span className="mt-1 block text-xs">
+                    {room.capacity} guests · up to {room.totalUnits} room{room.totalUnits === 1 ? "" : "s"} ·{" "}
+                    {sym}
+                    {room.pricePerNight.toLocaleString("en-IN")}/night
+                    {room.extraBedAvailable
+                      ? ` · extra bed ${sym}${room.extraBedPricePerNight.toLocaleString("en-IN")}/night`
+                      : ""}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            aria-label="Decrease guest count"
-            disabled={guests <= 1}
-            onClick={() => onGuestsChange(Math.max(1, guests - 1))}
-            className="inline-flex h-9 w-9 items-center justify-center text-[#4A0000]/80 transition-colors hover:text-[#4A0000] disabled:opacity-35"
-          >
-            <Minus className="h-4 w-4" strokeWidth={1.75} />
-          </button>
-          <span className="w-8 text-center font-display text-2xl text-[#4A0000]">{guests}</span>
-          <button
-            type="button"
-            aria-label="Increase guest count"
-            disabled={guests >= stay.maxGuests}
-            onClick={() => onGuestsChange(Math.min(stay.maxGuests, guests + 1))}
-            className="inline-flex h-9 w-9 items-center justify-center text-[#4A0000]/80 transition-colors hover:text-[#4A0000] disabled:opacity-35"
-          >
-            <Plus className="h-4 w-4" strokeWidth={1.75} />
-          </button>
-        </div>
-      </div>
+      ) : null}
+
+      {rooms.length > 0 && selectedRoom ? (
+        <Stepper
+          label="Rooms"
+          hint={`Up to ${maxRooms} available`}
+          value={roomCount}
+          min={1}
+          max={maxRooms}
+          onChange={(value) => onRoomCountChange?.(value)}
+        />
+      ) : null}
+
+      <Stepper
+        label="Guests"
+        hint={`Up to ${maxGuests} with this selection`}
+        value={guests}
+        min={1}
+        max={maxGuests}
+        onChange={onGuestsChange}
+      />
+
+      {selectedRoom?.extraBedAvailable && maxExtraBeds > 0 ? (
+        <Stepper
+          label="Extra beds"
+          hint={`${sym}${selectedRoom.extraBedPricePerNight.toLocaleString("en-IN")}/night each · max ${maxExtraBeds}`}
+          value={extraBedCount}
+          min={0}
+          max={maxExtraBeds}
+          onChange={(value) => onExtraBedCountChange?.(value)}
+        />
+      ) : null}
 
       <div>
         <h2 className="eyebrow luxury-panel-label mb-3">Notes (optional)</h2>
@@ -123,7 +227,11 @@ export function HomestayBookingPanel({
           <div className="eyebrow luxury-panel-label">Estimated total</div>
           <div className="luxury-panel-body mt-1 text-xs">
             {sym}
-            {stay.pricePerNight.toLocaleString("en-IN")} × {nights} night{nights === 1 ? "" : "s"}
+            {nightlyRate.toLocaleString("en-IN")} × {roomCount} room{roomCount === 1 ? "" : "s"}
+            {extraBedCount > 0 && selectedRoom
+              ? ` + ${sym}${selectedRoom.extraBedPricePerNight.toLocaleString("en-IN")} × ${extraBedCount} extra bed${extraBedCount === 1 ? "" : "s"}`
+              : ""}{" "}
+            × {nights} night{nights === 1 ? "" : "s"}
           </div>
           {checkIn && checkOut ? (
             <div className="luxury-panel-body mt-1 text-xs">

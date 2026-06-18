@@ -35,10 +35,11 @@ def _has_booking_overlap(
     room_id: str | None,
     check_in: date,
     check_out: date,
+    requested_units: int = 1,
 ) -> bool:
     query = (
         supabase.table("homestay_bookings")
-        .select("id")
+        .select("id, room_count")
         .eq("homestay_id", homestay_id)
         .in_("booking_status", ["pending", "confirmed"])
         .lt("check_in", check_out.isoformat())
@@ -46,7 +47,19 @@ def _has_booking_overlap(
     )
     if room_id:
         query = query.eq("room_id", room_id)
-    result = query.limit(1).execute()
+    result = query.execute()
+    booked_units = sum(int(row.get("room_count") or 1) for row in (result.data or []))
+    if room_id:
+        room_result = (
+            supabase.table("homestay_rooms")
+            .select("total_units")
+            .eq("id", room_id)
+            .maybe_single()
+            .execute()
+        )
+        room_data = room_result.data if room_result else None
+        total_units = int((room_data or {}).get("total_units") or 1)
+        return booked_units + requested_units > total_units
     return bool(result.data)
 
 
@@ -107,11 +120,14 @@ def create_homestay_booking(
     max_guests = int(stay.get("max_guests") or 2)
     if payload.guestCount < 1:
         raise ValueError("At least one guest is required.")
-    if payload.guestCount > max_guests:
-        raise ValueError(f"This property allows at most {max_guests} guest(s).")
 
     room_id = payload.roomId
+    room_count = max(1, int(payload.roomCount or 1))
+    extra_bed_count = max(0, int(payload.extraBedCount or 0))
     price_per_night_minor = int(stay.get("price_per_night_minor") or 0)
+    extra_bed_price_minor = 0
+    room_capacity = max_guests
+
     if room_id:
         room_result = (
             supabase.table("homestay_rooms")
@@ -125,12 +141,33 @@ def create_homestay_booking(
         room = room_result.data if room_result else None
         if not room:
             raise ValueError("Room not found.")
-        if payload.guestCount > int(room.get("capacity") or max_guests):
-            raise ValueError("Too many guests for the selected room.")
+        total_units = int(room.get("total_units") or 1)
+        if room_count > total_units:
+            raise ValueError(f"Only {total_units} unit(s) available for this room type.")
+        room_capacity = int(room.get("capacity") or max_guests)
         price_per_night_minor = int(room.get("price_per_night_minor") or price_per_night_minor)
+        extra_bed_available = bool(room.get("extra_bed_available", False))
+        extra_bed_price_minor = int(room.get("extra_bed_price_per_night_minor") or 0)
+        if extra_bed_count > 0 and not extra_bed_available:
+            raise ValueError("Extra beds are not available for this room type.")
+        if extra_bed_count > room_count:
+            raise ValueError("You can add at most one extra bed per room.")
+        max_allowed_guests = room_count * room_capacity + extra_bed_count
+        if payload.guestCount > max_allowed_guests:
+            raise ValueError(
+                f"This selection allows up to {max_allowed_guests} guest(s) "
+                f"({room_count} room(s) × {room_capacity} + {extra_bed_count} extra bed(s))."
+            )
+    else:
+        if room_count > 1:
+            raise ValueError("Select a room type when booking multiple rooms.")
+        if extra_bed_count > 0:
+            raise ValueError("Extra beds are only available when a room type is selected.")
+        if payload.guestCount > max_guests:
+            raise ValueError(f"This property allows at most {max_guests} guest(s).")
 
-    if _has_booking_overlap(supabase, stay["id"], room_id, check_in, check_out):
-        raise ValueError("Selected dates are not available.")
+    if _has_booking_overlap(supabase, stay["id"], room_id, check_in, check_out, room_count):
+        raise ValueError("Selected dates are not available for the requested number of rooms.")
 
     day = check_in
     while day < check_out:
@@ -138,7 +175,8 @@ def create_homestay_booking(
             raise ValueError("One or more nights are blocked on the calendar.")
         day += timedelta(days=1)
 
-    subtotal_minor = price_per_night_minor * nights
+    nightly_minor = price_per_night_minor * room_count + extra_bed_price_minor * extra_bed_count
+    subtotal_minor = nightly_minor * nights
     commission_percent = _commission_percent(supabase)
     platform_fee_minor = round((subtotal_minor * commission_percent) / 100)
     host_payout_minor = subtotal_minor - platform_fee_minor
@@ -150,6 +188,8 @@ def create_homestay_booking(
         "check_in": check_in.isoformat(),
         "check_out": check_out.isoformat(),
         "guest_count": payload.guestCount,
+        "room_count": room_count,
+        "extra_bed_count": extra_bed_count,
         "subtotal_minor": subtotal_minor,
         "total_amount": subtotal_minor,
         "platform_fee_minor": platform_fee_minor,

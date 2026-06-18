@@ -8,6 +8,8 @@ export type CreateHomestayBookingPayload = {
   checkIn: string;
   checkOut: string;
   guestCount: number;
+  roomCount?: number;
+  extraBedCount?: number;
   notes?: string;
 };
 

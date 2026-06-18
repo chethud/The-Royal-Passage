@@ -1,5 +1,19 @@
 import type { Homestay as ProtoHomestay } from "@/gen/royalpassage/v1/types_pb";
-import type { Homestay, HomestayAmenity } from "@/data/homestays";
+import type { Homestay, HomestayAmenity, HomestayRoom } from "@/data/homestays";
+
+function mapProtoRoom(room: NonNullable<ProtoHomestay["rooms"]>[number]): HomestayRoom {
+  return {
+    id: room.id,
+    name: room.name,
+    category: room.category,
+    capacity: room.capacity,
+    pricePerNight: room.pricePerNight,
+    totalUnits: room.totalUnits,
+    amenities: room.amenities ?? [],
+    extraBedAvailable: room.extraBedAvailable,
+    extraBedPricePerNight: room.extraBedPricePerNight,
+  };
+}
 
 export function mapProtoHomestay(stay: ProtoHomestay): Homestay {
   const galleryUrls =
@@ -28,5 +42,6 @@ export function mapProtoHomestay(stay: ProtoHomestay): Homestay {
     checkInTime: stay.checkInTime,
     checkOutTime: stay.checkOutTime,
     houseRules: stay.houseRules ?? [],
+    rooms: stay.rooms?.length ? stay.rooms.map(mapProtoRoom) : undefined,
   };
 }
