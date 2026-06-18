@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import type { CitySummary } from "@/lib/cities";
 import {
   HOMESTAY_PROPERTY_TYPES,
@@ -6,7 +7,6 @@ import {
   type OwnerHomestayDetail,
   type UpdateOwnerHomestayPayload,
 } from "@/lib/api/owner-homestays";
-import { parseRupeeMajorInput } from "@/lib/money";
 
 type OwnerHomestayFormProps = {
   cities: CitySummary[];
@@ -15,6 +15,10 @@ type OwnerHomestayFormProps = {
   saving?: boolean;
   onSubmit: (payload: CreateOwnerHomestayPayload | UpdateOwnerHomestayPayload) => Promise<void>;
 };
+
+const labelClass = "eyebrow luxury-panel-label block text-xs uppercase tracking-[0.12em]";
+const inputClass = "luxury-input mt-1 w-full";
+const numberInputClass = `${inputClass} input-no-spin`;
 
 function splitLines(value: string): string[] {
   return value
@@ -38,7 +42,7 @@ export function OwnerHomestayForm({
   const [region, setRegion] = useState(initial?.region ?? "");
   const [address, setAddress] = useState(initial?.address ?? "");
   const [priceMajor, setPriceMajor] = useState(
-    String(Math.round((initial?.pricePerNightMinor ?? 0) / 100) || ""),
+    Math.round((initial?.pricePerNightMinor ?? 0) / 100) || 0,
   );
   const [heroImageUrl, setHeroImageUrl] = useState(initial?.heroImageUrl ?? "");
   const [galleryText, setGalleryText] = useState((initial?.galleryUrls ?? []).join("\n"));
@@ -61,7 +65,7 @@ export function OwnerHomestayForm({
       citySlug,
       region: region.trim() || undefined,
       address: address.trim() || undefined,
-      pricePerNightMinor: parseRupeeMajorInput(priceMajor) * 100,
+      pricePerNightMinor: priceMajor * 100,
       heroImageUrl: heroImageUrl.trim() || undefined,
       galleryUrls: splitLines(galleryText),
       amenities: splitLines(amenitiesText),
@@ -80,9 +84,9 @@ export function OwnerHomestayForm({
     <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Title</span>
+          <span className={labelClass}>Title</span>
           <input
-            className="luxury-input mt-2 w-full"
+            className={inputClass}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -90,9 +94,9 @@ export function OwnerHomestayForm({
           />
         </label>
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Property type</span>
+          <span className={labelClass}>Property type</span>
           <select
-            className="luxury-input mt-2 w-full"
+            className={inputClass}
             value={propertyType}
             onChange={(e) => setPropertyType(e.target.value)}
             disabled={disabled || saving}
@@ -107,9 +111,9 @@ export function OwnerHomestayForm({
       </div>
 
       <label className="block">
-        <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Tagline</span>
+        <span className={labelClass}>Tagline</span>
         <input
-          className="luxury-input mt-2 w-full"
+          className={inputClass}
           value={tagline}
           onChange={(e) => setTagline(e.target.value)}
           disabled={disabled || saving}
@@ -117,9 +121,9 @@ export function OwnerHomestayForm({
       </label>
 
       <label className="block">
-        <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Description</span>
+        <span className={labelClass}>Description</span>
         <textarea
-          className="luxury-input mt-2 min-h-32 w-full"
+          className={`${inputClass} min-h-32`}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
@@ -129,9 +133,9 @@ export function OwnerHomestayForm({
 
       <div className="grid gap-4 md:grid-cols-3">
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">City</span>
+          <span className={labelClass}>City</span>
           <select
-            className="luxury-input mt-2 w-full"
+            className={inputClass}
             value={citySlug}
             onChange={(e) => setCitySlug(e.target.value)}
             disabled={disabled || saving}
@@ -144,30 +148,29 @@ export function OwnerHomestayForm({
           </select>
         </label>
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Region</span>
+          <span className={labelClass}>Region</span>
           <input
-            className="luxury-input mt-2 w-full"
+            className={inputClass}
             value={region}
             onChange={(e) => setRegion(e.target.value)}
             disabled={disabled || saving}
           />
         </label>
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Price / night (₹)</span>
-          <input
-            className="luxury-input mt-2 w-full"
+          <span className={labelClass}>Price / night (₹)</span>
+          <RupeeAmountInput
+            className={inputClass}
             value={priceMajor}
-            onChange={(e) => setPriceMajor(e.target.value)}
-            required
+            onChange={setPriceMajor}
             disabled={disabled || saving}
           />
         </label>
       </div>
 
       <label className="block">
-        <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Address</span>
+        <span className={labelClass}>Address</span>
         <input
-          className="luxury-input mt-2 w-full"
+          className={inputClass}
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           disabled={disabled || saving}
@@ -176,9 +179,9 @@ export function OwnerHomestayForm({
 
       <div className="grid gap-4 md:grid-cols-3">
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Bedrooms</span>
+          <span className={labelClass}>Bedrooms</span>
           <input
-            className="luxury-input mt-2 w-full"
+            className={numberInputClass}
             type="number"
             min={1}
             value={bedrooms}
@@ -187,9 +190,9 @@ export function OwnerHomestayForm({
           />
         </label>
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Bathrooms</span>
+          <span className={labelClass}>Bathrooms</span>
           <input
-            className="luxury-input mt-2 w-full"
+            className={numberInputClass}
             type="number"
             min={1}
             value={bathrooms}
@@ -198,9 +201,9 @@ export function OwnerHomestayForm({
           />
         </label>
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Max guests</span>
+          <span className={labelClass}>Max guests</span>
           <input
-            className="luxury-input mt-2 w-full"
+            className={numberInputClass}
             type="number"
             min={1}
             value={maxGuests}
@@ -212,9 +215,9 @@ export function OwnerHomestayForm({
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Check-in time</span>
+          <span className={labelClass}>Check-in time</span>
           <input
-            className="luxury-input mt-2 w-full"
+            className={inputClass}
             type="time"
             value={checkInTime}
             onChange={(e) => setCheckInTime(e.target.value)}
@@ -222,9 +225,9 @@ export function OwnerHomestayForm({
           />
         </label>
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Check-out time</span>
+          <span className={labelClass}>Check-out time</span>
           <input
-            className="luxury-input mt-2 w-full"
+            className={inputClass}
             type="time"
             value={checkOutTime}
             onChange={(e) => setCheckOutTime(e.target.value)}
@@ -234,9 +237,9 @@ export function OwnerHomestayForm({
       </div>
 
       <label className="block">
-        <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Hero image URL</span>
+        <span className={labelClass}>Hero image URL</span>
         <input
-          className="luxury-input mt-2 w-full"
+          className={inputClass}
           value={heroImageUrl}
           onChange={(e) => setHeroImageUrl(e.target.value)}
           disabled={disabled || saving}
@@ -244,9 +247,9 @@ export function OwnerHomestayForm({
       </label>
 
       <label className="block">
-        <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Gallery URLs (one per line)</span>
+        <span className={labelClass}>Gallery URLs (one per line)</span>
         <textarea
-          className="luxury-input mt-2 min-h-24 w-full"
+          className={`${inputClass} min-h-24`}
           value={galleryText}
           onChange={(e) => setGalleryText(e.target.value)}
           disabled={disabled || saving}
@@ -255,18 +258,18 @@ export function OwnerHomestayForm({
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">Amenities (one per line)</span>
+          <span className={labelClass}>Amenities (one per line)</span>
           <textarea
-            className="luxury-input mt-2 min-h-24 w-full"
+            className={`${inputClass} min-h-24`}
             value={amenitiesText}
             onChange={(e) => setAmenitiesText(e.target.value)}
             disabled={disabled || saving}
           />
         </label>
         <label className="block">
-          <span className="luxury-panel-label text-xs uppercase tracking-[0.12em]">House rules (one per line)</span>
+          <span className={labelClass}>House rules (one per line)</span>
           <textarea
-            className="luxury-input mt-2 min-h-24 w-full"
+            className={`${inputClass} min-h-24`}
             value={houseRulesText}
             onChange={(e) => setHouseRulesText(e.target.value)}
             disabled={disabled || saving}
@@ -287,7 +290,7 @@ export function OwnerHomestayForm({
       ) : null}
 
       {!disabled ? (
-        <button type="submit" className="luxury-btn luxury-btn-primary" disabled={saving}>
+        <button type="submit" className="luxury-btn-primary" disabled={saving}>
           {saving ? "Saving…" : initial ? "Save property" : "Create property"}
         </button>
       ) : null}

@@ -569,6 +569,45 @@
   box-shadow: 0 10px 28px -14px rgb(58 0 0 / 0.18);
 }
 
+/* Cream-panel inputs — matches host add experience wizard */
+.luxury-input {
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgb(74 0 0 / 0.2);
+  background: rgb(255 255 255 / 0.55);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: rgb(58 0 0 / 0.88);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.luxury-input::placeholder {
+  color: rgb(58 0 0 / 0.4);
+}
+
+.luxury-input:focus {
+  border-color: rgb(74 0 0 / 0.5);
+  background: rgb(255 255 255 / 0.72);
+  outline: none;
+  box-shadow: 0 0 0 1px rgb(74 0 0 / 0.25);
+}
+
+.luxury-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.luxury-checkout-panel select.luxury-input,
+.luxury-checkout-panel .luxury-input[type="date"],
+.luxury-checkout-panel .luxury-input[type="time"] {
+  color: rgb(58 0 0 / 0.88);
+}
+
 .luxury-checkout-panel .hairline {
   background: linear-gradient(90deg, transparent, rgb(74 0 0 / 0.28), transparent);
 }
