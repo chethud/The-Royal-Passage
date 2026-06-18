@@ -104,6 +104,8 @@ class Homestay(BaseModel):
     currencySymbol: str | None = "₹"
     ownerName: str = "Host"
     rooms: list[HomestayRoom] = Field(default_factory=list)
+    extraBedAvailable: bool = False
+    extraBedPricePerNight: int = 0
 
 
 class ListHomestaysResponse(BaseModel):
@@ -218,6 +220,8 @@ class OwnerHomestayDetail(BaseModel):
     availability: list[OwnerHomestayAvailability] = Field(default_factory=list)
     createdAt: str
     updatedAt: str
+    extraBedAvailable: bool = False
+    extraBedPricePerNightMinor: int = 0
 
 
 class CreateOwnerHomestayRequest(BaseModel):
@@ -242,6 +246,8 @@ class CreateOwnerHomestayRequest(BaseModel):
     checkInTime: str | None = Field(default=None, max_length=8)
     checkOutTime: str | None = Field(default=None, max_length=8)
     submitForReview: bool = False
+    extraBedAvailable: bool = False
+    extraBedPricePerNightMinor: int = Field(default=0, ge=0)
 
 
 class UpdateOwnerHomestayRequest(BaseModel):
@@ -266,6 +272,8 @@ class UpdateOwnerHomestayRequest(BaseModel):
     checkInTime: str | None = Field(default=None, max_length=8)
     checkOutTime: str | None = Field(default=None, max_length=8)
     submitForReview: bool = False
+    extraBedAvailable: bool | None = None
+    extraBedPricePerNightMinor: int | None = Field(default=None, ge=0)
 
 
 class CreateOwnerHomestayRoomRequest(BaseModel):

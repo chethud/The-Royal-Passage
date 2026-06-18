@@ -94,6 +94,8 @@ export type OwnerHomestayDetail = {
   availability: OwnerHomestayAvailability[];
   createdAt: string;
   updatedAt: string;
+  extraBedAvailable: boolean;
+  extraBedPricePerNightMinor: number;
 };
 
 export type CreateOwnerHomestayPayload = {
@@ -118,6 +120,8 @@ export type CreateOwnerHomestayPayload = {
   checkInTime?: string;
   checkOutTime?: string;
   submitForReview?: boolean;
+  extraBedAvailable?: boolean;
+  extraBedPricePerNightMinor?: number;
 };
 
 export type UpdateOwnerHomestayPayload = Partial<CreateOwnerHomestayPayload>;

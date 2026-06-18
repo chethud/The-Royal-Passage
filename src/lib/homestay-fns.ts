@@ -102,6 +102,8 @@ async function loadHomestaysFromDb(citySlug = "mysuru"): Promise<Homestay[]> {
       checkInTime: String(row.check_in_time ?? "14:00").slice(0, 5),
       checkOutTime: String(row.check_out_time ?? "11:00").slice(0, 5),
       rooms: rooms.length ? rooms.map(mapDbRoom) : undefined,
+      extraBedAvailable: Boolean(row.extra_bed_available),
+      extraBedPricePerNight: Math.round(Number(row.extra_bed_price_per_night_minor ?? 0) / 100),
     };
   })
     .filter(isMysuruHomestay);

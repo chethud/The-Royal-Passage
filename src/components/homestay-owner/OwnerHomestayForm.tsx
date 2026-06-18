@@ -60,7 +60,12 @@ export function OwnerHomestayForm({
   const [maxGuests, setMaxGuests] = useState(String(initial?.maxGuests ?? 2));
   const [checkInTime, setCheckInTime] = useState(initial?.checkInTime ?? "14:00");
   const [checkOutTime, setCheckOutTime] = useState(initial?.checkOutTime ?? "11:00");
+  const [extraBedAvailable, setExtraBedAvailable] = useState(initial?.extraBedAvailable ?? false);
+  const [extraBedPriceMajor, setExtraBedPriceMajor] = useState(
+    Math.round((initial?.extraBedPricePerNightMinor ?? 0) / 100) || 0,
+  );
   const [submitForReview, setSubmitForReview] = useState(false);
+  const bedroomCount = Number.parseInt(bedrooms, 10) || 1;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -83,6 +88,8 @@ export function OwnerHomestayForm({
       maxGuests: Number.parseInt(maxGuests, 10) || 2,
       checkInTime,
       checkOutTime,
+      extraBedAvailable,
+      extraBedPricePerNightMinor: extraBedAvailable ? extraBedPriceMajor * 100 : 0,
       submitForReview,
     };
     await onSubmit(payload);
@@ -242,6 +249,36 @@ export function OwnerHomestayForm({
             disabled={disabled || saving}
           />
         </label>
+      </div>
+
+      <div className="space-y-3 rounded-sm border border-[rgb(74_0_0/0.12)] bg-[rgb(255_255_255/0.25)] p-4">
+        <label className="flex items-center gap-2 text-sm luxury-panel-body">
+          <input
+            type="checkbox"
+            checked={extraBedAvailable}
+            onChange={(e) => setExtraBedAvailable(e.target.checked)}
+            disabled={disabled || saving}
+            className="rounded border-[rgb(74_0_0/0.3)]"
+          />
+          Extra bed available
+        </label>
+        {extraBedAvailable ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="block">
+              <span className={labelClass}>Extra bed price / night (₹)</span>
+              <RupeeAmountInput
+                className={inputClass}
+                value={extraBedPriceMajor}
+                onChange={setExtraBedPriceMajor}
+                disabled={disabled || saving}
+                required
+              />
+            </label>
+            <p className="luxury-panel-body self-end pb-2 text-xs leading-relaxed">
+              Guests can add up to one extra bed per bedroom ({bedroomCount} max for this property).
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <div className="rounded-sm border border-[rgb(74_0_0/0.15)] bg-[rgb(255_255_255/0.35)] p-4 sm:p-5">

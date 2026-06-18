@@ -112,6 +112,8 @@ export function HomestayBookingPanel({
   const rooms = getActiveRooms(stay);
   const selectedRoom = rooms.find((room) => room.id === roomId) ?? (rooms.length === 1 ? rooms[0] : undefined);
   const nightlyRate = selectedRoom?.pricePerNight ?? stay.pricePerNight;
+  const extraBedPrice = selectedRoom?.extraBedPricePerNight ?? stay.extraBedPricePerNight ?? 0;
+  const showExtraBeds = maxExtraBeds > 0;
 
   return (
     <div className="space-y-8">
@@ -198,10 +200,10 @@ export function HomestayBookingPanel({
         onChange={onGuestsChange}
       />
 
-      {selectedRoom?.extraBedAvailable && maxExtraBeds > 0 ? (
+      {showExtraBeds ? (
         <Stepper
           label="Extra beds"
-          hint={`${sym}${selectedRoom.extraBedPricePerNight.toLocaleString("en-IN")}/night each · max ${maxExtraBeds}`}
+          hint={`${sym}${extraBedPrice.toLocaleString("en-IN")}/night each · max ${maxExtraBeds} (one per bedroom)`}
           value={extraBedCount}
           min={0}
           max={maxExtraBeds}
@@ -228,8 +230,8 @@ export function HomestayBookingPanel({
           <div className="luxury-panel-body mt-1 text-xs">
             {sym}
             {nightlyRate.toLocaleString("en-IN")} × {roomCount} room{roomCount === 1 ? "" : "s"}
-            {extraBedCount > 0 && selectedRoom
-              ? ` + ${sym}${selectedRoom.extraBedPricePerNight.toLocaleString("en-IN")} × ${extraBedCount} extra bed${extraBedCount === 1 ? "" : "s"}`
+            {extraBedCount > 0
+              ? ` + ${sym}${extraBedPrice.toLocaleString("en-IN")} × ${extraBedCount} extra bed${extraBedCount === 1 ? "" : "s"}`
               : ""}{" "}
             × {nights} night{nights === 1 ? "" : "s"}
           </div>

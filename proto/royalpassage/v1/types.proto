@@ -576,6 +576,8 @@ message Homestay {
   optional string currency_symbol = 24;
   string owner_name = 25;
   repeated HomestayRoom rooms = 26;
+  bool extra_bed_available = 27;
+  int32 extra_bed_price_per_night = 28;
 }
 
 message ListHomestaysResponse {
@@ -690,6 +692,8 @@ message OwnerHomestayDetail {
   repeated OwnerHomestayAvailability availability = 26;
   string created_at = 27;
   string updated_at = 28;
+  bool extra_bed_available = 29;
+  int32 extra_bed_price_per_night_minor = 30;
 }
 
 message ListOwnerHomestaysResponse {
@@ -718,6 +722,8 @@ message CreateOwnerHomestayRequest {
   optional string check_in_time = 19;
   optional string check_out_time = 20;
   bool submit_for_review = 21;
+  bool extra_bed_available = 22;
+  int32 extra_bed_price_per_night_minor = 23;
 }
 
 message UpdateOwnerHomestayRequest {
@@ -742,6 +748,8 @@ message UpdateOwnerHomestayRequest {
   optional string check_in_time = 19;
   optional string check_out_time = 20;
   bool submit_for_review = 21;
+  optional bool extra_bed_available = 22;
+  optional int32 extra_bed_price_per_night_minor = 23;
 }
 
 message CreateOwnerHomestayRoomRequest {

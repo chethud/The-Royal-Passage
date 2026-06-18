@@ -11,23 +11,28 @@ export function getSelectedRoom(stay: Homestay, roomId?: string): HomestayRoom |
   return undefined;
 }
 
+export function usesPropertyLevelExtraBeds(stay: Homestay, room?: HomestayRoom): boolean {
+  return getActiveRooms(stay).length === 0 && !room && stay.extraBedAvailable;
+}
+
 export function maxRoomCount(room: HomestayRoom | undefined): number {
   return room?.totalUnits ?? 1;
 }
 
-export function maxExtraBeds(room: HomestayRoom | undefined, roomCount: number): number {
-  if (!room?.extraBedAvailable) return 0;
-  return roomCount;
+export function maxExtraBeds(stay: Homestay, room?: HomestayRoom, roomCount = 1): number {
+  if (room?.extraBedAvailable) return roomCount;
+  if (usesPropertyLevelExtraBeds(stay, room)) return stay.bedrooms;
+  return 0;
 }
 
 export function maxGuestsForSelection(
+  stay: Homestay,
   room: HomestayRoom | undefined,
   roomCount: number,
   extraBedCount: number,
-  fallbackMaxGuests: number,
 ): number {
-  if (!room) return fallbackMaxGuests;
-  return roomCount * room.capacity + extraBedCount;
+  if (room) return roomCount * room.capacity + extraBedCount;
+  return stay.maxGuests + extraBedCount;
 }
 
 export function calculateStayTotalMinor(
@@ -41,7 +46,7 @@ export function calculateStayTotalMinor(
 ) {
   const room = getSelectedRoom(stay, options.roomId);
   const pricePerNightMajor = room?.pricePerNight ?? stay.pricePerNight;
-  const extraBedPriceMajor = room?.extraBedPricePerNight ?? 0;
+  const extraBedPriceMajor = room?.extraBedPricePerNight ?? stay.extraBedPricePerNight ?? 0;
   const nightlyRateMinor =
     pricePerNightMajor * 100 * options.roomCount +
     extraBedPriceMajor * 100 * options.extraBedCount;

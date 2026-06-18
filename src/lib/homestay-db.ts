@@ -43,5 +43,7 @@ export function mapProtoHomestay(stay: ProtoHomestay): Homestay {
     checkOutTime: stay.checkOutTime,
     houseRules: stay.houseRules ?? [],
     rooms: stay.rooms?.length ? stay.rooms.map(mapProtoRoom) : undefined,
+    extraBedAvailable: stay.extraBedAvailable,
+    extraBedPricePerNight: stay.extraBedPricePerNight,
   };
 }

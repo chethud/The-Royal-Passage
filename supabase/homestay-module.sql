@@ -66,6 +66,8 @@ create table if not exists public.homestays (
   bedrooms integer not null default 1,
   bathrooms integer not null default 1,
   max_guests integer not null default 2,
+  extra_bed_available boolean not null default false,
+  extra_bed_price_per_night_minor integer not null default 0,
   rating_avg numeric(3,2) not null default 0,
   reviews_count integer not null default 0,
   status text not null default 'draft'
@@ -202,6 +204,11 @@ alter table public.homestay_bookings
   add column if not exists room_count integer not null default 1;
 alter table public.homestay_bookings
   add column if not exists extra_bed_count integer not null default 0;
+
+alter table public.homestays
+  add column if not exists extra_bed_available boolean not null default false;
+alter table public.homestays
+  add column if not exists extra_bed_price_per_night_minor integer not null default 0;
 
 -- ---------------------------------------------------------------------------
 insert into public.homestay_owners (id, full_name, email, phone, address, approval_status, verified) values

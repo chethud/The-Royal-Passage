@@ -161,10 +161,23 @@ def create_homestay_booking(
     else:
         if room_count > 1:
             raise ValueError("Select a room type when booking multiple rooms.")
+        bedrooms = int(stay.get("bedrooms") or 1)
+        property_extra_bed_available = bool(stay.get("extra_bed_available", False))
+        property_extra_bed_price_minor = int(stay.get("extra_bed_price_per_night_minor") or 0)
         if extra_bed_count > 0:
-            raise ValueError("Extra beds are only available when a room type is selected.")
-        if payload.guestCount > max_guests:
-            raise ValueError(f"This property allows at most {max_guests} guest(s).")
+            if not property_extra_bed_available:
+                raise ValueError("Extra beds are not available at this property.")
+            if extra_bed_count > bedrooms:
+                raise ValueError(
+                    f"You can add at most {bedrooms} extra bed(s) (one per bedroom)."
+                )
+            extra_bed_price_minor = property_extra_bed_price_minor
+        max_allowed_guests = max_guests + extra_bed_count
+        if payload.guestCount > max_allowed_guests:
+            raise ValueError(
+                f"This property allows up to {max_allowed_guests} guest(s) "
+                f"({max_guests} included + {extra_bed_count} extra bed(s))."
+            )
 
     if _has_booking_overlap(supabase, stay["id"], room_id, check_in, check_out, room_count):
         raise ValueError("Selected dates are not available for the requested number of rooms.")

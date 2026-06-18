@@ -10,6 +10,7 @@ import {
   maxExtraBeds,
   maxGuestsForSelection,
   maxRoomCount,
+  usesPropertyLevelExtraBeds,
 } from "@/lib/homestay-room-pricing";
 import { formatMoney } from "@/lib/money";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
@@ -56,12 +57,12 @@ export function useHomestayCheckout(
 
   const selectedRoom = useMemo(() => getSelectedRoom(homestay, roomId), [homestay, roomId]);
   const maxRooms = maxRoomCount(selectedRoom);
-  const maxExtra = maxExtraBeds(selectedRoom, roomCount);
+  const maxExtra = maxExtraBeds(homestay, selectedRoom, roomCount);
   const maxGuests = maxGuestsForSelection(
+    homestay,
     selectedRoom,
     roomCount,
     extraBedCount,
-    homestay.maxGuests,
   );
 
   useEffect(() => {
@@ -83,10 +84,10 @@ export function useHomestayCheckout(
   }, [maxGuests]);
 
   useEffect(() => {
-    if (!selectedRoom?.extraBedAvailable) {
+    if (!selectedRoom?.extraBedAvailable && !usesPropertyLevelExtraBeds(homestay, selectedRoom)) {
       setExtraBedCount(0);
     }
-  }, [selectedRoom]);
+  }, [homestay, selectedRoom]);
 
   const nights = useMemo(() => nightsBetween(checkIn, checkOut), [checkIn, checkOut]);
   const pricing = useMemo(

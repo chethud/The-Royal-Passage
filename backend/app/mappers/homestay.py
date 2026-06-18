@@ -67,4 +67,6 @@ def map_row_to_homestay(row: dict, rooms: list[dict]) -> Homestay:
         currencySymbol=_currency_symbol(row.get("currency_code") or "INR"),
         ownerName=owner.get("full_name") or "Host",
         rooms=ui_rooms,
+        extraBedAvailable=bool(row.get("extra_bed_available", False)),
+        extraBedPricePerNight=round(int(row.get("extra_bed_price_per_night_minor") or 0) / 100),
     )

@@ -194,6 +194,8 @@ def _map_owner_homestay(row: dict, rooms: list[dict], availability: list[dict]) 
         availability=[_map_availability(item) for item in availability],
         createdAt=row.get("created_at", ""),
         updatedAt=row.get("updated_at", ""),
+        extraBedAvailable=bool(row.get("extra_bed_available", False)),
+        extraBedPricePerNightMinor=int(row.get("extra_bed_price_per_night_minor") or 0),
     )
 
 
@@ -299,6 +301,8 @@ def create_owner_homestay(auth: dict, payload: CreateOwnerHomestayRequest) -> Ow
         "check_out_time": payload.checkOutTime or "11:00",
         "status": status,
         "currency_code": "INR",
+        "extra_bed_available": payload.extraBedAvailable,
+        "extra_bed_price_per_night_minor": payload.extraBedPricePerNightMinor if payload.extraBedAvailable else 0,
     }
     if payload.mapLink and payload.mapLink.strip():
         insert_row["map_link"] = payload.mapLink.strip()
@@ -374,6 +378,12 @@ def update_owner_homestay(
         updates["check_in_time"] = payload.checkInTime
     if payload.checkOutTime is not None:
         updates["check_out_time"] = payload.checkOutTime
+    if payload.extraBedAvailable is not None:
+        updates["extra_bed_available"] = payload.extraBedAvailable
+        if not payload.extraBedAvailable:
+            updates["extra_bed_price_per_night_minor"] = 0
+    if payload.extraBedPricePerNightMinor is not None:
+        updates["extra_bed_price_per_night_minor"] = payload.extraBedPricePerNightMinor
 
     if payload.submitForReview and status in ("draft", "rejected"):
         updates["status"] = "pending_review"

@@ -63,6 +63,8 @@ export type Homestay = {
   checkOutTime: string;
   houseRules?: string[];
   rooms?: HomestayRoom[];
+  extraBedAvailable?: boolean;
+  extraBedPricePerNight?: number;
 };
 
 export const homestays: Homestay[] = [
