@@ -75,6 +75,7 @@ class HomestayRoom(BaseModel):
     amenities: list[str] = Field(default_factory=list)
     extraBedAvailable: bool = False
     extraBedPricePerNight: int = 0
+    extraBedsPerRoom: int = 1
 
 
 class Homestay(BaseModel):
@@ -106,6 +107,7 @@ class Homestay(BaseModel):
     rooms: list[HomestayRoom] = Field(default_factory=list)
     extraBedAvailable: bool = False
     extraBedPricePerNight: int = 0
+    extraBedsPerRoom: int = 1
 
 
 class ListHomestaysResponse(BaseModel):
@@ -177,6 +179,7 @@ class OwnerHomestayRoom(BaseModel):
     isActive: bool = True
     extraBedAvailable: bool = False
     extraBedPricePerNightMinor: int = 0
+    extraBedsPerRoom: int = 1
 
 
 class OwnerHomestaySummary(BaseModel):
@@ -222,6 +225,7 @@ class OwnerHomestayDetail(BaseModel):
     updatedAt: str
     extraBedAvailable: bool = False
     extraBedPricePerNightMinor: int = 0
+    extraBedsPerRoom: int = 1
 
 
 class CreateOwnerHomestayRequest(BaseModel):
@@ -248,6 +252,7 @@ class CreateOwnerHomestayRequest(BaseModel):
     submitForReview: bool = False
     extraBedAvailable: bool = False
     extraBedPricePerNightMinor: int = Field(default=0, ge=0)
+    extraBedsPerRoom: int = Field(default=1, ge=1, le=2)
 
 
 class UpdateOwnerHomestayRequest(BaseModel):
@@ -274,6 +279,7 @@ class UpdateOwnerHomestayRequest(BaseModel):
     submitForReview: bool = False
     extraBedAvailable: bool | None = None
     extraBedPricePerNightMinor: int | None = Field(default=None, ge=0)
+    extraBedsPerRoom: int | None = Field(default=None, ge=1, le=2)
 
 
 class CreateOwnerHomestayRoomRequest(BaseModel):
@@ -286,6 +292,7 @@ class CreateOwnerHomestayRoomRequest(BaseModel):
     sortOrder: int = 0
     extraBedAvailable: bool = False
     extraBedPricePerNightMinor: int = Field(default=0, ge=0)
+    extraBedsPerRoom: int = Field(default=1, ge=1, le=2)
 
 
 class UpdateOwnerHomestayRoomRequest(BaseModel):
@@ -299,6 +306,7 @@ class UpdateOwnerHomestayRoomRequest(BaseModel):
     isActive: bool | None = None
     extraBedAvailable: bool | None = None
     extraBedPricePerNightMinor: int | None = Field(default=None, ge=0)
+    extraBedsPerRoom: int | None = Field(default=None, ge=1, le=2)
 
 
 class UpsertOwnerAvailabilityRequest(BaseModel):

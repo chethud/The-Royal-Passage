@@ -36,6 +36,7 @@ export type HomestayRoom = {
   amenities?: string[];
   extraBedAvailable: boolean;
   extraBedPricePerNight: number;
+  extraBedsPerRoom?: number;
 };
 
 export type Homestay = {
@@ -65,6 +66,7 @@ export type Homestay = {
   rooms?: HomestayRoom[];
   extraBedAvailable?: boolean;
   extraBedPricePerNight?: number;
+  extraBedsPerRoom?: number;
 };
 
 export const homestays: Homestay[] = [

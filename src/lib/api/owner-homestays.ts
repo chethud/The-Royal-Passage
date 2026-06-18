@@ -41,6 +41,7 @@ export type OwnerHomestayRoom = {
   isActive: boolean;
   extraBedAvailable: boolean;
   extraBedPricePerNightMinor: number;
+  extraBedsPerRoom: number;
 };
 
 export type OwnerHomestayAvailability = {
@@ -96,6 +97,7 @@ export type OwnerHomestayDetail = {
   updatedAt: string;
   extraBedAvailable: boolean;
   extraBedPricePerNightMinor: number;
+  extraBedsPerRoom: number;
 };
 
 export type CreateOwnerHomestayPayload = {
@@ -122,6 +124,7 @@ export type CreateOwnerHomestayPayload = {
   submitForReview?: boolean;
   extraBedAvailable?: boolean;
   extraBedPricePerNightMinor?: number;
+  extraBedsPerRoom?: number;
 };
 
 export type UpdateOwnerHomestayPayload = Partial<CreateOwnerHomestayPayload>;
@@ -184,6 +187,7 @@ export function createOwnerHomestayRoom(
     sortOrder?: number;
     extraBedAvailable?: boolean;
     extraBedPricePerNightMinor?: number;
+    extraBedsPerRoom?: number;
   },
 ) {
   const client = createRoyalPassageClient(accessToken);
@@ -212,6 +216,7 @@ export function updateOwnerHomestayRoom(
     isActive: boolean;
     extraBedAvailable: boolean;
     extraBedPricePerNightMinor: number;
+    extraBedsPerRoom: number;
   }>,
 ) {
   const client = createRoyalPassageClient(accessToken);

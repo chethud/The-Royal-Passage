@@ -9,6 +9,10 @@ homestay_owners ( id, full_name, auth_user_id, approval_status )
 """
 
 
+def _extra_beds_per_room(value) -> int:
+    return 2 if int(value or 1) >= 2 else 1
+
+
 def _parse_day(value: str) -> date:
     return date.fromisoformat(str(value)[:10])
 
@@ -150,8 +154,13 @@ def create_homestay_booking(
         extra_bed_price_minor = int(room.get("extra_bed_price_per_night_minor") or 0)
         if extra_bed_count > 0 and not extra_bed_available:
             raise ValueError("Extra beds are not available for this room type.")
-        if extra_bed_count > room_count:
-            raise ValueError("You can add at most one extra bed per room.")
+        extra_beds_per_room = _extra_beds_per_room(room.get("extra_beds_per_room"))
+        max_extra_beds = room_count * extra_beds_per_room
+        if extra_bed_count > max_extra_beds:
+            raise ValueError(
+                f"You can add at most {max_extra_beds} extra bed(s) "
+                f"({extra_beds_per_room} per room × {room_count} room(s))."
+            )
         max_allowed_guests = room_count * room_capacity + extra_bed_count
         if payload.guestCount > max_allowed_guests:
             raise ValueError(
@@ -167,9 +176,12 @@ def create_homestay_booking(
         if extra_bed_count > 0:
             if not property_extra_bed_available:
                 raise ValueError("Extra beds are not available at this property.")
-            if extra_bed_count > bedrooms:
+            extra_beds_per_room = _extra_beds_per_room(stay.get("extra_beds_per_room"))
+            max_extra_beds = bedrooms * extra_beds_per_room
+            if extra_bed_count > max_extra_beds:
                 raise ValueError(
-                    f"You can add at most {bedrooms} extra bed(s) (one per bedroom)."
+                    f"You can add at most {max_extra_beds} extra bed(s) "
+                    f"({extra_beds_per_room} per bedroom × {bedrooms} bedroom(s))."
                 )
             extra_bed_price_minor = property_extra_bed_price_minor
         max_allowed_guests = max_guests + extra_bed_count

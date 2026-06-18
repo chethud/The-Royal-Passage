@@ -31,6 +31,7 @@ def map_row_to_homestay(row: dict, rooms: list[dict]) -> Homestay:
             amenities=room.get("amenities") or [],
             extraBedAvailable=bool(room.get("extra_bed_available", False)),
             extraBedPricePerNight=round(int(room.get("extra_bed_price_per_night_minor") or 0) / 100),
+            extraBedsPerRoom=2 if int(room.get("extra_beds_per_room") or 1) >= 2 else 1,
         )
         for room in sorted(rooms, key=lambda item: item.get("sort_order", 0))
         if room.get("is_active", True)
@@ -69,4 +70,5 @@ def map_row_to_homestay(row: dict, rooms: list[dict]) -> Homestay:
         rooms=ui_rooms,
         extraBedAvailable=bool(row.get("extra_bed_available", False)),
         extraBedPricePerNight=round(int(row.get("extra_bed_price_per_night_minor") or 0) / 100),
+        extraBedsPerRoom=2 if int(row.get("extra_beds_per_room") or 1) >= 2 else 1,
     )

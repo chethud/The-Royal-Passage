@@ -1,5 +1,9 @@
 import type { Homestay, HomestayRoom } from "@/data/homestays";
 
+export function normalizeExtraBedsPerRoom(value?: number | null): 1 | 2 {
+  return value != null && value >= 2 ? 2 : 1;
+}
+
 export function getActiveRooms(stay: Homestay): HomestayRoom[] {
   return stay.rooms ?? [];
 }
@@ -19,9 +23,16 @@ export function maxRoomCount(room: HomestayRoom | undefined): number {
   return room?.totalUnits ?? 1;
 }
 
+export function extraBedsPerRoomForSelection(stay: Homestay, room?: HomestayRoom): number {
+  if (room?.extraBedAvailable) return normalizeExtraBedsPerRoom(room.extraBedsPerRoom);
+  if (usesPropertyLevelExtraBeds(stay, room)) return normalizeExtraBedsPerRoom(stay.extraBedsPerRoom);
+  return 1;
+}
+
 export function maxExtraBeds(stay: Homestay, room?: HomestayRoom, roomCount = 1): number {
-  if (room?.extraBedAvailable) return roomCount;
-  if (usesPropertyLevelExtraBeds(stay, room)) return stay.bedrooms;
+  const perRoom = extraBedsPerRoomForSelection(stay, room);
+  if (room?.extraBedAvailable) return roomCount * perRoom;
+  if (usesPropertyLevelExtraBeds(stay, room)) return stay.bedrooms * perRoom;
   return 0;
 }
 

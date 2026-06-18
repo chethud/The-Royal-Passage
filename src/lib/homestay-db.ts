@@ -12,6 +12,7 @@ function mapProtoRoom(room: NonNullable<ProtoHomestay["rooms"]>[number]): Homest
     amenities: room.amenities ?? [],
     extraBedAvailable: room.extraBedAvailable,
     extraBedPricePerNight: room.extraBedPricePerNight,
+    extraBedsPerRoom: room.extraBedsPerRoom,
   };
 }
 
@@ -45,5 +46,6 @@ export function mapProtoHomestay(stay: ProtoHomestay): Homestay {
     rooms: stay.rooms?.length ? stay.rooms.map(mapProtoRoom) : undefined,
     extraBedAvailable: stay.extraBedAvailable,
     extraBedPricePerNight: stay.extraBedPricePerNight,
+    extraBedsPerRoom: stay.extraBedsPerRoom,
   };
 }

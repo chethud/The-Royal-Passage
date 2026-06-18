@@ -64,6 +64,9 @@ export function OwnerHomestayForm({
   const [extraBedPriceMajor, setExtraBedPriceMajor] = useState(
     Math.round((initial?.extraBedPricePerNightMinor ?? 0) / 100) || 0,
   );
+  const [extraBedsPerRoom, setExtraBedsPerRoom] = useState<1 | 2>(
+    (initial?.extraBedsPerRoom ?? 1) >= 2 ? 2 : 1,
+  );
   const [submitForReview, setSubmitForReview] = useState(false);
   const bedroomCount = Number.parseInt(bedrooms, 10) || 1;
 
@@ -90,6 +93,7 @@ export function OwnerHomestayForm({
       checkOutTime,
       extraBedAvailable,
       extraBedPricePerNightMinor: extraBedAvailable ? extraBedPriceMajor * 100 : 0,
+      extraBedsPerRoom: extraBedAvailable ? extraBedsPerRoom : 1,
       submitForReview,
     };
     await onSubmit(payload);
@@ -274,8 +278,21 @@ export function OwnerHomestayForm({
                 required
               />
             </label>
-            <p className="luxury-panel-body self-end pb-2 text-xs leading-relaxed">
-              Guests can add up to one extra bed per bedroom ({bedroomCount} max for this property).
+            <label className="block">
+              <span className={labelClass}>Extra beds allowed</span>
+              <select
+                className={inputClass}
+                value={extraBedsPerRoom}
+                onChange={(e) => setExtraBedsPerRoom(Number(e.target.value) === 2 ? 2 : 1)}
+                disabled={disabled || saving}
+              >
+                <option value={1}>1 per bedroom</option>
+                <option value={2}>2 per bedroom</option>
+              </select>
+            </label>
+            <p className="luxury-panel-body self-end pb-2 text-xs leading-relaxed md:col-span-2">
+              Guests can add up to {extraBedsPerRoom} extra bed{extraBedsPerRoom === 1 ? "" : "s"} per
+              bedroom ({bedroomCount * extraBedsPerRoom} max for this property).
             </p>
           </div>
         ) : null}

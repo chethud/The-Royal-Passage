@@ -135,6 +135,10 @@ def _load_availability(supabase, homestay_id: str) -> list[dict]:
     return result.data or []
 
 
+def _extra_beds_per_room(value) -> int:
+    return 2 if int(value or 1) >= 2 else 1
+
+
 def _map_room(row: dict) -> OwnerHomestayRoom:
     return OwnerHomestayRoom(
         id=row["id"],
@@ -148,6 +152,7 @@ def _map_room(row: dict) -> OwnerHomestayRoom:
         isActive=bool(row.get("is_active", True)),
         extraBedAvailable=bool(row.get("extra_bed_available", False)),
         extraBedPricePerNightMinor=int(row.get("extra_bed_price_per_night_minor") or 0),
+        extraBedsPerRoom=_extra_beds_per_room(row.get("extra_beds_per_room")),
     )
 
 
@@ -196,6 +201,7 @@ def _map_owner_homestay(row: dict, rooms: list[dict], availability: list[dict]) 
         updatedAt=row.get("updated_at", ""),
         extraBedAvailable=bool(row.get("extra_bed_available", False)),
         extraBedPricePerNightMinor=int(row.get("extra_bed_price_per_night_minor") or 0),
+        extraBedsPerRoom=_extra_beds_per_room(row.get("extra_beds_per_room")),
     )
 
 
@@ -303,6 +309,7 @@ def create_owner_homestay(auth: dict, payload: CreateOwnerHomestayRequest) -> Ow
         "currency_code": "INR",
         "extra_bed_available": payload.extraBedAvailable,
         "extra_bed_price_per_night_minor": payload.extraBedPricePerNightMinor if payload.extraBedAvailable else 0,
+        "extra_beds_per_room": _extra_beds_per_room(payload.extraBedsPerRoom) if payload.extraBedAvailable else 1,
     }
     if payload.mapLink and payload.mapLink.strip():
         insert_row["map_link"] = payload.mapLink.strip()
@@ -384,6 +391,8 @@ def update_owner_homestay(
             updates["extra_bed_price_per_night_minor"] = 0
     if payload.extraBedPricePerNightMinor is not None:
         updates["extra_bed_price_per_night_minor"] = payload.extraBedPricePerNightMinor
+    if payload.extraBedsPerRoom is not None:
+        updates["extra_beds_per_room"] = _extra_beds_per_room(payload.extraBedsPerRoom)
 
     if payload.submitForReview and status in ("draft", "rejected"):
         updates["status"] = "pending_review"
@@ -439,6 +448,7 @@ def create_owner_homestay_room(
             "sort_order": payload.sortOrder,
             "extra_bed_available": payload.extraBedAvailable,
             "extra_bed_price_per_night_minor": payload.extraBedPricePerNightMinor,
+            "extra_beds_per_room": _extra_beds_per_room(payload.extraBedsPerRoom) if payload.extraBedAvailable else 1,
         }
     ).execute()
 
@@ -485,6 +495,8 @@ def update_owner_homestay_room(
         updates["extra_bed_available"] = payload.extraBedAvailable
     if payload.extraBedPricePerNightMinor is not None:
         updates["extra_bed_price_per_night_minor"] = payload.extraBedPricePerNightMinor
+    if payload.extraBedsPerRoom is not None:
+        updates["extra_beds_per_room"] = _extra_beds_per_room(payload.extraBedsPerRoom)
 
     if updates:
         supabase.table("homestay_rooms").update(updates).eq("id", room_id).execute()

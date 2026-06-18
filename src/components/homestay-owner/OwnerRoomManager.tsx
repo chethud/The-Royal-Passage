@@ -2,6 +2,7 @@ import { useState } from "react";
 import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import type { OwnerHomestayDetail } from "@/lib/api/owner-homestays";
 import { formatMoney } from "@/lib/money";
+import { normalizeExtraBedsPerRoom } from "@/lib/homestay-room-pricing";
 
 type OwnerRoomManagerProps = {
   homestay: OwnerHomestayDetail;
@@ -14,6 +15,7 @@ type OwnerRoomManagerProps = {
     totalUnits: number;
     extraBedAvailable?: boolean;
     extraBedPricePerNightMinor?: number;
+    extraBedsPerRoom?: number;
   }) => Promise<void>;
   onDeactivate: (roomId: string) => Promise<void>;
 };
@@ -26,6 +28,7 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
   const [priceMajor, setPriceMajor] = useState(0);
   const [extraBedAvailable, setExtraBedAvailable] = useState(false);
   const [extraBedPriceMajor, setExtraBedPriceMajor] = useState(0);
+  const [extraBedsPerRoom, setExtraBedsPerRoom] = useState<1 | 2>(1);
 
   const handleAdd = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -37,12 +40,14 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
       totalUnits: Number.parseInt(units, 10) || 1,
       extraBedAvailable,
       extraBedPricePerNightMinor: extraBedAvailable ? extraBedPriceMajor * 100 : 0,
+      extraBedsPerRoom: extraBedAvailable ? extraBedsPerRoom : 1,
     });
     setName("");
     setCategory("");
     setPriceMajor(0);
     setExtraBedAvailable(false);
     setExtraBedPriceMajor(0);
+    setExtraBedsPerRoom(1);
   };
 
   return (
@@ -59,7 +64,7 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
                   {room.category ?? "Room"} · {room.capacity} guests · {room.totalUnits} unit(s) ·{" "}
                   {formatMoney(room.pricePerNightMinor, homestay.currencySymbol)}
                   {room.extraBedAvailable
-                    ? ` · extra bed ${formatMoney(room.extraBedPricePerNightMinor, homestay.currencySymbol)}/night`
+                    ? ` · extra bed ${formatMoney(room.extraBedPricePerNightMinor, homestay.currencySymbol)}/night · ${normalizeExtraBedsPerRoom(room.extraBedsPerRoom)}/room`
                     : ""}
                   {!room.isActive ? " · inactive" : ""}
                 </p>
@@ -136,14 +141,25 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
         </label>
 
         {extraBedAvailable ? (
-          <RupeeAmountInput
-            className="luxury-input max-w-xs"
-            placeholder="Extra bed price / night"
-            value={extraBedPriceMajor}
-            onChange={setExtraBedPriceMajor}
-            required
-            disabled={busy}
-          />
+          <div className="grid gap-3 md:grid-cols-2">
+            <RupeeAmountInput
+              className="luxury-input"
+              placeholder="Extra bed price / night"
+              value={extraBedPriceMajor}
+              onChange={setExtraBedPriceMajor}
+              required
+              disabled={busy}
+            />
+            <select
+              className="luxury-input"
+              value={extraBedsPerRoom}
+              onChange={(e) => setExtraBedsPerRoom(Number(e.target.value) === 2 ? 2 : 1)}
+              disabled={busy}
+            >
+              <option value={1}>1 extra bed per room</option>
+              <option value={2}>2 extra beds per room</option>
+            </select>
+          </div>
         ) : null}
 
         <button type="submit" className="luxury-btn-sm luxury-btn-primary" disabled={busy}>

@@ -2,7 +2,7 @@ import { Minus, Plus } from "lucide-react";
 import { PayAtHomestayBadge } from "@/components/homestays/PayAtHomestayBadge";
 import type { Homestay } from "@/data/homestays";
 import { formatDateLong } from "@/lib/date-format";
-import { getActiveRooms } from "@/lib/homestay-room-pricing";
+import { getActiveRooms, extraBedsPerRoomForSelection } from "@/lib/homestay-room-pricing";
 import { formatMoney } from "@/lib/money";
 import { formatTime12h } from "@/lib/weekday-slots";
 
@@ -113,7 +113,9 @@ export function HomestayBookingPanel({
   const selectedRoom = rooms.find((room) => room.id === roomId) ?? (rooms.length === 1 ? rooms[0] : undefined);
   const nightlyRate = selectedRoom?.pricePerNight ?? stay.pricePerNight;
   const extraBedPrice = selectedRoom?.extraBedPricePerNight ?? stay.extraBedPricePerNight ?? 0;
+  const extraBedsPerRoom = extraBedsPerRoomForSelection(stay, selectedRoom);
   const showExtraBeds = maxExtraBeds > 0;
+  const extraBedUnit = selectedRoom || getActiveRooms(stay).length > 0 ? "room" : "bedroom";
 
   return (
     <div className="space-y-8">
@@ -203,7 +205,7 @@ export function HomestayBookingPanel({
       {showExtraBeds ? (
         <Stepper
           label="Extra beds"
-          hint={`${sym}${extraBedPrice.toLocaleString("en-IN")}/night each · max ${maxExtraBeds} (one per bedroom)`}
+          hint={`${sym}${extraBedPrice.toLocaleString("en-IN")}/night each · up to ${extraBedsPerRoom} per ${extraBedUnit} (${maxExtraBeds} max)`}
           value={extraBedCount}
           min={0}
           max={maxExtraBeds}
