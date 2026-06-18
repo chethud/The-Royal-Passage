@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
 import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import type { CitySummary } from "@/lib/cities";
 import {
@@ -44,8 +45,14 @@ export function OwnerHomestayForm({
   const [priceMajor, setPriceMajor] = useState(
     Math.round((initial?.pricePerNightMinor ?? 0) / 100) || 0,
   );
-  const [heroImageUrl, setHeroImageUrl] = useState(initial?.heroImageUrl ?? "");
-  const [galleryText, setGalleryText] = useState((initial?.galleryUrls ?? []).join("\n"));
+  const [photoUrls, setPhotoUrls] = useState<string[]>(() => {
+    const existing = initial?.galleryUrls?.length
+      ? initial.galleryUrls
+      : initial?.heroImageUrl
+        ? [initial.heroImageUrl]
+        : [];
+    return existing;
+  });
   const [amenitiesText, setAmenitiesText] = useState((initial?.amenities ?? []).join("\n"));
   const [houseRulesText, setHouseRulesText] = useState((initial?.houseRules ?? []).join("\n"));
   const [bedrooms, setBedrooms] = useState(String(initial?.bedrooms ?? 1));
@@ -57,6 +64,7 @@ export function OwnerHomestayForm({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    const galleryUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
     const payload = {
       title: title.trim(),
       tagline: tagline.trim() || undefined,
@@ -66,8 +74,8 @@ export function OwnerHomestayForm({
       region: region.trim() || undefined,
       address: address.trim() || undefined,
       pricePerNightMinor: priceMajor * 100,
-      heroImageUrl: heroImageUrl.trim() || undefined,
-      galleryUrls: splitLines(galleryText),
+      heroImageUrl: galleryUrls[0],
+      galleryUrls,
       amenities: splitLines(amenitiesText),
       houseRules: splitLines(houseRulesText),
       bedrooms: Number.parseInt(bedrooms, 10) || 1,
@@ -236,25 +244,17 @@ export function OwnerHomestayForm({
         </label>
       </div>
 
-      <label className="block">
-        <span className={labelClass}>Hero image URL</span>
-        <input
-          className={inputClass}
-          value={heroImageUrl}
-          onChange={(e) => setHeroImageUrl(e.target.value)}
-          disabled={disabled || saving}
+      <div className="rounded-sm border border-[rgb(74_0_0/0.15)] bg-[rgb(255_255_255/0.35)] p-4 sm:p-5">
+        <ExperiencePhotoGallery
+          photoUrls={photoUrls}
+          onChange={setPhotoUrls}
+          readOnly={disabled || saving}
+          inputClass={inputClass}
+          label="Property photos"
+          hint="Upload photos from your device. The first image is the cover; additional images appear in the gallery."
+          photoAltPrefix="Homestay photo"
         />
-      </label>
-
-      <label className="block">
-        <span className={labelClass}>Gallery URLs (one per line)</span>
-        <textarea
-          className={`${inputClass} min-h-24`}
-          value={galleryText}
-          onChange={(e) => setGalleryText(e.target.value)}
-          disabled={disabled || saving}
-        />
-      </label>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block">

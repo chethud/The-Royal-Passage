@@ -12,6 +12,9 @@ type ExperiencePhotoGalleryProps = {
   onChange: (urls: string[]) => void;
   readOnly?: boolean;
   inputClass?: string;
+  label?: string;
+  hint?: string;
+  photoAltPrefix?: string;
 };
 
 export function ExperiencePhotoGallery({
@@ -19,6 +22,9 @@ export function ExperiencePhotoGallery({
   onChange,
   readOnly = false,
   inputClass = "mt-1 w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/50 px-3 py-2 text-sm",
+  label = "Experience photos",
+  hint = "Browse and upload multiple images from your device. The first photo becomes the cover image.",
+  photoAltPrefix = "Photo",
 }: ExperiencePhotoGalleryProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewErrors, setPreviewErrors] = useState<Record<number, boolean>>({});
@@ -81,10 +87,8 @@ export function ExperiencePhotoGallery({
   return (
     <div className="space-y-4">
       <div>
-        <span className="eyebrow text-muted-foreground">Experience photos</span>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Browse and upload multiple images from your device. The first photo becomes the cover image.
-        </p>
+        <span className="eyebrow text-muted-foreground">{label}</span>
+        <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
 
         {!readOnly ? (
           <div className="mt-4 space-y-3">
@@ -183,7 +187,7 @@ export function ExperiencePhotoGallery({
                 {previewOk ? (
                   <img
                     src={url}
-                    alt={`Experience photo ${index + 1}`}
+                    alt={`${photoAltPrefix} ${index + 1}`}
                     className="aspect-[4/3] w-full object-cover"
                     onError={() => setPreviewErrors((prev) => ({ ...prev, [index]: true }))}
                   />
