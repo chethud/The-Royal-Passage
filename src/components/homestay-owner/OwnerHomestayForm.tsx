@@ -20,6 +20,8 @@ type OwnerHomestayFormProps = {
 const labelClass = "eyebrow luxury-panel-label block text-xs uppercase tracking-[0.12em]";
 const inputClass = "luxury-input mt-1 w-full";
 const numberInputClass = `${inputClass} input-no-spin`;
+const sectionHeadingClass = "eyebrow luxury-panel-label text-xs uppercase tracking-[0.14em]";
+const checkboxClass = "rounded border-[rgb(74_0_0/0.3)]";
 
 function splitLines(value: string): string[] {
   return value
@@ -100,7 +102,9 @@ export function OwnerHomestayForm({
   };
 
   return (
-    <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
+    <form onSubmit={(e) => void handleSubmit(e)} className="space-y-8">
+      <section className="space-y-6">
+        <h2 className={sectionHeadingClass}>Property details</h2>
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block">
           <span className={labelClass}>Title</span>
@@ -149,7 +153,10 @@ export function OwnerHomestayForm({
           disabled={disabled || saving}
         />
       </label>
+      </section>
 
+      <section className="space-y-6">
+        <h2 className={sectionHeadingClass}>Location & pricing</h2>
       <div className="grid gap-4 md:grid-cols-3">
         <label className="block">
           <span className={labelClass}>City</span>
@@ -195,7 +202,10 @@ export function OwnerHomestayForm({
           disabled={disabled || saving}
         />
       </label>
+      </section>
 
+      <section className="space-y-6">
+        <h2 className={sectionHeadingClass}>Capacity</h2>
       <div className="grid gap-4 md:grid-cols-3">
         <label className="block">
           <span className={labelClass}>Bedrooms</span>
@@ -254,7 +264,10 @@ export function OwnerHomestayForm({
           />
         </label>
       </div>
+      </section>
 
+      <section className="space-y-4">
+        <h2 className={sectionHeadingClass}>Extra beds</h2>
       <div className="space-y-3 rounded-sm border border-[rgb(74_0_0/0.12)] bg-[rgb(255_255_255/0.25)] p-4">
         <label className="flex items-center gap-2 text-sm luxury-panel-body">
           <input
@@ -262,54 +275,63 @@ export function OwnerHomestayForm({
             checked={extraBedAvailable}
             onChange={(e) => setExtraBedAvailable(e.target.checked)}
             disabled={disabled || saving}
-            className="rounded border-[rgb(74_0_0/0.3)]"
+            className={checkboxClass}
           />
           Extra bed available
         </label>
         {extraBedAvailable ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className="block">
-              <span className={labelClass}>Extra bed price / night (₹)</span>
-              <RupeeAmountInput
-                className={inputClass}
-                value={extraBedPriceMajor}
-                onChange={setExtraBedPriceMajor}
-                disabled={disabled || saving}
-                required
-              />
-            </label>
-            <label className="block">
-              <span className={labelClass}>Extra beds allowed</span>
-              <select
-                className={inputClass}
-                value={extraBedsPerRoom}
-                onChange={(e) => setExtraBedsPerRoom(Number(e.target.value) === 2 ? 2 : 1)}
-                disabled={disabled || saving}
-              >
-                <option value={1}>1 per bedroom</option>
-                <option value={2}>2 per bedroom</option>
-              </select>
-            </label>
-            <p className="luxury-panel-body self-end pb-2 text-xs leading-relaxed md:col-span-2">
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="block">
+                <span className={labelClass}>Extra bed price / night (₹)</span>
+                <RupeeAmountInput
+                  className={inputClass}
+                  value={extraBedPriceMajor}
+                  onChange={setExtraBedPriceMajor}
+                  disabled={disabled || saving}
+                  required
+                />
+              </label>
+              <label className="block">
+                <span className={labelClass}>Extra beds allowed</span>
+                <select
+                  className={inputClass}
+                  value={extraBedsPerRoom}
+                  onChange={(e) => setExtraBedsPerRoom(Number(e.target.value) === 2 ? 2 : 1)}
+                  disabled={disabled || saving}
+                >
+                  <option value={1}>1 per bedroom</option>
+                  <option value={2}>2 per bedroom</option>
+                </select>
+              </label>
+            </div>
+            <p className="luxury-panel-body text-xs leading-relaxed">
               Guests can add up to {extraBedsPerRoom} extra bed{extraBedsPerRoom === 1 ? "" : "s"} per
               bedroom ({bedroomCount * extraBedsPerRoom} max for this property).
             </p>
           </div>
         ) : null}
       </div>
+      </section>
 
+      <section className="space-y-4">
+        <h2 className={sectionHeadingClass}>Photos</h2>
       <div className="rounded-sm border border-[rgb(74_0_0/0.15)] bg-[rgb(255_255_255/0.35)] p-4 sm:p-5">
         <ExperiencePhotoGallery
           photoUrls={photoUrls}
           onChange={setPhotoUrls}
           readOnly={disabled || saving}
           inputClass={inputClass}
+          surface="luxury"
           label="Property photos"
           hint="Upload photos from your device. The first image is the cover; additional images appear in the gallery."
           photoAltPrefix="Homestay photo"
         />
       </div>
+      </section>
 
+      <section className="space-y-6">
+        <h2 className={sectionHeadingClass}>Rules & amenities</h2>
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block">
           <span className={labelClass}>Amenities (one per line)</span>
@@ -330,14 +352,16 @@ export function OwnerHomestayForm({
           />
         </label>
       </div>
+      </section>
 
       {!disabled ? (
-        <label className="flex items-center gap-2 text-sm">
+        <label className="flex items-center gap-2 text-sm luxury-panel-body">
           <input
             type="checkbox"
             checked={submitForReview}
             onChange={(e) => setSubmitForReview(e.target.checked)}
             disabled={saving}
+            className={checkboxClass}
           />
           Submit for Royal Passage review after saving
         </label>

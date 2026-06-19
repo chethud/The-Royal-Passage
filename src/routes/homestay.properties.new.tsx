@@ -20,14 +20,18 @@ function OwnerNewHomestayPage() {
   const navigate = useNavigate();
   const { accessToken, ready, loading } = useHomestayOwnerAccess();
   const [cities, setCities] = useState<CitySummary[]>([]);
+  const [citiesLoading, setCitiesLoading] = useState(true);
   const [pageError, setPageError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const loadCities = useCallback(async () => {
+    setCitiesLoading(true);
     try {
       setCities(await fetchCities());
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to load cities."));
+    } finally {
+      setCitiesLoading(false);
     }
   }, []);
 
@@ -57,7 +61,17 @@ function OwnerNewHomestayPage() {
   };
 
   if (loading || !ready || !accessToken) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return (
+      <HomestayOwnerDashboardShell
+        title="New property"
+        subtitle="Add basics and pricing, then add rooms and calendar rules on the next screen."
+        showRoleDescription={false}
+      >
+        <LuxuryCheckoutPanel>
+          <p className="luxury-panel-body text-sm">Loading form…</p>
+        </LuxuryCheckoutPanel>
+      </HomestayOwnerDashboardShell>
+    );
   }
 
   return (
@@ -72,7 +86,11 @@ function OwnerNewHomestayPage() {
             {pageError}
           </p>
         ) : null}
-        <OwnerHomestayForm cities={cities} saving={saving} onSubmit={handleSubmit} />
+        {citiesLoading ? (
+          <p className="luxury-panel-body text-sm">Loading form…</p>
+        ) : (
+          <OwnerHomestayForm cities={cities} saving={saving} onSubmit={handleSubmit} />
+        )}
       </LuxuryCheckoutPanel>
     </HomestayOwnerDashboardShell>
   );

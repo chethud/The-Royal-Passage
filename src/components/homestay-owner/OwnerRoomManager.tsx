@@ -85,7 +85,8 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
       </ul>
 
       <form onSubmit={(e) => void handleAdd(e)} className="space-y-4 border-t luxury-panel-divider pt-6">
-        <div className="grid gap-3 md:grid-cols-5">
+        <h3 className="eyebrow luxury-panel-label text-xs uppercase tracking-[0.14em]">Add room</h3>
+        <div className="grid gap-4 md:grid-cols-5">
           <input
             className="luxury-input md:col-span-2"
             placeholder="Room name"
@@ -141,7 +142,7 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
         </label>
 
         {extraBedAvailable ? (
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <RupeeAmountInput
               className="luxury-input"
               placeholder="Extra bed price / night"

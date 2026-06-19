@@ -15,6 +15,8 @@ type ExperiencePhotoGalleryProps = {
   label?: string;
   hint?: string;
   photoAltPrefix?: string;
+  /** Host wizard uses ember tokens; homestay owner forms use cream luxury panels. */
+  surface?: "host" | "luxury";
 };
 
 export function ExperiencePhotoGallery({
@@ -25,7 +27,9 @@ export function ExperiencePhotoGallery({
   label = "Experience photos",
   hint = "Browse and upload multiple images from your device. The first photo becomes the cover image.",
   photoAltPrefix = "Photo",
+  surface = "host",
 }: ExperiencePhotoGalleryProps) {
+  const isLuxury = surface === "luxury";
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewErrors, setPreviewErrors] = useState<Record<number, boolean>>({});
   const [uploading, setUploading] = useState(false);
@@ -84,11 +88,46 @@ export function ExperiencePhotoGallery({
     setShowUrlInput(false);
   };
 
+  const labelClass = isLuxury ? "eyebrow luxury-panel-label" : "eyebrow text-muted-foreground";
+  const hintClass = isLuxury
+    ? "mt-1 text-xs luxury-panel-body"
+    : "mt-1 text-xs text-muted-foreground";
+  const mutedTextClass = isLuxury ? "text-xs luxury-panel-body" : "text-xs text-muted-foreground";
+  const emptyTextClass = isLuxury ? "text-sm luxury-panel-body" : "text-sm text-muted-foreground";
+  const accentClass = isLuxury ? "text-[#4A0000]" : "text-ember";
+  const uploadButtonClass = isLuxury
+    ? cn(
+        "flex w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed border-[rgb(74_0_0/0.35)] bg-[rgb(255_255_255/0.35)] px-4 py-8 text-sm transition-colors luxury-panel-body",
+        "hover:border-[rgb(74_0_0/0.5)] hover:bg-[rgb(255_255_255/0.5)] disabled:cursor-not-allowed disabled:opacity-50",
+      )
+    : cn(
+        "flex w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed border-ember/45 bg-background/20 px-4 py-8 text-sm transition-colors",
+        "hover:border-ember/70 hover:bg-ember/5 disabled:cursor-not-allowed disabled:opacity-50",
+      );
+  const linkButtonClass = isLuxury
+    ? "inline-flex items-center gap-1.5 text-xs luxury-panel-body underline-offset-2 hover:text-[#4A0000] hover:underline"
+    : "inline-flex items-center gap-1.5 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline";
+  const urlBoxClass = isLuxury
+    ? "flex flex-wrap items-start gap-2 rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.35)] p-3"
+    : "flex flex-wrap items-start gap-2 rounded-sm border border-[oklch(0.88_0.08_86_/_0.2)] bg-background/10 p-3";
+  const addLinkButtonClass = isLuxury
+    ? "rounded-sm border border-[rgb(74_0_0/0.35)] px-3 py-2 text-xs luxury-panel-body hover:bg-[rgb(74_0_0/0.06)]"
+    : "rounded-sm border border-ember/50 px-3 py-2 text-xs hover:bg-ember/10";
+  const cancelButtonClass = isLuxury
+    ? "rounded-sm px-3 py-2 text-xs luxury-panel-body hover:text-[#4A0000]"
+    : "rounded-sm px-3 py-2 text-xs text-muted-foreground hover:text-foreground";
+  const photoBorderClass = isLuxury
+    ? "border-[rgb(74_0_0/0.25)]"
+    : "border-[oklch(0.88_0.08_86_/_0.25)]";
+  const previewFallbackClass = isLuxury
+    ? "flex aspect-[4/3] items-center justify-center bg-[rgb(255_255_255/0.35)] px-3 text-center text-xs luxury-panel-body"
+    : "flex aspect-[4/3] items-center justify-center bg-muted/20 px-3 text-center text-xs text-muted-foreground";
+
   return (
     <div className="space-y-4">
       <div>
-        <span className="eyebrow text-muted-foreground">{label}</span>
-        <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
+        <span className={labelClass}>{label}</span>
+        <p className={hintClass}>{hint}</p>
 
         {!readOnly ? (
           <div className="mt-4 space-y-3">
@@ -106,54 +145,45 @@ export function ExperiencePhotoGallery({
               type="button"
               disabled={uploading || !uploadAvailable}
               onClick={() => fileInputRef.current?.click()}
-              className={cn(
-                "flex w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed border-ember/45 bg-background/20 px-4 py-8 text-sm transition-colors",
-                "hover:border-ember/70 hover:bg-ember/5 disabled:cursor-not-allowed disabled:opacity-50",
-              )}
+              className={uploadButtonClass}
             >
               {uploading ? (
                 <>
-                  <Loader2 className="h-6 w-6 animate-spin text-ember" />
+                  <Loader2 className={cn("h-6 w-6 animate-spin", accentClass)} />
                   <span>Uploading photos…</span>
                 </>
               ) : (
                 <>
-                  <ImagePlus className="h-6 w-6 text-ember" />
-                  <span className="font-medium text-foreground">Browse & upload photos</span>
-                  <span className="text-xs text-muted-foreground">JPEG, PNG, WebP, or GIF · up to 5 MB each</span>
+                  <ImagePlus className={cn("h-6 w-6", accentClass)} />
+                  <span className={cn("font-medium", isLuxury ? "luxury-panel-heading" : "text-foreground")}>
+                    Browse & upload photos
+                  </span>
+                  <span className={mutedTextClass}>JPEG, PNG, WebP, or GIF · up to 5 MB each</span>
                 </>
               )}
             </button>
 
             {!uploadAvailable ? (
-              <p className="text-xs text-muted-foreground">
+              <p className={mutedTextClass}>
                 Photo upload requires Supabase configuration. Sign in as a host and ensure
                 VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set.
               </p>
             ) : null}
 
             {!showUrlInput ? (
-              <button
-                type="button"
-                onClick={() => setShowUrlInput(true)}
-                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-              >
+              <button type="button" onClick={() => setShowUrlInput(true)} className={linkButtonClass}>
                 <Link2 className="h-3.5 w-3.5" />
                 Paste an image link instead
               </button>
             ) : (
-              <div className="flex flex-wrap items-start gap-2 rounded-sm border border-[oklch(0.88_0.08_86_/_0.2)] bg-background/10 p-3">
+              <div className={urlBoxClass}>
                 <input
                   value={urlDraft}
                   onChange={(e) => setUrlDraft(e.target.value)}
                   placeholder="https://…"
                   className={`${inputClass} min-w-[240px] flex-1`}
                 />
-                <button
-                  type="button"
-                  onClick={addUrlDraft}
-                  className="rounded-sm border border-ember/50 px-3 py-2 text-xs hover:bg-ember/10"
-                >
+                <button type="button" onClick={addUrlDraft} className={addLinkButtonClass}>
                   Add link
                 </button>
                 <button
@@ -163,7 +193,7 @@ export function ExperiencePhotoGallery({
                     setUrlDraft("");
                     setUploadError(null);
                   }}
-                  className="rounded-sm px-3 py-2 text-xs text-muted-foreground hover:text-foreground"
+                  className={cancelButtonClass}
                 >
                   Cancel
                 </button>
@@ -182,7 +212,7 @@ export function ExperiencePhotoGallery({
             return (
               <div
                 key={`${url}-${index}`}
-                className="group relative overflow-hidden rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)]"
+                className={cn("group relative overflow-hidden rounded-sm border", photoBorderClass)}
               >
                 {previewOk ? (
                   <img
@@ -192,9 +222,7 @@ export function ExperiencePhotoGallery({
                     onError={() => setPreviewErrors((prev) => ({ ...prev, [index]: true }))}
                   />
                 ) : (
-                  <div className="flex aspect-[4/3] items-center justify-center bg-muted/20 px-3 text-center text-xs text-muted-foreground">
-                    {url}
-                  </div>
+                  <div className={previewFallbackClass}>{url}</div>
                 )}
 
                 {index === 0 ? (
@@ -219,9 +247,9 @@ export function ExperiencePhotoGallery({
           })}
         </div>
       ) : readOnly ? (
-        <p className="text-sm text-muted-foreground">No photos added.</p>
+        <p className={emptyTextClass}>No photos added.</p>
       ) : (
-        <p className="text-sm text-muted-foreground">No photos uploaded yet.</p>
+        <p className={emptyTextClass}>No photos uploaded yet.</p>
       )}
     </div>
   );
