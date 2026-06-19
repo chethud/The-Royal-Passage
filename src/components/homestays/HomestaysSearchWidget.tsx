@@ -1,4 +1,5 @@
-import { Minus, Plus, Search } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
+import { ExperiencesSearchBar } from "@/components/experiences/ExperiencesSearchBar";
 import { defaultHomestayDates, HOMESTAY_CITY, type HomestayBrowseSearch } from "@/lib/homestay-filters";
 
 export type HomestaySearchValues = Required<
@@ -57,16 +58,12 @@ export function HomestaysSearchWidget({
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))_auto] lg:items-end">
         <label className="col-span-2 block lg:col-span-1">
           <span className="eyebrow mb-1.5 block text-[0.58rem] text-[#4A0000]/70 sm:mb-2">Property</span>
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4A0000]/55" />
-            <input
-              type="search"
-              value={values.q ?? ""}
-              onChange={(event) => onChange({ q: event.target.value })}
-              placeholder={`Search in ${HOMESTAY_CITY}…`}
-              className="w-full rounded-sm border border-[rgb(74_0_0/0.14)] bg-white py-2.5 pl-10 pr-3 text-base text-[#3A0000] placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/35 focus:outline-none sm:py-3 sm:text-sm"
-            />
-          </div>
+          <ExperiencesSearchBar
+            value={values.q ?? ""}
+            onChange={(q) => onChange({ q })}
+            placeholder={`Search in ${HOMESTAY_CITY}…`}
+            className="w-full"
+          />
           <span className="mt-1 block text-[0.62rem] uppercase tracking-[0.14em] text-[#4A0000]/55 sm:mt-1.5">
             {HOMESTAY_CITY} only
           </span>

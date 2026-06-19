@@ -3015,3 +3015,28 @@
     transform: none !important;
   }
 }
+
+.royal-search-select-trigger:focus-visible {
+  outline: none;
+}
+
+.royal-search-select-content {
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 32px -16px rgb(0 0 0 / 0.45);
+}
+
+.royal-search-select-item {
+  cursor: pointer;
+  border-radius: 0.375rem;
+  color: #3a0000;
+}
+
+.royal-search-select-item[data-highlighted] {
+  background: rgb(74 0 0 / 0.06);
+  color: #4a0000;
+}
+
+.royal-search-select-item[data-state="checked"] {
+  background: rgb(74 0 0 / 0.08);
+  color: #4a0000;
+}

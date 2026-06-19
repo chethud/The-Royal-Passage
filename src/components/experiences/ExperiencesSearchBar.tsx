@@ -4,9 +4,15 @@ type ExperiencesSearchBarProps = {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  placeholder?: string;
 };
 
-export function ExperiencesSearchBar({ value, onChange, className = "" }: ExperiencesSearchBarProps) {
+export function ExperiencesSearchBar({
+  value,
+  onChange,
+  className = "",
+  placeholder = "Search experiences, cities, categories…",
+}: ExperiencesSearchBarProps) {
   return (
     <div
       className={`relative overflow-hidden rounded-full border border-[rgb(74_0_0/0.14)] bg-[var(--cream-white)] shadow-[0_8px_24px_-12px_rgb(0_0_0/0.35)] ${className}`}
@@ -16,7 +22,7 @@ export function ExperiencesSearchBar({ value, onChange, className = "" }: Experi
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Search experiences, cities, categories…"
+        placeholder={placeholder}
         className="w-full border-0 bg-transparent py-3 pl-11 pr-10 text-sm text-[#3A0000] placeholder:text-[rgb(58_0_0/0.45)] focus:outline-none focus:ring-0"
       />
       {value ? (

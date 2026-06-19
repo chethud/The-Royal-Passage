@@ -4,8 +4,8 @@ import { useMemo } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { HomestayCard } from "@/components/homestays/HomestayCard";
+import { HomestaysPropertyTypeFilter } from "@/components/homestays/HomestaysPropertyTypeFilter";
 import { HomestaysBrowseHero } from "@/components/homestays/HomestaysBrowseHero";
-import { HOMESTAY_PROPERTY_TYPES } from "@/data/homestays";
 import { getHomestaysForUi } from "@/lib/homestay-fns";
 import {
   filterHomestays,
@@ -96,23 +96,13 @@ function HomestaysBrowsePage() {
               </p>
             ) : null}
           </div>
-          <label className="w-full sm:min-w-[200px] sm:w-auto">
+          <div className="w-full sm:min-w-[240px] sm:w-auto">
             <span className="eyebrow mb-2 block text-[0.58rem]">Property type</span>
-            <select
-              value={search.propertyType ?? ""}
-              onChange={(event) =>
-                updateSearch({ propertyType: event.target.value || undefined })
-              }
-              className="w-full border border-[oklch(0.72_0.09_78_/_0.25)] bg-card px-3 py-2.5 text-sm text-foreground focus:border-ember/55 focus:outline-none"
-            >
-              <option value="">All types</option>
-              {HOMESTAY_PROPERTY_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </label>
+            <HomestaysPropertyTypeFilter
+              value={search.propertyType}
+              onChange={(propertyType) => updateSearch({ propertyType })}
+            />
+          </div>
         </div>
 
         {filtered.length === 0 ? (
