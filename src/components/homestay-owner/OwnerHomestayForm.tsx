@@ -322,7 +322,6 @@ export function OwnerHomestayForm({
           onChange={setPhotoUrls}
           readOnly={disabled || saving}
           inputClass={inputClass}
-          surface="luxury"
           label="Property photos"
           hint="Upload photos from your device. The first image is the cover; additional images appear in the gallery."
           photoAltPrefix="Homestay photo"
@@ -355,13 +354,12 @@ export function OwnerHomestayForm({
       </section>
 
       {!disabled ? (
-        <label className="flex items-center gap-2 text-sm luxury-panel-body">
+        <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
             checked={submitForReview}
             onChange={(e) => setSubmitForReview(e.target.checked)}
             disabled={saving}
-            className={checkboxClass}
           />
           Submit for Royal Passage review after saving
         </label>

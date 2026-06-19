@@ -134,7 +134,7 @@ export function HomestayBookingPanel({
             min={today}
             value={checkIn}
             onChange={(event) => onCheckInChange(event.target.value)}
-            className="luxury-input"
+            className="w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body focus:border-[#4A0000]/50 focus:outline-none"
           />
         </label>
         <label className="block">
@@ -144,7 +144,7 @@ export function HomestayBookingPanel({
             min={checkIn}
             value={checkOut}
             onChange={(event) => onCheckOutChange(event.target.value)}
-            className="luxury-input"
+            className="w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body focus:border-[#4A0000]/50 focus:outline-none"
           />
         </label>
       </div>
@@ -220,7 +220,7 @@ export function HomestayBookingPanel({
           onChange={(event) => onNotesChange(event.target.value)}
           rows={3}
           placeholder="Arrival time, dietary needs, or special requests…"
-          className="luxury-input resize-none min-h-[5.5rem]"
+          className="w-full resize-none rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none"
         />
       </div>
 
