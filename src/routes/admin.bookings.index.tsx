@@ -10,6 +10,7 @@ import { parseBookingListSearch } from "@/lib/dashboard-booking-filters";
 import { dashboardPathForRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { NOINDEX_META } from "@/lib/seo-helpers";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/admin/bookings/")({
   validateSearch: parseBookingListSearch,
@@ -75,7 +76,7 @@ function AdminBookingsPage() {
   }, [accessToken, loadBookings]);
 
   if (loading || !user || role !== "admin" || !accessToken) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   return (

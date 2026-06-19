@@ -2,6 +2,21 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
 import { HostBookingActions } from "@/components/host/HostBookingActions";
+import {
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableEmpty,
+  DashboardTableFilters,
+  DashboardTableHead,
+  DashboardTableHeadCell,
+  DashboardTableHeadRow,
+  DashboardTableLinkCell,
+  DashboardTableRow,
+  DashboardTableScroll,
+  DashboardTableSection,
+  dashboardFilterBtnClass,
+} from "@/components/ui/DashboardTable";
 import type { BookingSummary } from "@/lib/api/bookings";
 import type { BookingListStatus, BookingPaymentFilter, BookingDateView } from "@/lib/dashboard-booking-filters";
 import { bookingMatchesDateView } from "@/lib/booking-window";
@@ -24,10 +39,6 @@ type HostBookingTableProps = {
 
 type StatusFilter = BookingListStatus;
 type PaymentFilter = BookingPaymentFilter;
-
-function filterBtn(active: boolean) {
-  return active ? "luxury-btn-sm luxury-btn-primary" : "luxury-btn-sm luxury-btn-panel-outline";
-}
 
 function filterBookings(
   bookings: BookingSummary[],
@@ -110,21 +121,21 @@ export function HostBookingTable({
   ];
 
   return (
-    <section className="space-y-5">
-      <div className="flex flex-wrap gap-2">
+    <DashboardTableSection>
+      <DashboardTableFilters>
         {dateViewButtons.map(({ value, label }) => (
           <button
             key={value}
             type="button"
             onClick={() => setDateView(value)}
-            className={filterBtn(dateView === value)}
+            className={dashboardFilterBtnClass(dateView === value)}
           >
             {label}
           </button>
         ))}
-      </div>
+      </DashboardTableFilters>
 
-      <div className="flex flex-wrap gap-2">
+      <DashboardTableFilters>
         {statusButtons.map((value) => (
           <button
             key={value}
@@ -133,7 +144,7 @@ export function HostBookingTable({
               setStatusFilter(value);
               if (value !== "confirmed") setPaymentFilter("all");
             }}
-            className={filterBtn(statusFilter === value && paymentFilter === "all")}
+            className={dashboardFilterBtnClass(statusFilter === value && paymentFilter === "all")}
           >
             {value}
           </button>
@@ -144,45 +155,38 @@ export function HostBookingTable({
             setStatusFilter("confirmed");
             setPaymentFilter("cod-pending");
           }}
-          className={filterBtn(paymentFilter === "cod-pending")}
+          className={dashboardFilterBtnClass(paymentFilter === "cod-pending")}
         >
           COD pending
         </button>
-      </div>
+      </DashboardTableFilters>
 
       {filtered.length === 0 ? (
-        <p className="luxury-panel-body py-8 text-sm">No bookings in this view.</p>
+        <DashboardTableEmpty>No bookings in this view.</DashboardTableEmpty>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px] text-left text-sm">
-            <thead>
-              <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
-                <th className="px-3 py-2 font-normal">Guest</th>
-                <th className="px-3 py-2 font-normal">Experience</th>
-                <th className="px-3 py-2 font-normal">When</th>
-                <th className="px-3 py-2 font-normal">Guests</th>
-                <th className="px-3 py-2 font-normal">Total</th>
-                <th className="px-3 py-2 font-normal">Status</th>
-                <th className="px-3 py-2 font-normal">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+        <DashboardTableScroll>
+          <DashboardTable minWidth="xl">
+            <DashboardTableHead>
+              <DashboardTableHeadRow>
+                <DashboardTableHeadCell>Guest</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Experience</DashboardTableHeadCell>
+                <DashboardTableHeadCell>When</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Guests</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Total</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Status</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Actions</DashboardTableHeadCell>
+              </DashboardTableHeadRow>
+            </DashboardTableHead>
+            <DashboardTableBody>
               {filtered.map((booking) => (
-                <tr
-                  key={booking.id}
-                  className="border-b border-[rgb(74_0_0/0.12)] last:border-0"
-                >
-                  <td className="px-3 py-3">
-                    <Link
-                      to="/host/bookings/$bookingId"
-                      params={{ bookingId: booking.id }}
-                      className="luxury-panel-link block hover:underline"
-                    >
-                      <div className="luxury-panel-heading">{booking.guestName ?? "Guest"}</div>
-                      <div className="luxury-panel-body text-xs">{booking.guestEmail}</div>
-                    </Link>
-                  </td>
-                  <td className="px-3 py-3">
+                <DashboardTableRow key={booking.id}>
+                  <DashboardTableLinkCell
+                    to="/host/bookings/$bookingId"
+                    params={{ bookingId: booking.id }}
+                    title={booking.guestName ?? "Guest"}
+                    subtitle={booking.guestEmail}
+                  />
+                  <DashboardTableCell>
                     <Link
                       to="/host/bookings/$bookingId"
                       params={{ bookingId: booking.id }}
@@ -190,25 +194,25 @@ export function HostBookingTable({
                     >
                       {booking.experience.title}
                     </Link>
-                  </td>
-                  <td className="luxury-panel-body px-3 py-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell>
                     {formatDateLong(booking.slot.date)}
                     <br />
                     <span className="text-xs">{booking.slot.start}</span>
-                  </td>
-                  <td className="luxury-panel-body px-3 py-3">{booking.participantCount}</td>
-                  <td className="luxury-panel-heading px-3 py-3 font-display text-lg">
+                  </DashboardTableCell>
+                  <DashboardTableCell>{booking.participantCount}</DashboardTableCell>
+                  <DashboardTableCell variant="money">
                     {formatMoney(booking.totalAmount, booking.currencySymbol)}
-                  </td>
-                  <td className="px-3 py-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell>
                     <BookingStatusChip
                       bookingStatus={booking.bookingStatus}
                       paymentStatus={booking.paymentStatus}
                       isPaused={booking.isPaused}
                       surface="light"
                     />
-                  </td>
-                  <td className="px-3 py-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell>
                     <HostBookingActions
                       booking={booking}
                       busy={busyId === booking.id}
@@ -220,13 +224,13 @@ export function HostBookingTable({
                       onPause={onPause}
                       onResume={onResume}
                     />
-                  </td>
-                </tr>
+                  </DashboardTableCell>
+                </DashboardTableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </DashboardTableBody>
+          </DashboardTable>
+        </DashboardTableScroll>
       )}
-    </section>
+    </DashboardTableSection>
   );
 }

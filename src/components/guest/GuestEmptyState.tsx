@@ -22,7 +22,7 @@ export function GuestEmptyState({
 
   if (isLight) {
     return (
-      <article className="py-14 text-center">
+      <article className="py-14 text-center" role="status">
         <div className="mx-auto flex h-8 w-8 items-center justify-center text-[#C8A25A]/75">{icon}</div>
         <h3 className="luxury-panel-heading mt-3 font-display text-xl tracking-wide">{title}</h3>
         <p className="luxury-panel-body mt-2 text-xs leading-relaxed">{description}</p>
@@ -37,7 +37,7 @@ export function GuestEmptyState({
   }
 
   return (
-    <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 text-center">
+    <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 text-center" role="status">
       <div className="mx-auto flex h-8 w-8 items-center justify-center text-ember">{icon}</div>
       <h3 className="mt-3 font-display text-xl">{title}</h3>
       <p className="mt-2 text-xs text-muted-foreground">{description}</p>

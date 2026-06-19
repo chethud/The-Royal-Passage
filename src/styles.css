@@ -302,6 +302,86 @@
   box-shadow: 0 0 12px #c8a25a66;
 }
 
+/* Header mobile sheet — touch targets, spacing, safe area (Phase 6) */
+.header-mobile-trigger,
+.header-mobile-action {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+.header-mobile-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+.header-mobile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.header-mobile-nav-divider {
+  margin-block: 0.75rem;
+  border-top: 1px solid oklch(0.72 0.09 78 / 0.18);
+}
+
+.header-mobile-nav-section-label {
+  margin: 0;
+  padding: 0.5rem 0.75rem 0.25rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: oklch(0.72 0.09 78 / 0.75);
+}
+
+.header-mobile-nav-link {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-sm);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: oklch(0.92 0.03 85 / 0.88);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.header-mobile-nav-link:hover {
+  background: oklch(1 0 0 / 0.05);
+  color: var(--color-ember);
+}
+
+.header-mobile-nav-link:focus-visible {
+  outline: 2px solid oklch(0.76 0.14 78 / 0.55);
+  outline-offset: 2px;
+}
+
+.header-mobile-nav-link--active {
+  background: oklch(0.76 0.14 78 / 0.1);
+  color: var(--color-ember);
+  box-shadow: inset 3px 0 0 0 #c8a25a;
+}
+
+.header-mobile-nav-link--danger {
+  color: var(--color-destructive);
+}
+
+.header-mobile-nav-link--danger:hover {
+  background: oklch(0.55 0.2 25 / 0.12);
+  color: var(--color-destructive);
+}
+
 .luxury-btn-primary {
   display: inline-flex;
   align-items: center;
@@ -560,6 +640,101 @@
 
 .luxury-panel-step-connector {
   background-color: rgb(74 0 0 / 0.42);
+}
+
+/* Checkout wizard step chrome (Phase 7) */
+.checkout-wizard-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .checkout-wizard-steps {
+    gap: 0.75rem 2rem;
+  }
+}
+
+.checkout-wizard-step {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .checkout-wizard-step {
+    gap: 2rem;
+  }
+}
+
+.checkout-wizard-step__label {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.checkout-wizard-step__badge {
+  display: inline-flex;
+  height: 2rem;
+  width: 2rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  line-height: 1;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.checkout-wizard-step__text {
+  max-width: 9rem;
+  line-height: 1.35;
+}
+
+@media (min-width: 480px) {
+  .checkout-wizard-step__text {
+    max-width: none;
+  }
+}
+
+.checkout-wizard-step__connector {
+  display: none;
+  height: 2px;
+  width: 2.5rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .checkout-wizard-step__connector {
+    display: block;
+  }
+}
+
+.checkout-wizard-back-link {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #4a0000;
+  transition: color 0.2s ease;
+}
+
+.checkout-wizard-back-link:hover {
+  color: #2d0000;
+}
+
+.checkout-wizard-back-link:focus-visible {
+  outline: 2px solid rgb(74 0 0 / 0.35);
+  outline-offset: 2px;
 }
 
 .luxury-panel-image {
@@ -914,6 +1089,100 @@
   );
   background-size: 200% 100%;
   animation: luxury-shimmer 1.6s ease-in-out infinite;
+}
+
+/* 8px-based layout utilities (spacing only — no color changes) */
+.page-section {
+  padding-block: 3.5rem;
+}
+
+@media (min-width: 640px) {
+  .page-section {
+    padding-block: 5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .page-section {
+    padding-block: 6rem;
+  }
+}
+
+.stack-4 {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stack-6 {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stack-8 {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.luxury-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+  text-align: center;
+  border-radius: var(--radius-md);
+  border: 1px solid oklch(0.72 0.09 78 / 0.2);
+  background: oklch(0.26 0.09 24 / 0.42);
+}
+
+.dashboard-skeleton {
+  border-radius: var(--radius-sm);
+}
+
+.dashboard-skeleton--badge {
+  width: 8rem;
+  height: 1.5rem;
+}
+
+.dashboard-skeleton--title {
+  width: min(16rem, 70%);
+  height: 2.5rem;
+}
+
+.dashboard-skeleton--subtitle {
+  width: min(24rem, 90%);
+  height: 1rem;
+}
+
+.dashboard-skeleton--panel {
+  min-height: 14rem;
+  border-radius: var(--radius-md);
+}
+
+.dashboard-skeleton--row {
+  height: 3.5rem;
+}
+
+.luxury-checkout-panel .dashboard-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0.35) 0%,
+    rgb(255 255 255 / 0.65) 50%,
+    rgb(255 255 255 / 0.35) 100%
+  );
+  background-size: 200% 100%;
+  animation: luxury-shimmer 1.6s ease-in-out infinite;
+}
+
+.luxury-input:focus-visible,
+.luxury-checkout-panel select.luxury-input:focus-visible,
+.luxury-checkout-panel .luxury-input[type="date"]:focus-visible,
+.luxury-checkout-panel .luxury-input[type="time"]:focus-visible {
+  outline: 2px solid rgb(74 0 0 / 0.35);
+  outline-offset: 2px;
 }
 
 /* Royal vintage Mysuru slider */

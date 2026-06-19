@@ -13,6 +13,7 @@ import { formatMoney } from "@/lib/money";
 import { dashboardPathForRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { NOINDEX_META } from "@/lib/seo-helpers";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/admin/bookings/$bookingId")({
   head: () => ({
@@ -73,7 +74,7 @@ function AdminBookingDetailPage() {
   }, [accessToken, loadBooking]);
 
   if (loading || !user || role !== "admin" || !accessToken || pageLoading) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   if (pageError || !booking) {

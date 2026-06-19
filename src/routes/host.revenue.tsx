@@ -6,6 +6,7 @@ import { fetchHostRevenue, type HostRevenueSummary } from "@/lib/api/host";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { formatMoney } from "@/lib/money";
 import { useHostAccess } from "@/lib/use-host-access";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/host/revenue")({
   head: () => ({
@@ -46,7 +47,7 @@ function HostRevenuePage() {
   }, [loadPage, ready]);
 
   if (loading || !ready) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   return (

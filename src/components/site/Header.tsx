@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -41,6 +40,14 @@ import {
   isPublicNavItemActive,
   publicNavItemsForSection,
 } from "@/lib/public-site-nav";
+import {
+  headerMobileActionClass,
+  headerMobileSheetClass,
+  headerMobileTriggerClass,
+  MobileNavDivider,
+  MobileNavLink,
+  MobileNavSectionLabel,
+} from "@/components/site/header-mobile-nav";
 
 type NavItem = { label: string; to: string };
 
@@ -64,9 +71,6 @@ function navItemsForUser(
 
 const navLinkClass =
   "header-nav-link rounded-sm px-1 py-1 text-ink/80 transition-colors hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60";
-
-const sheetLinkClass =
-  "rounded-sm px-3 py-2.5 text-sm uppercase tracking-[0.16em] text-ink/85 hover:bg-white/5 hover:text-ember";
 
 function NavCountBadge({ count }: { count?: number }) {
   if (!count || count <= 0) return null;
@@ -366,190 +370,130 @@ export function Header() {
           ) : null}
         </nav>
 
-        <Sheet>
-          <SheetTrigger asChild>
-            <button
-              type="button"
-              className={`${navLinkClass} inline-flex md:hidden`}
-              aria-label="Open menu"
+        <div className="flex items-center gap-1 sm:gap-2 md:hidden">
+          {showGuestCart ? (
+            <Link
+              to="/dashboard/cart"
+              className={`${headerMobileActionClass} relative gap-1`}
+              aria-label={cartCount > 0 ? `Cart (${cartCount} items)` : "Cart"}
             >
-              <Menu className="h-5 w-5" />
-            </button>
-          </SheetTrigger>
-          <SheetContent
-            side="right"
-            className="w-[88vw] border-[oklch(0.72_0.09_78_/_0.22)] bg-[oklch(0.14_0.05_22)] text-foreground sm:max-w-md"
-          >
-            <SheetHeader>
-              <SheetTitle className="font-display text-xl">The Royal Passage</SheetTitle>
-              <SheetDescription className="sr-only">Site navigation menu</SheetDescription>
-            </SheetHeader>
-            <div className="mt-8 flex flex-col gap-1">
-              {navItems.map((item) => {
-                const active = isHeaderNavItemActive(role, pathname, item.to);
-                return (
-                  <SheetClose asChild key={`${item.to}-${item.label}`}>
-                    <Link
-                      to={item.to as "/experiences"}
-                      className={`${sheetLinkClass}${active ? " text-ember header-nav-link--active" : ""}`}
+              <CartIcon size={40} />
+              {cartCount > 0 ? (
+                <span className="absolute right-1 top-1 rounded-full bg-ember px-1.5 py-0.5 text-[0.55rem] font-semibold leading-none text-primary-foreground">
+                  {cartCount > 9 ? "9+" : cartCount}
+                </span>
+              ) : null}
+            </Link>
+          ) : null}
+          {showStaffNotifications ? <NotificationBell /> : null}
+          <Sheet>
+            <SheetTrigger asChild>
+              <button type="button" className={headerMobileTriggerClass} aria-label="Open menu">
+                <Menu className="h-5 w-5" strokeWidth={1.75} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className={headerMobileSheetClass}>
+              <SheetHeader className="space-y-1 text-left">
+                <SheetTitle className="font-display text-xl tracking-wide">The Royal Passage</SheetTitle>
+                {displayName ? (
+                  <p className="text-sm text-muted-foreground">{displayName}</p>
+                ) : null}
+                <SheetDescription className="sr-only">Site navigation menu</SheetDescription>
+              </SheetHeader>
+
+              <nav className="header-mobile-nav mt-6" aria-label="Mobile navigation">
+                {navItems.map((item) => {
+                  const active = isHeaderNavItemActive(role, pathname, item.to);
+                  return (
+                    <MobileNavLink
+                      key={`${item.to}-${item.label}`}
+                      to={item.to}
+                      active={active}
                     >
                       {item.label}
                       <NavCountBadge count={navBadges[item.to]} />
-                    </Link>
-                  </SheetClose>
-                );
-              })}
+                    </MobileNavLink>
+                  );
+                })}
 
-              {showPublicBookingCtas ? (
-                isHomestaySection ? (
+                {showPublicBookingCtas || showSignIn ? (
                   <>
-                    <SheetClose asChild>
-                      <Link to="/homestays/browse" className={sheetLinkClass}>
-                        Book a Homestay
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link to="/" className={sheetLinkClass}>
-                        Experiences
-                      </Link>
-                    </SheetClose>
-                  </>
-                ) : (
-                  <>
-                    <SheetClose asChild>
-                      <Link to="/experiences" className={sheetLinkClass}>
-                        Book an Experience
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link to="/homestays" className={sheetLinkClass}>
-                        Homestays
-                      </Link>
-                    </SheetClose>
-                  </>
-                )
-              ) : null}
-              {showGuestCart ? (
-                <SheetClose asChild>
-                  <Link
-                    to="/dashboard/cart"
-                    className={`${sheetLinkClass} inline-flex items-center gap-2`}
-                    aria-label={cartCount > 0 ? `Cart (${cartCount} items)` : "Cart"}
-                  >
-                    <CartIcon size={38} />
-                    {cartCount > 0 ? (
-                      <span className="rounded-full bg-ember px-1.5 py-0.5 text-[0.6rem] font-semibold text-primary-foreground">
-                        {cartCount}
-                      </span>
+                    <MobileNavDivider />
+                    {showPublicBookingCtas ? (
+                      <>
+                        <MobileNavSectionLabel>Book</MobileNavSectionLabel>
+                        {isHomestaySection ? (
+                          <>
+                            <MobileNavLink to="/homestays/browse">Book a Homestay</MobileNavLink>
+                            <MobileNavLink to="/">Experiences</MobileNavLink>
+                          </>
+                        ) : (
+                          <>
+                            <MobileNavLink to="/experiences">Book an Experience</MobileNavLink>
+                            <MobileNavLink to="/homestays">Homestays</MobileNavLink>
+                          </>
+                        )}
+                      </>
                     ) : null}
-                  </Link>
-                </SheetClose>
-              ) : null}
-              {showSignIn ? (
-                <SheetClose asChild>
-                  <Link to="/sign-in" className={sheetLinkClass}>
-                    Sign in
-                  </Link>
-                </SheetClose>
-              ) : null}
-              {showAccountMenu ? (
-                <>
-                  {isGuest ? (
-                    <>
-                      <SheetClose asChild>
-                        <Link to={isHomestaySection ? "/homestays" : "/"} className={sheetLinkClass}>
-                          Home
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link to="/dashboard/history" className={sheetLinkClass}>
+                    {showSignIn ? <MobileNavLink to="/sign-in">Sign in</MobileNavLink> : null}
+                  </>
+                ) : null}
+
+                {showAccountMenu ? (
+                  <>
+                    <MobileNavDivider />
+                    <MobileNavSectionLabel>Account</MobileNavSectionLabel>
+                    {isGuest ? (
+                      <>
+                        <MobileNavLink to={isHomestaySection ? "/homestays" : "/"}>Home</MobileNavLink>
+                        <MobileNavLink to="/dashboard/history">
                           {isHomestaySection ? "My stays" : "History"}
-                        </Link>
-                      </SheetClose>
-                      {!isHomestaySection ? (
-                        <SheetClose asChild>
-                          <Link to="/dashboard/cart" className={sheetLinkClass}>
-                            Cart
-                          </Link>
-                        </SheetClose>
-                      ) : null}
-                    </>
-                  ) : (
-                    <SheetClose asChild>
-                      <Link to={dashboardPath} className={sheetLinkClass}>
-                        Dashboard
-                      </Link>
-                    </SheetClose>
-                  )}
-                  {isAdmin ? (
-                    <>
-                      <SheetClose asChild>
-                        <Link to="/admin/homepage-edit" className={sheetLinkClass}>
-                          Edit
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link to="/admin/hosts" className={sheetLinkClass}>
-                          Host accounts
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link to="/admin/reviews" className={sheetLinkClass}>
-                          Reviews
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link to="/admin/activity" className={sheetLinkClass}>
-                          Activity log
-                        </Link>
-                      </SheetClose>
-                    </>
-                  ) : null}
-                  <SheetClose asChild>
-                    <Link to={profilePathForRole(role)} className={sheetLinkClass}>
-                      Profile
-                    </Link>
-                  </SheetClose>
-                  {isGuest ? (
-                    <>
-                      {!isHomestaySection ? (
-                        <SheetClose asChild>
-                          <Link to="/experiences" className={sheetLinkClass}>
-                            Browse experiences
-                          </Link>
-                        </SheetClose>
-                      ) : null}
-                      <SheetClose asChild>
-                        <Link
-                          to={isHomestaySection ? "/homestays/browse" : "/homestays"}
-                          className={sheetLinkClass}
-                        >
+                        </MobileNavLink>
+                        {!isHomestaySection && !showGuestCart ? (
+                          <MobileNavLink to="/dashboard/cart">Cart</MobileNavLink>
+                        ) : null}
+                      </>
+                    ) : (
+                      <MobileNavLink to={dashboardPath}>Dashboard</MobileNavLink>
+                    )}
+                    {isAdmin ? (
+                      <>
+                        <MobileNavLink to="/admin/homepage-edit">Edit</MobileNavLink>
+                        <MobileNavLink to="/admin/hosts">Host accounts</MobileNavLink>
+                        <MobileNavLink to="/admin/reviews">Reviews</MobileNavLink>
+                        <MobileNavLink to="/admin/activity">Activity log</MobileNavLink>
+                      </>
+                    ) : null}
+                    <MobileNavLink to={profilePathForRole(role)}>Profile</MobileNavLink>
+                    {isGuest ? (
+                      <>
+                        {!isHomestaySection ? (
+                          <MobileNavLink to="/experiences">Browse experiences</MobileNavLink>
+                        ) : null}
+                        <MobileNavLink to={isHomestaySection ? "/homestays/browse" : "/homestays"}>
                           Browse homestays
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link to={isHomestaySection ? "/" : "/homestays"} className={sheetLinkClass}>
+                        </MobileNavLink>
+                        <MobileNavLink to={isHomestaySection ? "/" : "/homestays"}>
                           {isHomestaySection ? "Experiences home" : "Homestays home"}
-                        </Link>
-                      </SheetClose>
-                    </>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      void handleLogout();
-                    }}
-                    disabled={loggingOut}
-                    className="inline-flex items-center gap-2 rounded-sm px-3 py-2.5 text-left text-sm text-destructive hover:bg-white/5 disabled:opacity-70"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    {loggingOut ? "Logging out..." : "Logout"}
-                  </button>
-                </>
-              ) : null}
-            </div>
-          </SheetContent>
-        </Sheet>
+                        </MobileNavLink>
+                      </>
+                    ) : null}
+                    <MobileNavLink
+                      onClick={() => {
+                        void handleLogout();
+                      }}
+                      disabled={loggingOut}
+                      className="header-mobile-nav-link--danger gap-2"
+                    >
+                      <LogOut className="h-4 w-4" strokeWidth={1.75} />
+                      {loggingOut ? "Logging out..." : "Logout"}
+                    </MobileNavLink>
+                  </>
+                ) : null}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );

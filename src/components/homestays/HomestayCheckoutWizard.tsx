@@ -1,517 +1,244 @@
-import { Link } from "@tanstack/react-router";
-
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
-
+import {
+  CheckoutWizardConfirmRow,
+  CheckoutWizardStepBody,
+  CheckoutWizardStepFooter,
+  CheckoutWizardStepHeader,
+  CheckoutWizardStepper,
+  CheckoutWizardSummaryPanel,
+  CheckoutWizardSummaryRow,
+} from "@/components/booking/CheckoutWizardPrimitives";
 import { HomestayBookingPanel } from "@/components/homestays/HomestayBookingPanel";
-
 import { HomestayCashPaymentSelector } from "@/components/homestays/HomestayCashPaymentSelector";
-
 import { PayAtHomestayBadge } from "@/components/homestays/PayAtHomestayBadge";
-
 import type { Homestay } from "@/data/homestays";
-
 import { useHomestayCheckout } from "@/hooks/use-homestay-checkout";
-
 import { formatDateLong } from "@/lib/date-format";
-
 import { formatMoney } from "@/lib/money";
 
-
-
 type HomestayCheckoutWizardProps = {
-
   stay: Homestay;
-
   source: "live" | "static";
-
   initialCheckIn?: string;
-
   initialCheckOut?: string;
-
   initialGuests?: number;
   initialRoomId?: string;
   initialRoomCount?: number;
   initialExtraBeds?: number;
-
   onSuccess: (bookingId: string) => void;
-
   backLink: {
-
     to: "/homestays/$slug";
-
     params: { slug: string };
-
     label: string;
-
   };
-
 };
 
-
-
 const STEPS = [
-
   { id: 1, label: "Dates & guests" },
-
   { id: 2, label: "Cash payment" },
-
   { id: 3, label: "Confirm" },
-
 ] as const;
 
-
-
 export function HomestayCheckoutWizard({
-
   stay,
-
   source,
-
   initialCheckIn,
-
   initialCheckOut,
-
   initialGuests,
-
   initialRoomId,
-
   initialRoomCount,
-
   initialExtraBeds,
-
   onSuccess,
-
   backLink,
-
 }: HomestayCheckoutWizardProps) {
-
   const checkout = useHomestayCheckout(stay, {
-
     initialCheckIn,
-
     initialCheckOut,
-
     initialGuests,
-
     initialRoomId,
-
     initialRoomCount,
-
     initialExtraBeds,
-
   });
-
   const bookable = source === "live" && !stay.id.startsWith("stay-");
-
   const sym = stay.currencySymbol ?? "₹";
 
-
-
   const handleSubmit = async () => {
-
     const bookingId = await checkout.submit();
-
     if (bookingId) onSuccess(bookingId);
-
   };
 
-
+  const roomSummary = checkout.selectedRoom
+    ? `${checkout.selectedRoom.name}${checkout.roomCount > 1 ? ` × ${checkout.roomCount}` : ""}`
+    : "—";
 
   return (
-
     <div className="mt-6 space-y-6">
-
       {!bookable ? (
-
         <LuxuryCheckoutPanel>
-
           <p className="luxury-panel-body text-sm">
-
             Live booking opens once homestay listings are published in the database.
-
           </p>
-
         </LuxuryCheckoutPanel>
-
       ) : null}
 
-
-
-      <LuxuryCheckoutPanel className="py-5 sm:py-6">
-
-        <nav aria-label="Stay booking progress">
-
-          <ol className="flex flex-wrap items-center gap-x-8 gap-y-3">
-
-            {STEPS.map((item, index) => {
-
-              const active = checkout.step === item.id;
-
-              const done = checkout.step > item.id;
-
-              return (
-
-                <li key={item.id} className="flex items-center gap-8">
-
-                  <span
-
-                    className={`flex items-center gap-2.5 text-[0.65rem] uppercase tracking-[0.18em] transition-colors ${
-
-                      active
-
-                        ? "luxury-panel-heading font-semibold"
-
-                        : done
-
-                          ? "luxury-panel-heading"
-
-                          : "luxury-panel-step-text-idle"
-
-                    }`}
-
-                  >
-
-                    <span
-
-                      className={`flex h-8 w-8 items-center justify-center rounded-full border font-display text-xs transition-colors ${
-
-                        active
-
-                          ? "luxury-panel-step-active"
-
-                          : done
-
-                            ? "luxury-panel-step-done"
-
-                            : "luxury-panel-step-idle"
-
-                      }`}
-
-                    >
-
-                      {String(item.id).padStart(2, "0")}
-
-                    </span>
-
-                    <span>{item.label}</span>
-
-                  </span>
-
-                  {index < STEPS.length - 1 ? (
-
-                    <span className="luxury-panel-step-connector hidden h-0.5 w-10 sm:block" aria-hidden />
-
-                  ) : null}
-
-                </li>
-
-              );
-
-            })}
-
-          </ol>
-
-        </nav>
-
-      </LuxuryCheckoutPanel>
-
-
+      <CheckoutWizardStepper steps={STEPS} currentStep={checkout.step} ariaLabel="Stay booking progress" />
 
       {checkout.step === 1 ? (
-
         <LuxuryCheckoutPanel>
-
-          <h2 className="luxury-panel-heading font-display text-2xl tracking-[0.02em] md:text-3xl">
-
-            Choose your dates
-
-          </h2>
-
-          <p className="luxury-panel-body mt-2 max-w-xl text-sm leading-relaxed">
-
-            Select check-in and check-out, then tell us how many guests are staying.
-
-          </p>
-
-          <div className="luxury-panel-divider mt-8 border-t pt-8">
-
+          <CheckoutWizardStepHeader
+            title="Choose your dates"
+            description="Select check-in and check-out, then tell us how many guests are staying."
+          />
+          <CheckoutWizardStepBody>
             <HomestayBookingPanel
-
               stay={stay}
-
               checkIn={checkout.checkIn}
-
               checkOut={checkout.checkOut}
-
               guests={checkout.guests}
-
               roomId={checkout.roomId}
-
               roomCount={checkout.roomCount}
-
               extraBedCount={checkout.extraBedCount}
-
               maxGuests={checkout.maxGuests}
-
               maxRooms={checkout.maxRooms}
-
               maxExtraBeds={checkout.maxExtra}
-
               notes={checkout.notes}
-
               nights={checkout.nights}
-
               totalMinor={checkout.totalMinor}
-
               onCheckInChange={checkout.setCheckIn}
-
               onCheckOutChange={checkout.setCheckOut}
-
               onGuestsChange={checkout.setGuests}
-
               onRoomIdChange={checkout.setRoomId}
-
               onRoomCountChange={checkout.setRoomCount}
-
               onExtraBedCountChange={checkout.setExtraBedCount}
-
               onNotesChange={checkout.setNotes}
-
               hideActions
-
               bookable={bookable}
-
             />
-
-          </div>
-
-          <div className="luxury-panel-divider mt-8 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
-
-            <Link
-
-              to={backLink.to}
-
-              params={backLink.params}
-
-              hash="book"
-
-              className="luxury-panel-link text-[0.65rem] font-semibold uppercase tracking-[0.14em]"
-
-            >
-
-              {backLink.label}
-
-            </Link>
-
-            <button
-
-              type="button"
-
-              disabled={!bookable || checkout.nights < 1}
-
-              onClick={checkout.goNext}
-
-              className="luxury-btn-sm luxury-btn-primary disabled:opacity-50"
-
-            >
-
-              Continue to payment
-
-            </button>
-
-          </div>
-
+          </CheckoutWizardStepBody>
+          <CheckoutWizardStepFooter
+            back={{
+              to: backLink.to,
+              params: backLink.params,
+              hash: "book",
+              label: backLink.label,
+            }}
+            primary={{
+              label: "Continue to payment",
+              onClick: checkout.goNext,
+              disabled: !bookable || checkout.nights < 1,
+            }}
+          />
         </LuxuryCheckoutPanel>
-
       ) : null}
-
-
 
       {checkout.step === 2 ? (
-
         <LuxuryCheckoutPanel>
-
-          <h2 className="luxury-panel-heading font-display text-2xl tracking-[0.02em] md:text-3xl">
-
-            Cash at the homestay
-
-          </h2>
-
-          <p className="luxury-panel-body mt-2 max-w-xl text-sm leading-relaxed">
-
-            Homestays on Royal Passage use cash payment only — no cards or online checkout.
-
-          </p>
-
-          <div className="luxury-panel-divider mt-8 border-t pt-8">
-
+          <CheckoutWizardStepHeader
+            title="Cash at the homestay"
+            description="Homestays on Royal Passage use cash payment only — no cards or online checkout."
+          />
+          <CheckoutWizardStepBody>
             <HomestayCashPaymentSelector
-
               value={checkout.paymentMethod}
-
               onChange={checkout.setPaymentMethod}
-
               surface="light"
-
             />
-
-          </div>
-
-          <div className="luxury-panel-divider mt-8 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
-
-            <button type="button" onClick={checkout.goBack} className="luxury-btn-sm luxury-btn-panel-outline">
-
-              Back
-
-            </button>
-
-            <button type="button" onClick={checkout.goNext} className="luxury-btn-sm luxury-btn-primary">
-
-              Review & confirm
-
-            </button>
-
-          </div>
-
+          </CheckoutWizardStepBody>
+          <CheckoutWizardStepFooter
+            back={{ label: "Back", onClick: checkout.goBack }}
+            primary={{ label: "Review & confirm", onClick: checkout.goNext }}
+          />
         </LuxuryCheckoutPanel>
-
       ) : null}
-
-
 
       {checkout.step === 3 ? (
-
         <LuxuryCheckoutPanel>
-
-          <h2 className="luxury-panel-heading font-display text-2xl tracking-[0.02em] md:text-3xl">
-
-            Confirm your stay
-
-          </h2>
-
-          <dl className="luxury-panel-body mt-8 space-y-4 text-sm">
-
-            <div className="flex justify-between gap-4 border-b luxury-panel-divider pb-3">
-
-              <dt>Property</dt>
-
-              <dd className="text-right font-medium">{stay.title}</dd>
-
+          <CheckoutWizardStepHeader
+            title="Confirm your stay"
+            description="Review your details, then submit your stay request to the host."
+          />
+          <CheckoutWizardStepBody>
+            <dl className="luxury-panel-body space-y-0 text-sm">
+              <CheckoutWizardConfirmRow label="Property" value={stay.title} />
+              <CheckoutWizardConfirmRow
+                label="Dates"
+                value={
+                  <>
+                    {formatDateLong(checkout.checkIn)} → {formatDateLong(checkout.checkOut)}
+                  </>
+                }
+              />
+              <CheckoutWizardConfirmRow label="Guests" value={String(checkout.guests)} />
+              {checkout.selectedRoom ? (
+                <>
+                  <CheckoutWizardConfirmRow label="Room" value={roomSummary} />
+                  {checkout.extraBedCount > 0 ? (
+                    <CheckoutWizardConfirmRow
+                      label="Extra beds"
+                      value={String(checkout.extraBedCount)}
+                    />
+                  ) : null}
+                </>
+              ) : null}
+              <CheckoutWizardConfirmRow
+                label="Total (cash at check-in)"
+                value={formatMoney(checkout.totalMinor, sym)}
+                emphasis
+              />
+              <div className="flex justify-between gap-4 pb-3">
+                <dt className="luxury-panel-body">Payment</dt>
+                <dd className="luxury-panel-body">Cash at homestay</dd>
+              </div>
+            </dl>
+            <div className="mt-6">
+              <PayAtHomestayBadge surface="light" />
             </div>
-
-            <div className="flex justify-between gap-4 border-b luxury-panel-divider pb-3">
-
-              <dt>Dates</dt>
-
-              <dd className="text-right">
-
-                {formatDateLong(checkout.checkIn)} → {formatDateLong(checkout.checkOut)}
-
-              </dd>
-
-            </div>
-
-            <div className="flex justify-between gap-4 border-b luxury-panel-divider pb-3">
-
-              <dt>Guests</dt>
-
-              <dd>{checkout.guests}</dd>
-
-            </div>
-
-            {checkout.selectedRoom ? (
-
-              <>
-
-                <div className="flex justify-between gap-4 border-b luxury-panel-divider pb-3">
-
-                  <dt>Room</dt>
-
-                  <dd className="text-right">
-
-                    {checkout.selectedRoom.name}
-
-                    {checkout.roomCount > 1 ? ` × ${checkout.roomCount}` : ""}
-
-                  </dd>
-
-                </div>
-
-                {checkout.extraBedCount > 0 ? (
-
-                  <div className="flex justify-between gap-4 border-b luxury-panel-divider pb-3">
-
-                    <dt>Extra beds</dt>
-
-                    <dd>{checkout.extraBedCount}</dd>
-
-                  </div>
-
-                ) : null}
-
-              </>
-
-            ) : null}
-
-            <div className="flex justify-between gap-4 border-b luxury-panel-divider pb-3">
-
-              <dt>Total (cash at check-in)</dt>
-
-              <dd className="font-display text-xl text-[#4A0000]">{formatMoney(checkout.totalMinor, sym)}</dd>
-
-            </div>
-
-            <div className="flex justify-between gap-4 pb-3">
-
-              <dt>Payment</dt>
-
-              <dd>Cash at homestay</dd>
-
-            </div>
-
-          </dl>
-
-          <div className="mt-6">
-
-            <PayAtHomestayBadge surface="light" />
-
-          </div>
-
-          {checkout.error ? <p className="mt-4 text-sm text-destructive">{checkout.error}</p> : null}
-
-          <div className="luxury-panel-divider mt-8 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
-
-            <button type="button" onClick={checkout.goBack} className="luxury-btn-sm luxury-btn-panel-outline">
-
-              Back
-
-            </button>
-
-            <button
-
-              type="button"
-
-              disabled={checkout.busy}
-
-              onClick={() => void handleSubmit()}
-
-              className="luxury-btn-sm luxury-btn-primary disabled:opacity-50"
-
-            >
-
-              {checkout.busy ? "Submitting…" : "Request stay"}
-
-            </button>
-
-          </div>
-
+            {checkout.error ? <p className="mt-4 text-sm text-destructive">{checkout.error}</p> : null}
+          </CheckoutWizardStepBody>
+          <CheckoutWizardStepFooter
+            back={{ label: "Back", onClick: checkout.goBack }}
+            primary={{
+              label: checkout.busy ? "Submitting…" : "Request stay",
+              onClick: () => void handleSubmit(),
+              disabled: checkout.busy,
+              showArrow: false,
+            }}
+          />
         </LuxuryCheckoutPanel>
-
       ) : null}
 
+      <CheckoutWizardSummaryPanel
+        title="Stay summary"
+        heading={stay.title}
+        subheading={stay.city}
+        total={checkout.nights > 0 ? formatMoney(checkout.totalMinor, sym) : "—"}
+        rows={
+          <>
+            <CheckoutWizardSummaryRow
+              label="Check-in"
+              value={checkout.checkIn ? formatDateLong(checkout.checkIn) : "—"}
+            />
+            <CheckoutWizardSummaryRow
+              label="Check-out"
+              value={checkout.checkOut ? formatDateLong(checkout.checkOut) : "—"}
+            />
+            <CheckoutWizardSummaryRow
+              label="Nights"
+              value={checkout.nights > 0 ? String(checkout.nights) : "—"}
+              align="left"
+            />
+            <CheckoutWizardSummaryRow label="Guests" value={String(checkout.guests)} align="left" />
+            {checkout.selectedRoom ? (
+              <CheckoutWizardSummaryRow label="Room" value={roomSummary} />
+            ) : null}
+            <CheckoutWizardSummaryRow
+              label="Payment"
+              value={checkout.step >= 2 ? "Cash at homestay" : "—"}
+            />
+          </>
+        }
+        footnote="After you submit, your host can confirm your stay. Pay in cash at check-in once approved."
+      />
     </div>
-
   );
-
 }
-

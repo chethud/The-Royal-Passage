@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Home } from "lucide-react";
 import { useMemo } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -115,11 +116,27 @@ function HomestaysBrowsePage() {
         </div>
 
         {filtered.length === 0 ? (
-          <div className="rounded-md border border-[oklch(0.72_0.09_78_/_0.2)] bg-card/40 px-6 py-16 text-center">
-            <p className="font-display text-xl text-ink">No homestays match your search</p>
-            <p className="mt-2 text-sm text-muted-foreground">
+          <div className="luxury-empty">
+            <Home className="mb-4 h-8 w-8 text-[#D4AF6A]/80" strokeWidth={1.5} aria-hidden />
+            <h2 className="font-display text-xl text-ink">No homestays match your search</h2>
+            <p className="mt-2 max-w-md text-sm text-muted-foreground">
               Try different dates, fewer guests, or another city — new stays are added weekly.
             </p>
+            <button
+              type="button"
+              onClick={() =>
+                updateSearch({
+                  q: undefined,
+                  checkIn: undefined,
+                  checkOut: undefined,
+                  guests: undefined,
+                  propertyType: undefined,
+                })
+              }
+              className="luxury-btn-sm luxury-btn-primary mt-6"
+            >
+              Clear search
+            </button>
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -1,6 +1,16 @@
 import type { ReactNode } from "react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusBadge";
+import {
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableHead,
+  DashboardTableHeadCell,
+  DashboardTableHeadRow,
+  DashboardTableRow,
+  DashboardTableScroll,
+} from "@/components/ui/DashboardTable";
 import type { AdminExperienceDetail } from "@/lib/api/admin";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
@@ -177,33 +187,33 @@ export function AdminExperienceReview({ experience }: AdminExperienceReviewProps
             slots.
           </p>
         ) : (
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-sm">
-              <thead>
-                <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
-                  <th className="px-3 py-2">Date</th>
-                  <th className="px-3 py-2">Time</th>
-                  <th className="px-3 py-2">Capacity</th>
-                  <th className="px-3 py-2">Available</th>
-                  <th className="px-3 py-2">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {experience.slots.map((slot) => (
-                  <tr key={slot.id} className="border-b luxury-panel-divider">
-                    <td className="luxury-panel-body px-3 py-3">{formatDateLong(slot.date)}</td>
-                    <td className="luxury-panel-body px-3 py-3">
-                      {slot.start} – {slot.end}
-                    </td>
-                    <td className="luxury-panel-body px-3 py-3">{slot.capacity}</td>
-                    <td className="luxury-panel-body px-3 py-3">{slot.available}</td>
-                    <td className="luxury-panel-body px-3 py-3">
-                      {slot.isBlocked ? "Blocked" : "Open"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-4">
+            <DashboardTableScroll>
+              <DashboardTable minWidth="sm">
+                <DashboardTableHead>
+                  <DashboardTableHeadRow>
+                    <DashboardTableHeadCell>Date</DashboardTableHeadCell>
+                    <DashboardTableHeadCell>Time</DashboardTableHeadCell>
+                    <DashboardTableHeadCell>Capacity</DashboardTableHeadCell>
+                    <DashboardTableHeadCell>Available</DashboardTableHeadCell>
+                    <DashboardTableHeadCell>Status</DashboardTableHeadCell>
+                  </DashboardTableHeadRow>
+                </DashboardTableHead>
+                <DashboardTableBody>
+                  {experience.slots.map((slot) => (
+                    <DashboardTableRow key={slot.id}>
+                      <DashboardTableCell>{formatDateLong(slot.date)}</DashboardTableCell>
+                      <DashboardTableCell>
+                        {slot.start} – {slot.end}
+                      </DashboardTableCell>
+                      <DashboardTableCell>{slot.capacity}</DashboardTableCell>
+                      <DashboardTableCell>{slot.available}</DashboardTableCell>
+                      <DashboardTableCell>{slot.isBlocked ? "Blocked" : "Open"}</DashboardTableCell>
+                    </DashboardTableRow>
+                  ))}
+                </DashboardTableBody>
+              </DashboardTable>
+            </DashboardTableScroll>
           </div>
         )}
       </LuxuryCheckoutPanel>

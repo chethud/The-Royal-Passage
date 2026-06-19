@@ -13,6 +13,7 @@ import {
 } from "@/lib/api/owner-homestay-bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHomestayOwnerAccess } from "@/lib/use-homestay-owner-access";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/homestay/bookings/")({
   head: () => ({
@@ -67,7 +68,7 @@ function OwnerHomestayBookingsPage() {
   };
 
   if (loading || !ready) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   return (

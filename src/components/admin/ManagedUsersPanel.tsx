@@ -1,6 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { RoleBadge } from "@/components/auth/RoleBadge";
+import {
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableEmpty,
+  DashboardTableFilters,
+  DashboardTableHead,
+  DashboardTableHeadCell,
+  DashboardTableHeadRow,
+  DashboardTableRow,
+  DashboardTableScroll,
+  dashboardFilterBtnClass,
+} from "@/components/ui/DashboardTable";
+import { DashboardPanelSkeleton } from "@/components/ui/DashboardPanelSkeleton";
 import { fetchManagedUsers, type ManagedUser } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { ROLE_LABELS } from "@/lib/roles";
@@ -11,7 +25,7 @@ type ManagedUsersPanelProps = {
 };
 
 function filterBtnClass(active: boolean) {
-  return active ? "luxury-btn-sm luxury-btn-primary" : "luxury-btn-sm luxury-btn-panel-outline";
+  return dashboardFilterBtnClass(active);
 }
 
 export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanelProps) {
@@ -67,37 +81,41 @@ export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanel
       </div>
 
       {loading ? (
-        <p className="luxury-panel-body mt-6 text-sm">Loading accounts...</p>
+        <div className="mt-6">
+          <DashboardPanelSkeleton rows={4} />
+        </div>
       ) : error ? (
         <p className="mt-6 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {error}
         </p>
       ) : filtered.length === 0 ? (
-        <p className="luxury-panel-body mt-6 text-sm">No accounts in this view yet.</p>
+        <DashboardTableEmpty>No accounts in this view yet.</DashboardTableEmpty>
       ) : (
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <thead>
-              <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
-                <th className="px-3 py-2 font-medium">Name</th>
-                <th className="px-3 py-2 font-medium">Email</th>
-                <th className="px-3 py-2 font-medium">Role</th>
-                <th className="px-3 py-2 font-medium">Phone</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((user) => (
-                <tr key={user.id} className="border-b luxury-panel-divider last:border-0">
-                  <td className="luxury-panel-heading px-3 py-3">{user.fullName ?? "—"}</td>
-                  <td className="luxury-panel-body px-3 py-3">{user.email ?? "—"}</td>
-                  <td className="px-3 py-3">
-                    <RoleBadge role={user.role} />
-                  </td>
-                  <td className="luxury-panel-body px-3 py-3">{user.phone ?? "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="mt-6">
+          <DashboardTableScroll>
+            <DashboardTable minWidth="sm">
+              <DashboardTableHead>
+                <DashboardTableHeadRow>
+                  <DashboardTableHeadCell>Name</DashboardTableHeadCell>
+                  <DashboardTableHeadCell>Email</DashboardTableHeadCell>
+                  <DashboardTableHeadCell>Role</DashboardTableHeadCell>
+                  <DashboardTableHeadCell>Phone</DashboardTableHeadCell>
+                </DashboardTableHeadRow>
+              </DashboardTableHead>
+              <DashboardTableBody>
+                {filtered.map((user) => (
+                  <DashboardTableRow key={user.id}>
+                    <DashboardTableCell variant="heading">{user.fullName ?? "—"}</DashboardTableCell>
+                    <DashboardTableCell>{user.email ?? "—"}</DashboardTableCell>
+                    <DashboardTableCell>
+                      <RoleBadge role={user.role} />
+                    </DashboardTableCell>
+                    <DashboardTableCell>{user.phone ?? "—"}</DashboardTableCell>
+                  </DashboardTableRow>
+                ))}
+              </DashboardTableBody>
+            </DashboardTable>
+          </DashboardTableScroll>
         </div>
       )}
     </LuxuryCheckoutPanel>

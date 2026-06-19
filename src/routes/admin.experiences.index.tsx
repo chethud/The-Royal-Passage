@@ -8,6 +8,7 @@ import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { dashboardPathForRole } from "@/lib/roles";
 import { NOINDEX_META } from "@/lib/seo-helpers";
 import { useNavigate } from "@tanstack/react-router";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/admin/experiences/")({
   head: () => ({
@@ -47,7 +48,7 @@ function AdminExperiencesPage() {
   }, [user]);
 
   if (loading || !user || role !== "admin" || !accessToken) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   return (

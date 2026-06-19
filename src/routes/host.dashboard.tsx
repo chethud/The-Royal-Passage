@@ -13,6 +13,7 @@ import {
 } from "@/lib/api/host";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHostAccess } from "@/lib/use-host-access";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/host/dashboard")({
   head: () => ({
@@ -64,7 +65,7 @@ function HostOverviewPage() {
   }, [loadPage, ready]);
 
   if (loading || !ready) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   return (

@@ -17,6 +17,7 @@ import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 import { formatTime12h } from "@/lib/weekday-slots";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 type Search = {
   confirmed?: boolean;
@@ -80,7 +81,7 @@ function StayBookingDetailPage() {
   };
 
   if (loading || !user) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   const sym = booking?.currencySymbol ?? "₹";

@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { History } from "lucide-react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
+import { DashboardPanelSkeleton } from "@/components/ui/DashboardPanelSkeleton";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 import { GuestBookingsList } from "@/components/guest/GuestBookingsList";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { GuestEmptyState } from "@/components/guest/GuestEmptyState";
@@ -99,7 +101,7 @@ function GuestHistoryPage() {
   );
 
   if (loading || !ready || !accessToken) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   return (
@@ -130,7 +132,7 @@ function GuestHistoryPage() {
 
       {pageLoading ? (
         <LuxuryCheckoutPanel>
-          <p className="luxury-panel-body py-8 text-sm">Loading history…</p>
+          <DashboardPanelSkeleton rows={4} />
         </LuxuryCheckoutPanel>
       ) : pageError ? (
         <LuxuryCheckoutPanel>

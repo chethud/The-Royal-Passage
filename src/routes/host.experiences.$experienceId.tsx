@@ -22,6 +22,7 @@ import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { hostOperatingCities } from "@/lib/host-form-data";
 import { parseHostExperienceSectionSearch } from "@/lib/host-experience-section";
 import { useHostAccess } from "@/lib/use-host-access";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/host/experiences/$experienceId")({
   validateSearch: parseHostExperienceSectionSearch,
@@ -185,7 +186,7 @@ function HostExperienceDetailPage() {
   };
 
   if (loading || !ready || !accessToken || pageLoading) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   if (!experience) {

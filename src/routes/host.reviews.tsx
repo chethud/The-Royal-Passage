@@ -5,6 +5,7 @@ import { HostReviewsList } from "@/components/host/HostReviewsList";
 import { fetchHostReviews, type HostReviewSummary } from "@/lib/api/host";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHostAccess } from "@/lib/use-host-access";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/host/reviews")({
   head: () => ({
@@ -45,7 +46,7 @@ function HostReviewsPage() {
   }, [loadPage, ready]);
 
   if (loading || !ready) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   return (

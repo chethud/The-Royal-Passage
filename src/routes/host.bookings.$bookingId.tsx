@@ -19,6 +19,7 @@ import {
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { formatMoney } from "@/lib/money";
 import { useHostAccess } from "@/lib/use-host-access";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/host/bookings/$bookingId")({
   head: () => ({
@@ -74,7 +75,7 @@ function HostBookingDetailPage() {
   };
 
   if (loading || !ready || pageLoading) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   if (pageError || !booking) {

@@ -62,7 +62,7 @@ export function NotificationBell() {
   return (
     <DropdownMenu onOpenChange={handleOpen}>
       <DropdownMenuTrigger
-        className="relative rounded-sm p-2 text-ink/80 transition-colors hover:text-ember"
+        className="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm text-ink/80 transition-colors hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60"
         aria-label="Notifications"
       >
         <Bell className="h-5 w-5" />

@@ -16,6 +16,7 @@ import {
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { parseBookingListSearch } from "@/lib/dashboard-booking-filters";
 import { useHostAccess } from "@/lib/use-host-access";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/host/bookings/")({
   validateSearch: parseBookingListSearch,
@@ -77,7 +78,7 @@ function HostBookingsPage() {
   };
 
   if (loading || !ready) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   return (

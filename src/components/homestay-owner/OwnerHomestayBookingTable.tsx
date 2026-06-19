@@ -1,5 +1,19 @@
 import { useState } from "react";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
+import {
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableEmpty,
+  DashboardTableFilters,
+  DashboardTableHead,
+  DashboardTableHeadCell,
+  DashboardTableHeadRow,
+  DashboardTableRow,
+  DashboardTableScroll,
+  DashboardTableSection,
+  dashboardFilterBtnClass,
+} from "@/components/ui/DashboardTable";
 import type { HomestayBookingSummary } from "@/lib/api/owner-homestay-bookings";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
@@ -12,10 +26,6 @@ type OwnerHomestayBookingTableProps = {
   onMarkPaid: (id: string) => void;
   onComplete: (id: string) => void;
 };
-
-function filterBtn(active: boolean) {
-  return active ? "luxury-btn-sm luxury-btn-primary" : "luxury-btn-sm luxury-btn-panel-outline";
-}
 
 export function OwnerHomestayBookingTable({
   bookings,
@@ -33,58 +43,58 @@ export function OwnerHomestayBookingTable({
   });
 
   return (
-    <div>
-      <div className="mb-6 flex flex-wrap gap-2">
+    <DashboardTableSection>
+      <DashboardTableFilters>
         {(["all", "pending", "confirmed", "completed", "cancelled"] as const).map((status) => (
           <button
             key={status}
             type="button"
-            className={filterBtn(statusFilter === status)}
+            className={dashboardFilterBtnClass(statusFilter === status)}
             onClick={() => setStatusFilter(status)}
           >
             {status === "all" ? "All" : status}
           </button>
         ))}
-      </div>
+      </DashboardTableFilters>
 
       {filtered.length === 0 ? (
-        <p className="luxury-panel-body text-sm">No bookings match this filter.</p>
+        <DashboardTableEmpty>No bookings match this filter.</DashboardTableEmpty>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px] text-left text-sm">
-            <thead>
-              <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
-                <th className="px-3 py-2 font-medium">Property</th>
-                <th className="px-3 py-2 font-medium">Guest</th>
-                <th className="px-3 py-2 font-medium">Dates</th>
-                <th className="px-3 py-2 font-medium">Amount</th>
-                <th className="px-3 py-2 font-medium">Status</th>
-                <th className="px-3 py-2 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+        <DashboardTableScroll>
+          <DashboardTable minWidth="xl">
+            <DashboardTableHead>
+              <DashboardTableHeadRow>
+                <DashboardTableHeadCell>Property</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Guest</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Dates</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Amount</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Status</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Actions</DashboardTableHeadCell>
+              </DashboardTableHeadRow>
+            </DashboardTableHead>
+            <DashboardTableBody>
               {filtered.map((booking) => {
                 const busy = busyId === booking.id;
                 return (
-                  <tr key={booking.id} className="border-b luxury-panel-divider">
-                    <td className="px-3 py-3">
-                      <div className="luxury-panel-heading font-medium">{booking.homestayTitle}</div>
+                  <DashboardTableRow key={booking.id}>
+                    <DashboardTableCell variant="heading">
+                      <div className="font-medium">{booking.homestayTitle}</div>
                       {booking.roomName ? (
                         <div className="luxury-panel-body text-xs">{booking.roomName}</div>
                       ) : null}
-                    </td>
-                    <td className="luxury-panel-body px-3 py-3">
+                    </DashboardTableCell>
+                    <DashboardTableCell>
                       {booking.guestName ?? "Guest"} · {booking.guestCount} guest
                       {booking.guestCount !== 1 ? "s" : ""}
-                    </td>
-                    <td className="luxury-panel-body px-3 py-3">
+                    </DashboardTableCell>
+                    <DashboardTableCell>
                       {formatDateLong(booking.checkIn)} → {formatDateLong(booking.checkOut)}
                       <div className="text-xs opacity-75">{booking.nights} night(s)</div>
-                    </td>
-                    <td className="luxury-panel-body px-3 py-3">
+                    </DashboardTableCell>
+                    <DashboardTableCell variant="heading">
                       {formatMoney(booking.totalAmount, booking.currencySymbol)}
-                    </td>
-                    <td className="px-3 py-3">
+                    </DashboardTableCell>
+                    <DashboardTableCell>
                       <BookingStatusChip
                         bookingStatus={booking.bookingStatus}
                         paymentStatus={booking.paymentStatus}
@@ -94,8 +104,8 @@ export function OwnerHomestayBookingTable({
                       {booking.bookingStatus === "confirmed" && booking.paymentStatus !== "paid" ? (
                         <div className="luxury-panel-body mt-1 text-xs">Pay in cash at check-in</div>
                       ) : null}
-                    </td>
-                    <td className="px-3 py-3">
+                    </DashboardTableCell>
+                    <DashboardTableCell>
                       <div className="flex flex-wrap gap-2">
                         {booking.bookingStatus === "pending" ? (
                           <>
@@ -138,14 +148,14 @@ export function OwnerHomestayBookingTable({
                           </button>
                         ) : null}
                       </div>
-                    </td>
-                  </tr>
+                    </DashboardTableCell>
+                  </DashboardTableRow>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
+            </DashboardTableBody>
+          </DashboardTable>
+        </DashboardTableScroll>
       )}
-    </div>
+    </DashboardTableSection>
   );
 }

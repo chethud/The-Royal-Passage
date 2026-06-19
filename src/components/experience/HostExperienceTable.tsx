@@ -1,6 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { CalendarDays, Pencil } from "lucide-react";
 import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusBadge";
+import {
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableHead,
+  DashboardTableHeadCell,
+  DashboardTableHeadRow,
+  DashboardTableRow,
+  DashboardTableScroll,
+} from "@/components/ui/DashboardTable";
 import type { HostExperienceSummary } from "@/lib/api/host-experiences";
 import { formatMoney } from "@/lib/money";
 
@@ -13,35 +23,35 @@ const actionLinkClass =
 
 export function HostExperienceTable({ experiences }: HostExperienceTableProps) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[720px] text-left text-sm">
-        <thead>
-          <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
-            <th className="px-3 py-2 font-medium">Experience</th>
-            <th className="px-3 py-2 font-medium">City</th>
-            <th className="px-3 py-2 font-medium">Price</th>
-            <th className="px-3 py-2 font-medium">Slots</th>
-            <th className="px-3 py-2 font-medium">Status</th>
-            <th className="px-3 py-2 font-medium">Manage</th>
-            <th className="px-3 py-2 font-medium">Edit</th>
-          </tr>
-        </thead>
-        <tbody>
+    <DashboardTableScroll>
+      <DashboardTable minWidth="md">
+        <DashboardTableHead>
+          <DashboardTableHeadRow>
+            <DashboardTableHeadCell>Experience</DashboardTableHeadCell>
+            <DashboardTableHeadCell>City</DashboardTableHeadCell>
+            <DashboardTableHeadCell>Price</DashboardTableHeadCell>
+            <DashboardTableHeadCell>Slots</DashboardTableHeadCell>
+            <DashboardTableHeadCell>Status</DashboardTableHeadCell>
+            <DashboardTableHeadCell>Manage</DashboardTableHeadCell>
+            <DashboardTableHeadCell>Edit</DashboardTableHeadCell>
+          </DashboardTableHeadRow>
+        </DashboardTableHead>
+        <DashboardTableBody>
           {experiences.map((exp) => (
-            <tr key={exp.id} className="border-b luxury-panel-divider">
-              <td className="px-3 py-3">
-                <div className="luxury-panel-heading font-display text-lg">{exp.title}</div>
+            <DashboardTableRow key={exp.id}>
+              <DashboardTableCell variant="heading">
+                <div className="font-display text-lg">{exp.title}</div>
                 <div className="luxury-panel-body text-xs">{exp.slug}</div>
-              </td>
-              <td className="luxury-panel-body px-3 py-3">{exp.city}</td>
-              <td className="luxury-panel-body px-3 py-3">
+              </DashboardTableCell>
+              <DashboardTableCell>{exp.city}</DashboardTableCell>
+              <DashboardTableCell>
                 {formatMoney(exp.pricePerPersonMinor, exp.currencySymbol)}
-              </td>
-              <td className="luxury-panel-body px-3 py-3">{exp.slotCount}</td>
-              <td className="px-3 py-3">
+              </DashboardTableCell>
+              <DashboardTableCell>{exp.slotCount}</DashboardTableCell>
+              <DashboardTableCell>
                 <ExperienceStatusBadge status={exp.status} surface="light" />
-              </td>
-              <td className="px-3 py-3">
+              </DashboardTableCell>
+              <DashboardTableCell>
                 <Link
                   to="/host/experiences/$experienceId"
                   params={{ experienceId: exp.id }}
@@ -52,8 +62,8 @@ export function HostExperienceTable({ experiences }: HostExperienceTableProps) {
                 >
                   <CalendarDays className="h-4 w-4" strokeWidth={1.75} aria-hidden />
                 </Link>
-              </td>
-              <td className="px-3 py-3">
+              </DashboardTableCell>
+              <DashboardTableCell>
                 <Link
                   to="/host/experiences/$experienceId"
                   params={{ experienceId: exp.id }}
@@ -64,11 +74,11 @@ export function HostExperienceTable({ experiences }: HostExperienceTableProps) {
                 >
                   <Pencil className="h-4 w-4" strokeWidth={1.75} aria-hidden />
                 </Link>
-              </td>
-            </tr>
+              </DashboardTableCell>
+            </DashboardTableRow>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </DashboardTableBody>
+      </DashboardTable>
+    </DashboardTableScroll>
   );
 }

@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, ChevronDown, Minus, Plus } from "lucide-react";
+import { ArrowRight, Check, ChevronDown } from "lucide-react";
 import { PayAtVenueBadge } from "@/components/booking/PayAtVenueBadge";
+import {
+  BookingIntro,
+  BookingNotesField,
+  BookingPanelFootnote,
+  BookingPanelStack,
+  BookingStepper,
+  BookingTotalSummary,
+} from "@/components/booking/BookingPanelPrimitives";
 import type { Experience, Slot } from "@/data/experiences";
 import {
   BOOKING_WINDOW_DAYS,
@@ -12,7 +20,7 @@ import { bookExperiencePath, guestBookingLimits } from "@/lib/booking-url";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 import { isGuestAccount, isStaffRole } from "@/lib/roles";
-import { useTodayIsoDate, useBookingClock } from "@/hooks/use-today-iso-date";
+import { useBookingClock } from "@/hooks/use-today-iso-date";
 import { formatTime12h } from "@/lib/weekday-slots";
 
 type ExperienceBookingPanelProps = {
@@ -321,14 +329,11 @@ export function ExperienceBookingPanel({
   const staffSignedIn = signedIn && isStaffRole(userRole);
 
   return (
-    <div className="space-y-8">
-      <div>
-        <div className={`eyebrow mb-2 ${tone.eyebrow}`}>Available slots</div>
-        <p className={`text-xs leading-relaxed ${tone.muted}`}>
-          Showing {BOOKING_WINDOW_DAYS} days from today ({windowLabel}). New dates are added by
-          hosts on a rolling weekly basis.
-        </p>
-      </div>
+    <BookingPanelStack>
+      <BookingIntro label="Available slots" surface={surface}>
+        Showing {BOOKING_WINDOW_DAYS} days from today ({windowLabel}). New dates are added by
+        hosts on a rolling weekly basis.
+      </BookingIntro>
 
       {visibleSlots.length === 0 ? (
         <p className={`text-sm ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
@@ -360,65 +365,38 @@ export function ExperienceBookingPanel({
         <>
           <div className="hairline" />
 
-          <div className="flex items-center justify-between gap-6">
-            <div>
-              <div className={`eyebrow ${tone.eyebrow}`}>Guests</div>
-              <p className={`mt-1 text-xs ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
-                {limits.min}–{limits.max} per booking
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                aria-label="Decrease guest count"
-                disabled={!selectedSlot || guests <= limits.min}
-                onClick={() => onGuestsChange(Math.max(limits.min, guests - 1))}
-                className={`inline-flex h-9 w-9 items-center justify-center transition-colors disabled:cursor-default disabled:opacity-35 ${tone.guestBtn}`}
-              >
-                <Minus className="h-4 w-4" strokeWidth={1.75} />
-              </button>
-              <span className={`w-8 text-center font-display text-2xl ${tone.guestCount}`}>{guests}</span>
-              <button
-                type="button"
-                aria-label="Increase guest count"
-                disabled={!selectedSlot || guests >= limits.max}
-                onClick={() => onGuestsChange(Math.min(limits.max, guests + 1))}
-                className={`inline-flex h-9 w-9 items-center justify-center transition-colors disabled:cursor-default disabled:opacity-35 ${tone.guestBtn}`}
-              >
-                <Plus className="h-4 w-4" strokeWidth={1.75} />
-              </button>
-            </div>
-          </div>
+          <BookingStepper
+            label="Guests"
+            hint={`${limits.min}–${limits.max} per booking`}
+            value={guests}
+            min={limits.min}
+            max={limits.max}
+            onChange={onGuestsChange}
+            surface={surface}
+            disabled={!selectedSlot}
+          />
 
           {variant === "checkout" && onNotesChange ? (
-            <div>
-              <h2 className={`eyebrow mb-3 ${tone.eyebrow}`}>Notes (optional)</h2>
-              <textarea
-                value={notes}
-                onChange={(e) => onNotesChange(e.target.value)}
-                rows={3}
-                placeholder="Dietary needs, accessibility requests, or questions for your host…"
-                className={`w-full resize-none border-0 border-b bg-transparent px-0 py-3 text-sm focus:outline-none focus:ring-0 ${tone.textarea}`}
-              />
-            </div>
+            <BookingNotesField
+              value={notes}
+              onChange={onNotesChange}
+              placeholder="Dietary needs, accessibility requests, or questions for your host…"
+              surface={surface}
+            />
           ) : null}
 
           <div className="hairline" />
 
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <div className={`eyebrow ${surface === "light" ? "luxury-panel-label" : "text-muted-foreground"}`}>
-                Estimated total
-              </div>
-              <div className={`mt-1 text-xs ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`}>
+          <BookingTotalSummary
+            surface={surface}
+            breakdown={
+              <>
                 {sym}
                 {exp.pricePerPerson} × {guests} guest{guests > 1 ? "s" : ""}
-              </div>
-            </div>
-            <div className={`font-display text-3xl tracking-tight ${tone.total}`}>
-              {selectedSlot ? formatMoney(totalMinor, sym) : "—"}
-            </div>
-          </div>
+              </>
+            }
+            total={selectedSlot ? formatMoney(totalMinor, sym) : "—"}
+          />
 
           <PayAtVenueBadge surface={surface} />
 
@@ -464,13 +442,9 @@ export function ExperienceBookingPanel({
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               )}
-              <p
-                className={`text-center text-[0.65rem] tracking-wide ${
-                  surface === "light" ? "luxury-panel-body" : "text-muted-foreground/80"
-                }`}
-              >
+              <BookingPanelFootnote surface={surface}>
                 Pay at venue on arrival · Host confirms your booking
-              </p>
+              </BookingPanelFootnote>
             </>
           ) : (
             <>
@@ -487,17 +461,13 @@ export function ExperienceBookingPanel({
               >
                 {busy ? "Submitting…" : "Request booking"}
               </button>
-              <p
-                className={`text-center text-[0.65rem] tracking-wide ${
-                  surface === "light" ? "luxury-panel-body" : "text-muted-foreground/80"
-                }`}
-              >
+              <BookingPanelFootnote surface={surface}>
                 Your host will confirm. Pay at the venue on arrival.
-              </p>
+              </BookingPanelFootnote>
             </>
           )}
         </>
       ) : null}
-    </div>
+    </BookingPanelStack>
   );
 }

@@ -2,6 +2,21 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import type { AdminBookingRow } from "@/lib/api/admin";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
+import {
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableEmpty,
+  DashboardTableFilters,
+  DashboardTableHead,
+  DashboardTableHeadCell,
+  DashboardTableHeadRow,
+  DashboardTableLinkCell,
+  DashboardTableRow,
+  DashboardTableScroll,
+  DashboardTableSection,
+  dashboardFilterBtnClass,
+} from "@/components/ui/DashboardTable";
 import type { BookingListStatus, BookingPaymentFilter, BookingDateView } from "@/lib/dashboard-booking-filters";
 import { bookingMatchesDateView } from "@/lib/booking-window";
 import { formatDateLong } from "@/lib/date-format";
@@ -14,10 +29,6 @@ type AdminBookingsTableProps = {
   initialPayment?: BookingPaymentFilter;
   initialDateView?: BookingDateView;
 };
-
-function filterBtn(active: boolean) {
-  return active ? "luxury-btn-sm luxury-btn-primary" : "luxury-btn-sm luxury-btn-panel-outline";
-}
 
 function filterAdminBookings(
   bookings: AdminBookingRow[],
@@ -71,7 +82,7 @@ export function AdminBookingsTable({
   );
 
   if (bookings.length === 0) {
-    return <p className="luxury-panel-body py-8 text-sm">No bookings yet.</p>;
+    return <DashboardTableEmpty>No bookings yet.</DashboardTableEmpty>;
   }
 
   const dateViewButtons: { value: BookingDateView; label: string }[] = [
@@ -89,21 +100,21 @@ export function AdminBookingsTable({
   ];
 
   return (
-    <section className="space-y-4">
-      <div className="flex flex-wrap gap-2">
+    <DashboardTableSection>
+      <DashboardTableFilters>
         {dateViewButtons.map(({ value, label }) => (
           <button
             key={value}
             type="button"
             onClick={() => setDateView(value)}
-            className={filterBtn(dateView === value)}
+            className={dashboardFilterBtnClass(dateView === value)}
           >
             {label}
           </button>
         ))}
-      </div>
+      </DashboardTableFilters>
 
-      <div className="flex flex-wrap gap-2">
+      <DashboardTableFilters>
         {statusButtons.map((value) => (
           <button
             key={value}
@@ -112,7 +123,7 @@ export function AdminBookingsTable({
               setStatusFilter(value);
               if (value !== "confirmed") setPaymentFilter("all");
             }}
-            className={filterBtn(statusFilter === value && paymentFilter === "all")}
+            className={dashboardFilterBtnClass(statusFilter === value && paymentFilter === "all")}
           >
             {value}
           </button>
@@ -123,7 +134,7 @@ export function AdminBookingsTable({
             setStatusFilter("confirmed");
             setPaymentFilter("cod-pending");
           }}
-          className={filterBtn(paymentFilter === "cod-pending")}
+          className={dashboardFilterBtnClass(paymentFilter === "cod-pending")}
         >
           COD pending
         </button>
@@ -133,44 +144,40 @@ export function AdminBookingsTable({
             setStatusFilter("all");
             setPaymentFilter("collected");
           }}
-          className={filterBtn(paymentFilter === "collected")}
+          className={dashboardFilterBtnClass(paymentFilter === "collected")}
         >
           Collected
         </button>
-      </div>
+      </DashboardTableFilters>
 
       {filtered.length === 0 ? (
-        <p className="luxury-panel-body py-8 text-sm">No bookings in this view.</p>
+        <DashboardTableEmpty>No bookings in this view.</DashboardTableEmpty>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[1100px] text-left text-sm">
-            <thead>
-              <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
-                <th className="px-3 py-2 font-normal">Guest</th>
-                <th className="px-3 py-2 font-normal">Experience</th>
-                <th className="px-3 py-2 font-normal">Host</th>
-                <th className="px-3 py-2 font-normal">Session</th>
-                <th className="px-3 py-2 font-normal">Booked</th>
-                <th className="px-3 py-2 font-normal">Total</th>
-                <th className="px-3 py-2 font-normal">Platform ({commissionPercent}%)</th>
-                <th className="px-3 py-2 font-normal">Host payout</th>
-                <th className="px-3 py-2 font-normal">Status</th>
-              </tr>
-            </thead>
-            <tbody>
+        <DashboardTableScroll>
+          <DashboardTable minWidth="2xl">
+            <DashboardTableHead>
+              <DashboardTableHeadRow>
+                <DashboardTableHeadCell>Guest</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Experience</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Host</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Session</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Booked</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Total</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Platform ({commissionPercent}%)</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Host payout</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Status</DashboardTableHeadCell>
+              </DashboardTableHeadRow>
+            </DashboardTableHead>
+            <DashboardTableBody>
               {filtered.map((booking) => (
-                <tr key={booking.id} className="border-b border-[rgb(74_0_0/0.12)] last:border-0">
-                  <td className="px-3 py-3">
-                    <Link
-                      to="/admin/bookings/$bookingId"
-                      params={{ bookingId: booking.id }}
-                      className="luxury-panel-link block hover:underline"
-                    >
-                      <div className="luxury-panel-heading">{booking.guestName ?? "Guest"}</div>
-                      <div className="luxury-panel-body text-xs">{booking.guestEmail}</div>
-                    </Link>
-                  </td>
-                  <td className="px-3 py-3">
+                <DashboardTableRow key={booking.id}>
+                  <DashboardTableLinkCell
+                    to="/admin/bookings/$bookingId"
+                    params={{ bookingId: booking.id }}
+                    title={booking.guestName ?? "Guest"}
+                    subtitle={booking.guestEmail}
+                  />
+                  <DashboardTableCell>
                     <Link
                       to="/admin/bookings/$bookingId"
                       params={{ bookingId: booking.id }}
@@ -178,37 +185,35 @@ export function AdminBookingsTable({
                     >
                       {booking.experienceTitle}
                     </Link>
-                  </td>
-                  <td className="luxury-panel-body px-3 py-3">{booking.hostName ?? "—"}</td>
-                  <td className="luxury-panel-body px-3 py-3">
-                    {formatDateLong(booking.slotDate)}
-                  </td>
-                  <td className="luxury-panel-body px-3 py-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell>{booking.hostName ?? "—"}</DashboardTableCell>
+                  <DashboardTableCell>{formatDateLong(booking.slotDate)}</DashboardTableCell>
+                  <DashboardTableCell>
                     {formatDateLong(booking.createdAt.slice(0, 10))}
-                  </td>
-                  <td className="luxury-panel-heading px-3 py-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell variant="heading">
                     {formatMoney(booking.totalAmount, booking.currencySymbol)}
-                  </td>
-                  <td className="luxury-panel-body px-3 py-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell>
                     {formatMoney(booking.platformFeeMinor, booking.currencySymbol)}
-                  </td>
-                  <td className="luxury-panel-body px-3 py-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell>
                     {formatMoney(booking.hostPayoutMinor, booking.currencySymbol)}
-                  </td>
-                  <td className="px-3 py-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell>
                     <BookingStatusChip
                       bookingStatus={booking.bookingStatus}
                       paymentStatus={booking.paymentStatus}
                       isPaused={booking.isPaused}
                       surface="light"
                     />
-                  </td>
-                </tr>
+                  </DashboardTableCell>
+                </DashboardTableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </DashboardTableBody>
+          </DashboardTable>
+        </DashboardTableScroll>
       )}
-    </section>
+    </DashboardTableSection>
   );
 }

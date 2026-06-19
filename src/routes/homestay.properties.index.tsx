@@ -6,6 +6,7 @@ import { OwnerHomestayTable } from "@/components/homestay-owner/OwnerHomestayTab
 import { fetchOwnerHomestays, type OwnerHomestaySummary } from "@/lib/api/owner-homestays";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHomestayOwnerAccess } from "@/lib/use-homestay-owner-access";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/homestay/properties/")({
   head: () => ({
@@ -42,7 +43,7 @@ function OwnerHomestaysPage() {
   }, [loadPage, ready]);
 
   if (loading || !ready) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   return (

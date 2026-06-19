@@ -9,6 +9,7 @@ import type { WishlistItem } from "@/lib/api/wishlist";
 import { cartItemFromWishlist } from "@/lib/cart-storage";
 import { fetchWishlistBrowser, removeWishlistItemBrowser } from "@/lib/wishlist-browser";
 import { useGuestAccess } from "@/lib/use-guest-access";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/dashboard/cart/")({
   head: () => ({
@@ -77,7 +78,7 @@ function GuestCartPage() {
   };
 
   if (loading || !ready || !accessToken) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   return (

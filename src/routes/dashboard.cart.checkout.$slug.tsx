@@ -8,6 +8,7 @@ import { useExperienceCart } from "@/hooks/use-experience-cart";
 import { parseBookSearch } from "@/lib/booking-url";
 import { getExperienceForDetail } from "@/lib/marketplace-fns";
 import { useGuestAccess } from "@/lib/use-guest-access";
+import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/dashboard/cart/checkout/$slug")({
   validateSearch: parseBookSearch,
@@ -53,7 +54,7 @@ function CartCheckoutPage() {
   }, [cartHydrated, cartItem, navigate, ready]);
 
   if (loading || !ready || !cartHydrated) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return <PageLoadingGate />;
   }
 
   if (!cartItem) {
