@@ -87,11 +87,15 @@ export function ExperiencePhotoGallery({
   return (
     <div className="space-y-4">
       <div>
-        <span className="eyebrow text-muted-foreground">{label}</span>
-        <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
+        {label ? <span className="eyebrow text-muted-foreground">{label}</span> : null}
+        {hint ? (
+          <p className={label ? "mt-1 text-xs text-muted-foreground" : "text-xs text-muted-foreground"}>
+            {hint}
+          </p>
+        ) : null}
 
         {!readOnly ? (
-          <div className="mt-4 space-y-3">
+          <div className={label || hint ? "mt-4 space-y-3" : "space-y-3"}>
             <input
               ref={fileInputRef}
               type="file"

@@ -20,7 +20,8 @@ type OwnerHomestayFormProps = {
 const labelClass = "eyebrow luxury-panel-label block text-xs uppercase tracking-[0.12em]";
 const inputClass = "luxury-input mt-1 w-full";
 const numberInputClass = `${inputClass} input-no-spin`;
-const sectionHeadingClass = "eyebrow luxury-panel-label text-xs uppercase tracking-[0.14em]";
+const sectionHeadingClass = "eyebrow luxury-panel-label text-xs uppercase tracking-[0.12em]";
+const sectionClass = "space-y-5";
 const checkboxClass = "rounded border-[rgb(74_0_0/0.3)]";
 
 function splitLines(value: string): string[] {
@@ -103,272 +104,287 @@ export function OwnerHomestayForm({
 
   return (
     <form onSubmit={(e) => void handleSubmit(e)} className="space-y-8">
-      <section className="space-y-6">
+      <section className={sectionClass}>
         <h2 className={sectionHeadingClass}>Property details</h2>
-      <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="block">
+            <span className={labelClass}>Title</span>
+            <input
+              className={inputClass}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              disabled={disabled || saving}
+            />
+          </label>
+          <label className="block">
+            <span className={labelClass}>Property type</span>
+            <select
+              className={inputClass}
+              value={propertyType}
+              onChange={(e) => setPropertyType(e.target.value)}
+              disabled={disabled || saving}
+            >
+              {HOMESTAY_PROPERTY_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
         <label className="block">
-          <span className={labelClass}>Title</span>
+          <span className={labelClass}>Tagline</span>
           <input
             className={inputClass}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={tagline}
+            onChange={(e) => setTagline(e.target.value)}
+            disabled={disabled || saving}
+          />
+        </label>
+
+        <label className="block">
+          <span className={labelClass}>Description</span>
+          <textarea
+            className={`${inputClass} min-h-32`}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             required
             disabled={disabled || saving}
           />
         </label>
-        <label className="block">
-          <span className={labelClass}>Property type</span>
-          <select
-            className={inputClass}
-            value={propertyType}
-            onChange={(e) => setPropertyType(e.target.value)}
-            disabled={disabled || saving}
-          >
-            {HOMESTAY_PROPERTY_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <label className="block">
-        <span className={labelClass}>Tagline</span>
-        <input
-          className={inputClass}
-          value={tagline}
-          onChange={(e) => setTagline(e.target.value)}
-          disabled={disabled || saving}
-        />
-      </label>
-
-      <label className="block">
-        <span className={labelClass}>Description</span>
-        <textarea
-          className={`${inputClass} min-h-32`}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-          disabled={disabled || saving}
-        />
-      </label>
       </section>
 
-      <section className="space-y-6">
+      <div className="hairline" />
+
+      <section className={sectionClass}>
         <h2 className={sectionHeadingClass}>Location & pricing</h2>
-      <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3">
+          <label className="block">
+            <span className={labelClass}>City</span>
+            <select
+              className={inputClass}
+              value={citySlug}
+              onChange={(e) => setCitySlug(e.target.value)}
+              disabled={disabled || saving}
+            >
+              {cities.map((city) => (
+                <option key={city.slug} value={city.slug}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            <span className={labelClass}>Region</span>
+            <input
+              className={inputClass}
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
+              disabled={disabled || saving}
+            />
+          </label>
+          <label className="block">
+            <span className={labelClass}>Price / night (₹)</span>
+            <RupeeAmountInput
+              className={inputClass}
+              value={priceMajor}
+              onChange={setPriceMajor}
+              disabled={disabled || saving}
+            />
+          </label>
+        </div>
+
         <label className="block">
-          <span className={labelClass}>City</span>
-          <select
-            className={inputClass}
-            value={citySlug}
-            onChange={(e) => setCitySlug(e.target.value)}
-            disabled={disabled || saving}
-          >
-            {cities.map((city) => (
-              <option key={city.slug} value={city.slug}>
-                {city.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className={labelClass}>Region</span>
+          <span className={labelClass}>Address</span>
           <input
             className={inputClass}
-            value={region}
-            onChange={(e) => setRegion(e.target.value)}
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
             disabled={disabled || saving}
           />
         </label>
-        <label className="block">
-          <span className={labelClass}>Price / night (₹)</span>
-          <RupeeAmountInput
-            className={inputClass}
-            value={priceMajor}
-            onChange={setPriceMajor}
-            disabled={disabled || saving}
-          />
-        </label>
-      </div>
-
-      <label className="block">
-        <span className={labelClass}>Address</span>
-        <input
-          className={inputClass}
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          disabled={disabled || saving}
-        />
-      </label>
       </section>
 
-      <section className="space-y-6">
+      <div className="hairline" />
+
+      <section className={sectionClass}>
         <h2 className={sectionHeadingClass}>Capacity</h2>
-      <div className="grid gap-4 md:grid-cols-3">
-        <label className="block">
-          <span className={labelClass}>Bedrooms</span>
-          <input
-            className={numberInputClass}
-            type="number"
-            min={1}
-            value={bedrooms}
-            onChange={(e) => setBedrooms(e.target.value)}
-            disabled={disabled || saving}
-          />
-        </label>
-        <label className="block">
-          <span className={labelClass}>Bathrooms</span>
-          <input
-            className={numberInputClass}
-            type="number"
-            min={1}
-            value={bathrooms}
-            onChange={(e) => setBathrooms(e.target.value)}
-            disabled={disabled || saving}
-          />
-        </label>
-        <label className="block">
-          <span className={labelClass}>Max guests</span>
-          <input
-            className={numberInputClass}
-            type="number"
-            min={1}
-            value={maxGuests}
-            onChange={(e) => setMaxGuests(e.target.value)}
-            disabled={disabled || saving}
-          />
-        </label>
-      </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <label className="block">
+            <span className={labelClass}>Bedrooms</span>
+            <input
+              className={numberInputClass}
+              type="number"
+              min={1}
+              value={bedrooms}
+              onChange={(e) => setBedrooms(e.target.value)}
+              disabled={disabled || saving}
+            />
+          </label>
+          <label className="block">
+            <span className={labelClass}>Bathrooms</span>
+            <input
+              className={numberInputClass}
+              type="number"
+              min={1}
+              value={bathrooms}
+              onChange={(e) => setBathrooms(e.target.value)}
+              disabled={disabled || saving}
+            />
+          </label>
+          <label className="block">
+            <span className={labelClass}>Max guests</span>
+            <input
+              className={numberInputClass}
+              type="number"
+              min={1}
+              value={maxGuests}
+              onChange={(e) => setMaxGuests(e.target.value)}
+              disabled={disabled || saving}
+            />
+          </label>
+        </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="block">
-          <span className={labelClass}>Check-in time</span>
-          <input
-            className={inputClass}
-            type="time"
-            value={checkInTime}
-            onChange={(e) => setCheckInTime(e.target.value)}
-            disabled={disabled || saving}
-          />
-        </label>
-        <label className="block">
-          <span className={labelClass}>Check-out time</span>
-          <input
-            className={inputClass}
-            type="time"
-            value={checkOutTime}
-            onChange={(e) => setCheckOutTime(e.target.value)}
-            disabled={disabled || saving}
-          />
-        </label>
-      </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="block">
+            <span className={labelClass}>Check-in time</span>
+            <input
+              className={inputClass}
+              type="time"
+              value={checkInTime}
+              onChange={(e) => setCheckInTime(e.target.value)}
+              disabled={disabled || saving}
+            />
+          </label>
+          <label className="block">
+            <span className={labelClass}>Check-out time</span>
+            <input
+              className={inputClass}
+              type="time"
+              value={checkOutTime}
+              onChange={(e) => setCheckOutTime(e.target.value)}
+              disabled={disabled || saving}
+            />
+          </label>
+        </div>
       </section>
 
-      <section className="space-y-4">
+      <div className="hairline" />
+
+      <section className={sectionClass}>
         <h2 className={sectionHeadingClass}>Extra beds</h2>
-      <div className="space-y-3 rounded-sm border border-[rgb(74_0_0/0.12)] bg-[rgb(255_255_255/0.25)] p-4">
-        <label className="flex items-center gap-2 text-sm luxury-panel-body">
-          <input
-            type="checkbox"
-            checked={extraBedAvailable}
-            onChange={(e) => setExtraBedAvailable(e.target.checked)}
-            disabled={disabled || saving}
-            className={checkboxClass}
-          />
-          Extra bed available
-        </label>
-        {extraBedAvailable ? (
-          <div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <label className="block">
-                <span className={labelClass}>Extra bed price / night (₹)</span>
-                <RupeeAmountInput
-                  className={inputClass}
-                  value={extraBedPriceMajor}
-                  onChange={setExtraBedPriceMajor}
-                  disabled={disabled || saving}
-                  required
-                />
-              </label>
-              <label className="block">
-                <span className={labelClass}>Extra beds allowed</span>
-                <select
-                  className={inputClass}
-                  value={extraBedsPerRoom}
-                  onChange={(e) => setExtraBedsPerRoom(Number(e.target.value) === 2 ? 2 : 1)}
-                  disabled={disabled || saving}
-                >
-                  <option value={1}>1 per bedroom</option>
-                  <option value={2}>2 per bedroom</option>
-                </select>
-              </label>
+        <div className="space-y-3 rounded-sm border border-[rgb(74_0_0/0.12)] bg-[rgb(255_255_255/0.25)] p-4">
+          <label className="flex items-center gap-2 text-sm luxury-panel-body">
+            <input
+              type="checkbox"
+              checked={extraBedAvailable}
+              onChange={(e) => setExtraBedAvailable(e.target.checked)}
+              disabled={disabled || saving}
+              className={checkboxClass}
+            />
+            Extra bed available
+          </label>
+          {extraBedAvailable ? (
+            <div className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className={labelClass}>Extra bed price / night (₹)</span>
+                  <RupeeAmountInput
+                    className={inputClass}
+                    value={extraBedPriceMajor}
+                    onChange={setExtraBedPriceMajor}
+                    disabled={disabled || saving}
+                    required
+                  />
+                </label>
+                <label className="block">
+                  <span className={labelClass}>Extra beds allowed</span>
+                  <select
+                    className={inputClass}
+                    value={extraBedsPerRoom}
+                    onChange={(e) => setExtraBedsPerRoom(Number(e.target.value) === 2 ? 2 : 1)}
+                    disabled={disabled || saving}
+                  >
+                    <option value={1}>1 per bedroom</option>
+                    <option value={2}>2 per bedroom</option>
+                  </select>
+                </label>
+              </div>
+              <p className="luxury-panel-body text-xs leading-relaxed">
+                Guests can add up to {extraBedsPerRoom} extra bed{extraBedsPerRoom === 1 ? "" : "s"} per
+                bedroom ({bedroomCount * extraBedsPerRoom} max for this property).
+              </p>
             </div>
-            <p className="luxury-panel-body text-xs leading-relaxed">
-              Guests can add up to {extraBedsPerRoom} extra bed{extraBedsPerRoom === 1 ? "" : "s"} per
-              bedroom ({bedroomCount * extraBedsPerRoom} max for this property).
-            </p>
-          </div>
-        ) : null}
-      </div>
+          ) : null}
+        </div>
       </section>
 
-      <section className="space-y-4">
-        <h2 className={sectionHeadingClass}>Photos</h2>
-      <div className="rounded-sm border border-[rgb(74_0_0/0.15)] bg-[rgb(255_255_255/0.35)] p-4 sm:p-5">
-        <ExperiencePhotoGallery
-          photoUrls={photoUrls}
-          onChange={setPhotoUrls}
-          readOnly={disabled || saving}
-          inputClass={inputClass}
-          label="Property photos"
-          hint="Upload photos from your device. The first image is the cover; additional images appear in the gallery."
-          photoAltPrefix="Homestay photo"
-        />
-      </div>
+      <div className="hairline" />
+
+      <section className={sectionClass}>
+        <div>
+          <h2 className={sectionHeadingClass}>Photos</h2>
+          <p className="luxury-panel-body mt-2 text-xs leading-relaxed">
+            Upload photos from your device. The first image is the cover; additional images appear in the
+            gallery.
+          </p>
+        </div>
+        <div className="rounded-sm border border-[rgb(74_0_0/0.15)] bg-[rgb(255_255_255/0.35)] p-4 sm:p-5">
+          <ExperiencePhotoGallery
+            photoUrls={photoUrls}
+            onChange={setPhotoUrls}
+            readOnly={disabled || saving}
+            inputClass={inputClass}
+            label=""
+            hint=""
+            photoAltPrefix="Homestay photo"
+          />
+        </div>
       </section>
 
-      <section className="space-y-6">
+      <div className="hairline" />
+
+      <section className={sectionClass}>
         <h2 className={sectionHeadingClass}>Rules & amenities</h2>
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="block">
-          <span className={labelClass}>Amenities (one per line)</span>
-          <textarea
-            className={`${inputClass} min-h-24`}
-            value={amenitiesText}
-            onChange={(e) => setAmenitiesText(e.target.value)}
-            disabled={disabled || saving}
-          />
-        </label>
-        <label className="block">
-          <span className={labelClass}>House rules (one per line)</span>
-          <textarea
-            className={`${inputClass} min-h-24`}
-            value={houseRulesText}
-            onChange={(e) => setHouseRulesText(e.target.value)}
-            disabled={disabled || saving}
-          />
-        </label>
-      </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="block">
+            <span className={labelClass}>Amenities (one per line)</span>
+            <textarea
+              className={`${inputClass} min-h-24`}
+              value={amenitiesText}
+              onChange={(e) => setAmenitiesText(e.target.value)}
+              disabled={disabled || saving}
+            />
+          </label>
+          <label className="block">
+            <span className={labelClass}>House rules (one per line)</span>
+            <textarea
+              className={`${inputClass} min-h-24`}
+              value={houseRulesText}
+              onChange={(e) => setHouseRulesText(e.target.value)}
+              disabled={disabled || saving}
+            />
+          </label>
+        </div>
       </section>
 
       {!disabled ? (
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={submitForReview}
-            onChange={(e) => setSubmitForReview(e.target.checked)}
-            disabled={saving}
-          />
-          Submit for Royal Passage review after saving
-        </label>
-      ) : null}
-
-      {!disabled ? (
-        <button type="submit" className="luxury-btn-primary" disabled={saving}>
-          {saving ? "Saving…" : initial ? "Save property" : "Create property"}
-        </button>
+        <div className="space-y-4 border-t luxury-panel-divider pt-6">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={submitForReview}
+              onChange={(e) => setSubmitForReview(e.target.checked)}
+              disabled={saving}
+            />
+            Submit for Royal Passage review after saving
+          </label>
+          <button type="submit" className="luxury-btn-primary" disabled={saving}>
+            {saving ? "Saving…" : initial ? "Save property" : "Create property"}
+          </button>
+        </div>
       ) : null}
     </form>
   );

@@ -6,6 +6,10 @@ import { getActiveRooms, extraBedsPerRoomForSelection } from "@/lib/homestay-roo
 import { formatMoney } from "@/lib/money";
 import { formatTime12h } from "@/lib/weekday-slots";
 
+const bookingFieldClass =
+  "w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body focus:border-[#4A0000]/50 focus:outline-none";
+const bookingTextareaClass = `${bookingFieldClass} resize-none`;
+
 type HomestayBookingPanelProps = {
   stay: Homestay;
   checkIn: string;
@@ -50,10 +54,10 @@ function Stepper({
   onChange: (value: number) => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-6">
-      <div>
+    <div className="flex items-center justify-between gap-4 sm:gap-6">
+      <div className="min-w-0">
         <div className="eyebrow luxury-panel-label">{label}</div>
-        {hint ? <p className="luxury-panel-body mt-1 text-xs">{hint}</p> : null}
+        {hint ? <p className="luxury-panel-body mt-1 text-xs leading-relaxed">{hint}</p> : null}
       </div>
       <div className="flex items-center gap-4">
         <button
@@ -134,7 +138,7 @@ export function HomestayBookingPanel({
             min={today}
             value={checkIn}
             onChange={(event) => onCheckInChange(event.target.value)}
-            className="w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body focus:border-[#4A0000]/50 focus:outline-none"
+            className={bookingFieldClass}
           />
         </label>
         <label className="block">
@@ -144,14 +148,14 @@ export function HomestayBookingPanel({
             min={checkIn}
             value={checkOut}
             onChange={(event) => onCheckOutChange(event.target.value)}
-            className="w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body focus:border-[#4A0000]/50 focus:outline-none"
+            className={bookingFieldClass}
           />
         </label>
       </div>
 
       {rooms.length > 1 ? (
-        <div>
-          <div className="eyebrow luxury-panel-label mb-3">Room type</div>
+        <div className="space-y-3">
+          <div className="eyebrow luxury-panel-label">Room type</div>
           <div className="grid gap-2">
             {rooms.map((room) => {
               const active = roomId === room.id;
@@ -182,45 +186,47 @@ export function HomestayBookingPanel({
         </div>
       ) : null}
 
-      {rooms.length > 0 && selectedRoom ? (
+      <div className="space-y-5">
+        {rooms.length > 0 && selectedRoom ? (
+          <Stepper
+            label="Rooms"
+            hint={`Up to ${maxRooms} available`}
+            value={roomCount}
+            min={1}
+            max={maxRooms}
+            onChange={(value) => onRoomCountChange?.(value)}
+          />
+        ) : null}
+
         <Stepper
-          label="Rooms"
-          hint={`Up to ${maxRooms} available`}
-          value={roomCount}
+          label="Guests"
+          hint={`Up to ${maxGuests} with this selection`}
+          value={guests}
           min={1}
-          max={maxRooms}
-          onChange={(value) => onRoomCountChange?.(value)}
+          max={maxGuests}
+          onChange={onGuestsChange}
         />
-      ) : null}
 
-      <Stepper
-        label="Guests"
-        hint={`Up to ${maxGuests} with this selection`}
-        value={guests}
-        min={1}
-        max={maxGuests}
-        onChange={onGuestsChange}
-      />
-
-      {showExtraBeds ? (
-        <Stepper
-          label="Extra beds"
-          hint={`${sym}${extraBedPrice.toLocaleString("en-IN")}/night each · up to ${extraBedsPerRoom} per ${extraBedUnit} (${maxExtraBeds} max)`}
-          value={extraBedCount}
-          min={0}
-          max={maxExtraBeds}
-          onChange={(value) => onExtraBedCountChange?.(value)}
-        />
-      ) : null}
+        {showExtraBeds ? (
+          <Stepper
+            label="Extra beds"
+            hint={`${sym}${extraBedPrice.toLocaleString("en-IN")}/night each · up to ${extraBedsPerRoom} per ${extraBedUnit} (${maxExtraBeds} max)`}
+            value={extraBedCount}
+            min={0}
+            max={maxExtraBeds}
+            onChange={(value) => onExtraBedCountChange?.(value)}
+          />
+        ) : null}
+      </div>
 
       <div>
-        <h2 className="eyebrow luxury-panel-label mb-3">Notes (optional)</h2>
+        <div className="eyebrow luxury-panel-label mb-3">Notes (optional)</div>
         <textarea
           value={notes}
           onChange={(event) => onNotesChange(event.target.value)}
           rows={3}
           placeholder="Arrival time, dietary needs, or special requests…"
-          className="w-full resize-none rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none"
+          className={`${bookingTextareaClass} placeholder:text-[rgb(58_0_0/0.4)]`}
         />
       </div>
 

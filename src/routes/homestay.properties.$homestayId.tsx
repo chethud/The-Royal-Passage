@@ -96,7 +96,17 @@ function OwnerHomestayDetailPage() {
   };
 
   if (loading || !ready) {
-    return <div className="min-h-[50vh] pt-[var(--header-height)]" />;
+    return (
+      <HomestayOwnerDashboardShell
+        title="Manage property"
+        subtitle="Edit listing details, rooms, and calendar availability."
+        showRoleDescription={false}
+      >
+        <LuxuryCheckoutPanel>
+          <p className="luxury-panel-body py-8 text-sm">Loading property…</p>
+        </LuxuryCheckoutPanel>
+      </HomestayOwnerDashboardShell>
+    );
   }
 
   return (

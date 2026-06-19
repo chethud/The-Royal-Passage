@@ -58,9 +58,9 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
         ) : (
           homestay.rooms.map((room) => (
             <li key={room.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="luxury-panel-heading font-medium">{room.name}</p>
-                <p className="luxury-panel-body text-xs">
+                <p className="luxury-panel-body text-xs leading-relaxed">
                   {room.category ?? "Room"} · {room.capacity} guests · {room.totalUnits} unit(s) ·{" "}
                   {formatMoney(room.pricePerNightMinor, homestay.currencySymbol)}
                   {room.extraBedAvailable
@@ -85,8 +85,8 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
       </ul>
 
       <form onSubmit={(e) => void handleAdd(e)} className="space-y-4 border-t luxury-panel-divider pt-6">
-        <h3 className="eyebrow luxury-panel-label text-xs uppercase tracking-[0.14em]">Add room</h3>
-        <div className="grid gap-4 md:grid-cols-5">
+        <h3 className="eyebrow luxury-panel-label text-xs uppercase tracking-[0.12em]">Add room</h3>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
           <input
             className="luxury-input md:col-span-2"
             placeholder="Room name"
