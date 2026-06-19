@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Facebook, Instagram, Mail, MapPin, MessageCircle, Phone, Youtube } from "lucide-react";
 import logoUrl from "@/assets/logo/logo.png";
-import footerPalaceImg from "@/assets/footer-palace.png";
+import footerHeroImg from "@/assets/hero-image.png";
 
 const TAGLINE =
   "The Royal Passage is an experience-led travel company curating immersive journeys in and around Mysuru.";
@@ -214,16 +214,16 @@ function FooterFull() {
       </div>
 
       <img
-        src={footerPalaceImg}
+        src={footerHeroImg}
         alt=""
         aria-hidden="true"
         loading="lazy"
         decoding="async"
-        className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[58%] select-none object-cover object-right opacity-[0.14] mix-blend-screen [-webkit-mask-image:linear-gradient(to_right,transparent_0%,black_50%,black_100%)] [mask-image:linear-gradient(to_right,transparent_0%,black_50%,black_100%)] lg:block"
+        className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[62%] select-none object-cover object-[center_35%] opacity-[0.22] saturate-[0.85] lg:block [-webkit-mask-image:linear-gradient(to_right,transparent_0%,black_42%,black_100%)] [mask-image:linear-gradient(to_right,transparent_0%,black_42%,black_100%)]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,oklch(0.13_0.06_22)_0%,oklch(0.13_0.06_22_/_0.92)_30%,oklch(0.13_0.06_22_/_0.7)_55%,oklch(0.13_0.06_22_/_0.45)_80%,oklch(0.13_0.06_22_/_0.25)_100%)] lg:block"
+        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,oklch(0.13_0.06_22)_0%,oklch(0.13_0.06_22_/_0.94)_28%,oklch(0.13_0.06_22_/_0.78)_52%,oklch(0.13_0.06_22_/_0.5)_78%,oklch(0.13_0.06_22_/_0.28)_100%)] lg:block"
       />
       <div
         aria-hidden
