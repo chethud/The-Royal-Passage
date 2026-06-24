@@ -2,6 +2,7 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 
 import { AuthProvider } from "@/lib/auth-user";
 import { VipMembershipPrompt } from "@/components/vip/VipMembershipPrompt";
+import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -90,6 +91,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <AuthProvider>
+      <Toaster richColors closeButton position="top-center" />
       <VipMembershipPrompt />
       <Outlet />
     </AuthProvider>

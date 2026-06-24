@@ -78,7 +78,7 @@ function AccountProfilePage() {
   }
 
   return (
-    <GuestDashboardShell title="Profile" subtitle={subtitle}>
+    <GuestDashboardShell title="Profile" subtitle={subtitle} wide>
       {content}
     </GuestDashboardShell>
   );
