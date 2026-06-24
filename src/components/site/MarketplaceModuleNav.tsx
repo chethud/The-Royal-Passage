@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Compass, Home } from "lucide-react";
+import { Compass, Crown, Home } from "lucide-react";
 
 const modules = [
   {
@@ -18,10 +18,18 @@ const modules = [
     icon: Home,
     description: "Stays, villas & guest houses",
   },
+  {
+    id: "vip",
+    label: "VIP",
+    to: "/vips",
+    homeAnchor: "#vips",
+    icon: Crown,
+    description: "Palace suites & private villas",
+  },
 ] as const;
 
 type MarketplaceModuleNavProps = {
-  /** On homepage, link experiences/homestays to section anchors instead of routes. */
+  /** On homepage, link experiences/homestays/vip to section anchors instead of routes. */
   variant?: "routes" | "home";
   className?: string;
 };
@@ -31,6 +39,9 @@ export function MarketplaceModuleNav({ variant = "routes", className = "" }: Mar
   const onHome = pathname === "/";
 
   const isActive = (module: (typeof modules)[number]) => {
+    if (module.id === "vip") {
+      return pathname === "/vips" || pathname.startsWith("/vips/");
+    }
     if (module.id === "homestays") {
       return pathname === "/homestays" || pathname.startsWith("/homestays/");
     }

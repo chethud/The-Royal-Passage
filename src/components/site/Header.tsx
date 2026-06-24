@@ -12,6 +12,7 @@ import {
 } from "@/components/admin/admin-nav";
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
 import { HOMESTAY_OWNER_NAV_ITEMS } from "@/components/homestay-owner/homestay-owner-nav";
+import { VIP_OWNER_NAV_ITEMS } from "@/components/vip-owner/vip-owner-nav";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
 import { useNavBadges } from "@/hooks/use-nav-badges";
 import {
@@ -32,12 +33,15 @@ import {
 import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
 import { isHomestayOwnerNavItemActive } from "@/lib/homestay-owner-nav-active";
+import { isVipOwnerNavItemActive } from "@/lib/vip-owner-nav-active";
 import { dashboardPathForRole, isAdminRole, isGuestAccount, profilePathForRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 import {
   isHomestayPublicSection,
   isPublicNavItemActive,
+  isVipPublicSection,
+  marketplaceHomePath,
   publicNavItemsForSection,
 } from "@/lib/public-site-nav";
 import {
@@ -66,6 +70,9 @@ function navItemsForUser(
   if (role === "homestay_owner") {
     return HOMESTAY_OWNER_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
+  if (role === "vip_owner") {
+    return VIP_OWNER_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
+  }
   return publicNavItemsForSection(pathname);
 }
 
@@ -88,6 +95,7 @@ function isHeaderNavItemActive(
 ): boolean {
   if (role === "host") return isHostNavItemActive(pathname, to);
   if (role === "homestay_owner") return isHomestayOwnerNavItemActive(pathname, to);
+  if (role === "vip_owner") return isVipOwnerNavItemActive(pathname, to);
   if (role === "admin") {
     return isAdminNavItemActive(pathname, to);
   }
@@ -106,18 +114,20 @@ export function Header() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const navItems = navItemsForUser(role, Boolean(user), pathname);
   const isHomestaySection = isHomestayPublicSection(pathname);
+  const isVipSection = isVipPublicSection(pathname);
+  const isMarketplaceSection = isHomestaySection || isVipSection;
   const logoPath =
     user && role && role !== "guest"
       ? dashboardPath
-      : isHomestaySection
-        ? "/homestays"
+      : isMarketplaceSection
+        ? marketplaceHomePath(pathname)
         : "/";
   const isGuest = role === "guest";
   const isAdmin = isAdminRole(role);
   const isHost = role === "host";
   const showStaffNotifications = Boolean(user) && (isAdmin || isHost);
   const navBadges = useNavBadges();
-  const showGuestCart = Boolean(user) && isGuestAccount(role) && !isHomestaySection;
+  const showGuestCart = Boolean(user) && isGuestAccount(role) && !isMarketplaceSection;
   const { count: cartCount } = useExperienceCart();
   const showPublicBookingCtas = !user || isGuest;
   const showSignIn = !user;
@@ -135,7 +145,7 @@ export function Header() {
       setLoggingOut(true);
       await getSupabaseBrowser().auth.signOut();
       await router.invalidate();
-      void router.navigate({ to: isHomestaySection ? "/homestays" : "/" });
+      void router.navigate({ to: marketplaceHomePath(pathname) });
     } finally {
       setLoggingOut(false);
     }
@@ -155,11 +165,13 @@ export function Header() {
           to={logoPath}
           className="flex shrink-0 items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember/60"
           aria-label={
-            isHomestaySection && (!user || role === "guest")
-              ? "The Royal Passage — Homestays home"
-              : user && role !== "guest"
-                ? "Go to dashboard"
-                : "The Royal Passage — Home"
+            isVipSection && (!user || role === "guest")
+              ? "The Royal Passage — VIP home"
+              : isHomestaySection && (!user || role === "guest")
+                ? "The Royal Passage — Homestays home"
+                : user && role !== "guest"
+                  ? "Go to dashboard"
+                  : "The Royal Passage — Home"
           }
         >
           <img
@@ -189,7 +201,27 @@ export function Header() {
           })}
 
           {showPublicBookingCtas ? (
-            isHomestaySection ? (
+            isVipSection ? (
+              <>
+                <Link
+                  to="/vips/browse"
+                  className={navLinkClass}
+                  activeProps={{ className: "text-ember" }}
+                >
+                  Book VIP
+                </Link>
+                <Link to="/" className={navLinkClass} activeProps={{ className: "text-ember" }}>
+                  Experiences
+                </Link>
+                <Link
+                  to="/homestays"
+                  className={navLinkClass}
+                  activeProps={{ className: "text-ember" }}
+                >
+                  Homestays
+                </Link>
+              </>
+            ) : isHomestaySection ? (
               <>
                 <Link
                   to="/homestays/browse"
@@ -200,6 +232,13 @@ export function Header() {
                 </Link>
                 <Link to="/" className={navLinkClass} activeProps={{ className: "text-ember" }}>
                   Experiences
+                </Link>
+                <Link
+                  to="/vips"
+                  className={navLinkClass}
+                  activeProps={{ className: "text-ember" }}
+                >
+                  VIP
                 </Link>
               </>
             ) : (
@@ -217,6 +256,13 @@ export function Header() {
                   activeProps={{ className: "text-ember" }}
                 >
                   Homestays
+                </Link>
+                <Link
+                  to="/vips"
+                  className={navLinkClass}
+                  activeProps={{ className: "text-ember" }}
+                >
+                  VIP
                 </Link>
               </>
             )
@@ -257,7 +303,12 @@ export function Header() {
                   {isGuest ? (
                     <>
                       <DropdownMenuItem asChild>
-                        <Link to={isHomestaySection ? "/homestays" : "/"} className="cursor-pointer">
+                        <Link
+                          to={
+                            isVipSection ? "/vips" : isHomestaySection ? "/homestays" : "/"
+                          }
+                          className="cursor-pointer"
+                        >
                           <UserRound className="h-4 w-4" />
                           Home
                         </Link>
@@ -265,10 +316,10 @@ export function Header() {
                       <DropdownMenuItem asChild>
                         <Link to="/dashboard/history" className="cursor-pointer">
                           <UserRound className="h-4 w-4" />
-                          {isHomestaySection ? "My stays" : "History"}
+                          {isVipSection ? "My VIP stays" : isHomestaySection ? "My stays" : "History"}
                         </Link>
                       </DropdownMenuItem>
-                      {!isHomestaySection ? (
+                      {!isMarketplaceSection ? (
                         <DropdownMenuItem asChild>
                           <Link to="/dashboard/cart" className="cursor-pointer">
                             <UserRound className="h-4 w-4" />
@@ -385,15 +436,23 @@ export function Header() {
                     {showPublicBookingCtas ? (
                       <>
                         <MobileNavSectionLabel>Book</MobileNavSectionLabel>
-                        {isHomestaySection ? (
+                        {isVipSection ? (
+                          <>
+                            <MobileNavLink to="/vips/browse">Book VIP</MobileNavLink>
+                            <MobileNavLink to="/">Experiences</MobileNavLink>
+                            <MobileNavLink to="/homestays">Homestays</MobileNavLink>
+                          </>
+                        ) : isHomestaySection ? (
                           <>
                             <MobileNavLink to="/homestays/browse">Book a Homestay</MobileNavLink>
                             <MobileNavLink to="/">Experiences</MobileNavLink>
+                            <MobileNavLink to="/vips">VIP</MobileNavLink>
                           </>
                         ) : (
                           <>
                             <MobileNavLink to="/experiences">Book an Experience</MobileNavLink>
                             <MobileNavLink to="/homestays">Homestays</MobileNavLink>
+                            <MobileNavLink to="/vips">VIP</MobileNavLink>
                           </>
                         )}
                       </>
@@ -408,11 +467,15 @@ export function Header() {
                     <MobileNavSectionLabel>Account</MobileNavSectionLabel>
                     {isGuest ? (
                       <>
-                        <MobileNavLink to={isHomestaySection ? "/homestays" : "/"}>Home</MobileNavLink>
-                        <MobileNavLink to="/dashboard/history">
-                          {isHomestaySection ? "My stays" : "History"}
+                        <MobileNavLink
+                          to={isVipSection ? "/vips" : isHomestaySection ? "/homestays" : "/"}
+                        >
+                          Home
                         </MobileNavLink>
-                        {!isHomestaySection && !showGuestCart ? (
+                        <MobileNavLink to="/dashboard/history">
+                          {isVipSection ? "My VIP stays" : isHomestaySection ? "My stays" : "History"}
+                        </MobileNavLink>
+                        {!isMarketplaceSection && !showGuestCart ? (
                           <MobileNavLink to="/dashboard/cart">Cart</MobileNavLink>
                         ) : null}
                       </>

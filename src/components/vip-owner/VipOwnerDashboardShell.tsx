@@ -1,0 +1,40 @@
+import type { ReactNode } from "react";
+import { Footer } from "@/components/site/Footer";
+import { Header } from "@/components/site/Header";
+import { RoleBadge } from "@/components/auth/RoleBadge";
+import { ROLE_DESCRIPTIONS, ROLE_LABELS } from "@/lib/roles";
+
+type VipOwnerDashboardShellProps = {
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+  showRoleDescription?: boolean;
+};
+
+export function VipOwnerDashboardShell({
+  title,
+  subtitle,
+  children,
+  showRoleDescription = true,
+}: VipOwnerDashboardShellProps) {
+  return (
+    <div className="pt-[var(--header-height)] text-foreground">
+      <Header />
+      <section className="container-page py-14 sm:py-20 md:py-24">
+        <div className="mb-8 flex flex-wrap items-center gap-3">
+          <RoleBadge role="vip_owner" />
+          <span className="text-sm text-muted-foreground">{ROLE_LABELS.vip_owner} dashboard</span>
+        </div>
+        <h1 className="font-display text-4xl tracking-tight md:text-5xl">{title}</h1>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">{subtitle}</p>
+        {showRoleDescription ? (
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground/90">
+            {ROLE_DESCRIPTIONS.vip_owner}
+          </p>
+        ) : null}
+        <div className="mt-10">{children}</div>
+      </section>
+      <Footer />
+    </div>
+  );
+}

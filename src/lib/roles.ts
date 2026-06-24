@@ -1,5 +1,5 @@
-/** Platform roles — experience providers are **hosts**; property providers are **homestay owners**. */
-export const USER_ROLES = ["guest", "host", "homestay_owner", "admin", "editor"] as const;
+/** Platform roles — experience providers are **hosts**; property providers are **homestay owners**; VIP providers are **vip owners**. */
+export const USER_ROLES = ["guest", "host", "homestay_owner", "vip_owner", "admin", "editor"] as const;
 
 export type UserRole = (typeof USER_ROLES)[number];
 
@@ -7,6 +7,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   guest: "Guest",
   host: "Host",
   homestay_owner: "Homestay owner",
+  vip_owner: "VIP owner",
   admin: "Admin",
   editor: "Editor",
 };
@@ -15,6 +16,7 @@ export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
   guest: "Sign up or sign in to book experiences.",
   host: "Sign in with login credentials provided by Royal Passage.",
   homestay_owner: "Sign in with homestay owner credentials provided by Royal Passage.",
+  vip_owner: "Sign in with VIP owner credentials provided by Royal Passage.",
   admin: "Sign in with your admin credentials — manage bookings, experiences, and homepage hero, showcase, and video sections.",
   editor: "Sign in to edit journal stories and the heritage video section on the homepage.",
 };
@@ -23,6 +25,7 @@ export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
   guest: "/",
   host: "/host/dashboard",
   homestay_owner: "/homestay/dashboard",
+  vip_owner: "/vip/dashboard",
   admin: "/admin",
   editor: "/",
 };
@@ -31,6 +34,7 @@ export const ROLE_PROFILE_PATH: Record<UserRole, string> = {
   guest: "/account/profile",
   host: "/account/profile",
   homestay_owner: "/account/profile",
+  vip_owner: "/account/profile",
   admin: "/admin/profile",
   editor: "/account/profile",
 };
@@ -67,9 +71,15 @@ export function profilePathForRole(role: UserRole | null | undefined): string {
   return ROLE_PROFILE_PATH[role];
 }
 
-/** Host, homestay owner, admin, or editor — not allowed to book as a guest. */
+/** Host, homestay owner, VIP owner, admin, or editor — not allowed to book as a guest. */
 export function isStaffRole(role: UserRole | null | undefined): boolean {
-  return role === "host" || role === "homestay_owner" || role === "admin" || role === "editor";
+  return (
+    role === "host" ||
+    role === "homestay_owner" ||
+    role === "vip_owner" ||
+    role === "admin" ||
+    role === "editor"
+  );
 }
 
 export function isEditorRole(role: UserRole | null | undefined): boolean {

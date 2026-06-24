@@ -19,10 +19,15 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CitiesRouteImport } from './routes/cities'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VipsIndexRouteImport } from './routes/vips.index'
 import { Route as HomestaysIndexRouteImport } from './routes/homestays.index'
 import { Route as ExperiencesIndexRouteImport } from './routes/experiences.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as VipsSlugRouteImport } from './routes/vips.$slug'
+import { Route as VipListingsRouteImport } from './routes/vip.listings'
+import { Route as VipDashboardRouteImport } from './routes/vip.dashboard'
+import { Route as VipBookingsRouteImport } from './routes/vip.bookings'
 import { Route as StaysBookingIdRouteImport } from './routes/stays.$bookingId'
 import { Route as HostReviewsRouteImport } from './routes/host.reviews'
 import { Route as HostRevenueRouteImport } from './routes/host.revenue'
@@ -47,6 +52,10 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminHomepageEditRouteImport } from './routes/admin.homepage-edit'
 import { Route as AccountProfileRouteImport } from './routes/account.profile'
+import { Route as VipsBrowseIndexRouteImport } from './routes/vips.browse.index'
+import { Route as VipsSlugIndexRouteImport } from './routes/vips.$slug.index'
+import { Route as VipListingsIndexRouteImport } from './routes/vip.listings.index'
+import { Route as VipBookingsIndexRouteImport } from './routes/vip.bookings.index'
 import { Route as HostExperiencesIndexRouteImport } from './routes/host.experiences.index'
 import { Route as HostBookingsIndexRouteImport } from './routes/host.bookings.index'
 import { Route as HomestaysBrowseIndexRouteImport } from './routes/homestays.browse.index'
@@ -65,6 +74,7 @@ import { Route as AdminHomestayOwnersIndexRouteImport } from './routes/admin.hom
 import { Route as AdminExperiencesIndexRouteImport } from './routes/admin.experiences.index'
 import { Route as AdminBookingsIndexRouteImport } from './routes/admin.bookings.index'
 import { Route as AdminActivityIndexRouteImport } from './routes/admin.activity.index'
+import { Route as VipListingsNewRouteImport } from './routes/vip.listings.new'
 import { Route as HostExperiencesNewRouteImport } from './routes/host.experiences.new'
 import { Route as HostExperiencesExperienceIdRouteImport } from './routes/host.experiences.$experienceId'
 import { Route as HostBookingsBookingIdRouteImport } from './routes/host.bookings.$bookingId'
@@ -129,6 +139,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VipsIndexRoute = VipsIndexRouteImport.update({
+  id: '/vips/',
+  path: '/vips/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HomestaysIndexRoute = HomestaysIndexRouteImport.update({
   id: '/homestays/',
   path: '/homestays/',
@@ -148,6 +163,26 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const VipsSlugRoute = VipsSlugRouteImport.update({
+  id: '/vips/$slug',
+  path: '/vips/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VipListingsRoute = VipListingsRouteImport.update({
+  id: '/vip/listings',
+  path: '/vip/listings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VipDashboardRoute = VipDashboardRouteImport.update({
+  id: '/vip/dashboard',
+  path: '/vip/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VipBookingsRoute = VipBookingsRouteImport.update({
+  id: '/vip/bookings',
+  path: '/vip/bookings',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const StaysBookingIdRoute = StaysBookingIdRouteImport.update({
   id: '/stays/$bookingId',
@@ -269,6 +304,26 @@ const AccountProfileRoute = AccountProfileRouteImport.update({
   path: '/account/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VipsBrowseIndexRoute = VipsBrowseIndexRouteImport.update({
+  id: '/vips/browse/',
+  path: '/vips/browse/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VipsSlugIndexRoute = VipsSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => VipsSlugRoute,
+} as any)
+const VipListingsIndexRoute = VipListingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => VipListingsRoute,
+} as any)
+const VipBookingsIndexRoute = VipBookingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => VipBookingsRoute,
+} as any)
 const HostExperiencesIndexRoute = HostExperiencesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -359,6 +414,11 @@ const AdminActivityIndexRoute = AdminActivityIndexRouteImport.update({
   id: '/activity/',
   path: '/activity/',
   getParentRoute: () => AdminRoute,
+} as any)
+const VipListingsNewRoute = VipListingsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => VipListingsRoute,
 } as any)
 const HostExperiencesNewRoute = HostExperiencesNewRouteImport.update({
   id: '/new',
@@ -467,10 +527,15 @@ export interface FileRoutesByFullPath {
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
+  '/vip/bookings': typeof VipBookingsRouteWithChildren
+  '/vip/dashboard': typeof VipDashboardRoute
+  '/vip/listings': typeof VipListingsRouteWithChildren
+  '/vips/$slug': typeof VipsSlugRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
   '/homestays/': typeof HomestaysIndexRoute
+  '/vips/': typeof VipsIndexRoute
   '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
@@ -483,6 +548,7 @@ export interface FileRoutesByFullPath {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/vip/listings/new': typeof VipListingsNewRoute
   '/admin/activity/': typeof AdminActivityIndexRoute
   '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
@@ -501,6 +567,10 @@ export interface FileRoutesByFullPath {
   '/homestays/browse/': typeof HomestaysBrowseIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
   '/host/experiences/': typeof HostExperiencesIndexRoute
+  '/vip/bookings/': typeof VipBookingsIndexRoute
+  '/vip/listings/': typeof VipListingsIndexRoute
+  '/vips/$slug/': typeof VipsSlugIndexRoute
+  '/vips/browse/': typeof VipsBrowseIndexRoute
   '/dashboard/cart/checkout/$slug': typeof DashboardCartCheckoutSlugRoute
 }
 export interface FileRoutesByTo {
@@ -526,10 +596,12 @@ export interface FileRoutesByTo {
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
+  '/vip/dashboard': typeof VipDashboardRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/experiences': typeof ExperiencesIndexRoute
   '/homestays': typeof HomestaysIndexRoute
+  '/vips': typeof VipsIndexRoute
   '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
@@ -542,6 +614,7 @@ export interface FileRoutesByTo {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/vip/listings/new': typeof VipListingsNewRoute
   '/admin/activity': typeof AdminActivityIndexRoute
   '/admin/bookings': typeof AdminBookingsIndexRoute
   '/admin/experiences': typeof AdminExperiencesIndexRoute
@@ -560,6 +633,10 @@ export interface FileRoutesByTo {
   '/homestays/browse': typeof HomestaysBrowseIndexRoute
   '/host/bookings': typeof HostBookingsIndexRoute
   '/host/experiences': typeof HostExperiencesIndexRoute
+  '/vip/bookings': typeof VipBookingsIndexRoute
+  '/vip/listings': typeof VipListingsIndexRoute
+  '/vips/$slug': typeof VipsSlugIndexRoute
+  '/vips/browse': typeof VipsBrowseIndexRoute
   '/dashboard/cart/checkout/$slug': typeof DashboardCartCheckoutSlugRoute
 }
 export interface FileRoutesById {
@@ -598,10 +675,15 @@ export interface FileRoutesById {
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
+  '/vip/bookings': typeof VipBookingsRouteWithChildren
+  '/vip/dashboard': typeof VipDashboardRoute
+  '/vip/listings': typeof VipListingsRouteWithChildren
+  '/vips/$slug': typeof VipsSlugRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
   '/homestays/': typeof HomestaysIndexRoute
+  '/vips/': typeof VipsIndexRoute
   '/admin/bookings/$bookingId': typeof AdminBookingsBookingIdRoute
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
@@ -614,6 +696,7 @@ export interface FileRoutesById {
   '/host/bookings/$bookingId': typeof HostBookingsBookingIdRoute
   '/host/experiences/$experienceId': typeof HostExperiencesExperienceIdRoute
   '/host/experiences/new': typeof HostExperiencesNewRoute
+  '/vip/listings/new': typeof VipListingsNewRoute
   '/admin/activity/': typeof AdminActivityIndexRoute
   '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
@@ -632,6 +715,10 @@ export interface FileRoutesById {
   '/homestays/browse/': typeof HomestaysBrowseIndexRoute
   '/host/bookings/': typeof HostBookingsIndexRoute
   '/host/experiences/': typeof HostExperiencesIndexRoute
+  '/vip/bookings/': typeof VipBookingsIndexRoute
+  '/vip/listings/': typeof VipListingsIndexRoute
+  '/vips/$slug/': typeof VipsSlugIndexRoute
+  '/vips/browse/': typeof VipsBrowseIndexRoute
   '/dashboard/cart/checkout/$slug': typeof DashboardCartCheckoutSlugRoute
 }
 export interface FileRouteTypes {
@@ -671,10 +758,15 @@ export interface FileRouteTypes {
     | '/host/revenue'
     | '/host/reviews'
     | '/stays/$bookingId'
+    | '/vip/bookings'
+    | '/vip/dashboard'
+    | '/vip/listings'
+    | '/vips/$slug'
     | '/admin/'
     | '/dashboard/'
     | '/experiences/'
     | '/homestays/'
+    | '/vips/'
     | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
     | '/admin/homestays/$homestayId'
@@ -687,6 +779,7 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/vip/listings/new'
     | '/admin/activity/'
     | '/admin/bookings/'
     | '/admin/experiences/'
@@ -705,6 +798,10 @@ export interface FileRouteTypes {
     | '/homestays/browse/'
     | '/host/bookings/'
     | '/host/experiences/'
+    | '/vip/bookings/'
+    | '/vip/listings/'
+    | '/vips/$slug/'
+    | '/vips/browse/'
     | '/dashboard/cart/checkout/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -730,10 +827,12 @@ export interface FileRouteTypes {
     | '/host/revenue'
     | '/host/reviews'
     | '/stays/$bookingId'
+    | '/vip/dashboard'
     | '/admin'
     | '/dashboard'
     | '/experiences'
     | '/homestays'
+    | '/vips'
     | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
     | '/admin/homestays/$homestayId'
@@ -746,6 +845,7 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/vip/listings/new'
     | '/admin/activity'
     | '/admin/bookings'
     | '/admin/experiences'
@@ -764,6 +864,10 @@ export interface FileRouteTypes {
     | '/homestays/browse'
     | '/host/bookings'
     | '/host/experiences'
+    | '/vip/bookings'
+    | '/vip/listings'
+    | '/vips/$slug'
+    | '/vips/browse'
     | '/dashboard/cart/checkout/$slug'
   id:
     | '__root__'
@@ -801,10 +905,15 @@ export interface FileRouteTypes {
     | '/host/revenue'
     | '/host/reviews'
     | '/stays/$bookingId'
+    | '/vip/bookings'
+    | '/vip/dashboard'
+    | '/vip/listings'
+    | '/vips/$slug'
     | '/admin/'
     | '/dashboard/'
     | '/experiences/'
     | '/homestays/'
+    | '/vips/'
     | '/admin/bookings/$bookingId'
     | '/admin/experiences/$experienceId'
     | '/admin/homestays/$homestayId'
@@ -817,6 +926,7 @@ export interface FileRouteTypes {
     | '/host/bookings/$bookingId'
     | '/host/experiences/$experienceId'
     | '/host/experiences/new'
+    | '/vip/listings/new'
     | '/admin/activity/'
     | '/admin/bookings/'
     | '/admin/experiences/'
@@ -835,6 +945,10 @@ export interface FileRouteTypes {
     | '/homestays/browse/'
     | '/host/bookings/'
     | '/host/experiences/'
+    | '/vip/bookings/'
+    | '/vip/listings/'
+    | '/vips/$slug/'
+    | '/vips/browse/'
     | '/dashboard/cart/checkout/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -863,8 +977,14 @@ export interface RootRouteChildren {
   HostRevenueRoute: typeof HostRevenueRoute
   HostReviewsRoute: typeof HostReviewsRoute
   StaysBookingIdRoute: typeof StaysBookingIdRoute
+  VipBookingsRoute: typeof VipBookingsRouteWithChildren
+  VipDashboardRoute: typeof VipDashboardRoute
+  VipListingsRoute: typeof VipListingsRouteWithChildren
+  VipsSlugRoute: typeof VipsSlugRouteWithChildren
   HomestaysIndexRoute: typeof HomestaysIndexRoute
+  VipsIndexRoute: typeof VipsIndexRoute
   HomestaysBrowseIndexRoute: typeof HomestaysBrowseIndexRoute
+  VipsBrowseIndexRoute: typeof VipsBrowseIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -939,6 +1059,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vips/': {
+      id: '/vips/'
+      path: '/vips'
+      fullPath: '/vips/'
+      preLoaderRoute: typeof VipsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/homestays/': {
       id: '/homestays/'
       path: '/homestays'
@@ -966,6 +1093,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/vips/$slug': {
+      id: '/vips/$slug'
+      path: '/vips/$slug'
+      fullPath: '/vips/$slug'
+      preLoaderRoute: typeof VipsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vip/listings': {
+      id: '/vip/listings'
+      path: '/vip/listings'
+      fullPath: '/vip/listings'
+      preLoaderRoute: typeof VipListingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vip/dashboard': {
+      id: '/vip/dashboard'
+      path: '/vip/dashboard'
+      fullPath: '/vip/dashboard'
+      preLoaderRoute: typeof VipDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vip/bookings': {
+      id: '/vip/bookings'
+      path: '/vip/bookings'
+      fullPath: '/vip/bookings'
+      preLoaderRoute: typeof VipBookingsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/stays/$bookingId': {
       id: '/stays/$bookingId'
@@ -1135,6 +1290,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vips/browse/': {
+      id: '/vips/browse/'
+      path: '/vips/browse'
+      fullPath: '/vips/browse/'
+      preLoaderRoute: typeof VipsBrowseIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vips/$slug/': {
+      id: '/vips/$slug/'
+      path: '/'
+      fullPath: '/vips/$slug/'
+      preLoaderRoute: typeof VipsSlugIndexRouteImport
+      parentRoute: typeof VipsSlugRoute
+    }
+    '/vip/listings/': {
+      id: '/vip/listings/'
+      path: '/'
+      fullPath: '/vip/listings/'
+      preLoaderRoute: typeof VipListingsIndexRouteImport
+      parentRoute: typeof VipListingsRoute
+    }
+    '/vip/bookings/': {
+      id: '/vip/bookings/'
+      path: '/'
+      fullPath: '/vip/bookings/'
+      preLoaderRoute: typeof VipBookingsIndexRouteImport
+      parentRoute: typeof VipBookingsRoute
+    }
     '/host/experiences/': {
       id: '/host/experiences/'
       path: '/'
@@ -1260,6 +1443,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/activity/'
       preLoaderRoute: typeof AdminActivityIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/vip/listings/new': {
+      id: '/vip/listings/new'
+      path: '/new'
+      fullPath: '/vip/listings/new'
+      preLoaderRoute: typeof VipListingsNewRouteImport
+      parentRoute: typeof VipListingsRoute
     }
     '/host/experiences/new': {
       id: '/host/experiences/new'
@@ -1565,6 +1755,44 @@ const HostExperiencesRouteWithChildren = HostExperiencesRoute._addFileChildren(
   HostExperiencesRouteChildren,
 )
 
+interface VipBookingsRouteChildren {
+  VipBookingsIndexRoute: typeof VipBookingsIndexRoute
+}
+
+const VipBookingsRouteChildren: VipBookingsRouteChildren = {
+  VipBookingsIndexRoute: VipBookingsIndexRoute,
+}
+
+const VipBookingsRouteWithChildren = VipBookingsRoute._addFileChildren(
+  VipBookingsRouteChildren,
+)
+
+interface VipListingsRouteChildren {
+  VipListingsNewRoute: typeof VipListingsNewRoute
+  VipListingsIndexRoute: typeof VipListingsIndexRoute
+}
+
+const VipListingsRouteChildren: VipListingsRouteChildren = {
+  VipListingsNewRoute: VipListingsNewRoute,
+  VipListingsIndexRoute: VipListingsIndexRoute,
+}
+
+const VipListingsRouteWithChildren = VipListingsRoute._addFileChildren(
+  VipListingsRouteChildren,
+)
+
+interface VipsSlugRouteChildren {
+  VipsSlugIndexRoute: typeof VipsSlugIndexRoute
+}
+
+const VipsSlugRouteChildren: VipsSlugRouteChildren = {
+  VipsSlugIndexRoute: VipsSlugIndexRoute,
+}
+
+const VipsSlugRouteWithChildren = VipsSlugRoute._addFileChildren(
+  VipsSlugRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -1590,8 +1818,14 @@ const rootRouteChildren: RootRouteChildren = {
   HostRevenueRoute: HostRevenueRoute,
   HostReviewsRoute: HostReviewsRoute,
   StaysBookingIdRoute: StaysBookingIdRoute,
+  VipBookingsRoute: VipBookingsRouteWithChildren,
+  VipDashboardRoute: VipDashboardRoute,
+  VipListingsRoute: VipListingsRouteWithChildren,
+  VipsSlugRoute: VipsSlugRouteWithChildren,
   HomestaysIndexRoute: HomestaysIndexRoute,
+  VipsIndexRoute: VipsIndexRoute,
   HomestaysBrowseIndexRoute: HomestaysBrowseIndexRoute,
+  VipsBrowseIndexRoute: VipsBrowseIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
