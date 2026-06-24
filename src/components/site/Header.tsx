@@ -332,14 +332,6 @@ export function Header() {
                           {isVipSection ? "My bookings" : isHomestaySection ? "My stays" : "History"}
                         </Link>
                       </DropdownMenuItem>
-                      {!isMarketplaceSection ? (
-                        <DropdownMenuItem asChild>
-                          <Link to="/dashboard/cart" className="cursor-pointer">
-                            <UserRound className="h-4 w-4" />
-                            Cart
-                          </Link>
-                        </DropdownMenuItem>
-                      ) : null}
                     </>
                   ) : (
                     <DropdownMenuItem asChild>
@@ -488,9 +480,6 @@ export function Header() {
                         <MobileNavLink to="/dashboard/history">
                           {isVipSection ? "My bookings" : isHomestaySection ? "My stays" : "History"}
                         </MobileNavLink>
-                        {!isMarketplaceSection && !showGuestCart ? (
-                          <MobileNavLink to="/dashboard/cart">Cart</MobileNavLink>
-                        ) : null}
                       </>
                     ) : (
                       <MobileNavLink to={dashboardPath}>Dashboard</MobileNavLink>

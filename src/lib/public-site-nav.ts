@@ -69,11 +69,7 @@ export function isPublicNavItemActive(pathname: string, to: string): boolean {
     return pathname === "/homestays" || pathname === "/homestays/";
   }
   if (to === "/experiences") {
-    return (
-      pathname === "/" ||
-      pathname === "/experiences" ||
-      pathname.startsWith("/experiences/")
-    );
+    return pathname === "/experiences" || pathname.startsWith("/experiences/");
   }
   return pathname === to || pathname.startsWith(`${to}/`);
 }
