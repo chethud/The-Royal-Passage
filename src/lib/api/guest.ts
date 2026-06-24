@@ -11,6 +11,7 @@ export type GuestProfile = {
   createdAt: string;
   avatarUrl: string | null;
   dateOfBirth: string | null;
+  vipMembershipStatus: string;
 };
 
 export type UpdateGuestProfilePayload = {
@@ -29,6 +30,7 @@ function normalizeGuestProfile(raw: {
   createdAt?: string;
   avatarUrl?: string | null;
   dateOfBirth?: string | null;
+  vipMembershipStatus?: string | null;
 }): GuestProfile {
   return {
     id: String(raw.id ?? ""),
@@ -40,6 +42,7 @@ function normalizeGuestProfile(raw: {
     avatarUrl: raw.avatarUrl != null && String(raw.avatarUrl).trim() ? String(raw.avatarUrl) : null,
     dateOfBirth:
       raw.dateOfBirth != null && String(raw.dateOfBirth).trim() ? String(raw.dateOfBirth) : null,
+    vipMembershipStatus: String(raw.vipMembershipStatus ?? "none"),
   };
 }
 

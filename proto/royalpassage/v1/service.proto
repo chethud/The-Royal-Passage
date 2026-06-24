@@ -102,6 +102,24 @@ service RoyalPassageService {
 
   rpc UpdateOwnerVipPackage(UpdateOwnerVipPackageInput) returns (OwnerVipPackageDetail);
 
+  rpc SkipVipMembershipInterest(google.protobuf.Empty) returns (GuestProfile);
+
+  rpc SubmitVipMembershipApplication(SubmitVipMembershipApplicationRequest) returns (GuestProfile);
+
+  rpc SubmitVipCustomPackageRequest(CreateVipCustomPackageRequest) returns (VipCustomPackageRequestSummary);
+
+  rpc ListVipMembershipApplications(google.protobuf.Empty) returns (ListVipMembershipApplicationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc ApproveVipMembership(VipMembershipActionRequest) returns (VipMembershipApplicationSummary);
+
+  rpc RejectVipMembership(VipMembershipActionRequest) returns (VipMembershipApplicationSummary);
+
+  rpc ListVipCustomPackageRequests(google.protobuf.Empty) returns (ListVipCustomPackageRequestsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse);
 
   rpc ListMyBookings(ListMyBookingsRequest) returns (ListBookingsResponse) {

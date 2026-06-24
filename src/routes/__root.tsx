@@ -1,6 +1,7 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 
 import { AuthProvider } from "@/lib/auth-user";
+import { VipMembershipPrompt } from "@/components/vip/VipMembershipPrompt";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -89,6 +90,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <AuthProvider>
+      <VipMembershipPrompt />
       <Outlet />
     </AuthProvider>
   );

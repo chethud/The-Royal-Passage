@@ -134,7 +134,7 @@ def _map_owner_package(row: dict) -> OwnerVipPackageDetail:
 
 def list_owner_vip_packages(auth: dict) -> list[OwnerVipPackageSummary]:
     supabase = get_supabase_admin()
-    owner_id = _resolve_owner_id(auth)
+    _resolve_owner_id(auth)
 
     result = (
         supabase.table("vip_packages")
@@ -142,7 +142,6 @@ def list_owner_vip_packages(auth: dict) -> list[OwnerVipPackageSummary]:
             "id, slug, title, city, status, price_from_minor, currency_code, "
             "duration_days, hero_image_url, package_type"
         )
-        .eq("owner_id", owner_id)
         .neq("status", "archived")
         .order("updated_at", desc=True)
         .execute()
@@ -168,8 +167,17 @@ def list_owner_vip_packages(auth: dict) -> list[OwnerVipPackageSummary]:
 
 def get_owner_vip_package(auth: dict, package_id: str) -> OwnerVipPackageDetail:
     supabase = get_supabase_admin()
-    owner_id = _resolve_owner_id(auth)
-    row = _fetch_owner_package_row(supabase, package_id, owner_id)
+    _resolve_owner_id(auth)
+    result = (
+        supabase.table("vip_packages")
+        .select(PACKAGE_SELECT)
+        .eq("id", package_id)
+        .maybe_single()
+        .execute()
+    )
+    row = result.data if result else None
+    if not row:
+        raise ValueError("Package not found.")
     return _map_owner_package(row)
 
 

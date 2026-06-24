@@ -32,6 +32,8 @@ export type AuthUserState = {
   displayName: string | null;
   accessToken: string | null;
   hasCachedSession: boolean;
+  vipMembershipStatus: string | null;
+  refreshVipMembershipStatus: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthUserState | null>(null);
@@ -118,6 +120,7 @@ function useAuthUserState(): AuthUserState {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [vipMembershipStatus, setVipMembershipStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(configured);
   const [cachedUser, setCachedUser] = useState<CachedUser | null>(() => readCachedUser());
 
@@ -136,6 +139,7 @@ function useAuthUserState(): AuthUserState {
       if (!nextUser) {
         setProfile(null);
         setAccessToken(null);
+        setVipMembershipStatus(null);
         writeCachedUser(null);
         setCachedUser(readCachedUser());
         setLoading(false);
@@ -158,6 +162,19 @@ function useAuthUserState(): AuthUserState {
       setProfile(nextProfile);
       writeCachedUser(nextUser, nextProfile?.role);
       setCachedUser(readCachedUser());
+
+      if (nextProfile?.role === "guest" && resolvedToken && isApiConfigured()) {
+        try {
+          const apiProfile = await fetchGuestProfile(resolvedToken);
+          if (!mounted) return;
+          setVipMembershipStatus(apiProfile.vipMembershipStatus);
+        } catch {
+          if (!mounted) return;
+          setVipMembershipStatus("none");
+        }
+      } else {
+        setVipMembershipStatus(null);
+      }
     };
 
     void supabase.auth.getSession().then(({ data }) => {
@@ -183,6 +200,16 @@ function useAuthUserState(): AuthUserState {
 
   const role = profile?.role ?? (user ? cachedUser?.role : null) ?? null;
 
+  const refreshVipMembershipStatus = async () => {
+    if (!accessToken || role !== "guest" || !isApiConfigured()) return;
+    try {
+      const apiProfile = await fetchGuestProfile(accessToken);
+      setVipMembershipStatus(apiProfile.vipMembershipStatus);
+    } catch {
+      setVipMembershipStatus("none");
+    }
+  };
+
   return {
     user,
     profile,
@@ -192,6 +219,8 @@ function useAuthUserState(): AuthUserState {
     displayName,
     accessToken,
     hasCachedSession: Boolean(cachedUser?.id),
+    vipMembershipStatus,
+    refreshVipMembershipStatus,
   };
 }
 

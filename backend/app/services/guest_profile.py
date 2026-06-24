@@ -4,7 +4,7 @@ from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import GuestProfile, UpdateGuestProfileRequest
 
 _DATE_OF_BIRTH_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-_PROFILE_SELECT = "role, full_name, phone, avatar_url, date_of_birth, created_at"
+_PROFILE_SELECT = "role, full_name, phone, avatar_url, date_of_birth, created_at, vip_membership_status"
 
 
 def _normalize_date_of_birth(value) -> str | None:
@@ -27,6 +27,7 @@ def get_guest_profile(auth: dict) -> GuestProfile:
         createdAt=profile.get("created_at") or "",
         avatarUrl=profile.get("avatar_url"),
         dateOfBirth=_normalize_date_of_birth(profile.get("date_of_birth")),
+        vipMembershipStatus=profile.get("vip_membership_status") or "none",
     )
 
 

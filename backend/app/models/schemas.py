@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class Slot(BaseModel):
@@ -746,6 +746,78 @@ class GuestProfile(BaseModel):
     createdAt: str
     avatarUrl: str | None = None
     dateOfBirth: str | None = None
+    vipMembershipStatus: str = "none"
+
+
+class SubmitVipMembershipApplicationRequest(BaseModel):
+    fullName: str = Field(min_length=2, max_length=120)
+    email: str
+    phone: str | None = Field(default=None, max_length=30)
+    address: str | None = Field(default=None, max_length=500)
+    idDocumentType: str
+    idDocumentNumber: str = Field(min_length=4, max_length=64)
+
+    @field_validator("idDocumentType")
+    @classmethod
+    def validate_id_type(cls, value: str) -> str:
+        allowed = {"aadhaar", "visitor_id", "business_id"}
+        if value not in allowed:
+            raise ValueError("Invalid ID document type.")
+        return value
+
+
+class VipMembershipApplicationSummary(BaseModel):
+    id: str
+    guestUserId: str
+    fullName: str
+    email: str
+    phone: str | None = None
+    idDocumentType: str
+    status: str
+    createdAt: str
+
+
+class VipMembershipApplicationDetail(BaseModel):
+    id: str
+    guestUserId: str
+    fullName: str
+    email: str
+    phone: str | None = None
+    address: str | None = None
+    idDocumentType: str
+    idDocumentNumber: str
+    status: str
+    createdAt: str
+
+
+class ListVipMembershipApplicationsResponse(BaseModel):
+    applications: list[VipMembershipApplicationSummary]
+
+
+class CreateVipCustomPackageRequest(BaseModel):
+    travelStart: str
+    travelEnd: str
+    guestCount: int = Field(default=1, ge=1, le=50)
+    preferences: str | None = Field(default=None, max_length=2000)
+    guestPhone: str | None = Field(default=None, max_length=30)
+
+
+class VipCustomPackageRequestSummary(BaseModel):
+    id: str
+    guestUserId: str
+    guestName: str
+    guestEmail: str
+    guestPhone: str | None = None
+    travelStart: str
+    travelEnd: str
+    guestCount: int
+    preferences: str | None = None
+    status: str
+    createdAt: str
+
+
+class ListVipCustomPackageRequestsResponse(BaseModel):
+    requests: list[VipCustomPackageRequestSummary]
 
 
 class UpdateGuestProfileRequest(BaseModel):

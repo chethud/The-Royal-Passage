@@ -8,5 +8,9 @@ export function isVipOwnerNavItemActive(pathname: string, to: string): boolean {
     return segment !== undefined && segment !== "new";
   }
 
+  if (to === "/vip/dashboard") {
+    return pathname === "/vip/dashboard" || pathname === "/vip/dashboard/";
+  }
+
   return pathname.startsWith(`${to}/`);
 }

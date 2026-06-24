@@ -116,6 +116,27 @@ class RoyalPassageService(Protocol):
     async def update_owner_vip_package(self, request: royalpassage_dot_v1_dot_service__pb2.UpdateOwnerVipPackageInput, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerVipPackageDetail:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def skip_vip_membership_interest(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.GuestProfile:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def submit_vip_membership_application(self, request: royalpassage_dot_v1_dot_types__pb2.SubmitVipMembershipApplicationRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.GuestProfile:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def submit_vip_custom_package_request(self, request: royalpassage_dot_v1_dot_types__pb2.CreateVipCustomPackageRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.VipCustomPackageRequestSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def list_vip_membership_applications(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListVipMembershipApplicationsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def approve_vip_membership(self, request: royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def reject_vip_membership(self, request: royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def list_vip_custom_package_requests(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListVipCustomPackageRequestsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
     async def create_booking(self, request: royalpassage_dot_v1_dot_types__pb2.CreateBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateBookingResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
@@ -609,6 +630,76 @@ class RoyalPassageServiceASGIApplication(ConnectASGIApplication[RoyalPassageServ
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.update_owner_vip_package,
+                ),
+                "/royalpassage.v1.RoyalPassageService/SkipVipMembershipInterest": Endpoint.unary(
+                    method=MethodInfo(
+                        name="SkipVipMembershipInterest",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.GuestProfile,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.skip_vip_membership_interest,
+                ),
+                "/royalpassage.v1.RoyalPassageService/SubmitVipMembershipApplication": Endpoint.unary(
+                    method=MethodInfo(
+                        name="SubmitVipMembershipApplication",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.SubmitVipMembershipApplicationRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.GuestProfile,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.submit_vip_membership_application,
+                ),
+                "/royalpassage.v1.RoyalPassageService/SubmitVipCustomPackageRequest": Endpoint.unary(
+                    method=MethodInfo(
+                        name="SubmitVipCustomPackageRequest",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.CreateVipCustomPackageRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.VipCustomPackageRequestSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.submit_vip_custom_package_request,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListVipMembershipApplications": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ListVipMembershipApplications",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListVipMembershipApplicationsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.list_vip_membership_applications,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ApproveVipMembership": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ApproveVipMembership",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.approve_vip_membership,
+                ),
+                "/royalpassage.v1.RoyalPassageService/RejectVipMembership": Endpoint.unary(
+                    method=MethodInfo(
+                        name="RejectVipMembership",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.reject_vip_membership,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListVipCustomPackageRequests": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ListVipCustomPackageRequests",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListVipCustomPackageRequestsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.list_vip_custom_package_requests,
                 ),
                 "/royalpassage.v1.RoyalPassageService/CreateBooking": Endpoint.unary(
                     method=MethodInfo(
@@ -1856,6 +1947,150 @@ class RoyalPassageServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def skip_vip_membership_interest(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.GuestProfile:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="SkipVipMembershipInterest",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.GuestProfile,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def submit_vip_membership_application(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.SubmitVipMembershipApplicationRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.GuestProfile:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="SubmitVipMembershipApplication",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.SubmitVipMembershipApplicationRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.GuestProfile,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def submit_vip_custom_package_request(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.CreateVipCustomPackageRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.VipCustomPackageRequestSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="SubmitVipCustomPackageRequest",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.CreateVipCustomPackageRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.VipCustomPackageRequestSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def list_vip_membership_applications(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListVipMembershipApplicationsResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListVipMembershipApplications",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.ListVipMembershipApplicationsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def approve_vip_membership(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ApproveVipMembership",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def reject_vip_membership(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="RejectVipMembership",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def list_vip_custom_package_requests(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListVipCustomPackageRequestsResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListVipCustomPackageRequests",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.ListVipCustomPackageRequestsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
     async def create_booking(
         self,
         request: royalpassage_dot_v1_dot_types__pb2.CreateBookingRequest,
@@ -3095,6 +3330,20 @@ class RoyalPassageServiceSync(Protocol):
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def update_owner_vip_package(self, request: royalpassage_dot_v1_dot_service__pb2.UpdateOwnerVipPackageInput, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.OwnerVipPackageDetail:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def skip_vip_membership_interest(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.GuestProfile:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def submit_vip_membership_application(self, request: royalpassage_dot_v1_dot_types__pb2.SubmitVipMembershipApplicationRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.GuestProfile:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def submit_vip_custom_package_request(self, request: royalpassage_dot_v1_dot_types__pb2.CreateVipCustomPackageRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.VipCustomPackageRequestSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def list_vip_membership_applications(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListVipMembershipApplicationsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def approve_vip_membership(self, request: royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def reject_vip_membership(self, request: royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def list_vip_custom_package_requests(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListVipCustomPackageRequestsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def create_booking(self, request: royalpassage_dot_v1_dot_types__pb2.CreateBookingRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateBookingResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def list_my_bookings(self, request: royalpassage_dot_v1_dot_service__pb2.ListMyBookingsRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListBookingsResponse:
@@ -3532,6 +3781,76 @@ class RoyalPassageServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.update_owner_vip_package,
+                ),
+                "/royalpassage.v1.RoyalPassageService/SkipVipMembershipInterest": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="SkipVipMembershipInterest",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.GuestProfile,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.skip_vip_membership_interest,
+                ),
+                "/royalpassage.v1.RoyalPassageService/SubmitVipMembershipApplication": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="SubmitVipMembershipApplication",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.SubmitVipMembershipApplicationRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.GuestProfile,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.submit_vip_membership_application,
+                ),
+                "/royalpassage.v1.RoyalPassageService/SubmitVipCustomPackageRequest": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="SubmitVipCustomPackageRequest",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.CreateVipCustomPackageRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.VipCustomPackageRequestSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.submit_vip_custom_package_request,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListVipMembershipApplications": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ListVipMembershipApplications",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListVipMembershipApplicationsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.list_vip_membership_applications,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ApproveVipMembership": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ApproveVipMembership",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.approve_vip_membership,
+                ),
+                "/royalpassage.v1.RoyalPassageService/RejectVipMembership": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="RejectVipMembership",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.reject_vip_membership,
+                ),
+                "/royalpassage.v1.RoyalPassageService/ListVipCustomPackageRequests": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ListVipCustomPackageRequests",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=google_dot_protobuf_dot_empty__pb2.Empty,
+                        output=royalpassage_dot_v1_dot_types__pb2.ListVipCustomPackageRequestsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.list_vip_custom_package_requests,
                 ),
                 "/royalpassage.v1.RoyalPassageService/CreateBooking": EndpointSync.unary(
                     method=MethodInfo(
@@ -4777,6 +5096,150 @@ class RoyalPassageServiceClientSync(ConnectClientSync):
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+        )
+
+    def skip_vip_membership_interest(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.GuestProfile:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="SkipVipMembershipInterest",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.GuestProfile,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def submit_vip_membership_application(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.SubmitVipMembershipApplicationRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.GuestProfile:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="SubmitVipMembershipApplication",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.SubmitVipMembershipApplicationRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.GuestProfile,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def submit_vip_custom_package_request(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.CreateVipCustomPackageRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.VipCustomPackageRequestSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="SubmitVipCustomPackageRequest",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.CreateVipCustomPackageRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.VipCustomPackageRequestSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def list_vip_membership_applications(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListVipMembershipApplicationsResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListVipMembershipApplications",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.ListVipMembershipApplicationsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def approve_vip_membership(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ApproveVipMembership",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def reject_vip_membership(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="RejectVipMembership",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.VipMembershipActionRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.VipMembershipApplicationSummary,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def list_vip_custom_package_requests(
+        self,
+        request: google_dot_protobuf_dot_empty__pb2.Empty,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> royalpassage_dot_v1_dot_types__pb2.ListVipCustomPackageRequestsResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListVipCustomPackageRequests",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=google_dot_protobuf_dot_empty__pb2.Empty,
+                output=royalpassage_dot_v1_dot_types__pb2.ListVipCustomPackageRequestsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def create_booking(

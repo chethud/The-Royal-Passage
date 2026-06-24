@@ -338,7 +338,7 @@ class CreateHostResponse(_message.Message):
     def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., display_name: _Optional[str] = ..., host_id: _Optional[str] = ...) -> None: ...
 
 class GuestProfile(_message.Message):
-    __slots__ = ("id", "email", "full_name", "phone", "role", "created_at", "avatar_url", "date_of_birth")
+    __slots__ = ("id", "email", "full_name", "phone", "role", "created_at", "avatar_url", "date_of_birth", "vip_membership_status")
     ID_FIELD_NUMBER: _ClassVar[int]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
     FULL_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -347,6 +347,7 @@ class GuestProfile(_message.Message):
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     AVATAR_URL_FIELD_NUMBER: _ClassVar[int]
     DATE_OF_BIRTH_FIELD_NUMBER: _ClassVar[int]
+    VIP_MEMBERSHIP_STATUS_FIELD_NUMBER: _ClassVar[int]
     id: str
     email: str
     full_name: str
@@ -355,7 +356,8 @@ class GuestProfile(_message.Message):
     created_at: str
     avatar_url: str
     date_of_birth: str
-    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., phone: _Optional[str] = ..., role: _Optional[str] = ..., created_at: _Optional[str] = ..., avatar_url: _Optional[str] = ..., date_of_birth: _Optional[str] = ...) -> None: ...
+    vip_membership_status: str
+    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., phone: _Optional[str] = ..., role: _Optional[str] = ..., created_at: _Optional[str] = ..., avatar_url: _Optional[str] = ..., date_of_birth: _Optional[str] = ..., vip_membership_status: _Optional[str] = ...) -> None: ...
 
 class UpdateGuestProfileRequest(_message.Message):
     __slots__ = ("full_name", "phone", "avatar_url", "date_of_birth")
@@ -1866,3 +1868,121 @@ class UpdateOwnerVipPackageRequest(_message.Message):
     max_guests: int
     submit_for_review: bool
     def __init__(self, title: _Optional[str] = ..., slug: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., package_type: _Optional[str] = ..., city_slug: _Optional[str] = ..., city: _Optional[str] = ..., region: _Optional[str] = ..., price_from_minor: _Optional[int] = ..., hero_image_url: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., highlights: _Optional[_Iterable[str]] = ..., concierge_note: _Optional[str] = ..., duration_days: _Optional[int] = ..., max_guests: _Optional[int] = ..., submit_for_review: _Optional[bool] = ...) -> None: ...
+
+class SubmitVipMembershipApplicationRequest(_message.Message):
+    __slots__ = ("full_name", "email", "phone", "address", "id_document_type", "id_document_number")
+    FULL_NAME_FIELD_NUMBER: _ClassVar[int]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    PHONE_FIELD_NUMBER: _ClassVar[int]
+    ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    ID_DOCUMENT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    ID_DOCUMENT_NUMBER_FIELD_NUMBER: _ClassVar[int]
+    full_name: str
+    email: str
+    phone: str
+    address: str
+    id_document_type: str
+    id_document_number: str
+    def __init__(self, full_name: _Optional[str] = ..., email: _Optional[str] = ..., phone: _Optional[str] = ..., address: _Optional[str] = ..., id_document_type: _Optional[str] = ..., id_document_number: _Optional[str] = ...) -> None: ...
+
+class VipMembershipApplicationSummary(_message.Message):
+    __slots__ = ("id", "guest_user_id", "full_name", "email", "phone", "id_document_type", "status", "created_at")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    GUEST_USER_ID_FIELD_NUMBER: _ClassVar[int]
+    FULL_NAME_FIELD_NUMBER: _ClassVar[int]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    PHONE_FIELD_NUMBER: _ClassVar[int]
+    ID_DOCUMENT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    guest_user_id: str
+    full_name: str
+    email: str
+    phone: str
+    id_document_type: str
+    status: str
+    created_at: str
+    def __init__(self, id: _Optional[str] = ..., guest_user_id: _Optional[str] = ..., full_name: _Optional[str] = ..., email: _Optional[str] = ..., phone: _Optional[str] = ..., id_document_type: _Optional[str] = ..., status: _Optional[str] = ..., created_at: _Optional[str] = ...) -> None: ...
+
+class VipMembershipApplicationDetail(_message.Message):
+    __slots__ = ("id", "guest_user_id", "full_name", "email", "phone", "address", "id_document_type", "id_document_number", "status", "created_at")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    GUEST_USER_ID_FIELD_NUMBER: _ClassVar[int]
+    FULL_NAME_FIELD_NUMBER: _ClassVar[int]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    PHONE_FIELD_NUMBER: _ClassVar[int]
+    ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    ID_DOCUMENT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    ID_DOCUMENT_NUMBER_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    guest_user_id: str
+    full_name: str
+    email: str
+    phone: str
+    address: str
+    id_document_type: str
+    id_document_number: str
+    status: str
+    created_at: str
+    def __init__(self, id: _Optional[str] = ..., guest_user_id: _Optional[str] = ..., full_name: _Optional[str] = ..., email: _Optional[str] = ..., phone: _Optional[str] = ..., address: _Optional[str] = ..., id_document_type: _Optional[str] = ..., id_document_number: _Optional[str] = ..., status: _Optional[str] = ..., created_at: _Optional[str] = ...) -> None: ...
+
+class ListVipMembershipApplicationsResponse(_message.Message):
+    __slots__ = ("applications",)
+    APPLICATIONS_FIELD_NUMBER: _ClassVar[int]
+    applications: _containers.RepeatedCompositeFieldContainer[VipMembershipApplicationSummary]
+    def __init__(self, applications: _Optional[_Iterable[_Union[VipMembershipApplicationSummary, _Mapping]]] = ...) -> None: ...
+
+class VipMembershipActionRequest(_message.Message):
+    __slots__ = ("application_id",)
+    APPLICATION_ID_FIELD_NUMBER: _ClassVar[int]
+    application_id: str
+    def __init__(self, application_id: _Optional[str] = ...) -> None: ...
+
+class CreateVipCustomPackageRequest(_message.Message):
+    __slots__ = ("travel_start", "travel_end", "guest_count", "preferences", "guest_phone")
+    TRAVEL_START_FIELD_NUMBER: _ClassVar[int]
+    TRAVEL_END_FIELD_NUMBER: _ClassVar[int]
+    GUEST_COUNT_FIELD_NUMBER: _ClassVar[int]
+    PREFERENCES_FIELD_NUMBER: _ClassVar[int]
+    GUEST_PHONE_FIELD_NUMBER: _ClassVar[int]
+    travel_start: str
+    travel_end: str
+    guest_count: int
+    preferences: str
+    guest_phone: str
+    def __init__(self, travel_start: _Optional[str] = ..., travel_end: _Optional[str] = ..., guest_count: _Optional[int] = ..., preferences: _Optional[str] = ..., guest_phone: _Optional[str] = ...) -> None: ...
+
+class VipCustomPackageRequestSummary(_message.Message):
+    __slots__ = ("id", "guest_user_id", "guest_name", "guest_email", "guest_phone", "travel_start", "travel_end", "guest_count", "preferences", "status", "created_at")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    GUEST_USER_ID_FIELD_NUMBER: _ClassVar[int]
+    GUEST_NAME_FIELD_NUMBER: _ClassVar[int]
+    GUEST_EMAIL_FIELD_NUMBER: _ClassVar[int]
+    GUEST_PHONE_FIELD_NUMBER: _ClassVar[int]
+    TRAVEL_START_FIELD_NUMBER: _ClassVar[int]
+    TRAVEL_END_FIELD_NUMBER: _ClassVar[int]
+    GUEST_COUNT_FIELD_NUMBER: _ClassVar[int]
+    PREFERENCES_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    guest_user_id: str
+    guest_name: str
+    guest_email: str
+    guest_phone: str
+    travel_start: str
+    travel_end: str
+    guest_count: int
+    preferences: str
+    status: str
+    created_at: str
+    def __init__(self, id: _Optional[str] = ..., guest_user_id: _Optional[str] = ..., guest_name: _Optional[str] = ..., guest_email: _Optional[str] = ..., guest_phone: _Optional[str] = ..., travel_start: _Optional[str] = ..., travel_end: _Optional[str] = ..., guest_count: _Optional[int] = ..., preferences: _Optional[str] = ..., status: _Optional[str] = ..., created_at: _Optional[str] = ...) -> None: ...
+
+class ListVipCustomPackageRequestsResponse(_message.Message):
+    __slots__ = ("requests",)
+    REQUESTS_FIELD_NUMBER: _ClassVar[int]
+    requests: _containers.RepeatedCompositeFieldContainer[VipCustomPackageRequestSummary]
+    def __init__(self, requests: _Optional[_Iterable[_Union[VipCustomPackageRequestSummary, _Mapping]]] = ...) -> None: ...

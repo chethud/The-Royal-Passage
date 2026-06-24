@@ -75,6 +75,15 @@ from app.services.audit import log_audit
 from app.services.bookings import cancel_guest_booking, create_cod_booking, get_booking_by_id, list_guest_bookings
 from app.services.cities import get_city_by_slug, list_active_cities
 from app.services.guest_profile import get_guest_profile, update_guest_profile
+from app.services.vip_membership import (
+    approve_vip_membership,
+    list_vip_custom_package_requests,
+    list_vip_membership_applications,
+    reject_vip_membership,
+    skip_vip_membership_interest,
+    submit_vip_custom_package_request,
+    submit_vip_membership_application,
+)
 from app.services.host_bookings import (
     complete_host_booking,
     confirm_host_booking,
@@ -443,6 +452,83 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         return pydantic_to_proto(
             update_owner_vip_package(auth, request.package_id, payload),
             types_pb2.OwnerVipPackageDetail,
+        )
+
+    @_rpc
+    async def skip_vip_membership_interest(
+        self, _request: empty_pb2.Empty, ctx: RequestContext
+    ) -> types_pb2.GuestProfile:
+        _ensure_supabase()
+        auth = require_guest(ctx)
+        return pydantic_to_proto(skip_vip_membership_interest(auth), types_pb2.GuestProfile)
+
+    @_rpc
+    async def submit_vip_membership_application(
+        self, request: types_pb2.SubmitVipMembershipApplicationRequest, ctx: RequestContext
+    ) -> types_pb2.GuestProfile:
+        _ensure_supabase()
+        auth = require_guest(ctx)
+        payload = proto_to_pydantic(request, s.SubmitVipMembershipApplicationRequest)
+        return pydantic_to_proto(
+            submit_vip_membership_application(auth, payload), types_pb2.GuestProfile
+        )
+
+    @_rpc
+    async def submit_vip_custom_package_request(
+        self, request: types_pb2.CreateVipCustomPackageRequest, ctx: RequestContext
+    ) -> types_pb2.VipCustomPackageRequestSummary:
+        _ensure_supabase()
+        auth = require_guest(ctx)
+        payload = proto_to_pydantic(request, s.CreateVipCustomPackageRequest)
+        return pydantic_to_proto(
+            submit_vip_custom_package_request(auth, payload),
+            types_pb2.VipCustomPackageRequestSummary,
+        )
+
+    @_rpc
+    async def list_vip_membership_applications(
+        self, _request: empty_pb2.Empty, ctx: RequestContext
+    ) -> types_pb2.ListVipMembershipApplicationsResponse:
+        _ensure_supabase()
+        require_vip_owner(ctx)
+        result = list_vip_membership_applications()
+        return types_pb2.ListVipMembershipApplicationsResponse(
+            applications=[
+                pydantic_to_proto(app, types_pb2.VipMembershipApplicationSummary)
+                for app in result.applications
+            ]
+        )
+
+    @_rpc
+    async def approve_vip_membership(
+        self, request: types_pb2.VipMembershipActionRequest, ctx: RequestContext
+    ) -> types_pb2.VipMembershipApplicationSummary:
+        _ensure_supabase()
+        auth = require_vip_owner(ctx)
+        result = approve_vip_membership(request.application_id, auth["user"].id)
+        return pydantic_to_proto(result, types_pb2.VipMembershipApplicationSummary)
+
+    @_rpc
+    async def reject_vip_membership(
+        self, request: types_pb2.VipMembershipActionRequest, ctx: RequestContext
+    ) -> types_pb2.VipMembershipApplicationSummary:
+        _ensure_supabase()
+        auth = require_vip_owner(ctx)
+        result = reject_vip_membership(request.application_id, auth["user"].id)
+        return pydantic_to_proto(result, types_pb2.VipMembershipApplicationSummary)
+
+    @_rpc
+    async def list_vip_custom_package_requests(
+        self, _request: empty_pb2.Empty, ctx: RequestContext
+    ) -> types_pb2.ListVipCustomPackageRequestsResponse:
+        _ensure_supabase()
+        require_vip_owner(ctx)
+        result = list_vip_custom_package_requests()
+        return types_pb2.ListVipCustomPackageRequestsResponse(
+            requests=[
+                pydantic_to_proto(row, types_pb2.VipCustomPackageRequestSummary)
+                for row in result.requests
+            ]
         )
 
     @_rpc
