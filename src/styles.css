@@ -6,7 +6,8 @@
 
 @theme inline {
   --font-display: "Cinzel", ui-serif, Georgia, serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Cormorant Garamond", ui-serif, Georgia, "Times New Roman", serif;
+  --font-royal: "Cinzel Decorative", "Cinzel", ui-serif, Georgia, serif;
 
   --radius-sm: 2px;
   --radius-md: 6px;
@@ -135,6 +136,7 @@
   }
   html {
     font-family: var(--font-sans);
+    font-size: 17px;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -146,7 +148,6 @@
   }
   body {
     color: var(--color-foreground);
-    font-feature-settings: "ss01", "cv11";
     background-color: var(--color-background);
     background-image:
       radial-gradient(ellipse 90% 55% at 50% -18%, oklch(0.42 0.12 78 / 0.22), transparent 58%),
@@ -155,13 +156,34 @@
       linear-gradient(180deg, oklch(0.2 0.09 22) 0%, oklch(0.14 0.07 20) 100%);
     background-attachment: fixed;
   }
-  h1,
+  button,
+  input,
+  select,
+  textarea,
+  optgroup {
+    font-family: inherit;
+  }
+  button,
+  [role="button"] {
+    font-family: var(--font-display);
+    letter-spacing: 0.06em;
+  }
+  h1 {
+    font-family: var(--font-royal);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
   h2,
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 500;
-    letter-spacing: 0.02em;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  label,
+  legend {
+    font-family: var(--font-display);
+    letter-spacing: 0.08em;
   }
   ::selection {
     background-color: oklch(0.62 0.1 78 / 0.45);
@@ -179,11 +201,16 @@
 }
 
 @utility eyebrow {
+  font-family: var(--font-display);
   font-size: 0.7rem;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-muted-foreground);
+}
+
+@utility font-royal {
+  font-family: var(--font-royal);
 }
 
 /* Header — SSR-safe (no Framer Motion inline styles, no hydration mismatch) */
@@ -193,6 +220,7 @@
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
   border-bottom: 1px solid oklch(0.72 0.09 78 / 0.14);
   box-shadow: 0 0 0 transparent;
+  font-family: var(--font-display);
 }
 .site-header[data-elevated="true"] {
   background-color: oklch(0.17 0.08 22 / 0.92);
@@ -300,6 +328,165 @@
   border-radius: 999px;
   background: linear-gradient(90deg, #c8a25a, #d4af6a);
   box-shadow: 0 0 12px #c8a25a66;
+}
+
+/* Account profile dropdown — royal glass panel */
+.header-account-menu {
+  overflow: hidden;
+  border: 1px solid oklch(0.76 0.1 78 / 0.28);
+  border-radius: 10px;
+  background:
+    linear-gradient(165deg, oklch(0.2 0.07 22 / 0.97) 0%, oklch(0.16 0.06 20 / 0.98) 100%);
+  box-shadow:
+    0 24px 48px -20px oklch(0.05 0.04 18 / 0.75),
+    inset 0 1px 0 oklch(0.88 0.08 86 / 0.12);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+
+.header-account-menu__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid oklch(0.72 0.09 78 / 0.16);
+  padding: 0.9rem 1rem 0.85rem;
+}
+
+.header-account-menu__avatar {
+  display: inline-flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid oklch(0.76 0.1 78 / 0.45);
+  background: linear-gradient(145deg, oklch(0.28 0.06 24), oklch(0.2 0.05 22));
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: oklch(0.84 0.1 82);
+}
+
+.header-account-menu__name {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  letter-spacing: 0.03em;
+  color: oklch(0.94 0.02 86);
+}
+
+.header-account-menu__email {
+  margin-top: 0.1rem;
+  font-size: 0.72rem;
+  color: oklch(0.72 0.03 86);
+}
+
+.header-account-menu__role {
+  margin-top: 0.2rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: oklch(0.76 0.1 78);
+}
+
+.header-account-menu__body {
+  padding: 0.35rem 0.45rem 0.25rem;
+}
+
+.header-account-menu__footer {
+  border-top: 1px solid oklch(0.72 0.09 78 / 0.14);
+  padding: 0.35rem 0.45rem 0.45rem;
+  background: oklch(0.12 0.05 20 / 0.35);
+}
+
+.header-account-menu__section {
+  padding: 0.35rem 0.55rem 0.2rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: oklch(0.68 0.06 78);
+}
+
+.header-account-menu__divider {
+  margin: 0.25rem 0.5rem;
+  background: oklch(0.72 0.09 78 / 0.16);
+}
+
+.header-account-menu__item {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  gap: 0.65rem;
+  border-radius: 6px;
+  padding: 0.55rem 0.55rem;
+  outline: none;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.header-account-menu__item:hover,
+.header-account-menu__item:focus,
+.header-account-menu__item[data-highlighted] {
+  background: oklch(0.76 0.1 78 / 0.1);
+  color: oklch(0.94 0.02 86);
+}
+
+.header-account-menu__icon {
+  display: inline-flex;
+  height: 2rem;
+  width: 2rem;
+  shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid oklch(0.76 0.1 78 / 0.22);
+  background: oklch(0.22 0.05 22 / 0.65);
+  color: oklch(0.8 0.1 82);
+}
+
+.header-account-menu__item:hover .header-account-menu__icon,
+.header-account-menu__item:focus .header-account-menu__icon,
+.header-account-menu__item[data-highlighted] .header-account-menu__icon {
+  border-color: oklch(0.76 0.1 78 / 0.42);
+  color: oklch(0.88 0.11 84);
+}
+
+.header-account-menu__icon--danger {
+  border-color: oklch(0.62 0.14 28 / 0.35);
+  background: oklch(0.28 0.08 24 / 0.55);
+  color: oklch(0.78 0.1 42);
+}
+
+.header-account-menu__item-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+}
+
+.header-account-menu__item-desc {
+  display: block;
+  margin-top: 0.1rem;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: oklch(0.7 0.03 86);
+}
+
+.header-account-menu__item--danger .header-account-menu__item-label {
+  color: oklch(0.82 0.08 48);
+}
+
+.header-account-menu__item--danger:hover,
+.header-account-menu__item--danger:focus,
+.header-account-menu__item--danger[data-highlighted] {
+  background: oklch(0.42 0.1 28 / 0.22);
 }
 
 /* Header mobile sheet — touch targets, spacing, safe area (Phase 6) */
@@ -573,15 +760,20 @@
 }
 
 .luxury-panel-heading {
+  font-family: var(--font-display);
   color: #3a0000;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 
 .luxury-panel-body {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  line-height: 1.55;
   color: rgb(58 0 0 / 0.58);
 }
 
 .luxury-panel-label {
+  font-family: var(--font-display);
   color: #4a0000;
   letter-spacing: 0.18em;
 }

@@ -49,7 +49,7 @@ export function VipCard({ pkg, search }: { pkg: VipPackage; search?: VipBrowseSe
           <span className="font-display text-base text-[#F7F1E8]">
             From {sym}
             {pkg.priceFrom.toLocaleString("en-IN")}
-            <span className="ml-1 text-[0.62rem] font-sans font-normal uppercase tracking-[0.12em] text-[#E8DCC8]/75">
+            <span className="ml-1 text-[0.62rem] font-display font-normal uppercase tracking-[0.12em] text-[#E8DCC8]/75">
               / package
             </span>
           </span>

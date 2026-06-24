@@ -1,10 +1,10 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { LogOut, Menu, Pencil, ScrollText, Star, UserRound, Users } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoUrl from "@/assets/logo/logo.png";
 import { CartIcon } from "@/components/cart/CartIcon";
+import { AccountDropdownMenu } from "@/components/account/AccountDropdownMenu";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { ProfileNavIcon } from "@/components/account/ProfileNavIcon";
 import {
   adminNavItemsForModule,
   isAdminNavItemActive,
@@ -17,13 +17,6 @@ import { isApprovedVipMember } from "@/lib/api/vip-membership";
 import { GUEST_SIGNED_IN_NAV_ITEMS, VIP_MEMBER_NAV_ITEMS, isVipMemberNavItemActive } from "@/lib/vip-member-nav";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
 import { useNavBadges } from "@/hooks/use-nav-badges";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -302,90 +295,21 @@ export function Header() {
             </Link>
           ) : null}
           {showAccountMenu ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className={`${navLinkClass} group inline-flex p-0.5`}
-                    aria-label={displayName ? `${displayName} account menu` : "Account menu"}
-                  >
-                    <ProfileNavIcon size={40} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="z-[100] w-52">
-                  {isGuest ? (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link
-                          to={
-                            isVipSection ? "/vips" : isHomestaySection ? "/homestays" : "/"
-                          }
-                          className="cursor-pointer"
-                        >
-                          <UserRound className="h-4 w-4" />
-                          Home
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/dashboard/history" className="cursor-pointer">
-                          <UserRound className="h-4 w-4" />
-                          {isVipSection ? "My bookings" : isHomestaySection ? "My stays" : "History"}
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  ) : (
-                    <DropdownMenuItem asChild>
-                      <Link to={dashboardPath} className="cursor-pointer">
-                        <UserRound className="h-4 w-4" />
-                        Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  {isAdmin ? (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin/homepage-edit" className="cursor-pointer">
-                          <Pencil className="h-4 w-4" />
-                          Edit
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin/hosts" className="cursor-pointer">
-                          <Users className="h-4 w-4" />
-                          Host accounts
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin/reviews" className="cursor-pointer">
-                          <Star className="h-4 w-4" />
-                          Reviews
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin/activity" className="cursor-pointer">
-                          <ScrollText className="h-4 w-4" />
-                          Activity log
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  ) : null}
-                  <DropdownMenuItem onSelect={goToProfile} className="cursor-pointer">
-                    <UserRound className="h-4 w-4" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      void handleLogout();
-                    }}
-                    disabled={loggingOut}
-                    className="cursor-pointer text-destructive focus:text-destructive"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    {loggingOut ? "Logging out..." : "Logout"}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <AccountDropdownMenu
+              displayName={displayName}
+              email={user?.email}
+              role={role}
+              isGuest={isGuest}
+              isAdmin={isAdmin}
+              isVipSection={isVipSection}
+              isHomestaySection={isHomestaySection}
+              dashboardPath={dashboardPath}
+              loggingOut={loggingOut}
+              onProfile={goToProfile}
+              onLogout={() => {
+                void handleLogout();
+              }}
+            />
           ) : null}
         </nav>
 
