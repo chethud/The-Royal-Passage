@@ -737,6 +737,26 @@ class CreateHostResponse(BaseModel):
     hostId: str
 
 
+class CreatePlatformUserRequest(BaseModel):
+    role: Literal["host", "homestay_owner", "vip_owner", "admin", "editor"]
+    fullName: str = Field(min_length=2, max_length=120)
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
+    phone: str | None = Field(default=None, max_length=32)
+    bio: str | None = Field(default=None, max_length=500)
+    address: str | None = Field(default=None, max_length=500)
+
+
+class CreatePlatformUserResponse(BaseModel):
+    id: str
+    email: str
+    fullName: str
+    role: str
+    hostId: str | None = None
+    homestayOwnerId: str | None = None
+    vipOwnerId: str | None = None
+
+
 class GuestProfile(BaseModel):
     id: str
     email: str | None

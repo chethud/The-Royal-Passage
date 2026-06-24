@@ -239,6 +239,9 @@ class RoyalPassageService(Protocol):
     async def create_host(self, request: royalpassage_dot_v1_dot_types__pb2.CreateHostRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateHostResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def create_platform_user(self, request: royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
     async def create_homestay_owner(self, request: royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
@@ -1040,6 +1043,16 @@ class RoyalPassageServiceASGIApplication(ConnectASGIApplication[RoyalPassageServ
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.create_host,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CreatePlatformUser": Endpoint.unary(
+                    method=MethodInfo(
+                        name="CreatePlatformUser",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.create_platform_user,
                 ),
                 "/royalpassage.v1.RoyalPassageService/CreateHomestayOwner": Endpoint.unary(
                     method=MethodInfo(
@@ -2803,6 +2816,26 @@ class RoyalPassageServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def create_platform_user(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreatePlatformUser",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
     async def create_homestay_owner(
         self,
         request: royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerRequest,
@@ -3411,6 +3444,8 @@ class RoyalPassageServiceSync(Protocol):
     def list_admin_users(self, request: google_dot_protobuf_dot_empty__pb2.Empty, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.ListAdminUsersResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def create_host(self, request: royalpassage_dot_v1_dot_types__pb2.CreateHostRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateHostResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def create_platform_user(self, request: royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def create_homestay_owner(self, request: royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerRequest, ctx: RequestContext) -> royalpassage_dot_v1_dot_types__pb2.CreateHomestayOwnerResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
@@ -4191,6 +4226,16 @@ class RoyalPassageServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.create_host,
+                ),
+                "/royalpassage.v1.RoyalPassageService/CreatePlatformUser": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="CreatePlatformUser",
+                        service_name="royalpassage.v1.RoyalPassageService",
+                        input=royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserRequest,
+                        output=royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.create_platform_user,
                 ),
                 "/royalpassage.v1.RoyalPassageService/CreateHomestayOwner": EndpointSync.unary(
                     method=MethodInfo(
@@ -5948,6 +5993,26 @@ class RoyalPassageServiceClientSync(ConnectClientSync):
                 service_name="royalpassage.v1.RoyalPassageService",
                 input=royalpassage_dot_v1_dot_types__pb2.CreateHostRequest,
                 output=royalpassage_dot_v1_dot_types__pb2.CreateHostResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def create_platform_user(
+        self,
+        request: royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreatePlatformUser",
+                service_name="royalpassage.v1.RoyalPassageService",
+                input=royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserRequest,
+                output=royalpassage_dot_v1_dot_types__pb2.CreatePlatformUserResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,

@@ -1,5 +1,17 @@
 from app.dependencies.supabase import get_supabase_admin
-from app.models.schemas import CreateHostRequest, CreateHostResponse, ManagedUser
+from app.models.schemas import (
+    CreateHostRequest,
+    CreateHomestayOwnerRequest,
+    CreatePlatformUserRequest,
+    CreatePlatformUserResponse,
+    CreateHostResponse,
+    CreateVipOwnerRequest,
+    ManagedUser,
+)
+from app.services.homestay_owners import create_homestay_owner_account
+from app.services.vip_owners import create_vip_owner_account
+
+ADMIN_CREATABLE_ROLES = {"host", "homestay_owner", "vip_owner", "admin", "editor"}
 
 
 def _first_row(data):
@@ -125,3 +137,120 @@ def create_host_account(payload: CreateHostRequest) -> CreateHostResponse:
         displayName=payload.displayName,
         hostId=host_row["id"],
     )
+
+
+def create_staff_account(payload: CreatePlatformUserRequest) -> CreatePlatformUserResponse:
+    if payload.role not in {"admin", "editor"}:
+        raise ValueError("Staff accounts must be admin or editor.")
+
+    supabase = get_supabase_admin()
+
+    try:
+        created = supabase.auth.admin.create_user(
+            {
+                "email": str(payload.email),
+                "password": payload.password,
+                "email_confirm": True,
+                "user_metadata": {
+                    "full_name": payload.fullName,
+                    "phone": payload.phone,
+                },
+            }
+        )
+    except Exception as exc:
+        raise ValueError(_error_message(exc, f"Failed to create {payload.role} login.")) from exc
+
+    user = created.user if created else None
+    if not user:
+        raise ValueError(f"Failed to create {payload.role} login.")
+
+    user_id = user.id
+
+    try:
+        profile_result = (
+            supabase.table("profiles")
+            .upsert(
+                {
+                    "id": user_id,
+                    "full_name": payload.fullName,
+                    "phone": payload.phone,
+                    "role": payload.role,
+                }
+            )
+            .execute()
+        )
+    except Exception as exc:
+        supabase.auth.admin.delete_user(user_id)
+        raise ValueError(_error_message(exc, "Failed to create profile record.")) from exc
+
+    if not profile_result.data:
+        supabase.auth.admin.delete_user(user_id)
+        raise ValueError("Failed to create profile record.")
+
+    return CreatePlatformUserResponse(
+        id=user_id,
+        email=str(payload.email),
+        fullName=payload.fullName,
+        role=payload.role,
+    )
+
+
+def create_platform_user(payload: CreatePlatformUserRequest) -> CreatePlatformUserResponse:
+    if payload.role not in ADMIN_CREATABLE_ROLES:
+        raise ValueError("Unsupported role for admin user creation.")
+
+    if payload.role == "host":
+        host = create_host_account(
+            CreateHostRequest(
+                displayName=payload.fullName,
+                email=payload.email,
+                password=payload.password,
+                phone=payload.phone,
+                bio=payload.bio,
+            )
+        )
+        return CreatePlatformUserResponse(
+            id=host.id,
+            email=host.email,
+            fullName=host.displayName,
+            role="host",
+            hostId=host.hostId,
+        )
+
+    if payload.role == "homestay_owner":
+        owner = create_homestay_owner_account(
+            CreateHomestayOwnerRequest(
+                fullName=payload.fullName,
+                email=payload.email,
+                password=payload.password,
+                phone=payload.phone,
+                address=payload.address,
+            )
+        )
+        return CreatePlatformUserResponse(
+            id=owner.id,
+            email=str(owner.email),
+            fullName=owner.fullName,
+            role="homestay_owner",
+            homestayOwnerId=owner.homestayOwnerId,
+        )
+
+    if payload.role == "vip_owner":
+        owner = create_vip_owner_account(
+            CreateVipOwnerRequest(
+                fullName=payload.fullName,
+                email=payload.email,
+                password=payload.password,
+                phone=payload.phone,
+                address=payload.address,
+            )
+        )
+        return CreatePlatformUserResponse(
+            id=owner.id,
+            email=str(owner.email),
+            fullName=owner.fullName,
+            role="vip_owner",
+            vipOwnerId=owner.vipOwnerId,
+        )
+
+    return create_staff_account(payload)

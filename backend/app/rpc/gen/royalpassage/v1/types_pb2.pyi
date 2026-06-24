@@ -337,6 +337,42 @@ class CreateHostResponse(_message.Message):
     host_id: str
     def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., display_name: _Optional[str] = ..., host_id: _Optional[str] = ...) -> None: ...
 
+class CreatePlatformUserRequest(_message.Message):
+    __slots__ = ("role", "full_name", "email", "password", "phone", "bio", "address")
+    ROLE_FIELD_NUMBER: _ClassVar[int]
+    FULL_NAME_FIELD_NUMBER: _ClassVar[int]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    PASSWORD_FIELD_NUMBER: _ClassVar[int]
+    PHONE_FIELD_NUMBER: _ClassVar[int]
+    BIO_FIELD_NUMBER: _ClassVar[int]
+    ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    role: str
+    full_name: str
+    email: str
+    password: str
+    phone: str
+    bio: str
+    address: str
+    def __init__(self, role: _Optional[str] = ..., full_name: _Optional[str] = ..., email: _Optional[str] = ..., password: _Optional[str] = ..., phone: _Optional[str] = ..., bio: _Optional[str] = ..., address: _Optional[str] = ...) -> None: ...
+
+class CreatePlatformUserResponse(_message.Message):
+    __slots__ = ("id", "email", "full_name", "role", "host_id", "homestay_owner_id", "vip_owner_id")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    FULL_NAME_FIELD_NUMBER: _ClassVar[int]
+    ROLE_FIELD_NUMBER: _ClassVar[int]
+    HOST_ID_FIELD_NUMBER: _ClassVar[int]
+    HOMESTAY_OWNER_ID_FIELD_NUMBER: _ClassVar[int]
+    VIP_OWNER_ID_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    email: str
+    full_name: str
+    role: str
+    host_id: str
+    homestay_owner_id: str
+    vip_owner_id: str
+    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., role: _Optional[str] = ..., host_id: _Optional[str] = ..., homestay_owner_id: _Optional[str] = ..., vip_owner_id: _Optional[str] = ...) -> None: ...
+
 class GuestProfile(_message.Message):
     __slots__ = ("id", "email", "full_name", "phone", "role", "created_at", "avatar_url", "date_of_birth", "vip_membership_status")
     ID_FIELD_NUMBER: _ClassVar[int]

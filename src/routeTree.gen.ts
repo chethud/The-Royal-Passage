@@ -93,6 +93,7 @@ import { Route as HomestayPropertiesHomestayIdRouteImport } from './routes/homes
 import { Route as ExperiencesSlugBookRouteImport } from './routes/experiences.$slug.book'
 import { Route as BookingsBookingIdReviewRouteImport } from './routes/bookings.$bookingId.review'
 import { Route as AdminVipPackagesPackageIdRouteImport } from './routes/admin.vip-packages.$packageId'
+import { Route as AdminProfileUsersRouteImport } from './routes/admin.profile.users'
 import { Route as AdminProfileHomepagePhotosRouteImport } from './routes/admin.profile.homepage-photos'
 import { Route as AdminHomestaysHomestayIdRouteImport } from './routes/admin.homestays.$homestayId'
 import { Route as AdminExperiencesExperienceIdRouteImport } from './routes/admin.experiences.$experienceId'
@@ -523,6 +524,11 @@ const AdminVipPackagesPackageIdRoute =
     path: '/vip-packages/$packageId',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminProfileUsersRoute = AdminProfileUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminProfileRoute,
+} as any)
 const AdminProfileHomepagePhotosRoute =
   AdminProfileHomepagePhotosRouteImport.update({
     id: '/homepage-photos',
@@ -601,6 +607,7 @@ export interface FileRoutesByFullPath {
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
+  '/admin/profile/users': typeof AdminProfileUsersRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
@@ -677,6 +684,7 @@ export interface FileRoutesByTo {
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
+  '/admin/profile/users': typeof AdminProfileUsersRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
@@ -769,6 +777,7 @@ export interface FileRoutesById {
   '/admin/experiences/$experienceId': typeof AdminExperiencesExperienceIdRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
+  '/admin/profile/users': typeof AdminProfileUsersRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
   '/experiences/$slug/book': typeof ExperiencesSlugBookRoute
@@ -862,6 +871,7 @@ export interface FileRouteTypes {
     | '/admin/experiences/$experienceId'
     | '/admin/homestays/$homestayId'
     | '/admin/profile/homepage-photos'
+    | '/admin/profile/users'
     | '/admin/vip-packages/$packageId'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
@@ -938,6 +948,7 @@ export interface FileRouteTypes {
     | '/admin/experiences/$experienceId'
     | '/admin/homestays/$homestayId'
     | '/admin/profile/homepage-photos'
+    | '/admin/profile/users'
     | '/admin/vip-packages/$packageId'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
@@ -1029,6 +1040,7 @@ export interface FileRouteTypes {
     | '/admin/experiences/$experienceId'
     | '/admin/homestays/$homestayId'
     | '/admin/profile/homepage-photos'
+    | '/admin/profile/users'
     | '/admin/vip-packages/$packageId'
     | '/bookings/$bookingId/review'
     | '/experiences/$slug/book'
@@ -1703,6 +1715,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminVipPackagesPackageIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/profile/users': {
+      id: '/admin/profile/users'
+      path: '/users'
+      fullPath: '/admin/profile/users'
+      preLoaderRoute: typeof AdminProfileUsersRouteImport
+      parentRoute: typeof AdminProfileRoute
+    }
     '/admin/profile/homepage-photos': {
       id: '/admin/profile/homepage-photos'
       path: '/homepage-photos'
@@ -1743,11 +1762,13 @@ declare module '@tanstack/react-router' {
 
 interface AdminProfileRouteChildren {
   AdminProfileHomepagePhotosRoute: typeof AdminProfileHomepagePhotosRoute
+  AdminProfileUsersRoute: typeof AdminProfileUsersRoute
   AdminProfileIndexRoute: typeof AdminProfileIndexRoute
 }
 
 const AdminProfileRouteChildren: AdminProfileRouteChildren = {
   AdminProfileHomepagePhotosRoute: AdminProfileHomepagePhotosRoute,
+  AdminProfileUsersRoute: AdminProfileUsersRoute,
   AdminProfileIndexRoute: AdminProfileIndexRoute,
 }
 

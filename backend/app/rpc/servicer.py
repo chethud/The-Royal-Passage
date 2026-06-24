@@ -34,7 +34,7 @@ from app.services.admin_experiences import (
     publish_experience,
     reject_experience,
 )
-from app.services.admin_users import create_host_account, list_managed_users
+from app.services.admin_users import create_host_account, create_platform_user, list_managed_users
 from app.services.homestay_bookings import (
     cancel_guest_homestay_booking,
     create_homestay_booking,
@@ -843,6 +843,18 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         require_admin(ctx)
         payload = proto_to_pydantic(request, s.CreateHostRequest)
         return pydantic_to_proto(create_host_account(payload), types_pb2.CreateHostResponse)
+
+    @_rpc
+    async def create_platform_user(
+        self, request: types_pb2.CreatePlatformUserRequest, ctx: RequestContext
+    ) -> types_pb2.CreatePlatformUserResponse:
+        _ensure_supabase()
+        require_admin(ctx)
+        payload = proto_to_pydantic(request, s.CreatePlatformUserRequest)
+        return pydantic_to_proto(
+            create_platform_user(payload),
+            types_pb2.CreatePlatformUserResponse,
+        )
 
     @_rpc
     async def create_homestay_owner(

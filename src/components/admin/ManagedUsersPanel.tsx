@@ -17,12 +17,16 @@ import {
 import { DashboardPanelSkeleton } from "@/components/ui/DashboardPanelSkeleton";
 import { fetchManagedUsers, type ManagedUser } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
-import { ROLE_LABELS } from "@/lib/roles";
+import { ROLE_LABELS, USER_ROLES, type UserRole } from "@/lib/roles";
 
 type ManagedUsersPanelProps = {
   accessToken: string;
   refreshKey: number;
 };
+
+type UserFilter = "all" | UserRole;
+
+const FILTER_ROLES = USER_ROLES;
 
 function filterBtnClass(active: boolean) {
   return dashboardFilterBtnClass(active);
@@ -32,7 +36,7 @@ export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanel
   const [users, setUsers] = useState<ManagedUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "guest" | "host" | "admin">("all");
+  const [filter, setFilter] = useState<UserFilter>("all");
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -62,19 +66,26 @@ export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanel
         <div>
           <h2 className="luxury-panel-heading font-display text-2xl">Users & logins</h2>
           <p className="luxury-panel-body mt-2 text-sm">
-            Guests sign up themselves. Hosts and admins are created here and sign in with email and
-            password.
+            Guests sign up themselves. Hosts, owners, editors, and admins are created by platform
+            admins and sign in with email and password.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {(["all", "guest", "host", "admin"] as const).map((value) => (
+          <button
+            type="button"
+            onClick={() => setFilter("all")}
+            className={filterBtnClass(filter === "all")}
+          >
+            All
+          </button>
+          {FILTER_ROLES.map((value) => (
             <button
               key={value}
               type="button"
               onClick={() => setFilter(value)}
               className={filterBtnClass(filter === value)}
             >
-              {value === "all" ? "All" : ROLE_LABELS[value]}
+              {ROLE_LABELS[value]}
             </button>
           ))}
         </div>

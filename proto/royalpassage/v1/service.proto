@@ -220,6 +220,8 @@ service RoyalPassageService {
 
   rpc CreateHost(CreateHostRequest) returns (CreateHostResponse);
 
+  rpc CreatePlatformUser(CreatePlatformUserRequest) returns (CreatePlatformUserResponse);
+
   rpc CreateHomestayOwner(CreateHomestayOwnerRequest) returns (CreateHomestayOwnerResponse);
 
   rpc CreateVipOwner(CreateVipOwnerRequest) returns (CreateVipOwnerResponse);
