@@ -248,29 +248,13 @@ export function Header() {
                 </Link>
               </>
             ) : (
-              <>
-                <Link
-                  to="/experiences"
-                  className={navLinkClass}
-                  activeProps={{ className: "text-ember" }}
-                >
-                  Book an Experience
-                </Link>
-                <Link
-                  to="/homestays"
-                  className={navLinkClass}
-                  activeProps={{ className: "text-ember" }}
-                >
-                  Homestays
-                </Link>
-                <Link
-                  to="/vips"
-                  className={navLinkClass}
-                  activeProps={{ className: "text-ember" }}
-                >
-                  VIP
-                </Link>
-              </>
+              <Link
+                to="/homestays"
+                className={navLinkClass}
+                activeProps={{ className: "text-ember" }}
+              >
+                Homestays
+              </Link>
             )
           ) : null}
           {showGuestCart ? (
@@ -378,11 +362,7 @@ export function Header() {
                             <MobileNavLink to="/vips">VIP</MobileNavLink>
                           </>
                         ) : (
-                          <>
-                            <MobileNavLink to="/experiences">Book an Experience</MobileNavLink>
-                            <MobileNavLink to="/homestays">Homestays</MobileNavLink>
-                            <MobileNavLink to="/vips">VIP</MobileNavLink>
-                          </>
+                          <MobileNavLink to="/homestays">Homestays</MobileNavLink>
                         )}
                       </>
                     ) : null}
