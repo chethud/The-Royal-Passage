@@ -5,6 +5,13 @@ import { formatDateShort } from "@/lib/date-format";
 /** Guests may book sessions within this many calendar days starting today (inclusive). */
 export const BOOKING_WINDOW_DAYS = 7;
 
+/** Default date span in the host add-sessions form (not a scheduling cap). */
+export const HOST_SCHEDULE_DEFAULT_DAYS = 30;
+
+export function hostScheduleDefaultEndIso(fromToday = todayIsoDate()): string {
+  return addDays(fromToday, HOST_SCHEDULE_DEFAULT_DAYS - 1);
+}
+
 function formatLocalDate(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");

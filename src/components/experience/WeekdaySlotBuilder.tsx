@@ -1,7 +1,7 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { CreateHostSlotPayload } from "@/lib/api/host-experiences";
-import { BOOKING_WINDOW_DAYS, bookingWindowEndIso } from "@/lib/booking-window";
+import { BOOKING_WINDOW_DAYS, hostScheduleDefaultEndIso } from "@/lib/booking-window";
 import { Time12hField } from "@/components/experience/Time12hField";
 import { isoToWeekdayKey } from "@/lib/slot-week-overview";
 import {
@@ -81,10 +81,10 @@ export function WeekdaySlotBuilder({
 }: WeekdaySlotBuilderProps) {
   const ui = panelStyles(surface);
   const today = useMemo(() => formatToday(), []);
-  const windowEnd = useMemo(() => bookingWindowEndIso(today), [today]);
+  const defaultEnd = useMemo(() => hostScheduleDefaultEndIso(today), [today]);
   const [weekdays, setWeekdays] = useState<WeekdayKey[]>(DEFAULT_WEEKDAYS);
   const [fromDate, setFromDate] = useState(today);
-  const [toDate, setToDate] = useState(windowEnd);
+  const [toDate, setToDate] = useState(defaultEnd);
   const [sessions, setSessions] = useState<SessionRow[]>(() => [newSessionRow()]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -181,7 +181,6 @@ export function WeekdaySlotBuilder({
             type="date"
             value={fromDate}
             min={today}
-            max={windowEnd}
             disabled={busy}
             onChange={(e) => {
               clearFeedback();
@@ -198,7 +197,6 @@ export function WeekdaySlotBuilder({
             type="date"
             value={toDate}
             min={fromDate || today}
-            max={windowEnd}
             disabled={busy}
             onChange={(e) => {
               clearFeedback();
@@ -209,8 +207,8 @@ export function WeekdaySlotBuilder({
         </label>
       </div>
       <p className={ui.mutedXs}>
-        Guests can book within the next {BOOKING_WINDOW_DAYS} days ({formatDateReadable(today)} –{" "}
-        {formatDateReadable(windowEnd)}).
+        Schedule any future dates for your sessions. On the public site, guests can book within the
+        next {BOOKING_WINDOW_DAYS} days.
       </p>
 
       <div>

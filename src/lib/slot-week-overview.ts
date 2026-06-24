@@ -21,11 +21,14 @@ export function buildBookingWindowDays(
   slots: HostSlotDetail[],
   referenceToday = todayIsoDate(),
 ): WeekDayOverview[] {
-  const end = bookingWindowEndIso(referenceToday);
+  let end = bookingWindowEndIso(referenceToday);
   const byDate = new Map<string, HostSlotDetail[]>();
 
   for (const slot of slots) {
     const day = slot.date.slice(0, 10);
+    if (day >= referenceToday && day > end) {
+      end = day;
+    }
     const list = byDate.get(day) ?? [];
     list.push(slot);
     byDate.set(day, list);

@@ -73,6 +73,13 @@ def assert_slot_in_booking_window(slot_date: date | str) -> None:
         )
 
 
+def assert_host_slot_date_valid(slot_date: date | str) -> None:
+    day = _parse_slot_date(slot_date)
+    today = booking_today()
+    if day < today:
+        raise ValueError("Session date cannot be in the past.")
+
+
 def assert_slot_still_bookable(slot_date: date | str, start_time: str | None = None) -> None:
     if not is_slot_still_bookable(slot_date, start_time):
         raise ValueError("This session has already started or passed. Please choose another time.")

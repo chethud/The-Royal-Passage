@@ -1,7 +1,7 @@
 import re
 import uuid
 
-from app.booking_window import assert_slot_in_booking_window
+from app.booking_window import assert_host_slot_date_valid
 from app.dependencies.supabase import get_supabase_admin
 from app.services.cities import get_city_by_slug
 from app.models.schemas import (
@@ -394,7 +394,7 @@ def create_host_slot(
     host_id = _resolve_host_id(auth)
     _fetch_host_experience_row(supabase, experience_id, host_id)
 
-    assert_slot_in_booking_window(payload.slotDate)
+    assert_host_slot_date_valid(payload.slotDate)
 
     supabase.table("experience_slots").insert(
         {
@@ -430,7 +430,7 @@ def update_host_slot(
 
     updates: dict = {}
     if payload.slotDate is not None:
-        assert_slot_in_booking_window(payload.slotDate)
+        assert_host_slot_date_valid(payload.slotDate)
         updates["slot_date"] = payload.slotDate
     if payload.startTime is not None:
         updates["start_time"] = payload.startTime

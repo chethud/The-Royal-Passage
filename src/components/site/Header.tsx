@@ -317,43 +317,6 @@ export function Header() {
                     <UserRound className="h-4 w-4" />
                     Profile
                   </DropdownMenuItem>
-                  {isGuest ? (
-                    <>
-                      {!isHomestaySection ? (
-                        <DropdownMenuItem asChild>
-                          <Link to="/experiences" className="cursor-pointer">
-                            Browse experiences
-                          </Link>
-                        </DropdownMenuItem>
-                      ) : null}
-                      {isHomestaySection ? (
-                        <DropdownMenuItem asChild>
-                          <Link to="/homestays/browse" className="cursor-pointer">
-                            Browse homestays
-                          </Link>
-                        </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem asChild>
-                          <Link to="/homestays" className="cursor-pointer">
-                            Browse homestays
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
-                      {!isHomestaySection ? (
-                        <DropdownMenuItem asChild>
-                          <Link to="/homestays" className="cursor-pointer">
-                            Homestays home
-                          </Link>
-                        </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem asChild>
-                          <Link to="/" className="cursor-pointer">
-                            Experiences home
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
-                    </>
-                  ) : null}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onSelect={() => {
@@ -465,19 +428,6 @@ export function Header() {
                       </>
                     ) : null}
                     <MobileNavLink to={profilePathForRole(role)}>Profile</MobileNavLink>
-                    {isGuest ? (
-                      <>
-                        {!isHomestaySection ? (
-                          <MobileNavLink to="/experiences">Browse experiences</MobileNavLink>
-                        ) : null}
-                        <MobileNavLink to={isHomestaySection ? "/homestays/browse" : "/homestays"}>
-                          Browse homestays
-                        </MobileNavLink>
-                        <MobileNavLink to={isHomestaySection ? "/" : "/homestays"}>
-                          {isHomestaySection ? "Experiences home" : "Homestays home"}
-                        </MobileNavLink>
-                      </>
-                    ) : null}
                     <MobileNavLink
                       onClick={() => {
                         void handleLogout();
