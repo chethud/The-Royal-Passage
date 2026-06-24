@@ -5,12 +5,29 @@ export const EXPERIENCE_PUBLIC_NAV_ITEMS = [
 ] as const;
 
 export const HOMESTAY_PUBLIC_NAV_ITEMS = [
-  { label: "Browse Stays", to: "/homestays/browse" },
+  { label: "Homestays", to: "/homestays/browse" },
 ] as const;
 
 export const VIP_PUBLIC_NAV_ITEMS = [
-  { label: "Browse", to: "/vips/browse" },
+  { label: "Browse packages", to: "/vips/browse" },
 ] as const;
+
+export type PublicNavLink = { label: string; to: string };
+
+/** Cross-module links shown beside the primary section nav (unsigned visitors). */
+export const EXPERIENCE_CROSS_NAV_ITEMS: PublicNavLink[] = [
+  { label: "Homestays", to: "/homestays" },
+];
+
+export const HOMESTAY_CROSS_NAV_ITEMS: PublicNavLink[] = [
+  { label: "Experiences", to: "/" },
+  { label: "VIP", to: "/vips" },
+];
+
+export const VIP_CROSS_NAV_ITEMS: PublicNavLink[] = [
+  { label: "Experiences", to: "/" },
+  { label: "Homestays", to: "/homestays" },
+];
 
 export function isHomestayPublicSection(pathname: string): boolean {
   return pathname === "/homestays" || pathname.startsWith("/homestays/");
@@ -45,6 +62,12 @@ export function publicNavItemsForSection(pathname: string) {
         ? HOMESTAY_PUBLIC_NAV_ITEMS
         : EXPERIENCE_PUBLIC_NAV_ITEMS;
   return items.map((item) => ({ label: item.label, to: item.to }));
+}
+
+export function publicCrossNavItemsForSection(pathname: string): PublicNavLink[] {
+  if (isVipPublicSection(pathname)) return VIP_CROSS_NAV_ITEMS;
+  if (isHomestayPublicSection(pathname)) return HOMESTAY_CROSS_NAV_ITEMS;
+  return EXPERIENCE_CROSS_NAV_ITEMS;
 }
 
 export function isPublicNavItemActive(pathname: string, to: string): boolean {

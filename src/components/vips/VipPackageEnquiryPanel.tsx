@@ -56,12 +56,6 @@ export function VipPackageEnquiryPanel({ pkg }: VipPackageEnquiryPanelProps) {
       >
         Contact concierge
       </Link>
-      <Link
-        to="/contact"
-        className="luxury-btn-sm luxury-btn-secondary mt-3 inline-flex w-full justify-center no-underline"
-      >
-        Request a custom package
-      </Link>
     </LuxuryCheckoutPanel>
   );
 }

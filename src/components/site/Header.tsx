@@ -37,6 +37,7 @@ import {
   isPublicNavItemActive,
   isVipPublicSection,
   marketplaceHomePath,
+  publicCrossNavItemsForSection,
   publicNavItemsForSection,
 } from "@/lib/public-site-nav";
 import {
@@ -138,6 +139,7 @@ export function Header() {
   const showPublicBookingCtas = !user;
   const showSignIn = !user;
   const showAccountMenu = Boolean(user);
+  const publicCrossNavItems = publicCrossNavItemsForSection(pathname);
 
   useEffect(() => {
     const onScroll = () => setElevated(window.scrollY > 20);
@@ -206,57 +208,18 @@ export function Header() {
             );
           })}
 
-          {showPublicBookingCtas ? (
-            isVipSection ? (
-              <>
+          {showPublicBookingCtas
+            ? publicCrossNavItems.map((item) => (
                 <Link
-                  to="/vips/browse"
+                  key={item.to}
+                  to={item.to as "/homestays"}
                   className={navLinkClass}
                   activeProps={{ className: "text-ember" }}
                 >
-                  Browse packages
+                  {item.label}
                 </Link>
-                <Link to="/" className={navLinkClass} activeProps={{ className: "text-ember" }}>
-                  Experiences
-                </Link>
-                <Link
-                  to="/homestays"
-                  className={navLinkClass}
-                  activeProps={{ className: "text-ember" }}
-                >
-                  Homestays
-                </Link>
-              </>
-            ) : isHomestaySection ? (
-              <>
-                <Link
-                  to="/homestays/browse"
-                  className={navLinkClass}
-                  activeProps={{ className: "text-ember" }}
-                >
-                  Book a Homestay
-                </Link>
-                <Link to="/" className={navLinkClass} activeProps={{ className: "text-ember" }}>
-                  Experiences
-                </Link>
-                <Link
-                  to="/vips"
-                  className={navLinkClass}
-                  activeProps={{ className: "text-ember" }}
-                >
-                  VIP
-                </Link>
-              </>
-            ) : (
-              <Link
-                to="/homestays"
-                className={navLinkClass}
-                activeProps={{ className: "text-ember" }}
-              >
-                Homestays
-              </Link>
-            )
-          ) : null}
+              ))
+            : null}
           {showGuestCart ? (
             <Link
               to="/dashboard/cart"
@@ -343,30 +306,21 @@ export function Header() {
                   );
                 })}
 
-                {showPublicBookingCtas || showSignIn ? (
+                {showPublicBookingCtas && publicCrossNavItems.length > 0 ? (
                   <>
                     <MobileNavDivider />
-                    {showPublicBookingCtas ? (
-                      <>
-                        <MobileNavSectionLabel>Book</MobileNavSectionLabel>
-                        {isVipSection ? (
-                          <>
-                            <MobileNavLink to="/vips/browse">Browse packages</MobileNavLink>
-                            <MobileNavLink to="/">Experiences</MobileNavLink>
-                            <MobileNavLink to="/homestays">Homestays</MobileNavLink>
-                          </>
-                        ) : isHomestaySection ? (
-                          <>
-                            <MobileNavLink to="/homestays/browse">Book a Homestay</MobileNavLink>
-                            <MobileNavLink to="/">Experiences</MobileNavLink>
-                            <MobileNavLink to="/vips">VIP</MobileNavLink>
-                          </>
-                        ) : (
-                          <MobileNavLink to="/homestays">Homestays</MobileNavLink>
-                        )}
-                      </>
-                    ) : null}
-                    {showSignIn ? <MobileNavLink to="/sign-in">Sign in</MobileNavLink> : null}
+                    <MobileNavSectionLabel>Explore</MobileNavSectionLabel>
+                    {publicCrossNavItems.map((item) => (
+                      <MobileNavLink key={item.to} to={item.to}>
+                        {item.label}
+                      </MobileNavLink>
+                    ))}
+                  </>
+                ) : null}
+                {showSignIn ? (
+                  <>
+                    <MobileNavDivider />
+                    <MobileNavLink to="/sign-in">Sign in</MobileNavLink>
                   </>
                 ) : null}
 
