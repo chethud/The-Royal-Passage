@@ -12,6 +12,7 @@ import {
   redirectOffLocalhostIfNeeded,
 } from "@/lib/auth-redirect";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
+import { markVipSignupPromptPending } from "@/lib/vip-membership-prompt-storage";
 
 const inputClass =
   "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 text-sm text-ink placeholder:text-ink/45 backdrop-blur-sm focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
@@ -178,7 +179,8 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
         },
       });
       if (signUpError) throw signUpError;
-      if (data.session) {
+      if (data.session?.user?.id) {
+        markVipSignupPromptPending(data.session.user.id);
         setNotice("Account created. You are signed in.");
       } else {
         setNotice(

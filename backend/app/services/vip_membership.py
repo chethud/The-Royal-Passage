@@ -40,13 +40,16 @@ def skip_vip_membership_interest(auth: dict) -> GuestProfile:
     if auth["profile"].get("role") != "guest":
         raise ValueError("Only guest accounts can update VIP membership interest.")
     status = _membership_status(auth["profile"])
-    if status in {"pending", "approved"}:
-        raise ValueError("VIP membership is already in progress or approved.")
+    if status == "approved":
+        raise ValueError("You are already a VIP member.")
+    if status == "pending":
+        raise ValueError("Your VIP membership application is already under review.")
 
     supabase = get_supabase_admin()
-    supabase.table("profiles").update({"vip_membership_status": "skipped"}).eq(
-        "id", auth["user"].id
-    ).execute()
+    if status != "skipped":
+        supabase.table("profiles").update({"vip_membership_status": "skipped"}).eq(
+            "id", auth["user"].id
+        ).execute()
     _refresh_profile(auth)
     return get_guest_profile(auth)
 

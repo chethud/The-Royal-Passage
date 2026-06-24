@@ -6,6 +6,11 @@ import {
   VipMembershipActionRequestSchema,
 } from "@/gen/royalpassage/v1/types_pb";
 import type { GuestProfile } from "@/lib/api/guest";
+import {
+  hasVipPromptDismissed,
+  hasVipSignupPromptPending,
+  isRecentGuestAccount,
+} from "@/lib/vip-membership-prompt-storage";
 
 export type VipMembershipStatus = "none" | "skipped" | "pending" | "approved" | "rejected";
 
@@ -135,6 +140,13 @@ export function isApprovedVipMember(status: string | null | undefined): boolean 
   return status === "approved";
 }
 
-export function shouldPromptVipMembership(status: string | null | undefined): boolean {
-  return !status || status === "none";
+export function shouldPromptVipMembership(
+  status: string | null | undefined,
+  userId?: string | null,
+  createdAt?: string | null,
+): boolean {
+  if (status && status !== "none") return false;
+  if (!userId) return false;
+  if (hasVipPromptDismissed(userId)) return false;
+  return hasVipSignupPromptPending(userId) || isRecentGuestAccount(createdAt);
 }

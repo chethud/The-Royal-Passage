@@ -5,6 +5,7 @@ import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 import { toErrorMessage } from "@/lib/api/client";
 import { uploadProfilePhoto } from "@/lib/profile-photo-upload";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { VipMembershipUpgradeCard } from "@/components/vip/VipMembershipUpgradeCard";
 
 type GuestProfileFormProps = {
   profile: GuestProfile;
@@ -166,6 +167,10 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
           </div>
         </dl>
       </div>
+
+      {profile.role === "guest" ? (
+        <VipMembershipUpgradeCard status={profile.vipMembershipStatus} />
+      ) : null}
 
       {error ? (
         <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">

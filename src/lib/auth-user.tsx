@@ -12,6 +12,7 @@ import { fetchGuestProfile } from "@/lib/api/guest";
 import { ensureGuestProfile, fetchUserProfile, type UserProfile } from "@/lib/profiles";
 import { isUserRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
+import { markVipSignupPromptPending } from "@/lib/vip-membership-prompt-storage";
 
 const USER_CACHE_KEY = "rp_auth_user_v1";
 
@@ -33,6 +34,7 @@ export type AuthUserState = {
   accessToken: string | null;
   hasCachedSession: boolean;
   vipMembershipStatus: string | null;
+  guestCreatedAt: string | null;
   refreshVipMembershipStatus: () => Promise<void>;
 };
 
@@ -121,6 +123,7 @@ function useAuthUserState(): AuthUserState {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [vipMembershipStatus, setVipMembershipStatus] = useState<string | null>(null);
+  const [guestCreatedAt, setGuestCreatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(configured);
   const [cachedUser, setCachedUser] = useState<CachedUser | null>(() => readCachedUser());
 
@@ -140,6 +143,7 @@ function useAuthUserState(): AuthUserState {
         setProfile(null);
         setAccessToken(null);
         setVipMembershipStatus(null);
+        setGuestCreatedAt(null);
         writeCachedUser(null);
         setCachedUser(readCachedUser());
         setLoading(false);
@@ -168,12 +172,15 @@ function useAuthUserState(): AuthUserState {
           const apiProfile = await fetchGuestProfile(resolvedToken);
           if (!mounted) return;
           setVipMembershipStatus(apiProfile.vipMembershipStatus);
+          setGuestCreatedAt(apiProfile.createdAt || null);
         } catch {
           if (!mounted) return;
           setVipMembershipStatus("none");
+          setGuestCreatedAt(null);
         }
       } else {
         setVipMembershipStatus(null);
+        setGuestCreatedAt(null);
       }
     };
 
@@ -183,7 +190,10 @@ function useAuthUserState(): AuthUserState {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_UP" && session?.user?.id) {
+        markVipSignupPromptPending(session.user.id);
+      }
       void syncUser(session?.user ?? null, session?.access_token ?? null);
     });
 
@@ -205,8 +215,10 @@ function useAuthUserState(): AuthUserState {
     try {
       const apiProfile = await fetchGuestProfile(accessToken);
       setVipMembershipStatus(apiProfile.vipMembershipStatus);
+      setGuestCreatedAt(apiProfile.createdAt || null);
     } catch {
       setVipMembershipStatus("none");
+      setGuestCreatedAt(null);
     }
   };
 
@@ -220,6 +232,7 @@ function useAuthUserState(): AuthUserState {
     accessToken,
     hasCachedSession: Boolean(cachedUser?.id),
     vipMembershipStatus,
+    guestCreatedAt,
     refreshVipMembershipStatus,
   };
 }

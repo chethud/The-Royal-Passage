@@ -13,33 +13,46 @@ import { skipVipMembershipInterest, shouldPromptVipMembership } from "@/lib/api/
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useAuthUser } from "@/lib/auth-user";
 import { isGuestAccount } from "@/lib/roles";
+import { markVipPromptDismissed } from "@/lib/vip-membership-prompt-storage";
 
 export function VipMembershipPrompt() {
   const navigate = useNavigate();
-  const { user, role, accessToken, loading, vipMembershipStatus, refreshVipMembershipStatus } =
-    useAuthUser();
-  const [open, setOpen] = useState(true);
+  const {
+    user,
+    role,
+    accessToken,
+    loading,
+    vipMembershipStatus,
+    guestCreatedAt,
+    refreshVipMembershipStatus,
+  } = useAuthUser();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dismissedLocally, setDismissedLocally] = useState(false);
 
   const shouldShow =
     !loading &&
-    Boolean(user) &&
+    Boolean(user?.id) &&
     isGuestAccount(role) &&
     Boolean(accessToken) &&
-    shouldPromptVipMembership(vipMembershipStatus) &&
-    open;
+    !dismissedLocally &&
+    shouldPromptVipMembership(vipMembershipStatus, user?.id, guestCreatedAt);
+
+  const persistDismissal = async () => {
+    if (!user?.id) return;
+    markVipPromptDismissed(user.id);
+    setDismissedLocally(true);
+    if (!accessToken || !isApiConfigured()) return;
+    await skipVipMembershipInterest(accessToken);
+    await refreshVipMembershipStatus();
+  };
 
   const handleSkip = async () => {
     if (!accessToken) return;
     setBusy(true);
     setError(null);
     try {
-      if (isApiConfigured()) {
-        await skipVipMembershipInterest(accessToken);
-        await refreshVipMembershipStatus();
-      }
-      setOpen(false);
+      await persistDismissal();
     } catch (err) {
       setError(toErrorMessage(err, "Could not save your preference."));
     } finally {
@@ -47,9 +60,18 @@ export function VipMembershipPrompt() {
     }
   };
 
-  const handleContinue = () => {
-    setOpen(false);
-    void navigate({ to: "/account/vip-apply" });
+  const handleContinue = async () => {
+    if (!accessToken) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await persistDismissal();
+      void navigate({ to: "/account/vip-apply" });
+    } catch (err) {
+      setError(toErrorMessage(err, "Could not save your preference."));
+    } finally {
+      setBusy(false);
+    }
   };
 
   if (!shouldShow) return null;
@@ -85,7 +107,7 @@ export function VipMembershipPrompt() {
             type="button"
             className="luxury-btn-sm luxury-btn-primary w-full sm:w-auto"
             disabled={busy}
-            onClick={handleContinue}
+            onClick={() => void handleContinue()}
           >
             I&apos;m interested
           </button>
