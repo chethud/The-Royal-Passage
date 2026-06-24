@@ -1870,23 +1870,33 @@ class UpdateOwnerVipPackageRequest(_message.Message):
     def __init__(self, title: _Optional[str] = ..., slug: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., package_type: _Optional[str] = ..., city_slug: _Optional[str] = ..., city: _Optional[str] = ..., region: _Optional[str] = ..., price_from_minor: _Optional[int] = ..., hero_image_url: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., highlights: _Optional[_Iterable[str]] = ..., concierge_note: _Optional[str] = ..., duration_days: _Optional[int] = ..., max_guests: _Optional[int] = ..., submit_for_review: _Optional[bool] = ...) -> None: ...
 
 class SubmitVipMembershipApplicationRequest(_message.Message):
-    __slots__ = ("full_name", "email", "phone", "address", "id_document_number", "id_document_photo_url")
+    __slots__ = ("full_name", "email", "phone", "address", "id_document_number", "id_document_photo_url", "description", "professional_card_type", "professional_card_photo_url", "instagram_username", "facebook_username")
     FULL_NAME_FIELD_NUMBER: _ClassVar[int]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
     PHONE_FIELD_NUMBER: _ClassVar[int]
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
     ID_DOCUMENT_NUMBER_FIELD_NUMBER: _ClassVar[int]
     ID_DOCUMENT_PHOTO_URL_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    PROFESSIONAL_CARD_TYPE_FIELD_NUMBER: _ClassVar[int]
+    PROFESSIONAL_CARD_PHOTO_URL_FIELD_NUMBER: _ClassVar[int]
+    INSTAGRAM_USERNAME_FIELD_NUMBER: _ClassVar[int]
+    FACEBOOK_USERNAME_FIELD_NUMBER: _ClassVar[int]
     full_name: str
     email: str
     phone: str
     address: str
     id_document_number: str
     id_document_photo_url: str
-    def __init__(self, full_name: _Optional[str] = ..., email: _Optional[str] = ..., phone: _Optional[str] = ..., address: _Optional[str] = ..., id_document_number: _Optional[str] = ..., id_document_photo_url: _Optional[str] = ...) -> None: ...
+    description: str
+    professional_card_type: str
+    professional_card_photo_url: str
+    instagram_username: str
+    facebook_username: str
+    def __init__(self, full_name: _Optional[str] = ..., email: _Optional[str] = ..., phone: _Optional[str] = ..., address: _Optional[str] = ..., id_document_number: _Optional[str] = ..., id_document_photo_url: _Optional[str] = ..., description: _Optional[str] = ..., professional_card_type: _Optional[str] = ..., professional_card_photo_url: _Optional[str] = ..., instagram_username: _Optional[str] = ..., facebook_username: _Optional[str] = ...) -> None: ...
 
 class VipMembershipApplicationSummary(_message.Message):
-    __slots__ = ("id", "guest_user_id", "full_name", "email", "phone", "id_document_type", "status", "created_at", "id_document_photo_url")
+    __slots__ = ("id", "guest_user_id", "full_name", "email", "phone", "id_document_type", "status", "created_at", "id_document_photo_url", "description", "professional_card_type", "professional_card_photo_url", "instagram_username", "facebook_username")
     ID_FIELD_NUMBER: _ClassVar[int]
     GUEST_USER_ID_FIELD_NUMBER: _ClassVar[int]
     FULL_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -1896,6 +1906,11 @@ class VipMembershipApplicationSummary(_message.Message):
     STATUS_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     ID_DOCUMENT_PHOTO_URL_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    PROFESSIONAL_CARD_TYPE_FIELD_NUMBER: _ClassVar[int]
+    PROFESSIONAL_CARD_PHOTO_URL_FIELD_NUMBER: _ClassVar[int]
+    INSTAGRAM_USERNAME_FIELD_NUMBER: _ClassVar[int]
+    FACEBOOK_USERNAME_FIELD_NUMBER: _ClassVar[int]
     id: str
     guest_user_id: str
     full_name: str
@@ -1905,10 +1920,15 @@ class VipMembershipApplicationSummary(_message.Message):
     status: str
     created_at: str
     id_document_photo_url: str
-    def __init__(self, id: _Optional[str] = ..., guest_user_id: _Optional[str] = ..., full_name: _Optional[str] = ..., email: _Optional[str] = ..., phone: _Optional[str] = ..., id_document_type: _Optional[str] = ..., status: _Optional[str] = ..., created_at: _Optional[str] = ..., id_document_photo_url: _Optional[str] = ...) -> None: ...
+    description: str
+    professional_card_type: str
+    professional_card_photo_url: str
+    instagram_username: str
+    facebook_username: str
+    def __init__(self, id: _Optional[str] = ..., guest_user_id: _Optional[str] = ..., full_name: _Optional[str] = ..., email: _Optional[str] = ..., phone: _Optional[str] = ..., id_document_type: _Optional[str] = ..., status: _Optional[str] = ..., created_at: _Optional[str] = ..., id_document_photo_url: _Optional[str] = ..., description: _Optional[str] = ..., professional_card_type: _Optional[str] = ..., professional_card_photo_url: _Optional[str] = ..., instagram_username: _Optional[str] = ..., facebook_username: _Optional[str] = ...) -> None: ...
 
 class VipMembershipApplicationDetail(_message.Message):
-    __slots__ = ("id", "guest_user_id", "full_name", "email", "phone", "address", "id_document_type", "id_document_number", "status", "created_at", "id_document_photo_url")
+    __slots__ = ("id", "guest_user_id", "full_name", "email", "phone", "address", "id_document_type", "id_document_number", "status", "created_at", "id_document_photo_url", "description", "professional_card_type", "professional_card_photo_url", "instagram_username", "facebook_username")
     ID_FIELD_NUMBER: _ClassVar[int]
     GUEST_USER_ID_FIELD_NUMBER: _ClassVar[int]
     FULL_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -1920,6 +1940,11 @@ class VipMembershipApplicationDetail(_message.Message):
     STATUS_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     ID_DOCUMENT_PHOTO_URL_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    PROFESSIONAL_CARD_TYPE_FIELD_NUMBER: _ClassVar[int]
+    PROFESSIONAL_CARD_PHOTO_URL_FIELD_NUMBER: _ClassVar[int]
+    INSTAGRAM_USERNAME_FIELD_NUMBER: _ClassVar[int]
+    FACEBOOK_USERNAME_FIELD_NUMBER: _ClassVar[int]
     id: str
     guest_user_id: str
     full_name: str
@@ -1931,7 +1956,12 @@ class VipMembershipApplicationDetail(_message.Message):
     status: str
     created_at: str
     id_document_photo_url: str
-    def __init__(self, id: _Optional[str] = ..., guest_user_id: _Optional[str] = ..., full_name: _Optional[str] = ..., email: _Optional[str] = ..., phone: _Optional[str] = ..., address: _Optional[str] = ..., id_document_type: _Optional[str] = ..., id_document_number: _Optional[str] = ..., status: _Optional[str] = ..., created_at: _Optional[str] = ..., id_document_photo_url: _Optional[str] = ...) -> None: ...
+    description: str
+    professional_card_type: str
+    professional_card_photo_url: str
+    instagram_username: str
+    facebook_username: str
+    def __init__(self, id: _Optional[str] = ..., guest_user_id: _Optional[str] = ..., full_name: _Optional[str] = ..., email: _Optional[str] = ..., phone: _Optional[str] = ..., address: _Optional[str] = ..., id_document_type: _Optional[str] = ..., id_document_number: _Optional[str] = ..., status: _Optional[str] = ..., created_at: _Optional[str] = ..., id_document_photo_url: _Optional[str] = ..., description: _Optional[str] = ..., professional_card_type: _Optional[str] = ..., professional_card_photo_url: _Optional[str] = ..., instagram_username: _Optional[str] = ..., facebook_username: _Optional[str] = ...) -> None: ...
 
 class ListVipMembershipApplicationsResponse(_message.Message):
     __slots__ = ("applications",)

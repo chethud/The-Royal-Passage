@@ -12,6 +12,12 @@ type VipMembershipApplicationsQueueProps = {
   refreshKey?: number;
 };
 
+function cardTypeLabel(type: string | null | undefined) {
+  if (type === "business") return "Business card";
+  if (type === "visitor") return "Visitor card";
+  return "Card";
+}
+
 export function VipMembershipApplicationsQueue({
   accessToken,
   refreshKey = 0,
@@ -83,23 +89,44 @@ export function VipMembershipApplicationsQueue({
   return (
     <ul className="divide-y divide-[rgb(74_0_0/0.12)]">
       {rows.map((row) => (
-        <li key={row.id} className="flex flex-wrap items-center justify-between gap-4 py-4 first:pt-0 last:pb-0">
-          <div>
+        <li key={row.id} className="flex flex-wrap items-start justify-between gap-4 py-4 first:pt-0 last:pb-0">
+          <div className="min-w-0 flex-1 space-y-2">
             <p className="luxury-panel-heading font-display text-lg">{row.fullName}</p>
             <p className="luxury-panel-body text-sm">
               {row.email}
               {row.phone ? ` · ${row.phone}` : ""} · Aadhaar
             </p>
-            {row.idDocumentPhotoUrl ? (
-              <a
-                href={row.idDocumentPhotoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="luxury-panel-link mt-1 inline-block text-xs hover:underline"
-              >
-                View Aadhaar photo
-              </a>
+            {row.description ? (
+              <p className="luxury-panel-body text-sm leading-relaxed">{row.description}</p>
             ) : null}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+              {row.idDocumentPhotoUrl ? (
+                <a
+                  href={row.idDocumentPhotoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="luxury-panel-link hover:underline"
+                >
+                  View Aadhaar photo
+                </a>
+              ) : null}
+              {row.professionalCardPhotoUrl ? (
+                <a
+                  href={row.professionalCardPhotoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="luxury-panel-link hover:underline"
+                >
+                  View {cardTypeLabel(row.professionalCardType)}
+                </a>
+              ) : null}
+              {row.instagramUsername ? (
+                <span className="luxury-panel-body">Instagram: @{row.instagramUsername}</span>
+              ) : null}
+              {row.facebookUsername ? (
+                <span className="luxury-panel-body">Facebook: {row.facebookUsername}</span>
+              ) : null}
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <button

@@ -28,6 +28,12 @@ create table if not exists public.vip_membership_applications (
   id_document_type text not null default 'aadhaar',
   id_document_number text not null,
   id_document_photo_url text not null,
+  description text,
+  professional_card_type text
+    check (professional_card_type is null or professional_card_type in ('business', 'visitor')),
+  professional_card_photo_url text,
+  instagram_username text,
+  facebook_username text,
   status text not null default 'pending',
   reviewed_by uuid references auth.users (id) on delete set null,
   reviewed_at timestamptz,
@@ -41,6 +47,28 @@ alter table public.vip_membership_applications
 
 alter table public.vip_membership_applications
   add column if not exists id_document_photo_url text;
+
+alter table public.vip_membership_applications
+  add column if not exists description text;
+
+alter table public.vip_membership_applications
+  add column if not exists professional_card_type text;
+
+alter table public.vip_membership_applications
+  add column if not exists professional_card_photo_url text;
+
+alter table public.vip_membership_applications
+  add column if not exists instagram_username text;
+
+alter table public.vip_membership_applications
+  add column if not exists facebook_username text;
+
+alter table public.vip_membership_applications
+  drop constraint if exists vip_membership_applications_professional_card_type_check;
+
+alter table public.vip_membership_applications
+  add constraint vip_membership_applications_professional_card_type_check
+  check (professional_card_type is null or professional_card_type in ('business', 'visitor'));
 
 alter table public.vip_membership_applications
   alter column id_document_type set default 'aadhaar';

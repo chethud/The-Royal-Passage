@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
 
 class Slot(BaseModel):
@@ -756,6 +756,25 @@ class SubmitVipMembershipApplicationRequest(BaseModel):
     address: str | None = Field(default=None, max_length=500)
     idDocumentNumber: str = Field(min_length=12, max_length=12, pattern=r"^\d{12}$")
     idDocumentPhotoUrl: str = Field(min_length=10, max_length=2048)
+    description: str = Field(min_length=20, max_length=2000)
+    professionalCardType: Literal["business", "visitor"]
+    professionalCardPhotoUrl: str = Field(min_length=10, max_length=2048)
+    instagramUsername: str | None = Field(default=None, max_length=80)
+    facebookUsername: str | None = Field(default=None, max_length=80)
+
+    @field_validator("instagramUsername", "facebookUsername")
+    @classmethod
+    def normalize_social_username(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        trimmed = value.strip().lstrip("@")
+        return trimmed or None
+
+    @model_validator(mode="after")
+    def require_social_username(self) -> "SubmitVipMembershipApplicationRequest":
+        if not self.instagramUsername and not self.facebookUsername:
+            raise ValueError("Provide at least one Instagram or Facebook username.")
+        return self
 
 
 class VipMembershipApplicationSummary(BaseModel):
@@ -768,6 +787,11 @@ class VipMembershipApplicationSummary(BaseModel):
     status: str
     createdAt: str
     idDocumentPhotoUrl: str | None = None
+    description: str | None = None
+    professionalCardType: str | None = None
+    professionalCardPhotoUrl: str | None = None
+    instagramUsername: str | None = None
+    facebookUsername: str | None = None
 
 
 class VipMembershipApplicationDetail(BaseModel):
@@ -782,6 +806,11 @@ class VipMembershipApplicationDetail(BaseModel):
     status: str
     createdAt: str
     idDocumentPhotoUrl: str
+    description: str
+    professionalCardType: str
+    professionalCardPhotoUrl: str
+    instagramUsername: str | None = None
+    facebookUsername: str | None = None
 
 
 class ListVipMembershipApplicationsResponse(BaseModel):

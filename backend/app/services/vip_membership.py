@@ -14,6 +14,7 @@ from app.models.schemas import (
 from app.services.guest_profile import get_guest_profile
 
 VALID_ID_TYPE = "aadhaar"
+VALID_PROFESSIONAL_CARD_TYPES = {"business", "visitor"}
 
 
 def _membership_status(profile: dict) -> str:
@@ -50,10 +51,37 @@ def skip_vip_membership_interest(auth: dict) -> GuestProfile:
     return get_guest_profile(auth)
 
 
-def _validate_aadhaar_photo_url(url: str) -> None:
+def _validate_image_url(url: str, label: str) -> str:
     trimmed = url.strip()
     if not trimmed.startswith("http://") and not trimmed.startswith("https://"):
-        raise ValueError("Aadhaar photo must be a valid image URL.")
+        raise ValueError(f"{label} must be a valid image URL.")
+    return trimmed
+
+
+def _normalize_social_username(value: str | None) -> str | None:
+    if not value:
+        return None
+    trimmed = value.strip().lstrip("@")
+    return trimmed or None
+
+
+def _summary_from_row(row: dict) -> VipMembershipApplicationSummary:
+    return VipMembershipApplicationSummary(
+        id=row["id"],
+        guestUserId=row["guest_user_id"],
+        fullName=row["full_name"],
+        email=row["email"],
+        phone=row.get("phone"),
+        idDocumentType=row["id_document_type"],
+        status=row.get("status") or "pending",
+        createdAt=row.get("created_at", ""),
+        idDocumentPhotoUrl=row.get("id_document_photo_url"),
+        description=row.get("description"),
+        professionalCardType=row.get("professional_card_type"),
+        professionalCardPhotoUrl=row.get("professional_card_photo_url"),
+        instagramUsername=row.get("instagram_username"),
+        facebookUsername=row.get("facebook_username"),
+    )
 
 
 def submit_vip_membership_application(
@@ -67,8 +95,16 @@ def submit_vip_membership_application(
     if status == "pending":
         raise ValueError("Your VIP membership application is already under review.")
 
-    photo_url = payload.idDocumentPhotoUrl.strip()
-    _validate_aadhaar_photo_url(photo_url)
+    photo_url = _validate_image_url(payload.idDocumentPhotoUrl, "Aadhaar photo")
+    card_photo_url = _validate_image_url(payload.professionalCardPhotoUrl, "Card photo")
+    card_type = payload.professionalCardType
+    if card_type not in VALID_PROFESSIONAL_CARD_TYPES:
+        raise ValueError("Professional card type must be business or visitor.")
+
+    instagram = _normalize_social_username(payload.instagramUsername)
+    facebook = _normalize_social_username(payload.facebookUsername)
+    if not instagram and not facebook:
+        raise ValueError("Provide at least one Instagram or Facebook username.")
 
     supabase = get_supabase_admin()
     user_id = auth["user"].id
@@ -81,6 +117,11 @@ def submit_vip_membership_application(
         "id_document_type": VALID_ID_TYPE,
         "id_document_number": payload.idDocumentNumber.strip(),
         "id_document_photo_url": photo_url,
+        "description": payload.description.strip(),
+        "professional_card_type": card_type,
+        "professional_card_photo_url": card_photo_url,
+        "instagram_username": instagram,
+        "facebook_username": facebook,
         "status": "pending",
     }
 
@@ -113,7 +154,9 @@ def list_vip_membership_applications() -> ListVipMembershipApplicationsResponse:
     result = (
         supabase.table("vip_membership_applications")
         .select(
-            "id, guest_user_id, full_name, email, phone, id_document_type, status, created_at, id_document_photo_url"
+            "id, guest_user_id, full_name, email, phone, id_document_type, status, created_at, "
+            "id_document_photo_url, description, professional_card_type, professional_card_photo_url, "
+            "instagram_username, facebook_username"
         )
         .eq("status", "pending")
         .order("created_at", desc=True)
@@ -121,20 +164,7 @@ def list_vip_membership_applications() -> ListVipMembershipApplicationsResponse:
     )
     rows = result.data or []
     return ListVipMembershipApplicationsResponse(
-        applications=[
-            VipMembershipApplicationSummary(
-                id=row["id"],
-                guestUserId=row["guest_user_id"],
-                fullName=row["full_name"],
-                email=row["email"],
-                phone=row.get("phone"),
-                idDocumentType=row["id_document_type"],
-                status=row.get("status") or "pending",
-                createdAt=row.get("created_at", ""),
-                idDocumentPhotoUrl=row.get("id_document_photo_url"),
-            )
-            for row in rows
-        ]
+        applications=[_summary_from_row(row) for row in rows]
     )
 
 
@@ -162,6 +192,11 @@ def get_vip_membership_application(application_id: str) -> VipMembershipApplicat
         status=row.get("status") or "pending",
         createdAt=row.get("created_at", ""),
         idDocumentPhotoUrl=row.get("id_document_photo_url") or "",
+        description=row.get("description") or "",
+        professionalCardType=row.get("professional_card_type") or "",
+        professionalCardPhotoUrl=row.get("professional_card_photo_url") or "",
+        instagramUsername=row.get("instagram_username"),
+        facebookUsername=row.get("facebook_username"),
     )
 
 
@@ -192,6 +227,12 @@ def approve_vip_membership(application_id: str, reviewer_user_id: str) -> VipMem
         idDocumentType=detail.idDocumentType,
         status="approved",
         createdAt=detail.createdAt,
+        idDocumentPhotoUrl=detail.idDocumentPhotoUrl,
+        description=detail.description,
+        professionalCardType=detail.professionalCardType,
+        professionalCardPhotoUrl=detail.professionalCardPhotoUrl,
+        instagramUsername=detail.instagramUsername,
+        facebookUsername=detail.facebookUsername,
     )
 
 
@@ -222,6 +263,12 @@ def reject_vip_membership(application_id: str, reviewer_user_id: str) -> VipMemb
         idDocumentType=detail.idDocumentType,
         status="rejected",
         createdAt=detail.createdAt,
+        idDocumentPhotoUrl=detail.idDocumentPhotoUrl,
+        description=detail.description,
+        professionalCardType=detail.professionalCardType,
+        professionalCardPhotoUrl=detail.professionalCardPhotoUrl,
+        instagramUsername=detail.instagramUsername,
+        facebookUsername=detail.facebookUsername,
     )
 
 

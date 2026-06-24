@@ -19,6 +19,11 @@ export type VipMembershipApplicationSummary = {
   status: string;
   createdAt: string;
   idDocumentPhotoUrl?: string | null;
+  description?: string | null;
+  professionalCardType?: string | null;
+  professionalCardPhotoUrl?: string | null;
+  instagramUsername?: string | null;
+  facebookUsername?: string | null;
 };
 
 export type VipCustomPackageRequestSummary = {
@@ -42,6 +47,11 @@ export type SubmitVipMembershipPayload = {
   address?: string;
   idDocumentNumber: string;
   idDocumentPhotoUrl: string;
+  description: string;
+  professionalCardType: "business" | "visitor";
+  professionalCardPhotoUrl: string;
+  instagramUsername?: string;
+  facebookUsername?: string;
 };
 
 export type CreateVipCustomPackagePayload = {
