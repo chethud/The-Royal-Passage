@@ -1,0 +1,2 @@
+-- Deprecated: merged into supabase/vip-membership.sql (idempotent upgrade section).
+-- Re-run vip-membership.sql instead of this file.

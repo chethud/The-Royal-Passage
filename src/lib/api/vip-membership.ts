@@ -18,6 +18,7 @@ export type VipMembershipApplicationSummary = {
   idDocumentType: string;
   status: string;
   createdAt: string;
+  idDocumentPhotoUrl?: string | null;
 };
 
 export type VipCustomPackageRequestSummary = {
@@ -39,8 +40,8 @@ export type SubmitVipMembershipPayload = {
   email: string;
   phone?: string;
   address?: string;
-  idDocumentType: "aadhaar" | "visitor_id" | "business_id";
   idDocumentNumber: string;
+  idDocumentPhotoUrl: string;
 };
 
 export type CreateVipCustomPackagePayload = {

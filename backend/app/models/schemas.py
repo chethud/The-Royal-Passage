@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field
 
 
 class Slot(BaseModel):
@@ -754,16 +754,8 @@ class SubmitVipMembershipApplicationRequest(BaseModel):
     email: str
     phone: str | None = Field(default=None, max_length=30)
     address: str | None = Field(default=None, max_length=500)
-    idDocumentType: str
-    idDocumentNumber: str = Field(min_length=4, max_length=64)
-
-    @field_validator("idDocumentType")
-    @classmethod
-    def validate_id_type(cls, value: str) -> str:
-        allowed = {"aadhaar", "visitor_id", "business_id"}
-        if value not in allowed:
-            raise ValueError("Invalid ID document type.")
-        return value
+    idDocumentNumber: str = Field(min_length=12, max_length=12, pattern=r"^\d{12}$")
+    idDocumentPhotoUrl: str = Field(min_length=10, max_length=2048)
 
 
 class VipMembershipApplicationSummary(BaseModel):
@@ -775,6 +767,7 @@ class VipMembershipApplicationSummary(BaseModel):
     idDocumentType: str
     status: str
     createdAt: str
+    idDocumentPhotoUrl: str | None = None
 
 
 class VipMembershipApplicationDetail(BaseModel):
@@ -788,6 +781,7 @@ class VipMembershipApplicationDetail(BaseModel):
     idDocumentNumber: str
     status: str
     createdAt: str
+    idDocumentPhotoUrl: str
 
 
 class ListVipMembershipApplicationsResponse(BaseModel):

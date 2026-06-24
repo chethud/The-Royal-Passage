@@ -63,8 +63,8 @@ export function VipMembershipPrompt() {
             Royal VIP membership
           </DialogTitle>
           <DialogDescription className="text-sm leading-relaxed">
-            Would you like to apply for VIP access to curated Mysuru packages and bespoke concierge
-            itineraries? You can skip this and continue booking experiences as usual.
+            Would you like to apply for VIP access to curated Mysuru packages? Membership requires
+            Aadhaar verification. You can skip this and continue booking experiences as usual.
           </DialogDescription>
         </DialogHeader>
         {error ? (

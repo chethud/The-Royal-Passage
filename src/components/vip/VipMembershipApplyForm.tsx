@@ -1,10 +1,10 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
-import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { submitVipMembershipApplication } from "@/lib/api/vip-membership";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useAuthUser } from "@/lib/auth-user";
+import { uploadVipAadhaarPhoto } from "@/lib/vip-aadhaar-photo-upload";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 const inputClass =
@@ -12,21 +12,41 @@ const inputClass =
 
 export function VipMembershipApplyForm() {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, accessToken, displayName, profile, refreshVipMembershipStatus } = useAuthUser();
   const [fullName, setFullName] = useState(displayName ?? profile?.fullName ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
   const [phone, setPhone] = useState(profile?.phone ?? "");
   const [address, setAddress] = useState("");
-  const [idDocumentType, setIdDocumentType] = useState<"aadhaar" | "visitor_id" | "business_id">(
-    "aadhaar",
-  );
-  const [idDocumentNumber, setIdDocumentNumber] = useState("");
+  const [aadhaarNumber, setAadhaarNumber] = useState("");
+  const [aadhaarPhotoUrl, setAadhaarPhotoUrl] = useState("");
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handlePhotoSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    setUploadingPhoto(true);
+    setError(null);
+    try {
+      setAadhaarPhotoUrl(await uploadVipAadhaarPhoto(file));
+    } catch (err) {
+      setError(toErrorMessage(err, "Failed to upload Aadhaar photo."));
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!accessToken) return;
+    if (!aadhaarPhotoUrl) {
+      setError("Please upload a clear photo of your Aadhaar card.");
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -38,8 +58,8 @@ export function VipMembershipApplyForm() {
         email: email.trim(),
         phone: phone.trim() || undefined,
         address: address.trim() || undefined,
-        idDocumentType,
-        idDocumentNumber: idDocumentNumber.trim(),
+        idDocumentNumber: aadhaarNumber.replace(/\s/g, ""),
+        idDocumentPhotoUrl: aadhaarPhotoUrl,
       });
       await refreshVipMembershipStatus();
       void navigate({ to: "/account/profile" });
@@ -60,8 +80,8 @@ export function VipMembershipApplyForm() {
         <div>
           <h2 className="luxury-panel-heading font-display text-2xl">VIP membership application</h2>
           <p className="luxury-panel-body mt-2 text-sm">
-            Share your details and government-issued ID. Our Royal VIP concierge will review your
-            application and notify you once approved.
+            Aadhaar card is required for Royal VIP verification. Upload a clear photo of your
+            Aadhaar and enter the 12-digit number. Our concierge will review your application.
           </p>
         </div>
 
@@ -104,36 +124,54 @@ export function VipMembershipApplyForm() {
             />
           </div>
           <div>
-            <label htmlFor="vip-id-type" className="eyebrow luxury-panel-label mb-2 block">
-              ID document type
+            <label htmlFor="vip-aadhaar-number" className="eyebrow luxury-panel-label mb-2 block">
+              Aadhaar number
             </label>
-            <select
-              id="vip-id-type"
+            <input
+              id="vip-aadhaar-number"
               required
-              value={idDocumentType}
-              onChange={(e) =>
-                setIdDocumentType(e.target.value as "aadhaar" | "visitor_id" | "business_id")
-              }
+              inputMode="numeric"
+              pattern="\d{12}"
+              maxLength={12}
+              value={aadhaarNumber}
+              onChange={(e) => setAadhaarNumber(e.target.value.replace(/\D/g, "").slice(0, 12))}
+              placeholder="12-digit Aadhaar number"
               className={inputClass}
-            >
-              <option value="aadhaar">Aadhaar card</option>
-              <option value="visitor_id">Visitor / passport ID</option>
-              <option value="business_id">Business registration ID</option>
-            </select>
+            />
           </div>
         </div>
 
         <div>
-          <label htmlFor="vip-id-number" className="eyebrow luxury-panel-label mb-2 block">
-            ID document number
-          </label>
+          <p className="eyebrow luxury-panel-label mb-2 block">Aadhaar card photo</p>
+          <p className="luxury-panel-body mb-3 text-xs">
+            Required. JPEG, PNG, or WebP up to 5 MB. Ensure the number and photo are readable.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              disabled={uploadingPhoto || busy}
+              onClick={() => fileInputRef.current?.click()}
+              className="luxury-btn-sm luxury-btn-panel-outline"
+            >
+              {uploadingPhoto ? "Uploading…" : aadhaarPhotoUrl ? "Change photo" : "Upload Aadhaar photo"}
+            </button>
+            {aadhaarPhotoUrl ? (
+              <a
+                href={aadhaarPhotoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="luxury-panel-link text-sm hover:underline"
+              >
+                Preview uploaded photo
+              </a>
+            ) : null}
+          </div>
           <input
-            id="vip-id-number"
-            required
-            value={idDocumentNumber}
-            onChange={(e) => setIdDocumentNumber(e.target.value)}
-            placeholder="Enter your ID number"
-            className={inputClass}
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            className="sr-only"
+            onChange={(e) => void handlePhotoSelect(e)}
           />
         </div>
 
@@ -146,14 +184,14 @@ export function VipMembershipApplyForm() {
             rows={3}
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            placeholder="Residential or business address"
+            placeholder="Residential address"
             className={inputClass}
           />
         </div>
 
         <button
           type="submit"
-          disabled={busy}
+          disabled={busy || uploadingPhoto}
           className="luxury-btn-sm luxury-btn-primary disabled:cursor-not-allowed disabled:opacity-70"
         >
           {busy ? "Submitting…" : "Submit application"}

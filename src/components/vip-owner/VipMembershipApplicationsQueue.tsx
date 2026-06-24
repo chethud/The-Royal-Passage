@@ -88,8 +88,18 @@ export function VipMembershipApplicationsQueue({
             <p className="luxury-panel-heading font-display text-lg">{row.fullName}</p>
             <p className="luxury-panel-body text-sm">
               {row.email}
-              {row.phone ? ` · ${row.phone}` : ""} · {formatIdType(row.idDocumentType)}
+              {row.phone ? ` · ${row.phone}` : ""} · Aadhaar
             </p>
+            {row.idDocumentPhotoUrl ? (
+              <a
+                href={row.idDocumentPhotoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="luxury-panel-link mt-1 inline-block text-xs hover:underline"
+              >
+                View Aadhaar photo
+              </a>
+            ) : null}
           </div>
           <div className="flex flex-wrap gap-2">
             <button
@@ -113,11 +123,4 @@ export function VipMembershipApplicationsQueue({
       ))}
     </ul>
   );
-}
-
-function formatIdType(value: string): string {
-  if (value === "aadhaar") return "Aadhaar";
-  if (value === "visitor_id") return "Visitor ID";
-  if (value === "business_id") return "Business ID";
-  return value;
 }

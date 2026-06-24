@@ -13,7 +13,7 @@ from app.models.schemas import (
 )
 from app.services.guest_profile import get_guest_profile
 
-VALID_ID_TYPES = {"aadhaar", "visitor_id", "business_id"}
+VALID_ID_TYPE = "aadhaar"
 
 
 def _membership_status(profile: dict) -> str:
@@ -50,6 +50,12 @@ def skip_vip_membership_interest(auth: dict) -> GuestProfile:
     return get_guest_profile(auth)
 
 
+def _validate_aadhaar_photo_url(url: str) -> None:
+    trimmed = url.strip()
+    if not trimmed.startswith("http://") and not trimmed.startswith("https://"):
+        raise ValueError("Aadhaar photo must be a valid image URL.")
+
+
 def submit_vip_membership_application(
     auth: dict, payload: SubmitVipMembershipApplicationRequest
 ) -> GuestProfile:
@@ -60,8 +66,9 @@ def submit_vip_membership_application(
         raise ValueError("You are already a VIP member.")
     if status == "pending":
         raise ValueError("Your VIP membership application is already under review.")
-    if payload.idDocumentType not in VALID_ID_TYPES:
-        raise ValueError("Invalid ID document type.")
+
+    photo_url = payload.idDocumentPhotoUrl.strip()
+    _validate_aadhaar_photo_url(photo_url)
 
     supabase = get_supabase_admin()
     user_id = auth["user"].id
@@ -71,8 +78,9 @@ def submit_vip_membership_application(
         "email": str(payload.email).strip(),
         "phone": payload.phone.strip() if payload.phone else None,
         "address": payload.address.strip() if payload.address else None,
-        "id_document_type": payload.idDocumentType,
+        "id_document_type": VALID_ID_TYPE,
         "id_document_number": payload.idDocumentNumber.strip(),
+        "id_document_photo_url": photo_url,
         "status": "pending",
     }
 
@@ -105,7 +113,7 @@ def list_vip_membership_applications() -> ListVipMembershipApplicationsResponse:
     result = (
         supabase.table("vip_membership_applications")
         .select(
-            "id, guest_user_id, full_name, email, phone, id_document_type, status, created_at"
+            "id, guest_user_id, full_name, email, phone, id_document_type, status, created_at, id_document_photo_url"
         )
         .eq("status", "pending")
         .order("created_at", desc=True)
@@ -123,6 +131,7 @@ def list_vip_membership_applications() -> ListVipMembershipApplicationsResponse:
                 idDocumentType=row["id_document_type"],
                 status=row.get("status") or "pending",
                 createdAt=row.get("created_at", ""),
+                idDocumentPhotoUrl=row.get("id_document_photo_url"),
             )
             for row in rows
         ]
@@ -152,6 +161,7 @@ def get_vip_membership_application(application_id: str) -> VipMembershipApplicat
         idDocumentNumber=row["id_document_number"],
         status=row.get("status") or "pending",
         createdAt=row.get("created_at", ""),
+        idDocumentPhotoUrl=row.get("id_document_photo_url") or "",
     )
 
 
