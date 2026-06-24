@@ -1,12 +1,11 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { BedDouble, Crown, Star, Users } from "lucide-react";
+import { createFileRoute, notFound } from "@tanstack/react-router";
+import { Crown, Star, Users } from "lucide-react";
 import { ExperienceDetailGallery } from "@/components/experiences/ExperienceDetailGallery";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
+import { VipPackageDetailSections } from "@/components/vips/VipPackageDetailSections";
+import { VipPackageEnquiryPanel } from "@/components/vips/VipPackageEnquiryPanel";
 import {
   DetailCategoryBadge,
-  DetailDarkSection,
   DetailHeroGrid,
-  DetailLocationBlock,
   DetailMainSection,
   DetailPageShell,
   DetailBackLink,
@@ -29,15 +28,15 @@ export const Route = createFileRoute("/vips/$slug/")({
     return row;
   },
   head: ({ loaderData, params }) => {
-    const stay = loaderData?.vip;
-    if (!stay) return { meta: [{ title: "VIP stay — The Royal Passage" }] };
+    const pkg = loaderData?.vip;
+    if (!pkg) return { meta: [{ title: "VIP package — The Royal Passage" }] };
     const pageUrl = `${SITE_URL}/vips/${params.slug}`;
     return {
       meta: [
-        { title: `${stay.title} — Royal VIP` },
-        { name: "description", content: stay.tagline || stay.description.slice(0, 160) },
-        { property: "og:title", content: stay.title },
-        { property: "og:image", content: stay.image },
+        { title: `${pkg.title} — Royal VIP` },
+        { name: "description", content: pkg.tagline || pkg.description.slice(0, 160) },
+        { property: "og:title", content: pkg.title },
+        { property: "og:image", content: pkg.image },
         { property: "og:url", content: pageUrl },
       ],
       links: [canonicalLink(`/vips/${params.slug}`, SITE_URL)],
@@ -47,75 +46,62 @@ export const Route = createFileRoute("/vips/$slug/")({
 });
 
 function VipDetailPage() {
-  const { vip: stay } = Route.useLoaderData();
-  const sym = stay.currencySymbol ?? "₹";
-  const locationLine = [stay.region, stay.city].filter(Boolean).join(" · ");
+  const { vip: pkg } = Route.useLoaderData();
+  const sym = pkg.currencySymbol ?? "₹";
   const galleryExp = {
-    slug: stay.slug,
-    title: stay.title,
-    category: stay.propertyType,
-    image: stay.image,
-    galleryUrls: stay.galleryUrls,
+    slug: pkg.slug,
+    title: pkg.title,
+    category: pkg.packageType,
+    image: pkg.image,
+    galleryUrls: pkg.galleryUrls,
   } as Pick<Experience, "slug" | "title" | "category" | "image" | "galleryUrls"> as Experience;
 
   return (
     <DetailPageShell>
-      <DetailBackLink to="/vips/browse">Back to VIP stays</DetailBackLink>
+      <DetailBackLink to="/vips/browse">Back to packages</DetailBackLink>
 
       <DetailHeroGrid>
-        <ExperienceDetailGallery experience={galleryExp} />
+        <ExperienceDetailGallery exp={galleryExp} />
         <DetailMainSection>
           <DetailTitleRow>
             <DetailCategoryBadge>
               <Crown className="mr-1 inline h-3.5 w-3.5" aria-hidden />
-              {stay.propertyType}
+              {pkg.packageType}
             </DetailCategoryBadge>
             <h1 className="font-display text-3xl tracking-tight text-ink sm:text-4xl md:text-5xl">
-              {stay.title}
+              {pkg.title}
             </h1>
           </DetailTitleRow>
-          <DetailTagline>{stay.tagline}</DetailTagline>
+          <DetailTagline>{pkg.tagline}</DetailTagline>
           <DetailStatGrid>
-            <DetailStatItem icon={Star} label="Rating" value={String(stay.rating)} />
-            <DetailStatItem icon={BedDouble} label="Bedrooms" value={String(stay.bedrooms)} />
-            <DetailStatItem icon={Users} label="Max guests" value={String(stay.maxGuests)} />
+            <DetailStatItem label="Rating">
+              <span className="text-[#D4AF6A]">
+                <Star className="mr-1 inline h-4 w-4 fill-current" aria-hidden />
+                {pkg.rating}
+              </span>
+            </DetailStatItem>
+            <DetailStatItem label="Duration">
+              {pkg.durationDays} day{pkg.durationDays === 1 ? "" : "s"}
+            </DetailStatItem>
+            <DetailStatItem label="Max guests">
+              <Users className="mx-auto h-5 w-5 text-[#D4AF6A] sm:mx-0" aria-hidden />
+              {pkg.maxGuests}
+            </DetailStatItem>
           </DetailStatGrid>
-          <p className="mt-6 text-sm leading-relaxed text-muted-foreground">{stay.description}</p>
-          {stay.conciergeNote ? (
-            <p className="mt-4 rounded-sm border border-ember/25 bg-ember/8 px-4 py-3 text-sm text-ink/90">
-              {stay.conciergeNote}
-            </p>
-          ) : null}
+          <p className="mt-4 text-sm text-muted-foreground">
+            From {sym}
+            {pkg.priceFrom.toLocaleString("en-IN")} · {pkg.reviewsCount} guest review
+            {pkg.reviewsCount === 1 ? "" : "s"}
+          </p>
         </DetailMainSection>
       </DetailHeroGrid>
 
-      <DetailDarkSection>
-        <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
-          <DetailLocationBlock
-            address={stay.address}
-            locationLine={locationLine}
-            mapLink={stay.mapLink}
-          />
-          <LuxuryCheckoutPanel>
-            <p className="luxury-panel-heading font-display text-2xl">Reserve this VIP stay</p>
-            <p className="luxury-panel-body mt-2 text-sm">
-              From {sym}
-              {stay.pricePerNight.toLocaleString("en-IN")} per night · check-in {stay.checkInTime} ·
-              check-out {stay.checkOutTime}
-            </p>
-            <p className="luxury-panel-body mt-4 text-sm">
-              Full VIP booking checkout connects after the VIP module is enabled in Supabase. Contact
-              Royal Passage concierge to reserve this stay today.
-            </p>
-            <Link
-              to="/contact"
-              className="luxury-btn-sm luxury-btn-primary mt-6 inline-flex w-full justify-center no-underline"
-            >
-              Contact concierge
-            </Link>
-          </LuxuryCheckoutPanel>
+      <section className="border-t border-[rgb(200_162_90/0.18)] bg-[oklch(0.14_0.06_22)] py-10 sm:py-12 md:py-14">
+        <div className="container-page grid gap-10 lg:grid-cols-[1fr_22rem] lg:gap-12">
+          <VipPackageDetailSections pkg={pkg} />
+          <VipPackageEnquiryPanel pkg={pkg} />
         </div>
-      </DetailDarkSection>
+      </section>
     </DetailPageShell>
   );
 }

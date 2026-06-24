@@ -309,6 +309,156 @@ class UpdateOwnerHomestayRoomRequest(BaseModel):
     extraBedsPerRoom: int | None = Field(default=None, ge=1, le=2)
 
 
+class OwnerVipPackageSummary(BaseModel):
+    id: str
+    slug: str
+    title: str
+    city: str
+    status: str
+    priceFromMinor: int
+    currencySymbol: str
+    durationDays: int
+    image: str | None = None
+    packageType: str
+
+
+class OwnerVipPackageDetail(BaseModel):
+    id: str
+    slug: str
+    title: str
+    tagline: str | None = None
+    description: str | None = None
+    packageType: str
+    city: str
+    citySlug: str | None = None
+    region: str | None = None
+    priceFromMinor: int
+    status: str
+    heroImageUrl: str | None = None
+    galleryUrls: list[str] = Field(default_factory=list)
+    highlights: list[str] = Field(default_factory=list)
+    conciergeNote: str | None = None
+    durationDays: int = 1
+    maxGuests: int = 2
+    currencyCode: str = "INR"
+    currencySymbol: str = "₹"
+    createdAt: str
+    updatedAt: str
+
+
+class CreateOwnerVipPackageRequest(BaseModel):
+    title: str = Field(min_length=5, max_length=120)
+    slug: str | None = Field(default=None, max_length=120, pattern=r"^[a-z0-9-]+$")
+    tagline: str | None = Field(default=None, max_length=200)
+    description: str = Field(min_length=50, max_length=5000)
+    packageType: str
+    citySlug: str = Field(min_length=2, max_length=64, pattern=r"^[a-z0-9-]+$")
+    city: str | None = Field(default=None, min_length=2, max_length=80)
+    region: str | None = Field(default=None, max_length=80)
+    priceFromMinor: int = Field(ge=0)
+    heroImageUrl: str | None = Field(default=None, max_length=500)
+    galleryUrls: list[str] = Field(default_factory=list)
+    highlights: list[str] = Field(default_factory=list)
+    conciergeNote: str | None = Field(default=None, max_length=1000)
+    durationDays: int = Field(default=1, ge=1, le=30)
+    maxGuests: int = Field(default=2, ge=1, le=50)
+    submitForReview: bool = False
+
+
+class UpdateOwnerVipPackageRequest(BaseModel):
+    title: str | None = Field(default=None, min_length=5, max_length=120)
+    slug: str | None = Field(default=None, max_length=120, pattern=r"^[a-z0-9-]+$")
+    tagline: str | None = Field(default=None, max_length=200)
+    description: str | None = Field(default=None, min_length=50, max_length=5000)
+    packageType: str | None = None
+    citySlug: str | None = Field(default=None, min_length=2, max_length=64, pattern=r"^[a-z0-9-]+$")
+    city: str | None = Field(default=None, min_length=2, max_length=80)
+    region: str | None = Field(default=None, max_length=80)
+    priceFromMinor: int | None = Field(default=None, ge=0)
+    heroImageUrl: str | None = Field(default=None, max_length=500)
+    galleryUrls: list[str] | None = None
+    highlights: list[str] | None = None
+    conciergeNote: str | None = Field(default=None, max_length=1000)
+    durationDays: int | None = Field(default=None, ge=1, le=30)
+    maxGuests: int | None = Field(default=None, ge=1, le=50)
+    submitForReview: bool = False
+
+
+class OwnerVipPackageSummary(BaseModel):
+    id: str
+    slug: str
+    title: str
+    city: str
+    status: str
+    priceFromMinor: int
+    currencySymbol: str
+    durationDays: int
+    image: str | None = None
+    packageType: str
+
+
+class OwnerVipPackageDetail(BaseModel):
+    id: str
+    slug: str
+    title: str
+    tagline: str | None = None
+    description: str | None = None
+    packageType: str
+    city: str
+    citySlug: str | None = None
+    region: str | None = None
+    priceFromMinor: int
+    status: str
+    heroImageUrl: str | None = None
+    galleryUrls: list[str] = Field(default_factory=list)
+    highlights: list[str] = Field(default_factory=list)
+    conciergeNote: str | None = None
+    durationDays: int = 1
+    maxGuests: int = 2
+    currencyCode: str = "INR"
+    currencySymbol: str = "₹"
+    createdAt: str
+    updatedAt: str
+
+
+class CreateOwnerVipPackageRequest(BaseModel):
+    title: str = Field(min_length=5, max_length=120)
+    slug: str | None = Field(default=None, max_length=120, pattern=r"^[a-z0-9-]+$")
+    tagline: str | None = Field(default=None, max_length=200)
+    description: str = Field(min_length=50, max_length=5000)
+    packageType: str
+    citySlug: str = Field(min_length=2, max_length=64, pattern=r"^[a-z0-9-]+$")
+    city: str | None = Field(default=None, min_length=2, max_length=80)
+    region: str | None = Field(default=None, max_length=80)
+    priceFromMinor: int = Field(ge=0)
+    heroImageUrl: str | None = Field(default=None, max_length=500)
+    galleryUrls: list[str] = Field(default_factory=list)
+    highlights: list[str] = Field(default_factory=list)
+    conciergeNote: str | None = Field(default=None, max_length=1000)
+    durationDays: int = Field(default=1, ge=1, le=30)
+    maxGuests: int = Field(default=2, ge=1, le=50)
+    submitForReview: bool = False
+
+
+class UpdateOwnerVipPackageRequest(BaseModel):
+    title: str | None = Field(default=None, min_length=5, max_length=120)
+    slug: str | None = Field(default=None, max_length=120, pattern=r"^[a-z0-9-]+$")
+    tagline: str | None = Field(default=None, max_length=200)
+    description: str | None = Field(default=None, min_length=50, max_length=5000)
+    packageType: str | None = None
+    citySlug: str | None = Field(default=None, min_length=2, max_length=64, pattern=r"^[a-z0-9-]+$")
+    city: str | None = Field(default=None, min_length=2, max_length=80)
+    region: str | None = Field(default=None, max_length=80)
+    priceFromMinor: int | None = Field(default=None, ge=0)
+    heroImageUrl: str | None = Field(default=None, max_length=500)
+    galleryUrls: list[str] | None = None
+    highlights: list[str] | None = None
+    conciergeNote: str | None = Field(default=None, max_length=1000)
+    durationDays: int | None = Field(default=None, ge=1, le=30)
+    maxGuests: int | None = Field(default=None, ge=1, le=50)
+    submitForReview: bool = False
+
+
 class UpsertOwnerAvailabilityRequest(BaseModel):
     date: str
     roomId: str | None = None
@@ -407,6 +557,64 @@ class AdminHomestayDetail(BaseModel):
 
 class ListAdminHomestaysResponse(BaseModel):
     homestays: list[AdminHomestaySummary]
+
+
+class CreateVipOwnerRequest(BaseModel):
+    fullName: str = Field(min_length=2, max_length=120)
+    email: str
+    password: str = Field(min_length=8, max_length=128)
+    phone: str | None = Field(default=None, max_length=20)
+    address: str | None = Field(default=None, max_length=500)
+
+
+class CreateVipOwnerResponse(BaseModel):
+    id: str
+    email: str
+    fullName: str
+    vipOwnerId: str
+
+
+class AdminVipPackageSummary(BaseModel):
+    id: str
+    slug: str
+    title: str
+    city: str
+    status: str
+    ownerName: str
+    createdAt: str
+    packageType: str
+
+
+class AdminVipPackageDetail(BaseModel):
+    id: str
+    slug: str
+    title: str
+    tagline: str | None = None
+    description: str | None = None
+    packageType: str
+    city: str
+    citySlug: str | None = None
+    region: str | None = None
+    priceFromMinor: int
+    status: str
+    heroImageUrl: str | None = None
+    galleryUrls: list[str] = Field(default_factory=list)
+    highlights: list[str] = Field(default_factory=list)
+    conciergeNote: str | None = None
+    durationDays: int = 1
+    maxGuests: int = 2
+    currencyCode: str = "INR"
+    currencySymbol: str = "₹"
+    createdAt: str
+    updatedAt: str
+    ownerName: str
+    ownerEmail: str | None = None
+    ownerPhone: str | None = None
+    ownerVerified: bool = False
+
+
+class ListAdminVipPackagesResponse(BaseModel):
+    packages: list[AdminVipPackageSummary]
 
 
 class CreateBookingRequest(BaseModel):

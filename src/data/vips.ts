@@ -1,141 +1,180 @@
 import { HOMESTAY_IMG } from "@/lib/homestay-home-content";
 
-export const VIP_PROPERTY_TYPES = [
-  "Palace Suite",
-  "Private Villa",
-  "Royal Retreat",
-  "Heritage Mansion",
-  "Luxury Suite",
+export const VIP_PACKAGE_TYPES = [
+  "Palace Experience",
+  "Heritage Circuit",
+  "Wellness Retreat",
+  "Culinary Journey",
+  "Private Celebration",
 ] as const;
 
-export type VipPropertyType = (typeof VIP_PROPERTY_TYPES)[number];
+export type VipPackageType = (typeof VIP_PACKAGE_TYPES)[number];
 
-export type VipAmenity =
-  | "WiFi"
-  | "Pool"
-  | "Parking"
-  | "Kitchen"
-  | "AC"
-  | "TV"
-  | "Garden"
-  | "Security"
-  | "Breakfast"
-  | "Butler"
-  | "Spa"
-  | "Private Chef";
-
-export type VipRoom = {
-  id: string;
-  name: string;
-  category?: string;
-  capacity: number;
-  pricePerNight: number;
-  totalUnits: number;
-  amenities?: string[];
+export type VipPackageDay = {
+  day: number;
+  title: string;
+  detail: string;
 };
 
-export type VipStay = {
+export type VipPackage = {
   id: string;
   slug: string;
   title: string;
   tagline: string;
   description: string;
-  propertyType: VipPropertyType;
+  packageType: VipPackageType;
   city: string;
   region?: string;
-  address: string;
-  mapLink?: string;
-  pricePerNight: number;
+  priceFrom: number;
   currencySymbol?: string;
+  durationDays: number;
   rating: number;
   reviewsCount: number;
   image: string;
   galleryUrls?: string[];
-  amenities: VipAmenity[];
-  bedrooms: number;
-  bathrooms: number;
+  highlights: string[];
+  itinerary: VipPackageDay[];
+  goodToKnow?: string[];
   maxGuests: number;
-  checkInTime: string;
-  checkOutTime: string;
-  houseRules?: string[];
-  rooms?: VipRoom[];
   conciergeNote?: string;
 };
 
-export const vips: VipStay[] = [
+export const vips: VipPackage[] = [
   {
     id: "vip-001",
-    slug: "maharaja-palace-suite",
-    title: "Maharaja Palace Suite",
-    tagline: "Private wing with palace views and dedicated concierge",
+    slug: "maharaja-palace-experience",
+    title: "Maharaja Palace Experience",
+    tagline: "Private palace access, heritage lunch, and evening light & sound",
     description:
-      "An exclusive suite within walking distance of Mysuru Palace. Marble interiors, private courtyard dining, and a Royal Passage concierge for every detail of your stay.",
-    propertyType: "Palace Suite",
+      "A two-day immersion in Mysuru's royal heart. Your Royal Passage concierge handles palace entry, a curated heritage lunch, and reserved seating for the evening light and sound show — with private transfers throughout.",
+    packageType: "Palace Experience",
     city: "Mysuru",
     region: "Karnataka",
-    address: "Palace Road, Mysuru",
-    pricePerNight: 18500,
+    priceFrom: 28500,
     currencySymbol: "₹",
+    durationDays: 2,
     rating: 4.9,
     reviewsCount: 28,
     image: HOMESTAY_IMG.heritageExterior,
     galleryUrls: [HOMESTAY_IMG.heritageExterior, HOMESTAY_IMG.suiteInterior],
-    amenities: ["WiFi", "Breakfast", "Butler", "Spa", "Parking", "AC"],
-    bedrooms: 2,
-    bathrooms: 2,
+    highlights: [
+      "Private palace guide and skip-the-line entry",
+      "Heritage lunch at a royal-era venue",
+      "Light & sound show with reserved seating",
+      "Door-to-door transfers in Mysuru",
+      "Dedicated Royal Passage concierge on call",
+    ],
+    itinerary: [
+      {
+        day: 1,
+        title: "Palace & city arrival",
+        detail:
+          "Private pickup from your hotel or station. Guided tour of Mysuru Palace with reserved entry, followed by a heritage lunch. Afternoon at leisure or optional Devaraja Market walk with your concierge.",
+      },
+      {
+        day: 2,
+        title: "Royal evening",
+        detail:
+          "Late afternoon transfer to the palace grounds. Reserved seating for the light and sound show, then return transfer. Concierge confirms exact show timings with your group in advance.",
+      },
+    ],
+    goodToKnow: [
+      "Package price is per group (up to 4 guests) unless noted otherwise by concierge.",
+      "Palace entry rules and camera policies apply on the day.",
+      "Book at least 4 days before travel; Mysuru packages only.",
+    ],
     maxGuests: 4,
-    checkInTime: "15:00",
-    checkOutTime: "12:00",
-    houseRules: ["Adults preferred", "No events without approval"],
-    conciergeNote: "Airport transfers and palace entry can be arranged on request.",
+    conciergeNote: "Dates and palace timings are confirmed with your concierge after enquiry.",
   },
   {
     id: "vip-002",
-    slug: "chamundi-royal-villa",
-    title: "Chamundi Royal Villa",
-    tagline: "Hilltop villa with infinity pool and private chef",
+    slug: "chamundi-wellness-retreat",
+    title: "Chamundi Wellness Retreat",
+    tagline: "Hilltop spa day with private chef dinner and sunset views",
     description:
-      "A gated villa overlooking Chamundi Hills with panoramic views, heated pool, and in-villa dining by a private chef. Ideal for families and small groups seeking complete privacy.",
-    propertyType: "Private Villa",
+      "A full-day wellness package on Chamundi Hills: guided spa rituals, a chef-curated dinner with panoramic views, and a dedicated host for your group. Ideal for couples and small families seeking calm and privacy.",
+    packageType: "Wellness Retreat",
     city: "Mysuru",
     region: "Karnataka",
-    address: "Chamundi Hills, Mysuru",
-    pricePerNight: 32000,
+    priceFrom: 42000,
     currencySymbol: "₹",
+    durationDays: 1,
     rating: 5,
     reviewsCount: 14,
     image: HOMESTAY_IMG.villaExterior,
     galleryUrls: [HOMESTAY_IMG.villaExterior, HOMESTAY_IMG.suiteInterior],
-    amenities: ["WiFi", "Pool", "Private Chef", "Garden", "Parking", "Security"],
-    bedrooms: 4,
-    bathrooms: 4,
+    highlights: [
+      "Private spa and wellness session",
+      "Sunset dinner with in-house chef",
+      "Chauffeured hill transfers",
+      "Photography stop at Chamundi viewpoint",
+      "Dietary preferences noted before your visit",
+    ],
+    itinerary: [
+      {
+        day: 1,
+        title: "Hill wellness day",
+        detail:
+          "Morning pickup and scenic drive to Chamundi Hills. Private wellness session, light lunch, and time to enjoy the viewpoint. Chef-curated sunset dinner with hill views, then return transfer to Mysuru.",
+      },
+    ],
+    goodToKnow: [
+      "Share any wellness or dietary restrictions when you enquire.",
+      "Comfortable clothing recommended for spa and hill weather.",
+      "Book at least 4 days before travel; Mysuru packages only.",
+    ],
     maxGuests: 8,
-    checkInTime: "14:00",
-    checkOutTime: "11:00",
-    conciergeNote: "Chef menus and wellness sessions available on request.",
+    conciergeNote: "Chef menus and add-on wellness sessions can be tailored on request.",
   },
   {
     id: "vip-003",
-    slug: "heritage-mansion-retreat",
-    title: "Heritage Mansion Retreat",
-    tagline: "Restored mansion with art collection and wine cellar",
+    slug: "heritage-craft-immersion",
+    title: "Heritage & Craft Immersion",
+    tagline: "Artisan workshops, mansion tastings, and curated city walks",
     description:
-      "A century-old mansion converted into an intimate VIP retreat. Curated art, heritage library, and a sommelier-curated cellar for evening tastings with your host.",
-    propertyType: "Heritage Mansion",
+      "Three days of Mysuru's living heritage: private artisan workshops, a sommelier-led tasting in a restored mansion, and guided walks through Lakshmipuram and Devaraja Market — all orchestrated by your Royal Passage concierge.",
+    packageType: "Heritage Circuit",
     city: "Mysuru",
     region: "Karnataka",
-    address: "Lakshmipuram, Mysuru",
-    pricePerNight: 24000,
+    priceFrom: 56000,
     currencySymbol: "₹",
+    durationDays: 3,
     rating: 4.8,
     reviewsCount: 19,
     image: HOMESTAY_IMG.suiteInterior,
     galleryUrls: [HOMESTAY_IMG.suiteInterior, HOMESTAY_IMG.heritageExterior],
-    amenities: ["WiFi", "Breakfast", "Butler", "Garden", "AC", "TV"],
-    bedrooms: 3,
-    bathrooms: 3,
+    highlights: [
+      "Hands-on silk and sandalwood workshops",
+      "Heritage mansion wine & spice tasting",
+      "Private city walks with local historians",
+      "All workshop materials included",
+      "Transfers between venues each day",
+    ],
+    itinerary: [
+      {
+        day: 1,
+        title: "Artisan Mysuru",
+        detail:
+          "Private silk weaving and sandalwood carving workshops with master artisans. Lunch at a heritage café. Return transfer with time to rest before evening.",
+      },
+      {
+        day: 2,
+        title: "Mansion & flavours",
+        detail:
+          "Guided walk through Lakshmipuram. Afternoon sommelier-led tasting in a restored mansion — spices, local wines, and paired bites. Concierge handles all venue access.",
+      },
+      {
+        day: 3,
+        title: "Market & memories",
+        detail:
+          "Early Devaraja Market tour with a local guide, flower and produce highlights, and farewell coffee. Optional add-ons available through your concierge.",
+      },
+    ],
+    goodToKnow: [
+      "Workshop venues may vary slightly by artisan availability.",
+      "Walking shoes recommended for city and market segments.",
+      "Book at least 4 days before travel; Mysuru packages only.",
+    ],
     maxGuests: 6,
-    checkInTime: "14:00",
-    checkOutTime: "11:00",
   },
 ];

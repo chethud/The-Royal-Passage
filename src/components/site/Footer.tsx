@@ -16,7 +16,6 @@ const quickLinks = [
   { label: "Experiences", to: "/experiences" },
   { label: "Homestays", to: "/homestays" },
   { label: "Curated Journeys", to: "/experiences" },
-  { label: "About Us", to: "/hosts" },
   { label: "Gallery", to: "/experiences" },
   { label: "Journal", to: "/journal" },
   { label: "Contact", to: "/contact" },

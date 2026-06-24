@@ -1097,6 +1097,32 @@ class CreateHomestayOwnerResponse(_message.Message):
     homestay_owner_id: str
     def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., homestay_owner_id: _Optional[str] = ...) -> None: ...
 
+class CreateVipOwnerRequest(_message.Message):
+    __slots__ = ("full_name", "email", "password", "phone", "address")
+    FULL_NAME_FIELD_NUMBER: _ClassVar[int]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    PASSWORD_FIELD_NUMBER: _ClassVar[int]
+    PHONE_FIELD_NUMBER: _ClassVar[int]
+    ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    full_name: str
+    email: str
+    password: str
+    phone: str
+    address: str
+    def __init__(self, full_name: _Optional[str] = ..., email: _Optional[str] = ..., password: _Optional[str] = ..., phone: _Optional[str] = ..., address: _Optional[str] = ...) -> None: ...
+
+class CreateVipOwnerResponse(_message.Message):
+    __slots__ = ("id", "email", "full_name", "vip_owner_id")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    FULL_NAME_FIELD_NUMBER: _ClassVar[int]
+    VIP_OWNER_ID_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    email: str
+    full_name: str
+    vip_owner_id: str
+    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., vip_owner_id: _Optional[str] = ...) -> None: ...
+
 class CreateHomestayBookingRequest(_message.Message):
     __slots__ = ("homestay_id", "room_id", "check_in", "check_out", "guest_count", "notes", "room_count", "extra_bed_count")
     HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
@@ -1612,3 +1638,231 @@ class ListAdminHomestaysResponse(_message.Message):
     HOMESTAYS_FIELD_NUMBER: _ClassVar[int]
     homestays: _containers.RepeatedCompositeFieldContainer[AdminHomestaySummary]
     def __init__(self, homestays: _Optional[_Iterable[_Union[AdminHomestaySummary, _Mapping]]] = ...) -> None: ...
+
+class AdminVipPackageSummary(_message.Message):
+    __slots__ = ("id", "slug", "title", "city", "status", "owner_name", "created_at", "package_type")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    SLUG_FIELD_NUMBER: _ClassVar[int]
+    TITLE_FIELD_NUMBER: _ClassVar[int]
+    CITY_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    OWNER_NAME_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    PACKAGE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    slug: str
+    title: str
+    city: str
+    status: str
+    owner_name: str
+    created_at: str
+    package_type: str
+    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., city: _Optional[str] = ..., status: _Optional[str] = ..., owner_name: _Optional[str] = ..., created_at: _Optional[str] = ..., package_type: _Optional[str] = ...) -> None: ...
+
+class AdminVipPackageDetail(_message.Message):
+    __slots__ = ("id", "slug", "title", "tagline", "description", "package_type", "city", "city_slug", "region", "price_from_minor", "status", "hero_image_url", "gallery_urls", "highlights", "concierge_note", "duration_days", "max_guests", "currency_code", "currency_symbol", "created_at", "updated_at", "owner_name", "owner_email", "owner_phone", "owner_verified")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    SLUG_FIELD_NUMBER: _ClassVar[int]
+    TITLE_FIELD_NUMBER: _ClassVar[int]
+    TAGLINE_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    PACKAGE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    CITY_FIELD_NUMBER: _ClassVar[int]
+    CITY_SLUG_FIELD_NUMBER: _ClassVar[int]
+    REGION_FIELD_NUMBER: _ClassVar[int]
+    PRICE_FROM_MINOR_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    HERO_IMAGE_URL_FIELD_NUMBER: _ClassVar[int]
+    GALLERY_URLS_FIELD_NUMBER: _ClassVar[int]
+    HIGHLIGHTS_FIELD_NUMBER: _ClassVar[int]
+    CONCIERGE_NOTE_FIELD_NUMBER: _ClassVar[int]
+    DURATION_DAYS_FIELD_NUMBER: _ClassVar[int]
+    MAX_GUESTS_FIELD_NUMBER: _ClassVar[int]
+    CURRENCY_CODE_FIELD_NUMBER: _ClassVar[int]
+    CURRENCY_SYMBOL_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
+    OWNER_NAME_FIELD_NUMBER: _ClassVar[int]
+    OWNER_EMAIL_FIELD_NUMBER: _ClassVar[int]
+    OWNER_PHONE_FIELD_NUMBER: _ClassVar[int]
+    OWNER_VERIFIED_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    slug: str
+    title: str
+    tagline: str
+    description: str
+    package_type: str
+    city: str
+    city_slug: str
+    region: str
+    price_from_minor: int
+    status: str
+    hero_image_url: str
+    gallery_urls: _containers.RepeatedScalarFieldContainer[str]
+    highlights: _containers.RepeatedScalarFieldContainer[str]
+    concierge_note: str
+    duration_days: int
+    max_guests: int
+    currency_code: str
+    currency_symbol: str
+    created_at: str
+    updated_at: str
+    owner_name: str
+    owner_email: str
+    owner_phone: str
+    owner_verified: bool
+    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., package_type: _Optional[str] = ..., city: _Optional[str] = ..., city_slug: _Optional[str] = ..., region: _Optional[str] = ..., price_from_minor: _Optional[int] = ..., status: _Optional[str] = ..., hero_image_url: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., highlights: _Optional[_Iterable[str]] = ..., concierge_note: _Optional[str] = ..., duration_days: _Optional[int] = ..., max_guests: _Optional[int] = ..., currency_code: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ..., owner_name: _Optional[str] = ..., owner_email: _Optional[str] = ..., owner_phone: _Optional[str] = ..., owner_verified: _Optional[bool] = ...) -> None: ...
+
+class ListAdminVipPackagesResponse(_message.Message):
+    __slots__ = ("packages",)
+    PACKAGES_FIELD_NUMBER: _ClassVar[int]
+    packages: _containers.RepeatedCompositeFieldContainer[AdminVipPackageSummary]
+    def __init__(self, packages: _Optional[_Iterable[_Union[AdminVipPackageSummary, _Mapping]]] = ...) -> None: ...
+
+class OwnerVipPackageSummary(_message.Message):
+    __slots__ = ("id", "slug", "title", "city", "status", "price_from_minor", "currency_symbol", "duration_days", "image", "package_type")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    SLUG_FIELD_NUMBER: _ClassVar[int]
+    TITLE_FIELD_NUMBER: _ClassVar[int]
+    CITY_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    PRICE_FROM_MINOR_FIELD_NUMBER: _ClassVar[int]
+    CURRENCY_SYMBOL_FIELD_NUMBER: _ClassVar[int]
+    DURATION_DAYS_FIELD_NUMBER: _ClassVar[int]
+    IMAGE_FIELD_NUMBER: _ClassVar[int]
+    PACKAGE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    slug: str
+    title: str
+    city: str
+    status: str
+    price_from_minor: int
+    currency_symbol: str
+    duration_days: int
+    image: str
+    package_type: str
+    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., city: _Optional[str] = ..., status: _Optional[str] = ..., price_from_minor: _Optional[int] = ..., currency_symbol: _Optional[str] = ..., duration_days: _Optional[int] = ..., image: _Optional[str] = ..., package_type: _Optional[str] = ...) -> None: ...
+
+class OwnerVipPackageDetail(_message.Message):
+    __slots__ = ("id", "slug", "title", "tagline", "description", "package_type", "city", "city_slug", "region", "price_from_minor", "status", "hero_image_url", "gallery_urls", "highlights", "concierge_note", "duration_days", "max_guests", "currency_code", "currency_symbol", "created_at", "updated_at")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    SLUG_FIELD_NUMBER: _ClassVar[int]
+    TITLE_FIELD_NUMBER: _ClassVar[int]
+    TAGLINE_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    PACKAGE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    CITY_FIELD_NUMBER: _ClassVar[int]
+    CITY_SLUG_FIELD_NUMBER: _ClassVar[int]
+    REGION_FIELD_NUMBER: _ClassVar[int]
+    PRICE_FROM_MINOR_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    HERO_IMAGE_URL_FIELD_NUMBER: _ClassVar[int]
+    GALLERY_URLS_FIELD_NUMBER: _ClassVar[int]
+    HIGHLIGHTS_FIELD_NUMBER: _ClassVar[int]
+    CONCIERGE_NOTE_FIELD_NUMBER: _ClassVar[int]
+    DURATION_DAYS_FIELD_NUMBER: _ClassVar[int]
+    MAX_GUESTS_FIELD_NUMBER: _ClassVar[int]
+    CURRENCY_CODE_FIELD_NUMBER: _ClassVar[int]
+    CURRENCY_SYMBOL_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    slug: str
+    title: str
+    tagline: str
+    description: str
+    package_type: str
+    city: str
+    city_slug: str
+    region: str
+    price_from_minor: int
+    status: str
+    hero_image_url: str
+    gallery_urls: _containers.RepeatedScalarFieldContainer[str]
+    highlights: _containers.RepeatedScalarFieldContainer[str]
+    concierge_note: str
+    duration_days: int
+    max_guests: int
+    currency_code: str
+    currency_symbol: str
+    created_at: str
+    updated_at: str
+    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., package_type: _Optional[str] = ..., city: _Optional[str] = ..., city_slug: _Optional[str] = ..., region: _Optional[str] = ..., price_from_minor: _Optional[int] = ..., status: _Optional[str] = ..., hero_image_url: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., highlights: _Optional[_Iterable[str]] = ..., concierge_note: _Optional[str] = ..., duration_days: _Optional[int] = ..., max_guests: _Optional[int] = ..., currency_code: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ...) -> None: ...
+
+class ListOwnerVipPackagesResponse(_message.Message):
+    __slots__ = ("packages",)
+    PACKAGES_FIELD_NUMBER: _ClassVar[int]
+    packages: _containers.RepeatedCompositeFieldContainer[OwnerVipPackageSummary]
+    def __init__(self, packages: _Optional[_Iterable[_Union[OwnerVipPackageSummary, _Mapping]]] = ...) -> None: ...
+
+class CreateOwnerVipPackageRequest(_message.Message):
+    __slots__ = ("title", "slug", "tagline", "description", "package_type", "city_slug", "city", "region", "price_from_minor", "hero_image_url", "gallery_urls", "highlights", "concierge_note", "duration_days", "max_guests", "submit_for_review")
+    TITLE_FIELD_NUMBER: _ClassVar[int]
+    SLUG_FIELD_NUMBER: _ClassVar[int]
+    TAGLINE_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    PACKAGE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    CITY_SLUG_FIELD_NUMBER: _ClassVar[int]
+    CITY_FIELD_NUMBER: _ClassVar[int]
+    REGION_FIELD_NUMBER: _ClassVar[int]
+    PRICE_FROM_MINOR_FIELD_NUMBER: _ClassVar[int]
+    HERO_IMAGE_URL_FIELD_NUMBER: _ClassVar[int]
+    GALLERY_URLS_FIELD_NUMBER: _ClassVar[int]
+    HIGHLIGHTS_FIELD_NUMBER: _ClassVar[int]
+    CONCIERGE_NOTE_FIELD_NUMBER: _ClassVar[int]
+    DURATION_DAYS_FIELD_NUMBER: _ClassVar[int]
+    MAX_GUESTS_FIELD_NUMBER: _ClassVar[int]
+    SUBMIT_FOR_REVIEW_FIELD_NUMBER: _ClassVar[int]
+    title: str
+    slug: str
+    tagline: str
+    description: str
+    package_type: str
+    city_slug: str
+    city: str
+    region: str
+    price_from_minor: int
+    hero_image_url: str
+    gallery_urls: _containers.RepeatedScalarFieldContainer[str]
+    highlights: _containers.RepeatedScalarFieldContainer[str]
+    concierge_note: str
+    duration_days: int
+    max_guests: int
+    submit_for_review: bool
+    def __init__(self, title: _Optional[str] = ..., slug: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., package_type: _Optional[str] = ..., city_slug: _Optional[str] = ..., city: _Optional[str] = ..., region: _Optional[str] = ..., price_from_minor: _Optional[int] = ..., hero_image_url: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., highlights: _Optional[_Iterable[str]] = ..., concierge_note: _Optional[str] = ..., duration_days: _Optional[int] = ..., max_guests: _Optional[int] = ..., submit_for_review: _Optional[bool] = ...) -> None: ...
+
+class UpdateOwnerVipPackageRequest(_message.Message):
+    __slots__ = ("title", "slug", "tagline", "description", "package_type", "city_slug", "city", "region", "price_from_minor", "hero_image_url", "gallery_urls", "highlights", "concierge_note", "duration_days", "max_guests", "submit_for_review")
+    TITLE_FIELD_NUMBER: _ClassVar[int]
+    SLUG_FIELD_NUMBER: _ClassVar[int]
+    TAGLINE_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    PACKAGE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    CITY_SLUG_FIELD_NUMBER: _ClassVar[int]
+    CITY_FIELD_NUMBER: _ClassVar[int]
+    REGION_FIELD_NUMBER: _ClassVar[int]
+    PRICE_FROM_MINOR_FIELD_NUMBER: _ClassVar[int]
+    HERO_IMAGE_URL_FIELD_NUMBER: _ClassVar[int]
+    GALLERY_URLS_FIELD_NUMBER: _ClassVar[int]
+    HIGHLIGHTS_FIELD_NUMBER: _ClassVar[int]
+    CONCIERGE_NOTE_FIELD_NUMBER: _ClassVar[int]
+    DURATION_DAYS_FIELD_NUMBER: _ClassVar[int]
+    MAX_GUESTS_FIELD_NUMBER: _ClassVar[int]
+    SUBMIT_FOR_REVIEW_FIELD_NUMBER: _ClassVar[int]
+    title: str
+    slug: str
+    tagline: str
+    description: str
+    package_type: str
+    city_slug: str
+    city: str
+    region: str
+    price_from_minor: int
+    hero_image_url: str
+    gallery_urls: _containers.RepeatedScalarFieldContainer[str]
+    highlights: _containers.RepeatedScalarFieldContainer[str]
+    concierge_note: str
+    duration_days: int
+    max_guests: int
+    submit_for_review: bool
+    def __init__(self, title: _Optional[str] = ..., slug: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., package_type: _Optional[str] = ..., city_slug: _Optional[str] = ..., city: _Optional[str] = ..., region: _Optional[str] = ..., price_from_minor: _Optional[int] = ..., hero_image_url: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., highlights: _Optional[_Iterable[str]] = ..., concierge_note: _Optional[str] = ..., duration_days: _Optional[int] = ..., max_guests: _Optional[int] = ..., submit_for_review: _Optional[bool] = ...) -> None: ...

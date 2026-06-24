@@ -46,7 +46,7 @@ function buildSitemapXml(entries: { loc: string }[]) {
 
 export default async function sitemapHandler(_req: VercelRequest, res: VercelResponse) {
   const siteUrl = resolveSiteUrl();
-  const staticPaths = ["/", "/experiences", "/cities", "/contact", "/hosts", "/journal"];
+  const staticPaths = ["/", "/experiences", "/cities", "/contact", "/journal"];
   const experienceSlugs = await fetchExperienceSlugs();
 
   const entries = [

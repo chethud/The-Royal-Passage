@@ -2,10 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Crown } from "lucide-react";
 import { motion } from "motion/react";
 import { VipCard } from "@/components/vips/VipCard";
-import type { VipStay } from "@/data/vips";
+import { VipsCustomPackageCta } from "@/components/vips/VipsCustomPackageCta";
+import type { VipPackage } from "@/data/vips";
 
 type VipsShowcaseProps = {
-  vips?: VipStay[];
+  vips?: VipPackage[];
 };
 
 export function VipsShowcase({ vips = [] }: VipsShowcaseProps) {
@@ -25,18 +26,18 @@ export function VipsShowcase({ vips = [] }: VipsShowcaseProps) {
               Royal VIP
             </p>
             <h2 className="font-display text-3xl tracking-tight text-ink text-balance sm:text-4xl md:text-5xl">
-              Stays Beyond the Ordinary
+              Packages Beyond the Ordinary
             </h2>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Palace suites, private villas, and heritage mansions with dedicated concierge —
-              curated for guests who expect the exceptional.
+              Curated palace experiences, heritage circuits, and wellness retreats — Mysuru only, with
+              bookings from 4 days ahead. Custom packages available on request.
             </p>
           </div>
           <Link
             to="/vips/browse"
             className="group inline-flex items-center gap-2 self-start rounded-sm text-xs font-semibold uppercase tracking-[0.22em] text-ember transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:self-auto"
           >
-            Explore VIP stays
+            View all packages
             <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
@@ -48,10 +49,12 @@ export function VipsShowcase({ vips = [] }: VipsShowcaseProps) {
           transition={{ duration: 0.55 }}
           className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2 md:grid-cols-3 md:gap-7"
         >
-          {featured.map((stay) => (
-            <VipCard key={stay.id} stay={stay} />
+          {featured.map((pkg) => (
+            <VipCard key={pkg.id} pkg={pkg} />
           ))}
         </motion.div>
+
+        <VipsCustomPackageCta className="mt-12 sm:mt-14" compact />
       </div>
     </section>
   );

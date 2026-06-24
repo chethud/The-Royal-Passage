@@ -24,7 +24,7 @@ const modules = [
     to: "/vips",
     homeAnchor: "#vips",
     icon: Crown,
-    description: "Palace suites & private villas",
+    description: "Curated packages & bespoke itineraries",
   },
 ] as const;
 

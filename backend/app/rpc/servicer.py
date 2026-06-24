@@ -13,7 +13,7 @@ from royalpassage.v1.service_connect import RoyalPassageService
 
 from app.config import settings
 from app.models import schemas as s
-from app.rpc.auth import require_admin, require_guest, require_host, require_homestay_owner, resolve_current_user
+from app.rpc.auth import require_admin, require_guest, require_host, require_homestay_owner, require_vip_owner, resolve_current_user
 from app.rpc.converters import proto_to_pydantic, pydantic_to_proto
 from app.services.admin_analytics import get_admin_stats, list_admin_activity, list_admin_bookings
 from app.services.admin_homestays import (
@@ -21,6 +21,12 @@ from app.services.admin_homestays import (
     list_admin_homestays,
     publish_homestay,
     reject_homestay,
+)
+from app.services.admin_vip_packages import (
+    get_admin_vip_package,
+    list_admin_vip_packages,
+    publish_vip_package,
+    reject_vip_package,
 )
 from app.services.admin_experiences import (
     get_admin_experience,
@@ -36,6 +42,7 @@ from app.services.homestay_bookings import (
     list_guest_homestay_bookings,
 )
 from app.services.homestay_owners import create_homestay_owner_account
+from app.services.vip_owners import create_vip_owner_account
 from app.services.owner_homestay_bookings import (
     complete_owner_homestay_booking,
     confirm_owner_homestay_booking,
@@ -44,6 +51,12 @@ from app.services.owner_homestay_bookings import (
     list_owner_homestay_bookings,
     mark_owner_homestay_booking_paid,
     reject_owner_homestay_booking,
+)
+from app.services.owner_vip_packages import (
+    create_owner_vip_package,
+    get_owner_vip_package,
+    list_owner_vip_packages,
+    update_owner_vip_package,
 )
 from app.services.owner_homestays import (
     create_owner_homestay,
@@ -391,6 +404,48 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         )
 
     @_rpc
+    async def list_owner_vip_packages(
+        self, _request: empty_pb2.Empty, ctx: RequestContext
+    ) -> types_pb2.ListOwnerVipPackagesResponse:
+        _ensure_supabase()
+        auth = require_vip_owner(ctx)
+        packages = list_owner_vip_packages(auth)
+        return types_pb2.ListOwnerVipPackagesResponse(
+            packages=[pydantic_to_proto(pkg, types_pb2.OwnerVipPackageSummary) for pkg in packages]
+        )
+
+    @_rpc
+    async def create_owner_vip_package(
+        self, request: types_pb2.CreateOwnerVipPackageRequest, ctx: RequestContext
+    ) -> types_pb2.OwnerVipPackageDetail:
+        _ensure_supabase()
+        auth = require_vip_owner(ctx)
+        payload = proto_to_pydantic(request, s.CreateOwnerVipPackageRequest)
+        return pydantic_to_proto(create_owner_vip_package(auth, payload), types_pb2.OwnerVipPackageDetail)
+
+    @_rpc
+    async def get_owner_vip_package(
+        self, request: service_pb2.GetOwnerVipPackageRequest, ctx: RequestContext
+    ) -> types_pb2.OwnerVipPackageDetail:
+        _ensure_supabase()
+        auth = require_vip_owner(ctx)
+        return pydantic_to_proto(
+            get_owner_vip_package(auth, request.package_id), types_pb2.OwnerVipPackageDetail
+        )
+
+    @_rpc
+    async def update_owner_vip_package(
+        self, request: service_pb2.UpdateOwnerVipPackageInput, ctx: RequestContext
+    ) -> types_pb2.OwnerVipPackageDetail:
+        _ensure_supabase()
+        auth = require_vip_owner(ctx)
+        payload = proto_to_pydantic(request.package, s.UpdateOwnerVipPackageRequest)
+        return pydantic_to_proto(
+            update_owner_vip_package(auth, request.package_id, payload),
+            types_pb2.OwnerVipPackageDetail,
+        )
+
+    @_rpc
     async def create_booking(
         self, request: types_pb2.CreateBookingRequest, ctx: RequestContext
     ) -> types_pb2.CreateBookingResponse:
@@ -716,6 +771,18 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         )
 
     @_rpc
+    async def create_vip_owner(
+        self, request: types_pb2.CreateVipOwnerRequest, ctx: RequestContext
+    ) -> types_pb2.CreateVipOwnerResponse:
+        _ensure_supabase()
+        require_admin(ctx)
+        payload = proto_to_pydantic(request, s.CreateVipOwnerRequest)
+        return pydantic_to_proto(
+            create_vip_owner_account(payload),
+            types_pb2.CreateVipOwnerResponse,
+        )
+
+    @_rpc
     async def list_admin_experiences(
         self, _request: empty_pb2.Empty, ctx: RequestContext
     ) -> types_pb2.ListAdminExperiencesResponse:
@@ -789,6 +856,45 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         _ensure_supabase()
         require_admin(ctx)
         return pydantic_to_proto(reject_homestay(request.homestay_id), types_pb2.AdminHomestaySummary)
+
+    @_rpc
+    async def list_admin_vip_packages(
+        self, _request: empty_pb2.Empty, ctx: RequestContext
+    ) -> types_pb2.ListAdminVipPackagesResponse:
+        _ensure_supabase()
+        require_admin(ctx)
+        result = list_admin_vip_packages()
+        return types_pb2.ListAdminVipPackagesResponse(
+            packages=[pydantic_to_proto(p, types_pb2.AdminVipPackageSummary) for p in result.packages]
+        )
+
+    @_rpc
+    async def get_admin_vip_package(
+        self, request: service_pb2.AdminVipPackageActionRequest, ctx: RequestContext
+    ) -> types_pb2.AdminVipPackageDetail:
+        _ensure_supabase()
+        require_admin(ctx)
+        return pydantic_to_proto(
+            get_admin_vip_package(request.package_id), types_pb2.AdminVipPackageDetail
+        )
+
+    @_rpc
+    async def publish_vip_package(
+        self, request: service_pb2.AdminVipPackageActionRequest, ctx: RequestContext
+    ) -> types_pb2.AdminVipPackageSummary:
+        _ensure_supabase()
+        auth = require_admin(ctx)
+        result = publish_vip_package(request.package_id)
+        log_audit(auth["user"].id, "vip_package_published", "vip_package", request.package_id, {})
+        return pydantic_to_proto(result, types_pb2.AdminVipPackageSummary)
+
+    @_rpc
+    async def reject_vip_package(
+        self, request: service_pb2.AdminVipPackageActionRequest, ctx: RequestContext
+    ) -> types_pb2.AdminVipPackageSummary:
+        _ensure_supabase()
+        require_admin(ctx)
+        return pydantic_to_proto(reject_vip_package(request.package_id), types_pb2.AdminVipPackageSummary)
 
     @_rpc
     async def list_experience_reviews(

@@ -1,4 +1,4 @@
-export type AdminModule = "experiences" | "homestays";
+export type AdminModule = "experiences" | "homestays" | "vip";
 
 export const ADMIN_EXPERIENCE_NAV_ITEMS = [
   { to: "/admin", label: "Overview" },
@@ -17,10 +17,25 @@ export const ADMIN_HOMESTAY_NAV_ITEMS = [
   { to: "/homestays", label: "Live catalog" },
 ] as const;
 
+export const ADMIN_VIP_NAV_ITEMS = [
+  { to: "/admin/vip", label: "Overview" },
+  { to: "/admin/vip-packages", label: "Approve packages" },
+  { to: "/admin/vip-owners", label: "VIP owners" },
+  { to: "/vips", label: "Live catalog" },
+] as const;
+
 /** @deprecated Use adminNavItemsForModule(resolveAdminModule(pathname)) instead. */
 export const ADMIN_NAV_ITEMS = ADMIN_EXPERIENCE_NAV_ITEMS;
 
 export function resolveAdminModule(pathname: string): AdminModule {
+  if (
+    pathname === "/admin/vip" ||
+    pathname.startsWith("/admin/vip/") ||
+    pathname.startsWith("/admin/vip-packages") ||
+    pathname.startsWith("/admin/vip-owners")
+  ) {
+    return "vip";
+  }
   if (
     pathname === "/admin/homestay" ||
     pathname.startsWith("/admin/homestay/") ||
@@ -33,15 +48,24 @@ export function resolveAdminModule(pathname: string): AdminModule {
 }
 
 export function adminModuleHome(module: AdminModule): string {
-  return module === "homestays" ? "/admin/homestay" : "/admin";
+  if (module === "homestays") return "/admin/homestay";
+  if (module === "vip") return "/admin/vip";
+  return "/admin";
 }
 
 export function adminModuleLabel(module: AdminModule): string {
-  return module === "homestays" ? "Homestays admin" : "Experiences admin";
+  if (module === "homestays") return "Homestays admin";
+  if (module === "vip") return "VIP admin";
+  return "Experiences admin";
 }
 
 export function adminNavItemsForModule(module: AdminModule) {
-  const items = module === "homestays" ? ADMIN_HOMESTAY_NAV_ITEMS : ADMIN_EXPERIENCE_NAV_ITEMS;
+  const items =
+    module === "homestays"
+      ? ADMIN_HOMESTAY_NAV_ITEMS
+      : module === "vip"
+        ? ADMIN_VIP_NAV_ITEMS
+        : ADMIN_EXPERIENCE_NAV_ITEMS;
   return items.map((item) => ({ label: item.label, to: item.to }));
 }
 
@@ -51,6 +75,9 @@ export function isAdminNavItemActive(pathname: string, to: string): boolean {
   }
   if (to === "/admin/homestay") {
     return pathname === "/admin/homestay" || pathname === "/admin/homestay/";
+  }
+  if (to === "/admin/vip") {
+    return pathname === "/admin/vip" || pathname === "/admin/vip/";
   }
   return pathname === to || pathname.startsWith(`${to}/`);
 }

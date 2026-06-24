@@ -21,13 +21,13 @@ function VipOwnerBookingsPage() {
   return (
     <VipOwnerDashboardShell
       title="Bookings"
-      subtitle="Confirm VIP reservations, mark payments, and track guest arrivals."
+      subtitle="Confirm package bookings, mark payments, and track guest itineraries."
       showRoleDescription={false}
     >
       <LuxuryCheckoutPanel>
         <p className="luxury-panel-body text-sm">No VIP bookings yet.</p>
         <p className="luxury-panel-body mt-2 text-sm text-muted-foreground">
-          Published listings and guest reservations will appear here after the VIP module is live.
+          Published packages and guest reservations will appear here after the VIP module is live.
         </p>
       </LuxuryCheckoutPanel>
     </VipOwnerDashboardShell>

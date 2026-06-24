@@ -90,6 +90,18 @@ service RoyalPassageService {
 
   rpc CompleteOwnerHomestayBooking(OwnerHomestayBookingActionRequest) returns (HomestayBookingSummary);
 
+  rpc ListOwnerVipPackages(google.protobuf.Empty) returns (ListOwnerVipPackagesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc CreateOwnerVipPackage(CreateOwnerVipPackageRequest) returns (OwnerVipPackageDetail);
+
+  rpc GetOwnerVipPackage(GetOwnerVipPackageRequest) returns (OwnerVipPackageDetail) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc UpdateOwnerVipPackage(UpdateOwnerVipPackageInput) returns (OwnerVipPackageDetail);
+
   rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse);
 
   rpc ListMyBookings(ListMyBookingsRequest) returns (ListBookingsResponse) {
@@ -192,6 +204,8 @@ service RoyalPassageService {
 
   rpc CreateHomestayOwner(CreateHomestayOwnerRequest) returns (CreateHomestayOwnerResponse);
 
+  rpc CreateVipOwner(CreateVipOwnerRequest) returns (CreateVipOwnerResponse);
+
   rpc ListAdminExperiences(google.protobuf.Empty) returns (ListAdminExperiencesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
@@ -215,6 +229,18 @@ service RoyalPassageService {
   rpc PublishHomestay(AdminHomestayActionRequest) returns (AdminHomestaySummary);
 
   rpc RejectHomestay(AdminHomestayActionRequest) returns (AdminHomestaySummary);
+
+  rpc ListAdminVipPackages(google.protobuf.Empty) returns (ListAdminVipPackagesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetAdminVipPackage(AdminVipPackageActionRequest) returns (AdminVipPackageDetail) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc PublishVipPackage(AdminVipPackageActionRequest) returns (AdminVipPackageSummary);
+
+  rpc RejectVipPackage(AdminVipPackageActionRequest) returns (AdminVipPackageSummary);
 
   rpc ListExperienceReviews(ListExperienceReviewsRequest) returns (ListExperienceReviewsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
@@ -406,4 +432,17 @@ message OwnerHomestayBookingActionRequest {
 
 message AdminHomestayActionRequest {
   string homestay_id = 1;
+}
+
+message AdminVipPackageActionRequest {
+  string package_id = 1;
+}
+
+message GetOwnerVipPackageRequest {
+  string package_id = 1;
+}
+
+message UpdateOwnerVipPackageInput {
+  string package_id = 1;
+  UpdateOwnerVipPackageRequest package = 2;
 }

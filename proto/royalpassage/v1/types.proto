@@ -609,6 +609,21 @@ message CreateHomestayOwnerResponse {
   string homestay_owner_id = 4;
 }
 
+message CreateVipOwnerRequest {
+  string full_name = 1;
+  string email = 2;
+  string password = 3;
+  optional string phone = 4;
+  optional string address = 5;
+}
+
+message CreateVipOwnerResponse {
+  string id = 1;
+  string email = 2;
+  string full_name = 3;
+  string vip_owner_id = 4;
+}
+
 message CreateHomestayBookingRequest {
   string homestay_id = 1;
   optional string room_id = 2;
@@ -884,3 +899,126 @@ message AdminHomestayDetail {
 message ListAdminHomestaysResponse {
   repeated AdminHomestaySummary homestays = 1;
 }
+
+message AdminVipPackageSummary {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  string city = 4;
+  string status = 5;
+  string owner_name = 6;
+  string created_at = 7;
+  string package_type = 8;
+}
+
+message AdminVipPackageDetail {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  optional string tagline = 4;
+  optional string description = 5;
+  string package_type = 6;
+  string city = 7;
+  optional string city_slug = 8;
+  optional string region = 9;
+  int32 price_from_minor = 10;
+  string status = 11;
+  optional string hero_image_url = 12;
+  repeated string gallery_urls = 13;
+  repeated string highlights = 14;
+  optional string concierge_note = 15;
+  int32 duration_days = 16;
+  int32 max_guests = 17;
+  string currency_code = 18;
+  string currency_symbol = 19;
+  string created_at = 20;
+  string updated_at = 21;
+  string owner_name = 22;
+  optional string owner_email = 23;
+  optional string owner_phone = 24;
+  bool owner_verified = 25;
+}
+
+message ListAdminVipPackagesResponse {
+  repeated AdminVipPackageSummary packages = 1;
+}
+
+message OwnerVipPackageSummary {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  string city = 4;
+  string status = 5;
+  int32 price_from_minor = 6;
+  string currency_symbol = 7;
+  int32 duration_days = 8;
+  optional string image = 9;
+  string package_type = 10;
+}
+
+message OwnerVipPackageDetail {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  optional string tagline = 4;
+  optional string description = 5;
+  string package_type = 6;
+  string city = 7;
+  optional string city_slug = 8;
+  optional string region = 9;
+  int32 price_from_minor = 10;
+  string status = 11;
+  optional string hero_image_url = 12;
+  repeated string gallery_urls = 13;
+  repeated string highlights = 14;
+  optional string concierge_note = 15;
+  int32 duration_days = 16;
+  int32 max_guests = 17;
+  string currency_code = 18;
+  string currency_symbol = 19;
+  string created_at = 20;
+  string updated_at = 21;
+}
+
+message ListOwnerVipPackagesResponse {
+  repeated OwnerVipPackageSummary packages = 1;
+}
+
+message CreateOwnerVipPackageRequest {
+  string title = 1;
+  optional string slug = 2;
+  optional string tagline = 3;
+  string description = 4;
+  string package_type = 5;
+  string city_slug = 6;
+  optional string city = 7;
+  optional string region = 8;
+  int32 price_from_minor = 9;
+  optional string hero_image_url = 10;
+  repeated string gallery_urls = 11;
+  repeated string highlights = 12;
+  optional string concierge_note = 13;
+  int32 duration_days = 14;
+  int32 max_guests = 15;
+  bool submit_for_review = 16;
+}
+
+message UpdateOwnerVipPackageRequest {
+  optional string title = 1;
+  optional string slug = 2;
+  optional string tagline = 3;
+  optional string description = 4;
+  optional string package_type = 5;
+  optional string city_slug = 6;
+  optional string city = 7;
+  optional string region = 8;
+  optional int32 price_from_minor = 9;
+  optional string hero_image_url = 10;
+  repeated string gallery_urls = 11;
+  repeated string highlights = 12;
+  optional string concierge_note = 13;
+  optional int32 duration_days = 14;
+  optional int32 max_guests = 15;
+  bool submit_for_review = 16;
+}
+

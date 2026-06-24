@@ -208,7 +208,7 @@ export function Header() {
                   className={navLinkClass}
                   activeProps={{ className: "text-ember" }}
                 >
-                  Book VIP
+                  Browse packages
                 </Link>
                 <Link to="/" className={navLinkClass} activeProps={{ className: "text-ember" }}>
                   Experiences
@@ -316,7 +316,7 @@ export function Header() {
                       <DropdownMenuItem asChild>
                         <Link to="/dashboard/history" className="cursor-pointer">
                           <UserRound className="h-4 w-4" />
-                          {isVipSection ? "My VIP stays" : isHomestaySection ? "My stays" : "History"}
+                          {isVipSection ? "My bookings" : isHomestaySection ? "My stays" : "History"}
                         </Link>
                       </DropdownMenuItem>
                       {!isMarketplaceSection ? (
@@ -438,7 +438,7 @@ export function Header() {
                         <MobileNavSectionLabel>Book</MobileNavSectionLabel>
                         {isVipSection ? (
                           <>
-                            <MobileNavLink to="/vips/browse">Book VIP</MobileNavLink>
+                            <MobileNavLink to="/vips/browse">Browse packages</MobileNavLink>
                             <MobileNavLink to="/">Experiences</MobileNavLink>
                             <MobileNavLink to="/homestays">Homestays</MobileNavLink>
                           </>
@@ -473,7 +473,7 @@ export function Header() {
                           Home
                         </MobileNavLink>
                         <MobileNavLink to="/dashboard/history">
-                          {isVipSection ? "My VIP stays" : isHomestaySection ? "My stays" : "History"}
+                          {isVipSection ? "My bookings" : isHomestaySection ? "My stays" : "History"}
                         </MobileNavLink>
                         {!isMarketplaceSection && !showGuestCart ? (
                           <MobileNavLink to="/dashboard/cart">Cart</MobileNavLink>

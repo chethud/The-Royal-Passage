@@ -266,3 +266,23 @@ class AdminHomestayActionRequest(_message.Message):
     HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
     homestay_id: str
     def __init__(self, homestay_id: _Optional[str] = ...) -> None: ...
+
+class AdminVipPackageActionRequest(_message.Message):
+    __slots__ = ("package_id",)
+    PACKAGE_ID_FIELD_NUMBER: _ClassVar[int]
+    package_id: str
+    def __init__(self, package_id: _Optional[str] = ...) -> None: ...
+
+class GetOwnerVipPackageRequest(_message.Message):
+    __slots__ = ("package_id",)
+    PACKAGE_ID_FIELD_NUMBER: _ClassVar[int]
+    package_id: str
+    def __init__(self, package_id: _Optional[str] = ...) -> None: ...
+
+class UpdateOwnerVipPackageInput(_message.Message):
+    __slots__ = ("package_id", "package")
+    PACKAGE_ID_FIELD_NUMBER: _ClassVar[int]
+    PACKAGE_FIELD_NUMBER: _ClassVar[int]
+    package_id: str
+    package: _types_pb2.UpdateOwnerVipPackageRequest
+    def __init__(self, package_id: _Optional[str] = ..., package: _Optional[_Union[_types_pb2.UpdateOwnerVipPackageRequest, _Mapping]] = ...) -> None: ...

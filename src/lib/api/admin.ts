@@ -3,7 +3,7 @@ import type { UserRole } from "@/lib/roles";
 import { fetchBookingById } from "@/lib/api/bookings";
 import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
 import { AdminExperienceActionRequestSchema } from "@/gen/royalpassage/v1/service_pb";
-import { CreateHostRequestSchema, CreateHomestayOwnerRequestSchema } from "@/gen/royalpassage/v1/types_pb";
+import { CreateHostRequestSchema, CreateHomestayOwnerRequestSchema, CreateVipOwnerRequestSchema } from "@/gen/royalpassage/v1/types_pb";
 import type { HostSlotDetail } from "@/lib/api/host-experiences";
 
 export type ManagedUser = {
@@ -49,6 +49,21 @@ export function createHomestayOwner(accessToken: string, payload: CreateHomestay
   const client = createRoyalPassageClient(accessToken);
   return rpcCall(() =>
     client.createHomestayOwner(create(CreateHomestayOwnerRequestSchema, payload)),
+  );
+}
+
+export type CreateVipOwnerPayload = {
+  fullName: string;
+  email: string;
+  password: string;
+  phone?: string;
+  address?: string;
+};
+
+export function createVipOwner(accessToken: string, payload: CreateVipOwnerPayload) {
+  const client = createRoyalPassageClient(accessToken);
+  return rpcCall(() =>
+    client.createVipOwner(create(CreateVipOwnerRequestSchema, payload)),
   );
 }
 

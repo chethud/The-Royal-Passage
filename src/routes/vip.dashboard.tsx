@@ -22,14 +22,14 @@ function VipOwnerOverviewPage() {
   return (
     <VipOwnerDashboardShell
       title="Overview"
-      subtitle="Manage VIP listings, concierge requests, and guest reservations."
+      subtitle="Manage VIP packages, custom enquiries, and guest reservations."
       showRoleDescription={false}
     >
       <div className="grid gap-6 sm:grid-cols-3">
         {[
-          { label: "Published listings", value: "0" },
+          { label: "Published packages", value: "0" },
           { label: "Pending bookings", value: "0" },
-          { label: "Today's arrivals", value: "0" },
+          { label: "Custom enquiries", value: "0" },
         ].map((stat) => (
           <LuxuryCheckoutPanel key={stat.label}>
             <p className="eyebrow luxury-panel-label">{stat.label}</p>
@@ -45,14 +45,14 @@ function VipOwnerOverviewPage() {
             <h2 className="luxury-panel-heading font-display text-xl">Set up your VIP dashboard</h2>
             <p className="luxury-panel-body mt-2 text-sm">
               Run <code className="text-ember">supabase/vip-module.sql</code> in Supabase, then ask
-              your Royal Passage admin to provision a VIP owner account. Live listings and bookings
+              your Royal Passage admin to provision a VIP owner account. Live packages and bookings
               will appear here once connected.
             </p>
             <Link
               to="/vip/listings/new"
               className="luxury-btn-sm luxury-btn-primary mt-5 inline-flex no-underline"
             >
-              Add your first listing
+              Add your first package
             </Link>
           </div>
         </div>

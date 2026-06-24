@@ -1,15 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { vips as staticVips } from "@/data/vips";
-import type { VipStay } from "@/data/vips";
+import type { VipPackage } from "@/data/vips";
 import { isMysuruVip } from "@/lib/vip-filters";
 
 function fallbackCatalog() {
-  const listings = staticVips.filter(isMysuruVip);
+  const packages = staticVips.filter(isMysuruVip);
   return {
     mode: "static" as const,
-    vips: listings,
-    propertyTypes: [...new Set(listings.map((stay) => stay.propertyType))],
-    cities: [...new Set(listings.map((stay) => stay.city))],
+    vips: packages,
+    packageTypes: [...new Set(packages.map((pkg) => pkg.packageType))],
+    cities: [...new Set(packages.map((pkg) => pkg.city))],
   };
 }
 
@@ -20,14 +20,14 @@ export const getVipsForUi = createServerFn({ method: "GET" }).handler(async () =
 export const getVipForDetail = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => data)
   .handler(async ({ data }) => {
-    const stay = staticVips.find((row) => row.slug === data.slug);
-    if (!stay) return null;
-    return { vip: stay, source: "static" as const };
+    const pkg = staticVips.find((row) => row.slug === data.slug);
+    if (!pkg) return null;
+    return { vip: pkg, source: "static" as const };
   });
 
 export type VipCatalog = {
   mode: "static" | "live";
-  vips: VipStay[];
-  propertyTypes: string[];
+  vips: VipPackage[];
+  packageTypes: string[];
   cities: string[];
 };

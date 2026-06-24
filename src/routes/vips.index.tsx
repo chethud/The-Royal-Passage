@@ -11,13 +11,13 @@ export const Route = createFileRoute("/vips/")({
   loader: async () => getVipsForUi(),
   head: () => ({
     meta: [
-      { title: "Royal VIP — The Royal Passage" },
+      { title: "Royal VIP Packages — The Royal Passage" },
       {
         name: "description",
         content:
-          "Exclusive palace suites, private villas, and heritage mansions in Mysuru with Royal Passage concierge.",
+          "Curated Royal VIP packages in Mysuru — palace experiences, heritage circuits, and wellness retreats. Custom packages designed by our concierge.",
       },
-      { property: "og:title", content: "Royal VIP — The Royal Passage" },
+      { property: "og:title", content: "Royal VIP Packages — The Royal Passage" },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE_URL}/vips` },
       { name: "twitter:card", content: "summary_large_image" },

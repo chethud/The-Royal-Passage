@@ -1,5 +1,5 @@
 import { Crown } from "lucide-react";
-import { VIP_PROPERTY_TYPES } from "@/data/vips";
+import { VIP_PACKAGE_TYPES } from "@/data/vips";
 import {
   Select,
   SelectContent,
@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type VipsPropertyTypeFilterProps = {
+type VipsPackageTypeFilterProps = {
   value?: string;
   onChange: (value: string | undefined) => void;
   className?: string;
@@ -16,11 +16,11 @@ type VipsPropertyTypeFilterProps = {
 
 const ALL_TYPES_VALUE = "all";
 
-export function VipsPropertyTypeFilter({
+export function VipsPackageTypeFilter({
   value,
   onChange,
   className = "",
-}: VipsPropertyTypeFilterProps) {
+}: VipsPackageTypeFilterProps) {
   return (
     <div
       className={`relative overflow-hidden rounded-full border border-[rgb(74_0_0/0.14)] bg-[var(--cream-white)] shadow-[0_8px_24px_-12px_rgb(0_0_0/0.35)] ${className}`}
@@ -35,13 +35,13 @@ export function VipsPropertyTypeFilter({
         onValueChange={(next) => onChange(next === ALL_TYPES_VALUE ? undefined : next)}
       >
         <SelectTrigger className="royal-search-select-trigger h-auto w-full border-0 bg-transparent py-3 pl-11 pr-4 text-sm text-[#3A0000] shadow-none focus:ring-0 focus:ring-offset-0 [&>svg]:text-[#4A0000]/70">
-          <SelectValue placeholder="All types" />
+          <SelectValue placeholder="All packages" />
         </SelectTrigger>
         <SelectContent className="royal-search-select-content border-[rgb(74_0_0/0.14)] bg-[var(--cream-white)] text-[#3A0000]">
           <SelectItem value={ALL_TYPES_VALUE} className="royal-search-select-item">
-            All types
+            All packages
           </SelectItem>
-          {VIP_PROPERTY_TYPES.map((type) => (
+          {VIP_PACKAGE_TYPES.map((type) => (
             <SelectItem key={type} value={type} className="royal-search-select-item">
               {type}
             </SelectItem>

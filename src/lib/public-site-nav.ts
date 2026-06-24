@@ -2,17 +2,14 @@ export type PublicSiteModule = "experiences" | "homestays" | "vip";
 
 export const EXPERIENCE_PUBLIC_NAV_ITEMS = [
   { label: "Experiences", to: "/experiences" },
-  { label: "About Us", to: "/hosts" },
 ] as const;
 
 export const HOMESTAY_PUBLIC_NAV_ITEMS = [
   { label: "Browse Stays", to: "/homestays/browse" },
-  { label: "About Us", to: "/hosts" },
 ] as const;
 
 export const VIP_PUBLIC_NAV_ITEMS = [
-  { label: "VIP Stays", to: "/vips/browse" },
-  { label: "About Us", to: "/hosts" },
+  { label: "Browse", to: "/vips/browse" },
 ] as const;
 
 export function isHomestayPublicSection(pathname: string): boolean {
