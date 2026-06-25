@@ -52,6 +52,7 @@ type NavItem = { label: string; to: string };
 function navItemsForUser(
   role: UserRole | null | undefined,
   signedIn: boolean,
+  pathname: string,
 ): NavItem[] {
   if (!signedIn || !role) return publicGuestNavItems();
   if (role === "admin") {
@@ -108,7 +109,7 @@ export function Header() {
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const navItems = navItemsForUser(role, Boolean(user));
+  const navItems = navItemsForUser(role, Boolean(user), pathname);
   const isHomestaySection = isHomestayPublicSection(pathname);
   const isVipSection = isVipPublicSection(pathname);
   const isMarketplaceSection = isHomestaySection || isVipSection;

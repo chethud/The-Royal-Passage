@@ -142,6 +142,8 @@ async function loadPublishedWithSlots(): Promise<Experience[]> {
 }
 
 /** Listing + filters: FastAPI when configured; else Supabase; otherwise static demo data. */
+export const getCatalogFallback = fallbackCatalog;
+
 export const getCatalogForUi = createServerFn({ method: "GET" }).handler(async () => {
   if (isApiConfigured()) {
     try {

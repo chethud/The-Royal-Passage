@@ -22,7 +22,7 @@ export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
 };
 
 export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
-  guest: "/",
+  guest: "/dashboard/history",
   host: "/host/dashboard",
   homestay_owner: "/homestay/dashboard",
   vip_owner: "/vip/dashboard",

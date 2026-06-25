@@ -6,7 +6,7 @@ import { ExperiencesShowcase } from "@/components/site/ExperiencesShowcase";
 import { JourneysSplit } from "@/components/site/JourneysSplit";
 import { PillarsRow } from "@/components/site/PillarsRow";
 import { JournalPreview } from "@/components/site/JournalPreview";
-import { getCatalogForUi } from "@/lib/marketplace-fns";
+import { getCatalogForUi, getCatalogFallback } from "@/lib/marketplace-fns";
 import { getHomepageContent } from "@/lib/homepage-content-fns";
 import { normalizeHomepageContent } from "@/lib/homepage-content";
 import { buildHomeJsonLd, SITE_URL } from "@/lib/seo";
@@ -14,7 +14,7 @@ import { buildHomeJsonLd, SITE_URL } from "@/lib/seo";
 export const Route = createFileRoute("/")({
   loader: async () => {
     const [catalog, homepage] = await Promise.all([
-      getCatalogForUi(),
+      getCatalogForUi().catch(() => getCatalogFallback()),
       getHomepageContent().catch(() => normalizeHomepageContent({})),
     ]);
     return {
