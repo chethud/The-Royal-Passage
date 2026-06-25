@@ -61,13 +61,13 @@ export function RoyalPassportBook({
 
             <h2 className="royal-passport-book__title">Identity Certificate</h2>
 
-            <PassportPhotoFrame
-              photoUrl={photoUrl}
-              processing={photoProcessing}
-              onFileSelected={onPhotoSelected}
-            />
-
             <div className="royal-passport-book__identity-grid">
+              <PassportPhotoFrame
+                photoUrl={photoUrl}
+                processing={photoProcessing}
+                onFileSelected={onPhotoSelected}
+              />
+
               <div className="royal-passport-book__fields">
                 <div className="royal-passport-book__field">
                   <span className="royal-passport-book__label">Full name</span>

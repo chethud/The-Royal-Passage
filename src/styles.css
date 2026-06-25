@@ -3408,13 +3408,19 @@
 }
 
 .royal-passport-book__identity-grid {
-  position: relative;
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  column-gap: 1.25rem;
+  row-gap: 0.85rem;
   margin-top: 1.25rem;
-  min-height: 120px;
+  align-items: start;
 }
 
 .royal-passport-book__fields {
-  margin-left: 210px;
+  margin-left: 0;
+  min-width: 0;
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -3642,17 +3648,18 @@
   color: rgb(74 48 24 / 0.62);
 }
 
-/* Passport portrait frame — absolute on left page */
+/* Passport portrait frame — left column of identity grid */
 .passport-photo {
-  position: absolute;
-  left: 98px;
-  top: 345px;
+  position: relative;
   width: 180px;
   height: 240px;
   overflow: hidden;
   cursor: pointer;
   z-index: 2;
   background: rgb(58 36 18 / 0.06);
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: center;
 }
 
 .passport-photo__image {
@@ -3746,21 +3753,23 @@
 }
 
 @media (max-width: 640px) {
-  .royal-passport-book__fields {
-    margin-left: 0;
-    margin-top: 1rem;
-  }
-
   .royal-passport-book__identity-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
     min-height: auto;
     padding-top: 0.5rem;
   }
 
+  .royal-passport-book__fields {
+    grid-column: 1;
+    width: 100%;
+    margin-top: 0;
+  }
+
   .passport-photo {
-    position: relative;
-    left: auto;
-    top: auto;
-    margin: 0 auto 1rem;
+    width: min(180px, 70vw);
+    height: auto;
+    aspect-ratio: 3 / 4;
   }
 
   .royal-passport-book__approved-stamp {
