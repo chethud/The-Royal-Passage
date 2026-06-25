@@ -15,7 +15,6 @@ const SOCIAL_LINKS = [
 const quickLinks = [
   { label: "Experiences", to: "/experiences" },
   { label: "Homestays", to: "/homestays" },
-  { label: "VIP", to: "/vips" },
   { label: "Journal", to: "/journal" },
   { label: "Contact", to: "/contact" },
 ];

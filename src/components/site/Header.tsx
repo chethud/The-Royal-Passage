@@ -13,8 +13,7 @@ import {
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
 import { HOMESTAY_OWNER_NAV_ITEMS } from "@/components/homestay-owner/homestay-owner-nav";
 import { VIP_OWNER_NAV_ITEMS } from "@/components/vip-owner/vip-owner-nav";
-import { isApprovedVipMember } from "@/lib/api/vip-membership";
-import { GUEST_SIGNED_IN_NAV_ITEMS, VIP_MEMBER_NAV_ITEMS, isVipMemberNavItemActive } from "@/lib/vip-member-nav";
+import { GUEST_SIGNED_IN_NAV_ITEMS } from "@/lib/vip-member-nav";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
 import { useNavBadges } from "@/hooks/use-nav-badges";
 import {
@@ -37,8 +36,7 @@ import {
   isPublicNavItemActive,
   isVipPublicSection,
   marketplaceHomePath,
-  publicCrossNavItemsForSection,
-  publicNavItemsForSection,
+  publicGuestNavItems,
 } from "@/lib/public-site-nav";
 import {
   headerMobileActionClass,
@@ -54,10 +52,8 @@ type NavItem = { label: string; to: string };
 function navItemsForUser(
   role: UserRole | null | undefined,
   signedIn: boolean,
-  pathname: string,
-  vipMembershipStatus: string | null,
 ): NavItem[] {
-  if (!signedIn || !role) return publicNavItemsForSection(pathname);
+  if (!signedIn || !role) return publicGuestNavItems();
   if (role === "admin") {
     return adminNavItemsForModule(resolveAdminModule(pathname));
   }
@@ -71,12 +67,9 @@ function navItemsForUser(
     return VIP_OWNER_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
   if (role === "guest") {
-    if (isApprovedVipMember(vipMembershipStatus)) {
-      return VIP_MEMBER_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
-    }
     return GUEST_SIGNED_IN_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
-  return publicNavItemsForSection(pathname);
+  return publicGuestNavItems();
 }
 
 const navLinkClass =
@@ -95,14 +88,10 @@ function isHeaderNavItemActive(
   role: UserRole | null | undefined,
   pathname: string,
   to: string,
-  vipMembershipStatus: string | null,
 ): boolean {
   if (role === "host") return isHostNavItemActive(pathname, to);
   if (role === "homestay_owner") return isHomestayOwnerNavItemActive(pathname, to);
   if (role === "vip_owner") return isVipOwnerNavItemActive(pathname, to);
-  if (role === "guest" && isApprovedVipMember(vipMembershipStatus)) {
-    return isVipMemberNavItemActive(pathname, to);
-  }
   if (role === "admin") {
     return isAdminNavItemActive(pathname, to);
   }
@@ -114,12 +103,12 @@ function isHeaderNavItemActive(
 
 export function Header() {
   const [elevated, setElevated] = useState(false);
-  const { displayName, user, role, vipMembershipStatus } = useAuthUser();
+  const { displayName, user, role } = useAuthUser();
   const dashboardPath = role ? dashboardPathForRole(role) : "/sign-in";
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const navItems = navItemsForUser(role, Boolean(user), pathname, vipMembershipStatus);
+  const navItems = navItemsForUser(role, Boolean(user));
   const isHomestaySection = isHomestayPublicSection(pathname);
   const isVipSection = isVipPublicSection(pathname);
   const isMarketplaceSection = isHomestaySection || isVipSection;
@@ -136,10 +125,8 @@ export function Header() {
   const navBadges = useNavBadges();
   const showGuestCart = Boolean(user) && isGuestAccount(role) && !isMarketplaceSection;
   const { count: cartCount } = useExperienceCart();
-  const showPublicBookingCtas = !user;
   const showSignIn = !user;
   const showAccountMenu = Boolean(user);
-  const publicCrossNavItems = publicCrossNavItemsForSection(pathname);
 
   useEffect(() => {
     const onScroll = () => setElevated(window.scrollY > 20);
@@ -195,7 +182,7 @@ export function Header() {
 
         <nav className="hidden items-center gap-5 text-[0.72rem] font-medium uppercase tracking-[0.14em] md:flex lg:gap-7 lg:text-[0.76rem] lg:tracking-[0.16em]">
           {navItems.map((item) => {
-            const active = isHeaderNavItemActive(role, pathname, item.to, vipMembershipStatus);
+            const active = isHeaderNavItemActive(role, pathname, item.to);
             return (
               <Link
                 key={`${item.to}-${item.label}`}
@@ -208,18 +195,6 @@ export function Header() {
             );
           })}
 
-          {showPublicBookingCtas
-            ? publicCrossNavItems.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to as "/homestays"}
-                  className={navLinkClass}
-                  activeProps={{ className: "text-ember" }}
-                >
-                  {item.label}
-                </Link>
-              ))
-            : null}
           {showGuestCart ? (
             <Link
               to="/dashboard/cart"
@@ -293,7 +268,7 @@ export function Header() {
 
               <nav className="header-mobile-nav mt-6" aria-label="Mobile navigation">
                 {navItems.map((item) => {
-                  const active = isHeaderNavItemActive(role, pathname, item.to, vipMembershipStatus);
+                  const active = isHeaderNavItemActive(role, pathname, item.to);
                   return (
                     <MobileNavLink
                       key={`${item.to}-${item.label}`}
@@ -306,17 +281,6 @@ export function Header() {
                   );
                 })}
 
-                {showPublicBookingCtas && publicCrossNavItems.length > 0 ? (
-                  <>
-                    <MobileNavDivider />
-                    <MobileNavSectionLabel>Explore</MobileNavSectionLabel>
-                    {publicCrossNavItems.map((item) => (
-                      <MobileNavLink key={item.to} to={item.to}>
-                        {item.label}
-                      </MobileNavLink>
-                    ))}
-                  </>
-                ) : null}
                 {showSignIn ? (
                   <>
                     <MobileNavDivider />

@@ -3,7 +3,6 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { HomestaysHomeHero } from "@/components/homestays/HomestaysHomeHero";
 import { HomestaysShowcase } from "@/components/site/HomestaysShowcase";
-import { HomestayHighlightsSplit } from "@/components/homestays/HomestayHighlightsSplit";
 import { HomestayPillarsRow } from "@/components/homestays/HomestayPillarsRow";
 import { HomestayHowItWorks } from "@/components/homestays/HomestayHowItWorks";
 import { getHomestaysForUi } from "@/lib/homestay-fns";
@@ -45,7 +44,6 @@ function HomestaysHomePage() {
 
       <HomestaysHomeHero />
       <HomestaysShowcase homestays={homestays} />
-      <HomestayHighlightsSplit />
       <HomestayPillarsRow />
       <HomestayHowItWorks />
       <Footer />
