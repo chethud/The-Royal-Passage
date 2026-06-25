@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { Crown } from "lucide-react";
 import { toast } from "sonner";
 import type { GuestProfile } from "@/lib/api/guest";
 import { updateAccountProfile } from "@/lib/profile-browser";
@@ -130,6 +131,7 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
         disabled={saving || uploadingPhoto}
         className="royal-passport-form__save"
       >
+        <Crown className="royal-passport-form__save-icon" aria-hidden />
         {saving ? "Saving…" : "Save profile"}
       </button>
     </form>
