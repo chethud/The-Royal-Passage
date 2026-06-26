@@ -32,6 +32,7 @@ export type HomestayRoom = {
   category?: string;
   capacity: number;
   pricePerNight: number;
+  weekendPricePerNight?: number;
   totalUnits: number;
   amenities?: string[];
   extraBedAvailable: boolean;
@@ -51,6 +52,7 @@ export type Homestay = {
   address: string;
   mapLink?: string;
   pricePerNight: number;
+  weekendPricePerNight?: number;
   currencySymbol?: string;
   rating: number;
   reviewsCount: number;

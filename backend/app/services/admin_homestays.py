@@ -66,6 +66,7 @@ def get_admin_homestay(homestay_id: str) -> AdminHomestayDetail:
         address=row.get("address"),
         mapLink=row.get("map_link"),
         pricePerNightMinor=int(row.get("price_per_night_minor") or 0),
+        weekendPricePerNightMinor=row.get("weekend_price_per_night_minor"),
         status=row.get("status") or "draft",
         heroImageUrl=row.get("hero_image_url"),
         galleryUrls=row.get("gallery_urls") or [],

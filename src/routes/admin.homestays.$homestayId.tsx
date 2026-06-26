@@ -158,8 +158,17 @@ function AdminHomestayDetailPage() {
                 <dd>{homestay.city}</dd>
               </div>
               <div>
-                <dt className="luxury-panel-label text-xs uppercase">From / night</dt>
+                <dt className="luxury-panel-label text-xs uppercase">Weekday / night</dt>
                 <dd>{formatMoney(homestay.pricePerNightMinor, homestay.currencySymbol)}</dd>
+              </div>
+              <div>
+                <dt className="luxury-panel-label text-xs uppercase">Weekend / night</dt>
+                <dd>
+                  {formatMoney(
+                    homestay.weekendPricePerNightMinor ?? homestay.pricePerNightMinor,
+                    homestay.currencySymbol,
+                  )}
+                </dd>
               </div>
               <div>
                 <dt className="luxury-panel-label text-xs uppercase">Owner</dt>

@@ -1,6 +1,11 @@
 import { BedDouble, MapPin, Star, Users } from "lucide-react";
 import type { Homestay } from "@/data/homestays";
 import type { HomestayBrowseSearch } from "@/lib/homestay-filters";
+import {
+  formatWeekdayWeekendRates,
+  weekdayPriceMajor,
+  weekendPriceMajor,
+} from "@/lib/homestay-day-pricing";
 import { MarketplaceCard } from "@/components/site/MarketplaceCard";
 
 export function HomestayCard({
@@ -11,6 +16,7 @@ export function HomestayCard({
   search?: HomestayBrowseSearch;
 }) {
   const sym = stay.currencySymbol ?? "₹";
+  const rateLabel = formatWeekdayWeekendRates(sym, weekdayPriceMajor(stay), weekendPriceMajor(stay));
 
   return (
     <MarketplaceCard
@@ -52,11 +58,7 @@ export function HomestayCard({
       footer={
         <div className="flex items-center justify-between gap-3">
           <span className="font-display text-base text-[#F7F1E8]">
-            {sym}
-            {stay.pricePerNight.toLocaleString("en-IN")}
-            <span className="ml-1 text-[0.62rem] font-display font-normal uppercase tracking-[0.12em] text-[#E8DCC8]/75">
-              / night
-            </span>
+            {rateLabel}
           </span>
           <span className="inline-flex items-center gap-1 text-[0.62rem] text-[#D4AF6A]">
             <Star className="h-3.5 w-3.5 fill-current" aria-hidden />

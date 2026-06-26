@@ -26,6 +26,7 @@ export type AdminHomestayDetail = {
   address: string | null;
   mapLink: string | null;
   pricePerNightMinor: number;
+  weekendPricePerNightMinor?: number | null;
   status: string;
   heroImageUrl: string | null;
   galleryUrls: string[];

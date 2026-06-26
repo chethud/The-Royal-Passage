@@ -1,4 +1,5 @@
 import type { Homestay, HomestayRoom } from "@/data/homestays";
+import { eachNightBetween, nightPriceMajor } from "@/lib/homestay-day-pricing";
 
 export function normalizeExtraBedsPerRoom(value?: number | null): 1 | 2 {
   return value != null && value >= 2 ? 2 : 1;
@@ -52,21 +53,31 @@ export function calculateStayTotalMinor(
     roomId?: string;
     roomCount: number;
     extraBedCount: number;
-    nights: number;
+    checkIn: string;
+    checkOut: string;
   },
 ) {
   const room = getSelectedRoom(stay, options.roomId);
-  const pricePerNightMajor = room?.pricePerNight ?? stay.pricePerNight;
+  const nights = eachNightBetween(options.checkIn, options.checkOut);
   const extraBedPriceMajor = room?.extraBedPricePerNight ?? stay.extraBedPricePerNight ?? 0;
-  const nightlyRateMinor =
-    pricePerNightMajor * 100 * options.roomCount +
-    extraBedPriceMajor * 100 * options.extraBedCount;
-  const totalMinor = nightlyRateMinor * Math.max(0, options.nights);
+  const nightlyExtrasMinor = extraBedPriceMajor * 100 * options.extraBedCount;
+
+  let totalMinor = 0;
+  for (const night of nights) {
+    const nightMajor = nightPriceMajor(stay, night, room);
+    totalMinor += nightMajor * 100 * options.roomCount + nightlyExtrasMinor;
+  }
+
+  const pricePerNightMajor = nights.length
+    ? Math.round(totalMinor / nights.length / 100 / Math.max(1, options.roomCount))
+    : (room?.pricePerNight ?? stay.pricePerNight);
+
   return {
     room,
     pricePerNightMajor,
     extraBedPriceMajor,
-    nightlyRateMinor,
+    nightlyRateMinor: nights.length ? Math.round(totalMinor / nights.length) : 0,
     totalMinor,
+    nights: nights.length,
   };
 }

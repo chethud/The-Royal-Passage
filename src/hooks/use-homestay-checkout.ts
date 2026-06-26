@@ -12,6 +12,11 @@ import {
   maxRoomCount,
   usesPropertyLevelExtraBeds,
 } from "@/lib/homestay-room-pricing";
+import {
+  formatWeekdayWeekendRates,
+  weekdayPriceMajor,
+  weekendPriceMajor,
+} from "@/lib/homestay-day-pricing";
 import { formatMoney } from "@/lib/money";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
@@ -96,9 +101,10 @@ export function useHomestayCheckout(
         roomId,
         roomCount: rooms.length ? roomCount : 1,
         extraBedCount: rooms.length ? extraBedCount : 0,
-        nights,
+        checkIn,
+        checkOut,
       }),
-    [homestay, roomId, roomCount, extraBedCount, nights, rooms.length],
+    [homestay, roomId, roomCount, extraBedCount, checkIn, checkOut, rooms.length],
   );
   const sym = homestay.currencySymbol ?? "₹";
 
@@ -201,7 +207,11 @@ export function useHomestayCheckout(
     nights,
     totalMinor: pricing.totalMinor,
     totalLabel: formatMoney(pricing.totalMinor, sym),
-    nightlyLabel: `${sym}${pricing.pricePerNightMajor.toLocaleString("en-IN")}`,
+    nightlyLabel: formatWeekdayWeekendRates(
+      sym,
+      weekdayPriceMajor(homestay, selectedRoom),
+      weekendPriceMajor(homestay, selectedRoom),
+    ),
     extraBedLabel: pricing.extraBedPriceMajor
       ? `${sym}${pricing.extraBedPriceMajor.toLocaleString("en-IN")}`
       : null,

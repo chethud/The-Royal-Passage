@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import CreateHomestayBookingRequest, CreateHomestayBookingResponse
+from app.services.homestay_pricing import stay_subtotal_minor
 
 HOMESTAY_SELECT = """
 *,
@@ -129,6 +130,7 @@ def create_homestay_booking(
     room_count = max(1, int(payload.roomCount or 1))
     extra_bed_count = max(0, int(payload.extraBedCount or 0))
     price_per_night_minor = int(stay.get("price_per_night_minor") or 0)
+    weekend_price_per_night_minor = stay.get("weekend_price_per_night_minor")
     extra_bed_price_minor = 0
     room_capacity = max_guests
 
@@ -150,6 +152,7 @@ def create_homestay_booking(
             raise ValueError(f"Only {total_units} unit(s) available for this room type.")
         room_capacity = int(room.get("capacity") or max_guests)
         price_per_night_minor = int(room.get("price_per_night_minor") or price_per_night_minor)
+        weekend_price_per_night_minor = room.get("weekend_price_per_night_minor", weekend_price_per_night_minor)
         extra_bed_available = bool(room.get("extra_bed_available", False))
         extra_bed_price_minor = int(room.get("extra_bed_price_per_night_minor") or 0)
         if extra_bed_count > 0 and not extra_bed_available:
@@ -200,8 +203,15 @@ def create_homestay_booking(
             raise ValueError("One or more nights are blocked on the calendar.")
         day += timedelta(days=1)
 
-    nightly_minor = price_per_night_minor * room_count + extra_bed_price_minor * extra_bed_count
-    subtotal_minor = nightly_minor * nights
+    subtotal_minor = stay_subtotal_minor(
+        check_in,
+        check_out,
+        price_per_night_minor,
+        weekend_price_per_night_minor,
+        room_count,
+        extra_bed_price_minor,
+        extra_bed_count,
+    )
     commission_percent = _commission_percent(supabase)
     platform_fee_minor = round((subtotal_minor * commission_percent) / 100)
     host_payout_minor = subtotal_minor - platform_fee_minor

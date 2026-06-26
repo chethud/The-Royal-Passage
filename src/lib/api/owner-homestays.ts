@@ -35,6 +35,7 @@ export type OwnerHomestayRoom = {
   category: string | null;
   capacity: number;
   pricePerNightMinor: number;
+  weekendPricePerNightMinor?: number | null;
   totalUnits: number;
   amenities: string[];
   sortOrder: number;
@@ -79,6 +80,7 @@ export type OwnerHomestayDetail = {
   address: string | null;
   mapLink: string | null;
   pricePerNightMinor: number;
+  weekendPricePerNightMinor?: number | null;
   status: string;
   heroImageUrl: string | null;
   galleryUrls: string[];
@@ -112,6 +114,7 @@ export type CreateOwnerHomestayPayload = {
   address?: string;
   mapLink?: string;
   pricePerNightMinor: number;
+  weekendPricePerNightMinor?: number;
   heroImageUrl?: string;
   galleryUrls?: string[];
   amenities?: string[];
@@ -182,6 +185,7 @@ export function createOwnerHomestayRoom(
     category?: string;
     capacity: number;
     pricePerNightMinor: number;
+    weekendPricePerNightMinor?: number;
     totalUnits?: number;
     amenities?: string[];
     sortOrder?: number;
@@ -210,6 +214,7 @@ export function updateOwnerHomestayRoom(
     category: string;
     capacity: number;
     pricePerNightMinor: number;
+    weekendPricePerNightMinor?: number;
     totalUnits: number;
     amenities: string[];
     sortOrder: number;

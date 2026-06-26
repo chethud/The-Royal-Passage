@@ -27,6 +27,7 @@ def map_row_to_homestay(row: dict, rooms: list[dict]) -> Homestay:
             category=room.get("category"),
             capacity=int(room.get("capacity") or 2),
             pricePerNight=round(int(room.get("price_per_night_minor") or 0) / 100),
+            weekendPricePerNight=round(int(room.get("weekend_price_per_night_minor") or room.get("price_per_night_minor") or 0) / 100),
             totalUnits=int(room.get("total_units") or 1),
             amenities=room.get("amenities") or [],
             extraBedAvailable=bool(room.get("extra_bed_available", False)),
@@ -38,6 +39,9 @@ def map_row_to_homestay(row: dict, rooms: list[dict]) -> Homestay:
     ]
 
     base_night = round(int(row.get("price_per_night_minor") or 0) / 100)
+    weekend_night = round(
+        int(row.get("weekend_price_per_night_minor") or row.get("price_per_night_minor") or 0) / 100
+    )
     if ui_rooms and base_night <= 0:
         base_night = min(room.pricePerNight for room in ui_rooms)
 
@@ -54,6 +58,7 @@ def map_row_to_homestay(row: dict, rooms: list[dict]) -> Homestay:
         region=row.get("region"),
         mapLink=row.get("map_link"),
         pricePerNight=base_night,
+        weekendPricePerNight=weekend_night,
         rating=float(row.get("rating_avg") or 0),
         reviewsCount=int(row.get("reviews_count") or 0),
         image=hero,

@@ -21,6 +21,11 @@ import {
 import type { Experience } from "@/data/experiences";
 import { useAuthUser } from "@/lib/auth-user";
 import { bookHomestayPath, parseHomestayBookSearch } from "@/lib/homestay-booking-url";
+import {
+  formatWeekdayWeekendRates,
+  weekdayPriceMajor,
+  weekendPriceMajor,
+} from "@/lib/homestay-day-pricing";
 import { getHomestayForDetail } from "@/lib/homestay-fns";
 import { SITE_URL } from "@/lib/seo";
 import { canonicalLink } from "@/lib/seo-helpers";
@@ -121,8 +126,7 @@ function HomestayDetailPage() {
 
               <DetailStatGrid>
                 <DetailStatItem label="From">
-                  {sym}
-                  {stay.pricePerNight.toLocaleString("en-IN")}
+                  {formatWeekdayWeekendRates(sym, weekdayPriceMajor(stay), weekendPriceMajor(stay))}
                 </DetailStatItem>
                 <DetailStatItem label="Beds">
                   <BedDouble className="mx-auto h-5 w-5 text-[#D4AF6A] sm:mx-0" aria-hidden />

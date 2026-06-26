@@ -1,0 +1,40 @@
+from datetime import date, timedelta
+
+
+def is_weekend(day: date) -> bool:
+    """Saturday and Sunday count as weekend nights."""
+    return day.weekday() >= 5
+
+
+def resolve_weekend_price_minor(weekday_minor: int, weekend_minor: int | None) -> int:
+    if weekend_minor is None:
+        return weekday_minor
+    return int(weekend_minor)
+
+
+def night_rate_minor(
+    day: date,
+    weekday_minor: int,
+    weekend_minor: int | None,
+) -> int:
+    if is_weekend(day):
+        return resolve_weekend_price_minor(weekday_minor, weekend_minor)
+    return int(weekday_minor)
+
+
+def stay_subtotal_minor(
+    check_in: date,
+    check_out: date,
+    weekday_minor: int,
+    weekend_minor: int | None,
+    room_count: int,
+    extra_bed_minor: int,
+    extra_bed_count: int,
+) -> int:
+    total = 0
+    day = check_in
+    while day < check_out:
+        nightly = night_rate_minor(day, weekday_minor, weekend_minor)
+        total += nightly * room_count + extra_bed_minor * extra_bed_count
+        day += timedelta(days=1)
+    return total

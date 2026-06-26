@@ -16,6 +16,9 @@ function mapDbRoom(row: Record<string, unknown>): HomestayRoom {
     category: (row.category as string | null) ?? undefined,
     capacity: Number(row.capacity ?? 2),
     pricePerNight: Math.round(Number(row.price_per_night_minor ?? 0) / 100),
+    weekendPricePerNight: Math.round(
+      Number(row.weekend_price_per_night_minor ?? row.price_per_night_minor ?? 0) / 100,
+    ),
     totalUnits: Number(row.total_units ?? 1),
     amenities: (row.amenities as string[] | null) ?? [],
     extraBedAvailable: Boolean(row.extra_bed_available),
@@ -78,6 +81,9 @@ async function loadHomestaysFromDb(citySlug = "mysuru"): Promise<Homestay[]> {
     const hero = (row.hero_image_url as string | null) ?? "";
     const rooms = roomsByStay.get(row.id as string) ?? [];
     const baseNight = Math.round(Number(row.price_per_night_minor ?? 0) / 100);
+    const weekendNight = Math.round(
+      Number(row.weekend_price_per_night_minor ?? row.price_per_night_minor ?? 0) / 100,
+    );
     return {
       id: row.id as string,
       slug: row.slug as string,
@@ -90,6 +96,7 @@ async function loadHomestaysFromDb(citySlug = "mysuru"): Promise<Homestay[]> {
       address: (row.address as string | null) ?? "",
       mapLink: (row.map_link as string | null) ?? undefined,
       pricePerNight: baseNight,
+      weekendPricePerNight: weekendNight,
       currencySymbol: "₹",
       rating: Number(row.rating_avg ?? 0),
       reviewsCount: Number(row.reviews_count ?? 0),

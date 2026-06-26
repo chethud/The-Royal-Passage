@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import type { OwnerHomestayDetail } from "@/lib/api/owner-homestays";
+import {
+  formatWeekdayWeekendRates,
+} from "@/lib/homestay-day-pricing";
 import { formatMoney } from "@/lib/money";
 import { normalizeExtraBedsPerRoom } from "@/lib/homestay-room-pricing";
 
@@ -12,6 +15,7 @@ type OwnerRoomManagerProps = {
     category?: string;
     capacity: number;
     pricePerNightMinor: number;
+    weekendPricePerNightMinor?: number;
     totalUnits: number;
     extraBedAvailable?: boolean;
     extraBedPricePerNightMinor?: number;
@@ -26,6 +30,7 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
   const [capacity, setCapacity] = useState("2");
   const [units, setUnits] = useState("1");
   const [priceMajor, setPriceMajor] = useState(0);
+  const [weekendPriceMajor, setWeekendPriceMajor] = useState(0);
   const [extraBedAvailable, setExtraBedAvailable] = useState(false);
   const [extraBedPriceMajor, setExtraBedPriceMajor] = useState(0);
   const [extraBedsPerRoom, setExtraBedsPerRoom] = useState<1 | 2>(1);
@@ -37,6 +42,7 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
       category: category.trim() || undefined,
       capacity: Number.parseInt(capacity, 10) || 2,
       pricePerNightMinor: priceMajor * 100,
+      weekendPricePerNightMinor: weekendPriceMajor * 100,
       totalUnits: Number.parseInt(units, 10) || 1,
       extraBedAvailable,
       extraBedPricePerNightMinor: extraBedAvailable ? extraBedPriceMajor * 100 : 0,
@@ -45,10 +51,13 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
     setName("");
     setCategory("");
     setPriceMajor(0);
+    setWeekendPriceMajor(0);
     setExtraBedAvailable(false);
     setExtraBedPriceMajor(0);
     setExtraBedsPerRoom(1);
   };
+
+  const sym = homestay.currencySymbol ?? "₹";
 
   return (
     <div className="space-y-6">
@@ -62,7 +71,11 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
                 <p className="luxury-panel-heading font-medium">{room.name}</p>
                 <p className="luxury-panel-body text-xs leading-relaxed">
                   {room.category ?? "Room"} · {room.capacity} guests · {room.totalUnits} unit(s) ·{" "}
-                  {formatMoney(room.pricePerNightMinor, homestay.currencySymbol)}
+                  {formatWeekdayWeekendRates(
+                    sym,
+                    Math.round(room.pricePerNightMinor / 100),
+                    Math.round((room.weekendPricePerNightMinor ?? room.pricePerNightMinor) / 100),
+                  )}
                   {room.extraBedAvailable
                     ? ` · extra bed ${formatMoney(room.extraBedPricePerNightMinor, homestay.currencySymbol)}/night · ${normalizeExtraBedsPerRoom(room.extraBedsPerRoom)}/room`
                     : ""}
@@ -121,10 +134,18 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
             disabled={busy}
           />
           <RupeeAmountInput
-            className="luxury-input md:col-span-2"
-            placeholder="Price / night"
+            className="luxury-input"
+            placeholder="Weekday price / night"
             value={priceMajor}
             onChange={setPriceMajor}
+            required
+            disabled={busy}
+          />
+          <RupeeAmountInput
+            className="luxury-input"
+            placeholder="Weekend price / night"
+            value={weekendPriceMajor}
+            onChange={setWeekendPriceMajor}
             required
             disabled={busy}
           />

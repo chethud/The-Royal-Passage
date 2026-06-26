@@ -71,6 +71,7 @@ class HomestayRoom(BaseModel):
     category: str | None = None
     capacity: int
     pricePerNight: int
+    weekendPricePerNight: int | None = None
     totalUnits: int = 1
     amenities: list[str] = Field(default_factory=list)
     extraBedAvailable: bool = False
@@ -91,6 +92,7 @@ class Homestay(BaseModel):
     region: str | None = None
     mapLink: str | None = None
     pricePerNight: int
+    weekendPricePerNight: int | None = None
     rating: float
     reviewsCount: int
     image: str
@@ -173,6 +175,7 @@ class OwnerHomestayRoom(BaseModel):
     category: str | None = None
     capacity: int
     pricePerNightMinor: int
+    weekendPricePerNightMinor: int | None = None
     totalUnits: int = 1
     amenities: list[str] = Field(default_factory=list)
     sortOrder: int = 0
@@ -207,6 +210,7 @@ class OwnerHomestayDetail(BaseModel):
     address: str | None = None
     mapLink: str | None = None
     pricePerNightMinor: int
+    weekendPricePerNightMinor: int | None = None
     status: str
     heroImageUrl: str | None = None
     galleryUrls: list[str] = Field(default_factory=list)
@@ -240,6 +244,7 @@ class CreateOwnerHomestayRequest(BaseModel):
     address: str | None = Field(default=None, max_length=200)
     mapLink: str | None = Field(default=None, max_length=500)
     pricePerNightMinor: int = Field(ge=0)
+    weekendPricePerNightMinor: int | None = Field(default=None, ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] = Field(default_factory=list)
     amenities: list[str] = Field(default_factory=list)
@@ -267,6 +272,7 @@ class UpdateOwnerHomestayRequest(BaseModel):
     address: str | None = Field(default=None, max_length=200)
     mapLink: str | None = Field(default=None, max_length=500)
     pricePerNightMinor: int | None = Field(default=None, ge=0)
+    weekendPricePerNightMinor: int | None = Field(default=None, ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] | None = None
     amenities: list[str] | None = None
@@ -287,6 +293,7 @@ class CreateOwnerHomestayRoomRequest(BaseModel):
     category: str | None = Field(default=None, max_length=40)
     capacity: int = Field(ge=1, le=20)
     pricePerNightMinor: int = Field(ge=0)
+    weekendPricePerNightMinor: int | None = Field(default=None, ge=0)
     totalUnits: int = Field(default=1, ge=1, le=20)
     amenities: list[str] = Field(default_factory=list)
     sortOrder: int = 0
@@ -300,6 +307,7 @@ class UpdateOwnerHomestayRoomRequest(BaseModel):
     category: str | None = Field(default=None, max_length=40)
     capacity: int | None = Field(default=None, ge=1, le=20)
     pricePerNightMinor: int | None = Field(default=None, ge=0)
+    weekendPricePerNightMinor: int | None = Field(default=None, ge=0)
     totalUnits: int | None = Field(default=None, ge=1, le=20)
     amenities: list[str] | None = None
     sortOrder: int | None = None
@@ -534,6 +542,7 @@ class AdminHomestayDetail(BaseModel):
     address: str | None = None
     mapLink: str | None = None
     pricePerNightMinor: int
+    weekendPricePerNightMinor: int | None = None
     status: str
     heroImageUrl: str | None = None
     galleryUrls: list[str] = Field(default_factory=list)

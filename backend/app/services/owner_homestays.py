@@ -146,6 +146,7 @@ def _map_room(row: dict) -> OwnerHomestayRoom:
         category=row.get("category"),
         capacity=int(row.get("capacity") or 2),
         pricePerNightMinor=int(row.get("price_per_night_minor") or 0),
+        weekendPricePerNightMinor=row.get("weekend_price_per_night_minor"),
         totalUnits=int(row.get("total_units") or 1),
         amenities=row.get("amenities") or [],
         sortOrder=int(row.get("sort_order") or 0),
@@ -183,6 +184,7 @@ def _map_owner_homestay(row: dict, rooms: list[dict], availability: list[dict]) 
         address=row.get("address"),
         mapLink=row.get("map_link"),
         pricePerNightMinor=int(row.get("price_per_night_minor") or 0),
+        weekendPricePerNightMinor=row.get("weekend_price_per_night_minor"),
         status=row.get("status") or "draft",
         heroImageUrl=row.get("hero_image_url"),
         galleryUrls=row.get("gallery_urls") or [],
@@ -296,6 +298,9 @@ def create_owner_homestay(auth: dict, payload: CreateOwnerHomestayRequest) -> Ow
         "region": payload.region,
         "address": payload.address,
         "price_per_night_minor": payload.pricePerNightMinor,
+        "weekend_price_per_night_minor": payload.weekendPricePerNightMinor
+        if payload.weekendPricePerNightMinor is not None
+        else payload.pricePerNightMinor,
         "hero_image_url": hero_image_url,
         "gallery_urls": gallery_urls,
         "amenities": payload.amenities,
@@ -365,6 +370,8 @@ def update_owner_homestay(
         updates["map_link"] = payload.mapLink.strip() or None
     if payload.pricePerNightMinor is not None:
         updates["price_per_night_minor"] = payload.pricePerNightMinor
+    if payload.weekendPricePerNightMinor is not None:
+        updates["weekend_price_per_night_minor"] = payload.weekendPricePerNightMinor
     if payload.heroImageUrl is not None:
         updates["hero_image_url"] = payload.heroImageUrl
     if payload.galleryUrls is not None:
@@ -443,6 +450,9 @@ def create_owner_homestay_room(
             "category": payload.category,
             "capacity": payload.capacity,
             "price_per_night_minor": payload.pricePerNightMinor,
+            "weekend_price_per_night_minor": payload.weekendPricePerNightMinor
+            if payload.weekendPricePerNightMinor is not None
+            else payload.pricePerNightMinor,
             "total_units": payload.totalUnits,
             "amenities": payload.amenities,
             "sort_order": payload.sortOrder,
@@ -483,6 +493,8 @@ def update_owner_homestay_room(
         updates["capacity"] = payload.capacity
     if payload.pricePerNightMinor is not None:
         updates["price_per_night_minor"] = payload.pricePerNightMinor
+    if payload.weekendPricePerNightMinor is not None:
+        updates["weekend_price_per_night_minor"] = payload.weekendPricePerNightMinor
     if payload.totalUnits is not None:
         updates["total_units"] = payload.totalUnits
     if payload.amenities is not None:

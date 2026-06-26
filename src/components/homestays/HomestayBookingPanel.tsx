@@ -14,6 +14,11 @@ import {
 } from "@/components/booking/BookingPanelPrimitives";
 import type { Homestay } from "@/data/homestays";
 import { formatDateLong } from "@/lib/date-format";
+import {
+  formatWeekdayWeekendRates,
+  weekdayPriceMajor,
+  weekendPriceMajor,
+} from "@/lib/homestay-day-pricing";
 import { getActiveRooms, extraBedsPerRoomForSelection } from "@/lib/homestay-room-pricing";
 import { formatMoney } from "@/lib/money";
 import { formatTime12h } from "@/lib/weekday-slots";
@@ -77,7 +82,11 @@ export function HomestayBookingPanel({
   const today = new Date().toISOString().slice(0, 10);
   const rooms = getActiveRooms(stay);
   const selectedRoom = rooms.find((room) => room.id === roomId) ?? (rooms.length === 1 ? rooms[0] : undefined);
-  const nightlyRate = selectedRoom?.pricePerNight ?? stay.pricePerNight;
+  const rateLabel = formatWeekdayWeekendRates(
+    sym,
+    weekdayPriceMajor(stay, selectedRoom),
+    weekendPriceMajor(stay, selectedRoom),
+  );
   const extraBedPrice = selectedRoom?.extraBedPricePerNight ?? stay.extraBedPricePerNight ?? 0;
   const extraBedsPerRoom = extraBedsPerRoomForSelection(stay, selectedRoom);
   const showExtraBeds = maxExtraBeds > 0;
@@ -128,8 +137,11 @@ export function HomestayBookingPanel({
                   <span className="font-medium">{room.name}</span>
                   <span className="mt-1 block text-xs">
                     {room.capacity} guests · up to {room.totalUnits} room{room.totalUnits === 1 ? "" : "s"} ·{" "}
-                    {sym}
-                    {room.pricePerNight.toLocaleString("en-IN")}/night
+                    {formatWeekdayWeekendRates(
+                      sym,
+                      weekdayPriceMajor(stay, room),
+                      weekendPriceMajor(stay, room),
+                    )}
                     {room.extraBedAvailable
                       ? ` · extra bed ${sym}${room.extraBedPricePerNight.toLocaleString("en-IN")}/night`
                       : ""}
@@ -185,8 +197,7 @@ export function HomestayBookingPanel({
       <BookingTotalSummary
         breakdown={
           <>
-            {sym}
-            {nightlyRate.toLocaleString("en-IN")} × {roomCount} room{roomCount === 1 ? "" : "s"}
+            {rateLabel} × {roomCount} room{roomCount === 1 ? "" : "s"}
             {extraBedCount > 0
               ? ` + ${sym}${extraBedPrice.toLocaleString("en-IN")} × ${extraBedCount} extra bed${extraBedCount === 1 ? "" : "s"}`
               : ""}{" "}

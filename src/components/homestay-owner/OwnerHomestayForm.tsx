@@ -48,6 +48,9 @@ export function OwnerHomestayForm({
   const [priceMajor, setPriceMajor] = useState(
     Math.round((initial?.pricePerNightMinor ?? 0) / 100) || 0,
   );
+  const [weekendPriceMajor, setWeekendPriceMajor] = useState(
+    Math.round((initial?.weekendPricePerNightMinor ?? initial?.pricePerNightMinor ?? 0) / 100) || 0,
+  );
   const [photoUrls, setPhotoUrls] = useState<string[]>(() => {
     const existing = initial?.galleryUrls?.length
       ? initial.galleryUrls
@@ -85,6 +88,7 @@ export function OwnerHomestayForm({
       region: region.trim() || undefined,
       address: address.trim() || undefined,
       pricePerNightMinor: priceMajor * 100,
+      weekendPricePerNightMinor: weekendPriceMajor * 100,
       heroImageUrl: galleryUrls[0],
       galleryUrls,
       amenities: splitLines(amenitiesText),
@@ -185,12 +189,26 @@ export function OwnerHomestayForm({
               disabled={disabled || saving}
             />
           </label>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
           <label className="block">
-            <span className={labelClass}>Price / night (₹)</span>
+            <span className={labelClass}>Weekday price / night (₹)</span>
+            <p className="luxury-panel-body mb-2 text-xs">Monday through Friday</p>
             <RupeeAmountInput
               className={inputClass}
               value={priceMajor}
               onChange={setPriceMajor}
+              disabled={disabled || saving}
+            />
+          </label>
+          <label className="block">
+            <span className={labelClass}>Weekend price / night (₹)</span>
+            <p className="luxury-panel-body mb-2 text-xs">Saturday and Sunday</p>
+            <RupeeAmountInput
+              className={inputClass}
+              value={weekendPriceMajor}
+              onChange={setWeekendPriceMajor}
               disabled={disabled || saving}
             />
           </label>

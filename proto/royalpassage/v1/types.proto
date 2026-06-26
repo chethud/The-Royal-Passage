@@ -569,6 +569,7 @@ message HomestayRoom {
   bool extra_bed_available = 8;
   int32 extra_bed_price_per_night = 9;
   int32 extra_beds_per_room = 10;
+  optional int32 weekend_price_per_night = 11;
 }
 
 message Homestay {
@@ -601,6 +602,7 @@ message Homestay {
   bool extra_bed_available = 27;
   int32 extra_bed_price_per_night = 28;
   int32 extra_beds_per_room = 29;
+  optional int32 weekend_price_per_night = 30;
 }
 
 message ListHomestaysResponse {
@@ -688,6 +690,7 @@ message OwnerHomestayRoom {
   bool extra_bed_available = 10;
   int32 extra_bed_price_per_night_minor = 11;
   int32 extra_beds_per_room = 12;
+  optional int32 weekend_price_per_night_minor = 13;
 }
 
 message OwnerHomestaySummary {
@@ -734,6 +737,7 @@ message OwnerHomestayDetail {
   bool extra_bed_available = 29;
   int32 extra_bed_price_per_night_minor = 30;
   int32 extra_beds_per_room = 31;
+  optional int32 weekend_price_per_night_minor = 32;
 }
 
 message ListOwnerHomestaysResponse {
@@ -765,6 +769,7 @@ message CreateOwnerHomestayRequest {
   bool extra_bed_available = 22;
   int32 extra_bed_price_per_night_minor = 23;
   int32 extra_beds_per_room = 24;
+  optional int32 weekend_price_per_night_minor = 25;
 }
 
 message UpdateOwnerHomestayRequest {
@@ -792,6 +797,7 @@ message UpdateOwnerHomestayRequest {
   optional bool extra_bed_available = 22;
   optional int32 extra_bed_price_per_night_minor = 23;
   optional int32 extra_beds_per_room = 24;
+  optional int32 weekend_price_per_night_minor = 25;
 }
 
 message CreateOwnerHomestayRoomRequest {
@@ -805,6 +811,7 @@ message CreateOwnerHomestayRoomRequest {
   bool extra_bed_available = 8;
   int32 extra_bed_price_per_night_minor = 9;
   int32 extra_beds_per_room = 10;
+  optional int32 weekend_price_per_night_minor = 11;
 }
 
 message UpdateOwnerHomestayRoomRequest {
@@ -819,6 +826,7 @@ message UpdateOwnerHomestayRoomRequest {
   optional bool extra_bed_available = 9;
   optional int32 extra_bed_price_per_night_minor = 10;
   optional int32 extra_beds_per_room = 11;
+  optional int32 weekend_price_per_night_minor = 12;
 }
 
 message UpsertOwnerAvailabilityRequest {
