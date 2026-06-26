@@ -140,6 +140,13 @@ def _rpc(fn: F) -> F:
             raise
         except ValueError as exc:
             raise ConnectError(Code.INVALID_ARGUMENT, str(exc)) from exc
+        except Exception as exc:
+            from postgrest.exceptions import APIError
+
+            if isinstance(exc, APIError):
+                message = exc.message or exc.details or exc.hint or repr(exc)
+                raise ConnectError(Code.INTERNAL, message or "Database request failed.") from exc
+            raise ConnectError(Code.INTERNAL, f"{type(exc).__name__}: {exc}") from exc
 
     return wrapper  # type: ignore[return-value]
 

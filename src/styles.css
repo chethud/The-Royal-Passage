@@ -3310,6 +3310,18 @@
 }
 
 .royal-passport-book {
+  --passport-ink: #3a2610;
+  --passport-ink-muted: rgb(58 38 16 / 0.82);
+  --passport-portrait-top: 35.4%;
+  --passport-portrait-left: 5.6%;
+  --passport-portrait-width: 13.6%;
+  --passport-portrait-height: 35.6%;
+  --passport-field-left: 26.2%;
+  --passport-field-width: 22.2%;
+  --passport-line-name-top: 43%;
+  --passport-line-dob-top: 52.2%;
+  --passport-line-phone-top: 57.5%;
+
   position: relative;
   width: var(--passport-book-width);
   transform: scale(var(--passport-scale));
@@ -3333,6 +3345,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  color: var(--passport-ink);
 }
 
 .royal-passport-book__overlay > * {
@@ -3351,36 +3364,33 @@
 }
 
 .royal-passport-book__portrait-slot {
-  top: 35.8%;
-  left: 7.6%;
-  width: 13.4%;
-  height: 34.2%;
+  top: var(--passport-portrait-top);
+  left: var(--passport-portrait-left);
+  width: var(--passport-portrait-width);
+  height: var(--passport-portrait-height);
 }
 
 .royal-passport-book__field {
-  display: flex;
-  align-items: flex-end;
+  display: block;
+  height: auto;
 }
 
 .royal-passport-book__field--name {
-  top: 38.1%;
-  left: 26.4%;
-  width: 21.8%;
-  height: 5.2%;
+  top: var(--passport-line-name-top);
+  left: var(--passport-field-left);
+  width: var(--passport-field-width);
 }
 
 .royal-passport-book__field--dob {
-  top: 47.5%;
-  left: 26.4%;
-  width: 21.8%;
-  height: 5.2%;
+  top: var(--passport-line-dob-top);
+  left: var(--passport-field-left);
+  width: var(--passport-field-width);
 }
 
 .royal-passport-book__field--phone {
-  top: 56.9%;
-  left: 26.4%;
-  width: 21.8%;
-  height: 5.2%;
+  top: var(--passport-line-phone-top);
+  left: var(--passport-field-left);
+  width: var(--passport-field-width);
 }
 
 .royal-passport-book__right-panel {
@@ -3404,53 +3414,86 @@
 }
 
 .royal-passport-book__value {
-  font-family: "Courier New", "Lucida Console", monospace;
-  font-size: 0.88rem;
-  letter-spacing: 0.04em;
-  color: #2a1a0c;
+  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--passport-ink);
 }
 
 .royal-passport-book__value--small {
-  font-size: 0.74rem;
+  font-size: 0.8rem;
   word-break: break-all;
 }
 
 .royal-passport-book__input {
   width: 100%;
-  height: 100%;
+  height: auto;
   border: none;
-  border-bottom: 1px solid rgb(74 48 24 / 0.35);
+  border-bottom: none;
   background: transparent;
-  padding: 0 0 0.1rem;
+  padding: 0;
+  margin: 0;
   outline: none;
-  color: inherit;
-  font: inherit;
+  color: var(--passport-ink);
+  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  caret-color: var(--passport-ink);
+}
+
+.royal-passport-book__input::placeholder {
+  color: rgb(58 38 16 / 0.38);
+  font-weight: 500;
 }
 
 .royal-passport-book__input:focus {
-  border-bottom-color: rgb(120 72 28 / 0.65);
-  background: rgb(255 248 228 / 0.28);
+  background: rgb(255 248 228 / 0.18);
+  box-shadow: inset 0 -1px 0 rgb(74 48 24 / 0.45);
+}
+
+.royal-passport-book__input:-webkit-autofill,
+.royal-passport-book__input:-webkit-autofill:hover,
+.royal-passport-book__input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--passport-ink);
+  box-shadow: 0 0 0 1000px transparent inset;
+  transition: background-color 99999s ease-out 0s;
 }
 
 .royal-passport-book__input--date {
   color-scheme: light;
-  font-size: 0.78rem;
+  font-size: 0.9rem;
+  appearance: none;
+}
+
+.royal-passport-book__input--date::-webkit-calendar-picker-indicator {
+  opacity: 0.45;
+  filter: sepia(1) saturate(0.35);
+  cursor: pointer;
 }
 
 .royal-passport-book__meta {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.55rem 0.65rem;
-  border: 1px solid rgb(74 48 24 / 0.16);
-  background: rgb(255 248 228 / 0.42);
+  gap: 0.2rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid rgb(74 48 24 / 0.14);
+  background: rgb(255 248 228 / 0.28);
+}
+
+.royal-passport-book__meta .royal-passport-book__value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--passport-ink-muted);
 }
 
 .royal-passport-book__vip {
-  border: 1px solid rgb(74 48 24 / 0.22);
-  background: rgb(255 248 228 / 0.58);
-  padding: 0.85rem 0.9rem 0.95rem;
-  backdrop-filter: blur(1px);
+  border: 1px solid rgb(74 48 24 / 0.18);
+  background: rgb(255 248 228 / 0.42);
+  padding: 0.8rem 0.85rem 0.9rem;
+  backdrop-filter: blur(0.5px);
 }
 
 .royal-passport-book__vip-heading {
@@ -3474,9 +3517,9 @@
 .royal-passport-book__vip-note {
   margin-top: 0.55rem;
   font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: rgb(58 36 18 / 0.9);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--passport-ink-muted);
 }
 
 .royal-passport-book__vip-note {

@@ -7,16 +7,56 @@ import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 import { GuestBookingsList } from "@/components/guest/GuestBookingsList";
 import { GuestDashboardShell } from "@/components/guest/GuestDashboardShell";
 import { GuestEmptyState } from "@/components/guest/GuestEmptyState";
-import { fetchMyBookings, type BookingSummary } from "@/lib/api/bookings";
-import { fetchGuestHomestayBookings } from "@/lib/api/guest-homestay-bookings";
-import type { HomestayBookingSummary } from "@/lib/api/owner-homestay-bookings";
 import { GuestHomestayBookingsList } from "@/components/guest/GuestHomestayBookingsList";
+import type { BookingSummary } from "@/lib/api/bookings";
+import { fetchMyBookings } from "@/lib/api/bookings";
+import type { HomestayBookingSummary } from "@/lib/api/owner-homestay-bookings";
+import { fetchGuestHomestayBookings } from "@/lib/api/guest-homestay-bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
+import { loadGuestBookingHistory } from "@/lib/guest-booking-history";
+import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 import { useGuestAccess } from "@/lib/use-guest-access";
 
 type HistorySearch = {
   booked?: string;
 };
+
+async function loadHistory(accessToken: string | null) {
+  if (isSupabaseBrowserConfigured()) {
+    try {
+      return await loadGuestBookingHistory();
+    } catch (supabaseError) {
+      if (!isApiConfigured() || !accessToken) {
+        throw supabaseError;
+      }
+    }
+  }
+
+  if (!isApiConfigured() || !accessToken) {
+    throw new Error("Booking history is not configured for this deployment.");
+  }
+
+  const [upcoming, past, cancelled, homestayUpcoming, homestayPast, homestayCancelled] =
+    await Promise.all([
+      fetchMyBookings(accessToken, "upcoming"),
+      fetchMyBookings(accessToken, "past"),
+      fetchMyBookings(accessToken, "cancelled"),
+      fetchGuestHomestayBookings(accessToken, "upcoming"),
+      fetchGuestHomestayBookings(accessToken, "past"),
+      fetchGuestHomestayBookings(accessToken, "cancelled"),
+    ]);
+
+  return {
+    activeBookings: upcoming,
+    activeHomestayBookings: homestayUpcoming,
+    bookings: [...past, ...cancelled].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    ),
+    homestayBookings: [...homestayPast, ...homestayCancelled].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    ),
+  };
+}
 
 export const Route = createFileRoute("/dashboard/history")({
   validateSearch: (s: Record<string, unknown>): HistorySearch => ({
@@ -42,32 +82,14 @@ function GuestHistoryPage() {
   const [confirmedBookingId, setConfirmedBookingId] = useState<string | null>(null);
 
   const loadBookings = useCallback(async () => {
-    if (!accessToken) return;
     setPageLoading(true);
     setPageError(null);
     try {
-      if (!isApiConfigured()) {
-        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
-      }
-      const [upcoming, past, cancelled, homestayUpcoming, homestayPast, homestayCancelled] =
-        await Promise.all([
-          fetchMyBookings(accessToken, "upcoming"),
-          fetchMyBookings(accessToken, "past"),
-          fetchMyBookings(accessToken, "cancelled"),
-          fetchGuestHomestayBookings(accessToken, "upcoming"),
-          fetchGuestHomestayBookings(accessToken, "past"),
-          fetchGuestHomestayBookings(accessToken, "cancelled"),
-        ]);
-      setActiveBookings(upcoming);
-      setActiveHomestayBookings(homestayUpcoming);
-      const merged = [...past, ...cancelled].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-      setBookings(merged);
-      const mergedHomestays = [...homestayPast, ...homestayCancelled].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-      setHomestayBookings(mergedHomestays);
+      const result = await loadHistory(accessToken);
+      setActiveBookings(result.activeBookings);
+      setActiveHomestayBookings(result.activeHomestayBookings);
+      setBookings(result.bookings);
+      setHomestayBookings(result.homestayBookings);
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to load booking history."));
     } finally {
