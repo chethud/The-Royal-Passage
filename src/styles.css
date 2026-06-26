@@ -3316,11 +3316,17 @@
   --passport-portrait-left: 5.6%;
   --passport-portrait-width: 13.6%;
   --passport-portrait-height: 35.6%;
-  --passport-field-left: 26.2%;
-  --passport-field-width: 22.2%;
-  --passport-line-name-top: 43%;
-  --passport-line-dob-top: 52.2%;
-  --passport-line-phone-top: 57.5%;
+  --passport-field-font-size: clamp(0.68rem, 0.78vw, 0.8rem);
+  --passport-field-line-height: 1;
+  --passport-line-name-top: 40.76%;
+  --passport-line-name-left: 41.2%;
+  --passport-line-name-width: 7.6%;
+  --passport-line-dob-top: 45.31%;
+  --passport-line-dob-left: 39.9%;
+  --passport-line-dob-width: 8.9%;
+  --passport-line-phone-top: 50.59%;
+  --passport-line-phone-left: 40.5%;
+  --passport-line-phone-width: 8.3%;
 
   position: relative;
   width: var(--passport-book-width);
@@ -3371,26 +3377,28 @@
 }
 
 .royal-passport-book__field {
+  font-size: var(--passport-field-font-size);
+  line-height: var(--passport-field-line-height);
   display: block;
   height: auto;
 }
 
 .royal-passport-book__field--name {
-  top: var(--passport-line-name-top);
-  left: var(--passport-field-left);
-  width: var(--passport-field-width);
+  top: calc(var(--passport-line-name-top) - 1em);
+  left: var(--passport-line-name-left);
+  width: var(--passport-line-name-width);
 }
 
 .royal-passport-book__field--dob {
-  top: var(--passport-line-dob-top);
-  left: var(--passport-field-left);
-  width: var(--passport-field-width);
+  top: calc(var(--passport-line-dob-top) - 1em);
+  left: var(--passport-line-dob-left);
+  width: var(--passport-line-dob-width);
 }
 
 .royal-passport-book__field--phone {
-  top: var(--passport-line-phone-top);
-  left: var(--passport-field-left);
-  width: var(--passport-field-width);
+  top: calc(var(--passport-line-phone-top) - 1em);
+  left: var(--passport-line-phone-left);
+  width: var(--passport-line-phone-width);
 }
 
 .royal-passport-book__right-panel {
@@ -3415,9 +3423,10 @@
 
 .royal-passport-book__value {
   font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
-  font-size: 0.95rem;
+  font-size: var(--passport-field-font-size);
   font-weight: 600;
   letter-spacing: 0.02em;
+  line-height: var(--passport-field-line-height);
   color: var(--passport-ink);
 }
 
@@ -3427,19 +3436,22 @@
 }
 
 .royal-passport-book__input {
+  display: block;
   width: 100%;
   height: auto;
+  min-height: 0;
   border: none;
   border-bottom: none;
   background: transparent;
   padding: 0;
   margin: 0;
   outline: none;
+  text-align: left;
   color: var(--passport-ink);
   font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
-  font-size: 0.95rem;
+  font-size: var(--passport-field-font-size);
   font-weight: 600;
-  line-height: 1;
+  line-height: var(--passport-field-line-height);
   letter-spacing: 0.02em;
   caret-color: var(--passport-ink);
 }
@@ -3464,11 +3476,28 @@
 
 .royal-passport-book__input--date {
   color-scheme: light;
-  font-size: 0.9rem;
   appearance: none;
+  padding-inline-end: 0;
+}
+
+.royal-passport-book__input--date::-webkit-datetime-edit,
+.royal-passport-book__input--date::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+  line-height: var(--passport-field-line-height);
+}
+
+.royal-passport-book__input--date::-webkit-datetime-edit-text,
+.royal-passport-book__input--date::-webkit-datetime-edit-month-field,
+.royal-passport-book__input--date::-webkit-datetime-edit-day-field,
+.royal-passport-book__input--date::-webkit-datetime-edit-year-field {
+  padding: 0;
+  line-height: var(--passport-field-line-height);
 }
 
 .royal-passport-book__input--date::-webkit-calendar-picker-indicator {
+  width: 0.75rem;
+  height: 0.75rem;
+  margin: 0 0 0 0.1rem;
   opacity: 0.45;
   filter: sepia(1) saturate(0.35);
   cursor: pointer;
