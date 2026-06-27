@@ -3,6 +3,7 @@ import passportPageBorderUrl from "@/assets/passport/royal-passport-page-border.
 import passportCrestLogoUrl from "@/assets/passport/royal-passport-crest-logo.png";
 import passportProfileHeadingUrl from "@/assets/passport/royal-passport-profile-heading-ref.png";
 import passportWaxSealUrl from "@/assets/passport/royal-passport-wax-seal.png";
+import passportEndorsementsDividerUrl from "@/assets/passport/royal-passport-endorsements-divider.png";
 import { PassportPhotoFrame } from "@/components/passport/PassportPhotoFrame";
 
 type RoyalPassportBookProps = {
@@ -152,8 +153,22 @@ export function RoyalPassportBook({
           draggable={false}
         />
 
+        <p
+          className="royal-passport-book__reg royal-passport-book__reg--right"
+          aria-label={`Registration number ${regNo}`}
+        >
+          {regNo}
+        </p>
+
         <div className="royal-passport-book__endorsements-heading" role="heading" aria-level={3}>
           <span className="royal-passport-book__endorsements-title">Endorsements & Privileges</span>
+          <img
+            src={passportEndorsementsDividerUrl}
+            alt=""
+            className="royal-passport-book__endorsements-flourish"
+            decoding="async"
+            draggable={false}
+          />
         </div>
       </div>
     </div>

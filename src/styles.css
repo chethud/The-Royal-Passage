@@ -3336,6 +3336,8 @@
   --passport-fields-top: 45%;
   --passport-field-gap: 7.4%;
   --passport-field-font-size: clamp(1.02rem, 1.24vw, 1.24rem);
+  --passport-reg-right-bottom: 11%;
+  --passport-reg-right-left: calc(var(--passport-border-right-x) + 4%);
   --passport-seal-bottom: 11%;
   --passport-seal-right-inset: 3.5%;
   --passport-seal-width: 13%;
@@ -3400,7 +3402,7 @@
   height: auto;
   transform: translateX(-50%);
   opacity: 0.98;
-  filter: contrast(1.04) saturate(0.95) brightness(1);
+  filter: contrast(1.06) saturate(1.05) brightness(0.96);
   user-select: none;
   pointer-events: none;
 }
@@ -3445,6 +3447,10 @@
   top: var(--passport-endorsements-top);
   left: var(--passport-right-center-x);
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
   transform: translateX(-50%);
   pointer-events: none;
 }
@@ -3452,12 +3458,23 @@
 .royal-passport-book__endorsements-title {
   display: block;
   font-family: "Cinzel", ui-serif, Georgia, serif;
-  font-size: clamp(0.68rem, 0.84vw, 0.82rem);
+  font-size: clamp(0.88rem, 1.08vw, 1.05rem);
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   white-space: nowrap;
   color: var(--passport-ink);
+}
+
+.royal-passport-book__endorsements-flourish {
+  display: block;
+  width: clamp(16rem, 48vw, 26rem);
+  height: auto;
+  opacity: 0.94;
+  mix-blend-mode: multiply;
+  filter: contrast(1.08) brightness(0.92);
+  user-select: none;
+  pointer-events: none;
 }
 
 .royal-passport-book__left-overlay {
@@ -3486,6 +3503,16 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgb(46 30 12 / 0.78);
+  pointer-events: none;
+}
+
+.royal-passport-book__reg--right {
+  position: absolute;
+  top: auto;
+  bottom: var(--passport-reg-right-bottom);
+  left: var(--passport-reg-right-left);
+  z-index: 2;
+  transform: none;
   pointer-events: none;
 }
 
