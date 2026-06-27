@@ -17,7 +17,7 @@ export const Route = createFileRoute("/account/profile")({
 
 function ProfileLoadingShell() {
   return (
-    <GuestDashboardShell title="Profile" subtitle="Your account details.">
+    <GuestDashboardShell title="Profile" showPageHeader={false}>
       <p className="text-sm text-muted-foreground">Loading profile…</p>
     </GuestDashboardShell>
   );
@@ -53,7 +53,7 @@ function AccountProfilePage() {
       ? "Your contact details for host communications and payouts."
       : resolvedRole === "editor"
         ? "Your editor account details."
-        : "Your contact details for bookings and host communication.";
+        : undefined;
 
   const content = <AccountProfileSection />;
 
@@ -78,7 +78,7 @@ function AccountProfilePage() {
   }
 
   return (
-    <GuestDashboardShell title="Profile" subtitle={subtitle} wide>
+    <GuestDashboardShell title="Profile" wide showPageHeader={false}>
       {content}
     </GuestDashboardShell>
   );
