@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import (
@@ -15,6 +15,40 @@ from app.services.guest_profile import get_guest_profile
 
 VALID_ID_TYPE = "aadhaar"
 VALID_PROFESSIONAL_CARD_TYPES = {"business", "visitor"}
+VIP_REAPPLY_COOLDOWN_DAYS = 60
+
+
+def _parse_iso_datetime(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _reapply_available_at(reviewed_at: str | None) -> datetime | None:
+    reviewed = _parse_iso_datetime(reviewed_at)
+    if not reviewed:
+        return None
+    if reviewed.tzinfo is None:
+        reviewed = reviewed.replace(tzinfo=timezone.utc)
+    return reviewed + timedelta(days=VIP_REAPPLY_COOLDOWN_DAYS)
+
+
+def _ensure_can_reapply_after_rejection(existing_row: dict | None) -> None:
+    if not existing_row or existing_row.get("status") != "rejected":
+        return
+    available_at = _reapply_available_at(existing_row.get("reviewed_at"))
+    if not available_at:
+        return
+    now = datetime.now(timezone.utc)
+    if now < available_at:
+        days_remaining = max((available_at.date() - now.date()).days, 1)
+        raise ValueError(
+            "You can submit a new Royal VIP application after "
+            f"{available_at.strftime('%B %d, %Y')} ({days_remaining} day(s) remaining)."
+        )
 
 
 def _membership_status(profile: dict) -> str:
@@ -126,11 +160,13 @@ def submit_vip_membership_application(
         "instagram_username": instagram,
         "facebook_username": facebook,
         "status": "pending",
+        "reviewed_by": None,
+        "reviewed_at": None,
     }
 
     existing = (
         supabase.table("vip_membership_applications")
-        .select("id, status")
+        .select("id, status, reviewed_at")
         .eq("guest_user_id", user_id)
         .maybe_single()
         .execute()
@@ -139,6 +175,7 @@ def submit_vip_membership_application(
     if existing_row:
         if existing_row.get("status") == "pending":
             raise ValueError("Your VIP membership application is already under review.")
+        _ensure_can_reapply_after_rejection(existing_row)
         supabase.table("vip_membership_applications").update(application_row).eq(
             "id", existing_row["id"]
         ).execute()

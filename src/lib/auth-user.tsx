@@ -34,6 +34,7 @@ export type AuthUserState = {
   accessToken: string | null;
   hasCachedSession: boolean;
   vipMembershipStatus: string | null;
+  vipMembershipRejectedAt: string | null;
   guestCreatedAt: string | null;
   refreshVipMembershipStatus: () => Promise<void>;
 };
@@ -123,6 +124,7 @@ function useAuthUserState(): AuthUserState {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [vipMembershipStatus, setVipMembershipStatus] = useState<string | null>(null);
+  const [vipMembershipRejectedAt, setVipMembershipRejectedAt] = useState<string | null>(null);
   const [guestCreatedAt, setGuestCreatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(configured);
   const [cachedUser, setCachedUser] = useState<CachedUser | null>(() => readCachedUser());
@@ -143,6 +145,7 @@ function useAuthUserState(): AuthUserState {
         setProfile(null);
         setAccessToken(null);
         setVipMembershipStatus(null);
+        setVipMembershipRejectedAt(null);
         setGuestCreatedAt(null);
         writeCachedUser(null);
         setCachedUser(readCachedUser());
@@ -172,14 +175,17 @@ function useAuthUserState(): AuthUserState {
           const apiProfile = await fetchGuestProfile(resolvedToken);
           if (!mounted) return;
           setVipMembershipStatus(apiProfile.vipMembershipStatus);
+          setVipMembershipRejectedAt(apiProfile.vipMembershipRejectedAt);
           setGuestCreatedAt(apiProfile.createdAt || null);
         } catch {
           if (!mounted) return;
           setVipMembershipStatus("none");
+          setVipMembershipRejectedAt(null);
           setGuestCreatedAt(null);
         }
       } else {
         setVipMembershipStatus(null);
+        setVipMembershipRejectedAt(null);
         setGuestCreatedAt(null);
       }
     };
@@ -215,9 +221,11 @@ function useAuthUserState(): AuthUserState {
     try {
       const apiProfile = await fetchGuestProfile(accessToken);
       setVipMembershipStatus(apiProfile.vipMembershipStatus);
+      setVipMembershipRejectedAt(apiProfile.vipMembershipRejectedAt);
       setGuestCreatedAt(apiProfile.createdAt || null);
     } catch {
       setVipMembershipStatus("none");
+      setVipMembershipRejectedAt(null);
       setGuestCreatedAt(null);
     }
   };
@@ -232,6 +240,7 @@ function useAuthUserState(): AuthUserState {
     accessToken,
     hasCachedSession: Boolean(cachedUser?.id),
     vipMembershipStatus,
+    vipMembershipRejectedAt,
     guestCreatedAt,
     refreshVipMembershipStatus,
   };

@@ -1,12 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { Crown } from "lucide-react";
-import { isApprovedVipMember } from "@/lib/api/vip-membership";
+import {
+  canReapplyForVip,
+  formatVipReapplyDate,
+  isApprovedVipMember,
+} from "@/lib/api/vip-membership";
 
 type VipMembershipUpgradeCardProps = {
   status: string;
+  rejectedAt?: string | null;
 };
 
-export function VipMembershipUpgradeCard({ status }: VipMembershipUpgradeCardProps) {
+export function VipMembershipUpgradeCard({ status, rejectedAt = null }: VipMembershipUpgradeCardProps) {
   if (isApprovedVipMember(status)) {
     return (
       <section className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8">
@@ -48,6 +53,9 @@ export function VipMembershipUpgradeCard({ status }: VipMembershipUpgradeCardPro
     );
   }
 
+  const reapplyAllowed = canReapplyForVip(status, rejectedAt);
+  const reapplyDate = formatVipReapplyDate(rejectedAt);
+
   return (
     <section className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-6 sm:p-8">
       <div className="flex items-start gap-3">
@@ -61,17 +69,20 @@ export function VipMembershipUpgradeCard({ status }: VipMembershipUpgradeCardPro
             </p>
             {status === "rejected" ? (
               <p className="mt-2 text-sm text-muted-foreground">
-                Your previous application was not approved. You may submit a new application with
-                updated details.
+                {reapplyAllowed
+                  ? "Your previous application was not approved. You may submit a new application with updated details."
+                  : `Your previous application was not approved. You may reapply after ${reapplyDate ?? "the waiting period ends"}.`}
               </p>
             ) : null}
           </div>
-          <Link
-            to="/account/vip-apply"
-            className="inline-flex rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/50 px-4 py-2.5 text-sm font-medium uppercase tracking-[0.12em] text-foreground no-underline transition-colors hover:border-ember/50 hover:text-ember"
-          >
-            Apply for VIP membership
-          </Link>
+          {reapplyAllowed ? (
+            <Link
+              to="/account/vip-apply"
+              className="inline-flex rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/50 px-4 py-2.5 text-sm font-medium uppercase tracking-[0.12em] text-foreground no-underline transition-colors hover:border-ember/50 hover:text-ember"
+            >
+              Apply for VIP membership
+            </Link>
+          ) : null}
         </div>
       </div>
     </section>

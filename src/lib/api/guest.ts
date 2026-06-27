@@ -12,6 +12,7 @@ export type GuestProfile = {
   avatarUrl: string | null;
   dateOfBirth: string | null;
   vipMembershipStatus: string;
+  vipMembershipRejectedAt: string | null;
   registrationNumber: string | null;
 };
 
@@ -32,6 +33,7 @@ function normalizeGuestProfile(raw: {
   avatarUrl?: string | null;
   dateOfBirth?: string | null;
   vipMembershipStatus?: string | null;
+  vipMembershipRejectedAt?: string | null;
   registrationNumber?: string | null;
 }): GuestProfile {
   return {
@@ -45,6 +47,10 @@ function normalizeGuestProfile(raw: {
     dateOfBirth:
       raw.dateOfBirth != null && String(raw.dateOfBirth).trim() ? String(raw.dateOfBirth) : null,
     vipMembershipStatus: String(raw.vipMembershipStatus ?? "none"),
+    vipMembershipRejectedAt:
+      raw.vipMembershipRejectedAt != null && String(raw.vipMembershipRejectedAt).trim()
+        ? String(raw.vipMembershipRejectedAt).trim()
+        : null,
     registrationNumber:
       raw.registrationNumber != null && String(raw.registrationNumber).trim()
         ? String(raw.registrationNumber).trim()

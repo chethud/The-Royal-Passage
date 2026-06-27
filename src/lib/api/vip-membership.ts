@@ -12,6 +12,8 @@ import {
   isRecentGuestAccount,
 } from "@/lib/vip-membership-prompt-storage";
 
+export const VIP_REAPPLY_COOLDOWN_DAYS = 60;
+
 export type VipMembershipStatus = "none" | "skipped" | "pending" | "approved" | "rejected";
 
 export type VipMembershipApplicationSummary = {
@@ -138,6 +140,48 @@ export function isVipMembershipStatus(value: string | null | undefined): value i
 
 export function isApprovedVipMember(status: string | null | undefined): boolean {
   return status === "approved";
+}
+
+export function getVipReapplyAvailableAt(
+  rejectedAt: string | null | undefined,
+): Date | null {
+  if (!rejectedAt) return null;
+  const rejected = new Date(rejectedAt);
+  if (Number.isNaN(rejected.getTime())) return null;
+  const available = new Date(rejected);
+  available.setDate(available.getDate() + VIP_REAPPLY_COOLDOWN_DAYS);
+  return available;
+}
+
+export function canReapplyForVip(
+  status: string | null | undefined,
+  rejectedAt: string | null | undefined,
+  now: Date = new Date(),
+): boolean {
+  if (status !== "rejected") return true;
+  const availableAt = getVipReapplyAvailableAt(rejectedAt);
+  if (!availableAt) return true;
+  return now >= availableAt;
+}
+
+export function formatVipReapplyDate(
+  rejectedAt: string | null | undefined,
+  locale?: string,
+): string | null {
+  const availableAt = getVipReapplyAvailableAt(rejectedAt);
+  if (!availableAt) return null;
+  return availableAt.toLocaleDateString(locale, { dateStyle: "long" });
+}
+
+export function daysUntilVipReapply(
+  rejectedAt: string | null | undefined,
+  now: Date = new Date(),
+): number | null {
+  const availableAt = getVipReapplyAvailableAt(rejectedAt);
+  if (!availableAt) return null;
+  const diffMs = availableAt.getTime() - now.getTime();
+  if (diffMs <= 0) return 0;
+  return Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
 }
 
 export function shouldPromptVipMembership(

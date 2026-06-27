@@ -216,6 +216,7 @@ message GuestProfile {
   optional string avatar_url = 7;
   optional string date_of_birth = 8;
   string vip_membership_status = 9;
+  optional string vip_membership_rejected_at = 10;
 }
 
 message UpdateGuestProfileRequest {

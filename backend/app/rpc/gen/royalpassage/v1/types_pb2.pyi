@@ -374,7 +374,7 @@ class CreatePlatformUserResponse(_message.Message):
     def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., role: _Optional[str] = ..., host_id: _Optional[str] = ..., homestay_owner_id: _Optional[str] = ..., vip_owner_id: _Optional[str] = ...) -> None: ...
 
 class GuestProfile(_message.Message):
-    __slots__ = ("id", "email", "full_name", "phone", "role", "created_at", "avatar_url", "date_of_birth", "vip_membership_status")
+    __slots__ = ("id", "email", "full_name", "phone", "role", "created_at", "avatar_url", "date_of_birth", "vip_membership_status", "vip_membership_rejected_at")
     ID_FIELD_NUMBER: _ClassVar[int]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
     FULL_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -384,6 +384,7 @@ class GuestProfile(_message.Message):
     AVATAR_URL_FIELD_NUMBER: _ClassVar[int]
     DATE_OF_BIRTH_FIELD_NUMBER: _ClassVar[int]
     VIP_MEMBERSHIP_STATUS_FIELD_NUMBER: _ClassVar[int]
+    VIP_MEMBERSHIP_REJECTED_AT_FIELD_NUMBER: _ClassVar[int]
     id: str
     email: str
     full_name: str
@@ -393,7 +394,8 @@ class GuestProfile(_message.Message):
     avatar_url: str
     date_of_birth: str
     vip_membership_status: str
-    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., phone: _Optional[str] = ..., role: _Optional[str] = ..., created_at: _Optional[str] = ..., avatar_url: _Optional[str] = ..., date_of_birth: _Optional[str] = ..., vip_membership_status: _Optional[str] = ...) -> None: ...
+    vip_membership_rejected_at: str
+    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., phone: _Optional[str] = ..., role: _Optional[str] = ..., created_at: _Optional[str] = ..., avatar_url: _Optional[str] = ..., date_of_birth: _Optional[str] = ..., vip_membership_status: _Optional[str] = ..., vip_membership_rejected_at: _Optional[str] = ...) -> None: ...
 
 class UpdateGuestProfileRequest(_message.Message):
     __slots__ = ("full_name", "phone", "avatar_url", "date_of_birth")

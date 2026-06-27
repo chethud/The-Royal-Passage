@@ -127,3 +127,6 @@ drop trigger if exists trg_vip_custom_package_requests_updated on public.vip_cus
 create trigger trg_vip_custom_package_requests_updated
   before update on public.vip_custom_package_requests
   for each row execute procedure public.set_updated_at();
+
+
+

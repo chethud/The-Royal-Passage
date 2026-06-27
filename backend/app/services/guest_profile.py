@@ -14,9 +14,28 @@ def _normalize_date_of_birth(value) -> str | None:
     return text or None
 
 
+def _vip_membership_rejected_at(user_id: str, status: str) -> str | None:
+    if status != "rejected":
+        return None
+    supabase = get_supabase_admin()
+    result = (
+        supabase.table("vip_membership_applications")
+        .select("reviewed_at")
+        .eq("guest_user_id", user_id)
+        .maybe_single()
+        .execute()
+    )
+    row = result.data if result else None
+    if not row:
+        return None
+    reviewed_at = row.get("reviewed_at")
+    return str(reviewed_at) if reviewed_at else None
+
+
 def get_guest_profile(auth: dict) -> GuestProfile:
     profile = auth["profile"]
     user = auth["user"]
+    vip_status = profile.get("vip_membership_status") or "none"
 
     return GuestProfile(
         id=user.id,
@@ -27,7 +46,8 @@ def get_guest_profile(auth: dict) -> GuestProfile:
         createdAt=profile.get("created_at") or "",
         avatarUrl=profile.get("avatar_url"),
         dateOfBirth=_normalize_date_of_birth(profile.get("date_of_birth")),
-        vipMembershipStatus=profile.get("vip_membership_status") or "none",
+        vipMembershipStatus=vip_status,
+        vipMembershipRejectedAt=_vip_membership_rejected_at(user.id, vip_status),
     )
 
 

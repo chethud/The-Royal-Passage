@@ -8,6 +8,7 @@ import { handlePassportPhotoUpload } from "@/lib/passport-photo/passport-photo-u
 import { resolveRegistrationNumber } from "@/lib/registration-number";
 import { RoyalPassportBook } from "@/components/passport/RoyalPassportBook";
 import { useFaceDetection } from "@/hooks/useFaceDetection";
+import { useAuthUser } from "@/lib/auth-user";
 
 type GuestProfileFormProps = {
   profile: GuestProfile;
@@ -16,6 +17,10 @@ type GuestProfileFormProps = {
 
 export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) {
   const { detectLargestFace, loading: faceModelLoading, error: faceModelError } = useFaceDetection();
+  const { vipMembershipStatus: authVipStatus, vipMembershipRejectedAt: authVipRejectedAt } =
+    useAuthUser();
+  const vipMembershipStatus = authVipStatus ?? profile.vipMembershipStatus;
+  const vipMembershipRejectedAt = authVipRejectedAt;
 
   const [fullName, setFullName] = useState(profile.fullName ?? "");
   const [phone, setPhone] = useState(profile.phone ?? "");
@@ -102,7 +107,8 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
         domicile="Mysuru, Bharata"
         email={profile.email}
         phone={phone}
-        vipMembershipStatus={profile.vipMembershipStatus}
+        vipMembershipStatus={vipMembershipStatus}
+        vipMembershipRejectedAt={vipMembershipRejectedAt}
         photoUrl={previewUrl}
         photoProcessing={uploadingPhoto}
         onFullNameChange={setFullName}

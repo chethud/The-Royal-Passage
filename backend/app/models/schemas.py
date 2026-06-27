@@ -776,6 +776,7 @@ class GuestProfile(BaseModel):
     avatarUrl: str | None = None
     dateOfBirth: str | None = None
     vipMembershipStatus: str = "none"
+    vipMembershipRejectedAt: str | None = None
 
 
 class SubmitVipMembershipApplicationRequest(BaseModel):

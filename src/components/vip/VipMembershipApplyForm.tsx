@@ -8,7 +8,12 @@ import {
   CheckoutWizardStepper,
 } from "@/components/booking/CheckoutWizardPrimitives";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
-import { submitVipMembershipApplication } from "@/lib/api/vip-membership";
+import {
+  canReapplyForVip,
+  daysUntilVipReapply,
+  formatVipReapplyDate,
+  submitVipMembershipApplication,
+} from "@/lib/api/vip-membership";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useAuthUser } from "@/lib/auth-user";
 import {
@@ -89,7 +94,7 @@ function PhotoUploadField({
 
 export function VipMembershipApplyForm() {
   const navigate = useNavigate();
-  const { user, accessToken, displayName, profile, refreshVipMembershipStatus } = useAuthUser();
+  const { user, accessToken, displayName, profile, refreshVipMembershipStatus, vipMembershipStatus, vipMembershipRejectedAt } = useAuthUser();
   const [step, setStep] = useState(1);
   const [stepError, setStepError] = useState<string | null>(null);
   const [fullName, setFullName] = useState(displayName ?? profile?.fullName ?? "");
@@ -216,6 +221,37 @@ export function VipMembershipApplyForm() {
 
   if (!user || !accessToken) {
     return <PageLoadingGate />;
+  }
+
+  const reapplyBlocked =
+    vipMembershipStatus === "rejected" &&
+    !canReapplyForVip(vipMembershipStatus, vipMembershipRejectedAt);
+  const reapplyDate = formatVipReapplyDate(vipMembershipRejectedAt);
+  const daysRemaining = daysUntilVipReapply(vipMembershipRejectedAt);
+
+  if (reapplyBlocked) {
+    return (
+      <LuxuryCheckoutPanel>
+        <CheckoutWizardStepHeader
+          title="Reapply later"
+          description="Royal VIP applications can be submitted again 60 days after a rejection."
+        />
+        <CheckoutWizardStepBody>
+          <p className="luxury-panel-body text-sm leading-relaxed">
+            Your previous application was not approved. You may submit a new application on{" "}
+            <strong>{reapplyDate ?? "a later date"}</strong>
+            {daysRemaining ? ` (${daysRemaining} day(s) remaining).` : "."}
+          </p>
+        </CheckoutWizardStepBody>
+        <CheckoutWizardStepFooter
+          primary={{
+            label: "Back to profile",
+            onClick: () => void navigate({ to: "/account/profile" }),
+            showArrow: false,
+          }}
+        />
+      </LuxuryCheckoutPanel>
+    );
   }
 
   const cardLabel = professionalCardType === "business" ? "Business card" : "Visitor card";
