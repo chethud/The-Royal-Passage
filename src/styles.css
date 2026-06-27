@@ -3319,6 +3319,8 @@
   --passport-border-left-x: 1%;
   --passport-border-right-x: 50%;
   --passport-left-center-x: calc(var(--passport-border-left-x) + var(--passport-border-page-width) / 2);
+  --passport-right-center-x: calc(var(--passport-border-right-x) + var(--passport-border-page-width) / 2);
+  --passport-endorsements-top: 8%;
   --passport-crest-top: 7.5%;
   --passport-crest-width: 12%;
   --passport-title-top: calc(var(--passport-crest-top) + 21%);
@@ -3436,6 +3438,26 @@
   filter: contrast(1.05) saturate(1.02) drop-shadow(0 2px 6px rgb(40 8 8 / 0.28));
   user-select: none;
   pointer-events: none;
+}
+
+.royal-passport-book__endorsements-heading {
+  position: absolute;
+  top: var(--passport-endorsements-top);
+  left: var(--passport-right-center-x);
+  z-index: 2;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.royal-passport-book__endorsements-title {
+  display: block;
+  font-family: "Cinzel", ui-serif, Georgia, serif;
+  font-size: clamp(0.68rem, 0.84vw, 0.82rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--passport-ink);
 }
 
 .royal-passport-book__left-overlay {

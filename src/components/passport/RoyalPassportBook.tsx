@@ -151,6 +151,10 @@ export function RoyalPassportBook({
           decoding="async"
           draggable={false}
         />
+
+        <div className="royal-passport-book__endorsements-heading" role="heading" aria-level={3}>
+          <span className="royal-passport-book__endorsements-title">Endorsements & Privileges</span>
+        </div>
       </div>
     </div>
   );
