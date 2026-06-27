@@ -3,6 +3,7 @@ import passportPageBorderUrl from "@/assets/passport/royal-passport-page-border.
 import passportCrestLogoUrl from "@/assets/passport/royal-passport-crest-logo.png";
 import passportProfileHeadingUrl from "@/assets/passport/royal-passport-profile-heading-ref.png";
 import passportWaxSealUrl from "@/assets/passport/royal-passport-wax-seal.png";
+import { PassportPhotoFrame } from "@/components/passport/PassportPhotoFrame";
 
 type RoyalPassportBookProps = {
   regNo: string;
@@ -21,7 +22,18 @@ type RoyalPassportBookProps = {
 };
 
 /** Parchment spread + user-provided ornate page borders. */
-export function RoyalPassportBook(_props: RoyalPassportBookProps) {
+export function RoyalPassportBook({
+  regNo,
+  fullName,
+  dateOfBirth,
+  phone,
+  photoUrl,
+  photoProcessing,
+  onFullNameChange,
+  onDateOfBirthChange,
+  onPhoneChange,
+  onPhotoSelected,
+}: RoyalPassportBookProps) {
   return (
     <div className="royal-passport-scene">
       <div className="royal-passport-book" aria-label="Royal identity passport book">
@@ -66,6 +78,70 @@ export function RoyalPassportBook(_props: RoyalPassportBookProps) {
             decoding="async"
             draggable={false}
           />
+        </div>
+
+        <div className="royal-passport-book__left-overlay">
+          <p className="royal-passport-book__reg" aria-label={`Registration number ${regNo}`}>
+            {regNo}
+          </p>
+
+          <div className="royal-passport-book__cert-heading" role="heading" aria-level={3}>
+            <span className="royal-passport-book__cert-rule" aria-hidden />
+            <span className="royal-passport-book__cert-title">Identity Certificate</span>
+            <span className="royal-passport-book__cert-rule" aria-hidden />
+          </div>
+
+          <div className="royal-passport-book__portrait-slot">
+            <PassportPhotoFrame
+              photoUrl={photoUrl}
+              processing={photoProcessing}
+              onFileSelected={onPhotoSelected}
+            />
+          </div>
+
+          <div className="royal-passport-book__fields">
+            <div className="royal-passport-book__field royal-passport-book__field--name">
+              <label htmlFor="passport-full-name" className="royal-passport-book__label">
+                Full name
+              </label>
+              <input
+                id="passport-full-name"
+                value={fullName}
+                onChange={(event) => onFullNameChange(event.target.value)}
+                className="royal-passport-book__input"
+                placeholder="Your full name"
+                autoComplete="name"
+              />
+            </div>
+
+            <div className="royal-passport-book__field royal-passport-book__field--dob">
+              <label htmlFor="passport-date-of-birth" className="royal-passport-book__label">
+                Date of birth
+              </label>
+              <input
+                id="passport-date-of-birth"
+                type="date"
+                value={dateOfBirth}
+                onChange={(event) => onDateOfBirthChange(event.target.value)}
+                max={new Date().toISOString().slice(0, 10)}
+                className="royal-passport-book__input royal-passport-book__input--date"
+              />
+            </div>
+
+            <div className="royal-passport-book__field royal-passport-book__field--phone">
+              <label htmlFor="passport-phone" className="royal-passport-book__label">
+                Phone number
+              </label>
+              <input
+                id="passport-phone"
+                value={phone}
+                onChange={(event) => onPhoneChange(event.target.value)}
+                className="royal-passport-book__input"
+                placeholder="Phone number"
+                autoComplete="tel"
+              />
+            </div>
+          </div>
         </div>
 
         <img

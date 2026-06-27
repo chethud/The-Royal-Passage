@@ -5,6 +5,7 @@ import { updateAccountProfile } from "@/lib/profile-browser";
 import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 import { toErrorMessage } from "@/lib/api/client";
 import { handlePassportPhotoUpload } from "@/lib/passport-photo/passport-photo-upload";
+import { resolveRegistrationNumber } from "@/lib/registration-number";
 import { RoyalPassportBook } from "@/components/passport/RoyalPassportBook";
 import { useFaceDetection } from "@/hooks/useFaceDetection";
 
@@ -12,16 +13,6 @@ type GuestProfileFormProps = {
   profile: GuestProfile;
   onUpdated: (profile: GuestProfile) => void;
 };
-
-function registrationNumberFromId(id: string): string {
-  const digits = id.replace(/\D/g, "");
-  if (digits.length >= 7) return digits.slice(0, 7);
-  let hash = 0;
-  for (let i = 0; i < id.length; i += 1) {
-    hash = (hash * 31 + id.charCodeAt(i)) % 10_000_000;
-  }
-  return String(hash).padStart(7, "0");
-}
 
 export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) {
   const { detectLargestFace, loading: faceModelLoading, error: faceModelError } = useFaceDetection();
@@ -105,7 +96,7 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
       ) : null}
 
       <RoyalPassportBook
-        regNo={registrationNumberFromId(profile.id)}
+        regNo={resolveRegistrationNumber(profile)}
         fullName={fullName}
         dateOfBirth={dateOfBirth}
         domicile="Mysuru, Bharata"

@@ -3311,6 +3311,8 @@
 
 .royal-passport-book {
   /* Large symmetric frames — equal width on both pages, tight to parchment edges */
+  --passport-ink: #2e1e0c;
+  --passport-ink-muted: rgb(46 30 12 / 0.82);
   --passport-border-top: 2.5%;
   --passport-border-height: 96%;
   --passport-border-page-width: 49%;
@@ -3320,6 +3322,18 @@
   --passport-crest-top: 7.5%;
   --passport-crest-width: 12%;
   --passport-title-top: calc(var(--passport-crest-top) + 21%);
+  --passport-cert-top: 39%;
+  --passport-reg-top: 7%;
+  --passport-reg-left: calc(var(--passport-left-center-x) + 8%);
+  --passport-portrait-top: 45%;
+  --passport-portrait-left: 5.5%;
+  --passport-portrait-width: 14%;
+  --passport-portrait-height: 26%;
+  --passport-fields-left: 20.5%;
+  --passport-fields-width: 28%;
+  --passport-fields-top: 45%;
+  --passport-field-gap: 7.4%;
+  --passport-field-font-size: clamp(1.02rem, 1.24vw, 1.24rem);
   --passport-seal-bottom: 11%;
   --passport-seal-right-inset: 3.5%;
   --passport-seal-width: 13%;
@@ -3422,6 +3436,220 @@
   filter: contrast(1.05) saturate(1.02) drop-shadow(0 2px 6px rgb(40 8 8 / 0.28));
   user-select: none;
   pointer-events: none;
+}
+
+.royal-passport-book__left-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  color: var(--passport-ink);
+}
+
+.royal-passport-book__left-overlay > * {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.royal-passport-book__reg {
+  top: var(--passport-reg-top);
+  left: var(--passport-reg-left);
+  width: auto;
+  margin: 0;
+  transform: translateX(-35%);
+  text-align: left;
+  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-size: clamp(0.68rem, 0.84vw, 0.82rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(46 30 12 / 0.78);
+  pointer-events: none;
+}
+
+.royal-passport-book__cert-heading {
+  top: var(--passport-cert-top);
+  left: var(--passport-left-center-x);
+  display: flex;
+  width: 44%;
+  align-items: center;
+  gap: 0.55rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.royal-passport-book__cert-title {
+  flex-shrink: 0;
+  font-family: "Cinzel", ui-serif, Georgia, serif;
+  font-size: clamp(0.74rem, 0.92vw, 0.9rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--passport-ink);
+}
+
+.royal-passport-book__cert-rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(46 30 12 / 0.55) 18%,
+    rgb(46 30 12 / 0.55) 82%,
+    transparent
+  );
+  position: relative;
+}
+
+.royal-passport-book__cert-rule::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: rgb(46 30 12 / 0.65);
+}
+
+.royal-passport-book__portrait-slot {
+  top: var(--passport-portrait-top);
+  left: var(--passport-portrait-left);
+  width: var(--passport-portrait-width);
+  height: var(--passport-portrait-height);
+}
+
+.royal-passport-book__portrait-slot .passport-photo {
+  width: 100%;
+  height: 100%;
+  background: rgb(58 36 18 / 0.04);
+  border-radius: 2px;
+}
+
+.royal-passport-book__fields {
+  top: var(--passport-fields-top);
+  left: var(--passport-fields-left);
+  width: var(--passport-fields-width);
+  display: flex;
+  flex-direction: column;
+  gap: var(--passport-field-gap);
+}
+
+.royal-passport-book__field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding-bottom: 0.65rem;
+}
+
+.royal-passport-book__field::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 82%;
+  height: 1px;
+  background: rgb(46 30 12 / 0.22);
+}
+
+.royal-passport-book__label {
+  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-size: clamp(0.68rem, 0.82vw, 0.8rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(46 30 12 / 0.68);
+}
+
+.royal-passport-book__input {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  box-shadow: none;
+  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-size: var(--passport-field-font-size);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  color: var(--passport-ink);
+  caret-color: var(--passport-ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.royal-passport-book__input::selection {
+  background: rgb(120 88 40 / 0.22);
+  color: var(--passport-ink);
+}
+
+.royal-passport-book__input::placeholder {
+  color: rgb(46 30 12 / 0.35);
+  font-weight: 500;
+}
+
+.royal-passport-book__input:hover,
+.royal-passport-book__input:focus,
+.royal-passport-book__input:focus-visible,
+.royal-passport-book__input:active {
+  background: transparent;
+  outline: none;
+  box-shadow: none;
+}
+
+.royal-passport-book__input:-webkit-autofill,
+.royal-passport-book__input:-webkit-autofill:hover,
+.royal-passport-book__input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--passport-ink);
+  box-shadow: 0 0 0 1000px transparent inset;
+  transition: background-color 99999s ease-out 0s;
+}
+
+.royal-passport-book__input--date {
+  position: relative;
+  color-scheme: light;
+  appearance: none;
+  padding-left: 1.15rem;
+}
+
+.royal-passport-book__input--date::-webkit-datetime-edit,
+.royal-passport-book__input--date::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+.royal-passport-book__input--date::-webkit-datetime-edit-day-field,
+.royal-passport-book__input--date::-webkit-datetime-edit-month-field,
+.royal-passport-book__input--date::-webkit-datetime-edit-year-field,
+.royal-passport-book__input--date::-webkit-datetime-edit-text {
+  padding: 0;
+  background: transparent;
+  color: var(--passport-ink);
+}
+
+.royal-passport-book__input--date::-webkit-datetime-edit-day-field:focus,
+.royal-passport-book__input--date::-webkit-datetime-edit-month-field:focus,
+.royal-passport-book__input--date::-webkit-datetime-edit-year-field:focus {
+  background: transparent;
+  color: var(--passport-ink);
+  outline: none;
+}
+
+.royal-passport-book__input--date::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0.85rem;
+  height: 0.85rem;
+  margin: 0;
+  padding: 0;
+  transform: translateY(-50%);
+  opacity: 0.45;
+  filter: sepia(1) saturate(0.35);
+  cursor: pointer;
 }
 
 /* Passport portrait — reused when portrait overlay is added back */

@@ -10,7 +10,11 @@ type ProfileRow = {
   avatar_url: string | null;
   date_of_birth: string | null;
   vip_membership_status: string | null;
+  registration_number: string | null;
 };
+
+const PROFILE_SELECT =
+  "id, full_name, phone, role, created_at, avatar_url, date_of_birth, vip_membership_status, registration_number";
 
 function mapProfileRow(row: ProfileRow, email: string | null): GuestProfile {
   return {
@@ -23,6 +27,7 @@ function mapProfileRow(row: ProfileRow, email: string | null): GuestProfile {
     avatarUrl: row.avatar_url,
     dateOfBirth: row.date_of_birth,
     vipMembershipStatus: row.vip_membership_status ?? "none",
+    registrationNumber: row.registration_number,
   };
 }
 
@@ -38,7 +43,7 @@ export async function fetchAccountProfile(): Promise<GuestProfile> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, full_name, phone, role, created_at, avatar_url, date_of_birth, vip_membership_status")
+    .select(PROFILE_SELECT)
     .eq("id", user.id)
     .maybeSingle();
 
@@ -92,7 +97,7 @@ export async function updateAccountProfile(payload: UpdateGuestProfilePayload): 
     .from("profiles")
     .update(updates)
     .eq("id", user.id)
-    .select("id, full_name, phone, role, created_at, avatar_url, date_of_birth, vip_membership_status")
+    .select(PROFILE_SELECT)
     .single();
 
   if (error) {
