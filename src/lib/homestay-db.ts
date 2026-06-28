@@ -49,5 +49,10 @@ export function mapProtoHomestay(stay: ProtoHomestay): Homestay {
     extraBedAvailable: stay.extraBedAvailable,
     extraBedPricePerNight: stay.extraBedPricePerNight,
     extraBedsPerRoom: stay.extraBedsPerRoom,
+    datePrices: (stay.datePrices ?? []).map((entry) => ({
+      date: entry.date,
+      pricePerNight: entry.pricePerNight,
+      label: entry.label,
+    })),
   };
 }

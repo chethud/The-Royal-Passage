@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import CreateHomestayBookingRequest, CreateHomestayBookingResponse
+from app.services.homestay_availability import load_price_overrides_minor
 from app.services.homestay_pricing import stay_subtotal_minor
 
 HOMESTAY_SELECT = """
@@ -203,6 +204,8 @@ def create_homestay_booking(
             raise ValueError("One or more nights are blocked on the calendar.")
         day += timedelta(days=1)
 
+    price_overrides = load_price_overrides_minor(stay["id"], room_id, check_in, check_out)
+
     subtotal_minor = stay_subtotal_minor(
         check_in,
         check_out,
@@ -211,6 +214,7 @@ def create_homestay_booking(
         room_count,
         extra_bed_price_minor,
         extra_bed_count,
+        price_overrides,
     )
     commission_percent = _commission_percent(supabase)
     platform_fee_minor = round((subtotal_minor * commission_percent) / 100)

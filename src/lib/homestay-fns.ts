@@ -7,7 +7,7 @@ import { getOrSetServerCache } from "@/lib/cache.server";
 import { isSupabaseConfigured } from "@/lib/env.server";
 import { mapProtoHomestay } from "@/lib/homestay-db";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import type { Homestay, HomestayRoom } from "@/data/homestays";
+import type { Homestay, HomestayDatePrice, HomestayRoom } from "@/data/homestays";
 
 function mapDbRoom(row: Record<string, unknown>): HomestayRoom {
   return {
@@ -74,6 +74,36 @@ async function loadHomestaysFromDb(citySlug = "mysuru"): Promise<Homestay[]> {
     roomsByStay.set(homestayId, list);
   }
 
+  const today = new Date().toISOString().slice(0, 10);
+  const horizon = new Date();
+  horizon.setDate(horizon.getDate() + 365);
+  const horizonIso = horizon.toISOString().slice(0, 10);
+  const { data: priceRows, error: priceError } = await supabase
+    .from("homestay_availability")
+    .select("homestay_id, date, price_override_minor, note")
+    .in("homestay_id", ids)
+    .eq("is_blocked", false)
+    .is("room_id", null)
+    .gte("date", today)
+    .lte("date", horizonIso)
+    .not("price_override_minor", "is", null)
+    .order("date");
+  if (priceError) throw new Error(priceError.message);
+
+  const datePricesByStay = new Map<string, HomestayDatePrice[]>();
+  for (const row of priceRows ?? []) {
+    const homestayId = row.homestay_id as string;
+    const priceMinor = row.price_override_minor;
+    if (priceMinor == null) continue;
+    const list = datePricesByStay.get(homestayId) ?? [];
+    list.push({
+      date: row.date as string,
+      pricePerNight: Math.round(Number(priceMinor) / 100),
+      label: (row.note as string | null) ?? undefined,
+    });
+    datePricesByStay.set(homestayId, list);
+  }
+
   return visible
     .map((row) => {
     const owner = row.homestay_owners as { full_name?: string } | null;
@@ -113,6 +143,7 @@ async function loadHomestaysFromDb(citySlug = "mysuru"): Promise<Homestay[]> {
       extraBedAvailable: Boolean(row.extra_bed_available),
       extraBedPricePerNight: Math.round(Number(row.extra_bed_price_per_night_minor ?? 0) / 100),
       extraBedsPerRoom: Number(row.extra_beds_per_room ?? 1) >= 2 ? 2 : 1,
+      datePrices: datePricesByStay.get(row.id as string),
     };
   })
     .filter(isMysuruHomestay);

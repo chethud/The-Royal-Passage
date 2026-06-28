@@ -40,6 +40,12 @@ export type HomestayRoom = {
   extraBedsPerRoom?: number;
 };
 
+export type HomestayDatePrice = {
+  date: string;
+  pricePerNight: number;
+  label?: string;
+};
+
 export type Homestay = {
   id: string;
   slug: string;
@@ -69,6 +75,7 @@ export type Homestay = {
   extraBedAvailable?: boolean;
   extraBedPricePerNight?: number;
   extraBedsPerRoom?: number;
+  datePrices?: HomestayDatePrice[];
 };
 
 export const homestays: Homestay[] = [

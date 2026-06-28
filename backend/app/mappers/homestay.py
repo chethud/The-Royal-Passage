@@ -1,4 +1,5 @@
-from app.models.schemas import Homestay, HomestayRoom
+from app.models.schemas import Homestay, HomestayDatePrice, HomestayRoom
+from app.services.homestay_availability import load_homestay_date_prices
 
 
 def _format_time(value: str) -> str:
@@ -45,6 +46,16 @@ def map_row_to_homestay(row: dict, rooms: list[dict]) -> Homestay:
     if ui_rooms and base_night <= 0:
         base_night = min(room.pricePerNight for room in ui_rooms)
 
+    date_prices = [
+        HomestayDatePrice(
+            date=str(item["date"]),
+            pricePerNight=round(int(item["price_override_minor"]) / 100),
+            label=item.get("note") or None,
+        )
+        for item in load_homestay_date_prices(row["id"])
+        if item.get("price_override_minor") is not None
+    ]
+
     return Homestay(
         id=row["id"],
         slug=row["slug"],
@@ -76,4 +87,5 @@ def map_row_to_homestay(row: dict, rooms: list[dict]) -> Homestay:
         extraBedAvailable=bool(row.get("extra_bed_available", False)),
         extraBedPricePerNight=round(int(row.get("extra_bed_price_per_night_minor") or 0) / 100),
         extraBedsPerRoom=2 if int(row.get("extra_beds_per_room") or 1) >= 2 else 1,
+        datePrices=date_prices,
     )

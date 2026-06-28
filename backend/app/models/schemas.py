@@ -79,6 +79,12 @@ class HomestayRoom(BaseModel):
     extraBedsPerRoom: int = 1
 
 
+class HomestayDatePrice(BaseModel):
+    date: str
+    pricePerNight: int
+    label: str | None = None
+
+
 class Homestay(BaseModel):
     id: str
     slug: str
@@ -110,6 +116,7 @@ class Homestay(BaseModel):
     extraBedAvailable: bool = False
     extraBedPricePerNight: int = 0
     extraBedsPerRoom: int = 1
+    datePrices: list[HomestayDatePrice] = Field(default_factory=list)
 
 
 class ListHomestaysResponse(BaseModel):

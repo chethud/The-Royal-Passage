@@ -4,8 +4,10 @@ import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusB
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { HomestayOwnerDashboardShell } from "@/components/homestay-owner/HomestayOwnerDashboardShell";
 import { OwnerAvailabilityManager } from "@/components/homestay-owner/OwnerAvailabilityManager";
+import { OwnerHolidayPricingManager } from "@/components/homestay-owner/OwnerHolidayPricingManager";
 import { OwnerHomestayForm } from "@/components/homestay-owner/OwnerHomestayForm";
 import { OwnerRoomManager } from "@/components/homestay-owner/OwnerRoomManager";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchCities } from "@/lib/api/cities";
 import {
   createOwnerHomestayRoom,
@@ -126,9 +128,9 @@ function OwnerHomestayDetailPage() {
           </p>
         </LuxuryCheckoutPanel>
       ) : homestay ? (
-        <div className="space-y-8">
-          <LuxuryCheckoutPanel>
-            <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="space-y-6">
+          <LuxuryCheckoutPanel className="py-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <ExperienceStatusBadge status={homestay.status} surface="light" />
               {homestay.status === "published" ? (
                 <Link
@@ -140,99 +142,162 @@ function OwnerHomestayDetailPage() {
                 </Link>
               ) : null}
             </div>
-            {pageError ? (
-              <p className="mb-4 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                {pageError}
-              </p>
-            ) : null}
-            <OwnerHomestayForm
-              cities={cities}
-              initial={homestay}
-              disabled={readOnly}
-              saving={saving}
-              onSubmit={handleSave}
-            />
-            {!readOnly ? (
-              <button
-                type="button"
-                className="luxury-btn-sm luxury-btn-panel-outline mt-6"
-                disabled={saving}
-                onClick={() => void handleDelete()}
-              >
-                Archive / delete
-              </button>
-            ) : null}
           </LuxuryCheckoutPanel>
 
-          <LuxuryCheckoutPanel>
-            <h2 className="luxury-panel-heading font-display text-xl">Rooms</h2>
-            <div className="mt-4">
-              <OwnerRoomManager
-                homestay={homestay}
-                busy={roomBusy}
-                onAdd={async (payload) => {
-                  if (!accessToken) return;
-                  setRoomBusy(true);
-                  try {
-                    const updated = await createOwnerHomestayRoom(accessToken, homestayId, payload);
-                    setHomestay(updated);
-                  } catch (err) {
-                    setPageError(toErrorMessage(err, "Failed to add room."));
-                  } finally {
-                    setRoomBusy(false);
-                  }
-                }}
-                onDeactivate={async (roomId) => {
-                  if (!accessToken) return;
-                  setRoomBusy(true);
-                  try {
-                    const updated = await updateOwnerHomestayRoom(accessToken, homestayId, roomId, {
-                      isActive: false,
-                    });
-                    setHomestay(updated);
-                  } catch (err) {
-                    setPageError(toErrorMessage(err, "Failed to deactivate room."));
-                  } finally {
-                    setRoomBusy(false);
-                  }
-                }}
-              />
-            </div>
-          </LuxuryCheckoutPanel>
+          {pageError ? (
+            <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {pageError}
+            </p>
+          ) : null}
 
-          <LuxuryCheckoutPanel>
-            <h2 className="luxury-panel-heading font-display text-xl">Calendar</h2>
-            <div className="mt-4">
-              <OwnerAvailabilityManager
-                homestay={homestay}
-                busy={roomBusy}
-                onUpsert={async (payload) => {
-                  if (!accessToken) return;
-                  setRoomBusy(true);
-                  try {
-                    const updated = await upsertOwnerAvailability(accessToken, homestayId, payload);
-                    setHomestay(updated);
-                  } catch (err) {
-                    setPageError(toErrorMessage(err, "Failed to update calendar."));
-                  } finally {
-                    setRoomBusy(false);
-                  }
-                }}
-                onDelete={async (availabilityId) => {
-                  if (!accessToken) return;
-                  setRoomBusy(true);
-                  try {
-                    const updated = await deleteOwnerAvailability(accessToken, homestayId, availabilityId);
-                    setHomestay(updated);
-                  } catch (err) {
-                    setPageError(toErrorMessage(err, "Failed to remove calendar entry."));
-                  } finally {
-                    setRoomBusy(false);
-                  }
-                }}
-              />
-            </div>
-          </LuxuryCheckoutPanel>
+          <Tabs defaultValue="details" className="space-y-6">
+            <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 bg-[rgb(74_0_0/0.06)] p-1">
+              <TabsTrigger value="details" className="flex-1 sm:flex-none">
+                Details
+              </TabsTrigger>
+              <TabsTrigger value="rooms" className="flex-1 sm:flex-none">
+                Rooms
+              </TabsTrigger>
+              <TabsTrigger value="calendar" className="flex-1 sm:flex-none">
+                Calendar
+              </TabsTrigger>
+              <TabsTrigger value="holidays" className="flex-1 sm:flex-none">
+                Holiday pricing
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="details">
+              <LuxuryCheckoutPanel>
+                <OwnerHomestayForm
+                  cities={cities}
+                  initial={homestay}
+                  disabled={readOnly}
+                  saving={saving}
+                  onSubmit={handleSave}
+                />
+                {!readOnly ? (
+                  <button
+                    type="button"
+                    className="luxury-btn-sm luxury-btn-panel-outline mt-6"
+                    disabled={saving}
+                    onClick={() => void handleDelete()}
+                  >
+                    Archive / delete
+                  </button>
+                ) : null}
+              </LuxuryCheckoutPanel>
+            </TabsContent>
+
+            <TabsContent value="rooms">
+              <LuxuryCheckoutPanel>
+                <h2 className="luxury-panel-heading font-display text-xl">Rooms</h2>
+                <div className="mt-4">
+                  <OwnerRoomManager
+                    homestay={homestay}
+                    busy={roomBusy}
+                    onAdd={async (payload) => {
+                      if (!accessToken) return;
+                      setRoomBusy(true);
+                      try {
+                        const updated = await createOwnerHomestayRoom(accessToken, homestayId, payload);
+                        setHomestay(updated);
+                      } catch (err) {
+                        setPageError(toErrorMessage(err, "Failed to add room."));
+                      } finally {
+                        setRoomBusy(false);
+                      }
+                    }}
+                    onDeactivate={async (roomId) => {
+                      if (!accessToken) return;
+                      setRoomBusy(true);
+                      try {
+                        const updated = await updateOwnerHomestayRoom(accessToken, homestayId, roomId, {
+                          isActive: false,
+                        });
+                        setHomestay(updated);
+                      } catch (err) {
+                        setPageError(toErrorMessage(err, "Failed to deactivate room."));
+                      } finally {
+                        setRoomBusy(false);
+                      }
+                    }}
+                  />
+                </div>
+              </LuxuryCheckoutPanel>
+            </TabsContent>
+
+            <TabsContent value="calendar">
+              <LuxuryCheckoutPanel>
+                <h2 className="luxury-panel-heading font-display text-xl">Blocked dates</h2>
+                <div className="mt-4">
+                  <OwnerAvailabilityManager
+                    homestay={homestay}
+                    busy={roomBusy}
+                    onUpsert={async (payload) => {
+                      if (!accessToken) return;
+                      setRoomBusy(true);
+                      try {
+                        const updated = await upsertOwnerAvailability(accessToken, homestayId, payload);
+                        setHomestay(updated);
+                      } catch (err) {
+                        setPageError(toErrorMessage(err, "Failed to update calendar."));
+                      } finally {
+                        setRoomBusy(false);
+                      }
+                    }}
+                    onDelete={async (availabilityId) => {
+                      if (!accessToken) return;
+                      setRoomBusy(true);
+                      try {
+                        const updated = await deleteOwnerAvailability(accessToken, homestayId, availabilityId);
+                        setHomestay(updated);
+                      } catch (err) {
+                        setPageError(toErrorMessage(err, "Failed to remove calendar entry."));
+                      } finally {
+                        setRoomBusy(false);
+                      }
+                    }}
+                  />
+                </div>
+              </LuxuryCheckoutPanel>
+            </TabsContent>
+
+            <TabsContent value="holidays">
+              <LuxuryCheckoutPanel>
+                <h2 className="luxury-panel-heading font-display text-xl">Holiday pricing</h2>
+                <div className="mt-4">
+                  <OwnerHolidayPricingManager
+                    homestay={homestay}
+                    busy={roomBusy}
+                    onUpsert={async (payload) => {
+                      if (!accessToken) return;
+                      setRoomBusy(true);
+                      try {
+                        const updated = await upsertOwnerAvailability(accessToken, homestayId, payload);
+                        setHomestay(updated);
+                      } catch (err) {
+                        setPageError(toErrorMessage(err, "Failed to save holiday price."));
+                      } finally {
+                        setRoomBusy(false);
+                      }
+                    }}
+                    onDelete={async (availabilityId) => {
+                      if (!accessToken) return;
+                      setRoomBusy(true);
+                      try {
+                        const updated = await deleteOwnerAvailability(accessToken, homestayId, availabilityId);
+                        setHomestay(updated);
+                      } catch (err) {
+                        setPageError(toErrorMessage(err, "Failed to remove holiday price."));
+                      } finally {
+                        setRoomBusy(false);
+                      }
+                    }}
+                  />
+                </div>
+              </LuxuryCheckoutPanel>
+            </TabsContent>
+          </Tabs>
         </div>
       ) : null}
     </HomestayOwnerDashboardShell>

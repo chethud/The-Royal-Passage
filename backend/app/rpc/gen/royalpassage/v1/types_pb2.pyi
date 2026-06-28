@@ -1032,7 +1032,7 @@ class HomestayRoom(_message.Message):
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., category: _Optional[str] = ..., capacity: _Optional[int] = ..., price_per_night: _Optional[int] = ..., total_units: _Optional[int] = ..., amenities: _Optional[_Iterable[str]] = ..., extra_bed_available: _Optional[bool] = ..., extra_bed_price_per_night: _Optional[int] = ..., extra_beds_per_room: _Optional[int] = ..., weekend_price_per_night: _Optional[int] = ...) -> None: ...
 
 class Homestay(_message.Message):
-    __slots__ = ("id", "slug", "title", "tagline", "description", "property_type", "city", "city_slug", "address", "region", "map_link", "price_per_night", "rating", "reviews_count", "image", "gallery_urls", "amenities", "house_rules", "bedrooms", "bathrooms", "max_guests", "check_in_time", "check_out_time", "currency_symbol", "owner_name", "rooms", "extra_bed_available", "extra_bed_price_per_night", "extra_beds_per_room", "weekend_price_per_night")
+    __slots__ = ("id", "slug", "title", "tagline", "description", "property_type", "city", "city_slug", "address", "region", "map_link", "price_per_night", "rating", "reviews_count", "image", "gallery_urls", "amenities", "house_rules", "bedrooms", "bathrooms", "max_guests", "check_in_time", "check_out_time", "currency_symbol", "owner_name", "rooms", "extra_bed_available", "extra_bed_price_per_night", "extra_beds_per_room", "weekend_price_per_night", "date_prices")
     ID_FIELD_NUMBER: _ClassVar[int]
     SLUG_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
@@ -1063,6 +1063,7 @@ class Homestay(_message.Message):
     EXTRA_BED_PRICE_PER_NIGHT_FIELD_NUMBER: _ClassVar[int]
     EXTRA_BEDS_PER_ROOM_FIELD_NUMBER: _ClassVar[int]
     WEEKEND_PRICE_PER_NIGHT_FIELD_NUMBER: _ClassVar[int]
+    DATE_PRICES_FIELD_NUMBER: _ClassVar[int]
     id: str
     slug: str
     title: str
@@ -1093,7 +1094,18 @@ class Homestay(_message.Message):
     extra_bed_price_per_night: int
     extra_beds_per_room: int
     weekend_price_per_night: int
-    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., property_type: _Optional[str] = ..., city: _Optional[str] = ..., city_slug: _Optional[str] = ..., address: _Optional[str] = ..., region: _Optional[str] = ..., map_link: _Optional[str] = ..., price_per_night: _Optional[int] = ..., rating: _Optional[float] = ..., reviews_count: _Optional[int] = ..., image: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., amenities: _Optional[_Iterable[str]] = ..., house_rules: _Optional[_Iterable[str]] = ..., bedrooms: _Optional[int] = ..., bathrooms: _Optional[int] = ..., max_guests: _Optional[int] = ..., check_in_time: _Optional[str] = ..., check_out_time: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., owner_name: _Optional[str] = ..., rooms: _Optional[_Iterable[_Union[HomestayRoom, _Mapping]]] = ..., extra_bed_available: _Optional[bool] = ..., extra_bed_price_per_night: _Optional[int] = ..., extra_beds_per_room: _Optional[int] = ..., weekend_price_per_night: _Optional[int] = ...) -> None: ...
+    date_prices: _containers.RepeatedCompositeFieldContainer[HomestayDatePrice]
+    def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., property_type: _Optional[str] = ..., city: _Optional[str] = ..., city_slug: _Optional[str] = ..., address: _Optional[str] = ..., region: _Optional[str] = ..., map_link: _Optional[str] = ..., price_per_night: _Optional[int] = ..., rating: _Optional[float] = ..., reviews_count: _Optional[int] = ..., image: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., amenities: _Optional[_Iterable[str]] = ..., house_rules: _Optional[_Iterable[str]] = ..., bedrooms: _Optional[int] = ..., bathrooms: _Optional[int] = ..., max_guests: _Optional[int] = ..., check_in_time: _Optional[str] = ..., check_out_time: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., owner_name: _Optional[str] = ..., rooms: _Optional[_Iterable[_Union[HomestayRoom, _Mapping]]] = ..., extra_bed_available: _Optional[bool] = ..., extra_bed_price_per_night: _Optional[int] = ..., extra_beds_per_room: _Optional[int] = ..., weekend_price_per_night: _Optional[int] = ..., date_prices: _Optional[_Iterable[_Union[HomestayDatePrice, _Mapping]]] = ...) -> None: ...
+
+class HomestayDatePrice(_message.Message):
+    __slots__ = ("date", "price_per_night", "label")
+    DATE_FIELD_NUMBER: _ClassVar[int]
+    PRICE_PER_NIGHT_FIELD_NUMBER: _ClassVar[int]
+    LABEL_FIELD_NUMBER: _ClassVar[int]
+    date: str
+    price_per_night: int
+    label: str
+    def __init__(self, date: _Optional[str] = ..., price_per_night: _Optional[int] = ..., label: _Optional[str] = ...) -> None: ...
 
 class ListHomestaysResponse(_message.Message):
     __slots__ = ("mode", "homestays", "property_types", "cities")

@@ -604,6 +604,13 @@ message Homestay {
   int32 extra_bed_price_per_night = 28;
   int32 extra_beds_per_room = 29;
   optional int32 weekend_price_per_night = 30;
+  repeated HomestayDatePrice date_prices = 31;
+}
+
+message HomestayDatePrice {
+  string date = 1;
+  int32 price_per_night = 2;
+  optional string label = 3;
 }
 
 message ListHomestaysResponse {

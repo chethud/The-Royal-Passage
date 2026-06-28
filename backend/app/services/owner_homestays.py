@@ -558,12 +558,16 @@ def upsert_owner_availability(
         if not (room_result.data if room_result else None):
             raise ValueError("Room not found.")
 
+    if not payload.isBlocked:
+        if payload.priceOverrideMinor is None or payload.priceOverrideMinor <= 0:
+            raise ValueError("Enter a holiday price greater than zero, or block the date instead.")
+
     row = {
         "homestay_id": homestay_id,
         "room_id": payload.roomId,
         "date": day.isoformat(),
         "is_blocked": payload.isBlocked,
-        "price_override_minor": payload.priceOverrideMinor,
+        "price_override_minor": None if payload.isBlocked else payload.priceOverrideMinor,
         "min_nights": payload.minNights,
         "note": payload.note,
     }
