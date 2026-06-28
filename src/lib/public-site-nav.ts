@@ -1,7 +1,8 @@
 export type PublicSiteModule = "experiences" | "homestays" | "vip";
 
-/** Fixed public navbar: Experiences first, Homestays second — same on every page. */
+/** Fixed public navbar: Home first, then Experiences and Homestays. */
 export const PUBLIC_GUEST_NAV_ITEMS = [
+  { label: "Home", to: "/" },
   { label: "Experiences", to: "/experiences" },
   { label: "Homestays", to: "/homestays" },
 ] as const;
@@ -42,6 +43,9 @@ export function publicNavItemsForSection(_pathname: string) {
 }
 
 export function isPublicNavItemActive(pathname: string, to: string): boolean {
+  if (to === "/") {
+    return pathname === "/" || pathname === "";
+  }
   if (to === "/homestays") {
     return isHomestayPublicSection(pathname);
   }

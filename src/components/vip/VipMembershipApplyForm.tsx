@@ -24,17 +24,14 @@ import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 const STEPS = [
   { id: 1, label: "Contact" },
-  { id: 2, label: "About you" },
-  { id: 3, label: "Aadhaar" },
-  { id: 4, label: "Business card" },
-  { id: 5, label: "Social" },
-  { id: 6, label: "Review" },
+  { id: 2, label: "Documents" },
+  { id: 3, label: "Social" },
 ] as const;
 
 const inputClass =
   "w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
 
-type ProfessionalCardType = "business" | "visitor";
+type SocialPlatform = "instagram" | "facebook";
 
 function PhotoUploadField({
   label,
@@ -94,7 +91,15 @@ function PhotoUploadField({
 
 export function VipMembershipApplyForm() {
   const navigate = useNavigate();
-  const { user, accessToken, displayName, profile, refreshVipMembershipStatus, vipMembershipStatus, vipMembershipRejectedAt } = useAuthUser();
+  const {
+    user,
+    accessToken,
+    displayName,
+    profile,
+    refreshVipMembershipStatus,
+    vipMembershipStatus,
+    vipMembershipRejectedAt,
+  } = useAuthUser();
   const [step, setStep] = useState(1);
   const [stepError, setStepError] = useState<string | null>(null);
   const [fullName, setFullName] = useState(displayName ?? profile?.fullName ?? "");
@@ -104,10 +109,9 @@ export function VipMembershipApplyForm() {
   const [description, setDescription] = useState("");
   const [aadhaarNumber, setAadhaarNumber] = useState("");
   const [aadhaarPhotoUrl, setAadhaarPhotoUrl] = useState("");
-  const [professionalCardType, setProfessionalCardType] = useState<ProfessionalCardType>("business");
   const [professionalCardPhotoUrl, setProfessionalCardPhotoUrl] = useState("");
-  const [instagramUsername, setInstagramUsername] = useState("");
-  const [facebookUsername, setFacebookUsername] = useState("");
+  const [socialPlatform, setSocialPlatform] = useState<SocialPlatform>("instagram");
+  const [socialUsername, setSocialUsername] = useState("");
   const [uploadingAadhaar, setUploadingAadhaar] = useState(false);
   const [uploadingCard, setUploadingCard] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -116,28 +120,20 @@ export function VipMembershipApplyForm() {
     if (currentStep === 1) {
       if (fullName.trim().length < 2) return "Enter your full name.";
       if (!email.trim()) return "Enter your email address.";
+      if (description.trim().length < 20) return "About you must be at least 20 characters.";
       return null;
     }
     if (currentStep === 2) {
-      if (description.trim().length < 20) return "Description must be at least 20 characters.";
-      return null;
-    }
-    if (currentStep === 3) {
       if (!/^\d{12}$/.test(aadhaarNumber.replace(/\s/g, ""))) {
         return "Enter a valid 12-digit Aadhaar number.";
       }
       if (!aadhaarPhotoUrl) return "Upload a clear photo of your Aadhaar card.";
+      if (!professionalCardPhotoUrl) return "Upload a photo of your business card.";
       return null;
     }
-    if (currentStep === 4) {
-      if (!professionalCardPhotoUrl) {
-        return `Upload a photo of your ${professionalCardType === "business" ? "business" : "visitor"} card.`;
-      }
-      return null;
-    }
-    if (currentStep === 5) {
-      if (!instagramUsername.trim() && !facebookUsername.trim()) {
-        return "Provide at least one Instagram or Facebook username.";
+    if (currentStep === 3) {
+      if (!socialUsername.trim()) {
+        return `Enter your ${socialPlatform === "instagram" ? "Instagram" : "Facebook"} username.`;
       }
       return null;
     }
@@ -177,7 +173,7 @@ export function VipMembershipApplyForm() {
     try {
       setProfessionalCardPhotoUrl(await uploadVipProfessionalCardPhoto(file));
     } catch (err) {
-      setStepError(toErrorMessage(err, "Failed to upload card photo."));
+      setStepError(toErrorMessage(err, "Failed to upload business card photo."));
     } finally {
       setUploadingCard(false);
     }
@@ -185,11 +181,13 @@ export function VipMembershipApplyForm() {
 
   const handleSubmit = async () => {
     if (!accessToken) return;
-    const error = validateStep(5);
+    const error = validateStep(3);
     if (error) {
       setStepError(error);
       return;
     }
+
+    const normalizedSocial = socialUsername.trim().replace(/^@/, "");
 
     setBusy(true);
     setStepError(null);
@@ -205,10 +203,10 @@ export function VipMembershipApplyForm() {
         idDocumentNumber: aadhaarNumber.replace(/\s/g, ""),
         idDocumentPhotoUrl: aadhaarPhotoUrl,
         description: description.trim(),
-        professionalCardType,
+        professionalCardType: "business",
         professionalCardPhotoUrl,
-        instagramUsername: instagramUsername.trim().replace(/^@/, "") || undefined,
-        facebookUsername: facebookUsername.trim().replace(/^@/, "") || undefined,
+        instagramUsername: socialPlatform === "instagram" ? normalizedSocial : undefined,
+        facebookUsername: socialPlatform === "facebook" ? normalizedSocial : undefined,
       });
       await refreshVipMembershipStatus();
       void navigate({ to: "/account/profile" });
@@ -254,7 +252,9 @@ export function VipMembershipApplyForm() {
     );
   }
 
-  const cardLabel = professionalCardType === "business" ? "Business card" : "Visitor card";
+  const socialLabel = socialPlatform === "instagram" ? "Instagram" : "Facebook";
+  const socialPlaceholder =
+    socialPlatform === "instagram" ? "@username" : "username or profile name";
 
   return (
     <div className="space-y-6">
@@ -263,8 +263,8 @@ export function VipMembershipApplyForm() {
       {step === 1 ? (
         <LuxuryCheckoutPanel>
           <CheckoutWizardStepHeader
-            title="Contact details"
-            description="Tell us how our Royal VIP concierge can reach you."
+            title="Contact & about you"
+            description="Tell us how to reach you and share a short introduction for your Royal VIP application."
           />
           <CheckoutWizardStepBody>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -281,6 +281,18 @@ export function VipMembershipApplyForm() {
                 />
               </div>
               <div>
+                <label htmlFor="vip-phone" className="eyebrow luxury-panel-label mb-2 block">
+                  Phone number
+                </label>
+                <input
+                  id="vip-phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div className="sm:col-span-2">
                 <label htmlFor="vip-email" className="eyebrow luxury-panel-label mb-2 block">
                   Email
                 </label>
@@ -290,18 +302,6 @@ export function VipMembershipApplyForm() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label htmlFor="vip-phone" className="eyebrow luxury-panel-label mb-2 block">
-                  Phone
-                </label>
-                <input
-                  id="vip-phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
                   className={inputClass}
                 />
               </div>
@@ -319,49 +319,34 @@ export function VipMembershipApplyForm() {
                 className={inputClass}
               />
             </div>
+            <div className="mt-4">
+              <label htmlFor="vip-description" className="eyebrow luxury-panel-label mb-2 block">
+                About you
+              </label>
+              <textarea
+                id="vip-description"
+                rows={5}
+                required
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Your background, interests, or why you are applying for VIP access…"
+                className={inputClass}
+              />
+              <p className="luxury-panel-body mt-2 text-xs">{description.trim().length}/20 characters minimum</p>
+            </div>
           </CheckoutWizardStepBody>
-          <CheckoutWizardStepFooter
-            primary={{ label: "Continue", onClick: goNext }}
-          />
+          <CheckoutWizardStepFooter primary={{ label: "Continue", onClick: goNext }} />
         </LuxuryCheckoutPanel>
       ) : null}
 
       {step === 2 ? (
         <LuxuryCheckoutPanel>
           <CheckoutWizardStepHeader
-            title="About you"
-            description="Share a short introduction — your background, interests, or why you are applying for VIP access."
+            title="Identity documents"
+            description="Upload your Aadhaar verification and business card for Royal VIP identity checks."
           />
           <CheckoutWizardStepBody>
-            <label htmlFor="vip-description" className="eyebrow luxury-panel-label mb-2 block">
-              Description
-            </label>
-            <textarea
-              id="vip-description"
-              rows={6}
-              required
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Tell us about yourself or your business…"
-              className={inputClass}
-            />
-            <p className="luxury-panel-body mt-2 text-xs">{description.trim().length}/20 characters minimum</p>
-          </CheckoutWizardStepBody>
-          <CheckoutWizardStepFooter
-            back={{ label: "Back", onClick: goBack }}
-            primary={{ label: "Continue", onClick: goNext }}
-          />
-        </LuxuryCheckoutPanel>
-      ) : null}
-
-      {step === 3 ? (
-        <LuxuryCheckoutPanel>
-          <CheckoutWizardStepHeader
-            title="Aadhaar verification"
-            description="Aadhaar is required for Royal VIP identity verification. Upload a clear photo and enter your 12-digit number."
-          />
-          <CheckoutWizardStepBody>
-            <div className="mb-4">
+            <div className="mb-6">
               <label htmlFor="vip-aadhaar-number" className="eyebrow luxury-panel-label mb-2 block">
                 Aadhaar number
               </label>
@@ -385,131 +370,104 @@ export function VipMembershipApplyForm() {
               disabled={busy}
               onSelect={handleAadhaarUpload}
             />
-          </CheckoutWizardStepBody>
-          <CheckoutWizardStepFooter
-            back={{ label: "Back", onClick: goBack }}
-            primary={{
-              label: "Continue",
-              onClick: goNext,
-              disabled: uploadingAadhaar,
-            }}
-          />
-        </LuxuryCheckoutPanel>
-      ) : null}
-
-      {step === 4 ? (
-        <LuxuryCheckoutPanel>
-          <CheckoutWizardStepHeader
-            title="Business or visitor card"
-            description="Upload a photo of your business card or visitor card so our concierge can verify your profile."
-          />
-          <CheckoutWizardStepBody>
-            <fieldset className="mb-4">
-              <legend className="eyebrow luxury-panel-label mb-3 block">Card type</legend>
-              <div className="flex flex-wrap gap-4">
-                <label className="flex cursor-pointer items-center gap-2 text-sm luxury-panel-body">
-                  <input
-                    type="radio"
-                    name="professional-card-type"
-                    checked={professionalCardType === "business"}
-                    onChange={() => setProfessionalCardType("business")}
-                  />
-                  Business card
-                </label>
-                <label className="flex cursor-pointer items-center gap-2 text-sm luxury-panel-body">
-                  <input
-                    type="radio"
-                    name="professional-card-type"
-                    checked={professionalCardType === "visitor"}
-                    onChange={() => setProfessionalCardType("visitor")}
-                  />
-                  Visitor card
-                </label>
-              </div>
-            </fieldset>
-            <PhotoUploadField
-              label={`${cardLabel} photo`}
-              hint="Required. JPEG, PNG, or WebP up to 5 MB."
-              photoUrl={professionalCardPhotoUrl}
-              uploading={uploadingCard}
-              disabled={busy}
-              onSelect={handleCardUpload}
-            />
-          </CheckoutWizardStepBody>
-          <CheckoutWizardStepFooter
-            back={{ label: "Back", onClick: goBack }}
-            primary={{
-              label: "Continue",
-              onClick: goNext,
-              disabled: uploadingCard,
-            }}
-          />
-        </LuxuryCheckoutPanel>
-      ) : null}
-
-      {step === 5 ? (
-        <LuxuryCheckoutPanel>
-          <CheckoutWizardStepHeader
-            title="Social profiles"
-            description="Share at least one Instagram or Facebook username so we can verify your public profile."
-          />
-          <CheckoutWizardStepBody>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="vip-instagram" className="eyebrow luxury-panel-label mb-2 block">
-                  Instagram username
-                </label>
-                <input
-                  id="vip-instagram"
-                  value={instagramUsername}
-                  onChange={(e) => setInstagramUsername(e.target.value)}
-                  placeholder="@username"
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label htmlFor="vip-facebook" className="eyebrow luxury-panel-label mb-2 block">
-                  Facebook username
-                </label>
-                <input
-                  id="vip-facebook"
-                  value={facebookUsername}
-                  onChange={(e) => setFacebookUsername(e.target.value)}
-                  placeholder="username or profile name"
-                  className={inputClass}
-                />
-              </div>
+            <div className="mt-6 border-t border-[rgb(74_0_0/0.12)] pt-6">
+              <PhotoUploadField
+                label="Business card photo"
+                hint="Required. Upload a clear photo of your business card (JPEG, PNG, or WebP up to 5 MB)."
+                photoUrl={professionalCardPhotoUrl}
+                uploading={uploadingCard}
+                disabled={busy}
+                onSelect={handleCardUpload}
+              />
             </div>
           </CheckoutWizardStepBody>
           <CheckoutWizardStepFooter
             back={{ label: "Back", onClick: goBack }}
-            primary={{ label: "Review application", onClick: goNext }}
+            primary={{
+              label: "Continue",
+              onClick: goNext,
+              disabled: uploadingAadhaar || uploadingCard,
+            }}
           />
         </LuxuryCheckoutPanel>
       ) : null}
 
-      {step === 6 ? (
+      {step === 3 ? (
         <LuxuryCheckoutPanel>
           <CheckoutWizardStepHeader
-            title="Review your application"
-            description="Check everything below, then submit for Royal VIP concierge review."
+            title="Social account"
+            description="Share one public profile so our concierge can verify you."
           />
           <CheckoutWizardStepBody>
-            <dl className="space-y-4 text-sm">
-              <CheckoutWizardConfirmRow label="Full name" value={fullName} />
-              <CheckoutWizardConfirmRow label="Email" value={email} />
-              {phone ? <CheckoutWizardConfirmRow label="Phone" value={phone} /> : null}
-              {address ? <CheckoutWizardConfirmRow label="Address" value={address} /> : null}
-              <CheckoutWizardConfirmRow label="Description" value={description} />
-              <CheckoutWizardConfirmRow label="Aadhaar" value="•••• •••• ••••" />
-              <CheckoutWizardConfirmRow label="Card type" value={cardLabel} />
-              {instagramUsername ? (
-                <CheckoutWizardConfirmRow label="Instagram" value={`@${instagramUsername.replace(/^@/, "")}`} />
-              ) : null}
-              {facebookUsername ? (
-                <CheckoutWizardConfirmRow label="Facebook" value={facebookUsername} />
-              ) : null}
-            </dl>
+            <div
+              className="mb-4 inline-flex rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.35)] p-1"
+              role="tablist"
+              aria-label="Social platform"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={socialPlatform === "instagram"}
+                className={`rounded-sm px-4 py-2 text-sm font-medium transition-colors ${
+                  socialPlatform === "instagram"
+                    ? "bg-[#4A0000] text-[#f2e4c4]"
+                    : "text-[rgb(58_0_0/0.65)] hover:text-[#4A0000]"
+                }`}
+                onClick={() => {
+                  setSocialPlatform("instagram");
+                  setStepError(null);
+                }}
+              >
+                Instagram
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={socialPlatform === "facebook"}
+                className={`rounded-sm px-4 py-2 text-sm font-medium transition-colors ${
+                  socialPlatform === "facebook"
+                    ? "bg-[#4A0000] text-[#f2e4c4]"
+                    : "text-[rgb(58_0_0/0.65)] hover:text-[#4A0000]"
+                }`}
+                onClick={() => {
+                  setSocialPlatform("facebook");
+                  setStepError(null);
+                }}
+              >
+                Facebook
+              </button>
+            </div>
+            <label htmlFor="vip-social-username" className="eyebrow luxury-panel-label mb-2 block">
+              {socialLabel} username
+            </label>
+            <input
+              id="vip-social-username"
+              value={socialUsername}
+              onChange={(e) => setSocialUsername(e.target.value)}
+              placeholder={socialPlaceholder}
+              className={inputClass}
+            />
+
+            <div className="mt-8 border-t border-[rgb(74_0_0/0.12)] pt-6">
+              <p className="eyebrow luxury-panel-label mb-3 block">Review</p>
+              <dl className="space-y-3 text-sm">
+                <CheckoutWizardConfirmRow label="Full name" value={fullName} />
+                <CheckoutWizardConfirmRow label="Email" value={email} />
+                {phone ? <CheckoutWizardConfirmRow label="Phone" value={phone} /> : null}
+                {address ? <CheckoutWizardConfirmRow label="Address" value={address} /> : null}
+                <CheckoutWizardConfirmRow label="About you" value={description} />
+                <CheckoutWizardConfirmRow label="Aadhaar" value="•••• •••• ••••" />
+                <CheckoutWizardConfirmRow label="Business card" value="Uploaded" />
+                <CheckoutWizardConfirmRow
+                  label={socialLabel}
+                  value={
+                    socialPlatform === "instagram"
+                      ? `@${socialUsername.replace(/^@/, "")}`
+                      : socialUsername
+                  }
+                />
+              </dl>
+            </div>
           </CheckoutWizardStepBody>
           <CheckoutWizardStepFooter
             back={{ label: "Back", onClick: goBack }}
