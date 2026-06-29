@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+import logging
 
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import CreateHomestayBookingRequest, CreateHomestayBookingResponse
@@ -14,6 +15,8 @@ HOMESTAY_SELECT = """
 *,
 homestay_owners ( id, full_name, auth_user_id, approval_status )
 """
+
+logger = logging.getLogger(__name__)
 
 
 def _extra_beds_per_room(value) -> int:
@@ -253,23 +256,24 @@ def create_homestay_booking(
     from app.services.notifications import create_notification
 
     title = stay.get("title") or "your stay"
-    try:
-        create_notification(
-            user.id,
-            "booking_created",
-            "Stay requested",
-            f"Your request for {title} was submitted. The host will confirm shortly. Pay in cash at check-in once confirmed.",
-            {"bookingId": booking_id, "bookingType": "homestay"},
-        )
-        owner_user_id = owner.get("auth_user_id")
-        if owner_user_id:
-            create_notification(
-                owner_user_id,
-                "booking_created",
-                "New stay request",
-                f"A guest requested {title}. Review it in your dashboard.",
-                {"bookingId": booking_id, "bookingType": "homestay"},
+
+    if guest_email:
+        try:
+            send_homestay_booking_requested_email(
+                to=guest_email,
+                guest_name=guest_name,
+                stay_title=title,
+                check_in=check_in.isoformat(),
+                check_out=check_out.isoformat(),
+                nights=nights,
+                total_minor=subtotal_minor,
+                currency_code=stay.get("currency_code") or "INR",
+                booking_id=booking_id,
             )
+        except Exception:
+            logger.exception("Failed to send guest homestay booking email for %s", booking_id)
+
+    try:
         from datetime import datetime, timezone
 
         from app.services.host_booking_reminders import resolve_host_email
@@ -288,23 +292,39 @@ def create_homestay_booking(
             currency_code=stay.get("currency_code") or "INR",
             booking_id=booking_id,
         ):
-            supabase.table("homestay_bookings").update(
-                {"host_request_email_sent_at": datetime.now(timezone.utc).isoformat()}
-            ).eq("id", booking_id).execute()
-        log_audit(user.id, "homestay_booking_created", "homestay_booking", booking_id, {"homestayId": stay["id"]})
-        send_homestay_booking_requested_email(
-            to=guest_email,
-            guest_name=guest_name,
-            stay_title=title,
-            check_in=check_in.isoformat(),
-            check_out=check_out.isoformat(),
-            nights=nights,
-            total_minor=subtotal_minor,
-            currency_code=stay.get("currency_code") or "INR",
-            booking_id=booking_id,
-        )
+            try:
+                supabase.table("homestay_bookings").update(
+                    {"host_request_email_sent_at": datetime.now(timezone.utc).isoformat()}
+                ).eq("id", booking_id).execute()
+            except Exception:
+                logger.exception("Failed to mark host_request_email_sent_at for homestay %s", booking_id)
     except Exception:
-        pass
+        logger.exception("Failed to send host homestay booking email for %s", booking_id)
+
+    try:
+        create_notification(
+            user.id,
+            "booking_created",
+            "Stay requested",
+            f"Your request for {title} was submitted. The host will confirm shortly. Pay in cash at check-in once confirmed.",
+            {"bookingId": booking_id, "bookingType": "homestay"},
+        )
+        owner_user_id = owner.get("auth_user_id")
+        if owner_user_id:
+            create_notification(
+                owner_user_id,
+                "booking_created",
+                "New stay request",
+                f"A guest requested {title}. Review it in your dashboard.",
+                {"bookingId": booking_id, "bookingType": "homestay"},
+            )
+    except Exception:
+        logger.exception("Failed to create homestay booking notifications for %s", booking_id)
+
+    try:
+        log_audit(user.id, "homestay_booking_created", "homestay_booking", booking_id, {"homestayId": stay["id"]})
+    except Exception:
+        logger.exception("Failed to write homestay booking audit log for %s", booking_id)
 
     return CreateHomestayBookingResponse(
         bookingId=booking_id,

@@ -19,7 +19,7 @@ def send_email(*, to: str, subject: str, html: str, text: str | None = None) -> 
     if not to_address:
         return False
     if not email_configured():
-        logger.info("Resend not configured; skipping email to %s (%s)", to_address, subject)
+        logger.warning("Resend not configured; skipping email to %s (%s)", to_address, subject)
         return False
 
     payload: dict = {

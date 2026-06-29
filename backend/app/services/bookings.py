@@ -1,4 +1,5 @@
 from datetime import date, datetime, timezone
+import logging
 
 from app.booking_window import assert_slot_still_bookable
 from app.dependencies.supabase import get_supabase_admin
@@ -18,6 +19,9 @@ from app.models.schemas import (
     CreateBookingRequest,
     CreateBookingResponse,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 def _currency_symbol(code: str) -> str:
@@ -177,33 +181,39 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
     from app.services.notifications import create_notification
 
     title = experience.get("title") or "your experience"
+
+    if guest_email:
+        try:
+            send_experience_booking_requested_email(
+                to=guest_email,
+                guest_name=guest_name,
+                experience_title=title,
+                slot_date=slot.get("slot_date", ""),
+                slot_start=slot.get("start_time", ""),
+                slot_end=slot.get("end_time", ""),
+                guest_count=payload.guestCount,
+                total_minor=subtotal_minor,
+                currency_code=experience["currency_code"],
+                booking_id=booking_id,
+            )
+        except Exception:
+            logger.exception("Failed to send guest booking email for %s", booking_id)
+
+    host_row: dict = {}
     try:
-        create_notification(
-            user.id,
-            "booking_created",
-            "Booking requested",
-            f"Your request for {title} was submitted. The host will confirm shortly.",
-            {"bookingId": booking_id},
-        )
         host_result = (
             supabase.table("hosts")
             .select("auth_user_id, display_name, email")
             .eq("id", experience.get("host_id"))
-            .maybe_single()
+            .limit(1)
             .execute()
         )
-        host_row = (host_result.data if host_result else None) or {}
-        host_user_id = host_row.get("auth_user_id")
-        if host_user_id:
-            create_notification(
-                host_user_id,
-                "booking_created",
-                "New booking request",
-                f"A guest requested {title}. Review it in your host dashboard.",
-                {"bookingId": booking_id},
-            )
-        from datetime import datetime, timezone
+        rows = host_result.data or []
+        host_row = rows[0] if rows else {}
+    except Exception:
+        logger.exception("Failed to load host for booking %s", booking_id)
 
+    try:
         from app.services.host_booking_reminders import resolve_host_email
 
         host_email = resolve_host_email(supabase, host_row.get("auth_user_id"), host_row.get("email"))
@@ -220,24 +230,39 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
             currency_code=experience["currency_code"],
             booking_id=booking_id,
         ):
-            supabase.table("bookings").update(
-                {"host_request_email_sent_at": datetime.now(timezone.utc).isoformat()}
-            ).eq("id", booking_id).execute()
-        log_audit(user.id, "booking_created", "booking", booking_id, {"experienceId": experience["id"]})
-        send_experience_booking_requested_email(
-            to=guest_email,
-            guest_name=guest_name,
-            experience_title=title,
-            slot_date=slot.get("slot_date", ""),
-            slot_start=slot.get("start_time", ""),
-            slot_end=slot.get("end_time", ""),
-            guest_count=payload.guestCount,
-            total_minor=subtotal_minor,
-            currency_code=experience["currency_code"],
-            booking_id=booking_id,
-        )
+            try:
+                supabase.table("bookings").update(
+                    {"host_request_email_sent_at": datetime.now(timezone.utc).isoformat()}
+                ).eq("id", booking_id).execute()
+            except Exception:
+                logger.exception("Failed to mark host_request_email_sent_at for %s", booking_id)
     except Exception:
-        pass
+        logger.exception("Failed to send host booking email for %s", booking_id)
+
+    try:
+        create_notification(
+            user.id,
+            "booking_created",
+            "Booking requested",
+            f"Your request for {title} was submitted. The host will confirm shortly.",
+            {"bookingId": booking_id},
+        )
+        host_user_id = host_row.get("auth_user_id")
+        if host_user_id:
+            create_notification(
+                host_user_id,
+                "booking_created",
+                "New booking request",
+                f"A guest requested {title}. Review it in your host dashboard.",
+                {"bookingId": booking_id},
+            )
+    except Exception:
+        logger.exception("Failed to create booking notifications for %s", booking_id)
+
+    try:
+        log_audit(user.id, "booking_created", "booking", booking_id, {"experienceId": experience["id"]})
+    except Exception:
+        logger.exception("Failed to write booking audit log for %s", booking_id)
 
     return CreateBookingResponse(
         bookingId=booking_id,

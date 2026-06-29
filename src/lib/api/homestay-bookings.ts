@@ -1,6 +1,4 @@
-import { create } from "@bufbuild/protobuf";
-import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
-import { CreateHomestayBookingRequestSchema } from "@/gen/royalpassage/v1/types_pb";
+import { apiFetch } from "@/lib/api/client";
 
 export type CreateHomestayBookingPayload = {
   homestayId: string;
@@ -23,8 +21,9 @@ export type CreateHomestayBookingResult = {
 };
 
 export function createHomestayBooking(accessToken: string, payload: CreateHomestayBookingPayload) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(
-    () => client.createHomestayBooking(create(CreateHomestayBookingRequestSchema, payload)),
-  ) as Promise<CreateHomestayBookingResult>;
+  return apiFetch<CreateHomestayBookingResult>("/api/v1/homestay-bookings", {
+    accessToken,
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }

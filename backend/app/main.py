@@ -25,6 +25,13 @@ from app.http_api import (
     admin_users,
     healthz,
 )
+from app.http_bookings import (
+    guest_booking_detail,
+    guest_cancel_booking,
+    guest_create_booking,
+    guest_create_homestay_booking,
+    guest_list_bookings,
+)
 from app.http_host import (
     host_booking_detail,
     host_bookings,
@@ -99,6 +106,11 @@ core_app = Starlette(
             methods=["POST"],
         ),
         Route("/api/v1/admin/hosts", admin_create_host, methods=["POST"]),
+        Route("/api/v1/bookings", guest_create_booking, methods=["POST"]),
+        Route("/api/v1/bookings/me", guest_list_bookings, methods=["GET"]),
+        Route("/api/v1/bookings/{booking_id}", guest_booking_detail, methods=["GET"]),
+        Route("/api/v1/bookings/{booking_id}/cancel", guest_cancel_booking, methods=["POST"]),
+        Route("/api/v1/homestay-bookings", guest_create_homestay_booking, methods=["POST"]),
         Route("/api/v1/host/dashboard", host_dashboard, methods=["GET"]),
         Route("/api/v1/host/bookings", host_bookings, methods=["GET"]),
         Route("/api/v1/host/bookings/{booking_id}", host_booking_detail, methods=["GET"]),

@@ -56,3 +56,7 @@ def require_admin_request(request: Request) -> dict | JSONResponse:
 
 def require_host_request(request: Request) -> dict | JSONResponse:
     return require_role_request(request, "host")
+
+
+def require_guest_request(request: Request) -> dict | JSONResponse:
+    return require_role_request(request, "guest")
