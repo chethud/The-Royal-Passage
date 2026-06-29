@@ -31,6 +31,12 @@ export async function rpcCall<T>(fn: () => Promise<T>, fallback = "Request faile
   try {
     return await fn();
   } catch (err) {
+    if (err instanceof TypeError && err.message === "Failed to fetch") {
+      const base = readApiBaseUrl() || "the API";
+      throw new Error(
+        `Cannot reach the API at ${base}. On Vercel set VITE_API_BASE_URL=https://the-royal-passage.onrender.com. On Render set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, then redeploy.`,
+      );
+    }
     if (err instanceof ConnectError) {
       throw new Error(err.rawMessage || err.message || fallback);
     }
