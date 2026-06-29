@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { motion } from "motion/react";
+import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/site/ScrollReveal";
 import {
   EditablePhotoField,
   EditableTextField,
@@ -30,25 +30,29 @@ export function JournalPreview({
   };
 
   return (
-    <section className="bg-background py-16 sm:py-20 md:py-24">
+    <section className="bg-background pt-10 pb-8 sm:pt-12 sm:pb-10 md:pt-14 md:pb-12">
       <div className="container-page">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
-          <div>
-            <div className="eyebrow mb-3 text-ember/95">Stories & Inspiration</div>
-            <h2 className="font-display text-3xl tracking-tight text-ink text-balance sm:text-4xl md:text-5xl">
-              From our Journal
-            </h2>
-          </div>
+        <ScrollRevealGroup className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+          <ScrollRevealItem>
+            <div>
+              <div className="eyebrow mb-3 text-ember/95">Stories & Inspiration</div>
+              <h2 className="font-display text-3xl tracking-tight text-ink text-balance sm:text-4xl md:text-5xl">
+                From our Journal
+              </h2>
+            </div>
+          </ScrollRevealItem>
           {!editable ? (
-            <Link
-              to="/journal"
-              className="group inline-flex items-center gap-2 self-start rounded-sm text-xs font-semibold uppercase tracking-[0.22em] text-ember transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:self-auto"
-            >
-              View all stories
-              <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-            </Link>
+            <ScrollRevealItem>
+              <Link
+                to="/journal"
+                className="group inline-flex items-center gap-2 self-start rounded-sm text-xs font-semibold uppercase tracking-[0.22em] text-ember transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:self-auto"
+              >
+                View all stories
+                <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </ScrollRevealItem>
           ) : null}
-        </div>
+        </ScrollRevealGroup>
 
         <div className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2 md:grid-cols-3 md:gap-7">
           {items.map((story, idx) => {
@@ -89,12 +93,10 @@ export function JournalPreview({
                 </div>
               </article>
             ) : (
-              <motion.article
+              <ScrollReveal
                 key={story.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{ duration: 0.6, delay: idx * 0.08 }}
+                as="article"
+                delay={idx * 0.08}
                 className="group overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.18)] shadow-soft transition-all duration-500 hover:-translate-y-1 hover:border-ember/55 hover:shadow-[0_28px_60px_-30px_oklch(0.55_0.14_78_/_0.45)]"
               >
                 <Link
@@ -125,7 +127,7 @@ export function JournalPreview({
                     </span>
                   </div>
                 </Link>
-              </motion.article>
+              </ScrollReveal>
             );
           })}
         </div>

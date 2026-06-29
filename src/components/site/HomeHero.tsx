@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { EditablePhotoField } from "@/components/editor/EditableHomepageFields";
 import { HeroSlideshow } from "@/components/site/HeroSlideshow";
 import type { HomepageHeroSlide } from "@/lib/homepage-content";
@@ -131,6 +131,37 @@ export function HomeHero({
               />
             </div>
           </div>
+        ) : null}
+
+        {!editable ? (
+          reduceMotion ? (
+            <a
+              href="#experiences"
+              aria-label="Scroll to experiences"
+              className="pointer-events-auto absolute inset-x-0 bottom-[4.75rem] z-20 flex justify-center"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] bg-[oklch(0.12_0.06_22_/_0.45)] text-ink/80 backdrop-blur-md">
+                <ChevronDown className="h-5 w-5" strokeWidth={1.5} />
+              </span>
+            </a>
+          ) : (
+            <motion.a
+              href="#experiences"
+              aria-label="Scroll to experiences"
+              className="pointer-events-auto absolute inset-x-0 bottom-[4.75rem] z-20 flex justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: 1.1, ease: softEase }}
+            >
+              <motion.span
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] bg-[oklch(0.12_0.06_22_/_0.45)] text-ink/80 backdrop-blur-md"
+                animate={{ y: [0, 6, 0] }}
+                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              >
+                <ChevronDown className="h-5 w-5" strokeWidth={1.5} />
+              </motion.span>
+            </motion.a>
+          )
         ) : null}
 
         <div className="pointer-events-auto absolute inset-x-0 bottom-8 z-20 flex items-center justify-center gap-2">

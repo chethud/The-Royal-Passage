@@ -1,5 +1,5 @@
 import type { ComponentType, SVGProps } from "react";
-import { motion } from "motion/react";
+import { ScrollReveal } from "@/components/site/ScrollReveal";
 import { ClocheIcon, CrownIcon, LotusBudIcon, LotusIcon } from "@/components/site/PillarIcons";
 import { cn } from "@/lib/utils";
 
@@ -36,18 +36,16 @@ const pillars: Pillar[] = [
 
 export function PillarsRow() {
   return (
-    <section className="border-t border-[oklch(0.88_0.08_86_/_0.12)] bg-[color-mix(in srgb, var(--brand-noir) 88%, var(--brand-maroon) 12%)] py-12 sm:py-14 md:py-16">
+    <section className="border-t border-[oklch(0.88_0.08_86_/_0.12)] bg-[color-mix(in srgb, var(--brand-noir) 88%, var(--brand-maroon) 12%)] pt-8 pb-6 sm:pt-10 sm:pb-7 md:pt-12 md:pb-8">
       <div className="container-page">
         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4 md:gap-6 lg:gap-8">
           {pillars.map((p, idx) => {
             const Icon = p.icon;
             return (
-              <motion.div
+              <ScrollReveal
                 key={p.title}
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{ duration: 0.6, delay: idx * 0.07 }}
+                delay={idx * 0.07}
+                offsetY={18}
                 className={cn(
                   "relative flex flex-col items-center px-4 text-center",
                   // Vertical gradient line
@@ -67,7 +65,7 @@ export function PillarsRow() {
                 <p className="mt-2 max-w-[16rem] text-xs leading-relaxed text-muted-foreground sm:text-[0.78rem]">
                   {p.description}
                 </p>
-              </motion.div>
+              </ScrollReveal>
             );
           })}
         </div>

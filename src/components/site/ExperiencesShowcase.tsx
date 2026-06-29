@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { motion } from "motion/react";
+import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/site/ScrollReveal";
 import {
   EditablePhotoField,
   EditableTextField,
@@ -44,23 +44,27 @@ export function ExperiencesShowcase({
   return (
     <section
       id="experiences"
-      className="relative border-y border-[oklch(0.88_0.08_86_/_0.1)] bg-[oklch(0.16_0.07_22)] py-16 sm:py-20 md:py-24"
+      className="relative border-y border-[oklch(0.88_0.08_86_/_0.1)] bg-[oklch(0.16_0.07_22)] pt-16 pb-8 sm:pt-20 sm:pb-10 md:pt-24 md:pb-12"
     >
       <div className="container-page">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
-          <h2 className="font-display text-3xl tracking-tight text-ink text-balance sm:text-4xl md:text-5xl">
-            Our Top 3 Experiences
-          </h2>
+        <ScrollRevealGroup className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+          <ScrollRevealItem>
+            <h2 className="font-display text-3xl tracking-tight text-ink text-balance sm:text-4xl md:text-5xl">
+              Our Top 3 Experiences
+            </h2>
+          </ScrollRevealItem>
           {!editable ? (
-            <Link
-              to="/experiences"
-              className="group inline-flex items-center gap-2 self-start rounded-sm text-xs font-semibold uppercase tracking-[0.22em] text-ember transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:self-auto"
-            >
-              View all experiences
-              <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-            </Link>
+            <ScrollRevealItem>
+              <Link
+                to="/experiences"
+                className="group inline-flex items-center gap-2 self-start rounded-sm text-xs font-semibold uppercase tracking-[0.22em] text-ember transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:self-auto"
+              >
+                View all experiences
+                <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </ScrollRevealItem>
           ) : null}
-        </div>
+        </ScrollRevealGroup>
 
         <div className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2 md:grid-cols-3 md:gap-7">
           {items.map((card, idx) => (
@@ -126,11 +130,9 @@ function ExperienceShowcaseCard({
   }
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10%" }}
-      transition={{ duration: 0.6, delay: index * 0.08 }}
+    <ScrollReveal
+      as="article"
+      delay={index * 0.08}
       className="group overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.18)] shadow-soft transition-all duration-500 hover:-translate-y-1 hover:border-ember/55 hover:shadow-[0_28px_60px_-30px_oklch(0.55_0.14_78_/_0.45)]"
     >
       <Link
@@ -161,6 +163,6 @@ function ExperienceShowcaseCard({
           </h3>
         </div>
       </Link>
-    </motion.article>
+    </ScrollReveal>
   );
 }

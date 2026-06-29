@@ -106,7 +106,7 @@ function FooterSimple() {
 
 function FooterFull() {
   return (
-    <footer className="relative mt-24 overflow-hidden border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
+    <footer className="relative overflow-hidden border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
       <div className="container-page relative z-10 grid gap-10 py-12 sm:grid-cols-2 sm:py-14 md:grid-cols-[1.5fr_1fr_1fr_1.2fr] md:gap-12 md:py-16">
         <div>
           <FooterBrandBlock />

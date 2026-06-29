@@ -10,8 +10,10 @@ import {
 } from "@/components/site/RoyalHeritageDecor";
 import { DEFAULT_HOMEPAGE_JOURNEYS, type HomepageJourneySlide } from "@/lib/homepage-content";
 import { normalizeYoutubeVideoInput } from "@/lib/youtube-video-id";
+import logoUrl from "@/assets/logo/logo.png";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ScrollReveal } from "@/components/site/ScrollReveal";
 
 type SlideTheme = HomepageJourneySlide["theme"];
 
@@ -57,11 +59,11 @@ function SlideContent({ slide, visible }: SlideContentProps) {
     <div className={`royal-slide-content relative flex flex-col justify-center px-7 py-12 sm:px-12 sm:py-16 md:px-16 md:py-20 ${visible ? "is-visible" : ""}`}>
       <PalaceArchFrame className="pointer-events-none absolute top-6 right-8 left-8 z-10 h-8 opacity-70 sm:top-8" />
 
-      <div className="pointer-events-none absolute top-10 right-10 opacity-30">
+      <div className="pointer-events-none absolute top-8 left-7 z-10 opacity-35 sm:top-10 sm:left-10 md:left-12">
         {slide.theme === "manuscript" ? (
-          <HeritageCompass className="h-14 w-14 text-[#D4AF37]/40" />
+          <HeritageCompass className="h-16 w-16 text-[#D4AF37]/40 sm:h-20 sm:w-20" />
         ) : (
-          <MaharajaEmblem className="h-10 w-10 text-[#D4AF37]/35" />
+          <MaharajaEmblem className="h-14 w-14 text-[#D4AF37]/35 sm:h-20 sm:w-20" />
         )}
       </div>
 
@@ -134,6 +136,13 @@ function SlideMedia({
           referrerPolicy="strict-origin-when-cross-origin"
         />
       </div>
+
+      <img
+        src={logoUrl}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute top-3 left-2 z-[3] h-[4.5rem] w-auto max-w-[min(52vw,11rem)] origin-left object-contain object-left drop-shadow-[0_0_24px_oklch(0.75_0.12_86_/_0.5)] sm:top-4 sm:left-3 sm:h-24 sm:max-w-none md:left-4 md:h-28"
+      />
 
       {editable && isActive && onVideoIdChange ? (
         <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-50 border-t border-ember/45 bg-[#1a0505]/95 p-4 backdrop-blur-md">
@@ -244,7 +253,7 @@ export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesCh
 
   return (
     <section
-      className={`royal-heritage-section relative overflow-hidden bg-[#2A0A0A] py-16 sm:py-20 md:py-28 ${isTransitioning ? "is-transitioning" : ""}`}
+      className={`royal-heritage-section relative overflow-hidden pt-10 pb-8 sm:pt-12 sm:pb-10 md:pt-14 md:pb-12 ${isTransitioning ? "is-transitioning" : ""}`}
     >
       {editable && active ? (
         <div className="container-page relative z-20 mb-6">
@@ -318,6 +327,7 @@ export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesCh
         : null}
 
       <div className="container-page relative">
+        <ScrollReveal offsetY={32}>
         <div className="relative p-px">
           <div className="pointer-events-none absolute inset-0 rounded-sm bg-gradient-to-br from-[#D4AF37]/70 via-[#C9A227]/25 to-[#D4AF37]/50" />
 
@@ -358,8 +368,9 @@ export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesCh
             </div>
           </div>
         </div>
+        </ScrollReveal>
 
-        <div className="mt-10 flex items-center justify-center gap-6 sm:mt-12">
+        <ScrollReveal delay={0.15} className="mt-6 flex items-center justify-center gap-6 sm:mt-8">
           <button
             type="button"
             onClick={goPrev}
@@ -395,7 +406,7 @@ export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesCh
           >
             <ChevronRight className="h-4 w-4" strokeWidth={1.6} />
           </button>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

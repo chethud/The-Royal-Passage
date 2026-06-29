@@ -156,10 +156,10 @@ export function Header() {
       data-elevated={elevated ? "true" : "false"}
       className="site-header fixed inset-x-0 top-0 z-50 w-full transition-[background-color,backdrop-filter,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
     >
-      <div className="container-page flex h-[var(--header-height)] items-center justify-between gap-3 sm:gap-6">
+      <div className="mx-auto flex h-[var(--header-height)] max-w-[1280px] items-center justify-between gap-2 pl-1.5 pr-3 sm:gap-4 sm:pl-2.5 sm:pr-4 md:gap-6 md:pl-5 md:pr-10">
         <Link
           to={logoPath}
-          className="flex shrink-0 items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember/60"
+          className="flex min-h-11 min-w-0 shrink items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember/60"
           aria-label={
             isVipSection && (!user || role === "guest")
               ? "The Royal Passage — VIP home"
@@ -177,7 +177,7 @@ export function Header() {
             height={110}
             decoding="async"
             fetchPriority="high"
-            className="h-12 w-auto object-contain object-left drop-shadow-[0_0_30px_oklch(0.75_0.12_86_/_0.5)] sm:h-14 md:h-20 lg:h-24"
+            className="h-11 w-auto max-h-[calc(var(--header-height)-0.75rem)] max-w-[min(46vw,10.25rem)] origin-left -translate-x-0.5 object-contain object-left drop-shadow-[0_0_24px_oklch(0.75_0.12_86_/_0.45)] sm:h-14 sm:max-w-[min(42vw,12rem)] sm:-translate-x-1 md:h-[5.75rem] md:max-w-none lg:h-[7rem]"
           />
         </Link>
 
@@ -236,7 +236,7 @@ export function Header() {
           ) : null}
         </nav>
 
-        <div className="flex items-center gap-1 sm:gap-2 md:hidden">
+        <div className="flex shrink-0 items-center gap-0.5 sm:gap-1 md:hidden">
           {showGuestCart ? (
             <Link
               to="/dashboard/cart"
