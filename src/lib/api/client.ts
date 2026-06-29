@@ -64,6 +64,9 @@ function humanizeErrorMessage(message: string, fallback: string): string {
   if (lowered.includes("does not exist") && lowered.includes("relation")) {
     return CRYPTIC_ERROR_MESSAGES.from_json;
   }
+  if (lowered === "failed to fetch") {
+    return "Cannot reach the API. Set VITE_API_BASE_URL on Vercel and SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY on Render, then redeploy both.";
+  }
 
   return trimmed;
 }

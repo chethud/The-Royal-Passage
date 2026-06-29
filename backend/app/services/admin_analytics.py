@@ -28,44 +28,35 @@ def _get_commission_percent(supabase) -> float:
         return 10.0
 
 
+def _count_rows(supabase, table: str, **filters) -> int:
+    query = supabase.table(table).select("id")
+    for key, value in filters.items():
+        query = query.eq(key, value)
+    result = query.execute()
+    return len(result.data or [])
+
+
 def get_admin_stats() -> AdminStats:
     supabase = get_supabase_admin()
     commission_percent = _get_commission_percent(supabase)
 
-    guests = (
-        supabase.table("profiles")
-        .select("id", count="exact")
-        .eq("role", "guest")
-        .execute()
-    )
-    hosts = (
-        supabase.table("profiles")
-        .select("id", count="exact")
-        .eq("role", "host")
-        .execute()
-    )
-    experiences = (
-        supabase.table("experiences")
-        .select("id", count="exact")
-        .eq("status", "published")
-        .execute()
-    )
-    pending_reviews = (
-        supabase.table("experiences")
-        .select("id", count="exact")
-        .eq("status", "pending_review")
-        .execute()
-    )
+    total_guests = _count_rows(supabase, "profiles", role="guest")
+    total_hosts = _count_rows(supabase, "profiles", role="host")
+    published_experiences = _count_rows(supabase, "experiences", status="published")
+    pending_reviews = _count_rows(supabase, "experiences", status="pending_review")
 
-    bookings_result = (
-        supabase.table("bookings")
-        .select(
-            "booking_status, payment_status, total_amount, subtotal_minor, "
-            "platform_fee_minor, host_payout_minor"
+    try:
+        bookings_result = (
+            supabase.table("bookings")
+            .select(
+                "booking_status, payment_status, total_amount, subtotal_minor, "
+                "platform_fee_minor, host_payout_minor"
+            )
+            .execute()
         )
-        .execute()
-    )
-    rows = bookings_result.data or []
+        rows = bookings_result.data or []
+    except Exception:
+        rows = []
 
     pending_bookings = 0
     confirmed_bookings = 0
@@ -107,12 +98,12 @@ def get_admin_stats() -> AdminStats:
                 cod_pending_collection_minor += total
 
     return AdminStats(
-        totalGuests=guests.count or 0,
-        totalHosts=hosts.count or 0,
-        publishedExperiences=experiences.count or 0,
+        totalGuests=total_guests,
+        totalHosts=total_hosts,
+        publishedExperiences=published_experiences,
         totalBookings=len(rows),
         revenueCollectedMinor=revenue_collected_minor,
-        pendingExperienceReviews=pending_reviews.count or 0,
+        pendingExperienceReviews=pending_reviews,
         currencySymbol="₹",
         confirmedBookings=confirmed_bookings,
         pendingBookings=pending_bookings,
@@ -128,14 +119,20 @@ def get_admin_stats() -> AdminStats:
 
 def list_admin_bookings(limit: int = 500) -> list[AdminBookingRow]:
     supabase = get_supabase_admin()
-    auto_complete_due_confirmed_bookings(supabase)
-    result = (
-        supabase.table("bookings")
-        .select(BOOKING_SELECT)
-        .order("created_at", desc=True)
-        .limit(limit)
-        .execute()
-    )
+    try:
+        auto_complete_due_confirmed_bookings(supabase)
+    except Exception:
+        pass
+    try:
+        result = (
+            supabase.table("bookings")
+            .select(BOOKING_SELECT)
+            .order("created_at", desc=True)
+            .limit(limit)
+            .execute()
+        )
+    except Exception:
+        return []
 
     rows = []
     for row in result.data or []:
