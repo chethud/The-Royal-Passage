@@ -1,8 +1,8 @@
 import { create } from "@bufbuild/protobuf";
 import type { UserRole } from "@/lib/roles";
 import { fetchBookingById } from "@/lib/api/bookings";
+import { apiFetch } from "@/lib/api/client";
 import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
-import { AdminExperienceActionRequestSchema } from "@/gen/royalpassage/v1/service_pb";
 import { CreateHostRequestSchema, CreateHomestayOwnerRequestSchema, CreatePlatformUserRequestSchema, CreateVipOwnerRequestSchema } from "@/gen/royalpassage/v1/types_pb";
 import type { HostSlotDetail } from "@/lib/api/host-experiences";
 
@@ -17,11 +17,7 @@ export type ManagedUser = {
 };
 
 export function fetchManagedUsers(accessToken: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(async () => {
-    const response = await client.listAdminUsers({});
-    return response.users as ManagedUser[];
-  });
+  return apiFetch<ManagedUser[]>("/api/v1/admin/users", { accessToken });
 }
 
 export type CreateHostPayload = {
@@ -33,8 +29,11 @@ export type CreateHostPayload = {
 };
 
 export function createHost(accessToken: string, payload: CreateHostPayload) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() => client.createHost(create(CreateHostRequestSchema, payload)));
+  return apiFetch("/api/v1/admin/hosts", {
+    accessToken,
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 export type CreatePlatformUserPayload = {
@@ -131,11 +130,7 @@ export type AdminExperienceDetail = {
 };
 
 export function fetchAdminExperienceApprovals(accessToken: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(async () => {
-    const response = await client.listAdminExperiences({});
-    return response.experiences as AdminExperienceSummary[];
-  });
+  return apiFetch<AdminExperienceSummary[]>("/api/v1/admin/experiences", { accessToken });
 }
 
 /** @deprecated Use fetchAdminExperienceApprovals */
@@ -144,24 +139,23 @@ export function fetchPendingExperiences(accessToken: string) {
 }
 
 export function fetchAdminExperience(accessToken: string, experienceId: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() =>
-    client.getAdminExperience(create(AdminExperienceActionRequestSchema, { experienceId })),
-  ) as Promise<AdminExperienceDetail>;
+  return apiFetch<AdminExperienceDetail>(`/api/v1/admin/experiences/${experienceId}`, {
+    accessToken,
+  });
 }
 
 export function publishExperience(accessToken: string, experienceId: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() =>
-    client.publishExperience(create(AdminExperienceActionRequestSchema, { experienceId })),
-  ) as Promise<AdminExperienceSummary>;
+  return apiFetch<AdminExperienceSummary>(
+    `/api/v1/admin/experiences/${experienceId}/publish`,
+    { accessToken, method: "POST" },
+  );
 }
 
 export function rejectExperience(accessToken: string, experienceId: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() =>
-    client.rejectExperience(create(AdminExperienceActionRequestSchema, { experienceId })),
-  ) as Promise<AdminExperienceSummary>;
+  return apiFetch<AdminExperienceSummary>(
+    `/api/v1/admin/experiences/${experienceId}/reject`,
+    { accessToken, method: "POST" },
+  );
 }
 
 export type AdminStats = {
@@ -211,16 +205,13 @@ export type AuditLogEntry = {
 };
 
 export function fetchAdminStats(accessToken: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() => client.getAdminStats({})) as Promise<AdminStats>;
+  return apiFetch<AdminStats>("/api/v1/admin/stats", { accessToken });
 }
 
 export function fetchAdminBookings(accessToken: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(async () => {
-    const response = await client.listAdminBookings({});
-    return (response.bookings as AdminBookingRow[]).map(normalizeAdminBookingRow);
-  });
+  return apiFetch<AdminBookingRow[]>("/api/v1/admin/bookings", { accessToken }).then((rows) =>
+    rows.map(normalizeAdminBookingRow),
+  );
 }
 
 function normalizeAdminBookingRow(raw: AdminBookingRow): AdminBookingRow {
@@ -243,9 +234,5 @@ export function fetchAdminBooking(accessToken: string, bookingId: string) {
 }
 
 export function fetchAdminActivity(accessToken: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(async () => {
-    const response = await client.listAdminActivity({});
-    return response.entries as AuditLogEntry[];
-  });
+  return apiFetch<AuditLogEntry[]>("/api/v1/admin/activity", { accessToken });
 }

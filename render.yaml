@@ -10,6 +10,16 @@ services:
         value: "3.12"
       - key: CORS_ORIGINS
         value: http://localhost:5173,http://localhost:8080,https://the-royal-passage.vercel.app
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        value: noreplay@theroyalpassage.com
+      - key: SITE_URL
+        value: https://the-royal-passage.vercel.app
 
   - type: cron
     name: host-booking-reminders
@@ -21,3 +31,13 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.12"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        value: noreplay@theroyalpassage.com
+      - key: SITE_URL
+        value: https://the-royal-passage.vercel.app

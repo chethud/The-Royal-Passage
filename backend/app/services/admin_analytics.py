@@ -6,6 +6,7 @@ from app.services.booking_auto_complete import (
     auto_complete_due_confirmed_bookings,
 )
 from app.services.bookings import BOOKING_SELECT, _map_booking_row
+from app.services.supabase_query import run_supabase_query
 
 
 def _booking_total(row: dict) -> int:
@@ -13,27 +14,35 @@ def _booking_total(row: dict) -> int:
 
 
 def _get_commission_percent(supabase) -> float:
-    fee_result = (
-        supabase.table("platform_settings")
-        .select("value")
-        .eq("key", "commission_percent")
-        .maybe_single()
-        .execute()
-    )
-    fee_row = fee_result.data if fee_result else None
-    raw_fee = (fee_row or {}).get("value", 10)
-    try:
-        return float(raw_fee)
-    except (TypeError, ValueError):
-        return 10.0
+    def _load() -> float:
+        result = (
+            supabase.table("platform_settings")
+            .select("value")
+            .eq("key", "commission_percent")
+            .limit(1)
+            .execute()
+        )
+        rows = result.data or []
+        if not rows:
+            return 10.0
+        raw_fee = rows[0].get("value", 10)
+        try:
+            return float(raw_fee)
+        except (TypeError, ValueError):
+            return 10.0
+
+    return run_supabase_query(_load, fallback=10.0)
 
 
 def _count_rows(supabase, table: str, **filters) -> int:
-    query = supabase.table(table).select("id")
-    for key, value in filters.items():
-        query = query.eq(key, value)
-    result = query.execute()
-    return len(result.data or [])
+    def _load() -> int:
+        query = supabase.table(table).select("id")
+        for key, value in filters.items():
+            query = query.eq(key, value)
+        result = query.execute()
+        return len(result.data or [])
+
+    return run_supabase_query(_load, fallback=0)
 
 
 def get_admin_stats() -> AdminStats:

@@ -12,6 +12,19 @@ from starlette.responses import JSONResponse
 from starlette.routing import Mount, Route
 
 from app.config import settings
+from app.http_api import (
+    admin_activity,
+    admin_booking_detail,
+    admin_bookings,
+    admin_create_host,
+    admin_experience_detail,
+    admin_experiences,
+    admin_publish_experience,
+    admin_reject_experience,
+    admin_stats,
+    admin_users,
+    healthz,
+)
 from app.rpc.servicer import RoyalPassageServiceImpl
 from royalpassage.v1.service_connect import RoyalPassageServiceASGIApplication
 
@@ -36,6 +49,29 @@ async def cron_host_booking_reminders(request):
 
 core_app = Starlette(
     routes=[
+        Route("/healthz", healthz, methods=["GET"]),
+        Route("/api/v1/admin/stats", admin_stats, methods=["GET"]),
+        Route("/api/v1/admin/bookings", admin_bookings, methods=["GET"]),
+        Route("/api/v1/admin/bookings/{booking_id}", admin_booking_detail, methods=["GET"]),
+        Route("/api/v1/admin/activity", admin_activity, methods=["GET"]),
+        Route("/api/v1/admin/users", admin_users, methods=["GET"]),
+        Route("/api/v1/admin/experiences", admin_experiences, methods=["GET"]),
+        Route(
+            "/api/v1/admin/experiences/{experience_id}",
+            admin_experience_detail,
+            methods=["GET"],
+        ),
+        Route(
+            "/api/v1/admin/experiences/{experience_id}/publish",
+            admin_publish_experience,
+            methods=["POST"],
+        ),
+        Route(
+            "/api/v1/admin/experiences/{experience_id}/reject",
+            admin_reject_experience,
+            methods=["POST"],
+        ),
+        Route("/api/v1/admin/hosts", admin_create_host, methods=["POST"]),
         Route(
             "/internal/cron/host-booking-reminders",
             cron_host_booking_reminders,

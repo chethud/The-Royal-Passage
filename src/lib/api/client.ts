@@ -48,9 +48,11 @@ export function isApiConfigured(): boolean {
 
 const CRYPTIC_ERROR_MESSAGES: Record<string, string> = {
   from_json:
-    "The server could not read the database response. Run supabase/FULL_SCHEMA.sql in the Supabase SQL Editor, then redeploy the API.",
+    "The API server failed to decode requests (Connect/protobuf). Redeploy the Render backend and confirm SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are set.",
+  from_binary:
+    "The API server failed to decode requests (Connect/protobuf). Redeploy the Render backend and confirm SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are set.",
   "json could not be generated":
-    "The server returned an unexpected response. Check that the API and Supabase are configured correctly.",
+    "The server returned an unexpected database response. Check that Supabase schema is up to date and the API is configured correctly.",
 };
 
 function humanizeErrorMessage(message: string, fallback: string): string {
