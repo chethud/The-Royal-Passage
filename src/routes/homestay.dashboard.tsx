@@ -6,6 +6,7 @@ import { HomestayOwnerDashboardShell } from "@/components/homestay-owner/Homesta
 import { OwnerHomestayBookingTable } from "@/components/homestay-owner/OwnerHomestayBookingTable";
 import {
   confirmOwnerHomestayBooking,
+  EMPTY_OWNER_DASHBOARD_STATS,
   fetchOwnerDashboard,
   fetchOwnerHomestayBookings,
   rejectOwnerHomestayBooking,
@@ -25,10 +26,10 @@ export const Route = createFileRoute("/homestay/dashboard")({
 
 function HomestayOwnerOverviewPage() {
   const { accessToken, ready, loading } = useHomestayOwnerAccess();
-  const [stats, setStats] = useState<OwnerDashboardStats | null>(null);
+  const [stats, setStats] = useState<OwnerDashboardStats>(EMPTY_OWNER_DASHBOARD_STATS);
   const [pendingBookings, setPendingBookings] = useState<HomestayBookingSummary[]>([]);
   const [todayBookings, setTodayBookings] = useState<HomestayBookingSummary[]>([]);
-  const [pageError, setPageError] = useState<string | null>(null);
+  const [pageWarning, setPageWarning] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
 
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -39,12 +40,12 @@ function HomestayOwnerOverviewPage() {
   ) => {
     if (!accessToken) return;
     setBusyId(bookingId);
-    setPageError(null);
+    setPageWarning(null);
     try {
       await action(accessToken, bookingId);
       await loadPage();
     } catch (err) {
-      setPageError(toErrorMessage(err, "Action failed."));
+      setPageWarning(toErrorMessage(err, "Action failed."));
     } finally {
       setBusyId(null);
     }
@@ -53,24 +54,38 @@ function HomestayOwnerOverviewPage() {
   const loadPage = useCallback(async () => {
     if (!accessToken) return;
     setPageLoading(true);
-    setPageError(null);
-    try {
-      if (!isApiConfigured()) {
-        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
-      }
-      const [dashboard, pending, today] = await Promise.all([
-        fetchOwnerDashboard(accessToken),
-        fetchOwnerHomestayBookings(accessToken, "pending"),
-        fetchOwnerHomestayBookings(accessToken, "today"),
-      ]);
-      setStats(dashboard);
-      setPendingBookings(pending);
-      setTodayBookings(today);
-    } catch (err) {
-      setPageError(toErrorMessage(err, "Failed to load owner dashboard."));
-    } finally {
+    setPageWarning(null);
+    if (!isApiConfigured()) {
+      setPageWarning("VITE_API_BASE_URL is not configured for this deployment.");
       setPageLoading(false);
+      return;
     }
+
+    const warnings: string[] = [];
+
+    try {
+      setStats(await fetchOwnerDashboard(accessToken));
+    } catch (err) {
+      warnings.push(toErrorMessage(err, "Failed to load dashboard stats."));
+      setStats(EMPTY_OWNER_DASHBOARD_STATS);
+    }
+
+    try {
+      setPendingBookings(await fetchOwnerHomestayBookings(accessToken, "pending"));
+    } catch (err) {
+      warnings.push(toErrorMessage(err, "Failed to load pending bookings."));
+      setPendingBookings([]);
+    }
+
+    try {
+      setTodayBookings(await fetchOwnerHomestayBookings(accessToken, "today"));
+    } catch (err) {
+      warnings.push(toErrorMessage(err, "Failed to load today's check-ins."));
+      setTodayBookings([]);
+    }
+
+    setPageWarning(warnings[0] ?? null);
+    setPageLoading(false);
   }, [accessToken]);
 
   useEffect(() => {
@@ -92,21 +107,21 @@ function HomestayOwnerOverviewPage() {
         <LuxuryCheckoutPanel>
           <p className="luxury-panel-body py-8 text-sm">Loading overview…</p>
         </LuxuryCheckoutPanel>
-      ) : pageError ? (
-        <LuxuryCheckoutPanel>
-          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {pageError}
-          </p>
-        </LuxuryCheckoutPanel>
       ) : (
         <div className="space-y-8">
-          {stats ? (
+          {pageWarning ? (
             <LuxuryCheckoutPanel>
-              <OwnerHomestayStatsGrid stats={stats} />
+              <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {pageWarning}
+              </p>
             </LuxuryCheckoutPanel>
           ) : null}
 
-          {stats && stats.publishedHomestays === 0 ? (
+          <LuxuryCheckoutPanel>
+            <OwnerHomestayStatsGrid stats={stats} />
+          </LuxuryCheckoutPanel>
+
+          {stats.publishedHomestays === 0 ? (
             <LuxuryCheckoutPanel>
               <p className="luxury-panel-body text-sm">Add your first property to start accepting stay requests.</p>
               <Link

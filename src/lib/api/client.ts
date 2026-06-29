@@ -46,15 +46,39 @@ export function isApiConfigured(): boolean {
   return Boolean(readApiBaseUrl());
 }
 
+const CRYPTIC_ERROR_MESSAGES: Record<string, string> = {
+  from_json:
+    "The server could not read the database response. Confirm homestay migrations are applied on Supabase.",
+  "json could not be generated":
+    "The server returned an unexpected response. Check that the API and Supabase are configured correctly.",
+};
+
+function humanizeErrorMessage(message: string, fallback: string): string {
+  const trimmed = message.trim();
+  if (!trimmed) return fallback;
+
+  const mapped = CRYPTIC_ERROR_MESSAGES[trimmed.toLowerCase()];
+  if (mapped) return mapped;
+
+  const lowered = trimmed.toLowerCase();
+  if (lowered.includes("does not exist") && lowered.includes("relation") && lowered.includes("homestay")) {
+    return CRYPTIC_ERROR_MESSAGES.from_json;
+  }
+
+  return trimmed;
+}
+
 export function toErrorMessage(err: unknown, fallback = "Request failed."): string {
-  if (err instanceof Error) return err.message;
-  if (typeof err === "string" && err.trim()) return err.trim();
+  if (err instanceof Error) return humanizeErrorMessage(err.message, fallback);
+  if (typeof err === "string" && err.trim()) return humanizeErrorMessage(err.trim(), fallback);
   if (err && typeof err === "object" && "message" in err) {
     const message = (err as { message?: unknown }).message;
-    if (typeof message === "string" && message.trim()) return message.trim();
+    if (typeof message === "string" && message.trim()) {
+      return humanizeErrorMessage(message.trim(), fallback);
+    }
   }
   try {
-    return JSON.stringify(err);
+    return humanizeErrorMessage(JSON.stringify(err), fallback);
   } catch {
     return fallback;
   }

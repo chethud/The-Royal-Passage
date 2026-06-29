@@ -19,6 +19,19 @@ export type OwnerDashboardStats = {
   totalBookings: number;
 };
 
+export const EMPTY_OWNER_DASHBOARD_STATS: OwnerDashboardStats = {
+  pendingBookings: 0,
+  confirmedBookings: 0,
+  completedBookings: 0,
+  revenueCollectedMinor: 0,
+  revenuePendingMinor: 0,
+  upcomingBookings: 0,
+  checkInToday: 0,
+  publishedHomestays: 0,
+  currencySymbol: "₹",
+  totalBookings: 0,
+};
+
 export type HomestayBookingSummary = {
   id: string;
   homestayId: string;

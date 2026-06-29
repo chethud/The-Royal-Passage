@@ -79,15 +79,25 @@ def _fetch_owner_booking_row(supabase, booking_id: str, owner_id: str) -> dict:
     return row
 
 
+def _try_auto_complete(supabase, *, homestay_ids: list[str]) -> None:
+    if not homestay_ids:
+        return
+    try:
+        from app.services.homestay_auto_complete import auto_complete_due_homestay_bookings
+
+        auto_complete_due_homestay_bookings(supabase, homestay_ids=homestay_ids)
+    except Exception:
+        # Non-critical housekeeping; don't block owner dashboard reads.
+        pass
+
+
 def get_owner_dashboard(auth: dict) -> OwnerDashboardStats:
     supabase = get_supabase_admin()
     owner_id = _resolve_owner_id(auth)
     homestay_ids = _owner_homestay_ids(supabase, owner_id)
 
     if homestay_ids:
-        from app.services.homestay_auto_complete import auto_complete_due_homestay_bookings
-
-        auto_complete_due_homestay_bookings(supabase, homestay_ids=homestay_ids)
+        _try_auto_complete(supabase, homestay_ids=homestay_ids)
 
     if not homestay_ids:
         return OwnerDashboardStats(
@@ -160,9 +170,7 @@ def list_owner_homestay_bookings(auth: dict, status_filter: str | None = None) -
     homestay_ids = _owner_homestay_ids(supabase, owner_id)
 
     if homestay_ids:
-        from app.services.homestay_auto_complete import auto_complete_due_homestay_bookings
-
-        auto_complete_due_homestay_bookings(supabase, homestay_ids=homestay_ids)
+        _try_auto_complete(supabase, homestay_ids=homestay_ids)
 
     if not homestay_ids:
         return ListHomestayBookingsResponse(bookings=[])

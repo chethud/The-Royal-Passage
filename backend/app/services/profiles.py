@@ -1,4 +1,6 @@
-PROFILE_SELECT = "role, full_name, phone, avatar_url, date_of_birth, host_id, created_at"
+PROFILE_SELECT = (
+    "role, full_name, phone, avatar_url, date_of_birth, host_id, homestay_owner_id, created_at"
+)
 
 
 def _profile_name_from_user(user) -> str | None:

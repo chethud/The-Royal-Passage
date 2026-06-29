@@ -131,6 +131,43 @@ def _ensure_supabase() -> None:
         raise ConnectError(Code.UNAVAILABLE, "Supabase is not configured on the API server.")
 
 
+def _format_supabase_error(exc: Exception) -> str:
+    from postgrest.exceptions import APIError
+
+    if not isinstance(exc, APIError):
+        return f"{type(exc).__name__}: {exc}"
+
+    message = (exc.message or "").strip()
+    details = (exc.details or "").strip()
+    hint = (exc.hint or "").strip()
+    code = (exc.code or "").strip()
+
+    primary = message
+    if not primary or primary == "from_json":
+        primary = details or hint or ""
+    if not primary and code and not code.isdigit():
+        primary = f"Database error ({code})"
+    if not primary:
+        primary = "Database request failed."
+
+    lowered = primary.lower()
+    if "does not exist" in lowered and "relation" in lowered:
+        if "homestay" in lowered:
+            return (
+                "Homestay database tables are missing. Apply supabase/homestay-module.sql "
+                "to your Supabase project, then retry."
+            )
+        return "A required database table is missing. Confirm Supabase migrations have been applied."
+
+    if primary == "from_json":
+        return (
+            "The database returned an unreadable response. Confirm Supabase migrations are "
+            "applied and the homestay module schema is up to date."
+        )
+
+    return primary
+
+
 def _rpc(fn: F) -> F:
     @wraps(fn)
     async def wrapper(*args, **kwargs):
@@ -144,9 +181,8 @@ def _rpc(fn: F) -> F:
             from postgrest.exceptions import APIError
 
             if isinstance(exc, APIError):
-                message = exc.message or exc.details or exc.hint or repr(exc)
-                raise ConnectError(Code.INTERNAL, message or "Database request failed.") from exc
-            raise ConnectError(Code.INTERNAL, f"{type(exc).__name__}: {exc}") from exc
+                raise ConnectError(Code.INTERNAL, _format_supabase_error(exc)) from exc
+            raise ConnectError(Code.INTERNAL, _format_supabase_error(exc)) from exc
 
     return wrapper  # type: ignore[return-value]
 
