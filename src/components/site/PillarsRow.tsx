@@ -44,6 +44,7 @@ export function PillarsRow() {
             return (
               <ScrollReveal
                 key={p.title}
+                depth3d
                 delay={idx * 0.07}
                 offsetY={18}
                 className={cn(

@@ -213,6 +213,19 @@
   font-family: var(--font-royal);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .scroll-parallax-3d {
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}
+
+.scroll-parallax-3d {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
 /* Header — SSR-safe (no Framer Motion inline styles, no hydration mismatch) */
 .site-header {
   background-color: oklch(0.15 0.07 22 / 0.45);

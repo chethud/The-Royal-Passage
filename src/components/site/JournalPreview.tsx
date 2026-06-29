@@ -32,8 +32,11 @@ export function JournalPreview({
   return (
     <section className="bg-background pt-10 pb-8 sm:pt-12 sm:pb-10 md:pt-14 md:pb-12">
       <div className="container-page">
-        <ScrollRevealGroup className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
-          <ScrollRevealItem>
+        <ScrollRevealGroup
+          depth3d
+          className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6"
+        >
+          <ScrollRevealItem depth3d>
             <div>
               <div className="eyebrow mb-3 text-ember/95">Stories & Inspiration</div>
               <h2 className="font-display text-3xl tracking-tight text-ink text-balance sm:text-4xl md:text-5xl">
@@ -42,7 +45,7 @@ export function JournalPreview({
             </div>
           </ScrollRevealItem>
           {!editable ? (
-            <ScrollRevealItem>
+            <ScrollRevealItem depth3d>
               <Link
                 to="/journal"
                 className="group inline-flex items-center gap-2 self-start rounded-sm text-xs font-semibold uppercase tracking-[0.22em] text-ember transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:self-auto"
@@ -96,6 +99,7 @@ export function JournalPreview({
               <ScrollReveal
                 key={story.id}
                 as="article"
+                depth3d
                 delay={idx * 0.08}
                 className="group overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.18)] shadow-soft transition-all duration-500 hover:-translate-y-1 hover:border-ember/55 hover:shadow-[0_28px_60px_-30px_oklch(0.55_0.14_78_/_0.45)]"
               >

@@ -10,6 +10,7 @@ import { getCatalogForUi, getCatalogFallback } from "@/lib/marketplace-fns";
 import { getHomepageContent } from "@/lib/homepage-content-fns";
 import { normalizeHomepageContent } from "@/lib/homepage-content";
 import { buildHomeJsonLd, SITE_URL } from "@/lib/seo";
+import { ScrollParallaxSection } from "@/components/site/ScrollReveal";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -62,10 +63,18 @@ function Index() {
       />
 
       <HomeHero slides={publicContent.hero} imageVersion={publicContent.version} />
-      <ExperiencesShowcase items={publicContent.showcase} imageVersion={publicContent.version} />
-      <JourneysSplit slides={publicContent.journeys} />
-      <PillarsRow />
-      <JournalPreview items={publicContent.journal} imageVersion={publicContent.version} />
+      <ScrollParallaxSection>
+        <ExperiencesShowcase items={publicContent.showcase} imageVersion={publicContent.version} />
+      </ScrollParallaxSection>
+      <ScrollParallaxSection intensity="subtle">
+        <JourneysSplit slides={publicContent.journeys} />
+      </ScrollParallaxSection>
+      <ScrollParallaxSection intensity="subtle">
+        <PillarsRow />
+      </ScrollParallaxSection>
+      <ScrollParallaxSection>
+        <JournalPreview items={publicContent.journal} imageVersion={publicContent.version} />
+      </ScrollParallaxSection>
       <Footer />
     </div>
   );

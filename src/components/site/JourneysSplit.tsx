@@ -141,7 +141,7 @@ function SlideMedia({
         src={logoUrl}
         alt=""
         aria-hidden
-        className="pointer-events-none absolute top-3 left-2 z-[3] h-[4.5rem] w-auto max-w-[min(52vw,11rem)] origin-left object-contain object-left drop-shadow-[0_0_24px_oklch(0.75_0.12_86_/_0.5)] sm:top-4 sm:left-3 sm:h-24 sm:max-w-none md:left-4 md:h-28"
+        className="pointer-events-none absolute top-3 left-1 z-[3] h-20 w-auto max-w-[min(56vw,12.5rem)] origin-left -translate-x-0.5 object-contain object-left drop-shadow-[0_0_24px_oklch(0.75_0.12_86_/_0.5)] sm:top-4 sm:left-1.5 sm:h-28 sm:max-w-none md:left-2 md:h-32"
       />
 
       {editable && isActive && onVideoIdChange ? (
@@ -327,7 +327,7 @@ export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesCh
         : null}
 
       <div className="container-page relative">
-        <ScrollReveal offsetY={32}>
+        <ScrollReveal depth3d offsetY={32}>
         <div className="relative p-px">
           <div className="pointer-events-none absolute inset-0 rounded-sm bg-gradient-to-br from-[#D4AF37]/70 via-[#C9A227]/25 to-[#D4AF37]/50" />
 
@@ -370,7 +370,7 @@ export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesCh
         </div>
         </ScrollReveal>
 
-        <ScrollReveal delay={0.15} className="mt-6 flex items-center justify-center gap-6 sm:mt-8">
+        <ScrollReveal depth3d delay={0.15} className="mt-6 flex items-center justify-center gap-6 sm:mt-8">
           <button
             type="button"
             onClick={goPrev}

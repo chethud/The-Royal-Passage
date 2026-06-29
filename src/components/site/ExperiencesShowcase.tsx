@@ -47,14 +47,17 @@ export function ExperiencesShowcase({
       className="relative border-y border-[oklch(0.88_0.08_86_/_0.1)] bg-[oklch(0.16_0.07_22)] pt-16 pb-8 sm:pt-20 sm:pb-10 md:pt-24 md:pb-12"
     >
       <div className="container-page">
-        <ScrollRevealGroup className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
-          <ScrollRevealItem>
+        <ScrollRevealGroup
+          depth3d
+          className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6"
+        >
+          <ScrollRevealItem depth3d>
             <h2 className="font-display text-3xl tracking-tight text-ink text-balance sm:text-4xl md:text-5xl">
               Our Top 3 Experiences
             </h2>
           </ScrollRevealItem>
           {!editable ? (
-            <ScrollRevealItem>
+            <ScrollRevealItem depth3d>
               <Link
                 to="/experiences"
                 className="group inline-flex items-center gap-2 self-start rounded-sm text-xs font-semibold uppercase tracking-[0.22em] text-ember transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:self-auto"
@@ -132,6 +135,7 @@ function ExperienceShowcaseCard({
   return (
     <ScrollReveal
       as="article"
+      depth3d
       delay={index * 0.08}
       className="group overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.18)] shadow-soft transition-all duration-500 hover:-translate-y-1 hover:border-ember/55 hover:shadow-[0_28px_60px_-30px_oklch(0.55_0.14_78_/_0.45)]"
     >
