@@ -12,6 +12,7 @@ import {
   redirectOffLocalhostIfNeeded,
 } from "@/lib/auth-redirect";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
+import { formatAuthError } from "@/lib/format-auth-error";
 import { markVipSignupPromptPending } from "@/lib/vip-membership-prompt-storage";
 
 const inputClass =
@@ -154,7 +155,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       if (resendError) throw resendError;
       setNotice(`Confirmation email sent to ${trimmedEmail}. Check your inbox and spam folder.`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to resend confirmation email.");
+      setError(formatAuthError(err, "Failed to resend confirmation email."));
     } finally {
       setResendingConfirmation(false);
     }
@@ -195,7 +196,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       }
       setPassword("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create account.");
+      setError(formatAuthError(err, "Failed to create account."));
     } finally {
       setBusy(false);
     }
