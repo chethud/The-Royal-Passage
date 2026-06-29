@@ -44,6 +44,16 @@ export const listCities = createServerFn({ method: "GET" }).handler(async (): Pr
   return FALLBACK_CITIES;
 });
 
+/** Client-safe loader: API → DB → static fallback; never throws. */
+export async function loadCitiesWithFallback(): Promise<CitySummary[]> {
+  try {
+    const cities = await listCities();
+    return cities.length > 0 ? cities : FALLBACK_CITIES;
+  } catch {
+    return FALLBACK_CITIES;
+  }
+}
+
 export const getCityBySlug = createServerFn({ method: "POST" })
   .inputValidator(z.object({ slug: z.string().min(1) }))
   .handler(async ({ data }): Promise<CitySummary | null> => {

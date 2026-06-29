@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { VipOwnerDashboardShell } from "@/components/vip-owner/VipOwnerDashboardShell";
 import { OwnerVipPackageForm } from "@/components/vip-owner/OwnerVipPackageForm";
-import { fetchCities } from "@/lib/api/cities";
+import { loadCitiesWithFallback } from "@/lib/city-fns";
 import { createOwnerVipPackage } from "@/lib/api/owner-vip-packages";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import type { CitySummary } from "@/lib/cities";
@@ -28,9 +28,7 @@ function VipOwnerNewPackagePage() {
   const loadCities = useCallback(async () => {
     setCitiesLoading(true);
     try {
-      setCities(await fetchCities());
-    } catch (err) {
-      setPageError(toErrorMessage(err, "Failed to load cities."));
+      setCities(await loadCitiesWithFallback());
     } finally {
       setCitiesLoading(false);
     }

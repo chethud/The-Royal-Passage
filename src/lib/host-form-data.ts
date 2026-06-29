@@ -1,4 +1,4 @@
-import { fetchCities } from "@/lib/api/cities";
+import { loadCitiesWithFallback } from "@/lib/city-fns";
 import { fetchHostCategories, type CategoryOption } from "@/lib/api/host-experiences";
 import { FALLBACK_CITIES, type CitySummary } from "@/lib/cities";
 import { FALLBACK_CATEGORIES } from "@/lib/experience-categories";
@@ -38,7 +38,7 @@ export async function loadHostFormReferenceData(
 
   inflightReferenceData = Promise.all([
     fetchHostCategories(accessToken).catch(() => [] as CategoryOption[]),
-    fetchCities().catch(() => [] as CitySummary[]),
+    loadCitiesWithFallback(),
   ])
     .then(([categoryRows, cityRows]) => {
       const data: HostFormReferenceData = {

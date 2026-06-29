@@ -8,7 +8,7 @@ import { OwnerHolidayPricingManager } from "@/components/homestay-owner/OwnerHol
 import { OwnerHomestayForm } from "@/components/homestay-owner/OwnerHomestayForm";
 import { OwnerRoomManager } from "@/components/homestay-owner/OwnerRoomManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetchCities } from "@/lib/api/cities";
+import { loadCitiesWithFallback } from "@/lib/city-fns";
 import {
   createOwnerHomestayRoom,
   deleteOwnerAvailability,
@@ -50,7 +50,7 @@ function OwnerHomestayDetailPage() {
       }
       const [detail, cityRows] = await Promise.all([
         fetchOwnerHomestay(accessToken, homestayId),
-        fetchCities(),
+        loadCitiesWithFallback(),
       ]);
       setHomestay(detail);
       setCities(cityRows);

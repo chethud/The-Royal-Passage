@@ -6,7 +6,7 @@ import { HostExperienceSectionNav } from "@/components/experience/HostExperience
 import { SlotManager } from "@/components/experience/SlotManager";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import type { CitySummary } from "@/lib/cities";
-import { fetchCities } from "@/lib/api/cities";
+import { loadCitiesWithFallback } from "@/lib/city-fns";
 import {
   createHostSlot,
   deleteHostExperience,
@@ -56,7 +56,7 @@ function HostExperienceDetailPage() {
       const [detail, cats, cityRows] = await Promise.all([
         fetchHostExperience(accessToken, experienceId),
         fetchHostCategories(accessToken),
-        fetchCities(),
+        loadCitiesWithFallback(),
       ]);
       setExperience(detail);
       setCategories(cats);

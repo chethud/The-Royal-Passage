@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { HomestayOwnerDashboardShell } from "@/components/homestay-owner/HomestayOwnerDashboardShell";
 import { OwnerHomestayForm } from "@/components/homestay-owner/OwnerHomestayForm";
-import { fetchCities } from "@/lib/api/cities";
+import { loadCitiesWithFallback } from "@/lib/city-fns";
 import { createOwnerHomestay } from "@/lib/api/owner-homestays";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import type { CitySummary } from "@/lib/cities";
@@ -27,9 +27,7 @@ function OwnerNewHomestayPage() {
   const loadCities = useCallback(async () => {
     setCitiesLoading(true);
     try {
-      setCities(await fetchCities());
-    } catch (err) {
-      setPageError(toErrorMessage(err, "Failed to load cities."));
+      setCities(await loadCitiesWithFallback());
     } finally {
       setCitiesLoading(false);
     }

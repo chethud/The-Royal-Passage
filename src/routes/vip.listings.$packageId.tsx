@@ -4,7 +4,7 @@ import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusB
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { VipOwnerDashboardShell } from "@/components/vip-owner/VipOwnerDashboardShell";
 import { OwnerVipPackageForm } from "@/components/vip-owner/OwnerVipPackageForm";
-import { fetchCities } from "@/lib/api/cities";
+import { loadCitiesWithFallback } from "@/lib/city-fns";
 import {
   fetchOwnerVipPackage,
   updateOwnerVipPackage,
@@ -41,7 +41,7 @@ function VipOwnerPackageDetailPage() {
       }
       const [detail, cityRows] = await Promise.all([
         fetchOwnerVipPackage(accessToken, packageId),
-        fetchCities(),
+        loadCitiesWithFallback(),
       ]);
       setPkg(detail);
       setCities(cityRows);
