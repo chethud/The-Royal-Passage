@@ -48,7 +48,7 @@ export function isApiConfigured(): boolean {
 
 const CRYPTIC_ERROR_MESSAGES: Record<string, string> = {
   from_json:
-    "The server could not read the database response. Confirm homestay migrations are applied on Supabase.",
+    "The server could not read the database response. Run supabase/FULL_SCHEMA.sql in the Supabase SQL Editor, then redeploy the API.",
   "json could not be generated":
     "The server returned an unexpected response. Check that the API and Supabase are configured correctly.",
 };
@@ -61,7 +61,7 @@ function humanizeErrorMessage(message: string, fallback: string): string {
   if (mapped) return mapped;
 
   const lowered = trimmed.toLowerCase();
-  if (lowered.includes("does not exist") && lowered.includes("relation") && lowered.includes("homestay")) {
+  if (lowered.includes("does not exist") && lowered.includes("relation")) {
     return CRYPTIC_ERROR_MESSAGES.from_json;
   }
 

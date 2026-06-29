@@ -6,6 +6,7 @@ from app.services.booking_auto_complete import (
     auto_complete_booking_if_due,
     auto_complete_due_confirmed_bookings,
 )
+from app.services.supabase_query import insert_row_returning_id
 from app.models.schemas import (
     BookingExperienceSummary,
     BookingSlotSummary,
@@ -162,44 +163,46 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         "notes": payload.notes,
     }
 
-    booking_result = supabase.table("bookings").insert(booking_row).select("id").execute()
-    booking_rows = booking_result.data or []
-    booking = booking_rows[0] if booking_rows else None
-    if not booking:
+    try:
+        booking_id = insert_row_returning_id(supabase, "bookings", booking_row)
+    except Exception:
         _release_seats(supabase, payload.slotId, payload.guestCount)
-        raise ValueError("Failed to create booking.")
+        raise
 
     from app.services.audit import log_audit
     from app.services.notifications import create_notification
 
     title = experience.get("title") or "your experience"
-    create_notification(
-        user.id,
-        "booking_created",
-        "Booking requested",
-        f"Your request for {title} was submitted. The host will confirm shortly.",
-        {"bookingId": booking["id"]},
-    )
-    host_result = (
-        supabase.table("hosts")
-        .select("auth_user_id")
-        .eq("id", experience.get("host_id"))
-        .maybe_single()
-        .execute()
-    )
-    host_user_id = ((host_result.data if host_result else None) or {}).get("auth_user_id")
-    if host_user_id:
+    try:
         create_notification(
-            host_user_id,
+            user.id,
             "booking_created",
-            "New booking request",
-            f"A guest requested {title}. Review it in your host dashboard.",
-            {"bookingId": booking["id"]},
+            "Booking requested",
+            f"Your request for {title} was submitted. The host will confirm shortly.",
+            {"bookingId": booking_id},
         )
-    log_audit(user.id, "booking_created", "booking", booking["id"], {"experienceId": experience["id"]})
+        host_result = (
+            supabase.table("hosts")
+            .select("auth_user_id")
+            .eq("id", experience.get("host_id"))
+            .maybe_single()
+            .execute()
+        )
+        host_user_id = ((host_result.data if host_result else None) or {}).get("auth_user_id")
+        if host_user_id:
+            create_notification(
+                host_user_id,
+                "booking_created",
+                "New booking request",
+                f"A guest requested {title}. Review it in your host dashboard.",
+                {"bookingId": booking_id},
+            )
+        log_audit(user.id, "booking_created", "booking", booking_id, {"experienceId": experience["id"]})
+    except Exception:
+        pass
 
     return CreateBookingResponse(
-        bookingId=booking["id"],
+        bookingId=booking_id,
         totalAmount=subtotal_minor,
         currencyCode=experience["currency_code"],
         bookingStatus="pending",

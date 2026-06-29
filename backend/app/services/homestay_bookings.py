@@ -4,6 +4,7 @@ from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import CreateHomestayBookingRequest, CreateHomestayBookingResponse
 from app.services.homestay_availability import load_price_overrides_minor
 from app.services.homestay_pricing import stay_subtotal_minor
+from app.services.supabase_query import insert_row_returning_id
 
 HOMESTAY_SELECT = """
 *,
@@ -240,35 +241,35 @@ def create_homestay_booking(
         "notes": payload.notes,
     }
 
-    booking_result = supabase.table("homestay_bookings").insert(booking_row).select("id").execute()
-    booking = (booking_result.data or [None])[0]
-    if not booking:
-        raise ValueError("Failed to create homestay booking.")
+    booking_id = insert_row_returning_id(supabase, "homestay_bookings", booking_row)
 
     from app.services.audit import log_audit
     from app.services.notifications import create_notification
 
     title = stay.get("title") or "your stay"
-    create_notification(
-        user.id,
-        "booking_created",
-        "Stay requested",
-        f"Your request for {title} was submitted. The host will confirm shortly. Pay in cash at check-in once confirmed.",
-        {"bookingId": booking["id"], "bookingType": "homestay"},
-    )
-    owner_user_id = owner.get("auth_user_id")
-    if owner_user_id:
+    try:
         create_notification(
-            owner_user_id,
+            user.id,
             "booking_created",
-            "New stay request",
-            f"A guest requested {title}. Review it in your dashboard.",
-            {"bookingId": booking["id"], "bookingType": "homestay"},
+            "Stay requested",
+            f"Your request for {title} was submitted. The host will confirm shortly. Pay in cash at check-in once confirmed.",
+            {"bookingId": booking_id, "bookingType": "homestay"},
         )
-    log_audit(user.id, "homestay_booking_created", "homestay_booking", booking["id"], {"homestayId": stay["id"]})
+        owner_user_id = owner.get("auth_user_id")
+        if owner_user_id:
+            create_notification(
+                owner_user_id,
+                "booking_created",
+                "New stay request",
+                f"A guest requested {title}. Review it in your dashboard.",
+                {"bookingId": booking_id, "bookingType": "homestay"},
+            )
+        log_audit(user.id, "homestay_booking_created", "homestay_booking", booking_id, {"homestayId": stay["id"]})
+    except Exception:
+        pass
 
     return CreateHomestayBookingResponse(
-        bookingId=booking["id"],
+        bookingId=booking_id,
         totalAmount=subtotal_minor,
         currencyCode=stay.get("currency_code") or "INR",
         bookingStatus="pending",

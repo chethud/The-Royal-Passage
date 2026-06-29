@@ -23,6 +23,10 @@
 -- Admin: create in Dashboard → Authentication, then run admin block at bottom.
 -- Editor: npm run setup:editor  OR  see comments at bottom.
 -- =============================================================================
+--   (schema.sql does NOT create auth passwords â€” only tables/data.)
+--
+-- RLS: broad read for anon/authenticated; writes via service role (backend API).
+-- =============================================================================
 
 -- ---------------------------------------------------------------------------
 -- Extensions
@@ -588,6 +592,14 @@ create table if not exists public.notifications (
 );
 
 create index if not exists idx_notifications_user on public.notifications (user_id, created_at desc);
+
+alter table public.notifications drop constraint if exists notifications_type_check;
+alter table public.notifications
+  add constraint notifications_type_check check (type in (
+    'booking_created', 'booking_confirmed', 'booking_cancelled',
+    'booking_reminder', 'review_request', 'host_approved', 'review_received',
+    'experience_submitted', 'homestay_submitted'
+  ));
 
 -- ---------------------------------------------------------------------------
 -- Audit logs (admin ops visibility)
@@ -1532,6 +1544,48 @@ create table if not exists public.vip_bookings (
   updated_at timestamptz not null default now()
 );
 
+-- Upgrade legacy vip_bookings tables (CREATE TABLE IF NOT EXISTS skips new columns).
+alter table public.vip_bookings add column if not exists package_id uuid;
+alter table public.vip_bookings add column if not exists guest_user_id uuid;
+alter table public.vip_bookings add column if not exists guest_name text;
+alter table public.vip_bookings add column if not exists guest_email text;
+alter table public.vip_bookings add column if not exists guest_phone text;
+alter table public.vip_bookings add column if not exists travel_start date;
+alter table public.vip_bookings add column if not exists travel_end date;
+alter table public.vip_bookings add column if not exists guest_count integer not null default 1;
+alter table public.vip_bookings add column if not exists total_amount_minor integer not null default 0;
+alter table public.vip_bookings add column if not exists currency_code text not null default 'INR';
+alter table public.vip_bookings add column if not exists booking_status text not null default 'pending';
+alter table public.vip_bookings add column if not exists payment_status text not null default 'pending';
+alter table public.vip_bookings add column if not exists payment_method text not null default 'cod';
+alter table public.vip_bookings add column if not exists is_custom_package boolean not null default false;
+alter table public.vip_bookings add column if not exists notes text;
+alter table public.vip_bookings add column if not exists created_at timestamptz not null default now();
+alter table public.vip_bookings add column if not exists updated_at timestamptz not null default now();
+
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'vip_bookings' and column_name = 'vip_package_id'
+  ) and not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'vip_bookings' and column_name = 'package_id'
+  ) then
+    alter table public.vip_bookings rename column vip_package_id to package_id;
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'vip_bookings_package_id_fkey'
+      and conrelid = 'public.vip_bookings'::regclass
+  ) then
+    alter table public.vip_bookings
+      add constraint vip_bookings_package_id_fkey
+      foreign key (package_id) references public.vip_packages (id) on delete restrict;
+  end if;
+end $$;
+
 create index if not exists idx_vip_bookings_package on public.vip_bookings (package_id);
 create index if not exists idx_vip_bookings_guest on public.vip_bookings (guest_user_id);
 
@@ -1761,16 +1815,29 @@ comment on column public.profiles.registration_number is
 -- price_per_night_minor remains the weekday rate (Monâ€“Fri).
 -- weekend_price_per_night_minor applies to Saturday and Sunday; null = same as weekday.
 
-alter table public.homestays
-  add column if not exists weekend_price_per_night_minor integer;
+do $$
+begin
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'homestays'
+  ) then
+    alter table public.homestays
+      add column if not exists weekend_price_per_night_minor integer;
 
-alter table public.homestay_rooms
-  add column if not exists weekend_price_per_night_minor integer;
+    update public.homestays
+    set weekend_price_per_night_minor = price_per_night_minor
+    where weekend_price_per_night_minor is null;
+  end if;
 
-update public.homestays
-  set weekend_price_per_night_minor = price_per_night_minor
-  where weekend_price_per_night_minor is null;
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'homestay_rooms'
+  ) then
+    alter table public.homestay_rooms
+      add column if not exists weekend_price_per_night_minor integer;
 
-update public.homestay_rooms
-  set weekend_price_per_night_minor = price_per_night_minor
-  where weekend_price_per_night_minor is null;
+    update public.homestay_rooms
+    set weekend_price_per_night_minor = price_per_night_minor
+    where weekend_price_per_night_minor is null;
+  end if;
+end $$;

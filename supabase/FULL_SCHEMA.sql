@@ -589,6 +589,14 @@ create table if not exists public.notifications (
 
 create index if not exists idx_notifications_user on public.notifications (user_id, created_at desc);
 
+alter table public.notifications drop constraint if exists notifications_type_check;
+alter table public.notifications
+  add constraint notifications_type_check check (type in (
+    'booking_created', 'booking_confirmed', 'booking_cancelled',
+    'booking_reminder', 'review_request', 'host_approved', 'review_received',
+    'experience_submitted', 'homestay_submitted'
+  ));
+
 -- ---------------------------------------------------------------------------
 -- Audit logs (admin ops visibility)
 -- ---------------------------------------------------------------------------
@@ -1774,3 +1782,4 @@ update public.homestays
 update public.homestay_rooms
   set weekend_price_per_night_minor = price_per_night_minor
   where weekend_price_per_night_minor is null;
+

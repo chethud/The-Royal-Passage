@@ -95,6 +95,48 @@ create table if not exists public.vip_bookings (
   updated_at timestamptz not null default now()
 );
 
+-- Upgrade legacy vip_bookings tables (CREATE TABLE IF NOT EXISTS skips new columns).
+alter table public.vip_bookings add column if not exists package_id uuid;
+alter table public.vip_bookings add column if not exists guest_user_id uuid;
+alter table public.vip_bookings add column if not exists guest_name text;
+alter table public.vip_bookings add column if not exists guest_email text;
+alter table public.vip_bookings add column if not exists guest_phone text;
+alter table public.vip_bookings add column if not exists travel_start date;
+alter table public.vip_bookings add column if not exists travel_end date;
+alter table public.vip_bookings add column if not exists guest_count integer not null default 1;
+alter table public.vip_bookings add column if not exists total_amount_minor integer not null default 0;
+alter table public.vip_bookings add column if not exists currency_code text not null default 'INR';
+alter table public.vip_bookings add column if not exists booking_status text not null default 'pending';
+alter table public.vip_bookings add column if not exists payment_status text not null default 'pending';
+alter table public.vip_bookings add column if not exists payment_method text not null default 'cod';
+alter table public.vip_bookings add column if not exists is_custom_package boolean not null default false;
+alter table public.vip_bookings add column if not exists notes text;
+alter table public.vip_bookings add column if not exists created_at timestamptz not null default now();
+alter table public.vip_bookings add column if not exists updated_at timestamptz not null default now();
+
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'vip_bookings' and column_name = 'vip_package_id'
+  ) and not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'vip_bookings' and column_name = 'package_id'
+  ) then
+    alter table public.vip_bookings rename column vip_package_id to package_id;
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'vip_bookings_package_id_fkey'
+      and conrelid = 'public.vip_bookings'::regclass
+  ) then
+    alter table public.vip_bookings
+      add constraint vip_bookings_package_id_fkey
+      foreign key (package_id) references public.vip_packages (id) on delete restrict;
+  end if;
+end $$;
+
 create index if not exists idx_vip_bookings_package on public.vip_bookings (package_id);
 create index if not exists idx_vip_bookings_guest on public.vip_bookings (guest_user_id);
 

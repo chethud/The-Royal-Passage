@@ -205,15 +205,29 @@ alter table public.homestay_rooms
   add column if not exists extra_beds_per_room integer not null default 1;
 
 -- Weekend pricing (also in 20260625_homestay_weekend_pricing.sql; safe if that migration failed earlier)
-alter table public.homestays
-  add column if not exists weekend_price_per_night_minor integer;
-alter table public.homestay_rooms
-  add column if not exists weekend_price_per_night_minor integer;
+do $$
+begin
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'homestays'
+  ) then
+    alter table public.homestays
+      add column if not exists weekend_price_per_night_minor integer;
 
-update public.homestays
-  set weekend_price_per_night_minor = price_per_night_minor
-  where weekend_price_per_night_minor is null;
+    update public.homestays
+    set weekend_price_per_night_minor = price_per_night_minor
+    where weekend_price_per_night_minor is null;
+  end if;
 
-update public.homestay_rooms
-  set weekend_price_per_night_minor = price_per_night_minor
-  where weekend_price_per_night_minor is null;
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'homestay_rooms'
+  ) then
+    alter table public.homestay_rooms
+      add column if not exists weekend_price_per_night_minor integer;
+
+    update public.homestay_rooms
+    set weekend_price_per_night_minor = price_per_night_minor
+    where weekend_price_per_night_minor is null;
+  end if;
+end $$;

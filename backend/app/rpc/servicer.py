@@ -161,8 +161,8 @@ def _format_supabase_error(exc: Exception) -> str:
 
     if primary == "from_json":
         return (
-            "The database returned an unreadable response. Confirm Supabase migrations are "
-            "applied and the homestay module schema is up to date."
+            "The database returned an unreadable response. Run supabase/FULL_SCHEMA.sql "
+            "in the Supabase SQL Editor, then redeploy the API."
         )
 
     return primary
