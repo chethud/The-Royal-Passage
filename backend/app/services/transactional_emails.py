@@ -38,15 +38,49 @@ def _site_link(path: str) -> str:
     return f"{base}{path}"
 
 
+def _logo_url() -> str:
+    custom = (settings.email_logo_url or "").strip()
+    if custom:
+        return custom
+    return f"{settings.site_url.rstrip('/')}/brand/logo.png"
+
+
+def _email_header_html() -> str:
+    logo = _logo_url()
+    home = _site_link("/")
+    return f"""
+    <div style="text-align: center; margin: 0 0 22px; padding-bottom: 20px; border-bottom: 1px solid #e0d4c0;">
+      <a href="{home}" style="text-decoration: none;">
+        <img src="{logo}" alt="The Royal Passage" width="148" style="display: block; margin: 0 auto 10px; max-width: 168px; height: auto; border: 0;" />
+      </a>
+      <p style="margin: 0; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #9a7b4f;">Mysuru &middot; Curated royal journeys</p>
+    </div>"""
+
+
 def _wrap_html(title: str, body_html: str) -> str:
+    header = _email_header_html()
     return f"""<!DOCTYPE html>
-<html>
-<body style="font-family: Georgia, 'Times New Roman', serif; color: #3d2314; background: #faf6ef; margin: 0; padding: 24px;">
-  <div style="max-width: 560px; margin: 0 auto; background: #fffdf8; border: 1px solid #e8dcc8; border-radius: 12px; padding: 28px;">
-    <p style="margin: 0 0 8px; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #7a1f2b;">The Royal Passage</p>
-    <h1 style="margin: 0 0 16px; font-size: 22px; color: #5c1a24;">{title}</h1>
-    {body_html}
-    <p style="margin: 24px 0 0; font-size: 13px; color: #6b5b4d;">— The Royal Passage</p>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>{title}</title>
+</head>
+<body style="font-family: Georgia, 'Times New Roman', Times, serif; color: #3d2314; background-color: #ebe3d4; margin: 0; padding: 28px 14px;">
+  <div style="max-width: 580px; margin: 0 auto; background: #fffdf8; border: 1px solid #d9c9ad; border-radius: 6px; overflow: hidden; box-shadow: 0 8px 32px rgba(60, 28, 20, 0.1);">
+    <div style="height: 5px; background: linear-gradient(90deg, #4a0a14 0%, #b8860b 50%, #4a0a14 100%);"></div>
+    <div style="padding: 28px 30px 26px;">
+      {header}
+      <h1 style="margin: 0 0 18px; font-size: 23px; font-weight: normal; line-height: 1.35; color: #5c1a24; text-align: center;">{title}</h1>
+      <div style="font-size: 15px; line-height: 1.65; color: #3d2314;">
+        {body_html}
+      </div>
+      <div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid #e8dcc8; text-align: center;">
+        <p style="margin: 0 0 4px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #7a1f2b;">The Royal Passage</p>
+        <p style="margin: 0; font-size: 12px; color: #8b7355;">Experiences, homestays &amp; royal journeys across India</p>
+      </div>
+    </div>
   </div>
 </body>
 </html>"""

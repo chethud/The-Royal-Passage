@@ -15,7 +15,30 @@
 const to = process.argv[2]?.trim() || "chethannd05@gmail.com";
 const fromEmail = process.env.RESEND_FROM_EMAIL || "noreplay@theroyalpassage.com";
 const fromName = process.env.RESEND_FROM_NAME || "The Royal Passage";
-const siteUrl = process.env.VITE_SITE_URL || "https://the-royal-passage.vercel.app";
+const siteUrl = (process.env.VITE_SITE_URL || process.env.SITE_URL || "https://the-royal-passage.vercel.app").replace(/\/$/, "");
+const logoUrl = (process.env.EMAIL_LOGO_URL || `${siteUrl}/brand/logo.png`).trim();
+
+function brandedTestHtml() {
+  return `<!DOCTYPE html>
+<html lang="en">
+<body style="font-family: Georgia, 'Times New Roman', Times, serif; color: #3d2314; background-color: #ebe3d4; margin: 0; padding: 28px 14px;">
+  <div style="max-width: 580px; margin: 0 auto; background: #fffdf8; border: 1px solid #d9c9ad; border-radius: 6px; overflow: hidden;">
+    <div style="height: 5px; background: linear-gradient(90deg, #4a0a14 0%, #b8860b 50%, #4a0a14 100%);"></div>
+    <div style="padding: 28px 30px;">
+      <div style="text-align: center; margin-bottom: 22px; padding-bottom: 20px; border-bottom: 1px solid #e0d4c0;">
+        <img src="${logoUrl}" alt="The Royal Passage" width="148" style="display: block; margin: 0 auto 10px; max-width: 168px; height: auto;" />
+        <p style="margin: 0; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #9a7b4f;">Mysuru · Curated royal journeys</p>
+      </div>
+      <h1 style="margin: 0 0 16px; font-size: 23px; font-weight: normal; color: #5c1a24; text-align: center;">Resend test</h1>
+      <p style="line-height: 1.6;">Hello,</p>
+      <p style="line-height: 1.6;">This is a test message from <strong>The Royal Passage</strong> sent through Resend.</p>
+      <p style="line-height: 1.6;">Sender: ${fromEmail}</p>
+      <p style="line-height: 1.6;">If you received this, your domain and API key are working.</p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
 
 async function sendViaResend() {
   const apiKey = process.env.RESEND_API_KEY?.trim();
@@ -32,12 +55,7 @@ async function sendViaResend() {
       from: `${fromName} <${fromEmail}>`,
       to: [to],
       subject: "The Royal Passage — Resend test",
-      html: `
-        <p>Hello,</p>
-        <p>This is a test message from <strong>The Royal Passage</strong> sent through Resend.</p>
-        <p>Sender: ${fromEmail}</p>
-        <p>If you received this, your domain and API key are working.</p>
-      `,
+      html: brandedTestHtml(),
     }),
   });
 

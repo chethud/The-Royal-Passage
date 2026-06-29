@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     resend_from_email: str = "noreplay@theroyalpassage.com"
     resend_from_name: str = "The Royal Passage"
     site_url: str = "https://the-royal-passage.vercel.app"
+    email_logo_url: str = ""
     cron_secret: str = ""
 
     @property
