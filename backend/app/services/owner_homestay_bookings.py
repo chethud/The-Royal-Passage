@@ -1,9 +1,12 @@
 from datetime import date, datetime, timezone
+import logging
 
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import HomestayBookingSummary, ListHomestayBookingsResponse, OwnerDashboardStats
 from app.services.owner_homestays import _currency_symbol, _resolve_owner_id
 from app.services.transactional_emails import send_homestay_booking_confirmed_email, _guest_contact
+
+logger = logging.getLogger(__name__)
 
 BOOKING_SELECT = """
 *,
@@ -249,7 +252,7 @@ def confirm_owner_homestay_booking(booking_id: str, auth: dict) -> HomestayBooki
                 nights = row.get("nights")
                 if nights is None and check_in and check_out:
                     nights = (date.fromisoformat(str(check_out)[:10]) - date.fromisoformat(str(check_in)[:10])).days
-                send_homestay_booking_confirmed_email(
+                if not send_homestay_booking_confirmed_email(
                     to=guest_email,
                     guest_name=guest_name,
                     stay_title=stay.get("title") or "your stay",
@@ -259,9 +262,17 @@ def confirm_owner_homestay_booking(booking_id: str, auth: dict) -> HomestayBooki
                     total_minor=row.get("total_amount") or row.get("subtotal_minor") or 0,
                     currency_code=row.get("currency_code") or "INR",
                     booking_id=booking_id,
-                )
+                ):
+                    logger.error(
+                        "Guest homestay confirmed email not sent for %s to %s",
+                        booking_id,
+                        guest_email,
+                    )
             except Exception:
-                pass
+                logger.exception(
+                    "Failed to send guest homestay confirmed email for %s",
+                    booking_id,
+                )
     return updated
 
 

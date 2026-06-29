@@ -23,7 +23,13 @@ from app.models.schemas import CreateHostRequest
 
 
 async def healthz(_request: Request) -> JSONResponse:
-    return JSONResponse({"status": "ok"})
+    return JSONResponse(
+        {
+            "status": "ok",
+            "supabaseConfigured": settings.supabase_configured,
+            "emailConfigured": settings.email_configured,
+        }
+    )
 
 
 async def admin_stats(request: Request) -> JSONResponse:

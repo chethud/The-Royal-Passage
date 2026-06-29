@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import logging
 from datetime import date, datetime
 
 from app.config import settings
 from app.dependencies.supabase import get_supabase_admin
 from app.services.email import send_email
+
+logger = logging.getLogger(__name__)
 
 
 def _format_amount(minor: int, currency_code: str) -> str:
@@ -51,7 +54,7 @@ def _email_header_html() -> str:
     return f"""
     <div style="text-align: center; margin: 0 0 22px; padding-bottom: 20px; border-bottom: 1px solid #e0d4c0;">
       <a href="{home}" style="text-decoration: none;">
-        <img src="{logo}" alt="The Royal Passage" width="148" style="display: block; margin: 0 auto 10px; max-width: 168px; height: auto; border: 0;" />
+        <img src="{logo}" alt="The Royal Passage" height="140" style="display: block; margin: 0 auto 10px; max-height: 140px; width: auto; border: 0;" />
       </a>
       <p style="margin: 0; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #9a7b4f;">Mysuru &middot; Curated royal journeys</p>
     </div>"""
@@ -165,7 +168,7 @@ def send_experience_booking_requested_email(
     total_minor: int,
     currency_code: str,
     booking_id: str,
-) -> None:
+) -> bool:
     amount = _format_amount(total_minor, currency_code)
     html = _wrap_html(
         "Booking request received",
@@ -182,7 +185,7 @@ def send_experience_booking_requested_email(
     <p style="line-height: 1.6;"><a href="{_site_link(f"/bookings/{booking_id}")}" style="color: #7a1f2b;">View booking</a></p>
     """,
     )
-    send_email(
+    return send_email(
         to=to,
         subject=f"Booking request received — {experience_title}",
         html=html,
@@ -201,7 +204,7 @@ def send_experience_booking_confirmed_email(
     total_minor: int,
     currency_code: str,
     booking_id: str,
-) -> None:
+) -> bool:
     amount = _format_amount(total_minor, currency_code)
     html = _wrap_html(
         "Booking confirmed",
@@ -218,7 +221,7 @@ def send_experience_booking_confirmed_email(
     <p style="line-height: 1.6;"><a href="{_site_link(f"/bookings/{booking_id}")}" style="color: #7a1f2b;">View booking details</a></p>
     """,
     )
-    send_email(
+    return send_email(
         to=to,
         subject=f"Booking confirmed — {experience_title}",
         html=html,
@@ -236,7 +239,7 @@ def send_homestay_booking_requested_email(
     total_minor: int,
     currency_code: str,
     booking_id: str,
-) -> None:
+) -> bool:
     amount = _format_amount(total_minor, currency_code)
     html = _wrap_html(
         "Stay request received",
@@ -253,7 +256,7 @@ def send_homestay_booking_requested_email(
     <p style="line-height: 1.6;"><a href="{_site_link(f"/stays/{booking_id}")}" style="color: #7a1f2b;">View stay request</a></p>
     """,
     )
-    send_email(
+    return send_email(
         to=to,
         subject=f"Stay request received — {stay_title}",
         html=html,
@@ -271,7 +274,7 @@ def send_homestay_booking_confirmed_email(
     total_minor: int,
     currency_code: str,
     booking_id: str,
-) -> None:
+) -> bool:
     amount = _format_amount(total_minor, currency_code)
     html = _wrap_html(
         "Stay confirmed",
@@ -288,7 +291,7 @@ def send_homestay_booking_confirmed_email(
     <p style="line-height: 1.6;"><a href="{_site_link(f"/stays/{booking_id}")}" style="color: #7a1f2b;">View stay details</a></p>
     """,
     )
-    send_email(
+    return send_email(
         to=to,
         subject=f"Stay confirmed — {stay_title}",
         html=html,

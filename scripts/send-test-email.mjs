@@ -26,7 +26,7 @@ function brandedTestHtml() {
     <div style="height: 5px; background: linear-gradient(90deg, #4a0a14 0%, #b8860b 50%, #4a0a14 100%);"></div>
     <div style="padding: 28px 30px;">
       <div style="text-align: center; margin-bottom: 22px; padding-bottom: 20px; border-bottom: 1px solid #e0d4c0;">
-        <img src="${logoUrl}" alt="The Royal Passage" width="148" style="display: block; margin: 0 auto 10px; max-width: 168px; height: auto;" />
+        <img src="${logoUrl}" alt="The Royal Passage" height="140" style="display: block; margin: 0 auto 10px; max-height: 140px; width: auto; border: 0;" />
         <p style="margin: 0; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #9a7b4f;">Mysuru · Curated royal journeys</p>
       </div>
       <h1 style="margin: 0 0 16px; font-size: 23px; font-weight: normal; color: #5c1a24; text-align: center;">Resend test</h1>

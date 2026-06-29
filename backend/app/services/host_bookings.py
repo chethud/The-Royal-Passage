@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta, timezone
+import logging
 
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import (
@@ -15,6 +16,8 @@ from app.services.booking_auto_complete import (
 from app.services.bookings import BOOKING_SELECT, _map_booking_row, _release_seats
 from app.services.supabase_query import run_supabase_query
 from app.services.transactional_emails import send_experience_booking_confirmed_email
+
+logger = logging.getLogger(__name__)
 
 
 def _resolve_host_id(auth: dict) -> str:
@@ -386,7 +389,7 @@ def confirm_host_booking(booking_id: str, auth: dict) -> BookingSummary:
         guest_email = row.get("guest_email") or ""
         if guest_email:
             try:
-                send_experience_booking_confirmed_email(
+                if not send_experience_booking_confirmed_email(
                     to=guest_email,
                     guest_name=row.get("guest_name") or "Guest",
                     experience_title=exp.get("title") or "your experience",
@@ -397,9 +400,17 @@ def confirm_host_booking(booking_id: str, auth: dict) -> BookingSummary:
                     total_minor=row.get("total_amount") or row.get("subtotal_minor") or 0,
                     currency_code=row.get("currency_code") or "INR",
                     booking_id=booking_id,
-                )
+                ):
+                    logger.error(
+                        "Guest booking confirmed email not sent for %s to %s",
+                        booking_id,
+                        guest_email,
+                    )
             except Exception:
-                pass
+                logger.exception(
+                    "Failed to send guest booking confirmed email for %s",
+                    booking_id,
+                )
     from app.services.notifications import mark_booking_request_notifications_read
 
     mark_booking_request_notifications_read(auth["user"].id, booking_id)

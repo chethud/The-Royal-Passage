@@ -259,7 +259,7 @@ def create_homestay_booking(
 
     if guest_email:
         try:
-            send_homestay_booking_requested_email(
+            if not send_homestay_booking_requested_email(
                 to=guest_email,
                 guest_name=guest_name,
                 stay_title=title,
@@ -269,7 +269,12 @@ def create_homestay_booking(
                 total_minor=subtotal_minor,
                 currency_code=stay.get("currency_code") or "INR",
                 booking_id=booking_id,
-            )
+            ):
+                logger.error(
+                    "Guest homestay booking email not sent for %s to %s — configure RESEND_API_KEY on Render",
+                    booking_id,
+                    guest_email,
+                )
         except Exception:
             logger.exception("Failed to send guest homestay booking email for %s", booking_id)
 

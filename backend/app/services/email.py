@@ -19,7 +19,7 @@ def send_email(*, to: str, subject: str, html: str, text: str | None = None) -> 
     if not to_address:
         return False
     if not email_configured():
-        logger.warning("Resend not configured; skipping email to %s (%s)", to_address, subject)
+        logger.error("Resend not configured; skipping email to %s (%s)", to_address, subject)
         return False
 
     payload: dict = {
@@ -43,7 +43,7 @@ def send_email(*, to: str, subject: str, html: str, text: str | None = None) -> 
             timeout=15.0,
         )
         if response.status_code >= 400:
-            logger.warning(
+            logger.error(
                 "Resend failed for %s (%s): %s",
                 to_address,
                 subject,

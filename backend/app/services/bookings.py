@@ -184,7 +184,7 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
 
     if guest_email:
         try:
-            send_experience_booking_requested_email(
+            if not send_experience_booking_requested_email(
                 to=guest_email,
                 guest_name=guest_name,
                 experience_title=title,
@@ -195,7 +195,12 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
                 total_minor=subtotal_minor,
                 currency_code=experience["currency_code"],
                 booking_id=booking_id,
-            )
+            ):
+                logger.error(
+                    "Guest booking email not sent for %s to %s — configure RESEND_API_KEY on Render",
+                    booking_id,
+                    guest_email,
+                )
         except Exception:
             logger.exception("Failed to send guest booking email for %s", booking_id)
 
