@@ -78,18 +78,34 @@ def auto_complete_due_confirmed_bookings(
     experience_ids: list[str] | None = None,
     guest_id: str | None = None,
 ) -> int:
-    query = (
-        supabase.table("bookings")
-        .select("*, experience_slots ( slot_date, start_time, end_time )")
-        .eq("booking_status", "confirmed")
-        .eq("is_paused", False)
-    )
-    if experience_ids:
-        query = query.in_("experience_id", experience_ids)
-    if guest_id:
-        query = query.eq("guest_id", guest_id)
+    try:
+        query = (
+            supabase.table("bookings")
+            .select("*, experience_slots ( slot_date, start_time, end_time )")
+            .eq("booking_status", "confirmed")
+            .eq("is_paused", False)
+        )
+        if experience_ids:
+            query = query.in_("experience_id", experience_ids)
+        if guest_id:
+            query = query.eq("guest_id", guest_id)
 
-    result = query.execute()
+        result = query.execute()
+    except Exception:
+        try:
+            query = (
+                supabase.table("bookings")
+                .select("id, guest_id, booking_status, payment_status, is_paused, experience_slots ( slot_date, start_time, end_time )")
+                .eq("booking_status", "confirmed")
+            )
+            if experience_ids:
+                query = query.in_("experience_id", experience_ids)
+            if guest_id:
+                query = query.eq("guest_id", guest_id)
+            result = query.execute()
+        except Exception:
+            return 0
+
     count = 0
     for row in result.data or []:
         if auto_complete_booking_if_due(supabase, row):

@@ -13,6 +13,7 @@ from app.services.booking_auto_complete import (
     auto_complete_due_confirmed_bookings,
 )
 from app.services.bookings import BOOKING_SELECT, _map_booking_row, _release_seats
+from app.services.supabase_query import run_supabase_query
 from app.services.transactional_emails import send_experience_booking_confirmed_email
 
 
@@ -79,37 +80,64 @@ def _fetch_host_booking_row(supabase, booking_id: str, host_id: str) -> dict:
     return row
 
 
+def _empty_host_dashboard() -> HostDashboardStats:
+    return HostDashboardStats(
+        pendingBookings=0,
+        confirmedBookings=0,
+        completedBookings=0,
+        revenueCollectedMinor=0,
+        revenuePendingMinor=0,
+        weekRevenueEstimateMinor=0,
+        upcomingBookings=0,
+        todayBookings=0,
+        publishedExperiences=0,
+        totalBookings=0,
+    )
+
+
+def _load_dashboard_bookings(supabase, experience_ids: list[str]) -> list[dict]:
+    def with_slots() -> list[dict]:
+        result = (
+            supabase.table("bookings")
+            .select(
+                "booking_status, payment_status, total_amount, subtotal_minor, "
+                "experience_slots ( slot_date )"
+            )
+            .in_("experience_id", experience_ids)
+            .execute()
+        )
+        return result.data or []
+
+    def without_slots() -> list[dict]:
+        result = (
+            supabase.table("bookings")
+            .select("booking_status, payment_status, total_amount, subtotal_minor")
+            .in_("experience_id", experience_ids)
+            .execute()
+        )
+        return result.data or []
+
+    try:
+        return with_slots()
+    except Exception:
+        return run_supabase_query(without_slots, fallback=[])
+
+
 def get_host_dashboard(auth: dict) -> HostDashboardStats:
     supabase = get_supabase_admin()
     host_id = _resolve_host_id(auth)
     experience_ids = _host_experience_ids(supabase, host_id)
 
     if experience_ids:
-        auto_complete_due_confirmed_bookings(supabase, experience_ids=experience_ids)
+        try:
+            auto_complete_due_confirmed_bookings(supabase, experience_ids=experience_ids)
+        except Exception:
+            pass
 
     if not experience_ids:
-        return HostDashboardStats(
-            pendingBookings=0,
-            confirmedBookings=0,
-            completedBookings=0,
-            revenueCollectedMinor=0,
-            revenuePendingMinor=0,
-            weekRevenueEstimateMinor=0,
-            upcomingBookings=0,
-            todayBookings=0,
-            publishedExperiences=0,
-            totalBookings=0,
-        )
+        return _empty_host_dashboard()
 
-    bookings_result = (
-        supabase.table("bookings")
-        .select(
-            "booking_status, payment_status, total_amount, subtotal_minor, experience_slots ( slot_date )"
-        )
-        .in_("experience_id", experience_ids)
-        .execute()
-    )
-    bookings = bookings_result.data or []
+    bookings = _load_dashboard_bookings(supabase, experience_ids)
 
     today = date.today()
     week_end = today + timedelta(days=6)
@@ -138,14 +166,14 @@ def get_host_dashboard(auth: dict) -> HostDashboardStats:
         and today <= slot_day <= week_end
     )
 
-    exp_result = (
+    published_result = (
         supabase.table("experiences")
-        .select("id", count="exact")
+        .select("id")
         .eq("host_id", host_id)
         .eq("status", "published")
         .execute()
     )
-    published = exp_result.count or 0
+    published = len(published_result.data or [])
 
     return HostDashboardStats(
         pendingBookings=pending,
@@ -169,7 +197,10 @@ def list_host_bookings(auth: dict, status_filter: str | None = None) -> list[Boo
     if not experience_ids:
         return []
 
-    auto_complete_due_confirmed_bookings(supabase, experience_ids=experience_ids)
+    try:
+        auto_complete_due_confirmed_bookings(supabase, experience_ids=experience_ids)
+    except Exception:
+        pass
 
     query = (
         supabase.table("bookings")
@@ -191,8 +222,11 @@ def list_host_bookings(auth: dict, status_filter: str | None = None) -> list[Boo
     elif status_filter == "today":
         query = query.in_("booking_status", ["pending", "confirmed"])
 
-    result = query.execute()
-    rows = result.data or []
+    try:
+        result = query.execute()
+        rows = result.data or []
+    except Exception:
+        return []
 
     if status_filter == "today":
         today = date.today()

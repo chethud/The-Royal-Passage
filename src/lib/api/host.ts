@@ -21,6 +21,20 @@ export type HostDashboardStats = {
   currencySymbol: string;
 };
 
+export const EMPTY_HOST_DASHBOARD_STATS: HostDashboardStats = {
+  pendingBookings: 0,
+  confirmedBookings: 0,
+  completedBookings: 0,
+  revenueCollectedMinor: 0,
+  revenuePendingMinor: 0,
+  weekRevenueEstimateMinor: 0,
+  upcomingBookings: 0,
+  todayBookings: 0,
+  publishedExperiences: 0,
+  totalBookings: 0,
+  currencySymbol: "₹",
+};
+
 export type HostRevenueDay = {
   date: string;
   collectedMinor: number;

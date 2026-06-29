@@ -9,6 +9,7 @@ import type { BookingSummary } from "@/lib/api/bookings";
 import {
   fetchHostBookings,
   fetchHostDashboard,
+  EMPTY_HOST_DASHBOARD_STATS,
   type HostDashboardStats,
 } from "@/lib/api/host";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
@@ -30,33 +31,47 @@ export const Route = createFileRoute("/host/dashboard")({
 
 function HostOverviewPage() {
   const { accessToken, ready, loading } = useHostAccess();
-  const [stats, setStats] = useState<HostDashboardStats | null>(null);
+  const [stats, setStats] = useState<HostDashboardStats>(EMPTY_HOST_DASHBOARD_STATS);
   const [todayBookings, setTodayBookings] = useState<BookingSummary[]>([]);
   const [pendingBookings, setPendingBookings] = useState<BookingSummary[]>([]);
-  const [pageError, setPageError] = useState<string | null>(null);
+  const [pageWarning, setPageWarning] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
 
   const loadPage = useCallback(async () => {
     if (!accessToken) return;
     setPageLoading(true);
-    setPageError(null);
-    try {
-      if (!isApiConfigured()) {
-        throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
-      }
-      const [dashboard, today, pending] = await Promise.all([
-        fetchHostDashboard(accessToken),
-        fetchHostBookings(accessToken, "today"),
-        fetchHostBookings(accessToken, "pending"),
-      ]);
-      setStats(dashboard);
-      setTodayBookings(today);
-      setPendingBookings(pending);
-    } catch (err) {
-      setPageError(toErrorMessage(err, "Failed to load host dashboard."));
-    } finally {
+    setPageWarning(null);
+    if (!isApiConfigured()) {
+      setPageWarning("VITE_API_BASE_URL is not configured for this deployment.");
       setPageLoading(false);
+      return;
     }
+
+    const warnings: string[] = [];
+
+    try {
+      setStats(await fetchHostDashboard(accessToken));
+    } catch (err) {
+      warnings.push(toErrorMessage(err, "Failed to load dashboard stats."));
+      setStats(EMPTY_HOST_DASHBOARD_STATS);
+    }
+
+    try {
+      setTodayBookings(await fetchHostBookings(accessToken, "today"));
+    } catch (err) {
+      warnings.push(toErrorMessage(err, "Failed to load today's sessions."));
+      setTodayBookings([]);
+    }
+
+    try {
+      setPendingBookings(await fetchHostBookings(accessToken, "pending"));
+    } catch (err) {
+      warnings.push(toErrorMessage(err, "Failed to load pending bookings."));
+      setPendingBookings([]);
+    }
+
+    setPageWarning(warnings[0] ?? null);
+    setPageLoading(false);
   }, [accessToken]);
 
   useEffect(() => {
@@ -78,21 +93,21 @@ function HostOverviewPage() {
         <LuxuryCheckoutPanel>
           <p className="luxury-panel-body py-8 text-sm">Loading overview…</p>
         </LuxuryCheckoutPanel>
-      ) : pageError ? (
-        <LuxuryCheckoutPanel>
-          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {pageError}
-          </p>
-        </LuxuryCheckoutPanel>
       ) : (
         <div className="space-y-8">
-          {stats ? (
+          {pageWarning ? (
             <LuxuryCheckoutPanel>
-              <HostStatsGrid stats={stats} />
+              <p className="rounded-sm border border-amber-700/30 bg-amber-50/80 px-4 py-3 text-sm text-amber-950">
+                {pageWarning}
+              </p>
             </LuxuryCheckoutPanel>
           ) : null}
 
-          {stats && stats.publishedExperiences === 0 ? <CreateExperienceCta /> : null}
+          <LuxuryCheckoutPanel>
+            <HostStatsGrid stats={stats} />
+          </LuxuryCheckoutPanel>
+
+          {stats.publishedExperiences === 0 ? <CreateExperienceCta /> : null}
 
           <LuxuryCheckoutPanel>
             <div className="flex flex-wrap items-end justify-between gap-3">
