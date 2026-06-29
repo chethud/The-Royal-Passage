@@ -11,10 +11,12 @@
 --   • COD bookings, booking pause, wishlist, reviews, notifications, audit logs
 --   • Storage policies (experience photos + editor homepage uploads)
 --   • Homestay owner module (properties, rooms, availability, bookings, reviews)
---   • VIP owner module (packages, bookings)
+--   • VIP owner module (packages, bookings) + legacy vip_bookings upgrade
 --   • VIP guest membership applications + custom package requests
 --   • Royal passport registration numbers on profiles
---   • Homestay weekend pricing columns
+--   • Homestay weekend pricing columns (guarded for partial installs)
+--   • Notification types: homestay_submitted, account_welcome
+--   • Host booking email tracking (instant + 15m / 2h / 24h reminders while pending)
 --   • Profile backfill + booking guest FK repair
 --
 -- Safe to re-run: IF NOT EXISTS, ADD COLUMN IF NOT EXISTS, ON CONFLICT, DROP IF EXISTS
@@ -22,6 +24,8 @@
 -- Payment: Pay-at-venue (COD) only.
 -- Admin: create in Dashboard → Authentication, then run admin block at bottom.
 -- Editor: npm run setup:editor  OR  see comments at bottom.
+--
+-- RLS: broad read for anon/authenticated; writes via service role (backend API).
 -- =============================================================================
 
 -- ---------------------------------------------------------------------------
@@ -594,7 +598,7 @@ alter table public.notifications
   add constraint notifications_type_check check (type in (
     'booking_created', 'booking_confirmed', 'booking_cancelled',
     'booking_reminder', 'review_request', 'host_approved', 'review_received',
-    'experience_submitted', 'homestay_submitted'
+    'experience_submitted', 'homestay_submitted', 'account_welcome'
   ));
 
 -- ---------------------------------------------------------------------------
@@ -1540,6 +1544,48 @@ create table if not exists public.vip_bookings (
   updated_at timestamptz not null default now()
 );
 
+-- Upgrade legacy vip_bookings tables (CREATE TABLE IF NOT EXISTS skips new columns).
+alter table public.vip_bookings add column if not exists package_id uuid;
+alter table public.vip_bookings add column if not exists guest_user_id uuid;
+alter table public.vip_bookings add column if not exists guest_name text;
+alter table public.vip_bookings add column if not exists guest_email text;
+alter table public.vip_bookings add column if not exists guest_phone text;
+alter table public.vip_bookings add column if not exists travel_start date;
+alter table public.vip_bookings add column if not exists travel_end date;
+alter table public.vip_bookings add column if not exists guest_count integer not null default 1;
+alter table public.vip_bookings add column if not exists total_amount_minor integer not null default 0;
+alter table public.vip_bookings add column if not exists currency_code text not null default 'INR';
+alter table public.vip_bookings add column if not exists booking_status text not null default 'pending';
+alter table public.vip_bookings add column if not exists payment_status text not null default 'pending';
+alter table public.vip_bookings add column if not exists payment_method text not null default 'cod';
+alter table public.vip_bookings add column if not exists is_custom_package boolean not null default false;
+alter table public.vip_bookings add column if not exists notes text;
+alter table public.vip_bookings add column if not exists created_at timestamptz not null default now();
+alter table public.vip_bookings add column if not exists updated_at timestamptz not null default now();
+
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'vip_bookings' and column_name = 'vip_package_id'
+  ) and not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'vip_bookings' and column_name = 'package_id'
+  ) then
+    alter table public.vip_bookings rename column vip_package_id to package_id;
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'vip_bookings_package_id_fkey'
+      and conrelid = 'public.vip_bookings'::regclass
+  ) then
+    alter table public.vip_bookings
+      add constraint vip_bookings_package_id_fkey
+      foreign key (package_id) references public.vip_packages (id) on delete restrict;
+  end if;
+end $$;
+
 create index if not exists idx_vip_bookings_package on public.vip_bookings (package_id);
 create index if not exists idx_vip_bookings_guest on public.vip_bookings (guest_user_id);
 
@@ -1769,17 +1815,51 @@ comment on column public.profiles.registration_number is
 -- price_per_night_minor remains the weekday rate (Monâ€“Fri).
 -- weekend_price_per_night_minor applies to Saturday and Sunday; null = same as weekday.
 
-alter table public.homestays
-  add column if not exists weekend_price_per_night_minor integer;
+do $$
+begin
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'homestays'
+  ) then
+    alter table public.homestays
+      add column if not exists weekend_price_per_night_minor integer;
 
-alter table public.homestay_rooms
-  add column if not exists weekend_price_per_night_minor integer;
+    update public.homestays
+    set weekend_price_per_night_minor = price_per_night_minor
+    where weekend_price_per_night_minor is null;
+  end if;
 
-update public.homestays
-  set weekend_price_per_night_minor = price_per_night_minor
-  where weekend_price_per_night_minor is null;
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'homestay_rooms'
+  ) then
+    alter table public.homestay_rooms
+      add column if not exists weekend_price_per_night_minor integer;
 
-update public.homestay_rooms
-  set weekend_price_per_night_minor = price_per_night_minor
-  where weekend_price_per_night_minor is null;
+    update public.homestay_rooms
+    set weekend_price_per_night_minor = price_per_night_minor
+    where weekend_price_per_night_minor is null;
+  end if;
+end $$;
+
+-- Host booking-request email reminders (15m / 2h / 24h while pending)
+alter table public.bookings
+  add column if not exists host_request_email_sent_at timestamptz,
+  add column if not exists host_reminder_15m_at timestamptz,
+  add column if not exists host_reminder_2h_at timestamptz,
+  add column if not exists host_reminder_24h_at timestamptz;
+
+alter table public.homestay_bookings
+  add column if not exists host_request_email_sent_at timestamptz,
+  add column if not exists host_reminder_15m_at timestamptz,
+  add column if not exists host_reminder_2h_at timestamptz,
+  add column if not exists host_reminder_24h_at timestamptz;
+
+create index if not exists idx_bookings_pending_host_reminders
+  on public.bookings (created_at)
+  where booking_status = 'pending';
+
+create index if not exists idx_homestay_bookings_pending_host_reminders
+  on public.homestay_bookings (created_at)
+  where booking_status = 'pending';
 

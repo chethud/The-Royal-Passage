@@ -10,3 +10,14 @@ services:
         value: "3.12"
       - key: CORS_ORIGINS
         value: http://localhost:5173,http://localhost:8080,https://the-royal-passage.vercel.app
+
+  - type: cron
+    name: host-booking-reminders
+    runtime: python
+    rootDir: backend
+    schedule: "*/5 * * * *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -c "from app.services.host_booking_reminders import process_host_booking_reminders; import json; print(json.dumps(process_host_booking_reminders()))"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"

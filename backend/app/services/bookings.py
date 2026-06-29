@@ -7,6 +7,10 @@ from app.services.booking_auto_complete import (
     auto_complete_due_confirmed_bookings,
 )
 from app.services.supabase_query import insert_row_returning_id
+from app.services.transactional_emails import (
+    send_experience_booking_requested_email,
+    send_host_new_experience_booking_email,
+)
 from app.models.schemas import (
     BookingExperienceSummary,
     BookingSlotSummary,
@@ -183,12 +187,13 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         )
         host_result = (
             supabase.table("hosts")
-            .select("auth_user_id")
+            .select("auth_user_id, display_name, email")
             .eq("id", experience.get("host_id"))
             .maybe_single()
             .execute()
         )
-        host_user_id = ((host_result.data if host_result else None) or {}).get("auth_user_id")
+        host_row = (host_result.data if host_result else None) or {}
+        host_user_id = host_row.get("auth_user_id")
         if host_user_id:
             create_notification(
                 host_user_id,
@@ -197,7 +202,40 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
                 f"A guest requested {title}. Review it in your host dashboard.",
                 {"bookingId": booking_id},
             )
+        from datetime import datetime, timezone
+
+        from app.services.host_booking_reminders import resolve_host_email
+
+        host_email = resolve_host_email(supabase, host_row.get("auth_user_id"), host_row.get("email"))
+        if host_email and send_host_new_experience_booking_email(
+            to=host_email,
+            host_name=host_row.get("display_name") or "Host",
+            guest_name=guest_name,
+            experience_title=title,
+            slot_date=slot.get("slot_date", ""),
+            slot_start=slot.get("start_time", ""),
+            slot_end=slot.get("end_time", ""),
+            guest_count=payload.guestCount,
+            total_minor=subtotal_minor,
+            currency_code=experience["currency_code"],
+            booking_id=booking_id,
+        ):
+            supabase.table("bookings").update(
+                {"host_request_email_sent_at": datetime.now(timezone.utc).isoformat()}
+            ).eq("id", booking_id).execute()
         log_audit(user.id, "booking_created", "booking", booking_id, {"experienceId": experience["id"]})
+        send_experience_booking_requested_email(
+            to=guest_email,
+            guest_name=guest_name,
+            experience_title=title,
+            slot_date=slot.get("slot_date", ""),
+            slot_start=slot.get("start_time", ""),
+            slot_end=slot.get("end_time", ""),
+            guest_count=payload.guestCount,
+            total_minor=subtotal_minor,
+            currency_code=experience["currency_code"],
+            booking_id=booking_id,
+        )
     except Exception:
         pass
 

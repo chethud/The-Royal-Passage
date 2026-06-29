@@ -1,9 +1,8 @@
 -- =============================================================================
 -- The Royal Passage — CORE database schema (experiences, bookings, guests, hosts)
 -- =============================================================================
--- For the COMPLETE schema (homestay + VIP + membership + passport numbers), use:
---   FULL_SCHEMA.sql  (repo root)  OR  supabase/FULL_SCHEMA.sql
--- Run that single file in Supabase SQL Editor for a full production install.
+-- For the COMPLETE schema (homestay + VIP + membership + passport numbers + email tracking), use:
+--   supabase/FULL_SCHEMA.sql  (canonical — run this in Supabase SQL Editor)
 -- =============================================================================
 -- HOW TO USE (fresh or existing Supabase project):
 --   1. Supabase Dashboard → SQL Editor → New query
@@ -609,7 +608,7 @@ alter table public.notifications
   add constraint notifications_type_check check (type in (
     'booking_created', 'booking_confirmed', 'booking_cancelled',
     'booking_reminder', 'review_request', 'host_approved', 'review_received',
-    'experience_submitted', 'homestay_submitted'
+    'experience_submitted', 'homestay_submitted', 'account_welcome'
   ));
 
 -- ---------------------------------------------------------------------------

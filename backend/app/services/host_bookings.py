@@ -13,6 +13,7 @@ from app.services.booking_auto_complete import (
     auto_complete_due_confirmed_bookings,
 )
 from app.services.bookings import BOOKING_SELECT, _map_booking_row, _release_seats
+from app.services.transactional_emails import send_experience_booking_confirmed_email
 
 
 def _resolve_host_id(auth: dict) -> str:
@@ -346,6 +347,25 @@ def confirm_host_booking(booking_id: str, auth: dict) -> BookingSummary:
             "Your host confirmed your booking. Pay at the venue on arrival.",
             {"bookingId": booking_id},
         )
+        slot = row.get("experience_slots") or {}
+        exp = row.get("experiences") or {}
+        guest_email = row.get("guest_email") or ""
+        if guest_email:
+            try:
+                send_experience_booking_confirmed_email(
+                    to=guest_email,
+                    guest_name=row.get("guest_name") or "Guest",
+                    experience_title=exp.get("title") or "your experience",
+                    slot_date=slot.get("slot_date", ""),
+                    slot_start=slot.get("start_time", ""),
+                    slot_end=slot.get("end_time", ""),
+                    guest_count=row.get("participant_count") or row.get("guest_count") or 1,
+                    total_minor=row.get("total_amount") or row.get("subtotal_minor") or 0,
+                    currency_code=row.get("currency_code") or "INR",
+                    booking_id=booking_id,
+                )
+            except Exception:
+                pass
     from app.services.notifications import mark_booking_request_notifications_read
 
     mark_booking_request_notifications_read(auth["user"].id, booking_id)

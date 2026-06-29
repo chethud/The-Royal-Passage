@@ -5,6 +5,10 @@ from app.models.schemas import CreateHomestayBookingRequest, CreateHomestayBooki
 from app.services.homestay_availability import load_price_overrides_minor
 from app.services.homestay_pricing import stay_subtotal_minor
 from app.services.supabase_query import insert_row_returning_id
+from app.services.transactional_emails import (
+    send_homestay_booking_requested_email,
+    send_host_new_homestay_booking_email,
+)
 
 HOMESTAY_SELECT = """
 *,
@@ -96,6 +100,8 @@ def create_homestay_booking(
     supabase = get_supabase_admin()
     user = auth["user"]
     profile = auth["profile"]
+    guest_name = profile.get("full_name") or user.email or "Guest"
+    guest_email = user.email or ""
 
     check_in = _parse_day(payload.checkIn)
     check_out = _parse_day(payload.checkOut)
@@ -264,7 +270,39 @@ def create_homestay_booking(
                 f"A guest requested {title}. Review it in your dashboard.",
                 {"bookingId": booking_id, "bookingType": "homestay"},
             )
+        from datetime import datetime, timezone
+
+        from app.services.host_booking_reminders import resolve_host_email
+
+        owner_email = resolve_host_email(supabase, owner.get("auth_user_id"), owner.get("email"))
+        if owner_email and send_host_new_homestay_booking_email(
+            to=owner_email,
+            host_name=owner.get("full_name") or "Host",
+            guest_name=guest_name,
+            stay_title=title,
+            check_in=check_in.isoformat(),
+            check_out=check_out.isoformat(),
+            nights=nights,
+            guest_count=payload.guestCount,
+            total_minor=subtotal_minor,
+            currency_code=stay.get("currency_code") or "INR",
+            booking_id=booking_id,
+        ):
+            supabase.table("homestay_bookings").update(
+                {"host_request_email_sent_at": datetime.now(timezone.utc).isoformat()}
+            ).eq("id", booking_id).execute()
         log_audit(user.id, "homestay_booking_created", "homestay_booking", booking_id, {"homestayId": stay["id"]})
+        send_homestay_booking_requested_email(
+            to=guest_email,
+            guest_name=guest_name,
+            stay_title=title,
+            check_in=check_in.isoformat(),
+            check_out=check_out.isoformat(),
+            nights=nights,
+            total_minor=subtotal_minor,
+            currency_code=stay.get("currency_code") or "INR",
+            booking_id=booking_id,
+        )
     except Exception:
         pass
 

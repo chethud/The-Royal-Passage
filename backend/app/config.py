@@ -12,6 +12,15 @@ class Settings(BaseSettings):
     )
     rate_limit_per_minute: int = 120
     enable_api_docs: bool = False
+    resend_api_key: str = ""
+    resend_from_email: str = "noreplay@theroyalpassage.com"
+    resend_from_name: str = "The Royal Passage"
+    site_url: str = "https://the-royal-passage.vercel.app"
+    cron_secret: str = ""
+
+    @property
+    def email_configured(self) -> bool:
+        return bool(self.resend_api_key.strip() and self.resend_from_email.strip())
 
     @property
     def supabase_configured(self) -> bool:

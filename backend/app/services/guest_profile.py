@@ -33,6 +33,13 @@ def _vip_membership_rejected_at(user_id: str, status: str) -> str | None:
 
 
 def get_guest_profile(auth: dict) -> GuestProfile:
+    from app.services.transactional_emails import maybe_send_welcome_email
+
+    try:
+        maybe_send_welcome_email(auth)
+    except Exception:
+        pass
+
     profile = auth["profile"]
     user = auth["user"]
     vip_status = profile.get("vip_membership_status") or "none"

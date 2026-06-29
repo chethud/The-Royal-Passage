@@ -12,6 +12,9 @@
     "format": "prettier --write .",
     "setup:admin": "node --env-file=.env.local --env-file=.env scripts/create-admin.mjs",
     "setup:editor": "node --env-file=.env.local --env-file=.env scripts/create-editor.mjs",
+    "email:test": "node --env-file=.env.local scripts/send-test-email.mjs",
+    "email:preview-all": "cd backend && python ../scripts/send-all-transactional-emails.py",
+    "cron:host-reminders": "cd backend && python -c \"from app.services.host_booking_reminders import process_host_booking_reminders; import json; print(json.dumps(process_host_booking_reminders(), indent=2))\"",
     "api:dev": "cd backend && python -m uvicorn app.main:app --reload --port 8000",
     "proto:generate": "npx buf generate",
     "test:e2e": "node --env-file=backend/.env scripts/e2e-test.mjs"

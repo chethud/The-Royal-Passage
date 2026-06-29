@@ -182,6 +182,11 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       if (data.session?.user?.id) {
         markVipSignupPromptPending(data.session.user.id);
         setNotice("Account created. You are signed in.");
+        if (data.session.access_token) {
+          void import("@/lib/api/guest")
+            .then(({ fetchGuestProfile }) => fetchGuestProfile(data.session!.access_token))
+            .catch(() => undefined);
+        }
       } else {
         setNotice(
           "Account created. Check your email for a confirmation link, then sign in with your password.",

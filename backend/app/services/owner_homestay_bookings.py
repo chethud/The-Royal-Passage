@@ -3,6 +3,7 @@ from datetime import date, datetime, timezone
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import HomestayBookingSummary, ListHomestayBookingsResponse, OwnerDashboardStats
 from app.services.owner_homestays import _currency_symbol, _resolve_owner_id
+from app.services.transactional_emails import send_homestay_booking_confirmed_email, _guest_contact
 
 BOOKING_SELECT = """
 *,
@@ -240,6 +241,27 @@ def confirm_owner_homestay_booking(booking_id: str, auth: dict) -> HomestayBooki
             f"Your stay at {stay.get('title') or 'the property'} was confirmed. Pay the total in cash at check-in.",
             {"bookingId": booking_id, "bookingType": "homestay"},
         )
+        guest_email, guest_name = _guest_contact(supabase, row["guest_id"])
+        if guest_email:
+            try:
+                check_in = row.get("check_in", "")
+                check_out = row.get("check_out", "")
+                nights = row.get("nights")
+                if nights is None and check_in and check_out:
+                    nights = (date.fromisoformat(str(check_out)[:10]) - date.fromisoformat(str(check_in)[:10])).days
+                send_homestay_booking_confirmed_email(
+                    to=guest_email,
+                    guest_name=guest_name,
+                    stay_title=stay.get("title") or "your stay",
+                    check_in=str(check_in),
+                    check_out=str(check_out),
+                    nights=int(nights or 1),
+                    total_minor=row.get("total_amount") or row.get("subtotal_minor") or 0,
+                    currency_code=row.get("currency_code") or "INR",
+                    booking_id=booking_id,
+                )
+            except Exception:
+                pass
     return updated
 
 

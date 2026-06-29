@@ -6,15 +6,19 @@
 --   2. Paste this ENTIRE file → Run once
 --   3. No separate migration files needed — everything is below.
 --
+-- Canonical copy: supabase/FULL_SCHEMA.sql (this root file is kept in sync).
+--
 -- Includes (consolidated):
 --   • Core: profiles, hosts, cities, categories, experiences, slots, bookings
 --   • COD bookings, booking pause, wishlist, reviews, notifications, audit logs
 --   • Storage policies (experience photos + editor homepage uploads)
 --   • Homestay owner module (properties, rooms, availability, bookings, reviews)
---   • VIP owner module (packages, bookings)
+--   • VIP owner module (packages, bookings) + legacy vip_bookings upgrade
 --   • VIP guest membership applications + custom package requests
 --   • Royal passport registration numbers on profiles
---   • Homestay weekend pricing columns
+--   • Homestay weekend pricing columns (guarded for partial installs)
+--   • Notification types: homestay_submitted, account_welcome
+--   • Host booking email tracking (instant + 15m / 2h / 24h reminders while pending)
 --   • Profile backfill + booking guest FK repair
 --
 -- Safe to re-run: IF NOT EXISTS, ADD COLUMN IF NOT EXISTS, ON CONFLICT, DROP IF EXISTS
@@ -22,8 +26,6 @@
 -- Payment: Pay-at-venue (COD) only.
 -- Admin: create in Dashboard → Authentication, then run admin block at bottom.
 -- Editor: npm run setup:editor  OR  see comments at bottom.
--- =============================================================================
---   (schema.sql does NOT create auth passwords â€” only tables/data.)
 --
 -- RLS: broad read for anon/authenticated; writes via service role (backend API).
 -- =============================================================================
@@ -598,7 +600,7 @@ alter table public.notifications
   add constraint notifications_type_check check (type in (
     'booking_created', 'booking_confirmed', 'booking_cancelled',
     'booking_reminder', 'review_request', 'host_approved', 'review_received',
-    'experience_submitted', 'homestay_submitted'
+    'experience_submitted', 'homestay_submitted', 'account_welcome'
   ));
 
 -- ---------------------------------------------------------------------------
@@ -1841,3 +1843,25 @@ begin
     where weekend_price_per_night_minor is null;
   end if;
 end $$;
+
+-- Host booking-request email reminders (15m / 2h / 24h while pending)
+alter table public.bookings
+  add column if not exists host_request_email_sent_at timestamptz,
+  add column if not exists host_reminder_15m_at timestamptz,
+  add column if not exists host_reminder_2h_at timestamptz,
+  add column if not exists host_reminder_24h_at timestamptz;
+
+alter table public.homestay_bookings
+  add column if not exists host_request_email_sent_at timestamptz,
+  add column if not exists host_reminder_15m_at timestamptz,
+  add column if not exists host_reminder_2h_at timestamptz,
+  add column if not exists host_reminder_24h_at timestamptz;
+
+create index if not exists idx_bookings_pending_host_reminders
+  on public.bookings (created_at)
+  where booking_status = 'pending';
+
+create index if not exists idx_homestay_bookings_pending_host_reminders
+  on public.homestay_bookings (created_at)
+  where booking_status = 'pending';
+
