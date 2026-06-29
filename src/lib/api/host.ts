@@ -1,11 +1,5 @@
-import { create } from "@bufbuild/protobuf";
 import type { BookingSummary } from "@/lib/api/bookings";
-import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
-import {
-  GetHostBookingRequestSchema,
-  HostBookingActionRequestSchema,
-  ListHostBookingsRequestSchema,
-} from "@/gen/royalpassage/v1/service_pb";
+import { apiFetch } from "@/lib/api/client";
 
 export type HostDashboardStats = {
   pendingBookings: number;
@@ -64,88 +58,67 @@ export type HostReviewSummary = {
 };
 
 export function fetchHostDashboard(accessToken: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() => client.getHostDashboard({})) as Promise<HostDashboardStats>;
+  return apiFetch<HostDashboardStats>("/api/v1/host/dashboard", { accessToken });
 }
 
 export function fetchHostBookings(
   accessToken: string,
   status?: "pending" | "confirmed" | "completed" | "cancelled" | "upcoming" | "today",
 ) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(async () => {
-    const response = await client.listHostBookings(
-      create(ListHostBookingsRequestSchema, status ? { status } : {}),
-    );
-    return response.bookings as BookingSummary[];
-  });
+  const query = status ? `?status=${encodeURIComponent(status)}` : "";
+  return apiFetch<BookingSummary[]>(`/api/v1/host/bookings${query}`, { accessToken });
 }
 
 export function fetchHostBooking(accessToken: string, bookingId: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() =>
-    client.getHostBooking(create(GetHostBookingRequestSchema, { bookingId })),
-  ) as Promise<BookingSummary>;
+  return apiFetch<BookingSummary>(`/api/v1/host/bookings/${bookingId}`, { accessToken });
 }
 
 export function fetchHostRevenue(accessToken: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(() => client.getHostRevenue({})) as Promise<HostRevenueSummary>;
+  return apiFetch<HostRevenueSummary>("/api/v1/host/revenue", { accessToken });
 }
 
 export function fetchHostReviews(accessToken: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(async () => {
-    const response = await client.listHostReviews({});
-    return response.reviews as HostReviewSummary[];
-  });
-}
-
-function hostBookingAction(
-  accessToken: string,
-  bookingId: string,
-  action: "confirm" | "reject" | "markPaid" | "complete" | "pause" | "resume",
-) {
-  const client = createRoyalPassageClient(accessToken);
-  const request = create(HostBookingActionRequestSchema, { bookingId });
-  return rpcCall(() => {
-    switch (action) {
-      case "confirm":
-        return client.confirmHostBooking(request);
-      case "reject":
-        return client.rejectHostBooking(request);
-      case "markPaid":
-        return client.markHostBookingPaid(request);
-      case "complete":
-        return client.completeHostBooking(request);
-      case "pause":
-        return client.pauseHostBooking(request);
-      case "resume":
-        return client.resumeHostBooking(request);
-    }
-  }) as Promise<BookingSummary>;
+  return apiFetch<HostReviewSummary[]>("/api/v1/host/reviews", { accessToken });
 }
 
 export function confirmHostBooking(accessToken: string, bookingId: string) {
-  return hostBookingAction(accessToken, bookingId, "confirm");
+  return apiFetch<BookingSummary>(`/api/v1/host/bookings/${bookingId}/confirm`, {
+    accessToken,
+    method: "POST",
+  });
 }
 
 export function rejectHostBooking(accessToken: string, bookingId: string) {
-  return hostBookingAction(accessToken, bookingId, "reject");
+  return apiFetch<BookingSummary>(`/api/v1/host/bookings/${bookingId}/reject`, {
+    accessToken,
+    method: "POST",
+  });
 }
 
 export function markHostBookingPaid(accessToken: string, bookingId: string) {
-  return hostBookingAction(accessToken, bookingId, "markPaid");
+  return apiFetch<BookingSummary>(`/api/v1/host/bookings/${bookingId}/mark-paid`, {
+    accessToken,
+    method: "POST",
+  });
 }
 
 export function completeHostBooking(accessToken: string, bookingId: string) {
-  return hostBookingAction(accessToken, bookingId, "complete");
+  return apiFetch<BookingSummary>(`/api/v1/host/bookings/${bookingId}/complete`, {
+    accessToken,
+    method: "POST",
+  });
 }
 
 export function pauseHostBooking(accessToken: string, bookingId: string) {
-  return hostBookingAction(accessToken, bookingId, "pause");
+  return apiFetch<BookingSummary>(`/api/v1/host/bookings/${bookingId}/pause`, {
+    accessToken,
+    method: "POST",
+  });
 }
 
 export function resumeHostBooking(accessToken: string, bookingId: string) {
-  return hostBookingAction(accessToken, bookingId, "resume");
+  return apiFetch<BookingSummary>(`/api/v1/host/bookings/${bookingId}/resume`, {
+    accessToken,
+    method: "POST",
+  });
 }

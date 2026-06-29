@@ -16,7 +16,7 @@ def _read_bearer_token(request: Request) -> str | None:
     return token or None
 
 
-def require_admin_request(request: Request) -> dict | JSONResponse:
+def authenticate_request(request: Request) -> dict | JSONResponse:
     if not settings.supabase_configured:
         return JSONResponse(
             {"detail": "Supabase is not configured on the API server."},
@@ -38,7 +38,21 @@ def require_admin_request(request: Request) -> dict | JSONResponse:
     except ValueError as exc:
         return JSONResponse({"detail": str(exc)}, status_code=500)
 
-    if profile.get("role") != "admin":
-        return JSONResponse({"detail": "Admin access required."}, status_code=403)
-
     return {"user": user, "profile": profile, "token": token}
+
+
+def require_role_request(request: Request, role: str) -> dict | JSONResponse:
+    auth = authenticate_request(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    if auth["profile"].get("role") != role:
+        return JSONResponse({"detail": f"{role.title()} access required."}, status_code=403)
+    return auth
+
+
+def require_admin_request(request: Request) -> dict | JSONResponse:
+    return require_role_request(request, "admin")
+
+
+def require_host_request(request: Request) -> dict | JSONResponse:
+    return require_role_request(request, "host")

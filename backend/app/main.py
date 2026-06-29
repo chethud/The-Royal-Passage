@@ -25,6 +25,33 @@ from app.http_api import (
     admin_users,
     healthz,
 )
+from app.http_host import (
+    host_booking_detail,
+    host_bookings,
+    host_categories,
+    host_complete_booking,
+    host_confirm_booking,
+    host_dashboard,
+    host_experience_create,
+    host_experience_delete,
+    host_experience_detail,
+    host_experience_update,
+    host_experiences_list,
+    host_mark_paid_booking,
+    host_pause_booking,
+    host_reject_booking,
+    host_resume_booking,
+    host_revenue,
+    host_reviews,
+    host_slot_create,
+    host_slot_delete,
+    host_slot_update,
+)
+from app.http_notifications import (
+    notification_mark_read,
+    notifications_list,
+    notifications_mark_all_read,
+)
 from app.rpc.servicer import RoyalPassageServiceImpl
 from royalpassage.v1.service_connect import RoyalPassageServiceASGIApplication
 
@@ -72,6 +99,85 @@ core_app = Starlette(
             methods=["POST"],
         ),
         Route("/api/v1/admin/hosts", admin_create_host, methods=["POST"]),
+        Route("/api/v1/host/dashboard", host_dashboard, methods=["GET"]),
+        Route("/api/v1/host/bookings", host_bookings, methods=["GET"]),
+        Route("/api/v1/host/bookings/{booking_id}", host_booking_detail, methods=["GET"]),
+        Route(
+            "/api/v1/host/bookings/{booking_id}/confirm",
+            host_confirm_booking,
+            methods=["POST"],
+        ),
+        Route(
+            "/api/v1/host/bookings/{booking_id}/reject",
+            host_reject_booking,
+            methods=["POST"],
+        ),
+        Route(
+            "/api/v1/host/bookings/{booking_id}/mark-paid",
+            host_mark_paid_booking,
+            methods=["POST"],
+        ),
+        Route(
+            "/api/v1/host/bookings/{booking_id}/complete",
+            host_complete_booking,
+            methods=["POST"],
+        ),
+        Route(
+            "/api/v1/host/bookings/{booking_id}/pause",
+            host_pause_booking,
+            methods=["POST"],
+        ),
+        Route(
+            "/api/v1/host/bookings/{booking_id}/resume",
+            host_resume_booking,
+            methods=["POST"],
+        ),
+        Route("/api/v1/host/revenue", host_revenue, methods=["GET"]),
+        Route("/api/v1/host/reviews", host_reviews, methods=["GET"]),
+        Route("/api/v1/host/categories", host_categories, methods=["GET"]),
+        Route("/api/v1/host/experiences", host_experiences_list, methods=["GET"]),
+        Route("/api/v1/host/experiences", host_experience_create, methods=["POST"]),
+        Route(
+            "/api/v1/host/experiences/{experience_id}",
+            host_experience_detail,
+            methods=["GET"],
+        ),
+        Route(
+            "/api/v1/host/experiences/{experience_id}",
+            host_experience_update,
+            methods=["PATCH"],
+        ),
+        Route(
+            "/api/v1/host/experiences/{experience_id}",
+            host_experience_delete,
+            methods=["DELETE"],
+        ),
+        Route(
+            "/api/v1/host/experiences/{experience_id}/slots",
+            host_slot_create,
+            methods=["POST"],
+        ),
+        Route(
+            "/api/v1/host/experiences/{experience_id}/slots/{slot_id}",
+            host_slot_update,
+            methods=["PATCH"],
+        ),
+        Route(
+            "/api/v1/host/experiences/{experience_id}/slots/{slot_id}",
+            host_slot_delete,
+            methods=["DELETE"],
+        ),
+        Route("/api/v1/notifications", notifications_list, methods=["GET"]),
+        Route(
+            "/api/v1/notifications/read-all",
+            notifications_mark_all_read,
+            methods=["POST"],
+        ),
+        Route(
+            "/api/v1/notifications/{notification_id}/read",
+            notification_mark_read,
+            methods=["POST"],
+        ),
         Route(
             "/internal/cron/host-booking-reminders",
             cron_host_booking_reminders,
@@ -86,7 +192,7 @@ app = CORSMiddleware(
     allow_origins=settings.cors_origin_list,
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"],
 )
