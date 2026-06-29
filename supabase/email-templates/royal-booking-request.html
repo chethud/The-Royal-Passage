@@ -1,0 +1,31 @@
+<!--
+  Reference template — production emails are rendered by
+  backend/app/services/royal_email_templates.py (render_royal_booking_request_email).
+
+  Variables: {{GuestName}}, {{ExperienceName}}, {{BookingID}}, {{BookingDate}},
+  {{BookingTime}}, {{Guests}}, {{Venue}}, {{PaymentMethod}}, {{Price}},
+  {{SupportEmail}}, {{SupportPhone}}, {{Website}}
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Booking Request Received — The Royal Passage</title>
+</head>
+<body style="margin:0;padding:0;background:#F7F2E8;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F7F2E8;padding:48px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#FFF;border:1px solid #C79A42;border-radius:12px;">
+        <tr><td style="padding:48px 40px;text-align:center;">
+          <img src="https://the-royal-passage.vercel.app/brand/logo.png" alt="The Royal Passage" height="110" />
+          <p style="font-family:Inter,Arial,sans-serif;font-size:9px;letter-spacing:0.32em;color:#9A8A78;">MYSURU • CURATED ROYAL JOURNEYS</p>
+          <h1 style="font-family:'Cormorant Garamond',Georgia,serif;color:#5C1D1D;">Booking Request Received</h1>
+          <p style="font-family:Inter,Arial,sans-serif;color:#5B4A3B;">Dear {{GuestName}}, thank you for choosing The Royal Passage…</p>
+          <!-- Details + CTA + Concierge + Footer rendered in Python -->
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

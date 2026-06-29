@@ -103,7 +103,8 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         supabase.table("experience_slots")
         .select(
             "*, experiences ( id, title, host_id, price_per_person_minor, currency_code, status, "
-            "min_guests_per_booking, max_guests_per_booking )"
+            "min_guests_per_booking, max_guests_per_booking, hero_image_url, description, "
+            "duration_minutes, address, city, map_link, tagline )"
         )
         .eq("id", payload.slotId)
         .maybe_single()
@@ -181,6 +182,24 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
     from app.services.notifications import create_notification
 
     title = experience.get("title") or "your experience"
+    venue_parts = [experience.get("address"), experience.get("city")]
+    venue = ", ".join(p for p in venue_parts if p) or title
+
+    host_row: dict = {}
+    try:
+        host_result = (
+            supabase.table("hosts")
+            .select("auth_user_id, display_name, email")
+            .eq("id", experience.get("host_id"))
+            .limit(1)
+            .execute()
+        )
+        rows = host_result.data or []
+        host_row = rows[0] if rows else {}
+    except Exception:
+        logger.exception("Failed to load host for booking email %s", booking_id)
+
+    host_display = host_row.get("display_name") or "Heritage Host"
 
     if guest_email:
         try:
@@ -195,6 +214,12 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
                 total_minor=subtotal_minor,
                 currency_code=experience["currency_code"],
                 booking_id=booking_id,
+                experience_description=(experience.get("description") or experience.get("tagline") or ""),
+                experience_image_url=experience.get("hero_image_url") or "",
+                venue=venue,
+                map_link=experience.get("map_link") or "",
+                host_name=host_display,
+                duration_minutes=experience.get("duration_minutes"),
             ):
                 logger.error(
                     "Guest booking email not sent for %s to %s — configure RESEND_API_KEY on Render",
@@ -203,20 +228,6 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
                 )
         except Exception:
             logger.exception("Failed to send guest booking email for %s", booking_id)
-
-    host_row: dict = {}
-    try:
-        host_result = (
-            supabase.table("hosts")
-            .select("auth_user_id, display_name, email")
-            .eq("id", experience.get("host_id"))
-            .limit(1)
-            .execute()
-        )
-        rows = host_result.data or []
-        host_row = rows[0] if rows else {}
-    except Exception:
-        logger.exception("Failed to load host for booking %s", booking_id)
 
     try:
         from app.services.host_booking_reminders import resolve_host_email

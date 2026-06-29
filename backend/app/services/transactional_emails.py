@@ -6,6 +6,11 @@ from datetime import date, datetime
 from app.config import settings
 from app.dependencies.supabase import get_supabase_admin
 from app.services.email import send_email
+from app.services.royal_email_templates import (
+    RoyalBookingRequestContext,
+    format_duration_label,
+    render_royal_booking_request_email,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -168,26 +173,34 @@ def send_experience_booking_requested_email(
     total_minor: int,
     currency_code: str,
     booking_id: str,
+    experience_description: str = "",
+    experience_image_url: str = "",
+    venue: str = "",
+    map_link: str = "",
+    host_name: str = "",
+    duration_minutes: int | None = None,
 ) -> bool:
     amount = _format_amount(total_minor, currency_code)
-    html = _wrap_html(
-        "Booking request received",
-        f"""
-    <p style="line-height: 1.6;">Dear {guest_name or "Guest"},</p>
-    <p style="line-height: 1.6;">We received your booking request for <strong>{experience_title}</strong>.</p>
-    <ul style="line-height: 1.8; padding-left: 20px;">
-      <li>Date: {_format_date(slot_date)}</li>
-      <li>Time: {_format_time(slot_start)} – {_format_time(slot_end)}</li>
-      <li>Guests: {guest_count}</li>
-      <li>Estimated total: {amount} (pay at venue on arrival)</li>
-    </ul>
-    <p style="line-height: 1.6;">Your host will confirm shortly. We will email you again once it is confirmed.</p>
-    <p style="line-height: 1.6;"><a href="{_site_link(f"/bookings/{booking_id}")}" style="color: #7a1f2b;">View booking</a></p>
-    """,
+    ctx = RoyalBookingRequestContext(
+        guest_name=guest_name or "Guest",
+        experience_name=experience_title,
+        booking_id=booking_id,
+        booking_date=_format_date(slot_date),
+        booking_time=_format_time(slot_start),
+        booking_time_end=_format_time(slot_end),
+        guests=guest_count,
+        venue=venue or experience_title,
+        price=amount,
+        payment_method="Pay at Venue",
+        host_name=host_name or "",
+        duration_label=format_duration_label(duration_minutes),
+        experience_description=experience_description or "",
+        experience_image_url=experience_image_url or "",
     )
+    html = render_royal_booking_request_email(ctx)
     return send_email(
         to=to,
-        subject=f"Booking request received — {experience_title}",
+        subject=f"Booking Request Received — {experience_title}",
         html=html,
     )
 
