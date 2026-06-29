@@ -10,20 +10,31 @@ export type { CitySummary };
 
 async function loadCitiesFromDb(): Promise<CitySummary[]> {
   const supabase = getSupabaseAdmin();
-  const { data, error } = await supabase
-    .from("cities")
-    .select("slug, name, region, state, tagline, description")
-    .eq("is_active", true)
-    .order("sort_order");
-  if (error) throw new Error(error.message);
-  return (data ?? []).map((row) => ({
-    slug: row.slug,
-    name: row.name,
-    region: row.region,
-    state: row.state ?? "Karnataka",
-    tagline: row.tagline,
-    description: row.description,
-  }));
+  const columns = "slug, name, region, state, tagline, description";
+
+  const mapRows = (data: unknown) =>
+    ((data as Array<Record<string, unknown>>) ?? []).map((row) => ({
+      slug: String(row.slug),
+      name: String(row.name),
+      region: (row.region as string | null) ?? null,
+      state: (row.state as string | null) ?? "Karnataka",
+      tagline: (row.tagline as string | null) ?? null,
+      description: (row.description as string | null) ?? null,
+    }));
+
+  try {
+    const { data, error } = await supabase
+      .from("cities")
+      .select(columns)
+      .eq("is_active", true)
+      .order("sort_order");
+    if (error) throw new Error(error.message);
+    return mapRows(data);
+  } catch {
+    const { data, error } = await supabase.from("cities").select(columns).order("slug");
+    if (error) throw new Error(error.message);
+    return mapRows(data);
+  }
 }
 
 export const listCities = createServerFn({ method: "GET" }).handler(async (): Promise<CitySummary[]> => {

@@ -145,11 +145,12 @@ def get_owner_dashboard(auth: dict) -> OwnerDashboardStats:
 
     published_result = (
         supabase.table("homestays")
-        .select("id", count="exact")
+        .select("id")
         .eq("owner_id", owner_id)
         .eq("status", "published")
         .execute()
     )
+    published_count = len(published_result.data or [])
 
     return OwnerDashboardStats(
         pendingBookings=pending,
@@ -159,7 +160,7 @@ def get_owner_dashboard(auth: dict) -> OwnerDashboardStats:
         revenuePendingMinor=pending_revenue,
         upcomingBookings=upcoming,
         checkInToday=check_in_today,
-        publishedHomestays=published_result.count or 0,
+        publishedHomestays=published_count,
         totalBookings=len(bookings),
     )
 

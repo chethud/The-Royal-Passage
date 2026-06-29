@@ -1,6 +1,7 @@
 PROFILE_SELECT = (
     "role, full_name, phone, avatar_url, date_of_birth, host_id, homestay_owner_id, created_at"
 )
+PROFILE_SELECT_LEGACY = "role, full_name, phone, avatar_url, date_of_birth, host_id, created_at"
 
 
 def _profile_name_from_user(user) -> str | None:
@@ -19,14 +20,24 @@ def _profile_phone_from_user(user) -> str | None:
 
 
 def fetch_profile_row(supabase, user_id: str) -> dict | None:
-    result = (
-        supabase.table("profiles")
-        .select(PROFILE_SELECT)
-        .eq("id", user_id)
-        .maybe_single()
-        .execute()
-    )
-    return result.data if result else None
+    try:
+        result = (
+            supabase.table("profiles")
+            .select(PROFILE_SELECT)
+            .eq("id", user_id)
+            .maybe_single()
+            .execute()
+        )
+        return result.data if result else None
+    except Exception:
+        result = (
+            supabase.table("profiles")
+            .select(PROFILE_SELECT_LEGACY)
+            .eq("id", user_id)
+            .maybe_single()
+            .execute()
+        )
+        return result.data if result else None
 
 
 def ensure_user_profile(supabase, user) -> dict:

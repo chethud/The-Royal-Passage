@@ -1,5 +1,9 @@
 -- =============================================================================
--- The Royal Passage — COMPLETE database schema (single file — run all of this)
+-- The Royal Passage — CORE database schema (experiences, bookings, guests, hosts)
+-- =============================================================================
+-- For the COMPLETE schema (homestay + VIP + membership + passport numbers), use:
+--   FULL_SCHEMA.sql  (repo root)  OR  supabase/FULL_SCHEMA.sql
+-- Run that single file in Supabase SQL Editor for a full production install.
 -- =============================================================================
 -- HOW TO USE (fresh or existing Supabase project):
 --   1. Supabase Dashboard → SQL Editor → New query
