@@ -4,7 +4,6 @@ import { Footer } from "@/components/site/Footer";
 import { HomestaysHomeHero } from "@/components/homestays/HomestaysHomeHero";
 import { HomestaysShowcase } from "@/components/site/HomestaysShowcase";
 import { HomestayPillarsRow } from "@/components/homestays/HomestayPillarsRow";
-import { HomestayHowItWorks } from "@/components/homestays/HomestayHowItWorks";
 import { getHomestaysForUi } from "@/lib/homestay-fns";
 import { canonicalLink } from "@/lib/seo-helpers";
 import { SITE_URL } from "@/lib/seo";
@@ -45,7 +44,6 @@ function HomestaysHomePage() {
       <HomestaysHomeHero />
       <HomestaysShowcase homestays={homestays} />
       <HomestayPillarsRow />
-      <HomestayHowItWorks />
       <Footer />
     </div>
   );

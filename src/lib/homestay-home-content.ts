@@ -119,27 +119,3 @@ export const HOMESTAY_PILLARS: HomestayPillar[] = [
     description: "Meet families and caretakers who treat you as a guest, not a room number.",
   },
 ];
-
-export type HomestayHowItWorksStep = {
-  step: string;
-  title: string;
-  description: string;
-};
-
-export const HOMESTAY_HOW_IT_WORKS: HomestayHowItWorksStep[] = [
-  {
-    step: "01",
-    title: "Search & compare",
-    description: "Pick your dates and guest count — browse vetted Mysuru stays with clear nightly rates.",
-  },
-  {
-    step: "02",
-    title: "Reserve your stay",
-    description: "Confirm your booking in minutes. You'll receive details and host contact before arrival.",
-  },
-  {
-    step: "03",
-    title: "Check in & pay cash",
-    description: "Arrive at the homestay and pay your host in cash at check-in. No online payment required.",
-  },
-];
