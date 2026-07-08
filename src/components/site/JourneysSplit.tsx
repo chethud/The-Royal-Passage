@@ -56,34 +56,36 @@ type SlideContentProps = {
 
 function SlideContent({ slide, visible }: SlideContentProps) {
   return (
-    <div className={`royal-slide-content relative flex flex-col justify-center px-7 py-12 sm:px-12 sm:py-16 md:px-16 md:py-20 ${visible ? "is-visible" : ""}`}>
-      <PalaceArchFrame className="pointer-events-none absolute top-6 right-8 left-8 z-10 h-8 opacity-70 sm:top-8" />
+    <div
+      className={`royal-slide-content relative order-2 flex flex-col justify-center px-5 py-8 sm:px-12 sm:py-16 md:order-1 md:px-16 md:py-20 ${visible ? "is-visible" : ""}`}
+    >
+      <PalaceArchFrame className="pointer-events-none absolute top-4 right-5 left-5 z-10 h-7 opacity-70 sm:top-8 sm:right-8 sm:left-8 sm:h-8" />
 
-      <div className="pointer-events-none absolute top-8 left-7 z-10 opacity-35 sm:top-10 sm:left-10 md:left-12">
+      <div className="pointer-events-none absolute top-6 left-5 z-10 opacity-35 sm:top-10 sm:left-10 md:left-12">
         {slide.theme === "manuscript" ? (
-          <HeritageCompass className="h-16 w-16 text-[#D4AF37]/40 sm:h-20 sm:w-20" />
+          <HeritageCompass className="h-12 w-12 text-[#D4AF37]/40 sm:h-20 sm:w-20" />
         ) : (
-          <MaharajaEmblem className="h-14 w-14 text-[#D4AF37]/35 sm:h-20 sm:w-20" />
+          <MaharajaEmblem className="h-12 w-12 text-[#D4AF37]/35 sm:h-20 sm:w-20" />
         )}
       </div>
 
-      <p className="royal-slide-eyebrow relative z-10 mb-4 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-[#C9A227] sm:text-[0.68rem]">
+      <p className="royal-slide-eyebrow relative z-10 mb-3 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-[#C9A227] sm:mb-4 sm:text-[0.68rem]">
         {slide.subtitle}
       </p>
 
-      <div className="royal-slide-line royal-slide-line--top relative z-10 mb-5 h-px w-28 bg-gradient-to-r from-[#D4AF37] via-[#C9A227] to-transparent" aria-hidden />
+      <div className="royal-slide-line royal-slide-line--top relative z-10 mb-4 h-px w-28 bg-gradient-to-r from-[#D4AF37] via-[#C9A227] to-transparent sm:mb-5" aria-hidden />
 
-      <h2 className="royal-slide-title font-display text-[1.65rem] leading-[1.12] tracking-[0.06em] text-balance sm:text-4xl md:text-[2.65rem]">
+      <h2 className="royal-slide-title font-display text-[1.45rem] leading-[1.12] tracking-[0.06em] text-balance sm:text-4xl md:text-[2.65rem]">
         {slide.title}
       </h2>
 
-      <div className="royal-slide-line royal-slide-line--mid relative z-10 my-5 h-px max-w-md bg-gradient-to-r from-[#D4AF37]/60 via-[#C9A227]/25 to-transparent" aria-hidden />
+      <div className="royal-slide-line royal-slide-line--mid relative z-10 my-4 h-px max-w-md bg-gradient-to-r from-[#D4AF37]/60 via-[#C9A227]/25 to-transparent sm:my-5" aria-hidden />
 
-      <div className="relative z-10 space-y-3">
+      <div className="relative z-10 space-y-2.5 sm:space-y-3">
         {slide.lines.map((line, lineIndex) => (
           <p
             key={line}
-            className="royal-slide-line max-w-md text-sm leading-[1.9] text-[#F8F4E8]/75 text-balance sm:text-[0.95rem]"
+            className="royal-slide-line max-w-md text-sm leading-[1.75] text-[#F8F4E8]/75 text-balance sm:text-[0.95rem] sm:leading-[1.9]"
             style={{ "--line-delay": `${0.55 + lineIndex * 0.12}s` } as React.CSSProperties}
           >
             {line}
@@ -121,7 +123,7 @@ function SlideMedia({
   };
 
   return (
-    <div className="royal-slide-media relative min-h-[320px] overflow-hidden bg-black md:min-h-[480px]">
+    <div className="royal-slide-media relative order-1 aspect-video w-full min-h-[220px] overflow-hidden bg-black md:order-2 md:aspect-auto md:min-h-[480px]">
       <div
         className={`royal-slide-video absolute inset-0 z-[1] ${isActive && !reducedMotion ? "royal-slider-ken-burns" : ""}`}
       >
@@ -141,7 +143,7 @@ function SlideMedia({
         src={logoUrl}
         alt=""
         aria-hidden
-        className="pointer-events-none absolute top-3 left-1 z-[3] h-20 w-auto max-w-[min(56vw,12.5rem)] origin-left -translate-x-0.5 object-contain object-left drop-shadow-[0_0_24px_oklch(0.75_0.12_86_/_0.5)] sm:top-4 sm:left-1.5 sm:h-28 sm:max-w-none md:left-2 md:h-32"
+        className="pointer-events-none absolute top-2 left-1 z-[3] h-14 w-auto max-w-[min(42vw,9rem)] origin-left -translate-x-0.5 object-contain object-left drop-shadow-[0_0_24px_oklch(0.75_0.12_86_/_0.5)] sm:top-4 sm:left-1.5 sm:h-28 sm:max-w-none md:left-2 md:h-32"
       />
 
       {editable && isActive && onVideoIdChange ? (
@@ -339,14 +341,16 @@ export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesCh
             <CornerFiligree className="pointer-events-none absolute bottom-3 left-3 z-40 h-10 w-10 -rotate-90 sm:h-12 sm:w-12" />
             <CornerFiligree className="pointer-events-none absolute right-3 bottom-3 z-40 h-10 w-10 rotate-180 sm:h-12 sm:w-12" />
 
-            <div className="relative min-h-[520px] md:min-h-[480px]">
+            <div className="relative md:min-h-[480px]">
               {slides.map((item, index) => {
                 const isActive = index === activeIndex;
                 return (
                   <div
                     key={item.id}
-                    className={`royal-slide-layer absolute inset-0 grid grid-cols-1 transition-opacity duration-500 md:grid-cols-2 ${
-                      isActive ? "z-10 opacity-100" : "z-0 opacity-0"
+                    className={`royal-slide-layer grid grid-cols-1 transition-opacity duration-500 md:absolute md:inset-0 md:grid-cols-2 ${
+                      isActive
+                        ? "relative z-10 opacity-100"
+                        : "pointer-events-none absolute inset-0 z-0 h-0 overflow-hidden opacity-0 md:h-auto md:overflow-visible"
                     }`}
                     aria-hidden={!isActive}
                   >
