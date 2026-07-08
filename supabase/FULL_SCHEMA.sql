@@ -1179,9 +1179,9 @@ create table if not exists public.homestays (
   tagline text,
   description text,
   property_type text not null check (property_type in (
-    'Villa', 'Resort', 'Cottage', 'Farm House', 'Apartment',
-    'Home Stay', 'Guest House', 'Luxury Stay'
+    'Home Stay', 'Resort', 'Hotel'
   )),
+  license_certificate_url text,
   city_slug text references public.cities (slug),
   city text not null,
   region text,
@@ -1201,6 +1201,7 @@ create table if not exists public.homestays (
   max_guests integer not null default 2,
   extra_bed_available boolean not null default false,
   extra_bed_price_per_night_minor integer not null default 0,
+  weekend_extra_bed_price_per_night_minor integer not null default 0,
   extra_beds_per_room integer not null default 1 check (extra_beds_per_room in (1, 2)),
   rating_avg numeric(3,2) not null default 0,
   reviews_count integer not null default 0,
@@ -1230,6 +1231,7 @@ create table if not exists public.homestay_rooms (
   total_units integer not null default 1,
   extra_bed_available boolean not null default false,
   extra_bed_price_per_night_minor integer not null default 0,
+  weekend_extra_bed_price_per_night_minor integer not null default 0,
   extra_beds_per_room integer not null default 1 check (extra_beds_per_room in (1, 2)),
   amenities text[] not null default '{}',
   sort_order integer not null default 0,
@@ -1335,6 +1337,8 @@ alter table public.homestay_rooms
   add column if not exists extra_bed_available boolean not null default false;
 alter table public.homestay_rooms
   add column if not exists extra_bed_price_per_night_minor integer not null default 0;
+alter table public.homestay_rooms
+  add column if not exists weekend_extra_bed_price_per_night_minor integer not null default 0;
 alter table public.homestay_bookings
   add column if not exists room_count integer not null default 1;
 alter table public.homestay_bookings
@@ -1344,6 +1348,8 @@ alter table public.homestays
   add column if not exists extra_bed_available boolean not null default false;
 alter table public.homestays
   add column if not exists extra_bed_price_per_night_minor integer not null default 0;
+alter table public.homestays
+  add column if not exists weekend_extra_bed_price_per_night_minor integer not null default 0;
 alter table public.homestays
   add column if not exists extra_beds_per_room integer not null default 1;
 alter table public.homestay_rooms
@@ -1388,7 +1394,7 @@ insert into public.homestays (
     'Chamundi Hills Villa',
     'Palace views, gardens, and quiet mornings',
     'A serene villa at the Chamundi foothills with terraced gardens, glimpses of the palace skyline, and hosts who know every corner of Mysuru.',
-    'Villa', 'mysuru', 'Mysuru', 'Karnataka', 'Chamundi Hill Road, Mysuru',
+    'Resort', 'mysuru', 'Mysuru', 'Karnataka', 'Chamundi Hill Road, Mysuru',
     array['WiFi', 'Kitchen', 'Garden', 'Parking', 'Breakfast', 'AC'],
     array[]::text[],
     '15:00', '11:00',
@@ -1406,7 +1412,7 @@ insert into public.homestays (
     'Royal Passage Guest House',
     'Boutique rooms curated for discerning travellers',
     'A small guest house with Royal Passage hospitality standards â€” premium linens, local art, and concierge support for experiences and dining.',
-    'Guest House', 'mysuru', 'Mysuru', 'Karnataka', 'Saraswathipuram, Mysuru',
+    'Hotel', 'mysuru', 'Mysuru', 'Karnataka', 'Saraswathipuram, Mysuru',
     array['WiFi', 'AC', 'TV', 'Security', 'Breakfast', 'Parking'],
     array[]::text[],
     '13:00', '10:00',
@@ -1433,14 +1439,15 @@ on conflict (id) do update set
 
 insert into public.homestay_rooms (
   id, homestay_id, name, category, capacity, price_per_night_minor, total_units,
-  extra_bed_available, extra_bed_price_per_night_minor, sort_order
+  extra_bed_available, extra_bed_price_per_night_minor, weekend_extra_bed_price_per_night_minor, sort_order
 ) values
-  ('c0000001-0000-4000-8000-000000000001', 'b0000001-0000-4000-8000-000000000001', 'Courtyard Suite', 'Suite', 2, 450000, 2, true, 80000, 0),
-  ('c0000002-0000-4000-8000-000000000002', 'b0000002-0000-4000-8000-000000000002', 'Garden View Suite', 'Suite', 2, 620000, 3, true, 100000, 0),
-  ('c0000003-0000-4000-8000-000000000003', 'b0000003-0000-4000-8000-000000000003', 'Deluxe Double', 'Deluxe', 2, 380000, 4, false, 0, 0)
+  ('c0000001-0000-4000-8000-000000000001', 'b0000001-0000-4000-8000-000000000001', 'Courtyard Suite', 'Suite', 2, 450000, 2, true, 80000, 80000, 0),
+  ('c0000002-0000-4000-8000-000000000002', 'b0000002-0000-4000-8000-000000000002', 'Garden View Suite', 'Suite', 2, 620000, 3, true, 100000, 100000, 0),
+  ('c0000003-0000-4000-8000-000000000003', 'b0000003-0000-4000-8000-000000000003', 'Deluxe Double', 'Deluxe', 2, 380000, 4, false, 0, 0, 0)
 on conflict (id) do update set
   extra_bed_available = excluded.extra_bed_available,
-  extra_bed_price_per_night_minor = excluded.extra_bed_price_per_night_minor;
+  extra_bed_price_per_night_minor = excluded.extra_bed_price_per_night_minor,
+  weekend_extra_bed_price_per_night_minor = excluded.weekend_extra_bed_price_per_night_minor;
 
 
 -- =============================================================================

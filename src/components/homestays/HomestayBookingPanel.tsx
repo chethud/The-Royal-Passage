@@ -1,6 +1,6 @@
 import { PayAtHomestayBadge } from "@/components/homestays/PayAtHomestayBadge";
+import { HomestayDateCalendar } from "@/components/homestays/HomestayDateCalendar";
 import {
-  BookingFieldGrid,
   BookingFieldLabel,
   BookingIntro,
   BookingNotesField,
@@ -10,7 +10,6 @@ import {
   BookingStepperGroup,
   BookingTotalSummary,
   bookingOptionCardClass,
-  bookingPanelFieldClass,
 } from "@/components/booking/BookingPanelPrimitives";
 import type { Homestay } from "@/data/homestays";
 import { formatDateLong } from "@/lib/date-format";
@@ -19,7 +18,12 @@ import {
   weekdayPriceMajor,
   weekendPriceMajor,
 } from "@/lib/homestay-day-pricing";
-import { getActiveRooms, extraBedsPerRoomForSelection } from "@/lib/homestay-room-pricing";
+import {
+  getActiveRooms,
+  extraBedsPerRoomForSelection,
+  weekdayExtraBedPriceMajor,
+  weekendExtraBedPriceMajor,
+} from "@/lib/homestay-room-pricing";
 import { formatMoney } from "@/lib/money";
 import { formatTime12h } from "@/lib/weekday-slots";
 
@@ -79,7 +83,6 @@ export function HomestayBookingPanel({
   bookable = true,
 }: HomestayBookingPanelProps) {
   const sym = stay.currencySymbol ?? "₹";
-  const today = new Date().toISOString().slice(0, 10);
   const rooms = getActiveRooms(stay);
   const selectedRoom = rooms.find((room) => room.id === roomId) ?? (rooms.length === 1 ? rooms[0] : undefined);
   const rateLabel = formatWeekdayWeekendRates(
@@ -87,7 +90,9 @@ export function HomestayBookingPanel({
     weekdayPriceMajor(stay, selectedRoom),
     weekendPriceMajor(stay, selectedRoom),
   );
-  const extraBedPrice = selectedRoom?.extraBedPricePerNight ?? stay.extraBedPricePerNight ?? 0;
+  const extraBedWeekdayPrice = weekdayExtraBedPriceMajor(stay, selectedRoom);
+  const extraBedWeekendPrice = weekendExtraBedPriceMajor(stay, selectedRoom);
+  const extraBedRateLabel = formatWeekdayWeekendRates(sym, extraBedWeekdayPrice, extraBedWeekendPrice);
   const extraBedsPerRoom = extraBedsPerRoomForSelection(stay, selectedRoom);
   const showExtraBeds = maxExtraBeds > 0;
   const extraBedUnit = selectedRoom || getActiveRooms(stay).length > 0 ? "room" : "bedroom";
@@ -98,28 +103,22 @@ export function HomestayBookingPanel({
         Check-in from {formatTime12h(stay.checkInTime)} · Check-out by {formatTime12h(stay.checkOutTime)}
       </BookingIntro>
 
-      <BookingFieldGrid>
-        <label className="block">
-          <BookingFieldLabel>Check-in</BookingFieldLabel>
-          <input
-            type="date"
-            min={today}
-            value={checkIn}
-            onChange={(event) => onCheckInChange(event.target.value)}
-            className={bookingPanelFieldClass}
-          />
-        </label>
-        <label className="block">
-          <BookingFieldLabel>Check-out</BookingFieldLabel>
-          <input
-            type="date"
-            min={checkIn}
-            value={checkOut}
-            onChange={(event) => onCheckOutChange(event.target.value)}
-            className={bookingPanelFieldClass}
-          />
-        </label>
-      </BookingFieldGrid>
+      <div>
+        <BookingFieldLabel>Select dates on the calendar</BookingFieldLabel>
+        <p className="luxury-panel-body mb-3 mt-1 text-xs leading-relaxed">
+          Weekends and holiday prices are marked. Tap check-in, then check-out to book those nights.
+        </p>
+        <HomestayDateCalendar
+          checkIn={checkIn}
+          checkOut={checkOut}
+          datePrices={stay.datePrices}
+          currencySymbol={sym}
+          onRangeChange={(nextCheckIn, nextCheckOut) => {
+            onCheckInChange(nextCheckIn);
+            onCheckOutChange(nextCheckOut);
+          }}
+        />
+      </div>
 
       {rooms.length > 1 ? (
         <div className="space-y-3">
@@ -143,7 +142,11 @@ export function HomestayBookingPanel({
                       weekendPriceMajor(stay, room),
                     )}
                     {room.extraBedAvailable
-                      ? ` · extra bed ${sym}${room.extraBedPricePerNight.toLocaleString("en-IN")}/night`
+                      ? ` · extra bed ${formatWeekdayWeekendRates(
+                          sym,
+                          weekdayExtraBedPriceMajor(stay, room),
+                          weekendExtraBedPriceMajor(stay, room),
+                        )}`
                       : ""}
                   </span>
                 </button>
@@ -177,7 +180,7 @@ export function HomestayBookingPanel({
         {showExtraBeds ? (
           <BookingStepper
             label="Extra beds"
-            hint={`${sym}${extraBedPrice.toLocaleString("en-IN")}/night each · up to ${extraBedsPerRoom} per ${extraBedUnit} (${maxExtraBeds} max)`}
+            hint={`${extraBedRateLabel} each · up to ${extraBedsPerRoom} per ${extraBedUnit} (${maxExtraBeds} max)`}
             value={extraBedCount}
             min={0}
             max={maxExtraBeds}
@@ -199,7 +202,7 @@ export function HomestayBookingPanel({
           <>
             {rateLabel} × {roomCount} room{roomCount === 1 ? "" : "s"}
             {extraBedCount > 0
-              ? ` + ${sym}${extraBedPrice.toLocaleString("en-IN")} × ${extraBedCount} extra bed${extraBedCount === 1 ? "" : "s"}`
+              ? ` + ${extraBedRateLabel} × ${extraBedCount} extra bed${extraBedCount === 1 ? "" : "s"}`
               : ""}{" "}
             × {nights} night{nights === 1 ? "" : "s"}
           </>

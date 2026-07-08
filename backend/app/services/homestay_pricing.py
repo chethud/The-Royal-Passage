@@ -33,6 +33,7 @@ def stay_subtotal_minor(
     weekend_minor: int | None,
     room_count: int,
     extra_bed_minor: int,
+    weekend_extra_bed_minor: int | None,
     extra_bed_count: int,
     price_overrides: dict[str, int] | None = None,
 ) -> int:
@@ -40,6 +41,7 @@ def stay_subtotal_minor(
     day = check_in
     while day < check_out:
         nightly = night_rate_minor(day, weekday_minor, weekend_minor, price_overrides)
-        total += nightly * room_count + extra_bed_minor * extra_bed_count
+        extra_nightly = resolve_weekend_price_minor(extra_bed_minor, weekend_extra_bed_minor) if is_weekend(day) else extra_bed_minor
+        total += nightly * room_count + extra_nightly * extra_bed_count
         day += timedelta(days=1)
     return total

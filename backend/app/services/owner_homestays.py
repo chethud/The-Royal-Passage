@@ -17,14 +17,9 @@ from app.models.schemas import (
 from app.services.cities import get_city_by_slug
 
 VALID_PROPERTY_TYPES = {
-    "Villa",
-    "Resort",
-    "Cottage",
-    "Farm House",
-    "Apartment",
     "Home Stay",
-    "Guest House",
-    "Luxury Stay",
+    "Resort",
+    "Hotel",
 }
 
 HOMESTAY_SELECT = "*"
@@ -93,7 +88,14 @@ def _resolve_city_fields(city_slug: str, city_override: str | None = None) -> tu
 
 def _validate_property_type(value: str) -> None:
     if value not in VALID_PROPERTY_TYPES:
-        raise ValueError("Invalid property type.")
+        raise ValueError("Invalid property type. Choose Home Stay, Resort, or Hotel.")
+
+
+def _validate_license_certificate_url(url: str) -> str:
+    trimmed = (url or "").strip()
+    if not trimmed.startswith("http://") and not trimmed.startswith("https://"):
+        raise ValueError("Upload a valid property certificate or license document.")
+    return trimmed
 
 
 def _fetch_owner_homestay_row(supabase, homestay_id: str, owner_id: str) -> dict:
@@ -153,6 +155,11 @@ def _map_room(row: dict) -> OwnerHomestayRoom:
         isActive=bool(row.get("is_active", True)),
         extraBedAvailable=bool(row.get("extra_bed_available", False)),
         extraBedPricePerNightMinor=int(row.get("extra_bed_price_per_night_minor") or 0),
+        extraBedWeekendPricePerNightMinor=int(
+            row.get("weekend_extra_bed_price_per_night_minor")
+            or row.get("extra_bed_price_per_night_minor")
+            or 0
+        ),
         extraBedsPerRoom=_extra_beds_per_room(row.get("extra_beds_per_room")),
     )
 
@@ -203,7 +210,13 @@ def _map_owner_homestay(row: dict, rooms: list[dict], availability: list[dict]) 
         updatedAt=row.get("updated_at", ""),
         extraBedAvailable=bool(row.get("extra_bed_available", False)),
         extraBedPricePerNightMinor=int(row.get("extra_bed_price_per_night_minor") or 0),
+        extraBedWeekendPricePerNightMinor=int(
+            row.get("weekend_extra_bed_price_per_night_minor")
+            or row.get("extra_bed_price_per_night_minor")
+            or 0
+        ),
         extraBedsPerRoom=_extra_beds_per_room(row.get("extra_beds_per_room")),
+        licenseCertificateUrl=row.get("license_certificate_url"),
     )
 
 
@@ -279,6 +292,7 @@ def create_owner_homestay(auth: dict, payload: CreateOwnerHomestayRequest) -> Ow
     supabase = get_supabase_admin()
     owner_id = _resolve_owner_id(auth)
     _validate_property_type(payload.propertyType)
+    license_url = _validate_license_certificate_url(payload.licenseCertificateUrl)
 
     slug = _ensure_unique_slug(supabase, payload.slug or _slugify(payload.title))
     status = "pending_review" if payload.submitForReview else "draft"
@@ -314,7 +328,13 @@ def create_owner_homestay(auth: dict, payload: CreateOwnerHomestayRequest) -> Ow
         "currency_code": "INR",
         "extra_bed_available": payload.extraBedAvailable,
         "extra_bed_price_per_night_minor": payload.extraBedPricePerNightMinor if payload.extraBedAvailable else 0,
+        "weekend_extra_bed_price_per_night_minor": (
+            payload.extraBedWeekendPricePerNightMinor
+            if payload.extraBedAvailable
+            else 0
+        ),
         "extra_beds_per_room": _extra_beds_per_room(payload.extraBedsPerRoom) if payload.extraBedAvailable else 1,
+        "license_certificate_url": license_url,
     }
     if payload.mapLink and payload.mapLink.strip():
         insert_row["map_link"] = payload.mapLink.strip()
@@ -396,12 +416,24 @@ def update_owner_homestay(
         updates["extra_bed_available"] = payload.extraBedAvailable
         if not payload.extraBedAvailable:
             updates["extra_bed_price_per_night_minor"] = 0
+            updates["weekend_extra_bed_price_per_night_minor"] = 0
     if payload.extraBedPricePerNightMinor is not None:
         updates["extra_bed_price_per_night_minor"] = payload.extraBedPricePerNightMinor
+    if payload.extraBedWeekendPricePerNightMinor is not None:
+        updates["weekend_extra_bed_price_per_night_minor"] = (
+            payload.extraBedWeekendPricePerNightMinor
+        )
     if payload.extraBedsPerRoom is not None:
         updates["extra_beds_per_room"] = _extra_beds_per_room(payload.extraBedsPerRoom)
+    if payload.licenseCertificateUrl is not None:
+        updates["license_certificate_url"] = _validate_license_certificate_url(
+            payload.licenseCertificateUrl
+        )
 
     if payload.submitForReview and status in ("draft", "rejected"):
+        license_url = updates.get("license_certificate_url") or row.get("license_certificate_url")
+        if not license_url:
+            raise ValueError("Upload a property certificate or license before submitting for review.")
         updates["status"] = "pending_review"
 
     if updates:
@@ -458,6 +490,11 @@ def create_owner_homestay_room(
             "sort_order": payload.sortOrder,
             "extra_bed_available": payload.extraBedAvailable,
             "extra_bed_price_per_night_minor": payload.extraBedPricePerNightMinor,
+            "weekend_extra_bed_price_per_night_minor": (
+                payload.extraBedWeekendPricePerNightMinor
+                if payload.extraBedAvailable
+                else 0
+            ),
             "extra_beds_per_room": _extra_beds_per_room(payload.extraBedsPerRoom) if payload.extraBedAvailable else 1,
         }
     ).execute()
@@ -505,8 +542,15 @@ def update_owner_homestay_room(
         updates["is_active"] = payload.isActive
     if payload.extraBedAvailable is not None:
         updates["extra_bed_available"] = payload.extraBedAvailable
+        if not payload.extraBedAvailable:
+            updates["extra_bed_price_per_night_minor"] = 0
+            updates["weekend_extra_bed_price_per_night_minor"] = 0
     if payload.extraBedPricePerNightMinor is not None:
         updates["extra_bed_price_per_night_minor"] = payload.extraBedPricePerNightMinor
+    if payload.extraBedWeekendPricePerNightMinor is not None:
+        updates["weekend_extra_bed_price_per_night_minor"] = (
+            payload.extraBedWeekendPricePerNightMinor
+        )
     if payload.extraBedsPerRoom is not None:
         updates["extra_beds_per_room"] = _extra_beds_per_room(payload.extraBedsPerRoom)
 

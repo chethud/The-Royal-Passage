@@ -41,9 +41,9 @@ create table if not exists public.homestays (
   tagline text,
   description text,
   property_type text not null check (property_type in (
-    'Villa', 'Resort', 'Cottage', 'Farm House', 'Apartment',
-    'Home Stay', 'Guest House', 'Luxury Stay'
+    'Home Stay', 'Resort', 'Hotel'
   )),
+  license_certificate_url text,
   city_slug text references public.cities (slug),
   city text not null,
   region text,
@@ -63,6 +63,7 @@ create table if not exists public.homestays (
   max_guests integer not null default 2,
   extra_bed_available boolean not null default false,
   extra_bed_price_per_night_minor integer not null default 0,
+  weekend_extra_bed_price_per_night_minor integer not null default 0,
   extra_beds_per_room integer not null default 1 check (extra_beds_per_room in (1, 2)),
   rating_avg numeric(3,2) not null default 0,
   reviews_count integer not null default 0,
@@ -91,6 +92,7 @@ create table if not exists public.homestay_rooms (
   total_units integer not null default 1,
   extra_bed_available boolean not null default false,
   extra_bed_price_per_night_minor integer not null default 0,
+  weekend_extra_bed_price_per_night_minor integer not null default 0,
   extra_beds_per_room integer not null default 1 check (extra_beds_per_room in (1, 2)),
   amenities text[] not null default '{}',
   sort_order integer not null default 0,

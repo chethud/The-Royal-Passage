@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
 import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import type { CitySummary } from "@/lib/cities";
@@ -8,6 +8,8 @@ import {
   type OwnerHomestayDetail,
   type UpdateOwnerHomestayPayload,
 } from "@/lib/api/owner-homestays";
+import { uploadHomestayLicenseCertificate } from "@/lib/homestay-license-upload";
+import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
 type OwnerHomestayFormProps = {
   cities: CitySummary[];
@@ -41,7 +43,12 @@ export function OwnerHomestayForm({
   const [title, setTitle] = useState(initial?.title ?? "");
   const [tagline, setTagline] = useState(initial?.tagline ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
-  const [propertyType, setPropertyType] = useState(initial?.propertyType ?? "Home Stay");
+  const [propertyType, setPropertyType] = useState(() => {
+    const initialType = initial?.propertyType;
+    return HOMESTAY_PROPERTY_TYPES.includes(initialType as (typeof HOMESTAY_PROPERTY_TYPES)[number])
+      ? (initialType as (typeof HOMESTAY_PROPERTY_TYPES)[number])
+      : "Home Stay";
+  });
   const [citySlug, setCitySlug] = useState(initial?.citySlug ?? cities[0]?.slug ?? "");
   const [region, setRegion] = useState(initial?.region ?? "");
   const [address, setAddress] = useState(initial?.address ?? "");
@@ -70,14 +77,43 @@ export function OwnerHomestayForm({
   const [extraBedPriceMajor, setExtraBedPriceMajor] = useState(
     Math.round((initial?.extraBedPricePerNightMinor ?? 0) / 100) || 0,
   );
+  const [extraBedWeekendPriceMajor, setExtraBedWeekendPriceMajor] = useState(
+    Math.round(
+      (initial?.extraBedWeekendPricePerNightMinor ?? initial?.extraBedPricePerNightMinor ?? 0) / 100,
+    ) || 0,
+  );
   const [extraBedsPerRoom, setExtraBedsPerRoom] = useState<1 | 2>(
     (initial?.extraBedsPerRoom ?? 1) >= 2 ? 2 : 1,
   );
+  const [licenseCertificateUrl, setLicenseCertificateUrl] = useState(
+    initial?.licenseCertificateUrl ?? "",
+  );
+  const [uploadingLicense, setUploadingLicense] = useState(false);
+  const [licenseError, setLicenseError] = useState<string | null>(null);
   const [submitForReview, setSubmitForReview] = useState(false);
+  const licenseInputRef = useRef<HTMLInputElement>(null);
   const bedroomCount = Number.parseInt(bedrooms, 10) || 1;
+  const uploadAvailable = isSupabaseBrowserConfigured();
+
+  const handleLicenseSelect = async (file: File) => {
+    setLicenseError(null);
+    setUploadingLicense(true);
+    try {
+      const url = await uploadHomestayLicenseCertificate(file);
+      setLicenseCertificateUrl(url);
+    } catch (err) {
+      setLicenseError(err instanceof Error ? err.message : "Failed to upload certificate.");
+    } finally {
+      setUploadingLicense(false);
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!licenseCertificateUrl.trim()) {
+      setLicenseError("Upload a certificate or license for this property.");
+      return;
+    }
     const galleryUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
     const payload = {
       title: title.trim(),
@@ -100,7 +136,9 @@ export function OwnerHomestayForm({
       checkOutTime,
       extraBedAvailable,
       extraBedPricePerNightMinor: extraBedAvailable ? extraBedPriceMajor * 100 : 0,
+      extraBedWeekendPricePerNightMinor: extraBedAvailable ? extraBedWeekendPriceMajor * 100 : 0,
       extraBedsPerRoom: extraBedAvailable ? extraBedsPerRoom : 1,
+      licenseCertificateUrl: licenseCertificateUrl.trim(),
       submitForReview,
     };
     await onSubmit(payload);
@@ -306,13 +344,23 @@ export function OwnerHomestayForm({
           </label>
           {extraBedAvailable ? (
             <div className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-3">
                 <label className="block">
-                  <span className={labelClass}>Extra bed price / night (₹)</span>
+                  <span className={labelClass}>Extra bed weekday price (₹)</span>
                   <RupeeAmountInput
                     className={inputClass}
                     value={extraBedPriceMajor}
                     onChange={setExtraBedPriceMajor}
+                    disabled={disabled || saving}
+                    required
+                  />
+                </label>
+                <label className="block">
+                  <span className={labelClass}>Extra bed weekend price (₹)</span>
+                  <RupeeAmountInput
+                    className={inputClass}
+                    value={extraBedWeekendPriceMajor}
+                    onChange={setExtraBedWeekendPriceMajor}
                     disabled={disabled || saving}
                     required
                   />
@@ -359,6 +407,61 @@ export function OwnerHomestayForm({
             hint=""
             photoAltPrefix="Homestay photo"
           />
+        </div>
+      </section>
+
+      <div className="hairline" />
+
+      <section className={sectionClass}>
+        <div>
+          <h2 className={sectionHeadingClass}>Certificate / license</h2>
+          <p className="luxury-panel-body mt-2 text-xs leading-relaxed">
+            Upload a clear photo of your property registration certificate, trade license, or hotel
+            license. Required for every listing.
+          </p>
+        </div>
+        <div className="rounded-sm border border-[rgb(74_0_0/0.15)] bg-[rgb(255_255_255/0.35)] p-4 sm:p-5">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              disabled={disabled || saving || uploadingLicense || !uploadAvailable}
+              onClick={() => licenseInputRef.current?.click()}
+              className="luxury-btn-sm luxury-btn-panel-outline"
+            >
+              {uploadingLicense
+                ? "Uploading…"
+                : licenseCertificateUrl
+                  ? "Replace certificate"
+                  : "Upload certificate / license"}
+            </button>
+            {licenseCertificateUrl ? (
+              <a
+                href={licenseCertificateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="luxury-panel-link text-sm hover:underline"
+              >
+                Preview uploaded document
+              </a>
+            ) : null}
+          </div>
+          <input
+            ref={licenseInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (file) void handleLicenseSelect(file);
+            }}
+          />
+          {!uploadAvailable ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Document upload requires Supabase configuration.
+            </p>
+          ) : null}
+          {licenseError ? <p className="mt-2 text-xs text-destructive">{licenseError}</p> : null}
         </div>
       </section>
 

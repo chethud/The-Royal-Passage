@@ -1,5 +1,5 @@
 import type { Homestay, HomestayRoom } from "@/data/homestays";
-import { eachNightBetween, nightPriceMajor, buildDatePriceMap } from "@/lib/homestay-day-pricing";
+import { eachNightBetween, nightPriceMajor, buildDatePriceMap, isHomestayWeekend } from "@/lib/homestay-day-pricing";
 
 export function normalizeExtraBedsPerRoom(value?: number | null): 1 | 2 {
   return value != null && value >= 2 ? 2 : 1;
@@ -47,6 +47,20 @@ export function maxGuestsForSelection(
   return stay.maxGuests + extraBedCount;
 }
 
+export function weekdayExtraBedPriceMajor(stay: Homestay, room?: HomestayRoom): number {
+  return room?.extraBedPricePerNight ?? stay.extraBedPricePerNight ?? 0;
+}
+
+export function weekendExtraBedPriceMajor(stay: Homestay, room?: HomestayRoom): number {
+  return (
+    room?.extraBedWeekendPricePerNight ??
+    room?.extraBedPricePerNight ??
+    stay.extraBedWeekendPricePerNight ??
+    stay.extraBedPricePerNight ??
+    0
+  );
+}
+
 export function calculateStayTotalMinor(
   stay: Homestay,
   options: {
@@ -60,13 +74,14 @@ export function calculateStayTotalMinor(
   const room = getSelectedRoom(stay, options.roomId);
   const nights = eachNightBetween(options.checkIn, options.checkOut);
   const datePriceMap = buildDatePriceMap(stay.datePrices);
-  const extraBedPriceMajor = room?.extraBedPricePerNight ?? stay.extraBedPricePerNight ?? 0;
-  const nightlyExtrasMinor = extraBedPriceMajor * 100 * options.extraBedCount;
+  const weekdayExtraMajor = weekdayExtraBedPriceMajor(stay, room);
+  const weekendExtraMajor = weekendExtraBedPriceMajor(stay, room);
 
   let totalMinor = 0;
   for (const night of nights) {
     const nightMajor = nightPriceMajor(stay, night, room, datePriceMap);
-    totalMinor += nightMajor * 100 * options.roomCount + nightlyExtrasMinor;
+    const extraMajor = isHomestayWeekend(night) ? weekendExtraMajor : weekdayExtraMajor;
+    totalMinor += nightMajor * 100 * options.roomCount + extraMajor * 100 * options.extraBedCount;
   }
 
   const pricePerNightMajor = nights.length
@@ -76,7 +91,8 @@ export function calculateStayTotalMinor(
   return {
     room,
     pricePerNightMajor,
-    extraBedPriceMajor,
+    extraBedPriceMajor: weekdayExtraMajor,
+    extraBedWeekendPriceMajor: weekendExtraMajor,
     nightlyRateMinor: nights.length ? Math.round(totalMinor / nights.length) : 0,
     totalMinor,
     nights: nights.length,

@@ -143,6 +143,7 @@ def create_homestay_booking(
     price_per_night_minor = int(stay.get("price_per_night_minor") or 0)
     weekend_price_per_night_minor = stay.get("weekend_price_per_night_minor")
     extra_bed_price_minor = 0
+    weekend_extra_bed_price_minor = 0
     room_capacity = max_guests
 
     if room_id:
@@ -166,6 +167,11 @@ def create_homestay_booking(
         weekend_price_per_night_minor = room.get("weekend_price_per_night_minor", weekend_price_per_night_minor)
         extra_bed_available = bool(room.get("extra_bed_available", False))
         extra_bed_price_minor = int(room.get("extra_bed_price_per_night_minor") or 0)
+        weekend_extra_bed_price_minor = int(
+            room.get("weekend_extra_bed_price_per_night_minor")
+            or room.get("extra_bed_price_per_night_minor")
+            or 0
+        )
         if extra_bed_count > 0 and not extra_bed_available:
             raise ValueError("Extra beds are not available for this room type.")
         extra_beds_per_room = _extra_beds_per_room(room.get("extra_beds_per_room"))
@@ -187,6 +193,11 @@ def create_homestay_booking(
         bedrooms = int(stay.get("bedrooms") or 1)
         property_extra_bed_available = bool(stay.get("extra_bed_available", False))
         property_extra_bed_price_minor = int(stay.get("extra_bed_price_per_night_minor") or 0)
+        property_weekend_extra_bed_price_minor = int(
+            stay.get("weekend_extra_bed_price_per_night_minor")
+            or stay.get("extra_bed_price_per_night_minor")
+            or 0
+        )
         if extra_bed_count > 0:
             if not property_extra_bed_available:
                 raise ValueError("Extra beds are not available at this property.")
@@ -198,6 +209,7 @@ def create_homestay_booking(
                     f"({extra_beds_per_room} per bedroom × {bedrooms} bedroom(s))."
                 )
             extra_bed_price_minor = property_extra_bed_price_minor
+            weekend_extra_bed_price_minor = property_weekend_extra_bed_price_minor
         max_allowed_guests = max_guests + extra_bed_count
         if payload.guestCount > max_allowed_guests:
             raise ValueError(
@@ -223,6 +235,7 @@ def create_homestay_booking(
         weekend_price_per_night_minor,
         room_count,
         extra_bed_price_minor,
+        weekend_extra_bed_price_minor,
         extra_bed_count,
         price_overrides,
     )

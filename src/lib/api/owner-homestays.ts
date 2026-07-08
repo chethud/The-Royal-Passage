@@ -19,14 +19,9 @@ import {
 } from "@/gen/royalpassage/v1/types_pb";
 
 export const HOMESTAY_PROPERTY_TYPES = [
-  "Villa",
-  "Resort",
-  "Cottage",
-  "Farm House",
-  "Apartment",
   "Home Stay",
-  "Guest House",
-  "Luxury Stay",
+  "Resort",
+  "Hotel",
 ] as const;
 
 export type OwnerHomestayRoom = {
@@ -42,6 +37,7 @@ export type OwnerHomestayRoom = {
   isActive: boolean;
   extraBedAvailable: boolean;
   extraBedPricePerNightMinor: number;
+  extraBedWeekendPricePerNightMinor: number;
   extraBedsPerRoom: number;
 };
 
@@ -99,7 +95,9 @@ export type OwnerHomestayDetail = {
   updatedAt: string;
   extraBedAvailable: boolean;
   extraBedPricePerNightMinor: number;
+  extraBedWeekendPricePerNightMinor: number;
   extraBedsPerRoom: number;
+  licenseCertificateUrl: string | null;
 };
 
 export type CreateOwnerHomestayPayload = {
@@ -127,7 +125,9 @@ export type CreateOwnerHomestayPayload = {
   submitForReview?: boolean;
   extraBedAvailable?: boolean;
   extraBedPricePerNightMinor?: number;
+  extraBedWeekendPricePerNightMinor?: number;
   extraBedsPerRoom?: number;
+  licenseCertificateUrl: string;
 };
 
 export type UpdateOwnerHomestayPayload = Partial<CreateOwnerHomestayPayload>;
@@ -191,6 +191,7 @@ export function createOwnerHomestayRoom(
     sortOrder?: number;
     extraBedAvailable?: boolean;
     extraBedPricePerNightMinor?: number;
+    extraBedWeekendPricePerNightMinor?: number;
     extraBedsPerRoom?: number;
   },
 ) {
@@ -221,6 +222,7 @@ export function updateOwnerHomestayRoom(
     isActive: boolean;
     extraBedAvailable: boolean;
     extraBedPricePerNightMinor: number;
+    extraBedWeekendPricePerNightMinor: number;
     extraBedsPerRoom: number;
   }>,
 ) {

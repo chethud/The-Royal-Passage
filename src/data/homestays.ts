@@ -1,14 +1,9 @@
 import { HOMESTAY_IMG } from "@/lib/homestay-home-content";
 
 export const HOMESTAY_PROPERTY_TYPES = [
-  "Villa",
-  "Resort",
-  "Cottage",
-  "Farm House",
-  "Apartment",
   "Home Stay",
-  "Guest House",
-  "Luxury Stay",
+  "Resort",
+  "Hotel",
 ] as const;
 
 export type HomestayPropertyType = (typeof HOMESTAY_PROPERTY_TYPES)[number];
@@ -37,6 +32,7 @@ export type HomestayRoom = {
   amenities?: string[];
   extraBedAvailable: boolean;
   extraBedPricePerNight: number;
+  extraBedWeekendPricePerNight?: number;
   extraBedsPerRoom?: number;
 };
 
@@ -74,6 +70,7 @@ export type Homestay = {
   rooms?: HomestayRoom[];
   extraBedAvailable?: boolean;
   extraBedPricePerNight?: number;
+  extraBedWeekendPricePerNight?: number;
   extraBedsPerRoom?: number;
   datePrices?: HomestayDatePrice[];
 };
@@ -111,7 +108,7 @@ export const homestays: Homestay[] = [
     tagline: "Palace views, gardens, and quiet mornings",
     description:
       "A serene villa at the Chamundi foothills with terraced gardens, glimpses of the palace skyline, and hosts who know every corner of Mysuru.",
-    propertyType: "Villa",
+    propertyType: "Resort",
     city: "Mysuru",
     region: "Karnataka",
     address: "Chamundi Hill Road, Mysuru",
@@ -135,7 +132,7 @@ export const homestays: Homestay[] = [
     tagline: "Boutique rooms curated for discerning travellers",
     description:
       "A small guest house with Royal Passage hospitality standards — premium linens, local art, and concierge support for experiences and dining.",
-    propertyType: "Guest House",
+    propertyType: "Hotel",
     city: "Mysuru",
     region: "Karnataka",
     address: "Saraswathipuram, Mysuru",

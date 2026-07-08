@@ -19,6 +19,7 @@ type OwnerRoomManagerProps = {
     totalUnits: number;
     extraBedAvailable?: boolean;
     extraBedPricePerNightMinor?: number;
+    extraBedWeekendPricePerNightMinor?: number;
     extraBedsPerRoom?: number;
   }) => Promise<void>;
   onDeactivate: (roomId: string) => Promise<void>;
@@ -33,6 +34,7 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
   const [weekendPriceMajor, setWeekendPriceMajor] = useState(0);
   const [extraBedAvailable, setExtraBedAvailable] = useState(false);
   const [extraBedPriceMajor, setExtraBedPriceMajor] = useState(0);
+  const [extraBedWeekendPriceMajor, setExtraBedWeekendPriceMajor] = useState(0);
   const [extraBedsPerRoom, setExtraBedsPerRoom] = useState<1 | 2>(1);
 
   const handleAdd = async (event: React.FormEvent) => {
@@ -46,6 +48,7 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
       totalUnits: Number.parseInt(units, 10) || 1,
       extraBedAvailable,
       extraBedPricePerNightMinor: extraBedAvailable ? extraBedPriceMajor * 100 : 0,
+      extraBedWeekendPricePerNightMinor: extraBedAvailable ? extraBedWeekendPriceMajor * 100 : 0,
       extraBedsPerRoom: extraBedAvailable ? extraBedsPerRoom : 1,
     });
     setName("");
@@ -54,6 +57,7 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
     setWeekendPriceMajor(0);
     setExtraBedAvailable(false);
     setExtraBedPriceMajor(0);
+    setExtraBedWeekendPriceMajor(0);
     setExtraBedsPerRoom(1);
   };
 
@@ -77,7 +81,13 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
                     Math.round((room.weekendPricePerNightMinor ?? room.pricePerNightMinor) / 100),
                   )}
                   {room.extraBedAvailable
-                    ? ` · extra bed ${formatMoney(room.extraBedPricePerNightMinor, homestay.currencySymbol)}/night · ${normalizeExtraBedsPerRoom(room.extraBedsPerRoom)}/room`
+                    ? ` · extra bed ${formatWeekdayWeekendRates(
+                        sym,
+                        Math.round(room.extraBedPricePerNightMinor / 100),
+                        Math.round(
+                          (room.extraBedWeekendPricePerNightMinor ?? room.extraBedPricePerNightMinor) / 100,
+                        ),
+                      )} · ${normalizeExtraBedsPerRoom(room.extraBedsPerRoom)}/room`
                     : ""}
                   {!room.isActive ? " · inactive" : ""}
                 </p>
@@ -163,12 +173,20 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
         </label>
 
         {extraBedAvailable ? (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             <RupeeAmountInput
               className="luxury-input"
-              placeholder="Extra bed price / night"
+              placeholder="Extra bed weekday price"
               value={extraBedPriceMajor}
               onChange={setExtraBedPriceMajor}
+              required
+              disabled={busy}
+            />
+            <RupeeAmountInput
+              className="luxury-input"
+              placeholder="Extra bed weekend price"
+              value={extraBedWeekendPriceMajor}
+              onChange={setExtraBedWeekendPriceMajor}
               required
               disabled={busy}
             />

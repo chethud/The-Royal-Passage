@@ -42,10 +42,15 @@ export type AdminHomestayDetail = {
   rooms: OwnerHomestayRoom[];
   createdAt: string;
   updatedAt: string;
+  extraBedAvailable: boolean;
+  extraBedPricePerNightMinor: number;
+  extraBedWeekendPricePerNightMinor: number;
+  extraBedsPerRoom: number;
   ownerName: string;
   ownerEmail: string | null;
   ownerPhone: string | null;
   ownerVerified: boolean;
+  licenseCertificateUrl: string | null;
 };
 
 export function fetchAdminHomestayApprovals(accessToken: string) {

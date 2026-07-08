@@ -82,10 +82,19 @@ def get_admin_homestay(homestay_id: str) -> AdminHomestayDetail:
         rooms=[_map_room(room) for room in rooms if room.get("is_active", True)],
         createdAt=row.get("created_at", ""),
         updatedAt=row.get("updated_at", ""),
+        extraBedAvailable=bool(row.get("extra_bed_available", False)),
+        extraBedPricePerNightMinor=int(row.get("extra_bed_price_per_night_minor") or 0),
+        extraBedWeekendPricePerNightMinor=int(
+            row.get("weekend_extra_bed_price_per_night_minor")
+            or row.get("extra_bed_price_per_night_minor")
+            or 0
+        ),
+        extraBedsPerRoom=int(row.get("extra_beds_per_room") or 1),
         ownerName=owner.get("full_name") or "Owner",
         ownerEmail=owner.get("email"),
         ownerPhone=owner.get("phone"),
         ownerVerified=bool(owner.get("verified")),
+        licenseCertificateUrl=row.get("license_certificate_url"),
     )
 
 
@@ -108,6 +117,17 @@ def publish_homestay(homestay_id: str) -> AdminHomestaySummary:
     active_rooms = [room for room in rooms if room.get("is_active", True)]
     if not active_rooms:
         raise ValueError("Cannot publish without at least one active room.")
+
+    detail = (
+        supabase.table("homestays")
+        .select("license_certificate_url")
+        .eq("id", homestay_id)
+        .maybe_single()
+        .execute()
+    )
+    license_url = ((detail.data if detail else None) or {}).get("license_certificate_url")
+    if not license_url:
+        raise ValueError("Cannot publish without a property certificate or license.")
 
     supabase.table("homestays").update({"status": "published"}).eq("id", homestay_id).execute()
 

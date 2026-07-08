@@ -23,6 +23,9 @@ function mapDbRoom(row: Record<string, unknown>): HomestayRoom {
     amenities: (row.amenities as string[] | null) ?? [],
     extraBedAvailable: Boolean(row.extra_bed_available),
     extraBedPricePerNight: Math.round(Number(row.extra_bed_price_per_night_minor ?? 0) / 100),
+    extraBedWeekendPricePerNight: Math.round(
+      Number(row.weekend_extra_bed_price_per_night_minor ?? row.extra_bed_price_per_night_minor ?? 0) / 100,
+    ),
     extraBedsPerRoom: Number(row.extra_beds_per_room ?? 1) >= 2 ? 2 : 1,
   };
 }
@@ -142,6 +145,9 @@ async function loadHomestaysFromDb(citySlug = "mysuru"): Promise<Homestay[]> {
       rooms: rooms.length ? rooms.map(mapDbRoom) : undefined,
       extraBedAvailable: Boolean(row.extra_bed_available),
       extraBedPricePerNight: Math.round(Number(row.extra_bed_price_per_night_minor ?? 0) / 100),
+      extraBedWeekendPricePerNight: Math.round(
+        Number(row.weekend_extra_bed_price_per_night_minor ?? row.extra_bed_price_per_night_minor ?? 0) / 100,
+      ),
       extraBedsPerRoom: Number(row.extra_beds_per_room ?? 1) >= 2 ? 2 : 1,
       datePrices: datePricesByStay.get(row.id as string),
     };
