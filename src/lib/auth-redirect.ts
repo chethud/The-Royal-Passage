@@ -46,6 +46,24 @@ export function buildAuthRedirect(returnPath?: string): string {
   return base;
 }
 
+/** Landing page after the user clicks the password-reset link in email. */
+export function buildPasswordResetRedirect(returnPath?: string): string {
+  const origin = getAppOrigin();
+  const base = `${origin}/reset-password`;
+  if (returnPath?.startsWith("/")) {
+    return `${base}?redirect=${encodeURIComponent(returnPath)}`;
+  }
+  return base;
+}
+
+/** True when URL hash/query indicates a Supabase password-recovery session. */
+export function isPasswordRecoveryCallback(): boolean {
+  if (typeof window === "undefined") return false;
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const search = new URLSearchParams(window.location.search);
+  return hash.get("type") === "recovery" || search.get("type") === "recovery";
+}
+
 /** OAuth callback — dedicated route that completes the Google sign-in flow. */
 export function buildOAuthCallbackUrl(returnPath?: string): string {
   const origin = getAppOrigin();

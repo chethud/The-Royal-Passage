@@ -34,7 +34,7 @@ def _welcome_preview(to: str, name: str = "Chethan") -> bool:
         "Welcome",
         f"""
     <p style="line-height: 1.6;">Dear {name},</p>
-    <p style="line-height: 1.6;">Your account is ready. Discover curated experiences, homestays, and royal journeys across India.</p>
+    <p style="line-height: 1.6;">Your account is ready. Discover curated experiences, homestays, and royal journeys across Mysuru.</p>
     <p style="line-height: 1.6;"><a href="{_site_link("/")}" style="color: #7a1f2b;">Explore experiences</a></p>
     """,
     )

@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as JournalRouteImport } from './routes/journal'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExperiencesRouteImport } from './routes/experiences'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -110,9 +112,19 @@ const SignInRoute = SignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JournalRoute = JournalRouteImport.update({
   id: '/journal',
   path: '/journal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExperiencesRoute = ExperiencesRouteImport.update({
@@ -566,7 +578,9 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/experiences': typeof ExperiencesRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/account/profile': typeof AccountProfileRoute
@@ -655,7 +669,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cities': typeof CitiesRouteWithChildren
   '/contact': typeof ContactRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/account/profile': typeof AccountProfileRoute
@@ -736,7 +752,9 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/experiences': typeof ExperiencesRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/account/profile': typeof AccountProfileRoute
@@ -830,7 +848,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/experiences'
+    | '/forgot-password'
     | '/journal'
+    | '/reset-password'
     | '/sign-in'
     | '/sign-up'
     | '/account/profile'
@@ -919,7 +939,9 @@ export interface FileRouteTypes {
     | '/'
     | '/cities'
     | '/contact'
+    | '/forgot-password'
     | '/journal'
+    | '/reset-password'
     | '/sign-in'
     | '/sign-up'
     | '/account/profile'
@@ -999,7 +1021,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/experiences'
+    | '/forgot-password'
     | '/journal'
+    | '/reset-password'
     | '/sign-in'
     | '/sign-up'
     | '/account/profile'
@@ -1092,7 +1116,9 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   ExperiencesRoute: typeof ExperiencesRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   JournalRoute: typeof JournalRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   AccountProfileRoute: typeof AccountProfileRoute
@@ -1141,11 +1167,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/journal': {
       id: '/journal'
       path: '/journal'
       fullPath: '/journal'
       preLoaderRoute: typeof JournalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/experiences': {
@@ -2027,7 +2067,9 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   ExperiencesRoute: ExperiencesRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   JournalRoute: JournalRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   AccountProfileRoute: AccountProfileRoute,

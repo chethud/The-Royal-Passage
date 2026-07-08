@@ -8,6 +8,7 @@ import { dashboardPathForRole, isGuestAccount, isStaffRole, ROLE_LABELS } from "
 import {
   buildAuthRedirect,
   buildOAuthCallbackUrl,
+  buildPasswordResetRedirect,
   readAuthCallbackError,
   redirectOffLocalhostIfNeeded,
 } from "@/lib/auth-redirect";
@@ -19,7 +20,7 @@ const inputClass =
   "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 text-sm text-ink placeholder:text-ink/45 backdrop-blur-sm focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
 
 type RoyalAuthExperienceProps = {
-  initialMode: "signin" | "signup";
+  initialMode: "signin" | "signup" | "forgot";
 };
 
 export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
@@ -27,7 +28,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   const search = useSearch({ strict: false }) as { redirect?: string };
   const redirect = typeof search.redirect === "string" ? search.redirect : undefined;
 
-  const [mode, setMode] = useState<"signin" | "signup">(initialMode);
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -36,6 +37,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
   const [resendingConfirmation, setResendingConfirmation] = useState(false);
+  const [sendingPasswordReset, setSendingPasswordReset] = useState(false);
   const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +48,10 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     if (!browserConfigured) return null;
     return getSupabaseBrowser();
   }, [browserConfigured]);
+
+  useEffect(() => {
+    setMode(initialMode);
+  }, [initialMode]);
 
   const passwordType = showPassword ? "text" : "password";
 
@@ -126,7 +132,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
           "Your email is not confirmed yet. Open the confirmation link from Supabase, or resend it below.",
         );
       } else {
-        setError(message);
+        setError(formatAuthError(err, "Failed to sign in."));
       }
     } finally {
       setBusy(false);
@@ -158,6 +164,35 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       setError(formatAuthError(err, "Failed to resend confirmation email."));
     } finally {
       setResendingConfirmation(false);
+    }
+  };
+
+  const sendPasswordReset = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setNotice(null);
+    if (!supabase) {
+      setError("Supabase browser auth is not configured.");
+      return;
+    }
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError("Enter your email address.");
+      return;
+    }
+    try {
+      setSendingPasswordReset(true);
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+        redirectTo: buildPasswordResetRedirect(redirect),
+      });
+      if (resetError) throw resetError;
+      setNotice(
+        `If an account exists for ${trimmedEmail}, we sent a password reset link. Check your inbox and spam folder.`,
+      );
+    } catch (err) {
+      setError(formatAuthError(err, "Failed to send password reset email."));
+    } finally {
+      setSendingPasswordReset(false);
     }
   };
 
@@ -237,7 +272,13 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
         subtitle:
           "Your access level is set automatically. You will be redirected to your dashboard, or update your profile below.",
       }
-    : mode === "signin"
+    : mode === "forgot"
+      ? {
+          title: "Forgot password",
+          subtitle:
+            "Enter your email and we will send you a secure link to choose a new password.",
+        }
+      : mode === "signin"
       ? {
           title: "Sign in",
           subtitle:
@@ -325,6 +366,49 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
               </button>
             </div>
           </>
+        ) : mode === "forgot" ? (
+          <>
+            <form className="space-y-4" onSubmit={sendPasswordReset}>
+              <div>
+                <label htmlFor="forgot-email" className="eyebrow mb-2 block text-ink/90">
+                  Email
+                </label>
+                <input
+                  id="forgot-email"
+                  name="email"
+                  type="email"
+                  autoComplete="username"
+                  required
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={sendingPasswordReset || !email.trim()}
+                className="w-full rounded-sm bg-ember py-3.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {sendingPasswordReset ? "Sending…" : "Send reset link"}
+              </button>
+            </form>
+            <p className="mt-6 text-center text-sm text-ink/70">
+              Remember your password?{" "}
+              <Link
+                to="/sign-in"
+                search={redirect ? { redirect } : undefined}
+                className="text-ember underline-offset-4 transition-colors hover:underline"
+                onClick={() => {
+                  setMode("signin");
+                  setError(null);
+                  setNotice(null);
+                }}
+              >
+                Back to sign in
+              </Link>
+            </p>
+          </>
         ) : mode === "signin" ? (
           <>
             <div className="space-y-4">
@@ -381,6 +465,15 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                     {showPassword ? "Hide" : "Show"}
                   </button>
                 </div>
+                <p className="mt-2 text-right">
+                  <Link
+                    to="/forgot-password"
+                    search={redirect ? { redirect } : undefined}
+                    className="text-xs text-ember/90 underline-offset-4 transition-colors hover:text-ember hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </p>
               </div>
               <button
                 type="submit"

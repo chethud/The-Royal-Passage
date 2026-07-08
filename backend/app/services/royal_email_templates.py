@@ -116,6 +116,132 @@ def _royal_ornament_header() -> str:
     </table>"""
 
 
+def _royal_cta_button(label: str, url: str) -> str:
+    return f"""
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 28px auto 0;">
+      <tr>
+        <td align="center">
+          <a href="{_e(url)}" style="display: inline-block; background: linear-gradient(135deg, {EMAIL_GOLD} 0%, {EMAIL_GOLD_BRIGHT} 50%, {EMAIL_GOLD} 100%); color: {EMAIL_BTN_TEXT}; font-family: Cinzel, Georgia, serif; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none; padding: 17px 42px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 4px 24px rgba(200, 162, 90, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);">{_e(label)}</a>
+        </td>
+      </tr>
+    </table>"""
+
+
+def royal_link(url: str, label: str) -> str:
+    return (
+        f'<a href="{_e(url)}" style="color: {EMAIL_GOLD_BRIGHT}; text-decoration: none; '
+        f'border-bottom: 1px solid rgba(200, 162, 90, 0.45);">{_e(label)}</a>'
+    )
+
+
+def royal_list(items: list[str]) -> str:
+    rows = "".join(
+        f'<li style="margin: 0 0 8px; color: {EMAIL_INK_SOFT};">{_e(item)}</li>' for item in items
+    )
+    return (
+        f'<ul style="margin: 18px 0; padding-left: 20px; line-height: 1.75; '
+        f'font-family: \'Cormorant Garamond\', Georgia, serif; font-size: 16px;">{rows}</ul>'
+    )
+
+
+def royal_paragraph(html: str) -> str:
+    return (
+        f'<p style="margin: 0 0 16px; font-family: \'Cormorant Garamond\', Georgia, serif; '
+        f'font-size: 17px; line-height: 1.75; color: {EMAIL_INK_SOFT};">{html}</p>'
+    )
+
+
+def render_royal_transactional_email(
+    *,
+    title: str,
+    body_html: str,
+    cta_label: str | None = None,
+    cta_url: str | None = None,
+    preheader: str = "",
+) -> str:
+    """Dark burgundy + gold shell for welcome, booking updates, host alerts, etc."""
+    logo = _logo_url()
+    website = settings.site_url.rstrip("/")
+    year = datetime.now(timezone.utc).year
+    cta_block = _royal_cta_button(cta_label, cta_url) if cta_label and cta_url else ""
+    hidden = _e(preheader or title)
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>{_e(title)} — The Royal Passage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+</head>
+<body style="margin: 0; padding: 0; background-color: {EMAIL_BG}; -webkit-text-size-adjust: 100%;">
+  <div style="display: none; max-height: 0; overflow: hidden; opacity: 0;">{hidden}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background: radial-gradient(ellipse at center, #2a1218 0%, {EMAIL_BG} 70%); padding: 48px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width: 600px; max-width: 600px; border: 1px solid rgba(200, 162, 90, 0.22); border-radius: 12px; padding: 1px; background: linear-gradient(145deg, rgba(200,162,90,0.35), rgba(92,26,36,0.2), rgba(200,162,90,0.25)); box-shadow: 0 28px 64px rgba(0,0,0,0.5);">
+          <tr>
+            <td style="background-color: {EMAIL_CARD}; border-radius: 11px; overflow: hidden;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="height: 4px; background: linear-gradient(90deg, {EMAIL_BURGUNDY}, {EMAIL_GOLD}, {EMAIL_GOLD_BRIGHT}, {EMAIL_GOLD}, {EMAIL_BURGUNDY}); font-size: 0; line-height: 0;">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td style="padding: 44px 44px 36px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td align="center" style="padding-bottom: 8px;">
+                          <a href="{_e(website)}" style="text-decoration: none;">
+                            <img src="{_e(logo)}" alt="The Royal Passage" height="52" style="display: block; margin: 0 auto; max-height: 52px; width: auto; border: 0; opacity: 0.92;" />
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="center" style="padding: 12px 0 4px;">
+                          <p style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 9px; letter-spacing: 0.42em; text-transform: uppercase; color: {EMAIL_GOLD};">Mysuru &middot; Curated Royal Journeys</p>
+                        </td>
+                      </tr>
+                      <tr><td>{_royal_divider()}</td></tr>
+                      <tr>
+                        <td align="center" style="padding: 20px 0 24px;">
+                          <h1 style="margin: 0; font-family: 'Cinzel Decorative', Cinzel, Georgia, serif; font-size: 24px; font-weight: 400; color: {EMAIL_INK}; letter-spacing: 0.06em; line-height: 1.35;">{_e(title)}</h1>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding-bottom: 8px;">
+                          {body_html}
+                          {cta_block}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding-top: 20px;">
+                          {_royal_divider()}
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding-top: 22px;">
+                            <tr>
+                              <td align="center">
+                                <p style="margin: 0 0 6px; font-family: Cinzel, Georgia, serif; font-size: 11px; letter-spacing: 0.24em; color: {EMAIL_GOLD};">THE ROYAL PASSAGE</p>
+                                <p style="margin: 0 0 10px; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 15px; font-style: italic; color: {EMAIL_INK_MUTED};">Curated Heritage Experiences Across Mysuru</p>
+                                <p style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 9px; letter-spacing: 0.12em; color: {EMAIL_INK_MUTED};">&copy; {year} The Royal Passage</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+
+
 def _detail_row(icon: str, label: str, value: str) -> str:
     return f"""
     <tr>
