@@ -194,7 +194,7 @@ def render_royal_transactional_email(
                       <tr>
                         <td align="center" style="padding-bottom: 8px;">
                           <a href="{_e(website)}" style="text-decoration: none;">
-                            <img src="{_e(logo)}" alt="The Royal Passage" height="76" style="display: block; margin: 0 auto; max-height: 76px; width: auto; border: 0; opacity: 0.92;" />
+                            <img src="{_e(logo)}" alt="The Royal Passage" height="150" style="display: block; margin: 0 auto; max-height: 150px; width: auto; border: 0; opacity: 0.96;" />
                           </a>
                         </td>
                       </tr>
@@ -563,7 +563,7 @@ def render_royal_booking_invitation_email(ctx: RoyalBookingInvitationContext) ->
                   <tr><td>{_royal_divider()}</td></tr>
                   <tr>
                     <td align="center" style="padding-top: 8px;">
-                      <img src="{_e(logo)}" alt="The Royal Passage" height="64" style="display: block; margin: 0 auto 12px; max-height: 64px; width: auto; border: 0; opacity: 0.9;" />
+                      <img src="{_e(logo)}" alt="The Royal Passage" height="150" style="display: block; margin: 0 auto 12px; max-height: 150px; width: auto; border: 0; opacity: 0.96;" />
                       <p style="margin: 0 0 4px; font-family: Cinzel, Georgia, serif; font-size: 11px; letter-spacing: 0.2em; color: #4A2323;">THE ROYAL PASSAGE</p>
                       <p style="margin: 0 0 20px; font-family: 'Libre Baskerville', Georgia, serif; font-size: 12px; color: #9A8A78;">Curated Heritage Experiences Across Mysuru</p>
                       <p style="margin: 0 0 16px; font-family: Inter, Arial, sans-serif; font-size: 10px; letter-spacing: 0.08em;">
@@ -718,7 +718,7 @@ def render_royal_booking_request_email(ctx: RoyalBookingRequestContext) -> str:
                       <tr>
                         <td align="center" style="padding-bottom: 4px;">
                           <a href="{_e(website)}" style="text-decoration: none; display: inline-block;">
-                            <img src="{_e(logo)}" alt="The Royal Passage" height="76" style="display: block; margin: 0 auto; max-height: 76px; width: auto; border: 0; opacity: 0.92;" />
+                            <img src="{_e(logo)}" alt="The Royal Passage" height="150" style="display: block; margin: 0 auto; max-height: 150px; width: auto; border: 0; opacity: 0.96;" />
                           </a>
                         </td>
                       </tr>
