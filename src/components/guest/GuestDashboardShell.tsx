@@ -27,17 +27,19 @@ export function GuestDashboardShell({
   return (
     <div className="pt-[var(--header-height)] text-foreground">
       <Header />
-      <section className="container-page py-6 sm:py-14 md:py-20">
+      <section className="container-page py-4 sm:py-14 md:py-20">
         <div className={`mx-auto ${wide ? "max-w-6xl" : "max-w-3xl"}`}>
           {showPageHeader ? (
             <>
-              <div className="mb-4 flex flex-wrap items-center gap-2 sm:mb-8 sm:gap-3">
+              <div className="mb-3 flex flex-wrap items-center gap-2 sm:mb-8 sm:gap-3">
                 <RoleBadge role="guest" />
-                <span className="text-xs text-muted-foreground sm:text-sm">{ROLE_LABELS.guest} dashboard</span>
+                <span className="text-[0.7rem] text-muted-foreground sm:text-sm">
+                  {ROLE_LABELS.guest} dashboard
+                </span>
               </div>
-              <h1 className="font-display text-2xl tracking-tight sm:text-3xl md:text-5xl">{title}</h1>
+              <h1 className="font-display text-xl tracking-tight sm:text-3xl md:text-5xl">{title}</h1>
               {subtitle ? (
-                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:mt-4 sm:text-base">
+                <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-muted-foreground sm:mt-4 sm:text-base">
                   {subtitle}
                 </p>
               ) : null}
@@ -47,7 +49,7 @@ export function GuestDashboardShell({
             </>
           ) : null}
 
-          <div className={showPageHeader ? "mt-6 sm:mt-10" : undefined}>{children}</div>
+          <div className={showPageHeader ? "mt-4 sm:mt-10" : undefined}>{children}</div>
         </div>
       </section>
       <Footer />

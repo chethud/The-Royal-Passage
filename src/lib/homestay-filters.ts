@@ -45,8 +45,6 @@ export function filterHomestays(homestays: Homestay[], search: HomestayBrowseSea
 }
 
 export function defaultHomestayDates() {
-  const today = new Date().toISOString().slice(0, 10);
-  const checkOut = new Date(`${today}T12:00:00`);
-  checkOut.setDate(checkOut.getDate() + 2);
-  return { checkIn: today, checkOut: checkOut.toISOString().slice(0, 10) };
+  /** Prefer empty dates in search UIs — guests choose explicitly. */
+  return { checkIn: "", checkOut: "" };
 }

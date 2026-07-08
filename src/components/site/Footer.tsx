@@ -43,7 +43,7 @@ function FooterBrandBlock({
 }) {
   if (layout === "row") {
     return (
-      <div className="flex max-w-full flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-4">
+      <div className="flex max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center sm:justify-start sm:text-left sm:gap-x-4">
         <img
           src={logoUrl}
           alt="The Royal Passage"
@@ -62,7 +62,7 @@ function FooterBrandBlock({
           ))}
         </div>
         <p
-          className="shrink-0 text-[0.65rem] text-muted-foreground/75 sm:text-[0.68rem]"
+          className="w-full shrink-0 text-center text-[0.65rem] text-muted-foreground/75 sm:w-auto sm:text-[0.68rem]"
           suppressHydrationWarning
         >
           © {new Date().getFullYear()} The Royal Passage. All rights reserved.
@@ -72,7 +72,7 @@ function FooterBrandBlock({
   }
 
   return (
-    <div className="flex w-full flex-col items-start">
+    <div className="flex w-full flex-col items-center text-center sm:items-start sm:text-left">
       <img
         src={logoUrl}
         alt="The Royal Passage"
@@ -80,10 +80,10 @@ function FooterBrandBlock({
         height={110}
         loading="lazy"
         decoding="async"
-        className={`logo-breathe origin-left -translate-x-1.5 object-contain object-left ${logoClassName}`}
+        className={`logo-breathe object-contain ${logoClassName} sm:origin-left sm:-translate-x-1.5 sm:object-left`}
       />
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{TAGLINE}</p>
-      <div className="mt-3 flex items-center gap-2.5">
+      <div className="mt-3 flex items-center justify-center gap-2.5 sm:justify-start">
         {SOCIAL_LINKS.map(({ label, Icon, href }) => (
           <SocialIcon key={label} label={label} Icon={Icon} href={href} />
         ))}
@@ -94,9 +94,9 @@ function FooterBrandBlock({
 
 function FooterSimple() {
   return (
-    <footer className="mt-12 border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
-      <div className="container-page py-4 sm:py-5">
-        <FooterBrandBlock layout="row" logoClassName="h-12 w-auto object-contain sm:h-14 md:h-16" />
+    <footer className="mt-8 border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
+      <div className="container-page py-2.5 sm:py-5">
+        <FooterBrandBlock layout="row" logoClassName="h-9 w-auto object-contain sm:h-14 md:h-16" />
       </div>
     </footer>
   );
@@ -122,13 +122,13 @@ function FooterColumn({
 function FooterFull() {
   return (
     <footer className="relative overflow-hidden border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
-      <div className="container-page relative z-10 py-10 sm:py-12 lg:py-14">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-8 xl:gap-10">
+      <div className="container-page relative z-10 py-7 sm:py-12 lg:py-14">
+        <div className="flex flex-col gap-6 sm:gap-10 lg:flex-row lg:items-start lg:gap-8 xl:gap-10">
           <div className="w-full shrink-0 lg:w-[15rem] xl:w-[16rem]">
             <FooterBrandBlock logoClassName="h-14 w-auto sm:h-16" />
           </div>
 
-          <div className="grid min-w-0 flex-1 grid-cols-2 gap-x-8 gap-y-10 sm:gap-x-10 lg:grid-cols-3 lg:gap-x-8 xl:gap-x-10">
+          <div className="grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-6 sm:gap-x-10 sm:gap-y-10 lg:grid-cols-3 lg:gap-x-8 xl:gap-x-10">
             <FooterColumn title="Quick Links">
               <ul className="space-y-2 text-sm">
                 {quickLinks.map((l) => (
@@ -199,9 +199,9 @@ function FooterFull() {
         </div>
       </div>
 
-      <div className="container-page relative z-10 flex flex-wrap items-center justify-between gap-3 border-t border-[oklch(0.88_0.08_86_/_0.12)] py-6 text-xs text-muted-foreground">
+      <div className="container-page relative z-10 flex flex-wrap items-center justify-center gap-1.5 border-t border-[oklch(0.88_0.08_86_/_0.12)] py-3 text-[0.68rem] text-muted-foreground text-center sm:justify-between sm:gap-3 sm:py-6 sm:text-xs sm:text-left">
         <span suppressHydrationWarning>© {new Date().getFullYear()} The Royal Passage. All rights reserved.</span>
-        <span className="text-ember/70">Crafted with intention.</span>
+        <span className="w-full text-ember/70 sm:w-auto">Crafted with intention.</span>
       </div>
 
       <img

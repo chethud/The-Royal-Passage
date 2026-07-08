@@ -175,11 +175,11 @@ function GuestHistoryPage() {
           />
         </LuxuryCheckoutPanel>
       ) : (
-        <div className="space-y-5 sm:space-y-8">
+        <div className="space-y-4 sm:space-y-8">
           {activeHomestayBookings.length > 0 ? (
             <LuxuryCheckoutPanel>
-              <div className="mb-4 flex items-baseline justify-between gap-3 border-b luxury-panel-divider pb-3 sm:mb-6 sm:gap-4 sm:pb-5">
-                <h2 className="luxury-panel-heading font-display text-lg tracking-wide sm:text-xl">Active stays</h2>
+              <div className="mb-3 flex items-baseline justify-between gap-3 border-b luxury-panel-divider pb-2.5 sm:mb-6 sm:gap-4 sm:pb-5">
+                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">Active stays</h2>
                 <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
                   {activeHomestayBookings.length} active
                 </span>
@@ -190,8 +190,8 @@ function GuestHistoryPage() {
 
           {activeBookings.length > 0 ? (
             <LuxuryCheckoutPanel>
-              <div className="mb-4 flex items-baseline justify-between gap-3 border-b luxury-panel-divider pb-3 sm:mb-6 sm:gap-4 sm:pb-5">
-                <h2 className="luxury-panel-heading font-display text-lg tracking-wide sm:text-xl">Active bookings</h2>
+              <div className="mb-3 flex items-baseline justify-between gap-3 border-b luxury-panel-divider pb-2.5 sm:mb-6 sm:gap-4 sm:pb-5">
+                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">Active bookings</h2>
                 <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
                   {activeBookings.length} active
                 </span>
@@ -208,8 +208,8 @@ function GuestHistoryPage() {
 
           {homestayBookings.length > 0 ? (
             <LuxuryCheckoutPanel>
-              <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3 border-b luxury-panel-divider pb-3 sm:mb-6 sm:gap-4 sm:pb-5">
-                <h2 className="luxury-panel-heading font-display text-lg tracking-wide sm:text-xl">Past & cancelled stays</h2>
+              <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3 border-b luxury-panel-divider pb-2.5 sm:mb-6 sm:gap-4 sm:pb-5">
+                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">Past & cancelled stays</h2>
               </div>
               <GuestHomestayBookingsList bookings={homestayBookings} surface="light" />
             </LuxuryCheckoutPanel>
@@ -217,8 +217,8 @@ function GuestHistoryPage() {
 
           {bookings.length > 0 ? (
             <LuxuryCheckoutPanel>
-              <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3 border-b luxury-panel-divider pb-3 sm:mb-6 sm:gap-4 sm:pb-5">
-                <h2 className="luxury-panel-heading font-display text-lg tracking-wide sm:text-xl">Past & cancelled</h2>
+              <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3 border-b luxury-panel-divider pb-2.5 sm:mb-6 sm:gap-4 sm:pb-5">
+                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">Past & cancelled</h2>
                 <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
                   {completedCount} completed · {cancelledCount} cancelled
                 </span>

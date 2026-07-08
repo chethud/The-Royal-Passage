@@ -652,6 +652,16 @@
   letter-spacing: 0.1em;
 }
 
+@media (max-width: 639px) {
+  .luxury-checkout-panel .luxury-btn-sm,
+  .luxury-checkout-panel .luxury-btn-panel-danger,
+  .luxury-checkout-panel .dashboard-chrome-btn.luxury-btn-sm {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+  }
+}
+
 .luxury-btn-panel-danger {
   display: inline-flex;
   align-items: center;
@@ -4450,38 +4460,52 @@ a.royal-passport-book__vip-label:hover {
   }
 
   /*
-   * Zoom so a single leaf (~512px of the 1024 spread) fills the phone width.
-   * Clip the scene window to one page; shift the book to show identity (left) or VIP (right).
+   * Show one leaf of the open book at a time.
+   * Scene is a half-book viewport; book is scaled to fill that width.
+   * Identity = left leaf; Next pans to VIP (right leaf).
    */
   .royal-passport-scene {
     --passport-book-width: 1024px;
     --passport-page-height: 682px;
-    --passport-scale: min(1, calc((100vw - 1.5rem) / 512));
-    width: min(100%, calc(512px * var(--passport-scale)));
-    height: calc(682px * var(--passport-scale));
+    --passport-page-width: 512px;
+    container-type: inline-size;
+    container-name: passport;
+    width: min(100%, 26rem);
+    aspect-ratio: 512 / 682;
+    height: auto;
     overflow: hidden;
     padding-bottom: 0;
     margin-inline: auto;
   }
 
   .royal-passport-book {
-    /* Keep desktop % layout; only crop/pan which leaf is visible. */
+    width: var(--passport-book-width);
+    aspect-ratio: 1024 / 682;
+    /* Unitless scale from container width → one leaf fills the scene */
+    --passport-scale: calc(100cqw / 512px);
     transform-origin: top left;
+    /* translate first (right-to-left), then scale — pans by one leaf in layout px */
     transform: scale(var(--passport-scale));
   }
 
   .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book {
-    transform: translateX(-50%) scale(var(--passport-scale));
+    transform: scale(var(--passport-scale)) translateX(-512px);
   }
 
   .royal-passport-scene[data-mobile-page="identity"] .royal-passport-book__right-panel,
-  .royal-passport-scene[data-mobile-page="identity"] .royal-passport-book__vip-status {
+  .royal-passport-scene[data-mobile-page="identity"] .royal-passport-book__vip-status,
+  .royal-passport-scene[data-mobile-page="identity"] .royal-passport-book__endorsements-heading,
+  .royal-passport-scene[data-mobile-page="identity"] a.royal-passport-book__vip-label {
     pointer-events: none;
+    visibility: hidden;
   }
 
   .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book__left-overlay,
-  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book__left-overlay > * {
+  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book__left-overlay > *,
+  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book__left-crest,
+  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book__left-title {
     pointer-events: none;
+    visibility: hidden;
   }
 }
 

@@ -2,54 +2,62 @@ import type { ReactNode } from "react";
 
 export type BookingCardSurface = "light" | "dark";
 
-export const bookingCardRowClass = "group py-6 sm:py-7";
+export const bookingCardRowClass = "group py-3.5 sm:py-7";
 
-export const bookingCardLayoutClass = "flex gap-5 sm:gap-7";
+export const bookingCardLayoutClass = "flex gap-3 sm:gap-7";
 
-export const bookingCardContentClass = "flex min-w-0 flex-1 flex-col gap-4";
+export const bookingCardContentClass = "flex min-w-0 flex-1 flex-col gap-2.5 sm:gap-4";
 
 export const bookingCardThumbClass =
-  "h-[5.5rem] w-[4.5rem] shrink-0 rounded-sm border border-[rgb(200_162_90/0.28)] object-cover sm:h-28 sm:w-[6.5rem]";
+  "h-16 w-[3.35rem] shrink-0 rounded-sm border border-[rgb(200_162_90/0.28)] object-cover sm:h-28 sm:w-[6.5rem]";
 
 export const bookingCardThumbPlaceholderClass =
-  "h-[5.5rem] w-[4.5rem] shrink-0 rounded-sm border border-[rgb(200_162_90/0.28)] bg-[rgb(74_0_0/0.06)] sm:h-28 sm:w-[6.5rem]";
+  "h-16 w-[3.35rem] shrink-0 rounded-sm border border-[rgb(200_162_90/0.28)] bg-[rgb(74_0_0/0.06)] sm:h-28 sm:w-[6.5rem]";
 
 export function bookingCardTitleClass(surface: BookingCardSurface) {
   return `font-display leading-snug uppercase tracking-[0.05em] ${
-    surface === "light" ? "luxury-panel-heading text-base sm:text-lg" : "text-lg"
+    surface === "light" ? "luxury-panel-heading text-[0.82rem] sm:text-lg" : "text-base sm:text-lg"
   }`;
 }
 
 export function bookingCardSubtitleClass(surface: BookingCardSurface) {
-  return `mt-1 text-xs ${surface === "light" ? "luxury-panel-body" : "text-muted-foreground"}`;
+  return `mt-0.5 text-[0.65rem] leading-snug sm:mt-1 sm:text-xs ${
+    surface === "light" ? "luxury-panel-body" : "text-muted-foreground"
+  }`;
 }
 
 export function bookingCardMetaLabelClass(surface: BookingCardSurface) {
-  return `eyebrow ${surface === "light" ? "luxury-panel-label" : "text-muted-foreground"}`;
+  return `eyebrow text-[0.55rem] tracking-[0.14em] sm:text-[0.7rem] ${
+    surface === "light" ? "luxury-panel-label" : "text-muted-foreground"
+  }`;
 }
 
 export function bookingCardMetaValueClass(surface: BookingCardSurface, emphasis = false) {
   if (emphasis) {
-    return `mt-1 font-display text-lg ${surface === "light" ? "luxury-panel-heading" : ""}`;
+    return `mt-0.5 font-display text-sm sm:mt-1 sm:text-lg ${
+      surface === "light" ? "luxury-panel-heading" : ""
+    }`;
   }
-  return `mt-1 ${surface === "light" ? "luxury-panel-body" : ""}`;
+  return `mt-0.5 text-[0.7rem] leading-snug sm:mt-1 sm:text-sm ${
+    surface === "light" ? "luxury-panel-body" : ""
+  }`;
 }
 
 export function bookingCardPrimaryActionClass(surface: BookingCardSurface) {
   return surface === "light"
-    ? "luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
+    ? "luxury-btn-sm luxury-btn-primary inline-flex min-h-0 flex-1 items-center justify-center px-2.5 py-1.5 text-[0.58rem] tracking-[0.08em] no-underline sm:flex-none sm:px-4 sm:py-2 sm:text-[0.65rem] sm:tracking-[0.1em]"
     : "text-sm text-ember underline-offset-4 hover:underline";
 }
 
 export function bookingCardSecondaryActionClass(surface: BookingCardSurface) {
   return surface === "light"
-    ? "luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
+    ? "luxury-btn-sm dashboard-chrome-btn inline-flex min-h-0 flex-1 items-center justify-center px-2.5 py-1.5 text-[0.58rem] tracking-[0.08em] no-underline sm:flex-none sm:px-4 sm:py-2 sm:text-[0.65rem] sm:tracking-[0.1em]"
     : "text-sm text-ember underline-offset-4 hover:underline";
 }
 
 export function bookingCardDangerActionClass(surface: BookingCardSurface) {
   return surface === "light"
-    ? "luxury-btn-sm luxury-btn-panel-danger"
+    ? "luxury-btn-sm luxury-btn-panel-danger min-h-0 flex-1 px-2.5 py-1.5 text-[0.58rem] tracking-[0.08em] sm:flex-none sm:px-4 sm:py-2 sm:text-[0.65rem] sm:tracking-[0.1em]"
     : "text-sm text-destructive underline-offset-4 hover:underline disabled:opacity-60";
 }
 
@@ -61,7 +69,11 @@ export function BookingCardMetaGrid({
   surface?: BookingCardSurface;
 }) {
   return (
-    <dl className={`grid gap-3 text-xs sm:grid-cols-3 sm:gap-2 ${surface === "light" ? "sm:text-sm" : "sm:text-sm"}`}>
+    <dl
+      className={`grid grid-cols-3 gap-2 text-[0.7rem] sm:gap-2 sm:text-sm ${
+        surface === "light" ? "" : ""
+      }`}
+    >
       {children}
     </dl>
   );
@@ -79,7 +91,7 @@ export function BookingCardMetaItem({
   emphasis?: boolean;
 }) {
   return (
-    <div>
+    <div className="min-w-0">
       <dt className={bookingCardMetaLabelClass(surface)}>{label}</dt>
       <dd className={bookingCardMetaValueClass(surface, emphasis)}>{children}</dd>
     </div>
@@ -94,7 +106,11 @@ export function BookingCardActions({
   surface?: BookingCardSurface;
 }) {
   return (
-    <div className={`flex flex-wrap items-center gap-3 ${surface === "light" ? "mt-1" : "mt-5"}`}>
+    <div
+      className={`flex flex-wrap items-center gap-1.5 sm:gap-3 ${
+        surface === "light" ? "mt-0.5" : "mt-3 sm:mt-5"
+      }`}
+    >
       {children}
     </div>
   );

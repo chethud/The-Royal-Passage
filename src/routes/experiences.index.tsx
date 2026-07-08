@@ -139,7 +139,7 @@ function ExperiencesPage() {
           ) : null}
         </div>
 
-        <div className="flex flex-col items-start gap-8 lg:flex-row lg:gap-12">
+        <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
           <ExperiencesFilterSidebar
             search={search}
             categories={categories}
@@ -147,7 +147,8 @@ function ExperiencesPage() {
             onReset={resetFilters}
           />
 
-          <div className="min-w-0 flex-1">
+          {/* Compact Refine on mobile; full cards stay immediately below */}
+          <div className="order-2 min-w-0 w-full flex-1">
             <AnimatePresence mode="wait">
               {pending ? (
                 <motion.div

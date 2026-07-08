@@ -32,8 +32,8 @@ export function HomestaysHomeHero() {
       to: "/homestays/browse",
       search: {
         q: search.q?.trim() || undefined,
-        checkIn: search.checkIn,
-        checkOut: search.checkOut,
+        checkIn: search.checkIn || undefined,
+        checkOut: search.checkOut || undefined,
         guests: search.guests,
       },
     });
