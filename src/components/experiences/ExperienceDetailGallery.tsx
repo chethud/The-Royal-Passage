@@ -21,7 +21,7 @@ export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
       <img
         src={cover}
         alt={exp.title}
-        className="experience-detail-gallery__image aspect-[4/5] w-full object-cover md:aspect-auto md:h-[min(70vh,640px)]"
+        className="experience-detail-gallery__image aspect-[4/4] w-full object-cover sm:aspect-[4/5] md:aspect-auto md:h-[min(70vh,640px)]"
         width={1200}
         height={1500}
         decoding="async"

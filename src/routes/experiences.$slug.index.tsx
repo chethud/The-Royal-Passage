@@ -192,7 +192,7 @@ function ExperienceDetail() {
                   {canBook ? (
                     <a
                       href="#book"
-                      className="luxury-btn-sm luxury-btn-primary inline-flex w-fit items-center no-underline"
+                      className="luxury-btn-sm luxury-btn-primary inline-flex w-fit items-center px-4 py-2 text-[0.62rem] no-underline sm:px-5 sm:py-2.5 sm:text-[0.65rem]"
                     >
                       Check availability
                     </a>

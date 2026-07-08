@@ -96,7 +96,7 @@ function FooterSimple() {
   return (
     <footer className="mt-8 border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
       <div className="container-page py-2.5 sm:py-5">
-        <FooterBrandBlock layout="row" logoClassName="h-9 w-auto object-contain sm:h-14 md:h-16" />
+        <FooterBrandBlock layout="row" logoClassName="h-14 w-auto object-contain sm:h-14 md:h-16" />
       </div>
     </footer>
   );

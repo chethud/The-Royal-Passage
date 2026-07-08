@@ -139,7 +139,7 @@ function ExperiencesPage() {
           ) : null}
         </div>
 
-        <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+        <div className="flex flex-col items-start gap-6 md:flex-row md:gap-8 lg:gap-12">
           <ExperiencesFilterSidebar
             search={search}
             categories={categories}

@@ -83,8 +83,8 @@ export function DetailLocationBlock({ locationLine, address, mapLink }: DetailLo
   if (!locationLine && !address && !mapLink) return null;
 
   return (
-    <div className="flex items-start gap-2 text-sm text-[#D6C8B5]/90">
-      <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF6A]" aria-hidden />
+    <div className="flex items-start gap-1.5 text-[0.78rem] text-[#D6C8B5]/90 sm:gap-2 sm:text-sm">
+      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D4AF6A] sm:h-4 sm:w-4" aria-hidden />
       <div>
         {locationLine ? <div>{locationLine}</div> : null}
         {address ? <div className="mt-0.5 text-[#D6C8B5]/75">{address}</div> : null}
@@ -93,9 +93,9 @@ export function DetailLocationBlock({ locationLine, address, mapLink }: DetailLo
             href={mapLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
+            className="mt-1.5 inline-flex items-center gap-1 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8] sm:mt-2 sm:gap-1.5 sm:text-[0.65rem] sm:tracking-[0.16em]"
           >
-            <Navigation className="h-3.5 w-3.5" aria-hidden />
+            <Navigation className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden />
             Get directions
           </a>
         ) : null}
@@ -112,18 +112,18 @@ export function DetailTitleRow({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mt-3 flex items-start justify-between gap-4 sm:mt-5">
-      <h1 className="font-display text-[1.65rem] uppercase leading-[1.1] tracking-[0.04em] text-[#F7F1E8] sm:text-3xl sm:leading-[1.08] md:text-[2.65rem]">
+    <div className="mt-2.5 flex items-start justify-between gap-3 sm:mt-5 sm:gap-4">
+      <h1 className="font-display text-[1.45rem] uppercase leading-[1.08] tracking-[0.03em] text-[#F7F1E8] sm:text-3xl sm:leading-[1.08] md:text-[2.65rem]">
         {title}
       </h1>
-      {actions ? <div className="flex shrink-0 items-center gap-2 pt-1">{actions}</div> : null}
+      {actions ? <div className="flex shrink-0 items-center gap-1.5 pt-0.5 sm:gap-2 sm:pt-1">{actions}</div> : null}
     </div>
   );
 }
 
 export function DetailTagline({ children }: { children: ReactNode }) {
   return (
-    <p className="mt-2.5 font-display text-sm italic leading-relaxed text-[#D6C8B5]/90 sm:mt-4 sm:text-base md:text-lg">
+    <p className="mt-2 font-display text-[0.9rem] italic leading-relaxed text-[#D6C8B5]/90 sm:mt-4 sm:text-base md:text-lg">
       {children}
     </p>
   );
@@ -131,13 +131,13 @@ export function DetailTagline({ children }: { children: ReactNode }) {
 
 export function DetailDivider() {
   return (
-    <div className="my-5 h-px bg-gradient-to-r from-transparent via-[rgb(200_162_90/0.35)] to-transparent sm:my-7" />
+    <div className="my-4 h-px bg-gradient-to-r from-transparent via-[rgb(200_162_90/0.35)] to-transparent sm:my-7" />
   );
 }
 
 export function DetailStatGrid({ children }: { children: ReactNode }) {
   return (
-    <dl className="grid grid-cols-[minmax(0,1.35fr)_minmax(0,0.8fr)_minmax(0,0.85fr)] divide-x divide-[rgb(200_162_90/0.28)] text-center sm:grid-cols-3 sm:text-left">
+    <dl className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,0.75fr)_minmax(0,0.85fr)] divide-x divide-[rgb(200_162_90/0.28)] text-center sm:grid-cols-3 sm:text-left">
       {children}
     </dl>
   );
@@ -153,12 +153,12 @@ export function DetailStatItem({
   valueClassName?: string;
 }) {
   return (
-    <div className="min-w-0 px-1.5 first:pl-0 last:pr-0 sm:px-5">
+    <div className="min-w-0 px-1 first:pl-0 last:pr-0 sm:px-5">
       <dt className={detailSectionLabelClass}>{label}</dt>
       <dd
         className={
           valueClassName ??
-          "mt-1.5 break-words font-display text-[0.95rem] uppercase leading-snug tracking-[0.02em] text-[#F7F1E8] sm:text-lg md:text-xl"
+          "mt-1 break-words font-display text-[0.85rem] uppercase leading-snug tracking-[0.02em] text-[#F7F1E8] sm:mt-1.5 sm:text-lg md:text-xl"
         }
       >
         {children}
@@ -170,7 +170,7 @@ export function DetailStatItem({
 export function DetailDarkSection({
   label,
   children,
-  className = "mt-8",
+  className = "mt-6 sm:mt-8",
 }: {
   label: string;
   children: ReactNode;

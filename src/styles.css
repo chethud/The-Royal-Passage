@@ -4427,15 +4427,16 @@ a.royal-passport-book__vip-label:hover {
   }
 
   .royal-passport-form__actions {
-    max-width: min(22rem, 100%);
+    width: min(calc(var(--passport-book-width) * var(--passport-scale)), 100%);
+    max-width: calc(100vw - 1.5rem);
     justify-content: center;
     margin-inline: auto;
     gap: 0.65rem;
-    padding-top: 0.35rem;
+    padding-top: 0.15rem;
   }
 
   .royal-passport-form__save {
-    width: min(18rem, 100%);
+    width: min(16rem, calc(100vw - 3rem));
     flex: 0 1 auto;
     min-width: 0;
     padding: 0.7rem 1.1rem;

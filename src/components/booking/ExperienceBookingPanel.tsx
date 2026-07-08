@@ -136,7 +136,7 @@ function DateSlotPicker({
       : "border border-[#D4AF6A]/55 bg-[#2a1212] text-foreground shadow-[0_6px_18px_-12px_rgb(0_0_0/0.55)]";
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5 sm:space-y-3">
       {groups.map((group) => {
         const open = expandedDate === group.date;
         const availableCount = group.slots.filter((slot) => slot.available > 0).length;
@@ -146,19 +146,19 @@ function DateSlotPicker({
         return (
           <div
             key={group.date}
-            className={`overflow-hidden rounded-xl transition-all duration-200 ${open || hasSelected ? dateCardActive : dateCard}`}
+            className={`overflow-hidden rounded-lg sm:rounded-xl transition-all duration-200 ${open || hasSelected ? dateCardActive : dateCard}`}
           >
             <button
               type="button"
               aria-expanded={open}
               disabled={soldOut}
               onClick={() => onExpandedDateChange(open ? null : group.date)}
-              className={`flex w-full items-center gap-4 px-4 py-4 text-left transition-colors luxury-slot-focus disabled:cursor-not-allowed ${
+              className={`flex w-full items-center gap-3 px-3 py-3 text-left transition-colors luxury-slot-focus disabled:cursor-not-allowed sm:gap-4 sm:px-4 sm:py-4 ${
                 soldOut ? "opacity-45" : ""
               }`}
             >
               <div
-                className={`h-12 w-1 shrink-0 rounded-full transition-colors ${
+                className={`h-10 w-1 shrink-0 rounded-full transition-colors sm:h-12 ${
                   hasSelected || open
                     ? surface === "light"
                       ? "luxury-slot-date__rail--active"
@@ -170,13 +170,13 @@ function DateSlotPicker({
               />
               <div className="min-w-0 flex-1">
                 <div
-                  className={`font-display text-base tracking-wide sm:text-lg ${
+                  className={`font-display text-[0.95rem] tracking-wide sm:text-lg ${
                     surface === "light" ? "luxury-panel-heading" : "text-foreground"
                   }`}
                 >
                   {formatDateLong(group.date)}
                 </div>
-                <p className={`mt-1 text-xs ${tone.muted}`}>
+                <p className={`mt-0.5 text-[0.68rem] sm:mt-1 sm:text-xs ${tone.muted}`}>
                   {soldOut
                     ? "Sold out"
                     : `${availableCount} session${availableCount === 1 ? "" : "s"} available`}
@@ -184,7 +184,7 @@ function DateSlotPicker({
               </div>
               {!soldOut ? (
                 <ChevronDown
-                  className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
+                  className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 sm:h-4 sm:w-4 ${
                     open ? "rotate-180" : ""
                   } ${surface === "light" ? "text-[#8B6914]/85" : "text-[#D4AF6A]/90"}`}
                   strokeWidth={1.75}
@@ -194,7 +194,7 @@ function DateSlotPicker({
 
             {open && !soldOut ? (
               <div
-                className={`space-y-2 border-t px-4 pb-4 pt-3 ${
+                className={`space-y-2 border-t px-3 pb-3 pt-2.5 sm:px-4 sm:pb-4 sm:pt-3 ${
                   surface === "light" ? "luxury-slot-date__divider" : "border-[#C8A25A]/15"
                 }`}
               >
@@ -215,24 +215,24 @@ function DateSlotPicker({
                             : `${formatTime12h(slot.start)} to ${formatTime12h(slot.end)}, select session`
                       }
                       onClick={() => onSelectSlot(slot)}
-                      className={`relative flex w-full items-center justify-between gap-3 rounded-lg py-3 text-left transition-all duration-200 luxury-slot-focus ${
-                        active ? `pl-5 pr-3.5 ${slotRowActive}` : sold ? "cursor-not-allowed px-3.5 opacity-40" : `px-3.5 ${slotRowIdle}`
+                      className={`relative flex w-full items-center justify-between gap-2.5 rounded-lg py-2.5 text-left transition-all duration-200 luxury-slot-focus sm:gap-3 sm:py-3 ${
+                        active ? `pl-4 pr-3 ${slotRowActive}` : sold ? "cursor-not-allowed px-3 opacity-40 sm:px-3.5" : `px-3 sm:px-3.5 ${slotRowIdle}`
                       }`}
                     >
                       {active ? (
                         <span
-                          className={`absolute bottom-2.5 left-2 top-2.5 w-1 rounded-full ${
+                          className={`absolute bottom-2 left-1.5 top-2 w-1 rounded-full sm:bottom-2.5 sm:left-2 sm:top-2.5 ${
                             surface === "light" ? "luxury-slot-row__rail" : "bg-[#D4AF6A]"
                           }`}
                           aria-hidden
                         />
                       ) : null}
                       <div className="min-w-0 flex-1">
-                        <div className={`text-sm font-semibold ${active && surface === "light" ? "luxury-panel-heading" : active ? tone.seats : ""}`}>
+                        <div className={`text-[0.9rem] font-semibold sm:text-sm ${active && surface === "light" ? "luxury-panel-heading" : active ? tone.seats : ""}`}>
                           {formatTime12h(slot.start)} – {formatTime12h(slot.end)}
                         </div>
                         <div
-                          className={`mt-0.5 flex items-center gap-1.5 text-[0.65rem] uppercase tracking-[0.12em] ${
+                          className={`mt-0.5 flex items-center gap-1 text-[0.58rem] uppercase tracking-[0.1em] sm:gap-1.5 sm:text-[0.65rem] sm:tracking-[0.12em] ${
                             active
                               ? surface === "light"
                                 ? "luxury-slot-row__selected-label"
@@ -254,8 +254,8 @@ function DateSlotPicker({
                       </div>
                       {!sold ? (
                         <div className="shrink-0 text-right">
-                          <div className={`eyebrow text-[0.6rem] ${tone.muted}`}>Seats</div>
-                          <div className={`font-display text-lg ${surface === "light" ? "luxury-panel-heading" : tone.seats}`}>
+                          <div className={`eyebrow text-[0.55rem] sm:text-[0.6rem] ${tone.muted}`}>Seats</div>
+                          <div className={`font-display text-base sm:text-lg ${surface === "light" ? "luxury-panel-heading" : tone.seats}`}>
                             {slot.available}/{slot.capacity}
                           </div>
                         </div>
@@ -408,7 +408,7 @@ export function ExperienceBookingPanel({
             <>
               {!selectedSlot ? (
                 <span
-                  className={`inline-flex w-full items-center justify-center py-3 text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${
+                  className={`inline-flex w-full items-center justify-center py-2.5 text-[0.6rem] font-semibold uppercase tracking-[0.12em] sm:py-3 sm:text-[0.65rem] sm:tracking-[0.14em] ${
                     surface === "light" ? "luxury-panel-body opacity-70" : "text-muted-foreground/60"
                   }`}
                 >
@@ -418,7 +418,7 @@ export function ExperienceBookingPanel({
                 <Link
                   to="/sign-in"
                   search={{ redirect: bookPath }}
-                  className="luxury-btn-sm luxury-btn-primary inline-flex w-full items-center justify-center gap-2"
+                  className="luxury-btn-sm luxury-btn-primary inline-flex w-full items-center justify-center gap-1.5 sm:gap-2"
                 >
                   Sign in to book
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -436,7 +436,7 @@ export function ExperienceBookingPanel({
                   to="/experiences/$slug/book"
                   params={{ slug: exp.slug }}
                   search={bookSearch}
-                  className="luxury-btn-sm luxury-btn-primary inline-flex w-full items-center justify-center gap-2"
+                  className="luxury-btn-sm luxury-btn-primary inline-flex w-full items-center justify-center gap-1.5 sm:gap-2"
                 >
                   Continue to book
                   <ArrowRight className="h-3.5 w-3.5" />
