@@ -14,6 +14,7 @@ EMAIL_BG = "#1a0c10"
 EMAIL_CARD = "#261218"
 EMAIL_CARD_INNER = "#2e161e"
 EMAIL_BORDER = "rgba(200, 162, 90, 0.32)"
+EMAIL_PAGE_BG = "#ffffff"
 EMAIL_INK = "#f7f1e8"
 EMAIL_INK_SOFT = "#c4b5a5"
 EMAIL_INK_MUTED = "#9a8a78"
@@ -175,9 +176,9 @@ def render_royal_transactional_email(
   <title>{_e(title)} — The Royal Passage</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
 </head>
-<body style="margin: 0; padding: 0; background-color: {EMAIL_BG}; -webkit-text-size-adjust: 100%;">
+<body style="margin: 0; padding: 0; background-color: {EMAIL_PAGE_BG}; -webkit-text-size-adjust: 100%;">
   <div style="display: none; max-height: 0; overflow: hidden; opacity: 0;">{hidden}</div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background: radial-gradient(ellipse at center, #2a1218 0%, {EMAIL_BG} 70%); padding: 48px 16px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background: {EMAIL_PAGE_BG}; padding: 48px 16px;">
     <tr>
       <td align="center">
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width: 600px; max-width: 600px; border: 1px solid rgba(200, 162, 90, 0.22); border-radius: 12px; padding: 1px; background: linear-gradient(145deg, rgba(200,162,90,0.35), rgba(92,26,36,0.2), rgba(200,162,90,0.25)); box-shadow: 0 28px 64px rgba(0,0,0,0.5);">
@@ -193,7 +194,7 @@ def render_royal_transactional_email(
                       <tr>
                         <td align="center" style="padding-bottom: 8px;">
                           <a href="{_e(website)}" style="text-decoration: none;">
-                            <img src="{_e(logo)}" alt="The Royal Passage" height="52" style="display: block; margin: 0 auto; max-height: 52px; width: auto; border: 0; opacity: 0.92;" />
+                            <img src="{_e(logo)}" alt="The Royal Passage" height="76" style="display: block; margin: 0 auto; max-height: 76px; width: auto; border: 0; opacity: 0.92;" />
                           </a>
                         </td>
                       </tr>
@@ -697,9 +698,9 @@ def render_royal_booking_request_email(ctx: RoyalBookingRequestContext) -> str:
     .btn-gold:hover {{ filter: brightness(1.08); }}
   </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: {EMAIL_BG}; -webkit-text-size-adjust: 100%;">
+<body style="margin: 0; padding: 0; background-color: {EMAIL_PAGE_BG}; -webkit-text-size-adjust: 100%;">
   <div style="display: none; max-height: 0; overflow: hidden; opacity: 0;">Your royal booking request — {_e(ctx.experience_name)}</div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background: radial-gradient(ellipse at center, #2a1218 0%, {EMAIL_BG} 70%); padding: 48px 16px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background: {EMAIL_PAGE_BG}; padding: 48px 16px;">
     <tr>
       <td align="center">
         <!-- Outer gold frame -->
@@ -717,7 +718,7 @@ def render_royal_booking_request_email(ctx: RoyalBookingRequestContext) -> str:
                       <tr>
                         <td align="center" style="padding-bottom: 4px;">
                           <a href="{_e(website)}" style="text-decoration: none; display: inline-block;">
-                            <img src="{_e(logo)}" alt="The Royal Passage" height="52" style="display: block; margin: 0 auto; max-height: 52px; width: auto; border: 0; opacity: 0.92;" />
+                            <img src="{_e(logo)}" alt="The Royal Passage" height="76" style="display: block; margin: 0 auto; max-height: 76px; width: auto; border: 0; opacity: 0.92;" />
                           </a>
                         </td>
                       </tr>
