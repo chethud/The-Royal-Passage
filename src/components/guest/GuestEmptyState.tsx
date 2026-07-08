@@ -22,13 +22,13 @@ export function GuestEmptyState({
 
   if (isLight) {
     return (
-      <article className="py-14 text-center" role="status">
+      <article className="py-8 text-center sm:py-14" role="status">
         <div className="mx-auto flex h-8 w-8 items-center justify-center text-[#C8A25A]/75">{icon}</div>
-        <h3 className="luxury-panel-heading mt-3 font-display text-xl tracking-wide">{title}</h3>
+        <h3 className="luxury-panel-heading mt-3 font-display text-lg tracking-wide sm:text-xl">{title}</h3>
         <p className="luxury-panel-body mt-2 text-xs leading-relaxed">{description}</p>
         <Link
           to={ctaTo}
-          className="luxury-btn-sm luxury-btn-primary mt-6 inline-flex items-center gap-2"
+          className="luxury-btn-sm luxury-btn-primary mt-5 inline-flex items-center gap-2 sm:mt-6"
         >
           {ctaLabel}
         </Link>

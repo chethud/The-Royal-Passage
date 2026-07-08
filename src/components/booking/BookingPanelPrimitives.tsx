@@ -190,15 +190,18 @@ export function BookingTotalSummary({
   surface?: BookingSurface;
 }) {
   const labelClass = surface === "light" ? "eyebrow luxury-panel-label" : "eyebrow text-muted-foreground";
-  const bodyClass = surface === "light" ? "luxury-panel-body mt-1 text-xs" : "mt-1 text-xs text-muted-foreground";
+  const bodyClass =
+    surface === "light"
+      ? "luxury-panel-body mt-1 text-[0.7rem] leading-snug sm:text-xs"
+      : "mt-1 text-[0.7rem] leading-snug text-muted-foreground sm:text-xs";
   const totalClass =
     surface === "light"
-      ? "font-display text-3xl tracking-tight text-[#4A0000]"
-      : "font-display text-3xl tracking-tight text-[#F7F1E8]";
+      ? "shrink-0 font-display text-xl tracking-tight text-[#4A0000] sm:text-2xl md:text-3xl"
+      : "shrink-0 font-display text-xl tracking-tight text-[#F7F1E8] sm:text-2xl md:text-3xl";
 
   return (
-    <div className="flex items-end justify-between gap-4">
-      <div>
+    <div className="flex items-end justify-between gap-3 sm:gap-4">
+      <div className="min-w-0 flex-1">
         <div className={labelClass}>{label}</div>
         <div className={bodyClass}>{breakdown}</div>
         {footer ? <div className={bodyClass}>{footer}</div> : null}

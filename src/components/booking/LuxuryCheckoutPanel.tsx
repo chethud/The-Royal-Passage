@@ -9,6 +9,6 @@ export function LuxuryCheckoutPanel({
   className?: string;
 }) {
   return (
-    <div className={`luxury-checkout-panel p-7 sm:p-9 ${className}`}>{children}</div>
+    <div className={`luxury-checkout-panel p-4 sm:p-7 md:p-9 ${className}`}>{children}</div>
   );
 }

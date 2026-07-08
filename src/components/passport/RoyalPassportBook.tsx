@@ -122,6 +122,8 @@ function PassportVipStatusTrack({
   );
 }
 
+export type PassportMobilePage = "identity" | "vip";
+
 type RoyalPassportBookProps = {
   regNo: string;
   fullName: string;
@@ -133,6 +135,8 @@ type RoyalPassportBookProps = {
   vipMembershipRejectedAt: string | null;
   photoUrl: string | null;
   photoProcessing: boolean;
+  /** Mobile: show identity or VIP endorsements page full-width. Ignored on desktop. */
+  mobilePage?: PassportMobilePage;
   onFullNameChange: (value: string) => void;
   onDateOfBirthChange: (value: string) => void;
   onPhoneChange: (value: string) => void;
@@ -149,14 +153,22 @@ export function RoyalPassportBook({
   vipMembershipRejectedAt,
   photoUrl,
   photoProcessing,
+  mobilePage = "identity",
   onFullNameChange,
   onDateOfBirthChange,
   onPhoneChange,
   onPhotoSelected,
 }: RoyalPassportBookProps) {
   return (
-    <div className="royal-passport-scene">
-      <div className="royal-passport-book" aria-label="Royal identity passport book">
+    <div className="royal-passport-scene" data-mobile-page={mobilePage}>
+      <div
+        className="royal-passport-book"
+        aria-label={
+          mobilePage === "vip"
+            ? "Royal passport — VIP endorsements"
+            : "Royal identity passport book"
+        }
+      >
         <img
           src={passportSpreadUrl}
           alt=""

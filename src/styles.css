@@ -53,7 +53,7 @@
 :root {
   --radius: 6px;
   /* Header is shorter on mobile so the fixed bar doesn't eat the viewport. */
-  --header-height: 4.5rem;
+  --header-height: 3.75rem;
 
   --burgundy: oklch(0.21 0.1 22);
   --burgundy-deep: oklch(0.15 0.08 20);
@@ -136,10 +136,21 @@
   }
   html {
     font-family: var(--font-sans);
-    font-size: 17px;
+    /* Smaller base on phones — rem-based UI (header, panels, type) stays compact. */
+    font-size: 15px;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+  @media (min-width: 640px) {
+    html {
+      font-size: 16px;
+    }
+  }
+  @media (min-width: 768px) {
+    html {
+      font-size: 17px;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     html {
@@ -194,7 +205,10 @@
 @utility container-page {
   margin-inline: auto;
   max-width: 1280px;
-  padding-inline: 1.5rem;
+  padding-inline: 1.1rem;
+  @media (min-width: 640px) {
+    padding-inline: 1.5rem;
+  }
   @media (min-width: 768px) {
     padding-inline: 2.5rem;
   }
@@ -780,9 +794,16 @@
 
 .luxury-panel-body {
   font-family: var(--font-sans);
-  font-size: 1.05rem;
-  line-height: 1.55;
+  font-size: 0.92rem;
+  line-height: 1.5;
   color: rgb(58 0 0 / 0.58);
+}
+
+@media (min-width: 640px) {
+  .luxury-panel-body {
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
 }
 
 .luxury-panel-label {
@@ -3692,6 +3713,36 @@
   opacity: 0.6;
 }
 
+.royal-passport-form__actions {
+  display: flex;
+  width: 100%;
+  max-width: 58rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.royal-passport-form__nav {
+  display: none;
+  border-radius: 2px;
+  border: 1px solid oklch(0.72 0.1 78 / 0.45);
+  background: oklch(0.22 0.07 22 / 0.55);
+  padding: 0.75rem 1.35rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: oklch(0.92 0.04 86);
+  box-shadow: 0 0 24px -8px oklch(0.72 0.12 78 / 0.35);
+}
+
+.royal-passport-form__nav:hover {
+  border-color: oklch(0.76 0.11 78 / 0.7);
+  color: #f7f1e8;
+}
+
 .royal-passport-scene {
   --passport-book-width: 1024px;
   --passport-page-height: 682px;
@@ -4346,6 +4397,92 @@ a.royal-passport-book__vip-label:hover {
   opacity: 0.45;
   filter: sepia(1) saturate(0.35);
   cursor: pointer;
+}
+
+/* Mobile: one passport page at a time (identity → VIP), actions under the page */
+@media (max-width: 767px) {
+  .royal-passport-form {
+    gap: 1rem;
+    padding-inline: 0.25rem;
+  }
+
+  .royal-passport-profile-page {
+    width: 100%;
+  }
+
+  /* Guest profile shell already pads; keep passport snug under the header */
+  .royal-passport-profile-page .royal-passport-form {
+    margin-top: 0;
+  }
+
+  .royal-passport-form__actions {
+    position: sticky;
+    bottom: 0.75rem;
+    z-index: 20;
+    max-width: min(22rem, 100%);
+    gap: 0.65rem;
+    padding: 0.35rem 0 0.5rem;
+  }
+
+  .royal-passport-form__save {
+    flex: 1 1 auto;
+    min-width: 8.5rem;
+    padding: 0.7rem 1.1rem;
+    font-size: 0.8rem;
+  }
+
+  .royal-passport-form__nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .royal-passport-form[data-mobile-page="identity"] .royal-passport-form__nav--back {
+    display: none;
+  }
+
+  .royal-passport-form[data-mobile-page="vip"] .royal-passport-form__nav--next {
+    display: none;
+  }
+
+  .royal-passport-form[data-mobile-page="vip"] .royal-passport-form__save {
+    display: none;
+  }
+
+  /*
+   * Zoom so a single leaf (~512px of the 1024 spread) fills the phone width.
+   * Clip the scene window to one page; shift the book to show identity (left) or VIP (right).
+   */
+  .royal-passport-scene {
+    --passport-book-width: 1024px;
+    --passport-page-height: 682px;
+    --passport-scale: min(1, calc((100vw - 1.5rem) / 512));
+    width: min(100%, calc(512px * var(--passport-scale)));
+    height: calc(682px * var(--passport-scale));
+    overflow: hidden;
+    padding-bottom: 0;
+    margin-inline: auto;
+  }
+
+  .royal-passport-book {
+    /* Keep desktop % layout; only crop/pan which leaf is visible. */
+    transform-origin: top left;
+    transform: scale(var(--passport-scale));
+  }
+
+  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book {
+    transform: translateX(-50%) scale(var(--passport-scale));
+  }
+
+  .royal-passport-scene[data-mobile-page="identity"] .royal-passport-book__right-panel,
+  .royal-passport-scene[data-mobile-page="identity"] .royal-passport-book__vip-status {
+    pointer-events: none;
+  }
+
+  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book__left-overlay,
+  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book__left-overlay > * {
+    pointer-events: none;
+  }
 }
 
 /* Passport portrait — reused when portrait overlay is added back */

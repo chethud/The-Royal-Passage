@@ -53,7 +53,7 @@ export function formatWeekdayWeekendRates(
   weekendMajor: number,
 ): string {
   if (weekdayMajor === weekendMajor) {
-    return `${sym}${weekdayMajor.toLocaleString("en-IN")}/night`;
+    return `${sym}${weekdayMajor.toLocaleString("en-IN")}/\u200bnight`;
   }
   return `${sym}${weekdayMajor.toLocaleString("en-IN")} weekdays · ${sym}${weekendMajor.toLocaleString("en-IN")} weekends`;
 }

@@ -129,12 +129,14 @@ function HomestayDetailPage() {
                   {formatWeekdayWeekendRates(sym, weekdayPriceMajor(stay), weekendPriceMajor(stay))}
                 </DetailStatItem>
                 <DetailStatItem label="Beds">
-                  <BedDouble className="mx-auto h-5 w-5 text-[#D4AF6A] sm:mx-0" aria-hidden />
-                  {stay.bedrooms}
+                  <span className="inline-flex items-center justify-center gap-1.5 sm:justify-start">
+                    <BedDouble className="h-5 w-5 shrink-0 text-[#D4AF6A]" aria-hidden />
+                    {stay.bedrooms}
+                  </span>
                 </DetailStatItem>
                 <DetailStatItem label="Rating">
-                  <span className="text-[#D4AF6A]">
-                    <Star className="mr-1 inline h-4 w-4 fill-current" aria-hidden />
+                  <span className="inline-flex items-center justify-center gap-1 text-[#D4AF6A] sm:justify-start">
+                    <Star className="h-4 w-4 shrink-0 fill-current" aria-hidden />
                     {stay.rating}
                   </span>
                 </DetailStatItem>
@@ -171,9 +173,9 @@ function HomestayDetailPage() {
       <DetailHomestayBookingSection>
         <LuxuryCheckoutPanel>
           <div className="mx-auto max-w-2xl">
-            <div className="mb-8">
-              <div className="eyebrow luxury-panel-label mb-3">Reserve your stay</div>
-              <h2 className="luxury-panel-heading font-display text-3xl uppercase leading-tight tracking-[0.03em] sm:text-4xl">
+            <div className="mb-5 sm:mb-8">
+              <div className="eyebrow luxury-panel-label mb-2 sm:mb-3">Reserve your stay</div>
+              <h2 className="luxury-panel-heading font-display text-2xl uppercase leading-tight tracking-[0.03em] sm:text-3xl md:text-4xl">
                 Choose your dates.
                 <br />
                 <em className="italic normal-case text-[#8B6914]">Rest in character.</em>

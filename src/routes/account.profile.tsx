@@ -79,7 +79,7 @@ function AccountProfilePage() {
 
   return (
     <GuestDashboardShell title="Profile" wide showPageHeader={false}>
-      {content}
+      <div className="royal-passport-profile-page">{content}</div>
     </GuestDashboardShell>
   );
 }

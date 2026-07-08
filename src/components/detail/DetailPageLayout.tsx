@@ -41,7 +41,7 @@ export function DetailMainSection({
   children: ReactNode;
   className?: string;
 }) {
-  return <section className={`container-page pt-8 pb-14 ${className}`.trim()}>{children}</section>;
+  return <section className={`container-page pt-5 pb-10 sm:pt-8 sm:pb-14 ${className}`.trim()}>{children}</section>;
 }
 
 type DetailBackLinkProps = ComponentProps<typeof Link>;
@@ -60,7 +60,7 @@ export function DetailHeroGrid({
   contentClassName?: string;
 }) {
   return (
-    <div className="mt-8 grid gap-8 md:grid-cols-2 md:items-start md:gap-8 lg:gap-10">
+    <div className="mt-6 grid gap-6 md:grid-cols-2 md:items-start md:gap-8 lg:gap-10 sm:mt-8">
       <div className="w-full md:sticky md:top-[calc(var(--header-height)+1.5rem)] md:self-start">
         {gallery}
       </div>
@@ -70,7 +70,7 @@ export function DetailHeroGrid({
 }
 
 export function DetailCategoryBadge({ children }: { children: ReactNode }) {
-  return <div className={`mb-5 inline-flex items-center gap-2 ${detailEyebrowClass}`}>{children}</div>;
+  return <div className={`mb-3 inline-flex items-center gap-2 sm:mb-5 ${detailEyebrowClass}`}>{children}</div>;
 }
 
 type DetailLocationBlockProps = {
@@ -112,8 +112,8 @@ export function DetailTitleRow({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mt-5 flex items-start justify-between gap-4">
-      <h1 className="font-display text-3xl uppercase leading-[1.08] tracking-[0.04em] text-[#F7F1E8] sm:text-4xl md:text-[2.65rem]">
+    <div className="mt-3 flex items-start justify-between gap-4 sm:mt-5">
+      <h1 className="font-display text-[1.65rem] uppercase leading-[1.1] tracking-[0.04em] text-[#F7F1E8] sm:text-3xl sm:leading-[1.08] md:text-[2.65rem]">
         {title}
       </h1>
       {actions ? <div className="flex shrink-0 items-center gap-2 pt-1">{actions}</div> : null}
@@ -123,7 +123,7 @@ export function DetailTitleRow({
 
 export function DetailTagline({ children }: { children: ReactNode }) {
   return (
-    <p className="mt-4 font-display text-base italic leading-relaxed text-[#D6C8B5]/90 sm:text-lg">
+    <p className="mt-2.5 font-display text-sm italic leading-relaxed text-[#D6C8B5]/90 sm:mt-4 sm:text-base md:text-lg">
       {children}
     </p>
   );
@@ -131,13 +131,13 @@ export function DetailTagline({ children }: { children: ReactNode }) {
 
 export function DetailDivider() {
   return (
-    <div className="my-7 h-px bg-gradient-to-r from-transparent via-[rgb(200_162_90/0.35)] to-transparent" />
+    <div className="my-5 h-px bg-gradient-to-r from-transparent via-[rgb(200_162_90/0.35)] to-transparent sm:my-7" />
   );
 }
 
 export function DetailStatGrid({ children }: { children: ReactNode }) {
   return (
-    <dl className="grid grid-cols-3 divide-x divide-[rgb(200_162_90/0.28)] text-center sm:text-left">
+    <dl className="grid grid-cols-[minmax(0,1.35fr)_minmax(0,0.8fr)_minmax(0,0.85fr)] divide-x divide-[rgb(200_162_90/0.28)] text-center sm:grid-cols-3 sm:text-left">
       {children}
     </dl>
   );
@@ -153,12 +153,12 @@ export function DetailStatItem({
   valueClassName?: string;
 }) {
   return (
-    <div className="px-2 first:pl-0 last:pr-0 sm:px-5">
+    <div className="min-w-0 px-1.5 first:pl-0 last:pr-0 sm:px-5">
       <dt className={detailSectionLabelClass}>{label}</dt>
       <dd
         className={
           valueClassName ??
-          "mt-1.5 font-display text-xl uppercase tracking-[0.02em] text-[#F7F1E8]"
+          "mt-1.5 break-words font-display text-[0.95rem] uppercase leading-snug tracking-[0.02em] text-[#F7F1E8] sm:text-lg md:text-xl"
         }
       >
         {children}
@@ -194,7 +194,7 @@ export function DetailBookingSection({
   return (
     <section
       id="book"
-      className={`border-t border-[rgb(200_162_90/0.18)] pt-8 ${className}`.trim()}
+      className={`border-t border-[rgb(200_162_90/0.18)] pt-5 sm:pt-8 ${className}`.trim()}
     >
       {children}
     </section>
@@ -207,8 +207,8 @@ export function DetailHomestayBookingSection({
   children: ReactNode;
 }) {
   return (
-    <section id="book" className="border-t border-[rgb(200_162_90/0.18)] pb-16 pt-4">
-      <div className="container-page py-8 sm:py-10">{children}</div>
+    <section id="book" className="border-t border-[rgb(200_162_90/0.18)] pb-12 pt-2 sm:pb-16 sm:pt-4">
+      <div className="container-page py-5 sm:py-8 md:py-10">{children}</div>
     </section>
   );
 }

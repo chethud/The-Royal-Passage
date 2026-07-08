@@ -173,7 +173,7 @@ function ExperienceDetail() {
                   </DetailStatItem>
                 </DetailStatGrid>
 
-                <div className="mt-8 space-y-6">
+                <div className="mt-5 space-y-5 sm:mt-8 sm:space-y-6">
                   <DetailDarkSection label="About this experience" className="">
                     <p className="text-sm leading-relaxed text-[#D6C8B5]/92 whitespace-pre-line sm:text-[0.9375rem]">
                       {exp.description}
@@ -181,7 +181,7 @@ function ExperienceDetail() {
                   </DetailDarkSection>
 
                   <DetailDarkSection label="Hosted by" className="">
-                    <div className="font-display text-lg uppercase tracking-[0.04em] text-[#F7F1E8]">
+                    <div className="font-display text-base uppercase tracking-[0.04em] text-[#F7F1E8] sm:text-lg">
                       {exp.hostName}
                     </div>
                     {exp.hostBio ? (
@@ -222,11 +222,11 @@ function ExperienceDetail() {
               </LuxuryCheckoutPanel>
 
               <LuxuryCheckoutPanel>
-                <h2 className="eyebrow luxury-panel-label mb-3">Guest voices</h2>
-                <h2 className="luxury-panel-heading font-display text-2xl uppercase tracking-[0.03em] sm:text-3xl">
+                <h2 className="eyebrow luxury-panel-label mb-2 sm:mb-3">Guest voices</h2>
+                <h2 className="luxury-panel-heading font-display text-xl uppercase tracking-[0.03em] sm:text-2xl md:text-3xl">
                   What travellers <em className="italic normal-case text-[#8B6914]">remember</em>
                 </h2>
-                <div className="mt-8">
+                <div className="mt-5 sm:mt-8">
                   <ExperienceReviewsSection reviews={reviews} surface="light" />
                 </div>
               </LuxuryCheckoutPanel>
@@ -234,14 +234,14 @@ function ExperienceDetail() {
               {canBook ? (
                 <DetailBookingSection>
                   <LuxuryCheckoutPanel>
-                    <div className="mb-8">
-                      <div className="eyebrow luxury-panel-label mb-3">Reserve your seats</div>
-                      <h2 className="luxury-panel-heading font-display text-3xl uppercase leading-tight tracking-[0.03em] sm:text-4xl">
+                    <div className="mb-5 sm:mb-8">
+                      <div className="eyebrow luxury-panel-label mb-2 sm:mb-3">Reserve your seats</div>
+                      <h2 className="luxury-panel-heading font-display text-2xl uppercase leading-tight tracking-[0.03em] sm:text-3xl md:text-4xl">
                         Choose a date.
                         <br />
                         <em className="italic normal-case text-[#8B6914]">Hold your moment.</em>
                       </h2>
-                      <p className="luxury-panel-body mt-4 max-w-xl text-sm leading-relaxed">
+                      <p className="luxury-panel-body mt-3 max-w-xl text-sm leading-relaxed sm:mt-4">
                         Seats are released on a first-come basis and held for 10 minutes during
                         checkout to ensure no one is double-booked.
                       </p>
@@ -262,7 +262,7 @@ function ExperienceDetail() {
                 </DetailBookingSection>
               ) : (
                 <LuxuryCheckoutPanel className="text-center sm:text-left">
-                  <p className="luxury-panel-heading font-display text-2xl uppercase tracking-[0.03em]">
+                  <p className="luxury-panel-heading font-display text-xl uppercase tracking-[0.03em] sm:text-2xl">
                     Booking opens soon
                   </p>
                   <p className="luxury-panel-body mt-2 max-w-md text-sm">
