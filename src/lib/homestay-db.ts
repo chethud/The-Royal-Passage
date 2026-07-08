@@ -55,6 +55,7 @@ export function mapProtoHomestay(stay: ProtoHomestay): Homestay {
       date: entry.date,
       pricePerNight: entry.pricePerNight,
       label: entry.label,
+      extraBedPricePerNight: entry.extraBedPricePerNight,
     })),
   };
 }

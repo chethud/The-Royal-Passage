@@ -22,6 +22,7 @@ type OwnerHolidayPricingManagerProps = {
     date: string;
     isBlocked: boolean;
     priceOverrideMinor?: number;
+    extraBedPriceOverrideMinor?: number;
     note?: string;
   }) => Promise<void>;
   onDelete: (availabilityId: string) => Promise<void>;
@@ -56,9 +57,11 @@ export function OwnerHolidayPricingManager({
   const [holidayType, setHolidayType] = useState<HolidayType>("Custom");
   const [customLabel, setCustomLabel] = useState("");
   const [priceMajor, setPriceMajor] = useState("");
+  const [extraBedMajor, setExtraBedMajor] = useState("");
   const [savingRange, setSavingRange] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [inlinePrice, setInlinePrice] = useState("");
+  const [inlineExtraBed, setInlineExtraBed] = useState("");
   const [inlineLabel, setInlineLabel] = useState("");
   const [inlineBusy, setInlineBusy] = useState(false);
 
@@ -76,6 +79,10 @@ export function OwnerHolidayPricingManager({
         date: entry.date,
         pricePerNight: Math.round((entry.priceOverrideMinor ?? 0) / 100),
         label: entry.note ?? undefined,
+        extraBedPricePerNight:
+          entry.extraBedPriceOverrideMinor != null
+            ? Math.round(entry.extraBedPriceOverrideMinor / 100)
+            : undefined,
       })),
     [holidayEntries],
   );
@@ -106,6 +113,11 @@ export function OwnerHolidayPricingManager({
     const existing = holidayEntries.find((entry) => entry.date === startDate);
     if (!existing) return;
     setPriceMajor(String(Math.round((existing.priceOverrideMinor ?? 0) / 100)));
+    setExtraBedMajor(
+      existing.extraBedPriceOverrideMinor != null
+        ? String(Math.round(existing.extraBedPriceOverrideMinor / 100))
+        : "",
+    );
     const note = existing.note?.trim() ?? "";
     if (note && !(HOLIDAY_TYPES as readonly string[]).includes(note)) {
       setHolidayType("Custom");
@@ -120,6 +132,9 @@ export function OwnerHolidayPricingManager({
     event.preventDefault();
     const priceMinor = parseRupeeMajorInput(priceMajor);
     if (priceMinor <= 0 || selectedNights.length === 0) return;
+    const extraBedTrimmed = extraBedMajor.trim();
+    const extraBedMinor =
+      extraBedTrimmed === "" ? undefined : parseRupeeMajorInput(extraBedMajor);
 
     setSavingRange(true);
     try {
@@ -128,12 +143,15 @@ export function OwnerHolidayPricingManager({
           date: night,
           isBlocked: false,
           priceOverrideMinor: priceMinor * 100,
+          extraBedPriceOverrideMinor:
+            extraBedMinor != null && extraBedMinor > 0 ? extraBedMinor * 100 : undefined,
           note: resolvedLabel,
         });
       }
       setStartDate("");
       setEndDate("");
       setPriceMajor("");
+      setExtraBedMajor("");
       setCustomLabel("");
     } finally {
       setSavingRange(false);
@@ -143,16 +161,22 @@ export function OwnerHolidayPricingManager({
   const handleInlineSave = async (entry: OwnerHomestayDetail["availability"][number]) => {
     const priceMinor = parseRupeeMajorInput(inlinePrice);
     if (priceMinor <= 0) return;
+    const extraBedTrimmed = inlineExtraBed.trim();
+    const extraBedMinor =
+      extraBedTrimmed === "" ? undefined : parseRupeeMajorInput(inlineExtraBed);
     setInlineBusy(true);
     try {
       await onUpsert({
         date: entry.date,
         isBlocked: false,
         priceOverrideMinor: priceMinor * 100,
+        extraBedPriceOverrideMinor:
+          extraBedMinor != null && extraBedMinor > 0 ? extraBedMinor * 100 : undefined,
         note: inlineLabel.trim() || entry.note || "Custom day price",
       });
       setEditingId(null);
       setInlinePrice("");
+      setInlineExtraBed("");
       setInlineLabel("");
     } finally {
       setInlineBusy(false);
@@ -171,8 +195,8 @@ export function OwnerHolidayPricingManager({
   return (
     <div className="space-y-6">
       <p className="luxury-panel-body text-sm leading-relaxed">
-        Set a custom price for any single night or a full date range. These prices override weekday
-        and weekend rates for the selected nights.
+        Set a custom room price and optional extra-bed price for any single night or date range.
+        These override weekday and weekend rates for the selected nights.
       </p>
 
       <div>
@@ -285,7 +309,20 @@ export function OwnerHolidayPricingManager({
           />
         </label>
 
-        <div className="flex flex-wrap items-end gap-2">
+        <label className="block">
+          <span className="eyebrow luxury-panel-label mb-2 block">
+            Extra bed price / night (₹)
+          </span>
+          <input
+            className="luxury-input w-full"
+            placeholder="Optional · e.g. 800"
+            value={extraBedMajor}
+            onChange={(e) => setExtraBedMajor(e.target.value)}
+            disabled={disabled}
+          />
+        </label>
+
+        <div className="flex flex-wrap items-end gap-2 md:col-span-2">
           <button
             type="submit"
             className="luxury-btn-sm luxury-btn-primary flex-1"
@@ -306,6 +343,7 @@ export function OwnerHolidayPricingManager({
                 setStartDate("");
                 setEndDate("");
                 setPriceMajor("");
+                setExtraBedMajor("");
                 setCustomLabel("");
               }}
             >
@@ -332,6 +370,9 @@ export function OwnerHolidayPricingManager({
                       <p className="luxury-panel-heading font-medium">{formatDateLong(entry.date)}</p>
                       <p className="luxury-panel-body text-xs">
                         {formatMoney(entry.priceOverrideMinor ?? 0, sym)} / night
+                        {entry.extraBedPriceOverrideMinor != null
+                          ? ` · Extra bed ${formatMoney(entry.extraBedPriceOverrideMinor, sym)}`
+                          : ""}
                         {entry.note ? ` · ${entry.note}` : ""}
                       </p>
                     </div>
@@ -345,6 +386,11 @@ export function OwnerHolidayPricingManager({
                           setEndDate(entry.date);
                           setEditingId(editing ? null : entry.id);
                           setInlinePrice(String(Math.round((entry.priceOverrideMinor ?? 0) / 100)));
+                          setInlineExtraBed(
+                            entry.extraBedPriceOverrideMinor != null
+                              ? String(Math.round(entry.extraBedPriceOverrideMinor / 100))
+                              : "",
+                          );
                           setInlineLabel(entry.note ?? "");
                         }}
                       >
@@ -362,7 +408,7 @@ export function OwnerHolidayPricingManager({
                   </div>
 
                   {editing ? (
-                    <div className="grid gap-3 rounded-sm border border-[rgb(74_0_0/0.1)] bg-[rgb(255_248_230/0.45)] p-3 md:grid-cols-[1fr_1fr_auto]">
+                    <div className="grid gap-3 rounded-sm border border-[rgb(74_0_0/0.1)] bg-[rgb(255_248_230/0.45)] p-3 md:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
                       <label className="block">
                         <span className="eyebrow luxury-panel-label mb-1 block text-[0.65rem]">
                           Price (₹)
@@ -371,6 +417,18 @@ export function OwnerHolidayPricingManager({
                           className="luxury-input w-full"
                           value={inlinePrice}
                           onChange={(e) => setInlinePrice(e.target.value)}
+                          disabled={inlineBusy}
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="eyebrow luxury-panel-label mb-1 block text-[0.65rem]">
+                          Extra bed (₹)
+                        </span>
+                        <input
+                          className="luxury-input w-full"
+                          value={inlineExtraBed}
+                          onChange={(e) => setInlineExtraBed(e.target.value)}
+                          placeholder="Optional"
                           disabled={inlineBusy}
                         />
                       </label>

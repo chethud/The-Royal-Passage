@@ -84,6 +84,7 @@ class HomestayDatePrice(BaseModel):
     date: str
     pricePerNight: int
     label: str | None = None
+    extraBedPricePerNight: int | None = None
 
 
 class Homestay(BaseModel):
@@ -176,6 +177,7 @@ class OwnerHomestayAvailability(BaseModel):
     priceOverrideMinor: int | None = None
     minNights: int | None = None
     note: str | None = None
+    extraBedPriceOverrideMinor: int | None = None
 
 
 class OwnerHomestayRoom(BaseModel):
@@ -305,7 +307,7 @@ class UpdateOwnerHomestayRequest(BaseModel):
 
 
 class CreateOwnerHomestayRoomRequest(BaseModel):
-    name: str = Field(min_length=2, max_length=80)
+    name: str = Field(min_length=1, max_length=80)
     category: str | None = Field(default=None, max_length=40)
     capacity: int = Field(ge=1, le=20)
     pricePerNightMinor: int = Field(ge=0)
@@ -320,7 +322,7 @@ class CreateOwnerHomestayRoomRequest(BaseModel):
 
 
 class UpdateOwnerHomestayRoomRequest(BaseModel):
-    name: str | None = Field(default=None, min_length=2, max_length=80)
+    name: str | None = Field(default=None, min_length=1, max_length=80)
     category: str | None = Field(default=None, max_length=40)
     capacity: int | None = Field(default=None, ge=1, le=20)
     pricePerNightMinor: int | None = Field(default=None, ge=0)
@@ -492,6 +494,7 @@ class UpsertOwnerAvailabilityRequest(BaseModel):
     priceOverrideMinor: int | None = Field(default=None, ge=0)
     minNights: int | None = Field(default=None, ge=1)
     note: str | None = Field(default=None, max_length=200)
+    extraBedPriceOverrideMinor: int | None = Field(default=None, ge=0)
 
 
 class OwnerDashboardStats(BaseModel):

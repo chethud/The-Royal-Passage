@@ -40,6 +40,7 @@ export type HomestayDatePrice = {
   date: string;
   pricePerNight: number;
   label?: string;
+  extraBedPricePerNight?: number;
 };
 
 export type Homestay = {

@@ -83,7 +83,7 @@ async function loadHomestaysFromDb(citySlug = "mysuru"): Promise<Homestay[]> {
   const horizonIso = horizon.toISOString().slice(0, 10);
   const { data: priceRows, error: priceError } = await supabase
     .from("homestay_availability")
-    .select("homestay_id, date, price_override_minor, note")
+    .select("homestay_id, date, price_override_minor, extra_bed_price_override_minor, note")
     .in("homestay_id", ids)
     .eq("is_blocked", false)
     .is("room_id", null)
@@ -99,10 +99,13 @@ async function loadHomestaysFromDb(citySlug = "mysuru"): Promise<Homestay[]> {
     const priceMinor = row.price_override_minor;
     if (priceMinor == null) continue;
     const list = datePricesByStay.get(homestayId) ?? [];
+    const extraMinor = row.extra_bed_price_override_minor;
     list.push({
       date: row.date as string,
       pricePerNight: Math.round(Number(priceMinor) / 100),
       label: (row.note as string | null) ?? undefined,
+      extraBedPricePerNight:
+        extraMinor == null ? undefined : Math.round(Number(extraMinor) / 100),
     });
     datePricesByStay.set(homestayId, list);
   }

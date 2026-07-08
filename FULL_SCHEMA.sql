@@ -1252,6 +1252,7 @@ create table if not exists public.homestay_availability (
   date date not null,
   is_blocked boolean not null default false,
   price_override_minor integer,
+  extra_bed_price_override_minor integer,
   min_nights integer,
   note text,
   unique (homestay_id, room_id, date)
@@ -1356,6 +1357,8 @@ alter table public.homestays
   add column if not exists extra_beds_per_room integer not null default 1;
 alter table public.homestay_rooms
   add column if not exists extra_beds_per_room integer not null default 1;
+alter table public.homestay_availability
+  add column if not exists extra_bed_price_override_minor integer;
 
 -- ---------------------------------------------------------------------------
 insert into public.homestay_owners (id, full_name, email, phone, address, approval_status, verified) values

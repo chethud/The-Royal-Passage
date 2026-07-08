@@ -1102,14 +1102,16 @@ class Homestay(_message.Message):
     def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., tagline: _Optional[str] = ..., description: _Optional[str] = ..., property_type: _Optional[str] = ..., city: _Optional[str] = ..., city_slug: _Optional[str] = ..., address: _Optional[str] = ..., region: _Optional[str] = ..., map_link: _Optional[str] = ..., price_per_night: _Optional[int] = ..., rating: _Optional[float] = ..., reviews_count: _Optional[int] = ..., image: _Optional[str] = ..., gallery_urls: _Optional[_Iterable[str]] = ..., amenities: _Optional[_Iterable[str]] = ..., house_rules: _Optional[_Iterable[str]] = ..., bedrooms: _Optional[int] = ..., bathrooms: _Optional[int] = ..., max_guests: _Optional[int] = ..., check_in_time: _Optional[str] = ..., check_out_time: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., owner_name: _Optional[str] = ..., rooms: _Optional[_Iterable[_Union[HomestayRoom, _Mapping]]] = ..., extra_bed_available: _Optional[bool] = ..., extra_bed_price_per_night: _Optional[int] = ..., extra_beds_per_room: _Optional[int] = ..., weekend_price_per_night: _Optional[int] = ..., date_prices: _Optional[_Iterable[_Union[HomestayDatePrice, _Mapping]]] = ..., weekend_extra_bed_price_per_night: _Optional[int] = ...) -> None: ...
 
 class HomestayDatePrice(_message.Message):
-    __slots__ = ("date", "price_per_night", "label")
+    __slots__ = ("date", "price_per_night", "label", "extra_bed_price_per_night")
     DATE_FIELD_NUMBER: _ClassVar[int]
     PRICE_PER_NIGHT_FIELD_NUMBER: _ClassVar[int]
     LABEL_FIELD_NUMBER: _ClassVar[int]
+    EXTRA_BED_PRICE_PER_NIGHT_FIELD_NUMBER: _ClassVar[int]
     date: str
     price_per_night: int
     label: str
-    def __init__(self, date: _Optional[str] = ..., price_per_night: _Optional[int] = ..., label: _Optional[str] = ...) -> None: ...
+    extra_bed_price_per_night: int
+    def __init__(self, date: _Optional[str] = ..., price_per_night: _Optional[int] = ..., label: _Optional[str] = ..., extra_bed_price_per_night: _Optional[int] = ...) -> None: ...
 
 class ListHomestaysResponse(_message.Message):
     __slots__ = ("mode", "homestays", "property_types", "cities")
@@ -1220,7 +1222,7 @@ class CreateHomestayBookingResponse(_message.Message):
     def __init__(self, booking_id: _Optional[str] = ..., total_amount: _Optional[int] = ..., currency_code: _Optional[str] = ..., booking_status: _Optional[str] = ..., payment_status: _Optional[str] = ..., nights: _Optional[int] = ...) -> None: ...
 
 class OwnerHomestayAvailability(_message.Message):
-    __slots__ = ("id", "date", "room_id", "is_blocked", "price_override_minor", "min_nights", "note")
+    __slots__ = ("id", "date", "room_id", "is_blocked", "price_override_minor", "min_nights", "note", "extra_bed_price_override_minor")
     ID_FIELD_NUMBER: _ClassVar[int]
     DATE_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
@@ -1228,6 +1230,7 @@ class OwnerHomestayAvailability(_message.Message):
     PRICE_OVERRIDE_MINOR_FIELD_NUMBER: _ClassVar[int]
     MIN_NIGHTS_FIELD_NUMBER: _ClassVar[int]
     NOTE_FIELD_NUMBER: _ClassVar[int]
+    EXTRA_BED_PRICE_OVERRIDE_MINOR_FIELD_NUMBER: _ClassVar[int]
     id: str
     date: str
     room_id: str
@@ -1235,7 +1238,8 @@ class OwnerHomestayAvailability(_message.Message):
     price_override_minor: int
     min_nights: int
     note: str
-    def __init__(self, id: _Optional[str] = ..., date: _Optional[str] = ..., room_id: _Optional[str] = ..., is_blocked: _Optional[bool] = ..., price_override_minor: _Optional[int] = ..., min_nights: _Optional[int] = ..., note: _Optional[str] = ...) -> None: ...
+    extra_bed_price_override_minor: int
+    def __init__(self, id: _Optional[str] = ..., date: _Optional[str] = ..., room_id: _Optional[str] = ..., is_blocked: _Optional[bool] = ..., price_override_minor: _Optional[int] = ..., min_nights: _Optional[int] = ..., note: _Optional[str] = ..., extra_bed_price_override_minor: _Optional[int] = ...) -> None: ...
 
 class OwnerHomestayRoom(_message.Message):
     __slots__ = ("id", "name", "category", "capacity", "price_per_night_minor", "total_units", "amenities", "sort_order", "is_active", "extra_bed_available", "extra_bed_price_per_night_minor", "extra_beds_per_room", "weekend_price_per_night_minor", "weekend_extra_bed_price_per_night_minor")
@@ -1544,20 +1548,22 @@ class UpdateOwnerHomestayRoomRequest(_message.Message):
     def __init__(self, name: _Optional[str] = ..., category: _Optional[str] = ..., capacity: _Optional[int] = ..., price_per_night_minor: _Optional[int] = ..., total_units: _Optional[int] = ..., amenities: _Optional[_Iterable[str]] = ..., sort_order: _Optional[int] = ..., is_active: _Optional[bool] = ..., extra_bed_available: _Optional[bool] = ..., extra_bed_price_per_night_minor: _Optional[int] = ..., extra_beds_per_room: _Optional[int] = ..., weekend_price_per_night_minor: _Optional[int] = ..., weekend_extra_bed_price_per_night_minor: _Optional[int] = ...) -> None: ...
 
 class UpsertOwnerAvailabilityRequest(_message.Message):
-    __slots__ = ("date", "room_id", "is_blocked", "price_override_minor", "min_nights", "note")
+    __slots__ = ("date", "room_id", "is_blocked", "price_override_minor", "min_nights", "note", "extra_bed_price_override_minor")
     DATE_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     IS_BLOCKED_FIELD_NUMBER: _ClassVar[int]
     PRICE_OVERRIDE_MINOR_FIELD_NUMBER: _ClassVar[int]
     MIN_NIGHTS_FIELD_NUMBER: _ClassVar[int]
     NOTE_FIELD_NUMBER: _ClassVar[int]
+    EXTRA_BED_PRICE_OVERRIDE_MINOR_FIELD_NUMBER: _ClassVar[int]
     date: str
     room_id: str
     is_blocked: bool
     price_override_minor: int
     min_nights: int
     note: str
-    def __init__(self, date: _Optional[str] = ..., room_id: _Optional[str] = ..., is_blocked: _Optional[bool] = ..., price_override_minor: _Optional[int] = ..., min_nights: _Optional[int] = ..., note: _Optional[str] = ...) -> None: ...
+    extra_bed_price_override_minor: int
+    def __init__(self, date: _Optional[str] = ..., room_id: _Optional[str] = ..., is_blocked: _Optional[bool] = ..., price_override_minor: _Optional[int] = ..., min_nights: _Optional[int] = ..., note: _Optional[str] = ..., extra_bed_price_override_minor: _Optional[int] = ...) -> None: ...
 
 class OwnerDashboardStats(_message.Message):
     __slots__ = ("pending_bookings", "confirmed_bookings", "completed_bookings", "revenue_collected_minor", "revenue_pending_minor", "upcoming_bookings", "check_in_today", "published_homestays", "currency_symbol", "total_bookings")

@@ -3,7 +3,10 @@ import logging
 
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import CreateHomestayBookingRequest, CreateHomestayBookingResponse
-from app.services.homestay_availability import load_price_overrides_minor
+from app.services.homestay_availability import (
+    load_extra_bed_overrides_minor,
+    load_price_overrides_minor,
+)
 from app.services.homestay_pricing import stay_subtotal_minor
 from app.services.supabase_query import insert_row_returning_id
 from app.services.transactional_emails import (
@@ -227,6 +230,7 @@ def create_homestay_booking(
         day += timedelta(days=1)
 
     price_overrides = load_price_overrides_minor(stay["id"], room_id, check_in, check_out)
+    extra_bed_overrides = load_extra_bed_overrides_minor(stay["id"], room_id, check_in, check_out)
 
     subtotal_minor = stay_subtotal_minor(
         check_in,
@@ -238,6 +242,7 @@ def create_homestay_booking(
         weekend_extra_bed_price_minor,
         extra_bed_count,
         price_overrides,
+        extra_bed_overrides,
     )
     commission_percent = _commission_percent(supabase)
     platform_fee_minor = round((subtotal_minor * commission_percent) / 100)

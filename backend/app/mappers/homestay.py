@@ -59,6 +59,11 @@ def map_row_to_homestay(row: dict, rooms: list[dict]) -> Homestay:
             date=str(item["date"]),
             pricePerNight=round(int(item["price_override_minor"]) / 100),
             label=item.get("note") or None,
+            extraBedPricePerNight=(
+                round(int(item["extra_bed_price_override_minor"]) / 100)
+                if item.get("extra_bed_price_override_minor") is not None
+                else None
+            ),
         )
         for item in load_homestay_date_prices(row["id"])
         if item.get("price_override_minor") is not None

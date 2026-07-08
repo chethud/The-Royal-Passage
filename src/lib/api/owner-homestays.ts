@@ -49,6 +49,7 @@ export type OwnerHomestayAvailability = {
   priceOverrideMinor: number | null;
   minNights: number | null;
   note: string | null;
+  extraBedPriceOverrideMinor: number | null;
 };
 
 export type OwnerHomestaySummary = {
@@ -257,6 +258,7 @@ export function upsertOwnerAvailability(
     priceOverrideMinor?: number;
     minNights?: number;
     note?: string;
+    extraBedPriceOverrideMinor?: number;
   },
 ) {
   const client = createRoyalPassageClient(accessToken);

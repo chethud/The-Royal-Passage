@@ -613,6 +613,7 @@ message HomestayDatePrice {
   string date = 1;
   int32 price_per_night = 2;
   optional string label = 3;
+  optional int32 extra_bed_price_per_night = 4;
 }
 
 message ListHomestaysResponse {
@@ -685,6 +686,7 @@ message OwnerHomestayAvailability {
   optional int32 price_override_minor = 5;
   optional int32 min_nights = 6;
   optional string note = 7;
+  optional int32 extra_bed_price_override_minor = 8;
 }
 
 message OwnerHomestayRoom {
@@ -855,6 +857,7 @@ message UpsertOwnerAvailabilityRequest {
   optional int32 price_override_minor = 4;
   optional int32 min_nights = 5;
   optional string note = 6;
+  optional int32 extra_bed_price_override_minor = 7;
 }
 
 message OwnerDashboardStats {

@@ -10,6 +10,16 @@ export function buildDatePriceMap(datePrices?: HomestayDatePrice[]): Map<string,
   return new Map((datePrices ?? []).map((entry) => [entry.date, entry.pricePerNight]));
 }
 
+export function buildExtraBedDatePriceMap(datePrices?: HomestayDatePrice[]): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const entry of datePrices ?? []) {
+    if (entry.extraBedPricePerNight != null && entry.extraBedPricePerNight > 0) {
+      map.set(entry.date, entry.extraBedPricePerNight);
+    }
+  }
+  return map;
+}
+
 export function weekdayPriceMajor(stay: Homestay, room?: HomestayRoom): number {
   return room?.pricePerNight ?? stay.pricePerNight;
 }

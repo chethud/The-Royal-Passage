@@ -173,6 +173,7 @@ def _map_availability(row: dict) -> OwnerHomestayAvailability:
         priceOverrideMinor=row.get("price_override_minor"),
         minNights=row.get("min_nights"),
         note=row.get("note"),
+        extraBedPriceOverrideMinor=row.get("extra_bed_price_override_minor"),
     )
 
 
@@ -612,6 +613,9 @@ def upsert_owner_availability(
         "date": day.isoformat(),
         "is_blocked": payload.isBlocked,
         "price_override_minor": None if payload.isBlocked else payload.priceOverrideMinor,
+        "extra_bed_price_override_minor": (
+            None if payload.isBlocked else payload.extraBedPriceOverrideMinor
+        ),
         "min_nights": payload.minNights,
         "note": payload.note,
     }

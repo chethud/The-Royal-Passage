@@ -1,5 +1,11 @@
 import type { Homestay, HomestayRoom } from "@/data/homestays";
-import { eachNightBetween, nightPriceMajor, buildDatePriceMap, isHomestayWeekend } from "@/lib/homestay-day-pricing";
+import {
+  eachNightBetween,
+  nightPriceMajor,
+  buildDatePriceMap,
+  buildExtraBedDatePriceMap,
+  isHomestayWeekend,
+} from "@/lib/homestay-day-pricing";
 
 export function normalizeExtraBedsPerRoom(value?: number | null): 1 | 2 {
   return value != null && value >= 2 ? 2 : 1;
@@ -74,13 +80,20 @@ export function calculateStayTotalMinor(
   const room = getSelectedRoom(stay, options.roomId);
   const nights = eachNightBetween(options.checkIn, options.checkOut);
   const datePriceMap = buildDatePriceMap(stay.datePrices);
+  const extraBedDatePriceMap = buildExtraBedDatePriceMap(stay.datePrices);
   const weekdayExtraMajor = weekdayExtraBedPriceMajor(stay, room);
   const weekendExtraMajor = weekendExtraBedPriceMajor(stay, room);
 
   let totalMinor = 0;
   for (const night of nights) {
     const nightMajor = nightPriceMajor(stay, night, room, datePriceMap);
-    const extraMajor = isHomestayWeekend(night) ? weekendExtraMajor : weekdayExtraMajor;
+    const overrideExtra = extraBedDatePriceMap.get(night);
+    const extraMajor =
+      overrideExtra != null
+        ? overrideExtra
+        : isHomestayWeekend(night)
+          ? weekendExtraMajor
+          : weekdayExtraMajor;
     totalMinor += nightMajor * 100 * options.roomCount + extraMajor * 100 * options.extraBedCount;
   }
 

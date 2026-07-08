@@ -110,55 +110,78 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
       <form onSubmit={(e) => void handleAdd(e)} className="space-y-4 border-t luxury-panel-divider pt-6">
         <h3 className="eyebrow luxury-panel-label text-xs uppercase tracking-[0.12em]">Add room</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
-          <input
-            className="luxury-input md:col-span-2"
-            placeholder="Room name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            disabled={busy}
-          />
-          <input
-            className="luxury-input"
-            placeholder="Category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            disabled={busy}
-          />
-          <input
-            className="luxury-input"
-            placeholder="Capacity"
-            type="number"
-            min={1}
-            value={capacity}
-            onChange={(e) => setCapacity(e.target.value)}
-            disabled={busy}
-          />
-          <input
-            className="luxury-input"
-            placeholder="Units"
-            type="number"
-            min={1}
-            value={units}
-            onChange={(e) => setUnits(e.target.value)}
-            disabled={busy}
-          />
-          <RupeeAmountInput
-            className="luxury-input"
-            placeholder="Weekday price / night"
-            value={priceMajor}
-            onChange={setPriceMajor}
-            required
-            disabled={busy}
-          />
-          <RupeeAmountInput
-            className="luxury-input"
-            placeholder="Weekend price / night"
-            value={weekendPriceMajor}
-            onChange={setWeekendPriceMajor}
-            required
-            disabled={busy}
-          />
+          <label className="block md:col-span-2">
+            <span className="eyebrow luxury-panel-label mb-1 block text-[0.65rem]">Room name</span>
+            <input
+              className="luxury-input w-full"
+              placeholder="e.g. Deluxe Suite, Room 1"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              minLength={1}
+              disabled={busy}
+            />
+          </label>
+          <label className="block">
+            <span className="eyebrow luxury-panel-label mb-1 block text-[0.65rem]">Category</span>
+            <input
+              className="luxury-input w-full"
+              placeholder="e.g. Suite"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              disabled={busy}
+            />
+          </label>
+          <label className="block">
+            <span className="eyebrow luxury-panel-label mb-1 block text-[0.65rem]">Capacity</span>
+            <input
+              className="luxury-input w-full"
+              placeholder="Guests"
+              type="number"
+              min={1}
+              value={capacity}
+              onChange={(e) => setCapacity(e.target.value)}
+              disabled={busy}
+            />
+          </label>
+          <label className="block">
+            <span className="eyebrow luxury-panel-label mb-1 block text-[0.65rem]">Units</span>
+            <input
+              className="luxury-input w-full"
+              placeholder="How many"
+              type="number"
+              min={1}
+              value={units}
+              onChange={(e) => setUnits(e.target.value)}
+              disabled={busy}
+            />
+          </label>
+          <label className="block">
+            <span className="eyebrow luxury-panel-label mb-1 block text-[0.65rem]">
+              Weekday price / night (₹)
+            </span>
+            <RupeeAmountInput
+              className="luxury-input w-full"
+              placeholder="e.g. 4500"
+              value={priceMajor}
+              onChange={setPriceMajor}
+              required
+              disabled={busy}
+            />
+          </label>
+          <label className="block">
+            <span className="eyebrow luxury-panel-label mb-1 block text-[0.65rem]">
+              Weekend price / night (₹)
+            </span>
+            <RupeeAmountInput
+              className="luxury-input w-full"
+              placeholder="e.g. 5500"
+              value={weekendPriceMajor}
+              onChange={setWeekendPriceMajor}
+              required
+              disabled={busy}
+            />
+          </label>
         </div>
 
         <label className="flex items-center gap-2 text-sm luxury-panel-body">
@@ -174,31 +197,46 @@ export function OwnerRoomManager({ homestay, busy = false, onAdd, onDeactivate }
 
         {extraBedAvailable ? (
           <div className="grid gap-4 md:grid-cols-3">
-            <RupeeAmountInput
-              className="luxury-input"
-              placeholder="Extra bed weekday price"
-              value={extraBedPriceMajor}
-              onChange={setExtraBedPriceMajor}
-              required
-              disabled={busy}
-            />
-            <RupeeAmountInput
-              className="luxury-input"
-              placeholder="Extra bed weekend price"
-              value={extraBedWeekendPriceMajor}
-              onChange={setExtraBedWeekendPriceMajor}
-              required
-              disabled={busy}
-            />
-            <select
-              className="luxury-input"
-              value={extraBedsPerRoom}
-              onChange={(e) => setExtraBedsPerRoom(Number(e.target.value) === 2 ? 2 : 1)}
-              disabled={busy}
-            >
-              <option value={1}>1 extra bed per room</option>
-              <option value={2}>2 extra beds per room</option>
-            </select>
+            <label className="block">
+              <span className="eyebrow luxury-panel-label mb-1 block text-[0.65rem]">
+                Extra bed weekday (₹)
+              </span>
+              <RupeeAmountInput
+                className="luxury-input w-full"
+                placeholder="e.g. 800"
+                value={extraBedPriceMajor}
+                onChange={setExtraBedPriceMajor}
+                required
+                disabled={busy}
+              />
+            </label>
+            <label className="block">
+              <span className="eyebrow luxury-panel-label mb-1 block text-[0.65rem]">
+                Extra bed weekend (₹)
+              </span>
+              <RupeeAmountInput
+                className="luxury-input w-full"
+                placeholder="e.g. 1000"
+                value={extraBedWeekendPriceMajor}
+                onChange={setExtraBedWeekendPriceMajor}
+                required
+                disabled={busy}
+              />
+            </label>
+            <label className="block">
+              <span className="eyebrow luxury-panel-label mb-1 block text-[0.65rem]">
+                Extra beds per room
+              </span>
+              <select
+                className="luxury-input w-full"
+                value={extraBedsPerRoom}
+                onChange={(e) => setExtraBedsPerRoom(Number(e.target.value) === 2 ? 2 : 1)}
+                disabled={busy}
+              >
+                <option value={1}>1 extra bed per room</option>
+                <option value={2}>2 extra beds per room</option>
+              </select>
+            </label>
           </div>
         ) : null}
 
