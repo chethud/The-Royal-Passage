@@ -177,7 +177,7 @@ export function Header() {
             height={110}
             decoding="async"
             fetchPriority="high"
-            className="h-9 w-auto max-h-[calc(var(--header-height)-0.75rem)] max-w-[min(42vw,9.5rem)] object-contain object-left drop-shadow-[0_0_24px_oklch(0.75_0.12_86_/_0.45)] sm:h-14 sm:max-w-[min(50vw,14rem)] md:h-[6.75rem] md:max-w-none lg:h-[7.35rem]"
+            className="h-15 w-auto max-h-[calc(var(--header-height)-0.35rem)] max-w-[min(62vw,13.5rem)] object-contain object-left drop-shadow-[0_0_24px_oklch(0.75_0.12_86_/_0.45)] sm:h-16 sm:max-w-[min(50vw,14rem)] md:h-[6.75rem] md:max-w-none lg:h-[7.35rem]"
           />
         </Link>
 

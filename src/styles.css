@@ -53,7 +53,7 @@
 :root {
   --radius: 6px;
   /* Header is shorter on mobile so the fixed bar doesn't eat the viewport. */
-  --header-height: 3.75rem;
+  --header-height: 5rem;
 
   --burgundy: oklch(0.21 0.1 22);
   --burgundy-deep: oklch(0.15 0.08 20);

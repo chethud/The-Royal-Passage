@@ -8,7 +8,7 @@ export const marketplaceCardActionClass =
   "scale-90 border-0 bg-black/35 p-2 text-[#F7F1E8] shadow-none backdrop-blur-sm hover:border-0 hover:bg-black/50";
 
 export const marketplaceCardFrameClass =
-  "relative aspect-[4/5] w-full overflow-hidden rounded-md";
+  "relative aspect-[16/11] w-full overflow-hidden rounded-md sm:aspect-[4/5]";
 
 export const marketplaceCardShellClass = `${marketplaceCardFrameClass} shadow-[0_20px_50px_-28px_rgba(0,0,0,0.72)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_28px_56px_-24px_rgba(200,162,90,0.3)]`;
 
@@ -60,17 +60,17 @@ function MarketplaceCardContent({
         <div className="absolute inset-0 bg-gradient-to-t from-[#120000]/95 via-[#4A0000]/40 to-[#4A0000]/10" />
         <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent" />
 
-        <div className="absolute left-3.5 top-3.5 z-20">{topLeft}</div>
+        <div className="absolute left-2.5 top-2.5 z-20 sm:left-3.5 sm:top-3.5">{topLeft}</div>
 
-        <div className="absolute inset-x-0 bottom-0 z-20 p-5">
-          <h3 className="line-clamp-2 font-display text-lg uppercase leading-snug tracking-[0.06em] text-[#F7F1E8] drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] transition-colors group-hover:text-[#D4AF6A]">
+        <div className="absolute inset-x-0 bottom-0 z-20 p-3.5 sm:p-5">
+          <h3 className="line-clamp-2 font-display text-base uppercase leading-snug tracking-[0.06em] text-[#F7F1E8] drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] transition-colors group-hover:text-[#D4AF6A] sm:text-lg">
             {title}
           </h3>
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[0.68rem] text-[#E8DCC8]/90">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.62rem] text-[#E8DCC8]/90 sm:mt-2.5 sm:gap-x-3.5 sm:text-[0.68rem]">
             {meta}
           </div>
-          {footer ? <div className="mt-3">{footer}</div> : null}
-          <span className="mt-3 inline-flex items-center gap-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-all duration-300 group-hover:gap-2.5">
+          {footer ? <div className="mt-2 sm:mt-3">{footer}</div> : null}
+          <span className="mt-2 inline-flex items-center gap-1.5 text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-all duration-300 group-hover:gap-2.5 sm:mt-3 sm:text-[0.62rem]">
             {ctaLabel}
             <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
           </span>
