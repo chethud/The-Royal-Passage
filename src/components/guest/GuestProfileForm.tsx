@@ -6,10 +6,7 @@ import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 import { toErrorMessage } from "@/lib/api/client";
 import { handlePassportPhotoUpload } from "@/lib/passport-photo/passport-photo-upload";
 import { resolveRegistrationNumber } from "@/lib/registration-number";
-import {
-  RoyalPassportBook,
-  type PassportMobilePage,
-} from "@/components/passport/RoyalPassportBook";
+import { RoyalPassportBook } from "@/components/passport/RoyalPassportBook";
 import { useFaceDetection } from "@/hooks/useFaceDetection";
 import { useAuthUser } from "@/lib/auth-user";
 
@@ -34,7 +31,6 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
-  const [mobilePage, setMobilePage] = useState<PassportMobilePage>("identity");
 
   const handlePhotoSelected = useCallback(
     async (file: File) => {
@@ -93,19 +89,8 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
     }
   };
 
-  const goToPage = (page: PassportMobilePage) => {
-    setMobilePage(page);
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
   return (
-    <form
-      onSubmit={(event) => void handleSubmit(event)}
-      className="royal-passport-form"
-      data-mobile-page={mobilePage}
-    >
+    <form onSubmit={(event) => void handleSubmit(event)} className="royal-passport-form">
       {faceModelLoading ? (
         <p className="royal-passport-form__status">Preparing portrait intelligence…</p>
       ) : null}
@@ -126,7 +111,6 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
         vipMembershipRejectedAt={vipMembershipRejectedAt}
         photoUrl={previewUrl}
         photoProcessing={uploadingPhoto}
-        mobilePage={mobilePage}
         onFullNameChange={setFullName}
         onDateOfBirthChange={setDateOfBirth}
         onPhoneChange={setPhone}
@@ -138,27 +122,11 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
 
       <div className="royal-passport-form__actions">
         <button
-          type="button"
-          className="royal-passport-form__nav royal-passport-form__nav--back"
-          onClick={() => goToPage("identity")}
-        >
-          Back
-        </button>
-
-        <button
           type="submit"
           disabled={saving || uploadingPhoto}
           className="royal-passport-form__save"
         >
           {saving ? "Saving…" : "Save profile"}
-        </button>
-
-        <button
-          type="button"
-          className="royal-passport-form__nav royal-passport-form__nav--next"
-          onClick={() => goToPage("vip")}
-        >
-          Next
         </button>
       </div>
     </form>

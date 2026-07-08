@@ -1,15 +1,13 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   CalendarDays,
   CalendarRange,
   Clock,
   Grid3X3,
   Moon,
-  SlidersHorizontal,
   Sparkles,
   Sun,
   Sunrise,
-  X,
 } from "lucide-react";
 import type { ExperienceSearch } from "@/lib/experience-filters";
 import { categoryIconForLabel, shortCategoryLabel } from "@/lib/experience-category-icons";
@@ -50,52 +48,33 @@ export function ExperiencesFilterSidebar({
   onUpdate,
   onReset,
 }: ExperiencesFilterSidebarProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const activeCount = useMemo(() => countActiveFilters(search), [search]);
 
   return (
     <aside className="order-1 w-full shrink-0 lg:w-[220px] xl:w-[240px]">
-      {/* Mobile: compact toggle so experience cards stay visible above */}
+      {/* Mobile: always-visible compact filters */}
       <div className="lg:hidden">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen((open) => !open)}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-sm border border-[rgb(200_162_90/0.35)] bg-[rgb(0_0_0/0.2)] px-3 py-2.5 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#F7F1E8] transition-colors hover:border-[#D4AF6A]"
-          >
-            {mobileOpen ? (
-              <X className="h-3.5 w-3.5 text-[#D4AF6A]" aria-hidden />
-            ) : (
-              <SlidersHorizontal className="h-3.5 w-3.5 text-[#D4AF6A]" aria-hidden />
-            )}
-            {mobileOpen ? "Hide filters" : "Refine"}
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <h2 className="font-display text-base tracking-wide text-[#F7F1E8]">Refine</h2>
+          <div className="flex items-center gap-2">
             {activeCount > 0 ? (
               <span className="rounded-full bg-[#D4AF6A]/20 px-1.5 py-0.5 text-[0.6rem] text-[#D4AF6A]">
                 {activeCount}
               </span>
             ) : null}
-          </button>
-          {activeCount > 0 ? (
             <button
               type="button"
               onClick={onReset}
-              className="shrink-0 px-2 py-2.5 text-[0.65rem] uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
+              className="shrink-0 px-1.5 py-1 text-[0.65rem] uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
             >
               Reset
             </button>
-          ) : null}
+          </div>
         </div>
 
-        {mobileOpen ? (
-          <div className="mt-4 space-y-6 rounded-sm border border-[rgb(200_162_90/0.22)] bg-[rgb(0_0_0/0.18)] px-3 py-4">
-            <FilterPanels
-              search={search}
-              categories={categories}
-              onUpdate={onUpdate}
-            />
-          </div>
-        ) : null}
+        <div className="space-y-4 rounded-sm border border-[rgb(200_162_90/0.22)] bg-[rgb(0_0_0/0.18)] px-3 py-3">
+          <FilterPanels search={search} categories={categories} onUpdate={onUpdate} />
+        </div>
       </div>
 
       {/* Desktop: always-visible sticky sidebar */}

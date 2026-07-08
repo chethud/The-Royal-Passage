@@ -3730,6 +3730,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  margin-inline: auto;
   gap: 0.75rem;
 }
 
@@ -4409,7 +4410,7 @@ a.royal-passport-book__vip-label:hover {
   cursor: pointer;
 }
 
-/* Mobile: one passport page at a time (identity → VIP), actions under the page */
+/* Mobile passport tuning: keep single full spread visible. */
 @media (max-width: 767px) {
   .royal-passport-form {
     gap: 1rem;
@@ -4426,86 +4427,24 @@ a.royal-passport-book__vip-label:hover {
   }
 
   .royal-passport-form__actions {
-    position: sticky;
-    bottom: 0.75rem;
-    z-index: 20;
     max-width: min(22rem, 100%);
+    justify-content: center;
+    margin-inline: auto;
     gap: 0.65rem;
-    padding: 0.35rem 0 0.5rem;
+    padding-top: 0.35rem;
   }
 
   .royal-passport-form__save {
-    flex: 1 1 auto;
-    min-width: 8.5rem;
+    width: min(18rem, 100%);
+    flex: 0 1 auto;
+    min-width: 0;
     padding: 0.7rem 1.1rem;
     font-size: 0.8rem;
   }
 
-  .royal-passport-form__nav {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .royal-passport-form[data-mobile-page="identity"] .royal-passport-form__nav--back {
-    display: none;
-  }
-
-  .royal-passport-form[data-mobile-page="vip"] .royal-passport-form__nav--next {
-    display: none;
-  }
-
-  .royal-passport-form[data-mobile-page="vip"] .royal-passport-form__save {
-    display: none;
-  }
-
-  /*
-   * Show one leaf of the open book at a time.
-   * Scene is a half-book viewport; book is scaled to fill that width.
-   * Identity = left leaf; Next pans to VIP (right leaf).
-   */
   .royal-passport-scene {
-    --passport-book-width: 1024px;
-    --passport-page-height: 682px;
-    --passport-page-width: 512px;
-    container-type: inline-size;
-    container-name: passport;
-    width: min(100%, 26rem);
-    aspect-ratio: 512 / 682;
-    height: auto;
-    overflow: hidden;
+    --passport-scale: min(1, calc((100vw - 1.5rem) / var(--passport-book-width)));
     padding-bottom: 0;
-    margin-inline: auto;
-  }
-
-  .royal-passport-book {
-    width: var(--passport-book-width);
-    aspect-ratio: 1024 / 682;
-    /* Unitless scale from container width → one leaf fills the scene */
-    --passport-scale: calc(100cqw / 512px);
-    transform-origin: top left;
-    /* translate first (right-to-left), then scale — pans by one leaf in layout px */
-    transform: scale(var(--passport-scale));
-  }
-
-  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book {
-    transform: scale(var(--passport-scale)) translateX(-512px);
-  }
-
-  .royal-passport-scene[data-mobile-page="identity"] .royal-passport-book__right-panel,
-  .royal-passport-scene[data-mobile-page="identity"] .royal-passport-book__vip-status,
-  .royal-passport-scene[data-mobile-page="identity"] .royal-passport-book__endorsements-heading,
-  .royal-passport-scene[data-mobile-page="identity"] a.royal-passport-book__vip-label {
-    pointer-events: none;
-    visibility: hidden;
-  }
-
-  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book__left-overlay,
-  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book__left-overlay > *,
-  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book__left-crest,
-  .royal-passport-scene[data-mobile-page="vip"] .royal-passport-book__left-title {
-    pointer-events: none;
-    visibility: hidden;
   }
 }
 
