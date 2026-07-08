@@ -36,9 +36,9 @@ const pillars: Pillar[] = [
 
 export function PillarsRow() {
   return (
-    <section className="border-t border-[oklch(0.88_0.08_86_/_0.12)] bg-[color-mix(in srgb, var(--brand-noir) 88%, var(--brand-maroon) 12%)] pt-8 pb-6 sm:pt-10 sm:pb-7 md:pt-12 md:pb-8">
-      <div className="container-page">
-        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4 md:gap-6 lg:gap-8">
+    <section className="border-t border-[oklch(0.88_0.08_86_/_0.12)] bg-[color-mix(in srgb, var(--brand-noir) 88%, var(--brand-maroon) 12%)] pt-5 pb-4 sm:pt-10 sm:pb-7 md:pt-12 md:pb-8">
+      <div className="container-page px-2 sm:px-6">
+        <div className="grid grid-cols-4 gap-1 sm:gap-4 md:gap-6 lg:gap-8">
           {pillars.map((p, idx) => {
             const Icon = p.icon;
             return (
@@ -48,22 +48,21 @@ export function PillarsRow() {
                 delay={idx * 0.07}
                 offsetY={18}
                 className={cn(
-                  "relative flex flex-col items-center px-4 text-center",
+                  "relative flex min-w-0 flex-col items-center px-0.5 text-center sm:px-3 md:px-4",
                   // Vertical gradient line
                   "before:pointer-events-none before:absolute before:left-0 before:top-1/2 before:hidden before:h-[72%] before:w-px before:-translate-y-1/2 before:bg-gradient-to-b before:from-transparent before:via-ember/55 before:to-transparent",
                   // Centered diamond accent
                   "after:pointer-events-none after:absolute after:left-0 after:top-1/2 after:hidden after:h-1.5 after:w-1.5 after:-translate-x-1/2 after:-translate-y-1/2 after:rotate-45 after:border after:border-ember/55 after:bg-[color-mix(in srgb, var(--brand-noir) 88%, var(--brand-maroon) 12%)] after:shadow-[0_0_10px_oklch(0.78_0.13_86_/_0.45)]",
-                  idx % 2 === 1 && "sm:before:block sm:after:block",
-                  idx > 0 && "md:before:block md:after:block",
+                  idx > 0 && "before:block after:block",
                 )}
               >
-                <span className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-ember/55 bg-ember/8 text-ember shadow-[inset_0_1px_0_oklch(0.92_0.06_82_/_0.18)]">
-                  <Icon className="h-9 w-9" />
+                <span className="mb-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ember/55 bg-ember/8 text-ember shadow-[inset_0_1px_0_oklch(0.92_0.06_82_/_0.18)] sm:mb-5 sm:h-16 sm:w-16">
+                  <Icon className="h-4 w-4 sm:h-9 sm:w-9" />
                 </span>
-                <div className="font-display text-[0.95rem] uppercase tracking-[0.2em] text-ink">
+                <div className="font-display text-[0.52rem] uppercase leading-tight tracking-[0.08em] text-ink sm:text-[0.95rem] sm:tracking-[0.2em]">
                   {p.title}
                 </div>
-                <p className="mt-2 max-w-[16rem] text-xs leading-relaxed text-muted-foreground sm:text-[0.78rem]">
+                <p className="mt-1 max-w-none text-[0.5rem] leading-snug text-muted-foreground sm:mt-2 sm:max-w-[16rem] sm:text-[0.78rem] sm:leading-relaxed">
                   {p.description}
                 </p>
               </ScrollReveal>
