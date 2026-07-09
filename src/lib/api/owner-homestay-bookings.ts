@@ -50,6 +50,7 @@ export type HomestayBookingSummary = {
   paymentMethod: string;
   guestName: string | null;
   notes: string | null;
+  rejectionReason: string | null;
   createdAt: string;
   checkInTime: string | null;
   checkOutTime: string | null;

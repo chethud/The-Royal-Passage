@@ -93,6 +93,7 @@ function mapHomestayBooking(row: Record<string, unknown>): HomestayBookingSummar
     paymentMethod: String(row.payment_method ?? "cod"),
     guestName: null,
     notes: (row.notes as string | null) ?? null,
+    rejectionReason: (row.rejection_reason as string | null) ?? null,
     createdAt: String(row.created_at ?? ""),
     checkInTime: formatTime(String(stay.check_in_time ?? "")),
     checkOutTime: formatTime(String(stay.check_out_time ?? "")),

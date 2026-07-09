@@ -61,6 +61,7 @@ def _map_homestay_booking(row: dict) -> HomestayBookingSummary:
         homestayAddress=stay.get("address"),
         roomCount=int(row.get("room_count") or 1),
         extraBedCount=int(row.get("extra_bed_count") or 0),
+        rejectionReason=row.get("rejection_reason"),
     )
 
 

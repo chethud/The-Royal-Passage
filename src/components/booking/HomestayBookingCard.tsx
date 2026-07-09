@@ -16,6 +16,7 @@ import {
   type BookingCardSurface,
 } from "@/components/booking/BookingCardPrimitives";
 import { HomestayCashPaymentNotice } from "@/components/homestays/HomestayCashPaymentNotice";
+import { HomestayRejectionNotice } from "@/components/homestays/HomestayRejectionNotice";
 import type { HomestayBookingSummary } from "@/lib/api/owner-homestay-bookings";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
@@ -81,6 +82,8 @@ export function HomestayBookingCard({ booking, surface = "light" }: HomestayBook
               {formatMoney(booking.totalAmount, booking.currencySymbol)}
             </BookingCardMetaItem>
           </BookingCardMetaGrid>
+
+          <HomestayRejectionNotice booking={booking} surface={surface} />
 
           <HomestayCashPaymentNotice booking={booking} surface={surface} />
 

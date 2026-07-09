@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { HomestayCashPaymentNotice } from "@/components/homestays/HomestayCashPaymentNotice";
+import { HomestayRejectionNotice } from "@/components/homestays/HomestayRejectionNotice";
 import { PayAtHomestayBadge } from "@/components/homestays/PayAtHomestayBadge";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
@@ -161,6 +162,10 @@ function StayBookingDetailPage() {
                   </div>
                 ) : null}
               </dl>
+
+              <div className="mt-8">
+                <HomestayRejectionNotice booking={booking} surface="light" />
+              </div>
 
               <div className="mt-8 space-y-4 border-t luxury-panel-divider pt-6">
                 <HomestayCashPaymentNotice booking={booking} surface="light" />

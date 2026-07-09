@@ -897,6 +897,7 @@ message HomestayBookingSummary {
   optional string homestay_address = 21;
   int32 room_count = 22;
   int32 extra_bed_count = 23;
+  optional string rejection_reason = 24;
 }
 
 message ListHomestayBookingsResponse {
