@@ -42,3 +42,9 @@ __pycache__/
 *.njsproj
 *.sln
 *.sw?
+
+# Local email/video dev artifacts (generated during preview work)
+.cursor-curtain-frames/
+.video-frames/
+.royal-booking-email-preview.html
+.royal-booking-request-preview.html
