@@ -53,6 +53,9 @@ function HomestaysBrowsePage() {
     void navigate({
       search: (prev) => {
         const next = { ...prev, ...patch };
+        if ("guests" in patch && (patch.guests == null || patch.guests <= 0)) {
+          delete next.guests;
+        }
         if (next.checkIn && next.checkOut && next.checkOut <= next.checkIn) {
           const checkout = new Date(`${next.checkIn}T12:00:00`);
           checkout.setDate(checkout.getDate() + 1);

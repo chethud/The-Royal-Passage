@@ -7,7 +7,8 @@ export type HomestaySearchValues = {
   /** Empty until the guest picks a date. */
   checkIn: string;
   checkOut: string;
-  guests: number;
+  /** Empty until the guest picks a count. */
+  guests?: number;
 };
 
 type HomestaysSearchWidgetProps = {
@@ -25,7 +26,6 @@ export function createDefaultHomestaySearchValues(
     q: "",
     checkIn: "",
     checkOut: "",
-    guests: 2,
     ...overrides,
   };
 }
@@ -35,7 +35,7 @@ export function homestaySearchFromBrowse(search: HomestayBrowseSearch): Homestay
     q: search.q ?? "",
     checkIn: search.checkIn ?? "",
     checkOut: search.checkOut ?? "",
-    guests: search.guests ?? 2,
+    guests: search.guests,
   };
 }
 
@@ -51,6 +51,8 @@ export function HomestaysSearchWidget({
 }: HomestaysSearchWidgetProps) {
   const today = new Date().toISOString().slice(0, 10);
   const checkOutMin = values.checkIn || today;
+  const guestCount = values.guests;
+  const hasGuests = guestCount != null && guestCount > 0;
 
   const handleCheckInChange = (next: string) => {
     const patch: Partial<HomestaySearchValues> = { checkIn: next };
@@ -118,18 +120,28 @@ export function HomestaysSearchWidget({
             <button
               type="button"
               aria-label="Decrease guests"
-              disabled={values.guests <= 1}
-              onClick={() => onChange({ guests: Math.max(1, values.guests - 1) })}
+              disabled={!hasGuests}
+              onClick={() =>
+                onChange({
+                  guests: guestCount === 1 ? undefined : Math.max(1, (guestCount ?? 1) - 1),
+                })
+              }
               className="inline-flex h-7 w-7 items-center justify-center text-[#4A0000]/75 transition-colors hover:text-[#4A0000] disabled:opacity-35 sm:h-8 sm:w-8"
             >
               <Minus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </button>
-            <span className="font-display text-base text-[#4A0000] sm:text-lg">{values.guests}</span>
+            <span className="font-display text-base text-[#4A0000] sm:text-lg">
+              {hasGuests ? guestCount : "—"}
+            </span>
             <button
               type="button"
               aria-label="Increase guests"
-              disabled={values.guests >= 12}
-              onClick={() => onChange({ guests: Math.min(12, values.guests + 1) })}
+              disabled={hasGuests && guestCount >= 12}
+              onClick={() =>
+                onChange({
+                  guests: hasGuests ? Math.min(12, guestCount + 1) : 1,
+                })
+              }
               className="inline-flex h-7 w-7 items-center justify-center text-[#4A0000]/75 transition-colors hover:text-[#4A0000] disabled:opacity-35 sm:h-8 sm:w-8"
             >
               <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />

@@ -34,7 +34,7 @@ export function HomestaysHomeHero() {
         q: search.q?.trim() || undefined,
         checkIn: search.checkIn || undefined,
         checkOut: search.checkOut || undefined,
-        guests: search.guests,
+        guests: search.guests && search.guests > 0 ? search.guests : undefined,
       },
     });
   };

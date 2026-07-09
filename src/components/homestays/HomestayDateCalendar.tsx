@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
 import type { HomestayDatePrice } from "@/data/homestays";
@@ -16,6 +16,10 @@ function fromIsoDate(iso: string) {
   if (!iso) return undefined;
   const date = new Date(`${iso}T12:00:00`);
   return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
+function startOfMonth(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1, 12, 0, 0, 0);
 }
 
 function addDaysIso(iso: string, days: number) {
@@ -56,6 +60,27 @@ export function HomestayDateCalendar({
     now.setHours(12, 0, 0, 0);
     return now;
   }, []);
+
+  const [month, setMonth] = useState(() => startOfMonth(fromIsoDate(checkIn) ?? today));
+
+  useEffect(() => {
+    const selected = fromIsoDate(checkIn);
+    if (!selected) return;
+    setMonth((current) => {
+      if (
+        selected.getFullYear() === current.getFullYear() &&
+        selected.getMonth() === current.getMonth()
+      ) {
+        return current;
+      }
+      return startOfMonth(selected);
+    });
+  }, [checkIn]);
+
+  const calendarEndMonth = useMemo(
+    () => new Date(today.getFullYear() + 2, 11, 1, 12, 0, 0, 0),
+    [today],
+  );
 
   const holidayMap = useMemo(() => {
     const map = new Map<string, HomestayDatePrice>();
@@ -106,6 +131,11 @@ export function HomestayDateCalendar({
     <div className={cn("space-y-3", className)}>
       <Calendar
         mode="range"
+        month={month}
+        onMonthChange={setMonth}
+        startMonth={startOfMonth(today)}
+        endMonth={calendarEndMonth}
+        captionLayout={showDayPrices ? "dropdown" : "label"}
         selected={selected}
         onSelect={handleSelect}
         disabled={[{ before: today }, blockedMatcher]}
@@ -126,7 +156,22 @@ export function HomestayDateCalendar({
         classNames={{
           root: "w-full",
           months: "w-full",
-          month: "w-full",
+          month: "w-full gap-3",
+          nav: "relative flex w-full items-center justify-between gap-2",
+          button_previous: cn(
+            "h-9 w-9 rounded-sm border border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.55)] text-[#8B4A2B]",
+            "hover:bg-[rgb(200_162_90/0.22)] hover:text-[#5C2E12] disabled:opacity-35",
+          ),
+          button_next: cn(
+            "h-9 w-9 rounded-sm border border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.55)] text-[#8B4A2B]",
+            "hover:bg-[rgb(200_162_90/0.22)] hover:text-[#5C2E12] disabled:opacity-35",
+          ),
+          month_caption: "flex h-10 w-full items-center justify-center px-10",
+          caption_label: "font-display text-sm tracking-[0.08em] text-[#5C2E12]",
+          dropdowns: "flex items-center justify-center gap-2",
+          dropdown_root:
+            "rounded-sm border border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.7)] text-[#5C2E12] shadow-none",
+          dropdown: "cursor-pointer bg-transparent text-[#5C2E12]",
         }}
         components={{
           DayButton: ({ day, modifiers, className: dayClassName, ...props }) => {
