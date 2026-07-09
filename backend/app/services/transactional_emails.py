@@ -9,9 +9,12 @@ from app.dependencies.supabase import get_supabase_admin
 from app.services.email import send_email
 from app.services.royal_email_templates import (
     RoyalBookingRequestContext,
+    RoyalHostAlertContext,
     format_duration_label,
     render_royal_booking_request_email,
+    render_royal_host_alert_email,
     render_royal_transactional_email,
+    royal_centered_message,
     royal_link,
     royal_list,
     royal_paragraph,
@@ -299,24 +302,38 @@ def send_host_new_experience_booking_email(
     booking_id: str,
 ) -> bool:
     amount = _format_amount(total_minor, currency_code)
-    html = _wrap_html(
-        "New Booking Request",
-        royal_paragraph(f'Dear <span style="color: #f7f1e8; font-style: italic;">{host_name}</span>,')
-        + royal_paragraph(
-            f'<strong style="color: #f7f1e8;">{guest_name}</strong> requested a booking for '
-            f'<strong style="color: #d4af6a;">{experience_title}</strong>.'
+    time_range = _format_time(slot_start)
+    if slot_end:
+        time_range = f"{_format_time(slot_start)} – {_format_time(slot_end)}"
+    html = render_royal_host_alert_email(
+        RoyalHostAlertContext(
+            host_name=host_name,
+            headline="New Booking",
+            headline_accent="Request",
+            badge="Action Required",
+            ornament_label="Host Alert",
+            details_title="Booking Details",
+            preheader=f"New booking request — {experience_title}",
+            message_html=royal_centered_message(
+                f'Dear <span style="color: #f7f1e8; font-style: italic;">{esc(host_name)}</span>,<br/>'
+                f'<span style="font-size: 16px; color: #9a8a78;">'
+                f'<strong style="color: #f7f1e8;">{esc(guest_name)}</strong> requested '
+                f'<strong style="color: #d4af6a;">{esc(experience_title)}</strong>. '
+                f"Please confirm or reject in your host dashboard."
+                f"</span>"
+            ),
+            detail_rows=[
+                ("Experience", experience_title),
+                ("Date", _format_date(slot_date)),
+                ("Time", time_range),
+                ("Guests", str(guest_count)),
+            ],
+            highlight_label="Total",
+            highlight_value=f"{amount} (pay at venue)",
+            closing_note="A prompt response helps guests plan their royal journey.",
+            cta_label="Review Booking Request",
+            cta_url=_site_link("/host/bookings"),
         )
-        + royal_list(
-            [
-                f"Date: {_format_date(slot_date)}",
-                f"Time: {_format_time(slot_start)} – {_format_time(slot_end)}",
-                f"Guests: {guest_count}",
-                f"Total: {amount} (pay at venue)",
-            ]
-        )
-        + royal_paragraph("Please <strong style=\"color: #d4af6a;\">confirm or reject</strong> this request in your host dashboard."),
-        cta_label="Review Booking Request",
-        cta_url=_site_link("/host/bookings"),
     )
     return send_email(
         to=to,
@@ -342,24 +359,37 @@ def send_host_experience_booking_reminder_email(
 ) -> bool:
     amount = _format_amount(total_minor, currency_code)
     urgency = "Urgent Reminder" if waiting_for == "24 hours" else "Reminder"
-    html = _wrap_html(
-        urgency,
-        royal_paragraph(f'Dear <span style="color: #f7f1e8; font-style: italic;">{host_name}</span>,')
-        + royal_paragraph(
-            f'{guest_name} is still waiting for your response on '
-            f'<strong style="color: #d4af6a;">{experience_title}</strong> (pending for {waiting_for}).'
+    time_range = _format_time(slot_start)
+    if slot_end:
+        time_range = f"{_format_time(slot_start)} – {_format_time(slot_end)}"
+    html = render_royal_host_alert_email(
+        RoyalHostAlertContext(
+            host_name=host_name,
+            headline=urgency,
+            badge="Response Needed",
+            ornament_label="Host Alert",
+            details_title="Booking Details",
+            preheader=f"{urgency}: booking pending for {waiting_for} — {experience_title}",
+            message_html=royal_centered_message(
+                f'Dear <span style="color: #f7f1e8; font-style: italic;">{esc(host_name)}</span>,<br/>'
+                f'<span style="font-size: 16px; color: #9a8a78;">'
+                f"{esc(guest_name)} is still waiting for your response on "
+                f'<strong style="color: #d4af6a;">{esc(experience_title)}</strong> '
+                f"(pending for {esc(waiting_for)})."
+                f"</span>"
+            ),
+            detail_rows=[
+                ("Experience", experience_title),
+                ("Date", _format_date(slot_date)),
+                ("Time", time_range),
+                ("Guests", str(guest_count)),
+            ],
+            highlight_label="Total",
+            highlight_value=amount,
+            closing_note="Please confirm or reject so the guest knows what to expect.",
+            cta_label="Respond Now",
+            cta_url=_site_link(f"/host/bookings/{booking_id}"),
         )
-        + royal_list(
-            [
-                f"Date: {_format_date(slot_date)}",
-                f"Time: {_format_time(slot_start)} – {_format_time(slot_end)}",
-                f"Guests: {guest_count}",
-                f"Total: {amount}",
-            ]
-        )
-        + royal_paragraph("Please confirm or reject this booking so the guest knows what to expect."),
-        cta_label="Respond Now",
-        cta_url=_site_link(f"/host/bookings/{booking_id}"),
     )
     return send_email(
         to=to,
@@ -382,26 +412,66 @@ def send_host_new_homestay_booking_email(
     currency_code: str,
     booking_id: str,
 ) -> bool:
+    return send_homestay_owner_new_booking_email(
+        to=to,
+        owner_name=host_name,
+        guest_name=guest_name,
+        stay_title=stay_title,
+        check_in=check_in,
+        check_out=check_out,
+        nights=nights,
+        guest_count=guest_count,
+        total_minor=total_minor,
+        currency_code=currency_code,
+        booking_id=booking_id,
+    )
+
+
+def send_homestay_owner_new_booking_email(
+    *,
+    to: str,
+    owner_name: str,
+    guest_name: str,
+    stay_title: str,
+    check_in: str,
+    check_out: str,
+    nights: int,
+    guest_count: int,
+    total_minor: int,
+    currency_code: str,
+    booking_id: str,
+) -> bool:
     amount = _format_amount(total_minor, currency_code)
-    html = _wrap_html(
-        "New Stay Request",
-        royal_paragraph(f'Dear <span style="color: #f7f1e8; font-style: italic;">{host_name}</span>,')
-        + royal_paragraph(
-            f'<strong style="color: #f7f1e8;">{guest_name}</strong> requested a stay at '
-            f'<strong style="color: #d4af6a;">{stay_title}</strong>.'
+    html = render_royal_host_alert_email(
+        RoyalHostAlertContext(
+            host_name=owner_name,
+            headline="New Stay",
+            headline_accent="Request",
+            badge="Action Required",
+            ornament_label="Property Owner Alert",
+            details_title="Stay Request Details",
+            preheader=f"New stay request — {stay_title}",
+            message_html=royal_centered_message(
+                f'Dear <span style="color: #f7f1e8; font-style: italic;">{esc(owner_name)}</span>,<br/>'
+                f'<span style="font-size: 16px; color: #9a8a78;">'
+                f'<strong style="color: #f7f1e8;">{esc(guest_name)}</strong> requested a stay at '
+                f'<strong style="color: #d4af6a;">{esc(stay_title)}</strong>. '
+                f"Please confirm or reject in your property owner dashboard."
+                f"</span>"
+            ),
+            detail_rows=[
+                ("Property", stay_title),
+                ("Check-in", _format_date(check_in)),
+                ("Check-out", _format_date(check_out)),
+                ("Nights", str(nights)),
+                ("Guests", str(guest_count)),
+            ],
+            highlight_label="Total",
+            highlight_value=amount,
+            closing_note="A prompt response helps guests plan their stay.",
+            cta_label="Review Stay Request",
+            cta_url=_site_link("/homestay/bookings"),
         )
-        + royal_list(
-            [
-                f"Check-in: {_format_date(check_in)}",
-                f"Check-out: {_format_date(check_out)}",
-                f"Nights: {nights}",
-                f"Guests: {guest_count}",
-                f"Total: {amount}",
-            ]
-        )
-        + royal_paragraph("Please <strong style=\"color: #d4af6a;\">confirm or reject</strong> this request in your dashboard."),
-        cta_label="Review Stay Request",
-        cta_url=_site_link("/homestay/dashboard"),
     )
     return send_email(
         to=to,
@@ -425,30 +495,99 @@ def send_host_homestay_booking_reminder_email(
     booking_id: str,
     waiting_for: str,
 ) -> bool:
+    return send_homestay_owner_booking_reminder_email(
+        to=to,
+        owner_name=host_name,
+        guest_name=guest_name,
+        stay_title=stay_title,
+        check_in=check_in,
+        check_out=check_out,
+        nights=nights,
+        guest_count=guest_count,
+        total_minor=total_minor,
+        currency_code=currency_code,
+        booking_id=booking_id,
+        waiting_for=waiting_for,
+    )
+
+
+def send_homestay_owner_booking_reminder_email(
+    *,
+    to: str,
+    owner_name: str,
+    guest_name: str,
+    stay_title: str,
+    check_in: str,
+    check_out: str,
+    nights: int,
+    guest_count: int,
+    total_minor: int,
+    currency_code: str,
+    booking_id: str,
+    waiting_for: str,
+) -> bool:
     amount = _format_amount(total_minor, currency_code)
     urgency = "Urgent Reminder" if waiting_for == "24 hours" else "Reminder"
-    html = _wrap_html(
-        urgency,
-        royal_paragraph(f'Dear <span style="color: #f7f1e8; font-style: italic;">{host_name}</span>,')
-        + royal_paragraph(
-            f'{guest_name} is still waiting for your response on '
-            f'<strong style="color: #d4af6a;">{stay_title}</strong> (pending for {waiting_for}).'
+    html = render_royal_host_alert_email(
+        RoyalHostAlertContext(
+            host_name=owner_name,
+            headline=urgency,
+            badge="Response Needed",
+            ornament_label="Property Owner Alert",
+            details_title="Stay Request Details",
+            preheader=f"{urgency}: stay request pending for {waiting_for} — {stay_title}",
+            message_html=royal_centered_message(
+                f'Dear <span style="color: #f7f1e8; font-style: italic;">{esc(owner_name)}</span>,<br/>'
+                f'<span style="font-size: 16px; color: #9a8a78;">'
+                f"{esc(guest_name)} is still waiting for your response on "
+                f'<strong style="color: #d4af6a;">{esc(stay_title)}</strong> '
+                f"(pending for {esc(waiting_for)})."
+                f"</span>"
+            ),
+            detail_rows=[
+                ("Property", stay_title),
+                ("Check-in", _format_date(check_in)),
+                ("Check-out", _format_date(check_out)),
+                ("Nights", str(nights)),
+                ("Guests", str(guest_count)),
+            ],
+            highlight_label="Total",
+            highlight_value=amount,
+            closing_note="Please confirm or reject this stay request.",
+            cta_label="Respond Now",
+            cta_url=_site_link("/homestay/bookings"),
         )
-        + royal_list(
-            [
-                f"Check-in: {_format_date(check_in)}",
-                f"Check-out: {_format_date(check_out)}",
-                f"Nights: {nights}",
-                f"Guests: {guest_count}",
-                f"Total: {amount}",
-            ]
-        )
-        + royal_paragraph("Please confirm or reject this stay request."),
-        cta_label="Respond Now",
-        cta_url=_site_link("/homestay/dashboard"),
     )
     return send_email(
         to=to,
         subject=f"{urgency}: stay request still pending ({waiting_for}) — {stay_title}",
+        html=html,
+    )
+
+
+def send_homestay_owner_welcome_email(*, to: str, owner_name: str) -> bool:
+    html = render_royal_host_alert_email(
+        RoyalHostAlertContext(
+            host_name=owner_name,
+            headline="Welcome",
+            headline_accent="Property Owner",
+            badge="Account Ready",
+            ornament_label="Property Owner Alert",
+            preheader="Your Royal Passage property owner account is ready",
+            message_html=royal_centered_message(
+                f'Dear <span style="color: #f7f1e8; font-style: italic;">{esc(owner_name)}</span>,<br/>'
+                f'<span style="font-size: 16px; color: #9a8a78;">'
+                f"Your property owner account is ready. Add your homestay, manage bookings, "
+                f"and welcome guests to Mysuru."
+                f"</span>"
+            ),
+            closing_note="We are honoured to host your property on The Royal Passage.",
+            cta_label="Open Property Dashboard",
+            cta_url=_site_link("/homestay/dashboard"),
+        )
+    )
+    return send_email(
+        to=to,
+        subject="Welcome — The Royal Passage Property Owner",
         html=html,
     )

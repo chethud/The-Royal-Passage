@@ -24,6 +24,7 @@ from app.services.transactional_emails import (  # noqa: E402
     send_host_homestay_booking_reminder_email,
     send_host_new_experience_booking_email,
     send_host_new_homestay_booking_email,
+    send_homestay_owner_welcome_email,
 )
 from app.services.email import email_configured, send_email  # noqa: E402
 from app.services.transactional_emails import _wrap_html, _site_link  # noqa: E402
@@ -51,6 +52,7 @@ def main() -> None:
 
     steps: list[tuple[str, callable]] = [
         ("Welcome (registration)", lambda: _welcome_preview(to)),
+        ("Property owner — welcome", lambda: send_homestay_owner_welcome_email(to=to, owner_name="Chethan")),
         (
             "Guest — experience booking requested",
             lambda: send_experience_booking_requested_email(
@@ -177,10 +179,10 @@ def main() -> None:
             ),
         ),
         (
-            "Host — new homestay booking",
+            "Property owner — new homestay booking",
             lambda: send_host_new_homestay_booking_email(
                 to=to,
-                host_name="Host",
+                host_name="Property Owner",
                 guest_name="Chethan",
                 stay_title="Chamundi Hill Heritage Villa",
                 check_in="2026-07-20",
@@ -193,10 +195,10 @@ def main() -> None:
             ),
         ),
         (
-            "Host — homestay reminder (15 min)",
+            "Property owner — homestay reminder (15 min)",
             lambda: send_host_homestay_booking_reminder_email(
                 to=to,
-                host_name="Host",
+                host_name="Property Owner",
                 guest_name="Chethan",
                 stay_title="Chamundi Hill Heritage Villa",
                 check_in="2026-07-20",
@@ -210,10 +212,10 @@ def main() -> None:
             ),
         ),
         (
-            "Host — homestay reminder (2 hours)",
+            "Property owner — homestay reminder (2 hours)",
             lambda: send_host_homestay_booking_reminder_email(
                 to=to,
-                host_name="Host",
+                host_name="Property Owner",
                 guest_name="Chethan",
                 stay_title="Chamundi Hill Heritage Villa",
                 check_in="2026-07-20",
@@ -227,10 +229,10 @@ def main() -> None:
             ),
         ),
         (
-            "Host — homestay reminder (24 hours)",
+            "Property owner — homestay reminder (24 hours)",
             lambda: send_host_homestay_booking_reminder_email(
                 to=to,
-                host_name="Host",
+                host_name="Property Owner",
                 guest_name="Chethan",
                 stay_title="Chamundi Hill Heritage Villa",
                 check_in="2026-07-20",

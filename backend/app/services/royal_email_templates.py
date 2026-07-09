@@ -108,11 +108,11 @@ def _royal_divider() -> str:
     </table>"""
 
 
-def _royal_ornament_header() -> str:
+def _royal_ornament_header(label: str = "Royal Invitation") -> str:
     return f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 6px;">
       <tr>
-        <td align="center" style="font-family: Cinzel, Georgia, serif; font-size: 10px; letter-spacing: 0.42em; text-transform: uppercase; color: {EMAIL_GOLD};">&#10022;&nbsp;&nbsp;Royal Invitation&nbsp;&nbsp;&#10022;</td>
+        <td align="center" style="font-family: Cinzel, Georgia, serif; font-size: 10px; letter-spacing: 0.42em; text-transform: uppercase; color: {EMAIL_GOLD};">&#10022;&nbsp;&nbsp;{_e(label)}&nbsp;&nbsp;&#10022;</td>
       </tr>
     </table>"""
 
@@ -149,6 +149,13 @@ def royal_paragraph(html: str) -> str:
     return (
         f'<p style="margin: 0 0 16px; font-family: \'Cormorant Garamond\', Georgia, serif; '
         f'font-size: 17px; line-height: 1.75; color: {EMAIL_INK_SOFT};">{html}</p>'
+    )
+
+
+def royal_centered_message(html: str) -> str:
+    return (
+        f'<p style="margin: 0; font-family: \'Cormorant Garamond\', Georgia, serif; '
+        f'font-size: 18px; line-height: 1.8; color: {EMAIL_INK_SOFT}; text-align: center;">{html}</p>'
     )
 
 
@@ -817,6 +824,178 @@ def render_royal_booking_request_email(ctx: RoyalBookingRequestContext) -> str:
                       </tr>
 
                       <!-- Footer -->
+                      <tr>
+                        <td style="padding-top: 4px;">
+                          {_royal_divider()}
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding-top: 24px;">
+                            <tr>
+                              <td align="center">
+                                <p style="margin: 0 0 6px; font-family: Cinzel, Georgia, serif; font-size: 11px; letter-spacing: 0.24em; color: {EMAIL_GOLD};">THE ROYAL PASSAGE</p>
+                                <p style="margin: 0 0 14px; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 15px; font-style: italic; color: {EMAIL_INK_MUTED};">Curated Heritage Experiences Across Mysuru</p>
+                                <p style="margin: 0 0 10px; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 13px; font-style: italic; color: rgba(200, 162, 90, 0.55);">&ldquo;Every journey tells a story.&rdquo;</p>
+                                <p style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 9px; letter-spacing: 0.12em; color: {EMAIL_INK_MUTED};">&copy; {datetime.now(timezone.utc).year} The Royal Passage</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+
+
+@dataclass
+class RoyalHostAlertContext:
+    host_name: str
+    headline: str
+    headline_accent: str | None = None
+    badge: str = "Action Required"
+    ornament_label: str = "Host Alert"
+    details_title: str = "Request Details"
+    message_html: str = ""
+    detail_rows: list[tuple[str, str]] | None = None
+    highlight_label: str | None = None
+    highlight_value: str | None = None
+    closing_note: str = ""
+    cta_label: str = "Review Request"
+    cta_url: str = ""
+    preheader: str = ""
+
+
+def render_royal_host_alert_email(ctx: RoyalHostAlertContext) -> str:
+    """Host booking alerts — same burgundy + gold shell as guest booking-request emails."""
+    logo = _logo_url()
+    website = settings.site_url.rstrip("/")
+    detail_rows = ctx.detail_rows or []
+    rows_html = "".join(_minimal_detail_row(label, value) for label, value in detail_rows)
+    if ctx.highlight_label and ctx.highlight_value:
+        rows_html += _minimal_detail_row(ctx.highlight_label, ctx.highlight_value, highlight=True)
+
+    details_block = ""
+    if rows_html:
+        details_block = f"""
+                      <tr>
+                        <td style="padding-bottom: 28px;">
+                          {_royal_corner_ornaments()}
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid {EMAIL_BORDER}; border-radius: 10px; background: linear-gradient(180deg, {EMAIL_CARD_INNER} 0%, rgba(38,18,24,0.95) 100%); box-shadow: inset 0 0 0 1px rgba(200, 162, 90, 0.08);">
+                            <tr>
+                              <td style="padding: 18px 24px 6px; text-align: center;">
+                                <p style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 10px; letter-spacing: 0.24em; color: {EMAIL_GOLD};">&#10022; {_e(ctx.details_title)} &#10022;</p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="padding: 4px 24px 16px;">
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                  {rows_html}
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>"""
+
+    title_html = _e(ctx.headline)
+    if ctx.headline_accent:
+        title_html += (
+            f'<br/><span style="color: {EMAIL_GOLD_BRIGHT}; font-size: 22px;">'
+            f"{_e(ctx.headline_accent)}</span>"
+        )
+
+    closing_block = ""
+    if ctx.closing_note:
+        closing_block = f"""
+                      <tr>
+                        <td align="center" style="padding-bottom: 32px;">
+                          <p style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 14px; font-style: italic; color: {EMAIL_INK_MUTED};">{_e(ctx.closing_note)}</p>
+                        </td>
+                      </tr>"""
+
+    preheader = ctx.preheader or ctx.headline
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>{_e(ctx.headline)} — The Royal Passage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    @media only screen and (max-width: 620px) {{
+      .shell {{ width: 100% !important; }}
+      .page-pad {{ padding: 18px 8px !important; }}
+      .pad {{ padding-left: 20px !important; padding-right: 20px !important; padding-top: 28px !important; padding-bottom: 24px !important; }}
+      .hero-title {{ font-size: 22px !important; }}
+      .logo-lg {{ height: 96px !important; max-height: 96px !important; }}
+      .tagline-sm {{ font-size: 8px !important; letter-spacing: 0.28em !important; }}
+    }}
+    .btn-gold:hover {{ filter: brightness(1.08); }}
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: {EMAIL_PAGE_BG}; -webkit-text-size-adjust: 100%;">
+  <div style="display: none; max-height: 0; overflow: hidden; opacity: 0;">{_e(preheader)}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="page-pad" style="background: {EMAIL_PAGE_BG}; padding: 48px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" class="shell" style="width: 600px; max-width: 600px; border: 1px solid rgba(200, 162, 90, 0.22); border-radius: 12px; padding: 1px; background: linear-gradient(145deg, rgba(200,162,90,0.35), rgba(92,26,36,0.2), rgba(200,162,90,0.25)); box-shadow: 0 28px 64px rgba(0,0,0,0.5), 0 0 60px rgba(200, 162, 90, 0.06);">
+          <tr>
+            <td style="background-color: {EMAIL_CARD}; border-radius: 11px; overflow: hidden;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="height: 4px; background: linear-gradient(90deg, {EMAIL_BURGUNDY}, {EMAIL_GOLD}, {EMAIL_GOLD_BRIGHT}, {EMAIL_GOLD}, {EMAIL_BURGUNDY}); font-size: 0; line-height: 0;">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="pad" style="padding: 48px 44px 40px;">
+                      <tr>
+                        <td align="center" style="padding-bottom: 4px;">
+                          <a href="{_e(website)}" style="text-decoration: none; display: inline-block;">
+                            <img src="{_e(logo)}" alt="The Royal Passage" height="150" class="logo-lg" style="display: block; margin: 0 auto; max-height: 150px; width: auto; border: 0; opacity: 0.96;" />
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="center" style="padding: 16px 0 8px;">
+                          <p class="tagline-sm" style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 9px; letter-spacing: 0.42em; text-transform: uppercase; color: {EMAIL_GOLD};">Mysuru &middot; Curated Royal Journeys</p>
+                        </td>
+                      </tr>
+                      <tr><td>{_royal_divider()}</td></tr>
+                      <tr>
+                        <td align="center" style="padding: 24px 0 8px;">
+                          {_royal_ornament_header(ctx.ornament_label)}
+                          <h1 class="hero-title" style="margin: 12px 0 0; font-family: 'Cinzel Decorative', Cinzel, Georgia, serif; font-size: 26px; font-weight: 400; color: {EMAIL_INK}; letter-spacing: 0.06em; line-height: 1.35;">{title_html}</h1>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="center" style="padding: 20px 0 28px;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" style="border: 1px solid rgba(200, 162, 90, 0.45); border-radius: 999px; background: rgba(200, 162, 90, 0.06);">
+                            <tr>
+                              <td style="padding: 10px 22px; font-family: Cinzel, Georgia, serif; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: {EMAIL_GOLD_BRIGHT};">{_e(ctx.badge)}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding-bottom: 32px;">
+                          {ctx.message_html}
+                        </td>
+                      </tr>
+                      {details_block}
+                      <tr>
+                        <td align="center" style="padding-bottom: 12px;">
+                          <a href="{_e(ctx.cta_url)}" class="btn-gold" style="display: inline-block; background: linear-gradient(135deg, {EMAIL_GOLD} 0%, {EMAIL_GOLD_BRIGHT} 50%, {EMAIL_GOLD} 100%); color: {EMAIL_BTN_TEXT}; font-family: Cinzel, Georgia, serif; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none; padding: 17px 42px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 4px 24px rgba(200, 162, 90, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);">{_e(ctx.cta_label)}</a>
+                        </td>
+                      </tr>
+                      {closing_block}
                       <tr>
                         <td style="padding-top: 4px;">
                           {_royal_divider()}

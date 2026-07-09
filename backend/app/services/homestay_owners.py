@@ -1,5 +1,6 @@
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import CreateHomestayOwnerRequest, CreateHomestayOwnerResponse
+from app.services.transactional_emails import send_homestay_owner_welcome_email
 
 
 def _first_row(data):
@@ -91,6 +92,11 @@ def create_homestay_owner_account(payload: CreateHomestayOwnerRequest) -> Create
         supabase.table("homestay_owners").delete().eq("id", owner_row["id"]).execute()
         supabase.auth.admin.delete_user(user_id)
         raise ValueError("Failed to create homestay owner profile record.")
+
+    try:
+        send_homestay_owner_welcome_email(to=str(payload.email), owner_name=payload.fullName)
+    except Exception:
+        pass
 
     return CreateHomestayOwnerResponse(
         id=user_id,
