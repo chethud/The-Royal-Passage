@@ -4,9 +4,20 @@ type CoverSource = Pick<Experience, "image" | "galleryUrls">;
 
 /** Canonical cover photo — hero image first, then first gallery URL. */
 export function getExperienceCoverImage(exp: CoverSource): string {
-  const hero = exp.image?.trim();
-  if (hero) return hero;
-  return exp.galleryUrls?.find((url) => url.trim()) ?? "";
+  return getExperienceGalleryImages(exp)[0] ?? "";
+}
+
+/** All unique gallery images — hero first, then additional gallery URLs. */
+export function getExperienceGalleryImages(exp: CoverSource): string[] {
+  const seen = new Set<string>();
+  const urls: string[] = [];
+  for (const raw of [exp.image, ...(exp.galleryUrls ?? [])]) {
+    const url = raw?.trim();
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+    urls.push(url);
+  }
+  return urls;
 }
 
 export function withExperienceCoverImage<T extends CoverSource>(exp: T): T {

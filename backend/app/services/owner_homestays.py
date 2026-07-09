@@ -124,6 +124,22 @@ def _load_rooms(supabase, homestay_id: str) -> list[dict]:
     return result.data or []
 
 
+def _count_active_rooms(supabase, homestay_id: str) -> int:
+    result = (
+        supabase.table("homestay_rooms")
+        .select("id", count="exact")
+        .eq("homestay_id", homestay_id)
+        .eq("is_active", True)
+        .execute()
+    )
+    return result.count or 0
+
+
+def _ensure_has_active_room(supabase, homestay_id: str) -> None:
+    if _count_active_rooms(supabase, homestay_id) < 1:
+        raise ValueError("Add at least one active room before submitting for review.")
+
+
 def _load_availability(supabase, homestay_id: str) -> list[dict]:
     result = (
         supabase.table("homestay_availability")
@@ -296,7 +312,12 @@ def create_owner_homestay(auth: dict, payload: CreateOwnerHomestayRequest) -> Ow
     license_url = _validate_license_certificate_url(payload.licenseCertificateUrl)
 
     slug = _ensure_unique_slug(supabase, payload.slug or _slugify(payload.title))
-    status = "pending_review" if payload.submitForReview else "draft"
+    if payload.submitForReview:
+        raise ValueError(
+            "Add at least one active room before submitting for review. "
+            "Save as draft, add rooms, then submit."
+        )
+    status = "draft"
     city_slug, city_name = _resolve_city_fields(payload.citySlug, payload.city)
     gallery_urls = payload.galleryUrls or []
     hero_image_url = payload.heroImageUrl or (gallery_urls[0] if gallery_urls else None)
@@ -345,9 +366,6 @@ def create_owner_homestay(auth: dict, payload: CreateOwnerHomestayRequest) -> Ow
     row = rows[0] if rows else None
     if not row:
         raise ValueError("Failed to create homestay.")
-
-    if status == "pending_review":
-        _notify_admins_homestay_submitted(supabase, row["id"], payload.title.strip(), owner_id)
 
     return get_owner_homestay(auth, row["id"])
 
@@ -435,6 +453,7 @@ def update_owner_homestay(
         license_url = updates.get("license_certificate_url") or row.get("license_certificate_url")
         if not license_url:
             raise ValueError("Upload a property certificate or license before submitting for review.")
+        _ensure_has_active_room(supabase, homestay_id)
         updates["status"] = "pending_review"
 
     if updates:

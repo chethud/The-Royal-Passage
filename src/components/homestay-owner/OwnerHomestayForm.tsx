@@ -93,6 +93,8 @@ export function OwnerHomestayForm({
   const [submitForReview, setSubmitForReview] = useState(false);
   const licenseInputRef = useRef<HTMLInputElement>(null);
   const bedroomCount = Number.parseInt(bedrooms, 10) || 1;
+  const activeRoomCount = (initial?.rooms ?? []).filter((room) => room.isActive).length;
+  const canSubmitForReview = Boolean(initial) && activeRoomCount > 0;
   const uploadAvailable = isSupabaseBrowserConfigured();
 
   const handleLicenseSelect = async (file: File) => {
@@ -139,7 +141,7 @@ export function OwnerHomestayForm({
       extraBedWeekendPricePerNightMinor: extraBedAvailable ? extraBedWeekendPriceMajor * 100 : 0,
       extraBedsPerRoom: extraBedAvailable ? extraBedsPerRoom : 1,
       licenseCertificateUrl: licenseCertificateUrl.trim(),
-      submitForReview,
+      submitForReview: canSubmitForReview && submitForReview,
     };
     await onSubmit(payload);
   };
@@ -493,15 +495,26 @@ export function OwnerHomestayForm({
 
       {!disabled ? (
         <div className="space-y-4 border-t luxury-panel-divider pt-6">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={submitForReview}
-              onChange={(e) => setSubmitForReview(e.target.checked)}
-              disabled={saving}
-            />
-            Submit for Royal Passage review after saving
-          </label>
+          {initial ? (
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={submitForReview}
+                onChange={(e) => setSubmitForReview(e.target.checked)}
+                disabled={saving || !canSubmitForReview}
+              />
+              Submit for Royal Passage review after saving
+            </label>
+          ) : (
+            <p className="luxury-panel-body text-sm">
+              Save as draft first, then add at least one active room before submitting for review.
+            </p>
+          )}
+          {!canSubmitForReview && initial ? (
+            <p className="luxury-panel-body text-xs">
+              Add at least one active room in the Rooms tab before submitting for review.
+            </p>
+          ) : null}
           <button type="submit" className="luxury-btn-primary" disabled={saving}>
             {saving ? "Saving…" : initial ? "Save property" : "Create property"}
           </button>
