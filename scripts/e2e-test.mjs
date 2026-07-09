@@ -301,16 +301,11 @@ async function main() {
           },
           hostToken,
         );
-        const published = await rpc(
-          "PublishExperience",
-          { experienceId: created.id },
-          adminToken,
-        );
         const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
         const withSlot = await rpc(
           "CreateHostSlot",
           {
-            experienceId: published.id,
+            experienceId: created.id,
             slot: {
               slotDate: tomorrow,
               startTime: "10:00",
@@ -319,6 +314,11 @@ async function main() {
             },
           },
           hostToken,
+        );
+        await rpc(
+          "PublishExperience",
+          { experienceId: created.id },
+          adminToken,
         );
         const hostSlotId = withSlot.slots?.[withSlot.slots.length - 1]?.id;
         if (!hostSlotId || !guestToken) throw new Error("missing slot or guest token");
