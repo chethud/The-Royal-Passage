@@ -256,10 +256,12 @@ class GetOwnerHomestayBookingRequest(_message.Message):
     def __init__(self, booking_id: _Optional[str] = ...) -> None: ...
 
 class OwnerHomestayBookingActionRequest(_message.Message):
-    __slots__ = ("booking_id",)
+    __slots__ = ("booking_id", "reason")
     BOOKING_ID_FIELD_NUMBER: _ClassVar[int]
+    REASON_FIELD_NUMBER: _ClassVar[int]
     booking_id: str
-    def __init__(self, booking_id: _Optional[str] = ...) -> None: ...
+    reason: str
+    def __init__(self, booking_id: _Optional[str] = ..., reason: _Optional[str] = ...) -> None: ...
 
 class AdminHomestayActionRequest(_message.Message):
     __slots__ = ("homestay_id",)

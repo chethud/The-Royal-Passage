@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
+import { OwnerHomestayRejectDialog } from "@/components/homestay-owner/OwnerHomestayRejectDialog";
 import {
   DashboardTable,
   DashboardTableBody,
@@ -22,7 +23,7 @@ type OwnerHomestayBookingTableProps = {
   bookings: HomestayBookingSummary[];
   busyId: string | null;
   onConfirm: (id: string) => void;
-  onReject: (id: string) => void;
+  onReject: (id: string, reason: string) => Promise<void>;
   onMarkPaid: (id: string) => void;
   onComplete: (id: string) => void;
 };
@@ -36,6 +37,7 @@ export function OwnerHomestayBookingTable({
   onComplete,
 }: OwnerHomestayBookingTableProps) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [rejectBooking, setRejectBooking] = useState<HomestayBookingSummary | null>(null);
 
   const filtered = bookings.filter((b) => {
     if (statusFilter === "all") return true;
@@ -121,7 +123,7 @@ export function OwnerHomestayBookingTable({
                               type="button"
                               disabled={busy}
                               className="luxury-btn-sm luxury-btn-panel-outline"
-                              onClick={() => onReject(booking.id)}
+                              onClick={() => setRejectBooking(booking)}
                             >
                               Reject
                             </button>
@@ -156,6 +158,17 @@ export function OwnerHomestayBookingTable({
           </DashboardTable>
         </DashboardTableScroll>
       )}
+
+      <OwnerHomestayRejectDialog
+        booking={rejectBooking}
+        busy={Boolean(rejectBooking && busyId === rejectBooking.id)}
+        onClose={() => setRejectBooking(null)}
+        onConfirm={async (reason) => {
+          if (!rejectBooking) return;
+          await onReject(rejectBooking.id, reason);
+          setRejectBooking(null);
+        }}
+      />
     </DashboardTableSection>
   );
 }

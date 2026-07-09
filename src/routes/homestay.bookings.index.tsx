@@ -62,6 +62,22 @@ function OwnerHomestayBookingsPage() {
       await loadPage();
     } catch (err) {
       setPageError(toErrorMessage(err, "Action failed."));
+      throw err;
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const runReject = async (bookingId: string, reason: string) => {
+    if (!accessToken) return;
+    setBusyId(bookingId);
+    setPageError(null);
+    try {
+      await rejectOwnerHomestayBooking(accessToken, bookingId, reason);
+      await loadPage();
+    } catch (err) {
+      setPageError(toErrorMessage(err, "Action failed."));
+      throw err;
     } finally {
       setBusyId(null);
     }
@@ -93,7 +109,7 @@ function OwnerHomestayBookingsPage() {
             bookings={bookings}
             busyId={busyId}
             onConfirm={(id) => void runAction(id, confirmOwnerHomestayBooking)}
-            onReject={(id) => void runAction(id, rejectOwnerHomestayBooking)}
+            onReject={(id, reason) => runReject(id, reason)}
             onMarkPaid={(id) => void runAction(id, markOwnerHomestayBookingPaid)}
             onComplete={(id) => void runAction(id, completeOwnerHomestayBooking)}
           />

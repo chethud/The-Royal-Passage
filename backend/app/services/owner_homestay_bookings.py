@@ -276,7 +276,12 @@ def confirm_owner_homestay_booking(booking_id: str, auth: dict) -> HomestayBooki
     return updated
 
 
-def reject_owner_homestay_booking(booking_id: str, auth: dict) -> HomestayBookingSummary:
+def reject_owner_homestay_booking(
+    booking_id: str,
+    auth: dict,
+    *,
+    reason: str | None = None,
+) -> HomestayBookingSummary:
     supabase = get_supabase_admin()
     owner_id = _resolve_owner_id(auth)
     row = _fetch_owner_booking_row(supabase, booking_id, owner_id)
@@ -284,11 +289,21 @@ def reject_owner_homestay_booking(booking_id: str, auth: dict) -> HomestayBookin
     if row.get("booking_status") != "pending":
         raise ValueError("Only pending bookings can be rejected.")
 
+    reason_text = (reason or "").strip()
+    if len(reason_text) < 3:
+        raise ValueError("A rejection reason is required.")
+    if len(reason_text) > 500:
+        raise ValueError("Rejection reason must be 500 characters or fewer.")
+
     now = datetime.now(timezone.utc).isoformat()
     updated = _update_owner_booking(
         booking_id,
         auth,
-        {"booking_status": "cancelled", "cancelled_at": now},
+        {
+            "booking_status": "cancelled",
+            "cancelled_at": now,
+            "rejection_reason": reason_text,
+        },
     )
 
     from app.services.notifications import create_notification
@@ -299,7 +314,7 @@ def reject_owner_homestay_booking(booking_id: str, auth: dict) -> HomestayBookin
             row["guest_id"],
             "booking_cancelled",
             "Stay request declined",
-            f"Your request for {stay.get('title') or 'the property'} was not accepted.",
+            f"Your request for {stay.get('title') or 'the property'} was not accepted. Reason: {reason_text}",
             {"bookingId": booking_id, "bookingType": "homestay"},
         )
     return updated

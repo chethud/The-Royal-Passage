@@ -81,9 +81,17 @@ export function fetchOwnerHomestayBooking(accessToken: string, bookingId: string
   ) as Promise<HomestayBookingSummary>;
 }
 
-function ownerBookingAction(accessToken: string, bookingId: string, method: "confirm" | "reject" | "markPaid" | "complete") {
+function ownerBookingAction(
+  accessToken: string,
+  bookingId: string,
+  method: "confirm" | "reject" | "markPaid" | "complete",
+  reason?: string,
+) {
   const client = createRoyalPassageClient(accessToken);
-  const request = create(OwnerHomestayBookingActionRequestSchema, { bookingId });
+  const request = create(OwnerHomestayBookingActionRequestSchema, {
+    bookingId,
+    ...(reason ? { reason } : {}),
+  });
   const call =
     method === "confirm"
       ? client.confirmOwnerHomestayBooking.bind(client)
@@ -97,8 +105,8 @@ function ownerBookingAction(accessToken: string, bookingId: string, method: "con
 
 export const confirmOwnerHomestayBooking = (token: string, id: string) =>
   ownerBookingAction(token, id, "confirm");
-export const rejectOwnerHomestayBooking = (token: string, id: string) =>
-  ownerBookingAction(token, id, "reject");
+export const rejectOwnerHomestayBooking = (token: string, id: string, reason: string) =>
+  ownerBookingAction(token, id, "reject", reason);
 export const markOwnerHomestayBookingPaid = (token: string, id: string) =>
   ownerBookingAction(token, id, "markPaid");
 export const completeOwnerHomestayBooking = (token: string, id: string) =>

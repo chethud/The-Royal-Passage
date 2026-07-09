@@ -432,7 +432,12 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         _ensure_supabase()
         auth = require_homestay_owner(ctx)
         return pydantic_to_proto(
-            reject_owner_homestay_booking(request.booking_id, auth), types_pb2.HomestayBookingSummary
+            reject_owner_homestay_booking(
+                request.booking_id,
+                auth,
+                reason=request.reason or None,
+            ),
+            types_pb2.HomestayBookingSummary,
         )
 
     @_rpc
