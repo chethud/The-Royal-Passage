@@ -47,10 +47,9 @@ export function useHomestayCheckout(
   const defaultRoomId =
     options.initialRoomId ?? (rooms.length === 1 ? rooms[0]?.id : undefined);
 
-  const today = new Date().toISOString().slice(0, 10);
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [checkIn, setCheckIn] = useState(options.initialCheckIn ?? today);
-  const [checkOut, setCheckOut] = useState(options.initialCheckOut ?? addDays(today, 2));
+  const [checkIn, setCheckIn] = useState(options.initialCheckIn ?? "");
+  const [checkOut, setCheckOut] = useState(options.initialCheckOut ?? "");
   const [guests, setGuests] = useState(options.initialGuests ?? 1);
   const [roomId, setRoomId] = useState<string | undefined>(defaultRoomId);
   const [roomCount, setRoomCount] = useState(options.initialRoomCount ?? 1);
@@ -71,7 +70,11 @@ export function useHomestayCheckout(
   );
 
   useEffect(() => {
-    if (checkOut <= checkIn) {
+    if (!checkIn) {
+      if (checkOut) setCheckOut("");
+      return;
+    }
+    if (!checkOut || checkOut <= checkIn) {
       setCheckOut(addDays(checkIn, 1));
     }
   }, [checkIn, checkOut]);
