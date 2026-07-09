@@ -107,10 +107,9 @@ export function HomestayDateCalendar({
   const selected: DateRange | undefined = useMemo(() => {
     const from = fromIsoDate(checkIn);
     if (!from) return undefined;
-    const to = fromIsoDate(checkOut) ?? from;
-    const displayTo =
-      checkOut && checkOut > checkIn ? fromIsoDate(addDaysIso(checkOut, -1)) ?? to : to;
-    return { from, to: displayTo };
+    const checkout = fromIsoDate(checkOut);
+    if (!checkout || checkout <= from) return { from, to: from };
+    return { from, to: checkout };
   }, [checkIn, checkOut]);
 
   const handleSelect = (range: DateRange | undefined) => {
@@ -124,7 +123,7 @@ export function HomestayDateCalendar({
       return;
     }
     const toIso = toIsoDate(range.to);
-    onRangeChange(fromIso, addDaysIso(toIso, 1));
+    onRangeChange(fromIso, toIso);
   };
 
   return (
@@ -261,7 +260,7 @@ export function HomestayDateCalendar({
         <p className="text-xs text-[rgb(74_0_0/0.75)]">{hint}</p>
       ) : checkIn ? (
         <p className="text-xs text-[rgb(74_0_0/0.75)]">
-          {checkOut && checkOut > addDaysIso(checkIn, 1)
+          {checkOut && checkOut > checkIn
             ? `Selected: ${checkIn} → ${checkOut}`
             : singleNightOk
               ? `Selected night: ${checkIn}. Tap another day to expand the range, or set a custom price below.`
