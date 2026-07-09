@@ -8,6 +8,9 @@ from app.config import settings
 from app.dependencies.supabase import get_supabase_admin
 from app.services.email import send_email
 from app.services.royal_email_templates import (
+    EMAIL_GOLD_BRIGHT,
+    EMAIL_INK,
+    EMAIL_INK_MUTED,
     RoyalBookingRequestContext,
     RoyalHostAlertContext,
     format_duration_label,
@@ -17,6 +20,7 @@ from app.services.royal_email_templates import (
     royal_centered_message,
     royal_link,
     royal_list,
+    royal_luxury_recipient_message,
     royal_paragraph,
 )
 
@@ -311,25 +315,29 @@ def send_host_new_experience_booking_email(
             headline="New Booking",
             headline_accent="Request",
             badge="Action Required",
-            ornament_label="Host Alert",
-            details_title="Booking Details",
             preheader=f"New booking request — {experience_title}",
-            message_html=royal_centered_message(
-                f'Dear <span style="color: #f7f1e8; font-style: italic;">{esc(host_name)}</span>,<br/>'
-                f'<span style="font-size: 16px; color: #9a8a78;">'
-                f'<strong style="color: #f7f1e8;">{esc(guest_name)}</strong> requested '
-                f'<strong style="color: #d4af6a;">{esc(experience_title)}</strong>. '
-                f"Please confirm or reject in your host dashboard."
-                f"</span>"
+            message_html=royal_luxury_recipient_message(
+                host_name,
+                lead_html=(
+                    f'thank you for hosting with <strong style="font-weight: 600; color: {EMAIL_GOLD_BRIGHT};">The Royal Passage</strong>.<br/>'
+                    f'<span style="font-size: 16px; color: {EMAIL_INK_MUTED};">'
+                    f'<strong style="color: {EMAIL_INK};">{esc(guest_name)}</strong> requested '
+                    f'<strong style="color: {EMAIL_GOLD_BRIGHT};">{esc(experience_title)}</strong>. '
+                    f"Please confirm or reject in your host dashboard."
+                    f"</span>"
+                ),
             ),
+            booking_id=booking_id,
+            hero_label="Requested Experience",
+            hero_name=experience_title,
             detail_rows=[
-                ("Experience", experience_title),
                 ("Date", _format_date(slot_date)),
                 ("Time", time_range),
                 ("Guests", str(guest_count)),
             ],
+            payment_method="Pay at Venue",
             highlight_label="Total",
-            highlight_value=f"{amount} (pay at venue)",
+            highlight_value=amount,
             closing_note="A prompt response helps guests plan their royal journey.",
             cta_label="Review Booking Request",
             cta_url=_site_link("/host/bookings"),
@@ -367,23 +375,26 @@ def send_host_experience_booking_reminder_email(
             host_name=host_name,
             headline=urgency,
             badge="Response Needed",
-            ornament_label="Host Alert",
-            details_title="Booking Details",
             preheader=f"{urgency}: booking pending for {waiting_for} — {experience_title}",
-            message_html=royal_centered_message(
-                f'Dear <span style="color: #f7f1e8; font-style: italic;">{esc(host_name)}</span>,<br/>'
-                f'<span style="font-size: 16px; color: #9a8a78;">'
-                f"{esc(guest_name)} is still waiting for your response on "
-                f'<strong style="color: #d4af6a;">{esc(experience_title)}</strong> '
-                f"(pending for {esc(waiting_for)})."
-                f"</span>"
+            message_html=royal_luxury_recipient_message(
+                host_name,
+                lead_html=(
+                    f'<span style="font-size: 16px; color: {EMAIL_INK_MUTED};">'
+                    f"{esc(guest_name)} is still waiting for your response on "
+                    f'<strong style="color: {EMAIL_GOLD_BRIGHT};">{esc(experience_title)}</strong> '
+                    f"(pending for {esc(waiting_for)})."
+                    f"</span>"
+                ),
             ),
+            booking_id=booking_id,
+            hero_label="Requested Experience",
+            hero_name=experience_title,
             detail_rows=[
-                ("Experience", experience_title),
                 ("Date", _format_date(slot_date)),
                 ("Time", time_range),
                 ("Guests", str(guest_count)),
             ],
+            payment_method="Pay at Venue",
             highlight_label="Total",
             highlight_value=amount,
             closing_note="Please confirm or reject so the guest knows what to expect.",
@@ -448,24 +459,28 @@ def send_homestay_owner_new_booking_email(
             headline="New Stay",
             headline_accent="Request",
             badge="Action Required",
-            ornament_label="Property Owner Alert",
-            details_title="Stay Request Details",
             preheader=f"New stay request — {stay_title}",
-            message_html=royal_centered_message(
-                f'Dear <span style="color: #f7f1e8; font-style: italic;">{esc(owner_name)}</span>,<br/>'
-                f'<span style="font-size: 16px; color: #9a8a78;">'
-                f'<strong style="color: #f7f1e8;">{esc(guest_name)}</strong> requested a stay at '
-                f'<strong style="color: #d4af6a;">{esc(stay_title)}</strong>. '
-                f"Please confirm or reject in your property owner dashboard."
-                f"</span>"
+            message_html=royal_luxury_recipient_message(
+                owner_name,
+                lead_html=(
+                    f'thank you for hosting with <strong style="font-weight: 600; color: {EMAIL_GOLD_BRIGHT};">The Royal Passage</strong>.<br/>'
+                    f'<span style="font-size: 16px; color: {EMAIL_INK_MUTED};">'
+                    f'<strong style="color: {EMAIL_INK};">{esc(guest_name)}</strong> requested a stay at '
+                    f'<strong style="color: {EMAIL_GOLD_BRIGHT};">{esc(stay_title)}</strong>. '
+                    f"Please confirm or reject in your property owner dashboard."
+                    f"</span>"
+                ),
             ),
+            booking_id=booking_id,
+            hero_label="Requested Property",
+            hero_name=stay_title,
             detail_rows=[
-                ("Property", stay_title),
                 ("Check-in", _format_date(check_in)),
                 ("Check-out", _format_date(check_out)),
                 ("Nights", str(nights)),
                 ("Guests", str(guest_count)),
             ],
+            payment_method="Pay at check-in",
             highlight_label="Total",
             highlight_value=amount,
             closing_note="A prompt response helps guests plan their stay.",
@@ -533,24 +548,27 @@ def send_homestay_owner_booking_reminder_email(
             host_name=owner_name,
             headline=urgency,
             badge="Response Needed",
-            ornament_label="Property Owner Alert",
-            details_title="Stay Request Details",
             preheader=f"{urgency}: stay request pending for {waiting_for} — {stay_title}",
-            message_html=royal_centered_message(
-                f'Dear <span style="color: #f7f1e8; font-style: italic;">{esc(owner_name)}</span>,<br/>'
-                f'<span style="font-size: 16px; color: #9a8a78;">'
-                f"{esc(guest_name)} is still waiting for your response on "
-                f'<strong style="color: #d4af6a;">{esc(stay_title)}</strong> '
-                f"(pending for {esc(waiting_for)})."
-                f"</span>"
+            message_html=royal_luxury_recipient_message(
+                owner_name,
+                lead_html=(
+                    f'<span style="font-size: 16px; color: {EMAIL_INK_MUTED};">'
+                    f"{esc(guest_name)} is still waiting for your response on "
+                    f'<strong style="color: {EMAIL_GOLD_BRIGHT};">{esc(stay_title)}</strong> '
+                    f"(pending for {esc(waiting_for)})."
+                    f"</span>"
+                ),
             ),
+            booking_id=booking_id,
+            hero_label="Requested Property",
+            hero_name=stay_title,
             detail_rows=[
-                ("Property", stay_title),
                 ("Check-in", _format_date(check_in)),
                 ("Check-out", _format_date(check_out)),
                 ("Nights", str(nights)),
                 ("Guests", str(guest_count)),
             ],
+            payment_method="Pay at check-in",
             highlight_label="Total",
             highlight_value=amount,
             closing_note="Please confirm or reject this stay request.",
@@ -572,15 +590,18 @@ def send_homestay_owner_welcome_email(*, to: str, owner_name: str) -> bool:
             headline="Welcome",
             headline_accent="Property Owner",
             badge="Account Ready",
-            ornament_label="Property Owner Alert",
             preheader="Your Royal Passage property owner account is ready",
-            message_html=royal_centered_message(
-                f'Dear <span style="color: #f7f1e8; font-style: italic;">{esc(owner_name)}</span>,<br/>'
-                f'<span style="font-size: 16px; color: #9a8a78;">'
-                f"Your property owner account is ready. Add your homestay, manage bookings, "
-                f"and welcome guests to Mysuru."
-                f"</span>"
+            message_html=royal_luxury_recipient_message(
+                owner_name,
+                lead_html=(
+                    f'<span style="font-size: 16px; color: {EMAIL_INK_MUTED};">'
+                    f"Your property owner account is ready. Add your homestay, manage bookings, "
+                    f"and welcome guests to Mysuru."
+                    f"</span>"
+                ),
             ),
+            hero_label="Welcome to",
+            hero_name="The Royal Passage Homestays",
             closing_note="We are honoured to host your property on The Royal Passage.",
             cta_label="Open Property Dashboard",
             cta_url=_site_link("/homestay/dashboard"),
