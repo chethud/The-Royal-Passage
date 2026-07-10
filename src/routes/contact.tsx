@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
-import { buildContactJsonLd, SITE_URL } from "@/lib/seo";
+import { buildContactJsonLd, CONTACT_EMAIL, SITE_URL } from "@/lib/seo";
 
 const MAPS_LINK = "https://maps.app.goo.gl/Qy3oqMKGpJDQUbeZ9";
 const MAPS_EMBED =
@@ -55,8 +55,8 @@ const methods: Method[] = [
   {
     icon: Mail,
     label: "Email",
-    value: "prajwalbp500@gmail.com",
-    href: "mailto:prajwalbp500@gmail.com",
+    value: CONTACT_EMAIL,
+    href: `mailto:${CONTACT_EMAIL}`,
   },
   {
     icon: MapPin,

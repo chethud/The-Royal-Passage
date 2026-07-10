@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import experienceTermsMarkdown from "@/content/experience-terms.md?raw";
+import privacyPolicyMarkdown from "@/content/privacy-policy.md?raw";
 import { renderLegalMarkdown } from "@/lib/legal/render-legal-markdown";
 
-export function ExperienceTermsDocument() {
+export function PrivacyPolicyDocument() {
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash) return;
@@ -12,7 +12,7 @@ export function ExperienceTermsDocument() {
 
   return (
     <article className="legal-document w-full max-w-none space-y-5 text-left">
-      {renderLegalMarkdown(experienceTermsMarkdown)}
+      {renderLegalMarkdown(privacyPolicyMarkdown)}
     </article>
   );
 }

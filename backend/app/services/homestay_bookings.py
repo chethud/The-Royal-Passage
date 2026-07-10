@@ -2,7 +2,11 @@ from datetime import date, timedelta
 import logging
 
 from app.dependencies.supabase import get_supabase_admin
-from app.models.schemas import CreateHomestayBookingRequest, CreateHomestayBookingResponse
+from app.models.schemas import (
+    CreateHomestayBookingRequest,
+    CreateHomestayBookingResponse,
+    HomestayBookingSummary,
+)
 from app.services.homestay_availability import (
     load_extra_bed_overrides_minor,
     load_price_overrides_minor,

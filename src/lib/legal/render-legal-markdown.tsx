@@ -27,11 +27,20 @@ function slugifyHeading(text: string): string {
     .replace(/^-|-$/g, "");
 }
 
+function legalSectionId(text: string): string {
+  const sectionMatch = text.match(/^([A-Z])(\d+)\./i);
+  if (sectionMatch) return `section-${sectionMatch[1].toLowerCase()}${sectionMatch[2]}`;
+  const letterMatch = text.match(/^([A-Z])\.\s/i);
+  if (letterMatch) return `section-${letterMatch[1].toLowerCase()}`;
+  return slugifyHeading(text);
+}
+
 export function renderLegalMarkdown(markdown: string): ReactNode[] {
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   const nodes: ReactNode[] = [];
   let index = 0;
   let h1Count = 0;
+  let inTableOfContents = false;
   let paragraph: string[] = [];
   let listItems: string[] = [];
   let tocItems: string[] = [];
@@ -60,11 +69,23 @@ export function renderLegalMarkdown(markdown: string): ReactNode[] {
         key={`toc-${index++}`}
         className="grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-3"
       >
-        {tocItems.map((item, itemIndex) => (
-          <p key={itemIndex} className="text-left text-sm text-muted-foreground">
-            {inlineMarkdown(item)}
-          </p>
-        ))}
+        {tocItems.map((item, itemIndex) => {
+          const id = legalSectionId(item);
+          return (
+            <a
+              key={itemIndex}
+              href={`#${id}`}
+              onClick={(event) => {
+                event.preventDefault();
+                document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                window.history.replaceState(null, "", `#${id}`);
+              }}
+              className="text-left text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-ember hover:underline"
+            >
+              {inlineMarkdown(item)}
+            </a>
+          );
+        })}
       </div>,
     );
     tocItems = [];
@@ -158,6 +179,9 @@ export function renderLegalMarkdown(markdown: string): ReactNode[] {
       flushToc();
       h1Count += 1;
       const title = trimmed.slice(2);
+      if (title.trim().toLowerCase() === "table of contents") {
+        inTableOfContents = true;
+      }
       const h1Class =
         h1Count === 1
           ? "text-left font-display text-xs tracking-[0.28em] uppercase text-ember sm:text-sm"
@@ -177,11 +201,11 @@ export function renderLegalMarkdown(markdown: string): ReactNode[] {
       flushList();
       flushToc();
       const title = trimmed.slice(3);
-      const id = slugifyHeading(title);
+      const id = inTableOfContents ? undefined : legalSectionId(title);
       nodes.push(
         <h2
           key={`h2-${index++}`}
-          id={id}
+          {...(id ? { id } : {})}
           className="scroll-mt-28 border-t border-[oklch(0.88_0.08_86_/_0.12)] pt-8 text-left font-display text-xl tracking-tight text-ink first:border-t-0 first:pt-0 sm:text-2xl"
         >
           {inlineMarkdown(title)}
@@ -195,11 +219,11 @@ export function renderLegalMarkdown(markdown: string): ReactNode[] {
       flushList();
       flushToc();
       const title = trimmed.slice(4);
-      const id = slugifyHeading(title);
+      const id = inTableOfContents ? undefined : slugifyHeading(title);
       nodes.push(
         <h3
           key={`h3-${index++}`}
-          id={id}
+          {...(id ? { id } : {})}
           className="scroll-mt-28 pt-4 text-left font-display text-lg tracking-tight text-ink sm:text-xl"
         >
           {inlineMarkdown(title)}
@@ -212,11 +236,14 @@ export function renderLegalMarkdown(markdown: string): ReactNode[] {
       flushParagraph();
       flushList();
       flushToc();
+      if (inTableOfContents) {
+        inTableOfContents = false;
+      }
       nodes.push(<hr key={`hr-${index++}`} className="border-[oklch(0.88_0.08_86_/_0.2)]" />);
       continue;
     }
 
-    if (/^A\d+\./.test(trimmed)) {
+    if (/^[A-Z](\d+\.)?\s/.test(trimmed)) {
       flushParagraph();
       flushList();
       tocItems.push(trimmed);

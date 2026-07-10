@@ -27,7 +27,7 @@ export function AuthTermsAcceptance({ id, checked, onCheckedChange }: AuthTermsA
             className="text-ember underline-offset-4 hover:underline"
             onClick={(e) => e.stopPropagation()}
           >
-            terms and conditions
+            Terms & Conditions
           </Link>
         </span>
       </label>

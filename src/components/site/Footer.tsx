@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Facebook, Instagram, Mail, MapPin, MessageCircle, Phone, Youtube } from "lucide-react";
 import logoUrl from "@/assets/logo/logo.png";
 import footerHeroImg from "@/assets/hero-image.png";
+import { CONTACT_EMAIL } from "@/lib/seo";
 
 const TAGLINE =
   "The Royal Passage is an experience-led travel company curating immersive journeys in and around Mysuru.";
@@ -14,8 +15,18 @@ const SOCIAL_LINKS = [
 
 const MAPS_LINK = "https://maps.app.goo.gl/Qy3oqMKGpJDQUbeZ9";
 
+const PAYMENT_POLICY_LINK = {
+  label: "Payment Policy",
+  to: "/legal/payment-policy" as const,
+};
+
+const PRIVACY_POLICY_LINK = {
+  label: "Privacy Policy",
+  to: "/legal/privacy-policy" as const,
+};
+
 const EXPERIENCE_TERMS_LINK = {
-  label: "Terms of Service",
+  label: "Terms & Conditions",
   to: "/legal/experience-terms" as const,
 };
 
@@ -24,7 +35,9 @@ const quickLinks = [
   { label: "Homestays", to: "/homestays" },
   { label: "Journal", to: "/journal" },
   { label: "Contact", to: "/contact" },
-  { label: "Terms of Service", to: EXPERIENCE_TERMS_LINK.to },
+  { label: EXPERIENCE_TERMS_LINK.label, to: EXPERIENCE_TERMS_LINK.to },
+  { label: PRIVACY_POLICY_LINK.label, to: PRIVACY_POLICY_LINK.to },
+  { label: PAYMENT_POLICY_LINK.label, to: PAYMENT_POLICY_LINK.to },
 ];
 
 const experiences = ["Pottery Experience", "Outdoor Cooking", "Heritage Walks"];
@@ -184,10 +197,10 @@ function FooterFull() {
                 <li className="flex items-start gap-2.5">
                   <Mail className="mt-0.5 h-4 w-4 shrink-0 text-ember/80" />
                   <a
-                    href="mailto:prajwalbp500@gmail.com"
+                    href={`mailto:${CONTACT_EMAIL}`}
                     className="transition-colors hover:text-ember"
                   >
-                    prajwalbp500@gmail.com
+                    {CONTACT_EMAIL}
                   </a>
                 </li>
                 <li className="flex items-start gap-2.5">
@@ -244,6 +257,24 @@ function FooterLegalLinks({ className = "" }: { className?: string }) {
         className="text-ember/85 underline-offset-4 transition-colors hover:text-ember hover:underline"
       >
         {EXPERIENCE_TERMS_LINK.label}
+      </Link>
+      <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
+        ·
+      </span>
+      <Link
+        to={PAYMENT_POLICY_LINK.to}
+        className="text-ember/85 underline-offset-4 transition-colors hover:text-ember hover:underline"
+      >
+        {PAYMENT_POLICY_LINK.label}
+      </Link>
+      <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
+        ·
+      </span>
+      <Link
+        to={PRIVACY_POLICY_LINK.to}
+        className="text-ember/85 underline-offset-4 transition-colors hover:text-ember hover:underline"
+      >
+        {PRIVACY_POLICY_LINK.label}
       </Link>
       <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
         ·

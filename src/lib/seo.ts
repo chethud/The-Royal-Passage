@@ -14,7 +14,7 @@ export function resolveSiteUrl(): string {
 
 export const SITE_URL = resolveSiteUrl();
 export const SITE_NAME = "The Royal Passage";
-export const CONTACT_EMAIL = "prajwalbp500@gmail.com";
+export const CONTACT_EMAIL = "noreplay@theroyalpassage.com";
 export const CONTACT_PHONE = "+91 729588826";
 export const MAPS_LINK = "https://maps.app.goo.gl/Qy3oqMKGpJDQUbeZ9";
 
@@ -286,7 +286,7 @@ export function buildHomeJsonLd(experiences: Experience[] = []) {
             name: "How can I contact The Royal Passage?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "You can call or WhatsApp +91 729588826, or email prajwalbp500@gmail.com.",
+              text: `You can call or WhatsApp ${CONTACT_PHONE}, or email ${CONTACT_EMAIL}.`,
             },
           },
         ],

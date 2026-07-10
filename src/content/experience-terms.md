@@ -1,6 +1,6 @@
 # THE ROYAL PASSAGE™
 
-# CUSTOMER TERMS OF SERVICE
+# CUSTOMER TERMS & CONDITIONS
 
 **Effective Date:** 10 July 2026
 
@@ -10,7 +10,7 @@
 
 Welcome to **The Royal Passage**.
 
-These Terms of Service govern your access to and use of The Royal Passage website, mobile application, and all related services.
+These Terms & Conditions govern your access to and use of The Royal Passage website, mobile application, and all related services.
 
 These Terms apply whenever you:
 
@@ -376,8 +376,6 @@ Supported payment methods may include:
 * Credit Cards
 * Debit Cards
 * Net Banking
-* Wallets
-* EMI (where supported)
 
 ---
 
@@ -1232,7 +1230,7 @@ Where changes materially affect your rights or obligations, we will provide reas
 
 ### Entire Agreement
 
-These Customer Terms of Service, together with the Privacy Policy, Payment, Refund & Cancellation Policy, and any other policies referenced on the Platform, constitute the complete agreement between you and The Royal Passage regarding Experience bookings.
+These Customer Terms & Conditions, together with the Privacy Policy, Payment, Refund & Cancellation Policy, and any other policies referenced on the Platform, constitute the complete agreement between you and The Royal Passage regarding Experience bookings.
 
 ### Severability
 
@@ -1256,6 +1254,6 @@ For questions, complaints, legal notices, or support regarding Experience bookin
 
 **The Royal Passage – Customer Support**
 
-* **Email:** [prajwalbp500@gmail.com](mailto:prajwalbp500@gmail.com)
+* **Email:** [noreplay@theroyalpassage.com](mailto:noreplay@theroyalpassage.com)
 * **Business Hours:** Monday to Saturday, 9:00 AM – 6:00 PM (IST), excluding public holidays
 * **Website:** [https://www.theroyalpassage.com](https://www.theroyalpassage.com)
