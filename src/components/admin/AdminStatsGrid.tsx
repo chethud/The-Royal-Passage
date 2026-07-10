@@ -22,7 +22,7 @@ export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
           <ClickableStatCard
             label="Hosts"
             value={String(stats.totalHosts)}
-            to="/admin/hosts"
+            to="/admin/profile/users"
             surface={surface}
           />
           <ClickableStatCard

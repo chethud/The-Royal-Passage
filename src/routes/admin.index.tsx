@@ -110,7 +110,7 @@ function AdminOverviewPage() {
                 }
               />
               <QuickLink to="/admin/bookings" label="All bookings" detail="Guest reservations & payouts" />
-              <QuickLink to="/admin/hosts" label="Host accounts" detail="Create login credentials" />
+              <QuickLink to="/admin/profile/users" label="Users" detail="Create logins & assign access roles" />
               <QuickLink to="/admin/activity" label="Activity log" detail="Recent platform events" />
             </div>
           </LuxuryCheckoutPanel>

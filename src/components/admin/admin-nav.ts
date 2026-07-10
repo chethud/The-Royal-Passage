@@ -4,18 +4,21 @@ export const ADMIN_EXPERIENCE_NAV_ITEMS = [
   { to: "/admin", label: "Overview" },
   { to: "/admin/bookings", label: "Bookings" },
   { to: "/admin/experiences", label: "Approve experiences" },
+  { to: "/experiences", label: "Live catalog" },
 ] as const;
 
 export const ADMIN_HOMESTAY_NAV_ITEMS = [
   { to: "/admin/homestay", label: "Overview" },
   { to: "/admin/homestays", label: "Approve homestays" },
   { to: "/admin/homestay-owners", label: "Homestay owners" },
+  { to: "/homestays", label: "Live catalog" },
 ] as const;
 
 export const ADMIN_VIP_NAV_ITEMS = [
   { to: "/admin/vip", label: "Overview" },
   { to: "/admin/vip-packages", label: "Approve packages" },
   { to: "/admin/vip-owners", label: "VIP owners" },
+  { to: "/vips", label: "Live catalog" },
 ] as const;
 
 /** @deprecated Use adminNavItemsForModule(resolveAdminModule(pathname)) instead. */
@@ -54,12 +57,6 @@ export function adminModuleLabel(module: AdminModule): string {
   if (module === "homestays") return "Homestays admin";
   if (module === "vip") return "VIP admin";
   return "Experiences admin";
-}
-
-export function adminLiveCatalogPath(module: AdminModule): string {
-  if (module === "homestays") return "/homestays";
-  if (module === "vip") return "/vips";
-  return "/experiences";
 }
 
 export function adminNavItemsForModule(module: AdminModule) {

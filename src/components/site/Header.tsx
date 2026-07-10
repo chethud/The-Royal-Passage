@@ -6,7 +6,6 @@ import { CartIcon } from "@/components/cart/CartIcon";
 import { AccountDropdownMenu } from "@/components/account/AccountDropdownMenu";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import {
-  adminLiveCatalogPath,
   adminNavItemsForModule,
   isAdminNavItemActive,
   resolveAdminModule,
@@ -122,7 +121,6 @@ export function Header() {
         : "/";
   const isGuest = role === "guest";
   const isAdmin = isAdminRole(role);
-  const adminLiveCatalog = isAdmin ? adminLiveCatalogPath(resolveAdminModule(pathname)) : null;
   const isHost = role === "host";
   const showStaffNotifications = Boolean(user) && (isAdmin || isHost);
   const navBadges = useNavBadges();
@@ -299,11 +297,9 @@ export function Header() {
                       <>
                         <MobileNavLink to={dashboardPath}>Dashboard</MobileNavLink>
                         <MobileNavSectionLabel>Administration</MobileNavSectionLabel>
-                        <MobileNavLink to="/admin/hosts">Host accounts</MobileNavLink>
                         <MobileNavLink to="/admin/reviews">Reviews</MobileNavLink>
                         <MobileNavLink to="/admin/activity">Activity log</MobileNavLink>
                         <MobileNavLink to="/admin/homepage-edit">Edit homepage</MobileNavLink>
-                        {adminLiveCatalog ? <MobileNavLink to={adminLiveCatalog}>Live catalog</MobileNavLink> : null}
                         <MobileNavLink to="/admin/profile">Account</MobileNavLink>
                         <MobileNavLink to="/admin/profile/users">Users</MobileNavLink>
                         <MobileNavLink to="/admin/profile/homepage-photos">Homepage photos</MobileNavLink>

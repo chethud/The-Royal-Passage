@@ -67,10 +67,10 @@ function AdminExperiencesPage() {
             ← Overview
           </Link>
           <Link
-            to="/admin/hosts"
+            to="/admin/profile/users"
             className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
           >
-            Host accounts
+            Users
           </Link>
         </div>
         <Link

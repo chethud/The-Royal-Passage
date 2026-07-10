@@ -1,7 +1,6 @@
 import type { ComponentType } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
-  Compass,
   History,
   Home,
   Image,
@@ -21,7 +20,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { adminLiveCatalogPath, resolveAdminModule } from "@/components/admin/admin-nav";
 import { ProfileNavIcon } from "@/components/account/ProfileNavIcon";
 import { ROLE_LABELS, type UserRole } from "@/lib/roles";
 
@@ -121,9 +119,6 @@ export function AccountDropdownMenu({
       ? "Homestay reservations"
       : "Experience bookings";
   const roleLabel = role ? ROLE_LABELS[role] : "Account";
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const adminModule = resolveAdminModule(pathname);
-  const liveCatalogPath = adminLiveCatalogPath(adminModule);
 
   return (
     <DropdownMenu>
@@ -186,12 +181,6 @@ export function AccountDropdownMenu({
             <>
               <DropdownMenuSeparator className="header-account-menu__divider" />
               <DropdownMenuLabel className="header-account-menu__section">Administration</DropdownMenuLabel>
-              <AccountMenuItem
-                icon={Users}
-                label="Host accounts"
-                description="Manage experience hosts"
-                to="/admin/hosts"
-              />
               <AccountMenuItem icon={Star} label="Reviews" description="Moderate guest reviews" to="/admin/reviews" />
               <AccountMenuItem
                 icon={ScrollText}
@@ -204,12 +193,6 @@ export function AccountDropdownMenu({
                 label="Edit homepage"
                 description="Hero, showcase & video sections"
                 to="/admin/homepage-edit"
-              />
-              <AccountMenuItem
-                icon={Compass}
-                label="Live catalog"
-                description="View the public marketplace"
-                to={liveCatalogPath}
               />
             </>
           ) : null}
