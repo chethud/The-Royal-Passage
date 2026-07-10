@@ -28,27 +28,19 @@ export const Route = createFileRoute("/legal/experience-terms")({
 
 function ExperienceTermsPage() {
   return (
-    <div className="pt-[var(--header-height)] text-foreground">
+    <div className="min-h-dvh pt-[var(--header-height)] text-foreground">
       <Header />
-      <section className="container-page py-10 sm:py-14">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="eyebrow mb-2 text-ember/90">Legal</div>
-              <h1 className="font-display text-3xl tracking-tight text-ink sm:text-4xl">
-                Customer Terms of Service
-              </h1>
-            </div>
-            <Link
-              to="/experiences"
-              className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-ember hover:underline"
-            >
-              ← Back to experiences
-            </Link>
-          </div>
-          <div className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] px-5 py-8 sm:px-8 sm:py-10">
-            <ExperienceTermsDocument />
-          </div>
+      <section className="container-page w-full py-8 sm:py-12">
+        <div className="mb-5 flex justify-end sm:mb-6">
+          <Link
+            to="/experiences"
+            className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-ember hover:underline"
+          >
+            ← Back to experiences
+          </Link>
+        </div>
+        <div className="glass-strong w-full rounded-lg border border-[oklch(0.88_0.08_86_/_0.15)] px-5 py-8 sm:px-10 sm:py-12 lg:px-14">
+          <ExperienceTermsDocument />
         </div>
       </section>
       <Footer />
