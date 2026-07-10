@@ -118,6 +118,11 @@ function AdminHomestayOverviewPage() {
               label="Homestay owners"
               detail="Create owner login credentials"
             />
+            <QuickLink
+              to="/admin/homestay-featured"
+              label="Featured homestays"
+              detail="Choose the top 3 on the homestays page"
+            />
             <QuickLink to="/homestays" label="Live catalog" detail="Public homestay listings" />
           </div>
         </LuxuryCheckoutPanel>

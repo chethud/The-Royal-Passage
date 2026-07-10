@@ -6,12 +6,13 @@ import type { Homestay } from "@/data/homestays";
 import type { HomestayBrowseSearch } from "@/lib/homestay-filters";
 
 type HomestaysShowcaseProps = {
+  featured?: Homestay[];
   homestays?: Homestay[];
 };
 
-export function HomestaysShowcase({ homestays = [] }: HomestaysShowcaseProps) {
-  const featured = homestays.slice(0, 3);
-  if (featured.length === 0) return null;
+export function HomestaysShowcase({ featured, homestays = [] }: HomestaysShowcaseProps) {
+  const items = featured ?? homestays.slice(0, 3);
+  if (items.length === 0) return null;
 
   return (
     <section
@@ -46,7 +47,7 @@ export function HomestaysShowcase({ homestays = [] }: HomestaysShowcaseProps) {
           transition={{ duration: 0.55 }}
           className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2 md:grid-cols-3 md:gap-7"
         >
-          {featured.map((stay) => (
+          {items.map((stay) => (
             <HomestayCard key={stay.id} stay={stay} />
           ))}
         </motion.div>

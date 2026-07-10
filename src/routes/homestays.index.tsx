@@ -5,14 +5,23 @@ import { HomestaysHomeHero } from "@/components/homestays/HomestaysHomeHero";
 import { HomestaysShowcase } from "@/components/site/HomestaysShowcase";
 import { HomestayPillarsRow } from "@/components/homestays/HomestayPillarsRow";
 import { getHomestaysForUi } from "@/lib/homestay-fns";
+import {
+  fetchFeaturedHomestaySlugs,
+  resolveFeaturedHomestays,
+} from "@/lib/homestay-featured-fns";
 import { canonicalLink } from "@/lib/seo-helpers";
 import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/homestays/")({
   loader: async () => {
-    const catalog = await getHomestaysForUi();
+    const [catalog, featuredSlugs] = await Promise.all([
+      getHomestaysForUi(),
+      fetchFeaturedHomestaySlugs(),
+    ]);
+    const homestays = catalog.homestays ?? [];
     return {
-      homestays: catalog.homestays ?? [],
+      homestays,
+      featured: resolveFeaturedHomestays(homestays, featuredSlugs),
       mode: catalog.mode,
     };
   },
@@ -35,14 +44,14 @@ export const Route = createFileRoute("/homestays/")({
 });
 
 function HomestaysHomePage() {
-  const { homestays } = Route.useLoaderData();
+  const { featured } = Route.useLoaderData();
 
   return (
     <div className="overflow-x-hidden bg-background text-foreground">
       <Header />
 
       <HomestaysHomeHero />
-      <HomestaysShowcase homestays={homestays} />
+      <HomestaysShowcase featured={featured} />
       <HomestayPillarsRow />
       <Footer />
     </div>

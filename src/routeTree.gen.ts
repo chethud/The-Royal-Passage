@@ -54,6 +54,7 @@ import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
 import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookingId'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
+import { Route as AdminHomestayFeaturedRouteImport } from './routes/admin.homestay-featured'
 import { Route as AdminHomepageEditRouteImport } from './routes/admin.homepage-edit'
 import { Route as AccountVipApplyRouteImport } from './routes/account.vip-apply'
 import { Route as AccountProfileRouteImport } from './routes/account.profile'
@@ -330,6 +331,11 @@ const AdminProfileRoute = AdminProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHomestayFeaturedRoute = AdminHomestayFeaturedRouteImport.update({
+  id: '/homestay-featured',
+  path: '/homestay-featured',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHomepageEditRoute = AdminHomepageEditRouteImport.update({
   id: '/homepage-edit',
   path: '/homepage-edit',
@@ -604,6 +610,7 @@ export interface FileRoutesByFullPath {
   '/account/profile': typeof AccountProfileRoute
   '/account/vip-apply': typeof AccountVipApplyRoute
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
+  '/admin/homestay-featured': typeof AdminHomestayFeaturedRoute
   '/admin/profile': typeof AdminProfileRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -698,6 +705,7 @@ export interface FileRoutesByTo {
   '/account/profile': typeof AccountProfileRoute
   '/account/vip-apply': typeof AccountVipApplyRoute
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
+  '/admin/homestay-featured': typeof AdminHomestayFeaturedRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
@@ -784,6 +792,7 @@ export interface FileRoutesById {
   '/account/profile': typeof AccountProfileRoute
   '/account/vip-apply': typeof AccountVipApplyRoute
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
+  '/admin/homestay-featured': typeof AdminHomestayFeaturedRoute
   '/admin/profile': typeof AdminProfileRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -883,6 +892,7 @@ export interface FileRouteTypes {
     | '/account/profile'
     | '/account/vip-apply'
     | '/admin/homepage-edit'
+    | '/admin/homestay-featured'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -977,6 +987,7 @@ export interface FileRouteTypes {
     | '/account/profile'
     | '/account/vip-apply'
     | '/admin/homepage-edit'
+    | '/admin/homestay-featured'
     | '/auth/callback'
     | '/cities/$slug'
     | '/dashboard/cancelled'
@@ -1062,6 +1073,7 @@ export interface FileRouteTypes {
     | '/account/profile'
     | '/account/vip-apply'
     | '/admin/homepage-edit'
+    | '/admin/homestay-featured'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -1507,6 +1519,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProfileRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/homestay-featured': {
+      id: '/admin/homestay-featured'
+      path: '/homestay-featured'
+      fullPath: '/admin/homestay-featured'
+      preLoaderRoute: typeof AdminHomestayFeaturedRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/homepage-edit': {
       id: '/admin/homepage-edit'
       path: '/homepage-edit'
@@ -1878,6 +1897,7 @@ const AdminProfileRouteWithChildren = AdminProfileRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminHomepageEditRoute: typeof AdminHomepageEditRoute
+  AdminHomestayFeaturedRoute: typeof AdminHomestayFeaturedRoute
   AdminProfileRoute: typeof AdminProfileRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBookingsBookingIdRoute: typeof AdminBookingsBookingIdRoute
@@ -1899,6 +1919,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminHomepageEditRoute: AdminHomepageEditRoute,
+  AdminHomestayFeaturedRoute: AdminHomestayFeaturedRoute,
   AdminProfileRoute: AdminProfileRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   AdminBookingsBookingIdRoute: AdminBookingsBookingIdRoute,
