@@ -292,26 +292,32 @@ export function Header() {
                 {showAccountMenu ? (
                   <>
                     <MobileNavDivider />
-                    {!isAdmin ? (
+                    <MobileNavSectionLabel>Account</MobileNavSectionLabel>
+                    {isAdmin ? (
                       <>
-                        <MobileNavSectionLabel>Account</MobileNavSectionLabel>
-                        {isGuest ? (
-                          <>
-                            <MobileNavLink
-                              to={isVipSection ? "/vips" : isHomestaySection ? "/homestays" : "/"}
-                            >
-                              Home
-                            </MobileNavLink>
-                            <MobileNavLink to="/dashboard/history">
-                              {isVipSection ? "My bookings" : isHomestaySection ? "My stays" : "History"}
-                            </MobileNavLink>
-                          </>
-                        ) : (
-                          <MobileNavLink to={dashboardPath}>Dashboard</MobileNavLink>
-                        )}
+                        <MobileNavLink to={dashboardPath}>Dashboard</MobileNavLink>
+                        <MobileNavLink to="/admin/profile">Profile</MobileNavLink>
+                        <MobileNavLink to="/admin/profile/users">Users</MobileNavLink>
+                        <MobileNavLink to="/admin/profile/homepage-photos">Homepage photos</MobileNavLink>
+                      </>
+                    ) : isGuest ? (
+                      <>
+                        <MobileNavLink
+                          to={isVipSection ? "/vips" : isHomestaySection ? "/homestays" : "/"}
+                        >
+                          Home
+                        </MobileNavLink>
+                        <MobileNavLink to="/dashboard/history">
+                          {isVipSection ? "My bookings" : isHomestaySection ? "My stays" : "History"}
+                        </MobileNavLink>
                         <MobileNavLink to={profilePathForRole(role)}>Profile</MobileNavLink>
                       </>
-                    ) : null}
+                    ) : (
+                      <>
+                        <MobileNavLink to={dashboardPath}>Dashboard</MobileNavLink>
+                        <MobileNavLink to={profilePathForRole(role)}>Profile</MobileNavLink>
+                      </>
+                    )}
                     <MobileNavLink
                       onClick={() => {
                         void handleLogout();
