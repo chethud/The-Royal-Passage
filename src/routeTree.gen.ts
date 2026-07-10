@@ -30,6 +30,7 @@ import { Route as VipListingsRouteImport } from './routes/vip.listings'
 import { Route as VipDashboardRouteImport } from './routes/vip.dashboard'
 import { Route as VipBookingsRouteImport } from './routes/vip.bookings'
 import { Route as StaysBookingIdRouteImport } from './routes/stays.$bookingId'
+import { Route as LegalExperienceTermsRouteImport } from './routes/legal.experience-terms'
 import { Route as HostReviewsRouteImport } from './routes/host.reviews'
 import { Route as HostRevenueRouteImport } from './routes/host.revenue'
 import { Route as HostProfileRouteImport } from './routes/host.profile'
@@ -205,6 +206,11 @@ const VipBookingsRoute = VipBookingsRouteImport.update({
 const StaysBookingIdRoute = StaysBookingIdRouteImport.update({
   id: '/stays/$bookingId',
   path: '/stays/$bookingId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalExperienceTermsRoute = LegalExperienceTermsRouteImport.update({
+  id: '/legal/experience-terms',
+  path: '/legal/experience-terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HostReviewsRoute = HostReviewsRouteImport.update({
@@ -607,6 +613,7 @@ export interface FileRoutesByFullPath {
   '/host/profile': typeof HostProfileRoute
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
+  '/legal/experience-terms': typeof LegalExperienceTermsRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
   '/vip/bookings': typeof VipBookingsRouteWithChildren
   '/vip/dashboard': typeof VipDashboardRoute
@@ -689,6 +696,7 @@ export interface FileRoutesByTo {
   '/host/profile': typeof HostProfileRoute
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
+  '/legal/experience-terms': typeof LegalExperienceTermsRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
   '/vip/dashboard': typeof VipDashboardRoute
   '/admin': typeof AdminIndexRoute
@@ -781,6 +789,7 @@ export interface FileRoutesById {
   '/host/profile': typeof HostProfileRoute
   '/host/revenue': typeof HostRevenueRoute
   '/host/reviews': typeof HostReviewsRoute
+  '/legal/experience-terms': typeof LegalExperienceTermsRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
   '/vip/bookings': typeof VipBookingsRouteWithChildren
   '/vip/dashboard': typeof VipDashboardRoute
@@ -877,6 +886,7 @@ export interface FileRouteTypes {
     | '/host/profile'
     | '/host/revenue'
     | '/host/reviews'
+    | '/legal/experience-terms'
     | '/stays/$bookingId'
     | '/vip/bookings'
     | '/vip/dashboard'
@@ -959,6 +969,7 @@ export interface FileRouteTypes {
     | '/host/profile'
     | '/host/revenue'
     | '/host/reviews'
+    | '/legal/experience-terms'
     | '/stays/$bookingId'
     | '/vip/dashboard'
     | '/admin'
@@ -1050,6 +1061,7 @@ export interface FileRouteTypes {
     | '/host/profile'
     | '/host/revenue'
     | '/host/reviews'
+    | '/legal/experience-terms'
     | '/stays/$bookingId'
     | '/vip/bookings'
     | '/vip/dashboard'
@@ -1135,6 +1147,7 @@ export interface RootRouteChildren {
   HostProfileRoute: typeof HostProfileRoute
   HostRevenueRoute: typeof HostRevenueRoute
   HostReviewsRoute: typeof HostReviewsRoute
+  LegalExperienceTermsRoute: typeof LegalExperienceTermsRoute
   StaysBookingIdRoute: typeof StaysBookingIdRoute
   VipBookingsRoute: typeof VipBookingsRouteWithChildren
   VipDashboardRoute: typeof VipDashboardRoute
@@ -1298,6 +1311,13 @@ declare module '@tanstack/react-router' {
       path: '/stays/$bookingId'
       fullPath: '/stays/$bookingId'
       preLoaderRoute: typeof StaysBookingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/experience-terms': {
+      id: '/legal/experience-terms'
+      path: '/legal/experience-terms'
+      fullPath: '/legal/experience-terms'
+      preLoaderRoute: typeof LegalExperienceTermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/host/reviews': {
@@ -2086,6 +2106,7 @@ const rootRouteChildren: RootRouteChildren = {
   HostProfileRoute: HostProfileRoute,
   HostRevenueRoute: HostRevenueRoute,
   HostReviewsRoute: HostReviewsRoute,
+  LegalExperienceTermsRoute: LegalExperienceTermsRoute,
   StaysBookingIdRoute: StaysBookingIdRoute,
   VipBookingsRoute: VipBookingsRouteWithChildren,
   VipDashboardRoute: VipDashboardRoute,

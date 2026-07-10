@@ -17,18 +17,25 @@ const quickLinks = [
   { label: "Homestays", to: "/homestays" },
   { label: "Journal", to: "/journal" },
   { label: "Contact", to: "/contact" },
+  { label: "Experience Terms", to: EXPERIENCE_TERMS_LINK.to },
 ];
 
 const MAPS_LINK = "https://maps.app.goo.gl/Qy3oqMKGpJDQUbeZ9";
+
+const EXPERIENCE_TERMS_LINK = {
+  label: "Experience Terms & Conditions",
+  to: "/legal/experience-terms" as const,
+};
 
 const experiences = ["Pottery Experience", "Outdoor Cooking", "Heritage Walks"];
 
 export function Footer() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isHomepage = pathname === "/";
+  const isExperiencesPage = pathname === "/experiences" || pathname.startsWith("/experiences/");
 
   if (!isHomepage) {
-    return <FooterSimple />;
+    return <FooterSimple showLegalLinks={isExperiencesPage} />;
   }
 
   return <FooterFull />;
@@ -92,11 +99,12 @@ function FooterBrandBlock({
   );
 }
 
-function FooterSimple() {
+function FooterSimple({ showLegalLinks = false }: { showLegalLinks?: boolean }) {
   return (
     <footer className="border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
       <div className="container-page py-2.5 sm:py-5">
         <FooterBrandBlock layout="row" logoClassName="h-14 w-auto object-contain sm:h-14 md:h-16" />
+        {showLegalLinks ? <FooterLegalLinks className="mt-3 justify-center sm:justify-start" /> : null}
       </div>
     </footer>
   );
@@ -201,7 +209,7 @@ function FooterFull() {
 
       <div className="container-page relative z-10 flex flex-wrap items-center justify-center gap-1.5 border-t border-[oklch(0.88_0.08_86_/_0.12)] py-3 text-[0.68rem] text-muted-foreground text-center sm:justify-between sm:gap-3 sm:py-6 sm:text-xs sm:text-left">
         <span suppressHydrationWarning>© {new Date().getFullYear()} The Royal Passage. All rights reserved.</span>
-        <span className="w-full text-ember/70 sm:w-auto">Crafted with intention.</span>
+        <FooterLegalLinks className="w-full justify-center sm:w-auto" />
       </div>
 
       <img
@@ -225,6 +233,23 @@ function FooterFull() {
         className="pointer-events-none absolute inset-y-0 right-0 hidden w-[35%] bg-[radial-gradient(ellipse_at_right,oklch(0.55_0.14_78_/_0.05)_0%,transparent_70%)] lg:block"
       />
     </footer>
+  );
+}
+
+function FooterLegalLinks({ className = "" }: { className?: string }) {
+  return (
+    <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.68rem] sm:text-xs ${className}`}>
+      <Link
+        to={EXPERIENCE_TERMS_LINK.to}
+        className="text-ember/85 underline-offset-4 transition-colors hover:text-ember hover:underline"
+      >
+        {EXPERIENCE_TERMS_LINK.label}
+      </Link>
+      <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
+        ·
+      </span>
+      <span className="text-ember/70">Crafted with intention.</span>
+    </div>
   );
 }
 
