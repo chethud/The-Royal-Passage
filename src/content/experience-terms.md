@@ -1,930 +1,1261 @@
-# THE ROYAL PASSAGE
+# THE ROYAL PASSAGE™
 
-# EXPERIENCE TERMS & CONDITIONS
+# CUSTOMER TERMS OF SERVICE
 
-**Effective Date:** July 10, 2026
-
----
-
-## 1. Introduction
-
-Welcome to **The Royal Passage** ("The Royal Passage", "Company", "Platform", "we", "our", or "us").
-
-The Royal Passage is an online travel marketplace that enables guests to discover, book, and participate in curated experiences offered by independent Experience Hosts. Experiences may include, but are not limited to, heritage tours, cultural activities, food tours, adventure activities, workshops, nature trails, photography tours, wellness sessions, festivals, local events, and other tourism-related activities.
-
-These Experience Terms & Conditions ("Terms") govern the booking and participation in all Experiences listed on The Royal Passage.
-
-By creating an account, browsing experiences, making a booking, or participating in an Experience, you agree to be legally bound by these Terms, our Privacy Policy, Payment & Refund Policy, and any additional rules published on the Platform.
-
-If you do not agree with these Terms, you must not use the Platform.
+**Effective Date:** 10 July 2026
 
 ---
 
-## 2. Definitions
+# Summary of these Terms
 
-For the purposes of these Terms:
+Welcome to **The Royal Passage**.
 
-**Platform** means The Royal Passage website, mobile application, and associated services.
+These Terms of Service govern your access to and use of The Royal Passage website, mobile application, and all related services.
 
-**Experience** means any activity, event, workshop, guided tour, cultural program, adventure activity, food experience, educational session, wellness activity, or similar service offered through the Platform.
+These Terms apply whenever you:
 
-**Experience Host** means the verified individual, organization, or business responsible for conducting the Experience.
+* Browse Experiences
+* Search Experiences
+* Register an Account
+* Make a Booking
+* Contact an Experience Host
+* Make Payments
+* Submit Reviews
+* Participate in an Experience
+* Use any feature provided through The Royal Passage Platform
 
-**Guest** means any registered user who books an Experience.
+Together with our:
 
-**Booking** means a reservation confirmed through The Royal Passage.
+* Privacy Policy
+* Payment, Cancellation & Refund Policy
 
-**Booking Confirmation** means the electronic confirmation issued after successful payment and booking acceptance.
+these Terms form a legally binding agreement between **You** and **The Royal Passage**.
 
-**Platform Service Fee** means the service fee charged by The Royal Passage for facilitating the booking.
-
-**Experience Date** means the scheduled date on which the Experience is conducted.
-
-**Force Majeure Event** means any event beyond the reasonable control of the Platform or the Host, including natural disasters, government restrictions, strikes, pandemics, civil unrest, or other unforeseen circumstances.
-
----
-
-## 3. Acceptance of Terms
-
-By accessing or using the Platform, you acknowledge that:
-
-- You have read these Terms in full.
-- You understand your rights and responsibilities.
-- You agree to comply with all applicable laws and regulations.
-- You agree to follow all instructions provided by the Experience Host.
-- You accept that these Terms form a legally binding agreement between you and The Royal Passage.
-
-The Royal Passage reserves the right to modify these Terms at any time. Updated versions will be published on the Platform and become effective upon publication unless otherwise stated.
+If you do not agree with these Terms, you must not access or use the Platform.
 
 ---
 
-## 4. Eligibility
+# Table of Contents
 
-To book or participate in an Experience, you must:
+## A. All Experiences
 
-- Be at least 18 years of age, or have a parent or legal guardian complete the booking and accompany you where required.
-- Have the legal capacity to enter into a binding agreement.
-- Provide accurate, complete, and current information during registration and booking.
-- Comply with all applicable laws and these Terms.
+A1. Definitions
 
-The Royal Passage reserves the right to refuse service or suspend accounts if eligibility requirements are not met.
+A2. About these Terms
+
+A3. About The Royal Passage
+
+A4. Our Platform
+
+A5. Eligibility
+
+A6. User Account
+
+A7. Experience Listings
+
+A8. Booking an Experience
+
+A9. Pricing
+
+A10. Payments
+
+A11. Platform Service Fee
+
+A12. Booking Confirmation
+
+A13. Guest Responsibilities
+
+A14. Experience Host Responsibilities
+
+A15. Government Identification
+
+A16. Safety Requirements
+
+A17. Experience Changes
+
+A18. Cancellation by Guest
+
+A19. Cancellation by Host
+
+A20. Refund Policy
+
+A21. Technical Issues
+
+A22. Payment Failures
+
+A23. Reviews & Ratings
+
+A24. Communication
+
+A25. Fraud Prevention
+
+A26. Intellectual Property
+
+A27. Privacy
+
+A28. Limitation of Liability
+
+A29. Indemnification
+
+A30. Force Majeure
+
+A31. Dispute Resolution
+
+A32. Customer Support
+
+A33. Governing Law
+
+A34. Modification of Terms
+
+A35. Miscellaneous
+
+A36. Contact Information
 
 ---
 
-## 5. User Registration
-
-Certain Platform features require account registration.
-
-When creating an account, you agree to:
-
-- Provide accurate personal information.
-- Maintain the confidentiality of your login credentials.
-- Promptly update your account details if they change.
-- Accept responsibility for all activities conducted through your account.
-
-Providing false, misleading, or incomplete information may result in suspension or termination of your account.
+## A. All Experiences
 
 ---
 
-## 6. Experience Listings
+## A1. Definitions
 
-Experience listings are created and managed by verified Experience Hosts.
+Unless the context requires otherwise, the following definitions apply throughout these Terms.
 
-Each listing may include:
+**"Platform"** means The Royal Passage website, mobile application, software, APIs, and any associated services operated by The Royal Passage.
 
-- Experience title
-- Description
-- Location
-- Duration
-- Date and time
-- Meeting point
-- Maximum participant capacity
-- Age restrictions (if applicable)
-- Pricing
-- Inclusions and exclusions
-- Safety requirements
-- Cancellation policy
-- Accessibility information
+**"Company"**, **"we"**, **"our"**, or **"us"** means The Royal Passage.
 
-While The Royal Passage reviews listings before publication, the Host remains responsible for ensuring that all listing information is accurate and up to date.
+**"Guest"** means any registered User who books or participates in an Experience.
+
+**"Experience Host"** means an individual or business verified by The Royal Passage to provide Experiences through the Platform.
+
+**"Experience"** means any activity listed on the Platform including but not limited to:
+
+* Heritage Walks
+* Food Tours
+* Adventure Activities
+* Cultural Tours
+* Nature Experiences
+* Photography Tours
+* Workshops
+* Wellness Activities
+* Local Events
+* Festivals
+* Guided Tours
+* Trekking
+* Wildlife Activities
+* Educational Experiences
+
+**"Booking"** means a reservation made through The Royal Passage.
+
+**"Booking Confirmation"** means the electronic confirmation issued after successful payment and booking acceptance.
+
+**"Platform Service Fee"** means the service fee charged by The Royal Passage for facilitating bookings and operating the Platform.
+
+**"Host Dashboard"** means the management portal provided to Experience Hosts.
 
 ---
 
-## 7. Booking an Experience
+## A2. About these Terms
 
-Guests may browse available Experiences and submit a booking request through the Platform.
+1. These Terms apply to every Experience booked through The Royal Passage.
 
-A booking is considered confirmed only when:
+2. By creating an account, browsing Experiences, making a booking, or participating in an Experience, you agree to these Terms.
+
+3. These Terms should be read together with:
+
+* Privacy Policy
+* Payment Policy
+* Refund & Cancellation Policy
+
+4. If any provision of these Terms becomes invalid or unenforceable, the remaining provisions shall continue in full force and effect.
+
+5. The English version of these Terms shall prevail in case of any inconsistency with translated versions, unless otherwise required by applicable law.
+
+---
+
+## A3. About The Royal Passage
+
+The Royal Passage is an online travel marketplace that enables Guests to discover, compare, and book curated Experiences offered by verified Experience Hosts.
+
+The Royal Passage provides:
+
+* Discovery Platform
+* Secure Online Booking
+* Razorpay Payment Processing
+* Booking Management
+* Customer Support
+* Host Management Tools
+* Reviews & Ratings
+* Notifications
+
+The Royal Passage is **not the organizer or operator** of Experiences unless expressly stated. Each Experience is conducted by the respective Experience Host, who is responsible for delivering the Experience in accordance with applicable laws and the listing details.
+
+---
+
+## A4. Our Platform
+
+Our Platform enables Guests to:
+
+* Search Experiences
+* Filter by City
+* Filter by Date
+* Filter by Category
+* Compare Experiences
+* View Prices
+* Read Reviews
+* Save Experiences to Wishlist
+* Make Secure Payments
+* Manage Bookings
+* Receive Notifications
+* Contact Support
+
+While we take reasonable care to ensure the accuracy of information displayed on the Platform, Experience details, availability, pricing, schedules, and other listing information are primarily provided and maintained by the Experience Host.
+
+The Royal Passage cannot guarantee that every listing will remain available or unchanged at all times.
+
+---
+
+## A5. Eligibility
+
+To use the Platform and book an Experience, you must:
+
+* Be at least **18 years of age**, or have a parent or legal guardian make the booking on your behalf where permitted.
+* Have the legal capacity to enter into a binding agreement.
+* Provide accurate, complete, and current information during registration and booking.
+* Comply with all applicable laws and these Terms.
+
+We reserve the right to refuse service, suspend accounts, or cancel bookings where eligibility requirements are not met or false information has been provided.
+
+---
+
+## A6. User Account
+
+To access booking features, you may be required to create a User Account.
+
+You agree to:
+
+* Provide accurate registration details.
+* Keep your contact information up to date.
+* Maintain the confidentiality of your account credentials.
+* Notify us immediately of any unauthorized use of your account.
+
+You are responsible for all activities conducted through your account unless you have promptly reported unauthorized access.
+
+We may suspend or terminate accounts involved in fraud, misuse, or repeated violations of these Terms.
+
+---
+
+## A7. Experience Listings
+
+Experience Hosts are responsible for creating and maintaining accurate listings.
+
+Each Experience listing should include, where applicable:
+
+* Experience title
+* Description
+* Location
+* Duration
+* Schedule
+* Meeting point
+* Participant limits
+* Age restrictions
+* Inclusions and exclusions
+* Safety information
+* Accessibility details
+* Cancellation policy
+* Pricing
+
+Hosts must promptly update listings to reflect any material changes. The Royal Passage may review, edit, suspend, or remove listings that violate these Terms or applicable laws.
+
+---
+
+## A8. Booking an Experience
+
+Guests may browse available Experiences and submit a booking through the Platform.
+
+A booking is considered confirmed only after:
 
 1. Full payment has been successfully processed through the Platform.
-2. The booking is accepted by the Experience Host (where host approval is required).
-3. A Booking Confirmation and Booking ID are issued to the Guest.
+2. Any required host approval has been completed (where applicable).
+3. A Booking Confirmation and Booking ID have been issued to the Guest.
 
-If a booking cannot be confirmed, the guest will be notified and eligible payments will be refunded in accordance with the Refund Policy.
-
----
-
-## 8. Pricing
-
-All prices displayed on the Platform are in Indian Rupees (INR).
-
-Experience prices may vary due to:
-
-- Seasonal demand
-- Public holidays
-- Festivals
-- Special events
-- Limited availability
-- Promotional offers
-- Group discounts
-
-The final amount payable will be displayed before payment confirmation.
-
-The Royal Passage reserves the right to correct genuine pricing errors before confirming a booking.
+If a booking cannot be confirmed due to availability, host rejection, payment failure, or other operational reasons, any eligible payment will be refunded in accordance with the Refund Policy.
 
 ---
 
-## 9. Payments
+## A9. Prices
 
-All Experience bookings must be paid online using the payment methods supported by the Platform.
+### 9.1 Experience Pricing
 
-Payments are securely processed through **Razorpay** or other approved payment providers.
+All prices displayed on The Royal Passage Platform are shown in **Indian Rupees (INR)** unless otherwise specified.
 
-Accepted payment methods may include:
+Experience prices are determined by the respective Experience Host and may vary depending on:
 
-- UPI
-- Credit Cards
-- Debit Cards
-- Net Banking
-- Wallets
-- EMI (where supported)
+* Seasonality
+* Public holidays
+* Weekends
+* Festivals
+* Special events
+* Availability
+* Group size
+* Promotional offers
+* Limited-time discounts
 
-The Royal Passage does not store sensitive payment information such as complete card numbers, CVV, or UPI PINs.
+The Royal Passage reserves the right to correct any obvious pricing or typographical errors before confirming a booking.
 
 ---
 
-## 10. Platform Service Fee
+### 9.2 Taxes
+
+Displayed prices may include applicable taxes unless stated otherwise.
+
+Where required by applicable law:
+
+* Goods and Services Tax (GST)
+* Local Tourism Taxes
+* Government Charges
+
+may be added during checkout.
+
+The final payable amount will always be displayed before payment confirmation.
+
+---
+
+### 9.3 Promotional Discounts
+
+From time to time The Royal Passage may provide:
+
+* Promotional coupons
+* Discount vouchers
+* Cashback offers
+* Membership discounts
+* Referral rewards
+
+These promotions:
+
+* Cannot be exchanged for cash.
+* May have expiry dates.
+* May contain minimum booking values.
+* Cannot be combined unless specifically permitted.
+
+The Royal Passage reserves the right to modify or withdraw promotions at any time.
+
+---
+
+### 9.4 Pricing Errors
+
+If a genuine pricing error occurs due to:
+
+* Technical malfunction
+* Human error
+* Software bug
+* Third-party integration failure
+
+The Royal Passage may:
+
+* Cancel the booking,
+* Offer the correct price,
+* Refund the Guest in full.
+
+---
+
+## A10. Payments
+
+## 10.1 Payment Gateway
+
+All Experience bookings must be paid securely through the payment gateway integrated into The Royal Passage Platform.
+
+Currently supported payment gateway:
+
+**Razorpay**
+
+Supported payment methods may include:
+
+* UPI
+* Credit Cards
+* Debit Cards
+* Net Banking
+* Wallets
+* EMI (where supported)
+
+---
+
+## 10.2 Secure Transactions
+
+All payment transactions are encrypted using industry-standard security protocols.
+
+The Royal Passage **does not store**:
+
+* Card Numbers
+* CVV
+* UPI PIN
+* Banking Passwords
+
+Sensitive payment information is securely processed by Razorpay in accordance with its security standards.
+
+---
+
+## 10.3 Payment Authorization
+
+By completing a booking, the Guest authorizes The Royal Passage and its payment service provider to process the payment for the selected Experience.
+
+Guests must ensure:
+
+* Sufficient account balance.
+* Valid payment information.
+* Authorization from the payment provider.
+
+---
+
+## 10.4 Failed Payments
+
+A booking shall not be confirmed until payment has been successfully processed.
+
+If payment fails:
+
+* The booking remains incomplete.
+* No seat or reservation is guaranteed.
+* Guests may retry payment.
+
+---
+
+## 10.5 Duplicate Payments
+
+If multiple payments are processed for the same booking:
+
+Guests must report the issue within **7 calendar days**.
+
+Following verification:
+
+* Duplicate amounts will be refunded.
+* Refunds will be credited to the original payment method.
+
+---
+
+## 10.6 Payment Verification
+
+The Royal Passage may delay confirmation if additional payment verification is required.
+
+Verification may include:
+
+* Identity confirmation
+* Fraud screening
+* Bank verification
+* Payment gateway review
+
+---
+
+## A11. Platform Service Fee
+
+## 11.1 Platform Fee
 
 The Royal Passage charges a **10% Platform Service Fee** on every confirmed Experience booking.
 
 This fee supports:
 
-- Platform operations
-- Secure payment processing
-- Technology infrastructure
-- Booking management
-- Customer support
-- Fraud prevention
-- Marketing and promotional activities
-- Platform improvements
-
-Unless required by applicable law or where a booking is cancelled by the Experience Host or due to a platform error, the Platform Service Fee is **non-refundable**, even if the Guest later cancels the booking.
-
----
-
-## 11. Booking Confirmation
-
-Upon successful confirmation, the Guest will receive:
-
-- Booking ID
-- Experience details
-- Host information (where applicable)
-- Meeting point
-- Date and time
-- Number of participants
-- Payment receipt
-- Terms applicable to the Experience
-
-Guests are responsible for reviewing the confirmation details and reporting any discrepancies within **24 hours** of receiving the confirmation.
+* Technology infrastructure
+* Platform development
+* Booking management
+* Secure payment processing
+* Customer support
+* Fraud detection
+* Marketing
+* Platform maintenance
+* Operational expenses
 
 ---
 
-## 12. Guest Responsibilities
+## 11.2 Non-refundable Fee
+
+Once a booking has been confirmed, the **10% Platform Service Fee is non-refundable**, except where:
+
+* The Experience Host cancels the booking.
+* The booking cannot be fulfilled due to a Platform error.
+* Applicable consumer protection laws require otherwise.
+
+---
+
+## 11.3 Service Fee Disclosure
+
+The Platform Service Fee will be displayed during checkout before payment is completed.
+
+By confirming payment, the Guest agrees to this fee.
+
+---
+
+## A12. Booking Confirmation
+
+## 12.1 Confirmation
+
+A booking is confirmed only after:
+
+1. Successful payment.
+2. Host approval (where applicable).
+3. Booking Confirmation generated.
+
+Until all three conditions are satisfied, no reservation is guaranteed.
+
+---
+
+## 12.2 Booking Confirmation Includes
+
+Guests will receive:
+
+* Booking ID
+* Experience Name
+* Date
+* Time
+* Meeting Point
+* Host Information
+* Number of Participants
+* Payment Receipt
+* Contact Details
+* Cancellation Policy
+
+---
+
+## 12.3 Booking Status
+
+Bookings may display one of the following statuses:
+
+* Pending
+* Awaiting Payment
+* Payment Verification
+* Confirmed
+* Cancelled
+* Completed
+* Refunded
+
+---
+
+## 12.4 Guest Responsibility
+
+Guests are responsible for checking:
+
+* Date
+* Time
+* Participant count
+* Meeting point
+* Contact information
+
+Any discrepancies should be reported within **24 hours**.
+
+---
+
+## A13. Guest Responsibilities
 
 Guests agree to:
 
-- Arrive at the meeting point at least **15–30 minutes** before the scheduled start time, unless otherwise specified.
-- Carry a copy of the booking confirmation (digital or printed).
-- Present a valid Government-issued Photo ID if requested by the Host or required by law.
-- Follow all instructions provided by the Experience Host.
-- Treat fellow participants, hosts, local communities, and property with respect.
-- Wear suitable clothing and equipment appropriate for the Experience.
-- Disclose any medical conditions or accessibility requirements that may affect participation where relevant.
-- Refrain from disruptive, abusive, or unlawful behaviour.
-
-Guests are responsible for ensuring they meet any fitness, age, or participation requirements stated in the Experience listing.
-
----
-
-## 13. Government Identification
-
-For security, legal compliance, or verification purposes, Guests may be required to present a valid Government-issued Photo Identity Card before participating in an Experience.
-
-Accepted identification may include:
-
-- Aadhaar Card
-- Passport
-- Driving Licence
-- Voter ID
-- Any other Government-approved identity document
-
-Failure to present valid identification where required may result in denial of participation without a refund, subject to applicable law.
-
----
-
-## 14. Arrival and Late Arrival
-
-Guests are expected to arrive at the designated meeting location before the reporting time specified in the booking confirmation.
-
-If a Guest arrives late:
-
-- The Experience Host is not obligated to delay the Experience.
-- Participation may be denied if joining late would compromise safety, logistics, or the experience of other participants.
-- No refund or rescheduling will be provided for late arrivals unless otherwise approved by the Host.
-
----
-
-## 15. Experience Host Responsibilities
-
-Every Experience Host registered on The Royal Passage agrees to maintain professional standards and comply with all applicable laws.
-
-The Experience Host shall:
-
-- Conduct the Experience exactly as described on the Platform.
-- Maintain accurate schedules and availability.
-- Honor confirmed bookings except under exceptional circumstances.
-- Provide a safe environment for all participants.
-- Obtain and maintain all required licenses, permits, insurance, and regulatory approvals applicable to the Experience.
-- Clearly communicate meeting locations and reporting times.
-- Notify Guests immediately of any schedule changes.
-- Treat all Guests fairly, respectfully, and without discrimination.
-- Maintain professional conduct throughout the Experience.
-- Comply with health, safety, and environmental regulations.
-- Cooperate with The Royal Passage in resolving complaints and disputes.
-
-Hosts are solely responsible for ensuring the legality and safety of the Experiences they conduct.
-
----
-
-## 16. Guest Conduct
-
-Guests are expected to behave responsibly during the Experience.
+* Arrive before the reporting time.
+* Carry booking confirmation.
+* Carry Government ID where required.
+* Respect local customs and laws.
+* Follow Host instructions.
+* Treat other participants respectfully.
+* Wear suitable clothing.
+* Carry required equipment.
+* Maintain personal hygiene.
+* Protect public property.
+* Avoid disturbing wildlife or heritage sites.
+* Follow environmental guidelines.
+* Cooperate during emergencies.
 
 Guests shall not:
 
-- Engage in abusive, threatening, or violent behaviour.
-- Harass other participants or the Host.
-- Consume illegal drugs.
-- Participate while under excessive influence of alcohol or drugs.
-- Carry prohibited weapons or dangerous materials.
-- Damage public or private property.
-- Litter or damage heritage or environmentally protected sites.
-- Disturb wildlife or local communities.
-- Disobey lawful instructions provided by the Host.
+* Smoke where prohibited.
+* Consume illegal drugs.
+* Carry weapons.
+* Harass participants.
+* Use abusive language.
+* Damage equipment.
+* Enter restricted areas.
+* Participate while intoxicated.
 
-The Experience Host may remove any Guest whose behaviour creates safety risks or disrupts the Experience.
-
-No refund shall be issued in such cases.
+Failure to comply may result in removal from the Experience without refund.
 
 ---
 
-## 17. Safety Requirements
+## A14. Experience Host Responsibilities
 
-Certain Experiences involve physical activities or outdoor environments.
+Experience Hosts agree to:
 
-Guests acknowledge that participation may involve inherent risks including, but not limited to:
+* Conduct Experiences professionally.
+* Maintain accurate listings.
+* Honor confirmed bookings.
+* Arrive on time.
+* Maintain required licenses.
+* Ensure participant safety.
+* Provide accurate instructions.
+* Communicate changes promptly.
+* Respect Guests equally.
+* Avoid discrimination.
+* Comply with applicable laws.
+* Maintain professional conduct.
 
-- Slips and falls
-- Uneven terrain
-- Water-related activities
-- Wildlife encounters
-- Weather conditions
-- Physical exertion
-- Transportation risks
-- Adventure sports
-- Remote locations
+Hosts shall immediately notify The Royal Passage if:
 
-Guests voluntarily participate at their own risk.
-
-The Royal Passage is only a booking platform and is not the organizer or operator of the Experience unless expressly stated.
-
----
-
-## 18. Medical Fitness
-
-Guests are responsible for ensuring they are medically fit to participate.
-
-Guests should not participate if they suffer from conditions that may make participation unsafe, including but not limited to:
-
-- Serious heart conditions
-- Severe respiratory disorders
-- Uncontrolled epilepsy
-- Recent surgeries
-- Pregnancy (for activities where participation is restricted)
-- Severe mobility limitations where accessibility is not available
-
-Guests should consult a medical professional before booking if unsure.
+* An Experience becomes unsafe.
+* Venue changes occur.
+* Capacity changes occur.
+* Government restrictions affect the Experience.
 
 ---
 
-## 19. Age Restrictions
+## A15. Government Identification
 
-Certain Experiences may have minimum or maximum age requirements.
+Guests may be required to present valid Government-issued identification before participating.
 
-Where applicable:
+Accepted identification includes:
 
-- Children must be accompanied by a parent or legal guardian.
-- Age restrictions mentioned on the Experience listing are mandatory.
-- Hosts may request proof of age.
+* Aadhaar Card
+* Passport
+* Driving Licence
+* Voter ID
+* Government Employee ID (where applicable)
+* Other legally accepted Government IDs
 
-Failure to satisfy age requirements may result in refusal of participation.
-
----
-
-## 20. Equipment and Personal Belongings
-
-Guests are responsible for bringing any personal items specified in the Experience listing, including:
-
-- Comfortable clothing
-- Suitable footwear
-- Water bottles
-- Cameras
-- Personal medication
-- Sunscreen
-- Rain protection
-- Identification documents
-
-Unless expressly stated, Hosts are not responsible for providing personal equipment.
-
-Guests are solely responsible for safeguarding their personal belongings throughout the Experience.
-
-The Royal Passage and the Experience Host shall not be liable for loss, theft, or damage to personal belongings unless caused by proven negligence.
+Failure to provide valid identification may result in denial of participation without refund where legally permitted.
 
 ---
 
-## 21. Photography and Media
+## A16. Safety Requirements
 
-During an Experience, photographs or videos may be taken for operational, promotional, or marketing purposes.
+Safety is our highest priority.
 
-By participating, Guests acknowledge that:
+Guests agree to:
 
-- Group photographs may be captured.
-- Images may appear on the Platform, social media, brochures, or promotional materials.
+* Follow all safety instructions.
+* Use provided safety equipment.
+* Inform Hosts of medical conditions.
+* Follow emergency procedures.
+* Respect participant limits.
+* Stay with the assigned group where required.
 
-Guests who do not wish to appear in photographs should notify the Experience Host before the Experience begins.
+Certain Experiences may involve:
 
-The Royal Passage will make reasonable efforts to respect such requests but cannot guarantee exclusion from group images.
+* Walking
+* Trekking
+* Climbing
+* Cycling
+* Boating
+* Wildlife
+* Adventure activities
+* Remote locations
 
----
+Participation is voluntary.
 
-## 22. Weather Conditions
+Guests acknowledge that some Experiences carry inherent risks despite reasonable safety precautions.
 
-Outdoor Experiences may be affected by weather conditions.
-
-If severe weather creates safety concerns, the Experience Host may:
-
-- Delay the Experience.
-- Reschedule the Experience.
-- Modify the route or itinerary.
-- Cancel the Experience.
-
-The decision of the Host regarding safety shall be final.
-
-Where cancellation occurs due to unsafe weather conditions, Guests will be offered:
-
-- Rescheduling, or
-- Refunds in accordance with the Refund Policy.
+The Royal Passage acts solely as a booking platform and is not responsible for risks that are inherent to the Experience itself or arise from a Host's independent operation, except where liability is imposed by applicable law.
 
 ---
 
-## 23. Minimum Participant Requirement
+## A17. Experience Changes
 
-Certain Experiences require a minimum number of participants.
+## 17.1 Changes Before the Experience
 
-If the minimum number is not reached:
+The Royal Passage and the Experience Host strive to deliver each Experience as described at the time of booking. However, due to operational, safety, environmental, or other unforeseen circumstances, minor changes may occasionally be necessary before the scheduled Experience.
 
-- The Host may reschedule the Experience.
-- Offer an alternative Experience.
-- Cancel the booking.
+These changes may include:
 
-Guests will be informed as early as reasonably possible.
+* Meeting point updates
+* Reporting time adjustments
+* Route modifications
+* Guide or instructor replacement
+* Changes to the sequence of activities
+* Minor itinerary adjustments
+* Vehicle substitutions (where transportation is included)
+* Venue changes within the same destination
 
-Where cancellation occurs due to insufficient participation, Guests will receive a full refund, including the Platform Service Fee.
+Where reasonably possible, Guests will be informed of such changes in advance through the Platform, email, SMS, or other available communication channels.
 
 ---
 
-## 24. Changes to Experience
+## 17.2 Material Changes
 
-The Royal Passage or the Experience Host may modify minor aspects of an Experience where reasonably necessary.
+A material change is one that significantly affects the nature or value of the booked Experience.
 
 Examples include:
 
-- Meeting location
-- Guide replacement
-- Activity sequence
-- Route adjustments
-- Venue substitution
+* Change of Experience category
+* Significant reduction in duration
+* Removal of major advertised activities
+* Permanent venue relocation
+* Cancellation of premium inclusions
+* Significant change in participant capacity
 
-Such modifications shall not materially reduce the quality or value of the Experience.
+If a material change occurs before the Experience begins, Guests may be offered:
 
----
-
-## 25. Host Cancellation
-
-An Experience Host may cancel a confirmed booking only under exceptional circumstances, including:
-
-- Medical emergencies
-- Safety concerns
-- Natural disasters
-- Government restrictions
-- Venue closures
-- Force Majeure Events
-
-Where the Host cancels:
-
-- Guests shall receive a **100% refund**, including the Platform Service Fee.
-- Alternatively, Guests may choose to reschedule, subject to availability.
-
-Repeated host cancellations may result in warnings, suspension, or permanent removal from The Royal Passage.
+* An alternative Experience of similar value,
+* A rescheduled date (subject to availability), or
+* A refund in accordance with the Refund Policy.
 
 ---
 
-## 26. Guest No-Show
+## 17.3 Changes During the Experience
 
-A Guest who:
+For safety or operational reasons, the Experience Host may modify the Experience while it is in progress.
 
-- Fails to arrive,
-- Misses the reporting time,
-- Leaves before commencement,
-- Cannot be contacted,
+This may include:
 
-shall be considered a **No-Show**.
+* Route diversions
+* Activity substitutions
+* Schedule adjustments
+* Temporary suspension of certain activities
+* Changes due to weather or local authority instructions
 
-No refund shall be provided unless required by applicable law.
-
----
-
-## 27. Experience Completion
-
-An Experience shall be deemed completed when:
-
-- The scheduled activity concludes, or
-- The Guest voluntarily leaves after commencement.
-
-No partial refunds shall be provided for early departure unless otherwise approved by the Host.
+Such modifications shall not entitle Guests to compensation or refunds where they are reasonable and necessary.
 
 ---
 
-## 28. Reviews and Ratings
+## A18. Cancellation by Guest
 
-Guests may submit reviews only after completing an Experience.
+## 18.1 Guest Cancellation
 
-Reviews must:
+Guests may cancel their confirmed Experience booking through their account on The Royal Passage or by contacting Customer Support.
 
-- Reflect genuine personal experiences.
-- Be truthful.
-- Avoid abusive or offensive language.
-- Avoid defamatory statements.
-- Avoid misleading information.
-
-The Royal Passage reserves the right to moderate, edit, or remove reviews that violate Platform policies.
-
-Repeated misuse of the review system may result in account suspension.
+The cancellation request becomes effective only after it has been successfully received and acknowledged by the Platform.
 
 ---
 
-## 29. Communication
+## 18.2 Refund Eligibility
 
-Guests agree that The Royal Passage may communicate through:
+Refund eligibility depends on:
 
-- Email
-- SMS
-- WhatsApp
-- Mobile notifications
-- Telephone calls
+* The cancellation timeline,
+* The applicable cancellation policy,
+* The non-refundable Platform Service Fee,
+* Applicable laws.
 
-Communications may include:
-
-- Booking confirmations
-- Reminders
-- Safety updates
-- Experience changes
-- Payment confirmations
-- Refund updates
-- Customer support
-
-Marketing communications may be disabled through account preferences where applicable.
+Refunds will be calculated from the total booking amount after deducting any applicable charges.
 
 ---
 
-## 30. Technical Issues
+## 18.3 Cancellation Schedule
 
-The Royal Passage strives to maintain uninterrupted Platform availability.
+Unless otherwise specified in the Experience listing, the following cancellation schedule applies:
 
-However, temporary interruptions may occur due to:
+| Cancellation Time                      | Refund                                         |
+| -------------------------------------- | ---------------------------------------------- |
+| 15 days or more before the Experience  | 90% Refund (10% Platform Service Fee retained) |
+| 14–11 days before the Experience       | 65% Refund                                     |
+| 10–8 days before the Experience        | 40% Refund                                     |
+| Less than 7 days before the Experience | No Refund                                      |
 
-- Scheduled maintenance
-- Software updates
-- Server failures
-- Internet disruptions
-- Cloud service interruptions
-- Third-party API failures
-- Payment gateway outages
-- Cybersecurity incidents
-
-The Royal Passage shall not be liable for delays resulting from circumstances beyond its reasonable control.
+The Platform Service Fee is non-refundable except where required by applicable law or where the booking is cancelled by the Host or due to a Platform error.
 
 ---
 
-## 31. Payment Failures
+## 18.4 No-Show
 
-If payment is deducted but the booking is not confirmed:
+If a Guest:
 
-The Guest should contact Customer Support immediately.
+* Does not arrive at the meeting point,
+* Arrives after the Experience has commenced,
+* Fails to participate without prior notice,
 
-Upon verification:
+the booking will be treated as a **No-Show**.
 
-- Booking may be confirmed, or
-- Payment may be refunded.
-
-Investigation Timeline:
-
-- Initial acknowledgement: **Within 24 Business Hours**
-- Investigation: **3–5 Business Days**
-- Refund initiation (if applicable): **Within 2 Business Days after approval**
-- Credit to original payment method: **Typically 5–10 Business Days**, depending on the payment provider and bank.
+No refund, credit, or rescheduling will be provided unless otherwise required by applicable law.
 
 ---
 
-## 32. Duplicate Payments
+## A19. Cancellation by Experience Host
 
-If multiple payments are received for the same booking:
+## 19.1 Host Cancellation
 
-Guests must notify The Royal Passage within **7 calendar days**.
+An Experience Host may cancel a confirmed Experience only in exceptional circumstances, including:
 
-Following verification:
+* Illness or medical emergency
+* Unsafe weather conditions
+* Government restrictions
+* Venue closure
+* Natural disaster
+* Operational emergencies
+* Force Majeure Events
 
-- Duplicate payments will be refunded to the original payment method.
-- Processing timelines remain subject to payment gateway and banking systems.
-
----
-
-## 33. Platform Maintenance
-
-The Royal Passage may periodically suspend certain Platform features to perform maintenance, security updates, or infrastructure improvements.
-
-Where reasonably possible, advance notice will be provided.
-
-The Platform shall not be liable for temporary service interruptions necessary to maintain system security, reliability, or performance.
+Hosts must notify The Royal Passage immediately upon becoming aware of the need to cancel.
 
 ---
 
-## 34. Cancellation by Guest
+## 19.2 Guest Options
 
-Guests may cancel their confirmed Experience booking through their Royal Passage account or by contacting Customer Support before the scheduled Experience date.
+Where an Experience is cancelled by the Host, Guests may choose, where available:
 
-The applicable refund amount shall be calculated based on:
-
-- The cancellation timeline.
-- The non-refundable Platform Service Fee.
-- The Experience cancellation policy.
-
-Cancellation requests become effective only after they are successfully recorded by The Royal Passage.
+* A full refund, including the Platform Service Fee,
+* Rescheduling to another available date,
+* Booking an alternative Experience of similar value.
 
 ---
 
-## 35. Cancellation & Refund Schedule
+## 19.3 Repeated Host Cancellations
 
-The Royal Passage charges a **10% Platform Service Fee** on every confirmed Experience booking.
+The Royal Passage monitors cancellation patterns.
 
-Unless the cancellation is due to the Host or a verified platform error, the Platform Service Fee is **non-refundable**.
+Experience Hosts who repeatedly cancel confirmed bookings without reasonable justification may be subject to:
 
-| Cancellation Time | Platform Fee | Cancellation Charge | Refund to Guest |
-| --- | --- | --- | --- |
-| 15 days or more before the Experience | 10% | 0% | **90%** |
-| 14–11 days before the Experience | 10% | 25% | **65%** |
-| 10–8 days before the Experience | 10% | 50% | **40%** |
-| Less than 7 days before the Experience | Included | No Refund | **0%** |
-
-The refund amount shall be credited only to the original payment method used during booking.
+* Warnings,
+* Temporary suspension,
+* Reduced listing visibility,
+* Permanent removal from the Platform.
 
 ---
 
-## 36. Non-Refundable Charges
+## A20. Refund Policy
 
-The following charges are non-refundable:
+## 20.1 Refund Method
 
-- Platform Service Fee (10%)
-- Government taxes where applicable
-- Convenience charges imposed by payment providers (where legally permissible)
-- Optional add-on services already delivered
+Approved refunds will be issued to the original payment method used during booking.
 
----
-
-## 37. Rescheduling
-
-Guests may request to reschedule an Experience.
-
-Approval depends upon:
-
-- Host approval.
-- Seat availability.
-- Time remaining before the Experience.
-
-The Royal Passage cannot guarantee approval of rescheduling requests.
-
-Additional charges may apply where price differences exist.
+Refunds cannot generally be transferred to another account or payment method unless required by law or approved by The Royal Passage.
 
 ---
 
-## 38. Experience Cancellation by Host
+## 20.2 Refund Processing
 
-If an Experience is cancelled by the Host due to:
+Once approved:
 
-- Medical emergency
-- Safety concerns
-- Natural disaster
-- Government restrictions
-- Venue closure
-- Operational issues
-- Any other unavoidable circumstance
+* Refund initiation: Within **2 Business Days**
+* Payment gateway processing: **2–5 Business Days**
+* Bank processing: **5–10 Business Days**
 
-Guests may choose:
-
-- Full refund (including Platform Service Fee), or
-- Reschedule to another available date, subject to availability.
+Actual timelines may vary depending on the payment provider or issuing bank.
 
 ---
 
-## 39. Cancellation by The Royal Passage
+## 20.3 Non-Refundable Charges
 
-The Royal Passage reserves the right to cancel any Experience where:
+The following amounts are generally non-refundable:
 
-- Fraudulent activity is detected.
-- Incorrect pricing has been published due to technical error.
-- Safety risks are identified.
-- Government restrictions prohibit the Experience.
-- Legal compliance issues arise.
-- Force Majeure events prevent the Experience.
-
-Where cancellation occurs for these reasons, eligible Guests will receive a full refund.
+* 10% Platform Service Fee (except where the Host cancels or a Platform error occurs)
+* Government taxes where non-refundable under applicable law
+* Optional services already delivered
+* Processing fees charged by payment providers, where permitted
 
 ---
 
-## 40. Refund Processing
+## 20.4 Partial Refunds
 
-Approved refunds shall be initiated to the original payment method.
+Partial refunds may be issued only where:
 
-Estimated timelines:
-
-- Refund Approval: Within **2 Business Days** after investigation.
-- Payment Gateway Processing: **2–5 Business Days**.
-- Bank Processing: **5–10 Business Days**.
-
-The Royal Passage is not responsible for delays caused by banks, card issuers, or payment providers.
+* The Host fails to provide a substantial portion of the booked Experience,
+* The Experience is materially different from the confirmed booking,
+* The Royal Passage determines, after investigation, that a refund is appropriate.
 
 ---
 
-## 41. Fraud Prevention
+## A21. Technical Issues
 
-To protect Guests, Hosts, and the Platform, The Royal Passage reserves the right to investigate suspected fraudulent activity.
+## 21.1 Platform Availability
 
-Fraud includes, but is not limited to:
+The Royal Passage aims to provide continuous access to the Platform. However, interruptions may occur due to:
 
-- False identity.
-- Fake bookings.
-- Payment fraud.
-- Chargeback abuse.
-- Multiple fake accounts.
-- Use of stolen payment methods.
-- Submission of forged identification.
-- Manipulation of reviews or ratings.
+* Scheduled maintenance
+* Software updates
+* Internet outages
+* Cloud infrastructure failures
+* Cybersecurity incidents
+* Third-party service disruptions
+* Payment gateway downtime
 
-Where fraud is suspected, The Royal Passage may:
-
-- Suspend bookings.
-- Freeze payouts.
-- Request additional verification.
-- Suspend or terminate accounts.
-- Report unlawful activity to the appropriate authorities where required by law.
+While we take reasonable measures to minimize disruptions, uninterrupted access cannot be guaranteed.
 
 ---
 
-## 42. Chargebacks
+## 21.2 Booking Confirmation
 
-Guests are encouraged to contact The Royal Passage before initiating a chargeback through their bank or card issuer.
+A booking is considered valid only when:
 
-If a chargeback is initiated:
+* Payment is successfully processed,
+* A Booking ID is generated, and
+* A Booking Confirmation is issued.
 
-- The related booking may be suspended.
-- Services may be withheld until the dispute is resolved.
-- The Royal Passage may provide booking records and transaction evidence to the payment provider.
-- Fraudulent or abusive chargebacks may result in account suspension or legal action where permitted by law.
-
----
-
-## 43. Intellectual Property
-
-All content available on The Royal Passage, including but not limited to:
-
-- Logos
-- Branding
-- Graphics
-- Photographs
-- Videos
-- Experience descriptions
-- Website design
-- Mobile application
-- Software
-- Documents
-- Marketing materials
-
-is owned by or licensed to The Royal Passage and is protected under applicable intellectual property laws.
-
-Users shall not:
-
-- Copy.
-- Reproduce.
-- Modify.
-- Distribute.
-- Sell.
-- Reverse engineer.
-- Republish.
-- Create derivative works.
-
-without prior written consent.
+If payment is debited but no confirmation is received, Guests should contact Customer Support promptly.
 
 ---
 
-## 44. Third-Party Services
+## 21.3 Scheduled Maintenance
 
-The Royal Passage may integrate services provided by third parties including:
+The Royal Passage may temporarily suspend parts of the Platform to perform maintenance or upgrades.
 
-- Razorpay
-- Google Maps
-- Email providers
-- SMS providers
-- Analytics services
-- Cloud hosting services
-
-The Platform is not responsible for interruptions or failures caused solely by third-party providers.
-
-Users remain subject to the respective terms of those third-party services where applicable.
+Where practical, advance notice will be provided.
 
 ---
 
-## 45. Limitation of Liability
+## A22. Payment Failures
 
-To the maximum extent permitted by applicable law, The Royal Passage shall not be liable for:
+## 22.1 Failed Transactions
 
-- Personal injury not caused by our negligence.
-- Property loss.
-- Missed transportation.
-- Loss of income.
-- Indirect damages.
-- Consequential damages.
-- Loss of business opportunities.
-- Emotional distress.
-- Weather-related disruptions.
-- Delays caused by third parties.
+If a payment fails due to:
 
-The maximum aggregate liability of The Royal Passage arising from any claim relating to an Experience shall not exceed the total amount paid by the Guest for that specific booking.
+* Banking issues,
+* Payment gateway interruptions,
+* Network problems,
+* User interruption,
 
-Nothing in these Terms excludes or limits liability where such exclusion is prohibited by applicable law.
+the booking will remain incomplete until successful payment is received.
 
 ---
 
-## 46. Indemnification
+## 22.2 Amount Debited but Booking Not Confirmed
 
-Guests agree to indemnify and hold harmless The Royal Passage, its directors, officers, employees, affiliates, agents, and partners from any claims, liabilities, damages, costs, or expenses arising out of:
+If payment has been deducted but no booking confirmation has been received:
 
-- Violation of these Terms.
-- Misuse of the Platform.
-- Violation of applicable laws.
-- Damage caused to Hosts or third parties.
-- Submission of false information.
-- Fraudulent conduct.
+* Guests should notify Customer Support within **24 hours**.
+* The Royal Passage will investigate the transaction.
+* Upon verification, the booking may be confirmed or the payment refunded.
 
 ---
 
-## 47. Force Majeure
+## 22.3 Duplicate Payments
 
-Neither The Royal Passage nor the Experience Host shall be liable for delays, cancellations, or failure to perform obligations due to events beyond reasonable control, including:
+If multiple payments are made for the same booking:
 
-- Natural disasters
-- Floods
-- Earthquakes
-- Cyclones
-- Fire
-- Pandemic or epidemic
-- Government restrictions
-- Curfew
-- War
-- Terrorist activity
-- Civil unrest
-- Transportation strikes
-- Internet outages
-- Power failures
-- Payment gateway outages
-- Communication failures
-
-Where reasonably possible, affected bookings may be rescheduled or refunded in accordance with applicable policies.
+* Guests must notify The Royal Passage within **7 calendar days**.
+* Verified duplicate payments will be refunded to the original payment method.
 
 ---
 
-## 48. Dispute Resolution
+## A23. Reviews & Ratings
 
-The Royal Passage is committed to resolving disputes fairly and efficiently.
+## 23.1 Eligibility
 
-Guests should first contact Customer Support before pursuing formal legal remedies.
-
-Disputes may relate to:
-
-- Booking confirmation
-- Payments
-- Refunds
-- Experience quality
-- Host conduct
-- Guest conduct
-- Safety concerns
-- Technical issues
-- Billing
-- Fraud investigations
-
-Guests should report service-related issues within **48 hours** after the Experience concludes, and payment-related issues within **7 days** of the transaction.
+Guests may submit a review only after completing the booked Experience.
 
 ---
 
-## 49. Customer Support Service Levels
+## 23.2 Review Standards
 
-The Royal Passage aims to respond and resolve support requests within the following timeframes:
+Reviews should:
 
-| Issue Type | First Response | Resolution Target |
-| --- | --- | --- |
-| Booking Assistance | Within 12 Business Hours | 1–2 Business Days |
-| Payment Issue | Within 24 Business Hours | 3–5 Business Days |
-| Refund Request | Within 24 Business Hours | 5–10 Business Days (after approval) |
-| Technical Issue | Within 24 Business Hours | 1–5 Business Days |
-| Host Complaint | Within 24 Business Hours | 3–7 Business Days |
-| Safety Complaint | Within 12 Business Hours | Priority Investigation |
-| Fraud Investigation | Within 24 Business Hours | Up to 15 Business Days |
-
-Complex matters may require additional time where third-party providers or legal authorities are involved.
+* Reflect genuine experiences.
+* Be truthful and accurate.
+* Be respectful.
+* Avoid offensive or discriminatory language.
+* Avoid misleading or defamatory statements.
 
 ---
 
-## 50. Suspension and Termination
+## 23.3 Moderation
 
-The Royal Passage may suspend or terminate a User's account, temporarily or permanently, where the User:
+The Royal Passage reserves the right to:
 
-- Breaches these Terms.
-- Engages in fraudulent activity.
-- Misuses the Platform.
-- Violates applicable laws.
-- Harasses Hosts, Guests, or staff.
-- Attempts unauthorized access to the Platform.
-- Repeatedly violates booking or cancellation policies.
-
-Termination may result in cancellation of future bookings and forfeiture of access to the Platform, subject to applicable law and any outstanding refund obligations.
+* Review submitted content,
+* Remove reviews that violate Platform policies,
+* Suspend Users who repeatedly misuse the review system.
 
 ---
 
-## 51. Governing Law and Jurisdiction
+## A24. Communications
 
-These Terms shall be governed by and construed in accordance with the laws of India.
+The Royal Passage may communicate with Guests through:
 
-Any dispute that cannot be resolved amicably shall be subject to the exclusive jurisdiction of the competent courts located in **Bengaluru, Karnataka, India**, unless otherwise required by applicable law.
+* Email,
+* SMS,
+* WhatsApp,
+* Push notifications,
+* Telephone calls,
 
----
+for purposes including:
 
-## 52. Changes to these Terms
+* Booking confirmations,
+* Payment confirmations,
+* Experience reminders,
+* Schedule changes,
+* Safety alerts,
+* Refund updates,
+* Customer support,
+* Policy updates.
 
-The Royal Passage reserves the right to update or modify these Experience Terms & Conditions at any time.
-
-Updated Terms will be published on the Platform with a revised effective date. Continued use of the Platform after such publication constitutes acceptance of the revised Terms.
-
-For material changes that significantly affect Users' rights or obligations, reasonable notice will be provided through the Platform or by email where appropriate.
-
----
-
-## 53. Severability
-
-If any provision of these Terms is held to be invalid, illegal, or unenforceable by a court of competent jurisdiction, the remaining provisions shall continue in full force and effect.
-
----
-
-## 54. Entire Agreement
-
-These Experience Terms & Conditions, together with the Privacy Policy, Payment & Refund Policy, and any other policies referenced on the Platform, constitute the entire agreement between the User and The Royal Passage in relation to Experience bookings and supersede any prior understandings or agreements on the same subject.
+Marketing communications will only be sent where permitted by applicable law and may be managed through account preferences where available.
 
 ---
 
-## 55. Contact Information
+## A25. Fraud Prevention
 
-For questions, complaints, or support relating to Experience bookings, Users may contact:
+To maintain the integrity of the Platform, The Royal Passage may investigate suspected fraudulent activity, including:
+
+* Identity fraud,
+* Fake bookings,
+* Payment fraud,
+* Chargeback abuse,
+* Forged documents,
+* Review manipulation,
+* Multiple fraudulent accounts,
+* Unauthorized account access.
+
+Where fraud is reasonably suspected, The Royal Passage may:
+
+* Suspend or cancel bookings,
+* Delay or withhold refunds during investigation,
+* Request additional identity verification,
+* Suspend or terminate accounts,
+* Report unlawful activity to the relevant authorities where required by law.
+
+---
+
+## A26. Intellectual Property
+
+All content on The Royal Passage Platform, including text, logos, trademarks, graphics, images, videos, software, designs, and other materials, is owned by or licensed to The Royal Passage and protected by applicable intellectual property laws.
+
+Users may not copy, reproduce, modify, distribute, publish, or create derivative works from Platform content without prior written permission, except as permitted by law.
+
+---
+
+## A27. Privacy
+
+## 27.1 Collection of Personal Information
+
+To facilitate bookings and provide our services, The Royal Passage may collect personal information including, but not limited to:
+
+* Full Name
+* Email Address
+* Mobile Number
+* Date of Birth (where required)
+* Government-issued Identification (if required)
+* Emergency Contact Details
+* Profile Photograph (optional)
+* Booking History
+* Payment Transaction Information
+* Device Information
+* IP Address
+* Browser Information
+* Location Data (where permission is granted)
+
+The collection and processing of such information are governed by our Privacy Policy.
+
+---
+
+## 27.2 Purpose of Data Collection
+
+Your information is used to:
+
+* Create and manage your account.
+* Process bookings and payments.
+* Verify your identity where required.
+* Communicate booking updates.
+* Improve platform functionality and customer support.
+* Prevent fraud and unauthorized activity.
+* Comply with legal and regulatory obligations.
+
+---
+
+## 27.3 Data Sharing
+
+The Royal Passage may share relevant booking information with:
+
+* Experience Hosts
+* Payment Service Providers (e.g., Razorpay)
+* Government authorities where legally required
+* Third-party service providers assisting with operations
+
+We do **not** sell your personal information to third parties.
+
+---
+
+## 27.4 Data Security
+
+We implement appropriate technical and organizational safeguards, including:
+
+* SSL/TLS encryption
+* Secure password hashing
+* Role-based access controls
+* Regular security monitoring
+* Secure cloud infrastructure
+
+While we take reasonable measures to protect your information, no online system can guarantee absolute security.
+
+---
+
+## A28. Limitation of Liability
+
+## 28.1 Platform Role
+
+The Royal Passage acts as a technology platform that facilitates bookings between Guests and independent Experience Hosts.
+
+Unless expressly stated otherwise, The Royal Passage is **not** the organizer, operator, or provider of the Experience itself.
+
+Experience Hosts are independently responsible for conducting their Experiences in accordance with applicable laws and safety requirements.
+
+---
+
+## 28.2 Limitation of Liability
+
+To the fullest extent permitted by law, The Royal Passage shall not be liable for:
+
+* Personal injury or illness arising from participation in an Experience, except where caused by our negligence.
+* Loss, theft, or damage to personal belongings.
+* Missed transportation or travel connections.
+* Delays caused by traffic, weather, or third parties.
+* Changes made by Experience Hosts for safety or operational reasons.
+* Loss of income, business, or profits.
+* Indirect, incidental, consequential, or special damages.
+
+---
+
+## 28.3 Maximum Liability
+
+Where liability cannot be excluded under applicable law, the total liability of The Royal Passage shall not exceed the total amount paid by the Guest for the specific Experience giving rise to the claim.
+
+Nothing in these Terms limits any rights that cannot legally be excluded under applicable law.
+
+---
+
+## A29. Indemnification
+
+You agree to indemnify, defend, and hold harmless The Royal Passage, its directors, officers, employees, affiliates, partners, agents, and service providers from and against any claims, liabilities, losses, damages, costs, or expenses (including reasonable legal fees) arising out of or relating to:
+
+* Your breach of these Terms.
+* Your misuse of the Platform.
+* Your violation of applicable laws or regulations.
+* Damage caused to an Experience Host, other Guests, or third parties.
+* Fraudulent or misleading information provided by you.
+* Any unlawful act committed while using the Platform.
+
+---
+
+## A30. Force Majeure
+
+Neither The Royal Passage nor the Experience Host shall be responsible for delays, cancellations, or failure to perform obligations where such failure results from events beyond reasonable control, including but not limited to:
+
+* Natural disasters
+* Floods
+* Earthquakes
+* Cyclones
+* Fires
+* Pandemics or epidemics
+* Government orders or travel restrictions
+* Civil unrest
+* War or armed conflict
+* Terrorist acts
+* Transportation disruptions
+* Utility failures
+* Internet outages
+* Payment gateway outages
+* Labor strikes
+* Severe weather conditions
+
+Where feasible, affected bookings may be rescheduled or refunded in accordance with the applicable Refund Policy.
+
+---
+
+## A31. Dispute Resolution
+
+## 31.1 Customer Support First
+
+If you have any concern regarding a booking, payment, Experience, or Host, you agree to first contact The Royal Passage Customer Support to allow us an opportunity to resolve the matter.
+
+---
+
+## 31.2 Reporting Timelines
+
+Guests should report issues within the following timeframes:
+
+| Issue                          | Reporting Deadline               |
+| ------------------------------ | -------------------------------- |
+| Booking Confirmation Error     | Within 24 hours                  |
+| Payment Issue                  | Within 7 days                      |
+| Experience-related Complaint   | Within 48 hours after completion |
+| Refund Issue                   | Within 30 days of cancellation   |
+| Fraud or Unauthorized Activity | Immediately upon discovery       |
+
+Failure to report within these timelines may affect our ability to investigate and resolve the issue.
+
+---
+
+## 31.3 Investigation Process
+
+Upon receiving a complaint:
+
+* An acknowledgment will be sent within **24 business hours**.
+* A preliminary review will begin within **2 business days**.
+* Additional information may be requested from the Guest, Host, or relevant third parties.
+* A final decision will generally be issued within **3–10 business days**, depending on the complexity of the matter.
+
+Complex cases, including fraud investigations or those involving external parties, may take up to **15 business days**.
+
+---
+
+## 31.4 Mediation
+
+Where appropriate, The Royal Passage may facilitate communication between the Guest and the Experience Host to seek an amicable resolution.
+
+Participation in mediation does not prevent either party from exercising any legal rights available under applicable law.
+
+---
+
+## A32. Customer Support & Service Levels
+
+The Royal Passage aims to provide timely assistance to all users.
+
+| Support Request     | First Response           | Target Resolution                   |
+| ------------------- | ------------------------ | ----------------------------------- |
+| General Enquiry     | Within 24 Business Hours | 1–2 Business Days                   |
+| Booking Assistance  | Within 12 Business Hours | 1–3 Business Days                   |
+| Payment Issue       | Within 24 Business Hours | 3–5 Business Days                   |
+| Refund Request      | Within 24 Business Hours | 5–10 Business Days (after approval) |
+| Technical Issue     | Within 24 Business Hours | 1–5 Business Days                   |
+| Host Complaint      | Within 24 Business Hours | 3–7 Business Days                   |
+| Safety Concern      | Within 12 Business Hours | Priority Investigation              |
+| Fraud Investigation | Within 24 Business Hours | Up to 15 Business Days              |
+
+Support hours and contact methods will be published on the Platform.
+
+---
+
+## A33. Governing Law and Jurisdiction
+
+These Terms shall be governed by and interpreted in accordance with the laws of the **Republic of India**.
+
+Any dispute that cannot be resolved through customer support or mutual discussion shall be subject to the exclusive jurisdiction of the competent courts located in **Bengaluru, Karnataka**, unless otherwise required by applicable law.
+
+---
+
+## A34. Changes to these Terms
+
+The Royal Passage reserves the right to amend or update these Terms at any time to reflect:
+
+* Changes in legal or regulatory requirements.
+* New features or services.
+* Operational improvements.
+* Security enhancements.
+* Changes to our business practices.
+
+Updated Terms will be published on the Platform with a revised Effective Date. Continued use of the Platform after such publication constitutes acceptance of the updated Terms.
+
+Where changes materially affect your rights or obligations, we will provide reasonable notice by email, in-app notification, or through the Platform.
+
+---
+
+## A35. Miscellaneous
+
+### Entire Agreement
+
+These Customer Terms of Service, together with the Privacy Policy, Payment, Refund & Cancellation Policy, and any other policies referenced on the Platform, constitute the complete agreement between you and The Royal Passage regarding Experience bookings.
+
+### Severability
+
+If any provision of these Terms is found to be invalid or unenforceable by a court of competent jurisdiction, the remaining provisions shall remain valid and enforceable.
+
+### No Waiver
+
+Any failure by The Royal Passage to enforce a provision of these Terms shall not constitute a waiver of that provision or any other rights available to us.
+
+### Assignment
+
+Guests may not assign or transfer their rights or obligations under these Terms without prior written consent from The Royal Passage.
+
+The Royal Passage may assign its rights and obligations in connection with a merger, acquisition, corporate restructuring, or sale of assets, subject to applicable law.
+
+---
+
+## A36. Contact Information
+
+For questions, complaints, legal notices, or support regarding Experience bookings, please contact:
 
 **The Royal Passage – Customer Support**
 
-- **Email:** [prajwalbp500@gmail.com](mailto:prajwalbp500@gmail.com)
-- **Business Hours:** Monday to Saturday, 9:00 AM – 6:00 PM (IST), excluding public holidays
-- **Website:** [https://www.theroyalpassage.com](https://www.theroyalpassage.com)
+* **Email:** [prajwalbp500@gmail.com](mailto:prajwalbp500@gmail.com)
+* **Business Hours:** Monday to Saturday, 9:00 AM – 6:00 PM (IST), excluding public holidays
+* **Website:** [https://www.theroyalpassage.com](https://www.theroyalpassage.com)

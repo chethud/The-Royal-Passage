@@ -150,7 +150,31 @@ export function renderLegalMarkdown(markdown: string): ReactNode[] {
       continue;
     }
 
-    if (trimmed.startsWith("- ")) {
+    if (trimmed.startsWith("### ")) {
+      flushParagraph();
+      flushList();
+      const title = trimmed.slice(4);
+      const id = slugifyHeading(title);
+      nodes.push(
+        <h3
+          key={`h3-${index++}`}
+          id={id}
+          className="scroll-mt-28 pt-4 font-display text-lg tracking-tight text-ink sm:text-xl"
+        >
+          {inlineMarkdown(title)}
+        </h3>,
+      );
+      continue;
+    }
+
+    if (trimmed === "---") {
+      flushParagraph();
+      flushList();
+      nodes.push(<hr key={`hr-${index++}`} className="border-[oklch(0.88_0.08_86_/_0.2)]" />);
+      continue;
+    }
+
+    if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
       flushParagraph();
       listItems.push(trimmed.slice(2));
       continue;

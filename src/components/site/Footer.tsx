@@ -15,7 +15,7 @@ const SOCIAL_LINKS = [
 const MAPS_LINK = "https://maps.app.goo.gl/Qy3oqMKGpJDQUbeZ9";
 
 const EXPERIENCE_TERMS_LINK = {
-  label: "Experience Terms & Conditions",
+  label: "Terms of Service",
   to: "/legal/experience-terms" as const,
 };
 
@@ -24,7 +24,7 @@ const quickLinks = [
   { label: "Homestays", to: "/homestays" },
   { label: "Journal", to: "/journal" },
   { label: "Contact", to: "/contact" },
-  { label: "Experience Terms", to: EXPERIENCE_TERMS_LINK.to },
+  { label: "Terms of Service", to: EXPERIENCE_TERMS_LINK.to },
 ];
 
 const experiences = ["Pottery Experience", "Outdoor Cooking", "Heritage Walks"];

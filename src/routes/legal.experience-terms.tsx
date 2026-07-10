@@ -7,16 +7,16 @@ import { SITE_URL } from "@/lib/seo";
 export const Route = createFileRoute("/legal/experience-terms")({
   head: () => ({
     meta: [
-      { title: "Experience Terms & Conditions — The Royal Passage" },
+      { title: "Customer Terms of Service — The Royal Passage" },
       {
         name: "description",
         content:
-          "Read the Experience Terms & Conditions for booking curated experiences on The Royal Passage.",
+          "Read the Customer Terms of Service for booking curated experiences on The Royal Passage.",
       },
-      { property: "og:title", content: "Experience Terms & Conditions — The Royal Passage" },
+      { property: "og:title", content: "Customer Terms of Service — The Royal Passage" },
       {
         property: "og:description",
-        content: "Terms governing bookings and participation in experiences on The Royal Passage.",
+        content: "Terms governing your use of The Royal Passage platform and experience bookings.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE_URL}/legal/experience-terms` },
@@ -36,7 +36,7 @@ function ExperienceTermsPage() {
             <div>
               <div className="eyebrow mb-2 text-ember/90">Legal</div>
               <h1 className="font-display text-3xl tracking-tight text-ink sm:text-4xl">
-                Experience Terms & Conditions
+                Customer Terms of Service
               </h1>
             </div>
             <Link
