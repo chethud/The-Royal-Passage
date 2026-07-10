@@ -5,11 +5,7 @@ import {
   Home,
   LayoutDashboard,
   LogOut,
-  Pencil,
-  ScrollText,
-  Star,
   UserCircle,
-  Users,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -142,53 +138,44 @@ export function AccountDropdownMenu({
           </div>
         </div>
 
-        <div className="header-account-menu__body">
-          <DropdownMenuLabel className="header-account-menu__section">Navigate</DropdownMenuLabel>
+        {!isAdmin ? (
+          <div className="header-account-menu__body">
+            <DropdownMenuLabel className="header-account-menu__section">Navigate</DropdownMenuLabel>
 
-          {isGuest ? (
-            <>
+            {isGuest ? (
+              <>
+                <AccountMenuItem
+                  icon={Home}
+                  label="Home"
+                  description="Return to the main passage"
+                  to={homePath}
+                />
+                <AccountMenuItem
+                  icon={History}
+                  label={historyLabel}
+                  description={historyDescription}
+                  to="/dashboard/history"
+                />
+              </>
+            ) : (
               <AccountMenuItem
-                icon={Home}
-                label="Home"
-                description="Return to the main passage"
-                to={homePath}
+                icon={LayoutDashboard}
+                label="Dashboard"
+                description="Your workspace overview"
+                to={dashboardPath}
               />
-              <AccountMenuItem
-                icon={History}
-                label={historyLabel}
-                description={historyDescription}
-                to="/dashboard/history"
-              />
-            </>
-          ) : (
+            )}
+
+            <DropdownMenuSeparator className="header-account-menu__divider" />
+            <DropdownMenuLabel className="header-account-menu__section">Account</DropdownMenuLabel>
             <AccountMenuItem
-              icon={LayoutDashboard}
-              label="Dashboard"
-              description="Your workspace overview"
-              to={dashboardPath}
+              icon={UserCircle}
+              label="Profile"
+              description="Identity passport & details"
+              onSelect={onProfile}
             />
-          )}
-
-          {isAdmin ? (
-            <>
-              <DropdownMenuSeparator className="header-account-menu__divider" />
-              <DropdownMenuLabel className="header-account-menu__section">Administration</DropdownMenuLabel>
-              <AccountMenuItem icon={Pencil} label="Edit homepage" to="/admin/homepage-edit" />
-              <AccountMenuItem icon={Users} label="Host accounts" to="/admin/hosts" />
-              <AccountMenuItem icon={Star} label="Reviews" to="/admin/reviews" />
-              <AccountMenuItem icon={ScrollText} label="Activity log" to="/admin/activity" />
-            </>
-          ) : null}
-
-          <DropdownMenuSeparator className="header-account-menu__divider" />
-          <DropdownMenuLabel className="header-account-menu__section">Account</DropdownMenuLabel>
-          <AccountMenuItem
-            icon={UserCircle}
-            label="Profile"
-            description="Identity passport & details"
-            onSelect={onProfile}
-          />
-        </div>
+          </div>
+        ) : null}
 
         <div className="header-account-menu__footer">
           <AccountMenuItem

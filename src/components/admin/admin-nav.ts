@@ -7,27 +7,36 @@ export const ADMIN_EXPERIENCE_NAV_ITEMS = [
   { to: "/admin/hosts", label: "Host accounts" },
   { to: "/admin/reviews", label: "Reviews" },
   { to: "/admin/activity", label: "Activity log" },
+  { to: "/admin/homepage-edit", label: "Edit homepage" },
   { to: "/experiences", label: "Live catalog" },
+  { to: "/admin/profile", label: "Account" },
 ] as const;
 
 export const ADMIN_HOMESTAY_NAV_ITEMS = [
   { to: "/admin/homestay", label: "Overview" },
   { to: "/admin/homestays", label: "Approve homestays" },
   { to: "/admin/homestay-owners", label: "Homestay owners" },
+  { to: "/admin/homepage-edit", label: "Edit homepage" },
   { to: "/homestays", label: "Live catalog" },
+  { to: "/admin/profile", label: "Account" },
 ] as const;
 
 export const ADMIN_VIP_NAV_ITEMS = [
   { to: "/admin/vip", label: "Overview" },
   { to: "/admin/vip-packages", label: "Approve packages" },
   { to: "/admin/vip-owners", label: "VIP owners" },
+  { to: "/admin/homepage-edit", label: "Edit homepage" },
   { to: "/vips", label: "Live catalog" },
+  { to: "/admin/profile", label: "Account" },
 ] as const;
 
 /** @deprecated Use adminNavItemsForModule(resolveAdminModule(pathname)) instead. */
 export const ADMIN_NAV_ITEMS = ADMIN_EXPERIENCE_NAV_ITEMS;
 
 export function resolveAdminModule(pathname: string): AdminModule {
+  if (pathname === "/admin/profile" || pathname.startsWith("/admin/profile/")) {
+    return "experiences";
+  }
   if (
     pathname === "/admin/vip" ||
     pathname.startsWith("/admin/vip/") ||
@@ -78,6 +87,9 @@ export function isAdminNavItemActive(pathname: string, to: string): boolean {
   }
   if (to === "/admin/vip") {
     return pathname === "/admin/vip" || pathname === "/admin/vip/";
+  }
+  if (to === "/admin/profile") {
+    return pathname === "/admin/profile" || pathname.startsWith("/admin/profile/");
   }
   return pathname === to || pathname.startsWith(`${to}/`);
 }
