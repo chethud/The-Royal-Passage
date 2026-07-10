@@ -12,6 +12,13 @@ const SOCIAL_LINKS = [
   { label: "YouTube", Icon: Youtube, href: "https://www.youtube.com/" },
 ] as const;
 
+const MAPS_LINK = "https://maps.app.goo.gl/Qy3oqMKGpJDQUbeZ9";
+
+const EXPERIENCE_TERMS_LINK = {
+  label: "Experience Terms & Conditions",
+  to: "/legal/experience-terms" as const,
+};
+
 const quickLinks = [
   { label: "Experiences", to: "/experiences" },
   { label: "Homestays", to: "/homestays" },
@@ -19,13 +26,6 @@ const quickLinks = [
   { label: "Contact", to: "/contact" },
   { label: "Experience Terms", to: EXPERIENCE_TERMS_LINK.to },
 ];
-
-const MAPS_LINK = "https://maps.app.goo.gl/Qy3oqMKGpJDQUbeZ9";
-
-const EXPERIENCE_TERMS_LINK = {
-  label: "Experience Terms & Conditions",
-  to: "/legal/experience-terms" as const,
-};
 
 const experiences = ["Pottery Experience", "Outdoor Cooking", "Heritage Walks"];
 

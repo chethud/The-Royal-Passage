@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Checkbox } from "@/components/ui/checkbox";
-import { EXPERIENCE_TERMS_PATH } from "@/components/legal/ExperienceTermsDocument";
+import { EXPERIENCE_TERMS_PATH } from "@/lib/legal/experience-terms-path";
 
 type AuthTermsAcceptanceProps = {
   id: string;
