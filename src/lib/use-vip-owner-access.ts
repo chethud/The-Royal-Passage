@@ -1,11 +1,11 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuthUser } from "@/lib/auth-user";
-import { dashboardPathForRole } from "@/lib/roles";
+import { dashboardPathForRoles, hasRole } from "@/lib/roles";
 
 export function useVipOwnerAccess() {
   const navigate = useNavigate();
-  const { user, role, loading, accessToken } = useAuthUser();
+  const { user, role, roles, loading, accessToken } = useAuthUser();
 
   useEffect(() => {
     if (loading) return;
@@ -15,16 +15,18 @@ export function useVipOwnerAccess() {
       return;
     }
 
-    if (role && role !== "vip_owner") {
-      void navigate({ to: dashboardPathForRole(role) });
+    if (role && !hasRole(roles, "vip_owner", role)) {
+      void navigate({ to: dashboardPathForRoles(roles, role) });
     }
-  }, [loading, navigate, role, user]);
+  }, [loading, navigate, role, roles, user]);
 
-  const ready = !loading && Boolean(user) && role === "vip_owner" && Boolean(accessToken);
+  const ready =
+    !loading && Boolean(user) && hasRole(roles, "vip_owner", role) && Boolean(accessToken);
 
   return {
     user,
     role,
+    roles,
     accessToken,
     loading,
     ready,

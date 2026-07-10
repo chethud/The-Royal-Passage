@@ -294,7 +294,7 @@ class HostReviewSummary(_message.Message):
     def __init__(self, id: _Optional[str] = ..., experience_id: _Optional[str] = ..., experience_title: _Optional[str] = ..., rating: _Optional[int] = ..., comment: _Optional[str] = ..., reviewer_display_name: _Optional[str] = ..., host_reply: _Optional[str] = ..., host_replied_at: _Optional[str] = ..., is_verified: _Optional[bool] = ..., created_at: _Optional[str] = ...) -> None: ...
 
 class ManagedUser(_message.Message):
-    __slots__ = ("id", "email", "full_name", "phone", "role", "host_id", "created_at")
+    __slots__ = ("id", "email", "full_name", "phone", "role", "host_id", "created_at", "roles")
     ID_FIELD_NUMBER: _ClassVar[int]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
     FULL_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -302,6 +302,7 @@ class ManagedUser(_message.Message):
     ROLE_FIELD_NUMBER: _ClassVar[int]
     HOST_ID_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    ROLES_FIELD_NUMBER: _ClassVar[int]
     id: str
     email: str
     full_name: str
@@ -309,7 +310,8 @@ class ManagedUser(_message.Message):
     role: str
     host_id: str
     created_at: str
-    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., phone: _Optional[str] = ..., role: _Optional[str] = ..., host_id: _Optional[str] = ..., created_at: _Optional[str] = ...) -> None: ...
+    roles: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., phone: _Optional[str] = ..., role: _Optional[str] = ..., host_id: _Optional[str] = ..., created_at: _Optional[str] = ..., roles: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class CreateHostRequest(_message.Message):
     __slots__ = ("display_name", "email", "password", "phone", "bio")
@@ -338,7 +340,7 @@ class CreateHostResponse(_message.Message):
     def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., display_name: _Optional[str] = ..., host_id: _Optional[str] = ...) -> None: ...
 
 class CreatePlatformUserRequest(_message.Message):
-    __slots__ = ("role", "full_name", "email", "password", "phone", "bio", "address")
+    __slots__ = ("role", "full_name", "email", "password", "phone", "bio", "address", "roles")
     ROLE_FIELD_NUMBER: _ClassVar[int]
     FULL_NAME_FIELD_NUMBER: _ClassVar[int]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
@@ -346,6 +348,7 @@ class CreatePlatformUserRequest(_message.Message):
     PHONE_FIELD_NUMBER: _ClassVar[int]
     BIO_FIELD_NUMBER: _ClassVar[int]
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    ROLES_FIELD_NUMBER: _ClassVar[int]
     role: str
     full_name: str
     email: str
@@ -353,10 +356,11 @@ class CreatePlatformUserRequest(_message.Message):
     phone: str
     bio: str
     address: str
-    def __init__(self, role: _Optional[str] = ..., full_name: _Optional[str] = ..., email: _Optional[str] = ..., password: _Optional[str] = ..., phone: _Optional[str] = ..., bio: _Optional[str] = ..., address: _Optional[str] = ...) -> None: ...
+    roles: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, role: _Optional[str] = ..., full_name: _Optional[str] = ..., email: _Optional[str] = ..., password: _Optional[str] = ..., phone: _Optional[str] = ..., bio: _Optional[str] = ..., address: _Optional[str] = ..., roles: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class CreatePlatformUserResponse(_message.Message):
-    __slots__ = ("id", "email", "full_name", "role", "host_id", "homestay_owner_id", "vip_owner_id")
+    __slots__ = ("id", "email", "full_name", "role", "host_id", "homestay_owner_id", "vip_owner_id", "roles")
     ID_FIELD_NUMBER: _ClassVar[int]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
     FULL_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -364,6 +368,7 @@ class CreatePlatformUserResponse(_message.Message):
     HOST_ID_FIELD_NUMBER: _ClassVar[int]
     HOMESTAY_OWNER_ID_FIELD_NUMBER: _ClassVar[int]
     VIP_OWNER_ID_FIELD_NUMBER: _ClassVar[int]
+    ROLES_FIELD_NUMBER: _ClassVar[int]
     id: str
     email: str
     full_name: str
@@ -371,7 +376,8 @@ class CreatePlatformUserResponse(_message.Message):
     host_id: str
     homestay_owner_id: str
     vip_owner_id: str
-    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., role: _Optional[str] = ..., host_id: _Optional[str] = ..., homestay_owner_id: _Optional[str] = ..., vip_owner_id: _Optional[str] = ...) -> None: ...
+    roles: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, id: _Optional[str] = ..., email: _Optional[str] = ..., full_name: _Optional[str] = ..., role: _Optional[str] = ..., host_id: _Optional[str] = ..., homestay_owner_id: _Optional[str] = ..., vip_owner_id: _Optional[str] = ..., roles: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GuestProfile(_message.Message):
     __slots__ = ("id", "email", "full_name", "phone", "role", "created_at", "avatar_url", "date_of_birth", "vip_membership_status", "vip_membership_rejected_at")

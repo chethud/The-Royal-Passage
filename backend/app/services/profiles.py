@@ -1,9 +1,11 @@
+from app.services.user_roles import fetch_user_roles, sync_user_roles
+
 PROFILE_SELECT = (
-    "role, full_name, phone, avatar_url, date_of_birth, host_id, homestay_owner_id, "
+    "id, role, full_name, phone, avatar_url, date_of_birth, host_id, homestay_owner_id, vip_owner_id, "
     "created_at, vip_membership_status"
 )
 PROFILE_SELECT_LEGACY = (
-    "role, full_name, phone, avatar_url, date_of_birth, host_id, created_at, vip_membership_status"
+    "id, role, full_name, phone, avatar_url, date_of_birth, host_id, created_at, vip_membership_status"
 )
 
 
@@ -22,6 +24,14 @@ def _profile_phone_from_user(user) -> str | None:
     return str(phone) if phone else None
 
 
+def _attach_roles(supabase, row: dict) -> dict:
+    roles = fetch_user_roles(supabase, row["id"])
+    if not roles and row.get("role"):
+        roles = [row["role"]]
+    row["roles"] = roles
+    return row
+
+
 def fetch_profile_row(supabase, user_id: str) -> dict | None:
     try:
         result = (
@@ -31,7 +41,8 @@ def fetch_profile_row(supabase, user_id: str) -> dict | None:
             .maybe_single()
             .execute()
         )
-        return result.data if result else None
+        if result and result.data:
+            return _attach_roles(supabase, result.data)
     except Exception:
         result = (
             supabase.table("profiles")
@@ -40,7 +51,9 @@ def fetch_profile_row(supabase, user_id: str) -> dict | None:
             .maybe_single()
             .execute()
         )
-        return result.data if result else None
+        if result and result.data:
+            return _attach_roles(supabase, result.data)
+    return None
 
 
 def ensure_user_profile(supabase, user) -> dict:
@@ -63,7 +76,8 @@ def ensure_user_profile(supabase, user) -> dict:
     )
     insert_rows = insert_result.data if insert_result else None
     if insert_rows:
-        return insert_rows[0]
+        sync_user_roles(supabase, user.id, ["guest"])
+        return _attach_roles(supabase, insert_rows[0])
 
     row = fetch_profile_row(supabase, user.id)
     if row:

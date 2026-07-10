@@ -157,6 +157,7 @@ export function HomestayDateCalendar({
           months: "w-full",
           month: "w-full gap-3",
           nav: "relative flex w-full items-center justify-between gap-2",
+          today: "rounded-md",
           button_previous: cn(
             "h-9 w-9 rounded-sm border border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.55)] text-[#8B4A2B]",
             "hover:bg-[rgb(200_162_90/0.22)] hover:text-[#5C2E12] disabled:opacity-35",
@@ -185,6 +186,7 @@ export function HomestayDateCalendar({
                   "relative flex h-full w-full min-w-(--cell-size) flex-col items-center justify-center gap-0.5 rounded-md p-0.5 text-sm leading-none transition-colors",
                   "hover:bg-[rgb(200_162_90/0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]/60",
                   modifiers.selected && "bg-[#C8A25A] text-[#3B2208] hover:bg-[#C8A25A]",
+                  modifiers.today && !modifiers.selected && "bg-transparent text-inherit",
                   modifiers.range_middle &&
                     !modifiers.range_start &&
                     !modifiers.range_end &&

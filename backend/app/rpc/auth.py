@@ -4,6 +4,7 @@ from connectrpc.request import RequestContext
 
 from app.dependencies.supabase import get_supabase_admin
 from app.services.profiles import ensure_user_profile
+from app.services.user_roles import profile_has_role
 
 
 def _read_bearer_token(ctx: RequestContext) -> str:
@@ -32,34 +33,34 @@ def resolve_current_user(ctx: RequestContext) -> dict:
 
 def require_admin(ctx: RequestContext) -> dict:
     auth = resolve_current_user(ctx)
-    if auth["profile"].get("role") != "admin":
+    if not profile_has_role(auth["profile"], "admin", get_supabase_admin()):
         raise ConnectError(Code.PERMISSION_DENIED, "Admin access required.")
     return auth
 
 
 def require_guest(ctx: RequestContext) -> dict:
     auth = resolve_current_user(ctx)
-    if auth["profile"].get("role") != "guest":
+    if not profile_has_role(auth["profile"], "guest", get_supabase_admin()):
         raise ConnectError(Code.PERMISSION_DENIED, "Guest access required.")
     return auth
 
 
 def require_host(ctx: RequestContext) -> dict:
     auth = resolve_current_user(ctx)
-    if auth["profile"].get("role") != "host":
+    if not profile_has_role(auth["profile"], "host", get_supabase_admin()):
         raise ConnectError(Code.PERMISSION_DENIED, "Host access required.")
     return auth
 
 
 def require_homestay_owner(ctx: RequestContext) -> dict:
     auth = resolve_current_user(ctx)
-    if auth["profile"].get("role") != "homestay_owner":
+    if not profile_has_role(auth["profile"], "homestay_owner", get_supabase_admin()):
         raise ConnectError(Code.PERMISSION_DENIED, "Homestay owner access required.")
     return auth
 
 
 def require_vip_owner(ctx: RequestContext) -> dict:
     auth = resolve_current_user(ctx)
-    if auth["profile"].get("role") != "vip_owner":
+    if not profile_has_role(auth["profile"], "vip_owner", get_supabase_admin()):
         raise ConnectError(Code.PERMISSION_DENIED, "VIP owner access required.")
     return auth

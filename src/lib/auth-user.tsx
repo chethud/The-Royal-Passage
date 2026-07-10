@@ -10,7 +10,7 @@ import type { User } from "@supabase/supabase-js";
 import { isApiConfigured } from "@/lib/api/client";
 import { fetchGuestProfile } from "@/lib/api/guest";
 import { ensureGuestProfile, fetchUserProfile, type UserProfile } from "@/lib/profiles";
-import { isUserRole, type UserRole } from "@/lib/roles";
+import { isUserRole, resolveUserRoles, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 import { markVipSignupPromptPending } from "@/lib/vip-membership-prompt-storage";
 
@@ -22,12 +22,14 @@ type CachedUser = {
   fullName?: string;
   phone?: string;
   role?: UserRole;
+  roles?: UserRole[];
 };
 
 export type AuthUserState = {
   user: User | null;
   profile: UserProfile | null;
   role: UserRole | null;
+  roles: UserRole[];
   loading: boolean;
   configured: boolean;
   displayName: string | null;
@@ -52,7 +54,7 @@ function readCachedUser(): CachedUser | null {
   }
 }
 
-function writeCachedUser(user: User | null, role?: UserRole | null) {
+function writeCachedUser(user: User | null, role?: UserRole | null, roles?: UserRole[]) {
   if (typeof window === "undefined") return;
   if (!user) {
     window.localStorage.removeItem(USER_CACHE_KEY);
@@ -65,6 +67,7 @@ function writeCachedUser(user: User | null, role?: UserRole | null) {
     fullName: (meta.full_name as string | undefined) ?? (meta.name as string | undefined),
     phone: (meta.phone as string | undefined) ?? user.phone ?? undefined,
     role: role ?? undefined,
+    roles: roles?.length ? roles : undefined,
   };
   window.localStorage.setItem(USER_CACHE_KEY, JSON.stringify(payload));
 }
@@ -87,11 +90,16 @@ function userDisplayName(
 }
 
 function mapApiGuestProfile(apiProfile: Awaited<ReturnType<typeof fetchGuestProfile>>): UserProfile {
+  const role = isUserRole(apiProfile.role) ? apiProfile.role : "guest";
+  const apiRoles = "roles" in apiProfile && Array.isArray(apiProfile.roles)
+    ? apiProfile.roles.filter(isUserRole)
+    : undefined;
   return {
     id: apiProfile.id,
     fullName: apiProfile.fullName,
     phone: apiProfile.phone,
-    role: isUserRole(apiProfile.role) ? apiProfile.role : "guest",
+    role,
+    roles: resolveUserRoles(apiRoles, role),
     hostId: null,
   };
 }
@@ -167,7 +175,7 @@ function useAuthUserState(): AuthUserState {
       const nextProfile = await loadProfileForUser(nextUser, resolvedToken);
       if (!mounted) return;
       setProfile(nextProfile);
-      writeCachedUser(nextUser, nextProfile?.role);
+      writeCachedUser(nextUser, nextProfile?.role, nextProfile?.roles);
       setCachedUser(readCachedUser());
 
       if (nextProfile?.role === "guest" && resolvedToken && isApiConfigured()) {
@@ -215,6 +223,10 @@ function useAuthUserState(): AuthUserState {
   );
 
   const role = profile?.role ?? (user ? cachedUser?.role : null) ?? null;
+  const roles = useMemo(
+    () => resolveUserRoles(profile?.roles ?? cachedUser?.roles, role),
+    [cachedUser?.roles, profile?.roles, role],
+  );
 
   const refreshVipMembershipStatus = async () => {
     if (!accessToken || role !== "guest" || !isApiConfigured()) return;
@@ -234,6 +246,7 @@ function useAuthUserState(): AuthUserState {
     user,
     profile,
     role,
+    roles,
     loading,
     configured,
     displayName,

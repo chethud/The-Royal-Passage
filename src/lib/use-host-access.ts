@@ -1,11 +1,11 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuthUser } from "@/lib/auth-user";
-import { dashboardPathForRole } from "@/lib/roles";
+import { dashboardPathForRoles, hasRole } from "@/lib/roles";
 
 export function useHostAccess() {
   const navigate = useNavigate();
-  const { user, role, loading, accessToken } = useAuthUser();
+  const { user, role, roles, loading, accessToken } = useAuthUser();
 
   useEffect(() => {
     if (loading) return;
@@ -15,12 +15,12 @@ export function useHostAccess() {
       return;
     }
 
-    if (role && role !== "host") {
-      void navigate({ to: dashboardPathForRole(role) });
+    if (role && !hasRole(roles, "host", role)) {
+      void navigate({ to: dashboardPathForRoles(roles, role) });
     }
-  }, [loading, navigate, role, user]);
+  }, [loading, navigate, role, roles, user]);
 
-  const ready = !loading && Boolean(user) && role === "host" && Boolean(accessToken);
+  const ready = !loading && Boolean(user) && hasRole(roles, "host", role) && Boolean(accessToken);
 
   return {
     user,

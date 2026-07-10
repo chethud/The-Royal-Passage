@@ -1,11 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { isUserRole, type UserRole } from "@/lib/roles";
+import { isUserRole, resolveUserRoles, type UserRole } from "@/lib/roles";
 
 export type UserProfile = {
   id: string;
   fullName: string | null;
   phone: string | null;
   role: UserRole;
+  roles: UserRole[];
   hostId: string | null;
 };
 
@@ -17,12 +18,26 @@ type ProfileRow = {
   host_id: string | null;
 };
 
-function mapProfile(row: ProfileRow): UserProfile {
+async function fetchRoleRows(supabase: SupabaseClient, userId: string): Promise<UserRole[]> {
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId);
+
+  if (error || !data?.length) return [];
+  return data
+    .map((row) => row.role)
+    .filter((role): role is UserRole => isUserRole(role));
+}
+
+function mapProfile(row: ProfileRow, roles: UserRole[]): UserProfile {
+  const primaryRole = isUserRole(row.role) ? row.role : "guest";
   return {
     id: row.id,
     fullName: row.full_name,
     phone: row.phone,
-    role: isUserRole(row.role) ? row.role : "guest",
+    role: primaryRole,
+    roles: resolveUserRoles(roles, primaryRole),
     hostId: row.host_id,
   };
 }
@@ -38,7 +53,8 @@ export async function fetchUserProfile(
     .maybeSingle();
 
   if (error || !data) return null;
-  return mapProfile(data as ProfileRow);
+  const roles = await fetchRoleRows(supabase, userId);
+  return mapProfile(data as ProfileRow, roles);
 }
 
 /** Self-registration always creates a guest profile. Host/admin accounts are created by admin. */
@@ -62,5 +78,8 @@ export async function ensureGuestProfile(
     .single();
 
   if (error || !data) return null;
-  return mapProfile(data as ProfileRow);
+
+  await supabase.from("user_roles").insert({ user_id: userId, role: "guest" });
+
+  return mapProfile(data as ProfileRow, ["guest"]);
 }

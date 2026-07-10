@@ -3,6 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.dependencies.supabase import get_supabase_admin
 from app.services.profiles import ensure_user_profile
+from app.services.user_roles import profile_has_role
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -32,18 +33,18 @@ async def get_current_user(
 
 
 async def require_admin(auth=Depends(get_current_user)):
-    if auth["profile"].get("role") != "admin":
+    if not profile_has_role(auth["profile"], "admin", get_supabase_admin()):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required.")
     return auth
 
 
 async def require_guest(auth=Depends(get_current_user)):
-    if auth["profile"].get("role") != "guest":
+    if not profile_has_role(auth["profile"], "guest", get_supabase_admin()):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Guest access required.")
     return auth
 
 
 async def require_host(auth=Depends(get_current_user)):
-    if auth["profile"].get("role") != "host":
+    if not profile_has_role(auth["profile"], "host", get_supabase_admin()):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Host access required.")
     return auth

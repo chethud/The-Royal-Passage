@@ -754,6 +754,7 @@ class ManagedUser(BaseModel):
     fullName: str | None
     phone: str | None
     role: str
+    roles: list[str] = Field(default_factory=list)
     hostId: str | None
     createdAt: str
 
@@ -774,7 +775,8 @@ class CreateHostResponse(BaseModel):
 
 
 class CreatePlatformUserRequest(BaseModel):
-    role: Literal["host", "homestay_owner", "vip_owner", "admin", "editor"]
+    role: Literal["host", "homestay_owner", "vip_owner", "admin", "editor"] | None = None
+    roles: list[Literal["host", "homestay_owner", "vip_owner", "admin", "editor"]] | None = None
     fullName: str = Field(min_length=2, max_length=120)
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
@@ -788,6 +790,7 @@ class CreatePlatformUserResponse(BaseModel):
     email: str
     fullName: str
     role: str
+    roles: list[str] = Field(default_factory=list)
     hostId: str | None = None
     homestayOwnerId: str | None = None
     vipOwnerId: str | None = None

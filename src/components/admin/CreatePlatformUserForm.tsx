@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { createPlatformUser } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
@@ -23,7 +23,7 @@ type CreatePlatformUserFormProps = {
 };
 
 export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatformUserFormProps) {
-  const [role, setRole] = useState<CreatableRole>("host");
+  const [roles, setRoles] = useState<CreatableRole[]>(["host"]);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,8 +34,25 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const showBio = role === "host";
-  const showAddress = role === "homestay_owner" || role === "vip_owner";
+  const showBio = roles.includes("host");
+  const showAddress = roles.includes("homestay_owner") || roles.includes("vip_owner");
+
+  const roleSummary = useMemo(
+    () => roles.map((role) => ROLE_LABELS[role]).join(", "),
+    [roles],
+  );
+
+  const toggleRole = (role: CreatableRole) => {
+    setRoles((current) => {
+      if (current.includes(role)) {
+        const next = current.filter((value) => value !== role);
+        return next.length > 0 ? next : current;
+      }
+      return [...current, role];
+    });
+    setError(null);
+    setNotice(null);
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -48,7 +65,7 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
       await createPlatformUser(accessToken, {
-        role,
+        roles,
         fullName: fullName.trim(),
         email: email.trim(),
         password,
@@ -57,7 +74,7 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
         address: showAddress ? address.trim() || undefined : undefined,
       });
       setNotice(
-        `${ROLE_LABELS[role]} login created for ${email.trim()}. Share these credentials securely.`,
+        `Login created for ${email.trim()} with access: ${roleSummary}. Share these credentials securely.`,
       );
       setFullName("");
       setEmail("");
@@ -79,29 +96,47 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
         <div>
           <h2 className="luxury-panel-heading font-display text-2xl">Create platform user</h2>
           <p className="luxury-panel-body mt-2 text-sm">
-            Create a login with role-based access. Guests sign up themselves; all other roles are
-            provisioned here by admins.
+            Create a login and assign one or more access roles. Guests sign up themselves; all
+            other access is provisioned here by admins.
           </p>
         </div>
 
-        <div>
-          <label htmlFor="platform-user-role" className="eyebrow luxury-panel-label mb-2 block">
-            Role
-          </label>
-          <select
-            id="platform-user-role"
-            value={role}
-            onChange={(e) => setRole(e.target.value as CreatableRole)}
-            className={inputClass}
-          >
-            {CREATABLE_ROLES.map((value) => (
-              <option key={value} value={value}>
-                {ROLE_LABELS[value]}
-              </option>
-            ))}
-          </select>
-          <p className="luxury-panel-body mt-2 text-xs">{ROLE_DESCRIPTIONS[role]}</p>
-        </div>
+        <fieldset>
+          <legend className="eyebrow luxury-panel-label mb-3 block">Access roles</legend>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {CREATABLE_ROLES.map((value) => {
+              const checked = roles.includes(value);
+              return (
+                <label
+                  key={value}
+                  className={`flex cursor-pointer items-start gap-3 rounded-sm border px-4 py-3 transition-colors ${
+                    checked
+                      ? "border-[#C8A25A] bg-[rgb(200_162_90/0.14)]"
+                      : "border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.45)]"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleRole(value)}
+                    className="mt-1"
+                  />
+                  <span>
+                    <span className="block text-sm font-medium text-[#4A0000]">
+                      {ROLE_LABELS[value]}
+                    </span>
+                    <span className="mt-1 block text-xs leading-relaxed text-[rgb(74_0_0/0.72)]">
+                      {ROLE_DESCRIPTIONS[value]}
+                    </span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+          <p className="luxury-panel-body mt-2 text-xs">
+            Selected: {roleSummary}. Users can hold multiple roles, such as host and editor.
+          </p>
+        </fieldset>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -195,10 +230,10 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
 
         <button
           type="submit"
-          disabled={busy}
+          disabled={busy || roles.length === 0}
           className="luxury-btn-sm luxury-btn-primary disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {busy ? "Creating login…" : `Create ${ROLE_LABELS[role].toLowerCase()} login`}
+          {busy ? "Creating login…" : "Create user login"}
         </button>
 
         {error ? (

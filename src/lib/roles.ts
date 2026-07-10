@@ -82,6 +82,45 @@ export function isStaffRole(role: UserRole | null | undefined): boolean {
   );
 }
 
+export function resolveUserRoles(
+  roles: readonly UserRole[] | null | undefined,
+  primaryRole: UserRole | null | undefined,
+): UserRole[] {
+  const resolved = [...(roles ?? [])].filter(isUserRole);
+  if (resolved.length > 0) return [...new Set(resolved)];
+  if (primaryRole && isUserRole(primaryRole)) return [primaryRole];
+  return [];
+}
+
+export function hasRole(
+  roles: readonly UserRole[] | null | undefined,
+  role: UserRole,
+  primaryRole?: UserRole | null,
+): boolean {
+  return resolveUserRoles(roles, primaryRole ?? null).includes(role);
+}
+
+export function hasAnyRole(
+  roles: readonly UserRole[] | null | undefined,
+  candidates: readonly UserRole[],
+  primaryRole?: UserRole | null,
+): boolean {
+  const resolved = resolveUserRoles(roles, primaryRole ?? null);
+  return candidates.some((role) => resolved.includes(role));
+}
+
+export function dashboardPathForRoles(
+  roles: readonly UserRole[] | null | undefined,
+  primaryRole?: UserRole | null,
+): string {
+  const resolved = resolveUserRoles(roles, primaryRole ?? null);
+  const priority: UserRole[] = ["admin", "editor", "host", "homestay_owner", "vip_owner", "guest"];
+  for (const role of priority) {
+    if (resolved.includes(role)) return ROLE_DASHBOARD_PATH[role];
+  }
+  return dashboardPathForRole(primaryRole);
+}
+
 export function isEditorRole(role: UserRole | null | undefined): boolean {
   return role === "editor";
 }
@@ -91,21 +130,36 @@ export function isAdminRole(role: UserRole | null | undefined): boolean {
 }
 
 /** Journal section — editors and admins. */
-export function canEditHomepageJournal(role: UserRole | null | undefined): boolean {
-  return role === "editor" || role === "admin";
+export function canEditHomepageJournal(
+  role: UserRole | null | undefined,
+  roles?: readonly UserRole[] | null,
+): boolean {
+  return hasAnyRole(roles, ["editor", "admin"], role);
 }
 
 /** Heritage video section (title, description, YouTube link) — editors and admins. */
-export function canEditHomepageJourneys(role: UserRole | null | undefined): boolean {
-  return role === "editor" || role === "admin";
+export function canEditHomepageJourneys(
+  role: UserRole | null | undefined,
+  roles?: readonly UserRole[] | null,
+): boolean {
+  return hasAnyRole(roles, ["editor", "admin"], role);
 }
 
 /** Hero and top experiences — admins only. */
-export function canEditHomepageAdminSections(role: UserRole | null | undefined): boolean {
-  return role === "admin";
+export function canEditHomepageAdminSections(
+  role: UserRole | null | undefined,
+  roles?: readonly UserRole[] | null,
+): boolean {
+  return hasRole(roles, "admin", role);
 }
 
 /** Signed-in user who may book experiences (guest, or profile still loading). */
-export function isGuestAccount(role: UserRole | null | undefined): boolean {
+export function isGuestAccount(
+  role: UserRole | null | undefined,
+  roles?: readonly UserRole[] | null,
+): boolean {
+  if (hasAnyRole(roles, ["host", "homestay_owner", "vip_owner", "admin", "editor"], role)) {
+    return false;
+  }
   return !isStaffRole(role);
 }

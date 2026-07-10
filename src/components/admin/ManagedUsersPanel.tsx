@@ -58,7 +58,12 @@ export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanel
     void loadUsers();
   }, [loadUsers, refreshKey]);
 
-  const filtered = users.filter((user) => filter === "all" || user.role === filter);
+  const filtered = users.filter(
+    (user) =>
+      filter === "all" ||
+      user.role === filter ||
+      user.roles?.includes(filter),
+  );
 
   return (
     <LuxuryCheckoutPanel>
@@ -109,7 +114,7 @@ export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanel
                 <DashboardTableHeadRow>
                   <DashboardTableHeadCell>Name</DashboardTableHeadCell>
                   <DashboardTableHeadCell>Email</DashboardTableHeadCell>
-                  <DashboardTableHeadCell>Role</DashboardTableHeadCell>
+                  <DashboardTableHeadCell>Access</DashboardTableHeadCell>
                   <DashboardTableHeadCell>Phone</DashboardTableHeadCell>
                 </DashboardTableHeadRow>
               </DashboardTableHead>
@@ -119,7 +124,11 @@ export function ManagedUsersPanel({ accessToken, refreshKey }: ManagedUsersPanel
                     <DashboardTableCell variant="heading">{user.fullName ?? "—"}</DashboardTableCell>
                     <DashboardTableCell>{user.email ?? "—"}</DashboardTableCell>
                     <DashboardTableCell>
-                      <RoleBadge role={user.role} />
+                      <div className="flex flex-wrap gap-1.5">
+                        {(user.roles?.length ? user.roles : [user.role]).map((role) => (
+                          <RoleBadge key={`${user.id}-${role}`} role={role} />
+                        ))}
+                      </div>
                     </DashboardTableCell>
                     <DashboardTableCell>{user.phone ?? "—"}</DashboardTableCell>
                   </DashboardTableRow>

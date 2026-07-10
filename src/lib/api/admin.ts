@@ -12,12 +12,18 @@ export type ManagedUser = {
   fullName: string | null;
   phone: string | null;
   role: UserRole;
+  roles: UserRole[];
   hostId: string | null;
   createdAt: string;
 };
 
 export function fetchManagedUsers(accessToken: string) {
-  return apiFetch<ManagedUser[]>("/api/v1/admin/users", { accessToken });
+  return apiFetch<ManagedUser[]>("/api/v1/admin/users", { accessToken }).then((rows) =>
+    rows.map((row) => ({
+      ...row,
+      roles: row.roles?.length ? row.roles : [row.role],
+    })),
+  );
 }
 
 export type CreateHostPayload = {
@@ -37,7 +43,8 @@ export function createHost(accessToken: string, payload: CreateHostPayload) {
 }
 
 export type CreatePlatformUserPayload = {
-  role: "host" | "homestay_owner" | "vip_owner" | "admin" | "editor";
+  role?: "host" | "homestay_owner" | "vip_owner" | "admin" | "editor";
+  roles: Array<"host" | "homestay_owner" | "vip_owner" | "admin" | "editor">;
   fullName: string;
   email: string;
   password: string;
@@ -49,7 +56,12 @@ export type CreatePlatformUserPayload = {
 export function createPlatformUser(accessToken: string, payload: CreatePlatformUserPayload) {
   const client = createRoyalPassageClient(accessToken);
   return rpcCall(() =>
-    client.createPlatformUser(create(CreatePlatformUserRequestSchema, payload)),
+    client.createPlatformUser(
+      create(CreatePlatformUserRequestSchema, {
+        ...payload,
+        role: payload.role ?? payload.roles[0],
+      }),
+    ),
   );
 }
 
