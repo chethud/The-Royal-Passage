@@ -66,16 +66,48 @@ function toFetchHeaders(req: VercelRequest) {
   return headers;
 }
 
+function isBodyStream(value: unknown): value is ReadableStream<Uint8Array> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as ReadableStream<Uint8Array>).getReader === "function"
+  );
+}
+
+function toFetchBody(req: VercelRequest, method: string): BodyInit | undefined {
+  if (method === "GET" || method === "HEAD") return undefined;
+
+  const raw = req.body;
+  if (raw == null) {
+    if (typeof req[Symbol.asyncIterator] === "function") {
+      return req as unknown as BodyInit;
+    }
+    return undefined;
+  }
+
+  if (typeof raw === "string") return raw;
+  if (Buffer.isBuffer(raw)) return raw;
+  if (raw instanceof Uint8Array) return raw;
+  if (raw instanceof ArrayBuffer) return raw;
+  if (typeof FormData !== "undefined" && raw instanceof FormData) return raw;
+  if (typeof Blob !== "undefined" && raw instanceof Blob) return raw;
+  if (isBodyStream(raw)) return raw;
+  if (typeof raw === "object") return JSON.stringify(raw);
+
+  return String(raw);
+}
+
 function toFetchRequest(req: VercelRequest) {
   const method = req.method ?? "GET";
   const bodyless = method === "GET" || method === "HEAD";
-  const body = bodyless ? undefined : (req.body ?? (req as unknown as ReadableStream));
+  const body = bodyless ? undefined : toFetchBody(req, method);
+  const needsDuplex = !bodyless && isBodyStream(body);
 
   return new Request(new URL(req.url ?? "/", getRequestOrigin(req)), {
     method,
     headers: toFetchHeaders(req),
-    body: body as BodyInit | undefined,
-    ...(bodyless ? {} : { duplex: "half" as const }),
+    body,
+    ...(needsDuplex ? { duplex: "half" as const } : {}),
   });
 }
 
