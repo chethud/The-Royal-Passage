@@ -21,7 +21,7 @@ export function AuthPageLayout({ title, subtitle, children }: AuthPageLayoutProp
               width={280}
               height={96}
               decoding="async"
-              className="h-10 w-auto object-contain object-left sm:h-11"
+              className="h-16 w-auto object-contain object-left sm:h-20"
             />
           </Link>
           <Link

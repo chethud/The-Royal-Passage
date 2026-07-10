@@ -1,6 +1,7 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
+import { AuthTermsAcceptance } from "@/components/auth/AuthTermsAcceptance";
 import { RoleBadge } from "@/components/auth/RoleBadge";
 import { AuthPageLayout } from "@/components/auth/AuthPageLayout";
 import { useAuthUser } from "@/lib/auth-user";
@@ -42,6 +43,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   const [savingProfile, setSavingProfile] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const browserConfigured = isSupabaseBrowserConfigured();
   const { user, displayName, role, loading } = useAuthUser();
   const supabase = useMemo(() => {
@@ -51,6 +53,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
 
   useEffect(() => {
     setMode(initialMode);
+    setAcceptedTerms(false);
   }, [initialMode]);
 
   const passwordType = showPassword ? "text" : "password";
@@ -90,6 +93,10 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   const signInWithGoogle = async () => {
     setError(null);
     setNotice(null);
+    if (!acceptedTerms) {
+      setError("Please accept the terms and conditions to continue.");
+      return;
+    }
     if (!supabase) {
       setError("Supabase browser auth is not configured.");
       return;
@@ -112,6 +119,10 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     setError(null);
     setNotice(null);
     setEmailNotConfirmed(false);
+    if (!acceptedTerms) {
+      setError("Please accept the terms and conditions to continue.");
+      return;
+    }
     if (!supabase) {
       setError("Supabase browser auth is not configured.");
       return;
@@ -200,6 +211,10 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     e.preventDefault();
     setError(null);
     setNotice(null);
+    if (!acceptedTerms) {
+      setError("Please accept the terms and conditions to continue.");
+      return;
+    }
     if (!supabase) {
       setError("Supabase browser auth is not configured.");
       return;
@@ -228,6 +243,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
           "Account created. Check your email for a confirmation link, then sign in with your password.",
         );
         setMode("signin");
+        setAcceptedTerms(false);
       }
       setPassword("");
     } catch (err) {
@@ -401,6 +417,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                 className="text-ember underline-offset-4 transition-colors hover:underline"
                 onClick={() => {
                   setMode("signin");
+                  setAcceptedTerms(false);
                   setError(null);
                   setNotice(null);
                 }}
@@ -482,6 +499,11 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
               >
                 {busy ? "Signing in…" : "Sign in"}
               </button>
+              <AuthTermsAcceptance
+                id="signin-terms"
+                checked={acceptedTerms}
+                onCheckedChange={setAcceptedTerms}
+              />
               {emailNotConfirmed ? (
                 <button
                   type="button"
@@ -501,6 +523,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                 className="text-ember underline-offset-4 transition-colors hover:underline"
                 onClick={() => {
                   setMode("signup");
+                  setAcceptedTerms(false);
                   setError(null);
                   setNotice(null);
                 }}
@@ -606,6 +629,11 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
               >
                 {busy ? "Creating account…" : "Create guest account"}
               </button>
+              <AuthTermsAcceptance
+                id="signup-terms"
+                checked={acceptedTerms}
+                onCheckedChange={setAcceptedTerms}
+              />
             </form>
 
             <p className="mt-6 text-center text-sm text-ink/70">
@@ -615,6 +643,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                 className="text-ember underline-offset-4 transition-colors hover:underline"
                 onClick={() => {
                   setMode("signin");
+                  setAcceptedTerms(false);
                   setError(null);
                   setNotice(null);
                 }}
