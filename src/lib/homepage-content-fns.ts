@@ -18,6 +18,8 @@ import {
 } from "@/lib/homepage-content";
 import { getSupabaseConfigError } from "@/lib/env.server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { HOMESTAY_FEATURED_KEY, HOMESTAY_FEATURED_SLOT_COUNT } from "@/lib/homestay-featured-keys";
+import { invalidateHomestayCatalogCache } from "@/lib/homestay-featured-fns";
 
 const showcaseIconKeySchema = z.enum(["pottery", "flame", "heritage"]);
 const journeyThemeSchema = z.enum(["palace", "manuscript", "dasara"]);
@@ -148,6 +150,30 @@ export const saveHomepageJourneys = createServerFn({ method: "POST" })
     await writePlatformSetting(supabase, HOMEPAGE_JOURNEYS_KEY, data.items);
     const version = await bumpHomepageVersion(supabase);
     return { version };
+  });
+
+export const saveFeaturedHomestays = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      accessToken: z.string().min(1),
+      slugs: z.array(z.string().min(1)).length(HOMESTAY_FEATURED_SLOT_COUNT),
+    }),
+  )
+  .handler(async ({ data }): Promise<{ slugs: string[] }> => {
+    const configError = getSupabaseConfigError();
+    if (configError) {
+      throw new Error(configError);
+    }
+
+    if (new Set(data.slugs).size !== HOMESTAY_FEATURED_SLOT_COUNT) {
+      throw new Error("Each featured slot must be a different homestay.");
+    }
+
+    await requireHomepageAdmin(data.accessToken);
+    const supabase = getSupabaseAdmin();
+    await writePlatformSetting(supabase, HOMESTAY_FEATURED_KEY, data.slugs);
+    invalidateHomestayCatalogCache();
+    return { slugs: data.slugs };
   });
 
 export const applyHomepagePhoto = createServerFn({ method: "POST" })

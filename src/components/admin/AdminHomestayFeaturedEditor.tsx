@@ -7,10 +7,9 @@ import { resolveAccessToken } from "@/lib/auth-session";
 import {
   HOMESTAY_FEATURED_SLOT_COUNT,
 } from "@/lib/homestay-featured-keys";
-import {
-  resolveFeaturedHomestays,
-  saveFeaturedHomestays,
-} from "@/lib/homestay-featured-fns";
+import { resolveFeaturedHomestays } from "@/lib/homestay-featured";
+import { saveFeaturedHomestays } from "@/lib/homepage-content-fns";
+import { toErrorMessage } from "@/lib/api/client";
 
 type AdminHomestayFeaturedEditorProps = {
   homestays: Homestay[];
@@ -86,7 +85,7 @@ export function AdminHomestayFeaturedEditor({
       setMessage("Featured homestays updated. Changes are live on the homestays page.");
       onSaved(result.slugs);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save featured homestays.");
+      setError(toErrorMessage(err, "Could not save featured homestays."));
     } finally {
       setBusy(false);
     }
@@ -111,7 +110,7 @@ export function AdminHomestayFeaturedEditor({
             <h2 className="luxury-panel-heading font-display text-xl tracking-wide">
               Top 3 homestays
             </h2>
-            <p className="luxury-panel-body mt-2 max-w-2xl text-sm">
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#4A0000]/80">
               Choose which three homestays appear in the &ldquo;Rest Where Stories Live&rdquo;
               section on the public homestays page.
             </p>
@@ -120,7 +119,7 @@ export function AdminHomestayFeaturedEditor({
             type="button"
             onClick={() => void save()}
             disabled={busy || !dirty}
-            className="inline-flex items-center gap-2 rounded-sm border border-ember/50 bg-ember/15 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-ember transition-colors hover:bg-ember/25 disabled:cursor-not-allowed disabled:opacity-45"
+            className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
             Save featured homestays
@@ -137,13 +136,13 @@ export function AdminHomestayFeaturedEditor({
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           {slots.map((slug, index) => (
             <label key={index} className="block space-y-2">
-              <span className="luxury-panel-body text-xs font-semibold uppercase tracking-[0.14em]">
+              <span className="luxury-panel-label block text-xs">
                 Featured slot {index + 1}
               </span>
               <select
                 value={slug}
                 onChange={(event) => updateSlot(index, event.target.value)}
-                className="w-full rounded-sm border border-[rgb(74_0_0/0.18)] bg-white px-3 py-2.5 text-sm text-foreground"
+                className="luxury-input"
               >
                 <option value="">Select homestay…</option>
                 {homestays.map((stay) => (
@@ -163,7 +162,7 @@ export function AdminHomestayFeaturedEditor({
 
       <LuxuryCheckoutPanel>
         <h3 className="luxury-panel-heading font-display text-lg tracking-wide">Live preview</h3>
-        <p className="luxury-panel-body mt-2 text-sm">
+        <p className="mt-2 text-sm leading-relaxed text-[#4A0000]/80">
           This is how the three cards will appear on `/homestays`.
         </p>
         <div className="mt-6 grid gap-6 md:grid-cols-3">

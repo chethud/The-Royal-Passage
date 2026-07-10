@@ -7,8 +7,8 @@ import { HomestayPillarsRow } from "@/components/homestays/HomestayPillarsRow";
 import { getHomestaysForUi } from "@/lib/homestay-fns";
 import {
   fetchFeaturedHomestaySlugs,
-  resolveFeaturedHomestays,
 } from "@/lib/homestay-featured-fns";
+import { resolveFeaturedHomestays } from "@/lib/homestay-featured";
 import { canonicalLink } from "@/lib/seo-helpers";
 import { SITE_URL } from "@/lib/seo";
 

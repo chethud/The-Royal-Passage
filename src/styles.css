@@ -1019,6 +1019,11 @@
   color: rgb(58 0 0 / 0.88);
 }
 
+.luxury-checkout-panel select.luxury-input option {
+  color: #3a0000;
+  background-color: #fffdf7;
+}
+
 .luxury-checkout-panel .hairline {
   background: linear-gradient(90deg, transparent, rgb(74 0 0 / 0.28), transparent);
 }

@@ -5,8 +5,8 @@ import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import {
   fetchFeaturedHomestaySlugs,
-  resolveFeaturedHomestays,
 } from "@/lib/homestay-featured-fns";
+import { resolveFeaturedHomestays } from "@/lib/homestay-featured";
 import { getHomestaysForUi } from "@/lib/homestay-fns";
 import { dashboardPathForRole } from "@/lib/roles";
 import { NOINDEX_META } from "@/lib/seo-helpers";
