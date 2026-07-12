@@ -19,6 +19,7 @@ from app.http_api import (
     admin_create_host,
     admin_experience_detail,
     admin_experiences,
+    admin_homestay_stats,
     admin_publish_experience,
     admin_reject_experience,
     admin_stats,
@@ -85,6 +86,7 @@ core_app = Starlette(
     routes=[
         Route("/healthz", healthz, methods=["GET"]),
         Route("/api/v1/admin/stats", admin_stats, methods=["GET"]),
+        Route("/api/v1/admin/homestay-stats", admin_homestay_stats, methods=["GET"]),
         Route("/api/v1/admin/bookings", admin_bookings, methods=["GET"]),
         Route("/api/v1/admin/bookings/{booking_id}", admin_booking_detail, methods=["GET"]),
         Route("/api/v1/admin/activity", admin_activity, methods=["GET"]),

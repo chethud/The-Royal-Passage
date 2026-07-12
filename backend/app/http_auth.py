@@ -6,6 +6,7 @@ from starlette.responses import JSONResponse
 from app.config import settings
 from app.dependencies.supabase import get_supabase_admin
 from app.services.profiles import ensure_user_profile
+from app.services.user_roles import profile_has_role
 
 
 def _read_bearer_token(request: Request) -> str | None:
@@ -45,7 +46,7 @@ def require_role_request(request: Request, role: str) -> dict | JSONResponse:
     auth = authenticate_request(request)
     if isinstance(auth, JSONResponse):
         return auth
-    if auth["profile"].get("role") != role:
+    if not profile_has_role(auth["profile"], role, get_supabase_admin()):
         return JSONResponse({"detail": f"{role.title()} access required."}, status_code=403)
     return auth
 

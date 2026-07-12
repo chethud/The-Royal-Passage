@@ -7,6 +7,7 @@ from app.config import settings
 from app.http_auth import require_admin_request
 from app.services.admin_analytics import (
     get_admin_booking_by_id,
+    get_admin_homestay_stats,
     get_admin_stats,
     list_admin_activity,
     list_admin_bookings,
@@ -41,7 +42,25 @@ async def admin_stats(request: Request) -> JSONResponse:
             {"detail": "Supabase is not configured on the API server."},
             status_code=503,
         )
-    return JSONResponse(get_admin_stats().model_dump(mode="json"))
+    try:
+        return JSONResponse(get_admin_stats().model_dump(mode="json"))
+    except Exception as exc:
+        return JSONResponse({"detail": f"Failed to load admin stats: {exc}"}, status_code=500)
+
+
+async def admin_homestay_stats(request: Request) -> JSONResponse:
+    auth = require_admin_request(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    if not settings.supabase_configured:
+        return JSONResponse(
+            {"detail": "Supabase is not configured on the API server."},
+            status_code=503,
+        )
+    try:
+        return JSONResponse(get_admin_homestay_stats().model_dump(mode="json"))
+    except Exception as exc:
+        return JSONResponse({"detail": f"Failed to load homestay stats: {exc}"}, status_code=500)
 
 
 async def admin_bookings(request: Request) -> JSONResponse:

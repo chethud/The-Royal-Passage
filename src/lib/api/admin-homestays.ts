@@ -1,4 +1,5 @@
 import { create } from "@bufbuild/protobuf";
+import { apiFetch } from "@/lib/api/client";
 import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
 import { AdminHomestayActionRequestSchema } from "@/gen/royalpassage/v1/service_pb";
 import type { OwnerHomestayRoom } from "@/lib/api/owner-homestays";
@@ -52,6 +53,28 @@ export type AdminHomestayDetail = {
   ownerVerified: boolean;
   licenseCertificateUrl: string | null;
 };
+
+export type AdminHomestayStats = {
+  totalOwners: number;
+  publishedHomestays: number;
+  pendingApprovals: number;
+  totalBookings: number;
+  pendingBookings: number;
+  confirmedBookings: number;
+  completedBookings: number;
+  cancelledBookings: number;
+  grossBookingValueMinor: number;
+  revenueCollectedMinor: number;
+  platformRevenueMinor: number;
+  ownerPayoutDueMinor: number;
+  codPendingCollectionMinor: number;
+  currencySymbol: string;
+  commissionPercent: number;
+};
+
+export function fetchAdminHomestayStats(accessToken: string) {
+  return apiFetch<AdminHomestayStats>("/api/v1/admin/homestay-stats", { accessToken });
+}
 
 export function fetchAdminHomestayApprovals(accessToken: string) {
   const client = createRoyalPassageClient(accessToken);

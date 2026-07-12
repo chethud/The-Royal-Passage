@@ -22,6 +22,7 @@ export function AuthTermsAcceptance({ id, checked, onCheckedChange }: AuthTermsA
           I agree to the{" "}
           <Link
             to={EXPERIENCE_TERMS_PATH}
+            search={{ from: "sign-in" }}
             target="_blank"
             rel="noreferrer"
             className="text-ember underline-offset-4 hover:underline"

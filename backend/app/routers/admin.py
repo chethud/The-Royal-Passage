@@ -6,6 +6,7 @@ from app.models.schemas import (
     AdminBookingRow,
     AdminExperienceDetail,
     AdminExperienceSummary,
+    AdminHomestayStats,
     AdminStats,
     AuditLogEntry,
     BookingSummary,
@@ -15,6 +16,7 @@ from app.models.schemas import (
 )
 from app.services.admin_analytics import (
     get_admin_booking_by_id,
+    get_admin_homestay_stats,
     get_admin_stats,
     list_admin_activity,
     list_admin_bookings,
@@ -36,6 +38,13 @@ def admin_stats(_auth=Depends(require_admin)):
     if not settings.supabase_configured:
         raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
     return get_admin_stats()
+
+
+@router.get("/homestay-stats", response_model=AdminHomestayStats)
+def admin_homestay_stats(_auth=Depends(require_admin)):
+    if not settings.supabase_configured:
+        raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
+    return get_admin_homestay_stats()
 
 
 @router.get("/bookings", response_model=list[AdminBookingRow])

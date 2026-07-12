@@ -1161,6 +1161,24 @@ class AdminStats(BaseModel):
     commissionPercent: float = 10.0
 
 
+class AdminHomestayStats(BaseModel):
+    totalOwners: int = 0
+    publishedHomestays: int = 0
+    pendingApprovals: int = 0
+    totalBookings: int = 0
+    pendingBookings: int = 0
+    confirmedBookings: int = 0
+    completedBookings: int = 0
+    cancelledBookings: int = 0
+    grossBookingValueMinor: int = 0
+    revenueCollectedMinor: int = 0
+    platformRevenueMinor: int = 0
+    ownerPayoutDueMinor: int = 0
+    codPendingCollectionMinor: int = 0
+    currencySymbol: str = "₹"
+    commissionPercent: float = 10.0
+
+
 class AdminBookingRow(BaseModel):
     id: str
     guestName: str | None
