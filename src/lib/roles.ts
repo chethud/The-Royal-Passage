@@ -92,6 +92,27 @@ export function resolveUserRoles(
   return [];
 }
 
+const ROLE_PRIORITY: UserRole[] = [
+  "admin",
+  "editor",
+  "host",
+  "homestay_owner",
+  "vip_owner",
+  "guest",
+];
+
+/** Highest-privilege role from a multi-role profile (admin wins over guest, etc.). */
+export function pickPrimaryRole(
+  roles: readonly UserRole[] | null | undefined,
+  fallbackRole?: UserRole | null,
+): UserRole | null {
+  const resolved = resolveUserRoles(roles, fallbackRole ?? null);
+  for (const role of ROLE_PRIORITY) {
+    if (resolved.includes(role)) return role;
+  }
+  return fallbackRole && isUserRole(fallbackRole) ? fallbackRole : null;
+}
+
 export function hasRole(
   roles: readonly UserRole[] | null | undefined,
   role: UserRole,
@@ -113,12 +134,7 @@ export function dashboardPathForRoles(
   roles: readonly UserRole[] | null | undefined,
   primaryRole?: UserRole | null,
 ): string {
-  const resolved = resolveUserRoles(roles, primaryRole ?? null);
-  const priority: UserRole[] = ["admin", "editor", "host", "homestay_owner", "vip_owner", "guest"];
-  for (const role of priority) {
-    if (resolved.includes(role)) return ROLE_DASHBOARD_PATH[role];
-  }
-  return dashboardPathForRole(primaryRole);
+  return dashboardPathForRole(pickPrimaryRole(roles, primaryRole));
 }
 
 export function isEditorRole(role: UserRole | null | undefined): boolean {

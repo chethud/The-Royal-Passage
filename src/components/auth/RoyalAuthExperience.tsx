@@ -5,7 +5,7 @@ import { AuthTermsAcceptance } from "@/components/auth/AuthTermsAcceptance";
 import { RoleBadge } from "@/components/auth/RoleBadge";
 import { AuthPageLayout } from "@/components/auth/AuthPageLayout";
 import { useAuthUser } from "@/lib/auth-user";
-import { dashboardPathForRole, isGuestAccount, isStaffRole, ROLE_LABELS } from "@/lib/roles";
+import { dashboardPathForRoles, isGuestAccount, isStaffRole, ROLE_LABELS } from "@/lib/roles";
 import {
   buildAuthRedirect,
   buildOAuthCallbackUrl,
@@ -45,7 +45,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   const [notice, setNotice] = useState<string | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const browserConfigured = isSupabaseBrowserConfigured();
-  const { user, displayName, role, loading } = useAuthUser();
+  const { user, displayName, role, roles, loading } = useAuthUser();
   const supabase = useMemo(() => {
     if (!browserConfigured) return null;
     return getSupabaseBrowser();
@@ -76,17 +76,17 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   useEffect(() => {
     if (loading || !user) return;
     if (isStaffRole(role)) {
-      void navigate({ to: dashboardPathForRole(role) });
+      void navigate({ to: dashboardPathForRoles(roles, role) });
       return;
     }
-    if (redirect && isGuestAccount(role) && redirect.startsWith("/")) {
+    if (redirect && isGuestAccount(role, roles) && redirect.startsWith("/")) {
       window.location.href = redirect;
       return;
     }
     if (role) {
-      void navigate({ to: dashboardPathForRole(role) });
+      void navigate({ to: dashboardPathForRoles(roles, role) });
     }
-  }, [loading, navigate, redirect, role, user]);
+  }, [loading, navigate, redirect, role, roles, user]);
 
   const isEmailNotConfirmedError = (message: string) => /email not confirmed/i.test(message);
 
@@ -367,7 +367,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
             <div className="mt-6 flex flex-col gap-3 text-center text-sm">
               {role ? (
                 <Link
-                  to={dashboardPathForRole(role)}
+                  to={dashboardPathForRoles(roles, role)}
                   className="text-ember underline-offset-4 hover:underline"
                 >
                   Go to {ROLE_LABELS[role]} dashboard →

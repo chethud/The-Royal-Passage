@@ -10,7 +10,7 @@ import type { User } from "@supabase/supabase-js";
 import { isApiConfigured } from "@/lib/api/client";
 import { fetchGuestProfile } from "@/lib/api/guest";
 import { ensureGuestProfile, fetchUserProfile, type UserProfile } from "@/lib/profiles";
-import { isUserRole, resolveUserRoles, type UserRole } from "@/lib/roles";
+import { isUserRole, pickPrimaryRole, resolveUserRoles, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 import { markVipSignupPromptPending } from "@/lib/vip-membership-prompt-storage";
 
@@ -90,16 +90,17 @@ function userDisplayName(
 }
 
 function mapApiGuestProfile(apiProfile: Awaited<ReturnType<typeof fetchGuestProfile>>): UserProfile {
-  const role = isUserRole(apiProfile.role) ? apiProfile.role : "guest";
+  const fallbackRole = isUserRole(apiProfile.role) ? apiProfile.role : "guest";
   const apiRoles = "roles" in apiProfile && Array.isArray(apiProfile.roles)
     ? apiProfile.roles.filter(isUserRole)
     : undefined;
+  const resolvedRoles = resolveUserRoles(apiRoles, fallbackRole);
   return {
     id: apiProfile.id,
     fullName: apiProfile.fullName,
     phone: apiProfile.phone,
-    role,
-    roles: resolveUserRoles(apiRoles, role),
+    role: pickPrimaryRole(resolvedRoles, fallbackRole) ?? fallbackRole,
+    roles: resolvedRoles,
     hostId: null,
   };
 }
@@ -222,7 +223,9 @@ function useAuthUserState(): AuthUserState {
     [cachedUser, profile, user],
   );
 
-  const role = profile?.role ?? (user ? cachedUser?.role : null) ?? null;
+  const role =
+    pickPrimaryRole(profile?.roles ?? cachedUser?.roles, profile?.role ?? cachedUser?.role) ??
+    null;
   const roles = useMemo(
     () => resolveUserRoles(profile?.roles ?? cachedUser?.roles, role),
     [cachedUser?.roles, profile?.roles, role],

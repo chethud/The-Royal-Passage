@@ -7,7 +7,7 @@ import { useAuthUser } from "@/lib/auth-user";
 import { fetchAdminStats, type AdminStats } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { resolveAccessToken } from "@/lib/auth-session";
-import { dashboardPathForRole } from "@/lib/roles";
+import { dashboardPathForRole, hasRole } from "@/lib/roles";
 import { NOINDEX_META } from "@/lib/seo-helpers";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
@@ -43,11 +43,11 @@ const EMPTY_STATS: AdminStats = {
 
 function AdminOverviewPage() {
   const navigate = useNavigate();
-  const { user, role, loading } = useAuthUser();
+  const { user, role, roles, loading, accessToken: authToken } = useAuthUser();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [analyticsError, setAnalyticsError] = useState<string | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
-  const [sessionReady, setSessionReady] = useState(false);
+  const isAdmin = hasRole(roles, "admin", role);
 
   useEffect(() => {
     if (loading) return;
@@ -55,10 +55,10 @@ function AdminOverviewPage() {
       void navigate({ to: "/sign-in" });
       return;
     }
-    if (role && role !== "admin") {
+    if (role && !isAdmin) {
       void navigate({ to: dashboardPathForRole(role) });
     }
-  }, [loading, navigate, role, user]);
+  }, [isAdmin, loading, navigate, role, user]);
 
   const loadAnalytics = useCallback(async () => {
     setAnalyticsLoading(true);
@@ -67,26 +67,23 @@ function AdminOverviewPage() {
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
-      // Force-refresh so we never send a JWT whose Supabase session row was revoked.
-      const token = await resolveAccessToken({ forceRefresh: true });
+      const token = authToken || (await resolveAccessToken());
       const statsRow = await fetchAdminStats(token);
       setStats(statsRow);
-      setSessionReady(true);
     } catch (err) {
       setAnalyticsError(toErrorMessage(err, "Failed to load analytics."));
       setStats(EMPTY_STATS);
-      setSessionReady(true);
     } finally {
       setAnalyticsLoading(false);
     }
-  }, []);
+  }, [authToken]);
 
   useEffect(() => {
-    if (!user || loading || role !== "admin") return;
+    if (!user || loading || !isAdmin) return;
     void loadAnalytics();
-  }, [user, loading, role, loadAnalytics]);
+  }, [user, loading, isAdmin, loadAnalytics]);
 
-  if (loading || !user || role !== "admin" || !sessionReady) {
+  if (loading || !user || !isAdmin) {
     return <PageLoadingGate />;
   }
 

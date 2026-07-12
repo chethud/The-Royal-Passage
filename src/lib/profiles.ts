@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { isUserRole, resolveUserRoles, type UserRole } from "@/lib/roles";
+import { isUserRole, pickPrimaryRole, resolveUserRoles, type UserRole } from "@/lib/roles";
 
 export type UserProfile = {
   id: string;
@@ -31,13 +31,15 @@ async function fetchRoleRows(supabase: SupabaseClient, userId: string): Promise<
 }
 
 function mapProfile(row: ProfileRow, roles: UserRole[]): UserProfile {
-  const primaryRole = isUserRole(row.role) ? row.role : "guest";
+  const fallbackRole = isUserRole(row.role) ? row.role : "guest";
+  const resolvedRoles = resolveUserRoles(roles, fallbackRole);
+  const primaryRole = pickPrimaryRole(resolvedRoles, fallbackRole) ?? fallbackRole;
   return {
     id: row.id,
     fullName: row.full_name,
     phone: row.phone,
     role: primaryRole,
-    roles: resolveUserRoles(roles, primaryRole),
+    roles: resolvedRoles,
     hostId: row.host_id,
   };
 }

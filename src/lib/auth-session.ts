@@ -1,7 +1,7 @@
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
 type ResolveAccessTokenOptions = {
-  /** Always rotate via refresh_token before returning. */
+  /** Prefer rotating via refresh_token before returning. */
   forceRefresh?: boolean;
   /** Friendly error when no session exists. */
   missingMessage?: string;
@@ -9,7 +9,11 @@ type ResolveAccessTokenOptions = {
 
 const DEFAULT_MISSING = "Sign in again to continue.";
 
-/** Fresh Supabase access token (refreshes when near expiry or when forced). */
+/**
+ * Fresh Supabase access token.
+ * Never force-refresh in a way that signs the user out on failure — fall back to
+ * the current session token instead.
+ */
 export async function resolveAccessToken(
   options: ResolveAccessTokenOptions = {},
 ): Promise<string> {
@@ -20,34 +24,30 @@ export async function resolveAccessToken(
   }
 
   const supabase = getSupabaseBrowser();
-
-  if (options.forceRefresh) {
-    const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
-    if (refreshError || !refreshed.session?.access_token) {
-      throw new Error("Session expired. Sign out and sign in again.");
-    }
-    return refreshed.session.access_token;
-  }
-
   const { data: sessionData, error } = await supabase.auth.getSession();
+  const currentToken = sessionData.session?.access_token ?? null;
 
-  if (error || !sessionData.session?.access_token) {
+  if (error || !currentToken) {
     throw new Error(missingMessage);
   }
 
-  const expiresAt = sessionData.session.expires_at;
+  const expiresAt = sessionData.session?.expires_at;
   const now = Math.floor(Date.now() / 1000);
-  const shouldRefresh = !expiresAt || expiresAt - now < 120;
+  const nearExpiry = !expiresAt || expiresAt - now < 120;
+  const shouldRefresh = Boolean(options.forceRefresh) || nearExpiry;
 
-  if (shouldRefresh) {
-    const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
-    if (refreshError || !refreshed.session?.access_token) {
-      throw new Error("Session expired. Sign out and sign in again.");
-    }
+  if (!shouldRefresh) {
+    return currentToken;
+  }
+
+  const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+  if (!refreshError && refreshed.session?.access_token) {
     return refreshed.session.access_token;
   }
 
-  return sessionData.session.access_token;
+  // Refresh failed — keep the existing token. Forcing a hard failure here can
+  // leave supabase-js in a signed-out state and bounce admins to /sign-in.
+  return currentToken;
 }
 
 export function isStaleSessionError(message: string): boolean {
@@ -65,7 +65,11 @@ export function isStaleSessionError(message: string): boolean {
 export async function refreshAccessTokenAfterAuthError(): Promise<string | null> {
   if (!isSupabaseBrowserConfigured()) return null;
   try {
-    return await resolveAccessToken({ forceRefresh: true });
+    const before = await resolveAccessToken();
+    const after = await resolveAccessToken({ forceRefresh: true });
+    // Only treat as success if we actually got a different token.
+    if (after && after !== before) return after;
+    return after || null;
   } catch {
     return null;
   }
