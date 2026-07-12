@@ -60,12 +60,13 @@ export function HeroSlideshow({
           src={current.src}
           alt={current.alt}
           loading={isFirstSlide ? "eager" : "lazy"}
-          decoding="async"
+          decoding={isFirstSlide ? "sync" : "async"}
           fetchPriority={isFirstSlide ? "high" : "low"}
           className="h-full w-full object-cover"
-          initial={reduceMotion ? false : { opacity: 0, scale: 1.02, filter: "blur(3px)" }}
-          animate={{ opacity: 1, scale: 1.04, filter: "blur(0px)" }}
-          exit={reduceMotion ? undefined : { opacity: 0, scale: 1.01, filter: "blur(4px)" }}
+          // Opacity-only transitions avoid filter-driven layout/paint thrash on first paint.
+          initial={reduceMotion || isFirstSlide ? false : { opacity: 0, scale: 1.02 }}
+          animate={{ opacity: 1, scale: 1.04 }}
+          exit={reduceMotion ? undefined : { opacity: 0, scale: 1.01 }}
           transition={{ duration: 0.9, ease: softEase }}
         />
       </AnimatePresence>

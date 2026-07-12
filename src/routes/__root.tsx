@@ -3,7 +3,18 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 import { AuthProvider } from "@/lib/auth-user";
 import { VipMembershipPrompt } from "@/components/vip/VipMembershipPrompt";
 import { Toaster } from "@/components/ui/sonner";
+import logoUrl from "@/assets/logo/logo.png?url";
 import appCss from "../styles.css?url";
+
+/** Slimmed family set — display=swap avoids invisible text while fonts load. */
+const GOOGLE_FONTS_HREF =
+  "https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap";
+
+/** Above-the-fold paint without waiting on the full stylesheet. */
+const CRITICAL_CSS = `
+html{background:#2a0808;color:#f7f1e8}
+body{margin:0;min-height:100%;background:#2a0808;color:#f7f1e8;font-family:Georgia,"Times New Roman",serif}
+`.replace(/\s+/g, " ").trim();
 
 function NotFoundComponent() {
   return (
@@ -51,6 +62,18 @@ export const Route = createRootRoute({
     ],
     links: [
       {
+        rel: "preload",
+        href: logoUrl,
+        as: "image",
+        type: "image/png",
+        fetchPriority: "high",
+      },
+      {
+        rel: "preload",
+        href: appCss,
+        as: "style",
+      },
+      {
         rel: "stylesheet",
         href: appCss,
       },
@@ -64,8 +87,19 @@ export const Route = createRootRoute({
         crossOrigin: "anonymous",
       },
       {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400;1,500&display=swap",
+        rel: "preload",
+        href: GOOGLE_FONTS_HREF,
+        as: "style",
+      },
+    ],
+    styles: [
+      {
+        children: CRITICAL_CSS,
+      },
+    ],
+    scripts: [
+      {
+        children: `(function(){var h=${JSON.stringify(GOOGLE_FONTS_HREF)};var l=document.createElement("link");l.rel="stylesheet";l.href=h;l.media="print";l.onload=function(){this.media="all";this.onload=null};document.head.appendChild(l)})();`,
       },
     ],
   }),
@@ -79,6 +113,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <noscript>
+          <link rel="stylesheet" href={GOOGLE_FONTS_HREF} />
+        </noscript>
       </head>
       <body>
         {children}

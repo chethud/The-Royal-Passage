@@ -130,10 +130,24 @@ export function Header() {
   const showAccountMenu = Boolean(user);
 
   useEffect(() => {
-    const onScroll = () => setElevated(window.scrollY > 20);
-    onScroll();
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        setElevated(window.scrollY > 20);
+      });
+    };
+    // Defer first read so it does not compete with LCP layout.
+    frame = window.requestAnimationFrame(() => {
+      frame = 0;
+      setElevated(window.scrollY > 20);
+    });
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -175,7 +189,8 @@ export function Header() {
             alt="The Royal Passage"
             width={320}
             height={110}
-            decoding="async"
+            decoding="sync"
+            loading="eager"
             fetchPriority="high"
             className="h-15 w-auto max-h-[calc(var(--header-height)-0.35rem)] max-w-[min(62vw,13.5rem)] object-contain object-left drop-shadow-[0_0_24px_oklch(0.75_0.12_86_/_0.45)] sm:h-16 sm:max-w-[min(50vw,14rem)] md:h-[6.75rem] md:max-w-none lg:h-[7.35rem]"
           />

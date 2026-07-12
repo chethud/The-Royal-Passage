@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
 import {
   CalendarDays,
   CalendarRange,
@@ -200,23 +200,30 @@ function FilterSection({
   const listRef = useRef<HTMLDivElement>(null);
   const [indicator, setIndicator] = useState<{ top: number; height: number } | null>(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const list = listRef.current;
     if (!list) return;
 
+    let frame = 0;
     const update = () => {
-      if (!activeKey) {
-        setIndicator(null);
-        return;
-      }
-      const active = list.querySelector<HTMLElement>(`[data-filter-key="${activeKey.replace(/"/g, '\\"')}"]`);
-      if (!active) {
-        setIndicator(null);
-        return;
-      }
-      setIndicator({
-        top: active.offsetTop,
-        height: active.offsetHeight,
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        if (!activeKey) {
+          setIndicator(null);
+          return;
+        }
+        const active = list.querySelector<HTMLElement>(
+          `[data-filter-key="${activeKey.replace(/"/g, '\\"')}"]`,
+        );
+        if (!active) {
+          setIndicator(null);
+          return;
+        }
+        // Read geometry in one frame, then write — avoids forced sync reflow.
+        const top = active.offsetTop;
+        const height = active.offsetHeight;
+        setIndicator({ top, height });
       });
     };
 
@@ -226,6 +233,7 @@ function FilterSection({
     const mutationObserver = new MutationObserver(update);
     mutationObserver.observe(list, { childList: true, subtree: true });
     return () => {
+      if (frame) window.cancelAnimationFrame(frame);
       resizeObserver.disconnect();
       mutationObserver.disconnect();
     };

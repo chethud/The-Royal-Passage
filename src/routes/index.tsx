@@ -8,7 +8,7 @@ import { PillarsRow } from "@/components/site/PillarsRow";
 import { JournalPreview } from "@/components/site/JournalPreview";
 import { getCatalogForUi, getCatalogFallback } from "@/lib/marketplace-fns";
 import { getHomepageContent } from "@/lib/homepage-content-fns";
-import { normalizeHomepageContent } from "@/lib/homepage-content";
+import { withHomepageCacheBust, normalizeHomepageContent } from "@/lib/homepage-content";
 import { buildHomeJsonLd, SITE_URL } from "@/lib/seo";
 import { ScrollParallaxSection } from "@/components/site/ScrollReveal";
 
@@ -25,25 +25,44 @@ export const Route = createFileRoute("/")({
     };
   },
   staleTime: 0,
-  head: () => ({
-    meta: [
-      { title: "The Royal Passage — Experience Mysuru, Royally" },
-      {
-        name: "description",
-        content:
-          "Curated experiences in Mysuru — heritage walks, culinary journeys, pottery, nature trails and bespoke royal expeditions hosted by trusted local experts.",
-      },
-      { property: "og:title", content: "The Royal Passage" },
-      {
-        property: "og:description",
-        content: "Experience Mysuru, Royally — curated, immersive, unforgettable.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: SITE_URL },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [{ rel: "canonical", href: SITE_URL }],
-  }),
+  head: ({ loaderData }) => {
+    const heroSrc = loaderData?.homepage?.hero?.[0]?.imageUrl;
+    const heroHref = heroSrc
+      ? withHomepageCacheBust(heroSrc, loaderData?.homepage?.version ?? 0)
+      : undefined;
+
+    return {
+      meta: [
+        { title: "The Royal Passage — Experience Mysuru, Royally" },
+        {
+          name: "description",
+          content:
+            "Curated experiences in Mysuru — heritage walks, culinary journeys, pottery, nature trails and bespoke royal expeditions hosted by trusted local experts.",
+        },
+        { property: "og:title", content: "The Royal Passage" },
+        {
+          property: "og:description",
+          content: "Experience Mysuru, Royally — curated, immersive, unforgettable.",
+        },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: SITE_URL },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [
+        { rel: "canonical", href: SITE_URL },
+        ...(heroHref
+          ? [
+              {
+                rel: "preload" as const,
+                href: heroHref,
+                as: "image" as const,
+                fetchPriority: "high" as const,
+              },
+            ]
+          : []),
+      ],
+    };
+  },
   component: Index,
 });
 
