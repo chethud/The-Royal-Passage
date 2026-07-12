@@ -72,7 +72,7 @@ export function useAdminModuleAlerts(): AdminModuleAlertsMap {
           ...experienceApprovals.map((row) => ({
             id: `exp-approval-${row.id}`,
             label: row.title,
-            detail: `New experience request · ${row.city || "Mysuru"}`,
+            detail: `New experience request · ${row.hostName || "Host"} · ${row.city || "Mysuru"}`,
             status: "Review",
             to: `/admin/experiences/${row.id}`,
           })),
