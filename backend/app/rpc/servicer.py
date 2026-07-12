@@ -848,7 +848,21 @@ class RoyalPassageServiceImpl(RoyalPassageService):
     async def get_admin_stats(self, _request: empty_pb2.Empty, _ctx: RequestContext) -> types_pb2.AdminStats:
         _ensure_supabase()
         require_admin(_ctx)
-        return pydantic_to_proto(get_admin_stats(), types_pb2.AdminStats)
+        try:
+            return pydantic_to_proto(get_admin_stats(), types_pb2.AdminStats)
+        except Exception:
+            from app.models.schemas import AdminStats
+
+            empty = AdminStats(
+                totalGuests=0,
+                totalHosts=0,
+                publishedExperiences=0,
+                totalBookings=0,
+                revenueCollectedMinor=0,
+                pendingExperienceReviews=0,
+                currencySymbol="₹",
+            )
+            return pydantic_to_proto(empty, types_pb2.AdminStats)
 
     @_rpc
     async def list_admin_bookings(

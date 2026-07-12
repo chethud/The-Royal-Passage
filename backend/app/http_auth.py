@@ -28,16 +28,26 @@ def authenticate_request(request: Request) -> dict | JSONResponse:
     if not token:
         return JSONResponse({"detail": "Missing bearer token."}, status_code=401)
 
-    supabase = get_supabase_admin()
-    result = supabase.auth.get_user(token)
-    user = result.user if result else None
+    try:
+        supabase = get_supabase_admin()
+        result = supabase.auth.get_user(token)
+        user = result.user if result else None
+    except Exception as exc:
+        return JSONResponse(
+            {"detail": f"Could not validate session: {exc}"},
+            status_code=401,
+        )
+
     if not user:
         return JSONResponse({"detail": "Invalid or expired token."}, status_code=401)
 
     try:
         profile = ensure_user_profile(supabase, user)
-    except ValueError as exc:
-        return JSONResponse({"detail": str(exc)}, status_code=500)
+    except Exception as exc:
+        return JSONResponse(
+            {"detail": f"Failed to load user profile: {exc}"},
+            status_code=500,
+        )
 
     return {"user": user, "profile": profile, "token": token}
 
@@ -46,7 +56,14 @@ def require_role_request(request: Request, role: str) -> dict | JSONResponse:
     auth = authenticate_request(request)
     if isinstance(auth, JSONResponse):
         return auth
-    if not profile_has_role(auth["profile"], role, get_supabase_admin()):
+    try:
+        allowed = profile_has_role(auth["profile"], role, get_supabase_admin())
+    except Exception as exc:
+        return JSONResponse(
+            {"detail": f"Failed to verify {role} access: {exc}"},
+            status_code=500,
+        )
+    if not allowed:
         return JSONResponse({"detail": f"{role.title()} access required."}, status_code=403)
     return auth
 

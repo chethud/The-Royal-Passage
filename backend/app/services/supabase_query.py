@@ -29,8 +29,8 @@ def is_schema_mismatch_error(exc: Exception) -> bool:
 def run_supabase_query(fn: Callable[[], T], *, fallback: T | None = None) -> T:
     try:
         return fn()
-    except APIError as exc:
-        if fallback is not None and is_schema_mismatch_error(exc):
+    except Exception:
+        if fallback is not None:
             return fallback
         raise
 

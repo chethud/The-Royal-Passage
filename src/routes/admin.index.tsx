@@ -62,6 +62,24 @@ function AdminOverviewPage() {
       setStats(statsRow);
     } catch (err) {
       setAnalyticsError(toErrorMessage(err, "Failed to load analytics."));
+      setStats({
+        totalGuests: 0,
+        totalHosts: 0,
+        publishedExperiences: 0,
+        totalBookings: 0,
+        revenueCollectedMinor: 0,
+        pendingExperienceReviews: 0,
+        currencySymbol: "₹",
+        confirmedBookings: 0,
+        pendingBookings: 0,
+        completedBookings: 0,
+        cancelledBookings: 0,
+        grossBookingValueMinor: 0,
+        platformRevenueMinor: 0,
+        hostPayoutDueMinor: 0,
+        codPendingCollectionMinor: 0,
+        commissionPercent: 10,
+      });
     } finally {
       setAnalyticsLoading(false);
     }
@@ -87,13 +105,23 @@ function AdminOverviewPage() {
         <LuxuryCheckoutPanel>
           {analyticsLoading ? (
             <p className="luxury-panel-body py-8 text-sm">Loading platform analytics…</p>
-          ) : analyticsError ? (
-            <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {analyticsError}
-            </p>
-          ) : stats ? (
-            <AdminStatsGrid stats={stats} />
-          ) : null}
+          ) : (
+            <>
+              {analyticsError ? (
+                <div className="mb-5 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                  <p>{analyticsError}</p>
+                  <button
+                    type="button"
+                    className="luxury-btn-sm luxury-btn-panel-outline mt-3"
+                    onClick={() => void loadAnalytics()}
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : null}
+              {stats ? <AdminStatsGrid stats={stats} /> : null}
+            </>
+          )}
         </LuxuryCheckoutPanel>
 
         {stats ? (

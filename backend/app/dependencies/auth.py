@@ -14,26 +14,39 @@ async def get_current_user(
     if not credentials or not credentials.credentials:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing bearer token.")
 
-    supabase = get_supabase_admin()
-    result = supabase.auth.get_user(credentials.credentials)
-    user = result.user if result else None
+    try:
+        supabase = get_supabase_admin()
+        result = supabase.auth.get_user(credentials.credentials)
+        user = result.user if result else None
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Could not validate session: {exc}",
+        ) from exc
 
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token.")
 
     try:
         row = ensure_user_profile(supabase, user)
-    except ValueError as exc:
+    except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(exc),
+            detail=f"Failed to load user profile: {exc}",
         ) from exc
 
     return {"user": user, "profile": row, "token": credentials.credentials}
 
 
 async def require_admin(auth=Depends(get_current_user)):
-    if not profile_has_role(auth["profile"], "admin", get_supabase_admin()):
+    try:
+        allowed = profile_has_role(auth["profile"], "admin", get_supabase_admin())
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to verify admin access: {exc}",
+        ) from exc
+    if not allowed:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required.")
     return auth
 

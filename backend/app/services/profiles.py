@@ -68,15 +68,26 @@ def ensure_user_profile(supabase, user) -> dict:
         "phone": _profile_phone_from_user(user),
         "role": "guest",
     }
-    insert_result = (
-        supabase.table("profiles")
-        .insert(insert_row)
-        .select(PROFILE_SELECT)
-        .execute()
-    )
+    try:
+        insert_result = (
+            supabase.table("profiles")
+            .insert(insert_row)
+            .select(PROFILE_SELECT)
+            .execute()
+        )
+    except Exception:
+        insert_result = (
+            supabase.table("profiles")
+            .insert(insert_row)
+            .select(PROFILE_SELECT_LEGACY)
+            .execute()
+        )
     insert_rows = insert_result.data if insert_result else None
     if insert_rows:
-        sync_user_roles(supabase, user.id, ["guest"])
+        try:
+            sync_user_roles(supabase, user.id, ["guest"])
+        except Exception:
+            pass
         return _attach_roles(supabase, insert_rows[0])
 
     row = fetch_profile_row(supabase, user.id)

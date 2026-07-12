@@ -17,23 +17,31 @@ def _read_bearer_token(ctx: RequestContext) -> str:
 
 def resolve_current_user(ctx: RequestContext) -> dict:
     token = _read_bearer_token(ctx)
-    supabase = get_supabase_admin()
-    result = supabase.auth.get_user(token)
-    user = result.user if result else None
+    try:
+        supabase = get_supabase_admin()
+        result = supabase.auth.get_user(token)
+        user = result.user if result else None
+    except Exception as exc:
+        raise ConnectError(Code.UNAUTHENTICATED, f"Could not validate session: {exc}") from exc
+
     if not user:
         raise ConnectError(Code.UNAUTHENTICATED, "Invalid or expired token.")
 
     try:
         row = ensure_user_profile(supabase, user)
-    except ValueError as exc:
-        raise ConnectError(Code.INTERNAL, str(exc)) from exc
+    except Exception as exc:
+        raise ConnectError(Code.INTERNAL, f"Failed to load user profile: {exc}") from exc
 
     return {"user": user, "profile": row, "token": token}
 
 
 def require_admin(ctx: RequestContext) -> dict:
     auth = resolve_current_user(ctx)
-    if not profile_has_role(auth["profile"], "admin", get_supabase_admin()):
+    try:
+        allowed = profile_has_role(auth["profile"], "admin", get_supabase_admin())
+    except Exception as exc:
+        raise ConnectError(Code.INTERNAL, f"Failed to verify admin access: {exc}") from exc
+    if not allowed:
         raise ConnectError(Code.PERMISSION_DENIED, "Admin access required.")
     return auth
 

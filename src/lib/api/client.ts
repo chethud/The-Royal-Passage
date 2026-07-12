@@ -150,17 +150,18 @@ export async function apiFetch<T>(
   }
 
   if (!response.ok) {
-    let detail = response.statusText;
+    let detail = "";
     try {
       const json = (await response.json()) as { detail?: unknown; message?: unknown };
       detail =
         formatApiDetail(json.detail) ??
         formatApiDetail(json.message) ??
-        detail;
+        "";
     } catch {
       // ignore parse errors
     }
-    throw new Error(detail || `API request failed (${response.status})`);
+    const statusHint = response.statusText?.trim() || `HTTP ${response.status}`;
+    throw new Error(detail || `API request failed (${statusHint})`);
   }
 
   return (await response.json()) as T;
