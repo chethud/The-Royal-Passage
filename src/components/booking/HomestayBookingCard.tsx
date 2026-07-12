@@ -11,6 +11,7 @@ import {
   bookingCardRowClass,
   bookingCardSecondaryActionClass,
   bookingCardSubtitleClass,
+  bookingCardThumbClass,
   bookingCardThumbPlaceholderClass,
   bookingCardTitleClass,
   type BookingCardSurface,
@@ -28,17 +29,22 @@ type HomestayBookingCardProps = {
 
 export function HomestayBookingCard({ booking, surface = "light" }: HomestayBookingCardProps) {
   const isLight = surface === "light";
+  const imageUrl = booking.homestayImageUrl?.trim() || null;
 
   return (
     <article className={isLight ? bookingCardRowClass : "glass-strong overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-4"}>
       <div className={isLight ? bookingCardLayoutClass : "space-y-4"}>
         {isLight ? (
-          <div
-            className={`${bookingCardThumbPlaceholderClass} flex items-center justify-center`}
-            aria-hidden
-          >
-            <House className="h-7 w-7 text-[rgb(74_0_0/0.35)]" strokeWidth={1.5} />
-          </div>
+          imageUrl ? (
+            <img src={imageUrl} alt="" className={bookingCardThumbClass} loading="lazy" />
+          ) : (
+            <div
+              className={`${bookingCardThumbPlaceholderClass} flex items-center justify-center`}
+              aria-hidden
+            >
+              <House className="h-7 w-7 text-[rgb(74_0_0/0.35)]" strokeWidth={1.5} />
+            </div>
+          )
         ) : null}
 
         <div className={isLight ? bookingCardContentClass : "space-y-4"}>
