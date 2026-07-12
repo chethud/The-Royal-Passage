@@ -1,5 +1,4 @@
 import { PayAtHomestayBadge } from "@/components/homestays/PayAtHomestayBadge";
-import { HomestayDateCalendar } from "@/components/homestays/HomestayDateCalendar";
 import {
   BookingFieldLabel,
   BookingIntro,
@@ -55,6 +54,9 @@ type HomestayBookingPanelProps = {
   bookable?: boolean;
 };
 
+const dateFieldClass =
+  "w-full min-w-0 rounded-sm border border-[rgb(74_0_0/0.14)] bg-white px-2.5 py-2 text-sm text-[#3A0000] focus:border-[#4A0000]/35 focus:outline-none";
+
 export function HomestayBookingPanel({
   stay,
   checkIn,
@@ -96,6 +98,15 @@ export function HomestayBookingPanel({
   const extraBedsPerRoom = extraBedsPerRoomForSelection(stay, selectedRoom);
   const showExtraBeds = maxExtraBeds > 0;
   const extraBedUnit = selectedRoom || getActiveRooms(stay).length > 0 ? "room" : "bedroom";
+  const today = new Date().toISOString().slice(0, 10);
+  const checkOutMin = checkIn || today;
+
+  const handleCheckInChange = (next: string) => {
+    onCheckInChange(next);
+    if (next && checkOut && checkOut <= next) {
+      onCheckOutChange("");
+    }
+  };
 
   return (
     <BookingPanelStack>
@@ -104,20 +115,38 @@ export function HomestayBookingPanel({
       </BookingIntro>
 
       <div>
-        <BookingFieldLabel>Select dates on the calendar</BookingFieldLabel>
+        <BookingFieldLabel>Stay dates</BookingFieldLabel>
         <p className="luxury-panel-body mb-3 mt-1 text-xs leading-relaxed">
-          Weekends and holiday prices are marked. Tap check-in, then check-out to book those nights.
+          Choose your check-in and check-out dates. Weekend and holiday prices apply automatically.
         </p>
-        <HomestayDateCalendar
-          checkIn={checkIn}
-          checkOut={checkOut}
-          datePrices={stay.datePrices}
-          currencySymbol={sym}
-          onRangeChange={(nextCheckIn, nextCheckOut) => {
-            onCheckInChange(nextCheckIn);
-            onCheckOutChange(nextCheckOut);
-          }}
-        />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <label className="block min-w-0">
+            <span className="eyebrow luxury-panel-label mb-1.5 block">Check-in</span>
+            <input
+              type="date"
+              min={today}
+              value={checkIn}
+              onChange={(event) => handleCheckInChange(event.target.value)}
+              className={dateFieldClass}
+            />
+          </label>
+          <label className="block min-w-0">
+            <span className="eyebrow luxury-panel-label mb-1.5 block">Check-out</span>
+            <input
+              type="date"
+              min={checkOutMin}
+              value={checkOut}
+              onChange={(event) => onCheckOutChange(event.target.value)}
+              className={dateFieldClass}
+            />
+          </label>
+        </div>
+        {checkIn && checkOut && checkOut > checkIn ? (
+          <p className="luxury-panel-body mt-2 text-xs">
+            {formatDateLong(checkIn)} → {formatDateLong(checkOut)} · {nights} night
+            {nights === 1 ? "" : "s"}
+          </p>
+        ) : null}
       </div>
 
       {rooms.length > 1 ? (

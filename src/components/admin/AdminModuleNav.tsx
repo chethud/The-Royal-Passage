@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Compass, Crown, Home } from "lucide-react";
 import {
   adminModuleHome,
@@ -6,7 +6,11 @@ import {
   resolveAdminModule,
   type AdminModule,
 } from "@/components/admin/admin-nav";
-import { useNavBadges } from "@/hooks/use-nav-badges";
+import {
+  adminModuleAlertTotal,
+  useAdminModuleAlerts,
+  type AdminModuleAlert,
+} from "@/hooks/use-admin-module-alerts";
 
 const modules: {
   id: AdminModule;
@@ -38,10 +42,24 @@ type AdminModuleNavProps = {
   className?: string;
 };
 
+function alertHref(alert: Pick<AdminModuleAlert, "to" | "search">): string {
+  if (!alert.search || Object.keys(alert.search).length === 0) return alert.to;
+  const params = new URLSearchParams(alert.search);
+  return `${alert.to}?${params.toString()}`;
+}
+
 export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
+  const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const activeModule = resolveAdminModule(pathname);
-  const badges = useNavBadges();
+  const alertsByModule = useAdminModuleAlerts();
+
+  const goTo = (target: Pick<AdminModuleAlert, "to" | "search">) => {
+    void navigate({
+      to: target.to,
+      search: target.search,
+    });
+  };
 
   return (
     <nav aria-label="Admin modules" className={`marketplace-module-nav ${className}`}>
@@ -49,34 +67,66 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
         {modules.map((module) => {
           const active = activeModule === module.id;
           const Icon = module.icon;
-          const to = adminModuleHome(module.id);
+          const homePath = adminModuleHome(module.id);
           const queuePath = adminModuleQueuePath(module.id);
-          const pending = badges[queuePath] ?? 0;
+          const alerts = alertsByModule[module.id];
+          const pendingTotal = adminModuleAlertTotal(alerts);
+          const primaryAlert = alerts[0] ?? { to: queuePath, search: undefined };
 
           return (
-            <div
-              key={module.id}
-              className={`marketplace-module-nav__item${active ? " marketplace-module-nav__item--active" : ""}`}
-            >
-              <Link
-                to={to}
-                className="marketplace-module-nav__link"
-                aria-current={active ? "page" : undefined}
+            <div key={module.id} className="marketplace-module-nav__column">
+              <div
+                className={`marketplace-module-nav__item${active ? " marketplace-module-nav__item--active" : ""}`}
               >
-                <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
-                <span className="marketplace-module-nav__label">{module.label}</span>
-                <span className="marketplace-module-nav__hint">{module.description}</span>
-              </Link>
-              {pending > 0 ? (
-                <Link
-                  to={queuePath}
-                  className="marketplace-module-nav__badge"
-                  aria-label={`${pending} pending ${module.label.toLowerCase()} approval${pending === 1 ? "" : "s"}`}
-                  title="View recent approvals"
+                <button
+                  type="button"
+                  className="marketplace-module-nav__link"
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => goTo({ to: homePath })}
                 >
-                  {pending > 9 ? "9+" : pending}
-                </Link>
-              ) : null}
+                  <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+                  <span className="marketplace-module-nav__label">{module.label}</span>
+                  <span className="marketplace-module-nav__hint">{module.description}</span>
+                </button>
+                {pendingTotal > 0 ? (
+                  <a
+                    href={alertHref(primaryAlert)}
+                    className="marketplace-module-nav__badge"
+                    aria-label={`${pendingTotal} new items for ${module.label}`}
+                    title="View latest updates"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      goTo(primaryAlert);
+                    }}
+                  >
+                    {pendingTotal > 9 ? "9+" : pendingTotal}
+                  </a>
+                ) : null}
+              </div>
+
+              {alerts.length > 0 ? (
+                <ul className="marketplace-module-nav__alerts" aria-label={`${module.label} updates`}>
+                  {alerts.map((alert) => (
+                    <li key={alert.id}>
+                      <a
+                        href={alertHref(alert)}
+                        className="marketplace-module-nav__alert"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          goTo(alert);
+                        }}
+                      >
+                        <span className="marketplace-module-nav__alert-count">
+                          {alert.count > 9 ? "9+" : alert.count}
+                        </span>
+                        <span className="marketplace-module-nav__alert-label">{alert.label}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="marketplace-module-nav__alerts-empty">No new updates</p>
+              )}
             </div>
           );
         })}
