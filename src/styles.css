@@ -363,11 +363,12 @@
   box-shadow: 0 0 12px #c8a25a66;
 }
 
-/* Account profile dropdown — royal glass panel */
+/* Account profile dropdown — royal glass panel; Sign out stays pinned */
 .header-account-menu {
+  display: flex;
+  flex-direction: column;
+  max-height: min(85dvh, var(--radix-dropdown-menu-content-available-height, 85dvh));
   overflow: hidden;
-  max-height: min(85dvh, 40rem);
-  overflow-y: auto;
   border: 1px solid oklch(0.76 0.1 78 / 0.28);
   border-radius: 10px;
   background:
@@ -381,6 +382,7 @@
 
 .header-account-menu__header {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 0.75rem;
   border-bottom: 1px solid oklch(0.72 0.09 78 / 0.16);
@@ -427,13 +429,33 @@
 }
 
 .header-account-menu__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 0.35rem 0.45rem 0.25rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 .header-account-menu__footer {
-  border-top: 1px solid oklch(0.72 0.09 78 / 0.14);
-  padding: 0.35rem 0.45rem 0.45rem;
-  background: oklch(0.12 0.05 20 / 0.35);
+  flex-shrink: 0;
+  border-top: 1px solid oklch(0.72 0.09 78 / 0.22);
+  padding: 0.4rem 0.45rem 0.5rem;
+  background: oklch(0.12 0.05 20 / 0.55);
+}
+
+.header-account-menu__footer .header-account-menu__item {
+  padding: 0.45rem 0.55rem;
+}
+
+.header-account-menu__footer .header-account-menu__icon {
+  height: 1.75rem;
+  width: 1.75rem;
+}
+
+.header-account-menu__footer .header-account-menu__item-label {
+  font-size: 0.75rem;
 }
 
 .header-account-menu__section {

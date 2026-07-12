@@ -132,8 +132,8 @@ export function AccountDropdownMenu({
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        collisionPadding={12}
-        className="header-account-menu z-[100] w-[min(22rem,calc(100vw-1.25rem))] max-w-[calc(100vw-1.25rem)] p-0"
+        collisionPadding={16}
+        className="header-account-menu z-[100] flex w-[min(22rem,calc(100vw-1.25rem))] max-h-[min(85dvh,var(--radix-dropdown-menu-content-available-height))] max-w-[calc(100vw-1.25rem)] flex-col overflow-hidden p-0"
       >
         <div className="header-account-menu__header">
           <span className="header-account-menu__avatar" aria-hidden>
