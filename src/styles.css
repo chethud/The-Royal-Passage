@@ -6,7 +6,7 @@
 
 @theme inline {
   --font-display: "Cinzel", ui-serif, Georgia, serif;
-  --font-sans: "Cormorant Garamond", ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;
   --font-royal: "Cinzel Decorative", "Cinzel", ui-serif, Georgia, serif;
 
   --radius-sm: 2px;
@@ -1090,16 +1090,17 @@
   box-shadow: 0 0 0 2px rgb(200 162 90 / 0.45);
 }
 
-/* Marketplace module switcher — Experiences | Homestays */
+/* Marketplace module switcher — Experiences | Homestays | VIP */
 .marketplace-module-nav__inner {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.65rem;
-  max-width: 42rem;
+  max-width: 56rem;
   margin-inline: auto;
 }
 
 .marketplace-module-nav__item {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -1115,6 +1116,17 @@
     background 0.25s ease,
     color 0.25s ease,
     box-shadow 0.25s ease;
+}
+
+.marketplace-module-nav__link {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  width: 100%;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
 }
 
 .marketplace-module-nav__item:hover {
@@ -1140,6 +1152,7 @@
 }
 
 .marketplace-module-nav__hint {
+  font-family: var(--font-sans);
   font-size: 0.68rem;
   letter-spacing: 0.04em;
   color: rgb(247 241 232 / 0.55);
@@ -1147,6 +1160,35 @@
 
 .marketplace-module-nav__item--active .marketplace-module-nav__hint {
   color: rgb(212 175 106 / 0.85);
+}
+
+.marketplace-module-nav__badge {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  z-index: 1;
+  display: inline-flex;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--ember, #c45c26);
+  color: var(--primary-foreground, #fff8ef);
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  box-shadow: 0 4px 12px -4px rgb(0 0 0 / 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.marketplace-module-nav__badge:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px -4px rgb(196 92 38 / 0.55);
 }
 
 .luxury-checkout-panel .marketplace-module-nav__item {
@@ -1170,16 +1212,31 @@
 }
 
 @media (min-width: 640px) {
-  .marketplace-module-nav__item {
+  .marketplace-module-nav__item,
+  .marketplace-module-nav__link {
     flex-direction: row;
     align-items: center;
     gap: 0.65rem;
+  }
+
+  .marketplace-module-nav__item {
     padding: 0.9rem 1.1rem;
   }
 
   .marketplace-module-nav__hint {
     margin-left: auto;
     text-align: right;
+    padding-right: 1.6rem;
+  }
+
+  .marketplace-module-nav__badge {
+    top: 50%;
+    right: 0.7rem;
+    transform: translateY(-50%);
+  }
+
+  .marketplace-module-nav__badge:hover {
+    transform: translateY(-50%) scale(1.08);
   }
 }
 
@@ -2465,7 +2522,7 @@
 
 .royal-gate-decree__eyebrow {
   text-align: center;
-  font-family: "Cormorant Garamond", var(--font-display, Georgia, serif);
+  font-family: var(--font-sans);
   font-style: italic;
   font-size: 0.85rem;
   letter-spacing: 0.18em;
@@ -3775,7 +3832,7 @@
   margin-top: 0.5rem;
   max-width: 36rem;
   text-align: center;
-  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   line-height: 1.5;
   color: oklch(0.72 0.03 86);
@@ -3997,7 +4054,7 @@
 .royal-passport-book__privileges-copy,
 .royal-passport-book__privileges-note {
   margin: 0;
-  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-family: var(--font-sans);
   font-size: clamp(0.78rem, 0.94vw, 0.92rem);
   font-weight: 600;
   line-height: 1.45;
@@ -4170,7 +4227,7 @@ a.royal-passport-book__vip-label:hover {
 
 .royal-passport-book__vip-status-message {
   margin: 0.65rem 0 0;
-  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-family: var(--font-sans);
   font-size: clamp(0.72rem, 0.92vw, 0.88rem);
   font-weight: 600;
   font-style: italic;
@@ -4221,7 +4278,7 @@ a.royal-passport-book__vip-label:hover {
   width: auto;
   margin: 0;
   text-align: left;
-  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-family: var(--font-sans);
   font-size: clamp(1.22rem, 1.52vw, 1.48rem);
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -4318,7 +4375,7 @@ a.royal-passport-book__vip-label:hover {
 }
 
 .royal-passport-book__label {
-  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-family: var(--font-sans);
   font-size: clamp(0.68rem, 0.82vw, 0.8rem);
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -4335,7 +4392,7 @@ a.royal-passport-book__vip-label:hover {
   margin: 0;
   outline: none;
   box-shadow: none;
-  font-family: "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-family: var(--font-sans);
   font-size: var(--passport-field-font-size);
   font-weight: 600;
   line-height: 1.3;

@@ -1,8 +1,7 @@
 export type PublicSiteModule = "experiences" | "homestays" | "vip";
 
-/** Fixed public navbar: Home first, then Experiences and Homestays. */
+/** Fixed public navbar: Experiences and Homestays. */
 export const PUBLIC_GUEST_NAV_ITEMS = [
-  { label: "Home", to: "/" },
   { label: "Experiences", to: "/experiences" },
   { label: "Homestays", to: "/homestays" },
 ] as const;

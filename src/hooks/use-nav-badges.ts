@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchAdminHomestayApprovals } from "@/lib/api/admin-homestays";
+import { fetchAdminVipPackageApprovals } from "@/lib/api/admin-vip-packages";
 import { fetchAdminStats } from "@/lib/api/admin";
 import { isApiConfigured } from "@/lib/api/client";
 import { fetchHostDashboard } from "@/lib/api/host";
@@ -22,14 +23,16 @@ export function useNavBadges(): NavBadgeMap {
     const load = async () => {
       try {
         if (role === "admin") {
-          const [stats, homestays] = await Promise.all([
+          const [stats, homestays, vipPackages] = await Promise.all([
             fetchAdminStats(accessToken),
             fetchAdminHomestayApprovals(accessToken).catch(() => []),
+            fetchAdminVipPackageApprovals(accessToken).catch(() => []),
           ]);
           if (cancelled) return;
           setBadges({
             "/admin/experiences": stats.pendingExperienceReviews,
             "/admin/homestays": homestays.length,
+            "/admin/vip-packages": vipPackages.length,
           });
           return;
         }

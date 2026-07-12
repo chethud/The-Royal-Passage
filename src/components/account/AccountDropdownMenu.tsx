@@ -2,7 +2,6 @@ import type { ComponentType } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   History,
-  Home,
   Image,
   LayoutDashboard,
   LogOut,
@@ -111,7 +110,6 @@ export function AccountDropdownMenu({
   onProfile,
   onLogout,
 }: AccountDropdownMenuProps) {
-  const homePath = isVipSection ? "/vips" : isHomestaySection ? "/homestays" : "/";
   const historyLabel = isVipSection ? "My bookings" : isHomestaySection ? "My stays" : "History";
   const historyDescription = isVipSection
     ? "VIP package reservations"
@@ -154,20 +152,12 @@ export function AccountDropdownMenu({
               to={dashboardPath}
             />
           ) : isGuest ? (
-            <>
-              <AccountMenuItem
-                icon={Home}
-                label="Home"
-                description="Return to the main passage"
-                to={homePath}
-              />
-              <AccountMenuItem
-                icon={History}
-                label={historyLabel}
-                description={historyDescription}
-                to="/dashboard/history"
-              />
-            </>
+            <AccountMenuItem
+              icon={History}
+              label={historyLabel}
+              description={historyDescription}
+              to="/dashboard/history"
+            />
           ) : (
             <AccountMenuItem
               icon={LayoutDashboard}

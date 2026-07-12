@@ -306,11 +306,6 @@ export function Header() {
                       </>
                     ) : isGuest ? (
                       <>
-                        <MobileNavLink
-                          to={isVipSection ? "/vips" : isHomestaySection ? "/homestays" : "/"}
-                        >
-                          Home
-                        </MobileNavLink>
                         <MobileNavLink to="/dashboard/history">
                           {isVipSection ? "My bookings" : isHomestaySection ? "My stays" : "History"}
                         </MobileNavLink>

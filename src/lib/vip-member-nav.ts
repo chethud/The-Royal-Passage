@@ -5,7 +5,6 @@ export const VIP_MEMBER_NAV_ITEMS = [
 ] as const;
 
 export const GUEST_SIGNED_IN_NAV_ITEMS = [
-  { to: "/", label: "Home" },
   { to: "/experiences", label: "Experiences" },
   { to: "/homestays", label: "Homestays" },
 ] as const;

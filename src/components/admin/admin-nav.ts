@@ -53,6 +53,13 @@ export function adminModuleHome(module: AdminModule): string {
   return "/admin";
 }
 
+/** Pending-approval queue for each admin marketplace module. */
+export function adminModuleQueuePath(module: AdminModule): string {
+  if (module === "homestays") return "/admin/homestays";
+  if (module === "vip") return "/admin/vip-packages";
+  return "/admin/experiences";
+}
+
 export function adminModuleLabel(module: AdminModule): string {
   if (module === "homestays") return "Homestays admin";
   if (module === "vip") return "VIP admin";

@@ -24,12 +24,6 @@ export function AuthPageLayout({ title, subtitle, children }: AuthPageLayoutProp
               className="h-16 w-auto object-contain object-left sm:h-20"
             />
           </Link>
-          <Link
-            to="/"
-            className="text-xs font-medium uppercase tracking-[0.14em] text-ink/65 transition-colors hover:text-ember"
-          >
-            Home
-          </Link>
         </header>
 
         <main className="flex flex-1 flex-col justify-center py-8 sm:py-10">
