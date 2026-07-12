@@ -4767,3 +4767,35 @@ a.royal-passport-book__vip-label:hover {
     animation: none;
   }
 }
+
+/* Experiences refine filters — vertical selection rail */
+.experiences-filter-rail__track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: rgb(212 175 106 / 0.28);
+  pointer-events: none;
+}
+
+.experiences-filter-rail__thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  margin-left: -0.5px;
+  background: #d4af6a;
+  box-shadow: 0 0 10px rgb(212 175 106 / 0.45);
+  pointer-events: none;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .experiences-filter-rail__thumb {
+    transition: none;
+  }
+}

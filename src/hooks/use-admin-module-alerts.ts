@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchAdminHomestayApprovals,
   fetchAdminHomestayBookings,
@@ -69,14 +69,63 @@ function withoutDismissed(
   };
 }
 
+function collectAlertIds(alerts: AdminModuleAlertsMap): string[] {
+  return [
+    ...alerts.experiences,
+    ...alerts.homestays,
+    ...alerts.vip,
+  ].map((alert) => alert.id);
+}
+
+function hasAnyAlerts(alerts: AdminModuleAlertsMap): boolean {
+  return (
+    alerts.experiences.length > 0 ||
+    alerts.homestays.length > 0 ||
+    alerts.vip.length > 0
+  );
+}
+
+function mergeAlerts(
+  current: AdminModuleAlertsMap,
+  incoming: AdminModuleAlertsMap,
+): AdminModuleAlertsMap {
+  const mergeList = (a: AdminModuleAlert[], b: AdminModuleAlert[]) => {
+    const seen = new Set(a.map((item) => item.id));
+    return [...a, ...b.filter((item) => !seen.has(item.id))];
+  };
+  return {
+    experiences: mergeList(current.experiences, incoming.experiences),
+    homestays: mergeList(current.homestays, incoming.homestays),
+    vip: mergeList(current.vip, incoming.vip),
+  };
+}
+
 export function useAdminModuleAlerts(): {
   alerts: AdminModuleAlertsMap;
-  dismissAlert: (alertId: string) => void;
 } {
   const { accessToken, role, roles } = useAuthUser();
   const [rawAlerts, setRawAlerts] = useState<AdminModuleAlertsMap>(EMPTY_ALERTS);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => readDismissedAlertIds());
+  const [visitAlerts, setVisitAlerts] = useState<AdminModuleAlertsMap | null>(null);
+  const visitLockedRef = useRef(false);
   const isAdmin = hasRole(roles, "admin", role);
+
+  const markSeen = useCallback((ids: string[]) => {
+    if (ids.length === 0) return;
+    setDismissedIds((prev) => {
+      let changed = false;
+      const next = new Set(prev);
+      for (const id of ids) {
+        if (!next.has(id)) {
+          next.add(id);
+          changed = true;
+        }
+      }
+      if (!changed) return prev;
+      writeDismissedAlertIds(next);
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     if (!accessToken || !isApiConfigured() || !isAdmin) {
@@ -98,7 +147,7 @@ export function useAdminModuleAlerts(): {
           fetchAdminExperienceApprovals(accessToken).catch(() => []),
           fetchAdminBookings(accessToken).catch(() => []),
           fetchAdminHomestayApprovals(accessToken).catch(() => []),
-          fetchAdminHomestayBookings(accessToken, ["pending", "cancelled"]).catch(() => []),
+          fetchAdminHomestayBookings(accessToken, ["pending"]).catch(() => []),
           fetchAdminVipPackageApprovals(accessToken).catch(() => []),
         ]);
         if (cancelled) return;
@@ -118,15 +167,6 @@ export function useAdminModuleAlerts(): {
               label: row.experienceTitle,
               detail: `${row.guestName?.trim() || "Guest"} · ${row.slotDate || "Date TBD"} · new booking request`,
               status: "Pending",
-              to: `/admin/bookings/${row.id}`,
-            })),
-          ...experienceBookings
-            .filter((row) => row.bookingStatus === "cancelled")
-            .map((row) => ({
-              id: `exp-cancelled-${row.id}`,
-              label: row.experienceTitle,
-              detail: `${row.guestName?.trim() || "Guest"} · ${row.slotDate || "Date TBD"} · cancelled booking`,
-              status: "Cancelled",
               to: `/admin/bookings/${row.id}`,
             })),
         ];
@@ -150,15 +190,6 @@ export function useAdminModuleAlerts(): {
               label: row.homestayTitle,
               detail: `${row.guestName?.trim() || "Guest"} · ${formatStayDates(row.checkIn, row.checkOut)} · new stay request`,
               status: "Pending",
-              to: "/admin/homestay",
-            })),
-          ...homestayBookings
-            .filter((row) => row.bookingStatus === "cancelled")
-            .map((row) => ({
-              id: `stay-cancelled-${row.id}`,
-              label: row.homestayTitle,
-              detail: `${row.guestName?.trim() || "Guest"} · ${formatStayDates(row.checkIn, row.checkOut)} · cancelled stay`,
-              status: "Cancelled",
               to: "/admin/homestay",
             })),
         ];
@@ -185,22 +216,35 @@ export function useAdminModuleAlerts(): {
     };
   }, [accessToken, isAdmin]);
 
-  const dismissAlert = useCallback((alertId: string) => {
-    setDismissedIds((prev) => {
-      if (prev.has(alertId)) return prev;
-      const next = new Set(prev);
-      next.add(alertId);
-      writeDismissedAlertIds(next);
-      return next;
-    });
-  }, []);
-
-  const alerts = useMemo(
+  const freshAlerts = useMemo(
     () => withoutDismissed(rawAlerts, dismissedIds),
     [dismissedIds, rawAlerts],
   );
 
-  return { alerts, dismissAlert };
+  // Once alerts are shown on the dashboard, mark them all seen so the next
+  // visit does not require opening each item. Keep this visit's list visible.
+  useEffect(() => {
+    if (!visitLockedRef.current) {
+      if (!hasAnyAlerts(freshAlerts)) return;
+
+      visitLockedRef.current = true;
+      setVisitAlerts(freshAlerts);
+
+      const ids = collectAlertIds(freshAlerts);
+      // Defer so React Strict Mode remounts do not wipe alerts before paint.
+      const timer = window.setTimeout(() => markSeen(ids), 400);
+      return () => window.clearTimeout(timer);
+    }
+
+    const newcomers = withoutDismissed(rawAlerts, dismissedIds);
+    if (!hasAnyAlerts(newcomers)) return;
+
+    setVisitAlerts((prev) => mergeAlerts(prev ?? EMPTY_ALERTS, newcomers));
+    const timer = window.setTimeout(() => markSeen(collectAlertIds(newcomers)), 400);
+    return () => window.clearTimeout(timer);
+  }, [dismissedIds, freshAlerts, markSeen, rawAlerts]);
+
+  return { alerts: visitAlerts ?? freshAlerts };
 }
 
 export function adminModuleAlertTotal(alerts: AdminModuleAlert[]): number {

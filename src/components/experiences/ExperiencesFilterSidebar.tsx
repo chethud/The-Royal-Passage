@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
 import {
   CalendarDays,
   CalendarRange,
@@ -123,8 +123,12 @@ function FilterPanels({
 }) {
   return (
     <>
-      <FilterSection title="Category">
+      <FilterSection
+        title="Category"
+        activeKey={search.category ?? "__all__"}
+      >
         <FilterOption
+          optionKey="__all__"
           active={!search.category}
           label="All categories"
           Icon={Grid3X3}
@@ -133,6 +137,7 @@ function FilterPanels({
         {categories.map((category) => (
           <FilterOption
             key={category}
+            optionKey={category}
             active={search.category === category}
             label={category}
             Icon={categoryIconForLabel(category)}
@@ -143,10 +148,11 @@ function FilterPanels({
         ))}
       </FilterSection>
 
-      <FilterSection title="Duration">
+      <FilterSection title="Duration" activeKey={search.duration}>
         {DURATION_OPTIONS.map(({ id, label, shortLabel, Icon }) => (
           <FilterOption
             key={id}
+            optionKey={id}
             active={search.duration === id}
             label={label}
             displayLabel={shortLabel}
@@ -161,10 +167,11 @@ function FilterPanels({
         ))}
       </FilterSection>
 
-      <FilterSection title="When">
+      <FilterSection title="When" activeKey={search.availability}>
         {AVAILABILITY_OPTIONS.map(({ id, label, Icon }) => (
           <FilterOption
             key={id}
+            optionKey={id}
             active={search.availability === id}
             label={label}
             Icon={Icon}
@@ -181,26 +188,85 @@ function FilterPanels({
   );
 }
 
-function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
+function FilterSection({
+  title,
+  children,
+  activeKey,
+}: {
+  title: string;
+  children: ReactNode;
+  activeKey?: string;
+}) {
+  const listRef = useRef<HTMLDivElement>(null);
+  const [indicator, setIndicator] = useState<{ top: number; height: number } | null>(null);
+
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    const update = () => {
+      if (!activeKey) {
+        setIndicator(null);
+        return;
+      }
+      const active = list.querySelector<HTMLElement>(`[data-filter-key="${activeKey.replace(/"/g, '\\"')}"]`);
+      if (!active) {
+        setIndicator(null);
+        return;
+      }
+      setIndicator({
+        top: active.offsetTop,
+        height: active.offsetHeight,
+      });
+    };
+
+    update();
+    const resizeObserver = new ResizeObserver(update);
+    resizeObserver.observe(list);
+    const mutationObserver = new MutationObserver(update);
+    mutationObserver.observe(list, { childList: true, subtree: true });
+    return () => {
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+    };
+  }, [activeKey]);
+
   return (
     <div>
       <h3 className="eyebrow mb-3 text-[0.62rem] tracking-[0.2em] text-[#D4AF6A]/90">{title}</h3>
-      <div className="flex flex-col gap-0.5">{children}</div>
+      <div className="experiences-filter-rail relative pl-3">
+        <div className="experiences-filter-rail__track" aria-hidden />
+        {indicator ? (
+          <div
+            className="experiences-filter-rail__thumb"
+            aria-hidden
+            style={{
+              transform: `translateY(${indicator.top}px)`,
+              height: `${indicator.height}px`,
+            }}
+          />
+        ) : null}
+        <div ref={listRef} className="relative flex flex-col gap-0.5">
+          {children}
+        </div>
+      </div>
     </div>
   );
 }
 
 function FilterOption({
+  optionKey,
   active,
   label,
   displayLabel,
   Icon,
   onClick,
 }: {
+  optionKey: string;
   active?: boolean;
   label: string;
   displayLabel?: string;
-  Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  Icon: ComponentType<{ className?: string; strokeWidth?: number }>;
   onClick?: () => void;
 }) {
   const text = displayLabel ?? shortCategoryLabel(label);
@@ -208,13 +274,12 @@ function FilterOption({
   return (
     <button
       type="button"
+      data-filter-key={optionKey}
       aria-label={label}
       aria-pressed={active}
       onClick={onClick}
-      className={`group flex w-full items-center gap-2.5 border-l-2 py-2 pl-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]/50 ${
-        active
-          ? "border-[#D4AF6A] text-[#F7F1E8]"
-          : "border-transparent text-[#F7F1E8]/65 hover:border-[#C8A25A]/35 hover:text-[#F7F1E8]"
+      className={`group flex w-full items-center gap-2.5 py-2 pl-2 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]/50 ${
+        active ? "text-[#F7F1E8]" : "text-[#F7F1E8]/65 hover:text-[#F7F1E8]"
       }`}
     >
       <Icon
