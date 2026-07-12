@@ -33,8 +33,15 @@ def authenticate_request(request: Request) -> dict | JSONResponse:
         result = supabase.auth.get_user(token)
         user = result.user if result else None
     except Exception as exc:
+        message = str(exc)
+        lowered = message.lower()
+        if "session_id" in lowered or "session from session_id" in lowered:
+            message = (
+                "Session expired or revoked. Sign out and sign in again "
+                f"(details: {exc})"
+            )
         return JSONResponse(
-            {"detail": f"Could not validate session: {exc}"},
+            {"detail": f"Could not validate session: {message}"},
             status_code=401,
         )
 

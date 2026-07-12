@@ -22,6 +22,13 @@ def resolve_current_user(ctx: RequestContext) -> dict:
         result = supabase.auth.get_user(token)
         user = result.user if result else None
     except Exception as exc:
+        message = str(exc)
+        lowered = message.lower()
+        if "session_id" in lowered or "session from session_id" in lowered:
+            raise ConnectError(
+                Code.UNAUTHENTICATED,
+                "Session expired or revoked. Sign out and sign in again.",
+            ) from exc
         raise ConnectError(Code.UNAUTHENTICATED, f"Could not validate session: {exc}") from exc
 
     if not user:

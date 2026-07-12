@@ -66,6 +66,13 @@ function humanizeErrorMessage(message: string, fallback: string): string {
   if (lowered.includes("does not exist") && lowered.includes("relation")) {
     return CRYPTIC_ERROR_MESSAGES.from_json;
   }
+  if (
+    lowered.includes("session from session_id") ||
+    lowered.includes("session_id claim") ||
+    lowered.includes("could not validate session")
+  ) {
+    return "Your sign-in session expired. Click Retry, or sign out and sign in again.";
+  }
   if (lowered === "failed to fetch") {
     return "Cannot reach the API. Set VITE_API_BASE_URL on Vercel and SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY on Render, then redeploy both.";
   }
@@ -119,25 +126,26 @@ function formatApiDetail(detail: unknown): string | null {
 
 export async function apiFetch<T>(
   path: string,
-  options: RequestInit & { accessToken?: string } = {},
+  options: RequestInit & { accessToken?: string; _authRetry?: boolean } = {},
 ): Promise<T> {
   const base = readApiBaseUrl();
   if (!base) {
     throw new Error("VITE_API_BASE_URL is not configured.");
   }
 
-  const headers = new Headers(options.headers);
-  if (!headers.has("Content-Type") && options.body) {
+  const { accessToken, _authRetry, ...requestInit } = options;
+  const headers = new Headers(requestInit.headers);
+  if (!headers.has("Content-Type") && requestInit.body) {
     headers.set("Content-Type", "application/json");
   }
-  if (options.accessToken) {
-    headers.set("Authorization", `Bearer ${options.accessToken}`);
+  if (accessToken) {
+    headers.set("Authorization", `Bearer ${accessToken}`);
   }
 
   let response: Response;
   try {
     response = await fetch(`${base}${path}`, {
-      ...options,
+      ...requestInit,
       headers,
     });
   } catch (err) {
@@ -161,7 +169,31 @@ export async function apiFetch<T>(
       // ignore parse errors
     }
     const statusHint = response.statusText?.trim() || `HTTP ${response.status}`;
-    throw new Error(detail || `API request failed (${statusHint})`);
+    const message = detail || `API request failed (${statusHint})`;
+
+    // Stale JWT / deleted session — refresh once and retry.
+    if (
+      !_authRetry &&
+      accessToken &&
+      response.status === 401 &&
+      typeof window !== "undefined"
+    ) {
+      const { isStaleSessionError, refreshAccessTokenAfterAuthError } = await import(
+        "@/lib/auth-session"
+      );
+      if (isStaleSessionError(message)) {
+        const nextToken = await refreshAccessTokenAfterAuthError();
+        if (nextToken) {
+          return apiFetch<T>(path, {
+            ...requestInit,
+            accessToken: nextToken,
+            _authRetry: true,
+          });
+        }
+      }
+    }
+
+    throw new Error(message);
   }
 
   return (await response.json()) as T;

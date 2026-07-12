@@ -6,8 +6,8 @@ import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import { fetchAdminStats, type AdminStats } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
+import { resolveAccessToken } from "@/lib/auth-session";
 import { dashboardPathForRole } from "@/lib/roles";
-import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { NOINDEX_META } from "@/lib/seo-helpers";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
@@ -22,13 +22,32 @@ export const Route = createFileRoute("/admin/")({
   component: AdminOverviewPage,
 });
 
+const EMPTY_STATS: AdminStats = {
+  totalGuests: 0,
+  totalHosts: 0,
+  publishedExperiences: 0,
+  totalBookings: 0,
+  revenueCollectedMinor: 0,
+  pendingExperienceReviews: 0,
+  currencySymbol: "₹",
+  confirmedBookings: 0,
+  pendingBookings: 0,
+  completedBookings: 0,
+  cancelledBookings: 0,
+  grossBookingValueMinor: 0,
+  platformRevenueMinor: 0,
+  hostPayoutDueMinor: 0,
+  codPendingCollectionMinor: 0,
+  commissionPercent: 10,
+};
+
 function AdminOverviewPage() {
   const navigate = useNavigate();
   const { user, role, loading } = useAuthUser();
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [analyticsError, setAnalyticsError] = useState<string | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
+  const [sessionReady, setSessionReady] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -41,56 +60,33 @@ function AdminOverviewPage() {
     }
   }, [loading, navigate, role, user]);
 
-  useEffect(() => {
-    if (!user) return;
-    void getSupabaseBrowser()
-      .auth.getSession()
-      .then(({ data }) => {
-        setAccessToken(data.session?.access_token ?? null);
-      });
-  }, [user]);
-
   const loadAnalytics = useCallback(async () => {
-    if (!accessToken) return;
     setAnalyticsLoading(true);
     setAnalyticsError(null);
     try {
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
-      const statsRow = await fetchAdminStats(accessToken);
+      // Force-refresh so we never send a JWT whose Supabase session row was revoked.
+      const token = await resolveAccessToken({ forceRefresh: true });
+      const statsRow = await fetchAdminStats(token);
       setStats(statsRow);
+      setSessionReady(true);
     } catch (err) {
       setAnalyticsError(toErrorMessage(err, "Failed to load analytics."));
-      setStats({
-        totalGuests: 0,
-        totalHosts: 0,
-        publishedExperiences: 0,
-        totalBookings: 0,
-        revenueCollectedMinor: 0,
-        pendingExperienceReviews: 0,
-        currencySymbol: "₹",
-        confirmedBookings: 0,
-        pendingBookings: 0,
-        completedBookings: 0,
-        cancelledBookings: 0,
-        grossBookingValueMinor: 0,
-        platformRevenueMinor: 0,
-        hostPayoutDueMinor: 0,
-        codPendingCollectionMinor: 0,
-        commissionPercent: 10,
-      });
+      setStats(EMPTY_STATS);
+      setSessionReady(true);
     } finally {
       setAnalyticsLoading(false);
     }
-  }, [accessToken]);
+  }, []);
 
   useEffect(() => {
-    if (!accessToken) return;
+    if (!user || loading || role !== "admin") return;
     void loadAnalytics();
-  }, [accessToken, loadAnalytics]);
+  }, [user, loading, role, loadAnalytics]);
 
-  if (loading || !user || role !== "admin" || !accessToken) {
+  if (loading || !user || role !== "admin" || !sessionReady) {
     return <PageLoadingGate />;
   }
 
