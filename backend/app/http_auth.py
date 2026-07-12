@@ -6,7 +6,12 @@ from starlette.responses import JSONResponse
 from app.config import settings
 from app.dependencies.supabase import get_supabase_admin
 from app.services.profiles import ensure_user_profile
+from app.services.ttl_cache import TtlCache, token_cache_key
 from app.services.user_roles import profile_has_role
+
+# Avoid repeating Supabase Auth get_user on every notification poll.
+_auth_user_cache: TtlCache[object] = TtlCache(ttl_seconds=45.0, max_size=256)
+_profile_cache: TtlCache[dict] = TtlCache(ttl_seconds=45.0, max_size=256)
 
 
 def _read_bearer_token(request: Request) -> str | None:
@@ -15,6 +20,20 @@ def _read_bearer_token(request: Request) -> str | None:
         return None
     token = auth[7:].strip()
     return token or None
+
+
+def _resolve_auth_user(token: str):
+    cache_key = token_cache_key(token)
+    cached = _auth_user_cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    supabase = get_supabase_admin()
+    result = supabase.auth.get_user(token)
+    user = result.user if result else None
+    if user is not None:
+        _auth_user_cache.set(cache_key, user)
+    return user
 
 
 def authenticate_request(request: Request) -> dict | JSONResponse:
@@ -29,9 +48,7 @@ def authenticate_request(request: Request) -> dict | JSONResponse:
         return JSONResponse({"detail": "Missing bearer token."}, status_code=401)
 
     try:
-        supabase = get_supabase_admin()
-        result = supabase.auth.get_user(token)
-        user = result.user if result else None
+        user = _resolve_auth_user(token)
     except Exception as exc:
         message = str(exc)
         lowered = message.lower()
@@ -49,7 +66,11 @@ def authenticate_request(request: Request) -> dict | JSONResponse:
         return JSONResponse({"detail": "Invalid or expired token."}, status_code=401)
 
     try:
-        profile = ensure_user_profile(supabase, user)
+        profile_key = f"profile:{user.id}"
+        profile = _profile_cache.get(profile_key)
+        if profile is None:
+            profile = ensure_user_profile(get_supabase_admin(), user)
+            _profile_cache.set(profile_key, profile)
     except Exception as exc:
         return JSONResponse(
             {"detail": f"Failed to load user profile: {exc}"},
@@ -57,6 +78,32 @@ def authenticate_request(request: Request) -> dict | JSONResponse:
         )
 
     return {"user": user, "profile": profile, "token": token}
+
+
+def authenticate_request_user_only(request: Request) -> dict | JSONResponse:
+    """Fast auth for endpoints that only need user.id (skips profile/roles)."""
+    if not settings.supabase_configured:
+        return JSONResponse(
+            {"detail": "Supabase is not configured on the API server."},
+            status_code=503,
+        )
+
+    token = _read_bearer_token(request)
+    if not token:
+        return JSONResponse({"detail": "Missing bearer token."}, status_code=401)
+
+    try:
+        user = _resolve_auth_user(token)
+    except Exception as exc:
+        return JSONResponse(
+            {"detail": f"Could not validate session: {exc}"},
+            status_code=401,
+        )
+
+    if not user:
+        return JSONResponse({"detail": "Invalid or expired token."}, status_code=401)
+
+    return {"user": user, "token": token}
 
 
 def require_role_request(request: Request, role: str) -> dict | JSONResponse:

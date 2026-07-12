@@ -61,7 +61,10 @@ function AdminBookingsPage() {
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
-      const rows = await fetchAdminBookings(accessToken);
+      const rows = await fetchAdminBookings(accessToken, {
+        limit: 200,
+        autoComplete: true,
+      });
       setBookings(rows);
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to load bookings."));

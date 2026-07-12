@@ -144,8 +144,8 @@ export function useAdminModuleAlerts(): {
           homestayBookings,
           vipPackages,
         ] = await Promise.all([
-          fetchAdminExperienceApprovals(accessToken).catch(() => []),
-          fetchAdminBookings(accessToken).catch(() => []),
+          fetchAdminExperienceApprovals(accessToken, 30).catch(() => []),
+          fetchAdminBookings(accessToken, { status: "pending", limit: 40 }).catch(() => []),
           fetchAdminHomestayApprovals(accessToken).catch(() => []),
           fetchAdminHomestayBookings(accessToken, ["pending"]).catch(() => []),
           fetchAdminVipPackageApprovals(accessToken).catch(() => []),
@@ -209,7 +209,7 @@ export function useAdminModuleAlerts(): {
     };
 
     void load();
-    const id = window.setInterval(() => void load(), 60_000);
+    const id = window.setInterval(() => void load(), 90_000);
     return () => {
       cancelled = true;
       window.clearInterval(id);

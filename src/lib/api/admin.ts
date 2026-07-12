@@ -141,8 +141,12 @@ export type AdminExperienceDetail = {
   hostVerified: boolean;
 };
 
-export function fetchAdminExperienceApprovals(accessToken: string) {
-  return apiFetch<AdminExperienceSummary[]>("/api/v1/admin/experiences", { accessToken });
+export function fetchAdminExperienceApprovals(accessToken: string, limit = 50) {
+  const capped = Math.max(1, Math.min(limit, 100));
+  return apiFetch<AdminExperienceSummary[]>(
+    `/api/v1/admin/experiences?limit=${capped}`,
+    { accessToken },
+  );
 }
 
 /** @deprecated Use fetchAdminExperienceApprovals */
@@ -220,8 +224,20 @@ export function fetchAdminStats(accessToken: string) {
   return apiFetch<AdminStats>("/api/v1/admin/stats", { accessToken });
 }
 
-export function fetchAdminBookings(accessToken: string) {
-  return apiFetch<AdminBookingRow[]>("/api/v1/admin/bookings", { accessToken }).then((rows) =>
+export function fetchAdminBookings(
+  accessToken: string,
+  options?: { status?: string | string[]; limit?: number; autoComplete?: boolean },
+) {
+  const params = new URLSearchParams();
+  if (options?.status) {
+    const status = Array.isArray(options.status) ? options.status.join(",") : options.status;
+    if (status) params.set("status", status);
+  }
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  if (options?.autoComplete) params.set("autoComplete", "1");
+  const qs = params.toString();
+  const path = qs ? `/api/v1/admin/bookings?${qs}` : "/api/v1/admin/bookings";
+  return apiFetch<AdminBookingRow[]>(path, { accessToken }).then((rows) =>
     rows.map(normalizeAdminBookingRow),
   );
 }

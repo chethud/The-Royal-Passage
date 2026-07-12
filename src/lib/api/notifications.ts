@@ -25,10 +25,11 @@ function normalizeNotification(raw: NotificationSummary): NotificationSummary {
   };
 }
 
-export function fetchNotifications(accessToken: string) {
-  return apiFetch<NotificationSummary[]>("/api/v1/notifications", { accessToken }).then((rows) =>
-    rows.map((row) => normalizeNotification(row)),
-  );
+export function fetchNotifications(accessToken: string, limit = 20) {
+  const capped = Math.max(1, Math.min(limit, 50));
+  return apiFetch<NotificationSummary[]>(`/api/v1/notifications?limit=${capped}`, {
+    accessToken,
+  }).then((rows) => rows.map((row) => normalizeNotification(row)));
 }
 
 export function markNotificationRead(accessToken: string, notificationId: string) {

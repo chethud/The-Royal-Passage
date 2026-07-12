@@ -77,6 +77,7 @@ def auto_complete_due_confirmed_bookings(
     *,
     experience_ids: list[str] | None = None,
     guest_id: str | None = None,
+    limit: int = 100,
 ) -> int:
     try:
         query = (
@@ -84,6 +85,8 @@ def auto_complete_due_confirmed_bookings(
             .select("*, experience_slots ( slot_date, start_time, end_time )")
             .eq("booking_status", "confirmed")
             .eq("is_paused", False)
+            .order("created_at", desc=False)
+            .limit(limit)
         )
         if experience_ids:
             query = query.in_("experience_id", experience_ids)
@@ -97,6 +100,7 @@ def auto_complete_due_confirmed_bookings(
                 supabase.table("bookings")
                 .select("id, guest_id, booking_status, payment_status, is_paused, experience_slots ( slot_date, start_time, end_time )")
                 .eq("booking_status", "confirmed")
+                .limit(limit)
             )
             if experience_ids:
                 query = query.in_("experience_id", experience_ids)

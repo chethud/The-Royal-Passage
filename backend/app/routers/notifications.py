@@ -13,10 +13,10 @@ router = APIRouter(prefix="/api/v1/notifications", tags=["notifications"])
 
 
 @router.get("", response_model=list[NotificationSummary])
-def get_notifications(auth=Depends(get_current_user)):
+def get_notifications(limit: int | None = None, auth=Depends(get_current_user)):
     if not settings.supabase_configured:
         raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
-    return list_user_notifications(auth)
+    return list_user_notifications(auth, limit=limit)
 
 
 @router.post("/{notification_id}/read", response_model=NotificationSummary)

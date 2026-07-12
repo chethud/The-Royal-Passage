@@ -1,3 +1,5 @@
+import time
+
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import AdminBookingRow, AdminHomestayBookingRow, AdminHomestayStats, AdminStats
 from app.services.audit import list_recent_audit_logs
@@ -7,6 +9,13 @@ from app.services.booking_auto_complete import (
 )
 from app.services.bookings import BOOKING_SELECT, _map_booking_row
 from app.services.supabase_query import run_supabase_query
+from app.services.ttl_cache import TtlCache
+
+# Auto-complete on every admin bookings list blocked the single worker for seconds.
+_AUTO_COMPLETE_MIN_INTERVAL_S = 300.0
+_last_admin_auto_complete_at = 0.0
+_admin_bookings_cache: TtlCache[list[AdminBookingRow]] = TtlCache(ttl_seconds=15.0, max_size=32)
+_admin_stats_cache: TtlCache[AdminStats] = TtlCache(ttl_seconds=20.0, max_size=4)
 
 
 def _as_int(value, default: int = 0) -> int:
@@ -57,6 +66,10 @@ def _count_rows(supabase, table: str, **filters) -> int:
 
 
 def get_admin_stats() -> AdminStats:
+    cached = _admin_stats_cache.get("stats")
+    if cached is not None:
+        return cached
+
     try:
         supabase = get_supabase_admin()
         commission_percent = _get_commission_percent(supabase)
@@ -67,12 +80,14 @@ def get_admin_stats() -> AdminStats:
         pending_reviews = _count_rows(supabase, "experiences", status="pending_review")
 
         try:
+            # Aggregate columns only — never pull nested joins for the overview.
             bookings_result = (
                 supabase.table("bookings")
                 .select(
                     "booking_status, payment_status, total_amount, subtotal_minor, "
                     "platform_fee_minor, host_payout_minor"
                 )
+                .limit(2000)
                 .execute()
             )
             rows = bookings_result.data or []
@@ -120,7 +135,7 @@ def get_admin_stats() -> AdminStats:
                 else:
                     cod_pending_collection_minor += total
 
-        return AdminStats(
+        stats = AdminStats(
             totalGuests=total_guests,
             totalHosts=total_hosts,
             publishedExperiences=published_experiences,
@@ -138,6 +153,8 @@ def get_admin_stats() -> AdminStats:
             codPendingCollectionMinor=cod_pending_collection_minor,
             commissionPercent=commission_percent,
         )
+        _admin_stats_cache.set("stats", stats)
+        return stats
     except Exception:
         # Never blank the admin overview — return zeros if analytics cannot load.
         return AdminStats(
@@ -297,20 +314,46 @@ def list_admin_homestay_bookings(
     return rows
 
 
-def list_admin_bookings(limit: int = 500) -> list[AdminBookingRow]:
-    supabase = get_supabase_admin()
+def _maybe_run_admin_auto_complete(supabase) -> None:
+    """Throttle bulk auto-complete so list endpoints stay responsive."""
+    global _last_admin_auto_complete_at
+    now = time.monotonic()
+    if now - _last_admin_auto_complete_at < _AUTO_COMPLETE_MIN_INTERVAL_S:
+        return
+    _last_admin_auto_complete_at = now
     try:
         auto_complete_due_confirmed_bookings(supabase)
     except Exception:
         pass
+
+
+def list_admin_bookings(
+    limit: int = 100,
+    *,
+    statuses: list[str] | None = None,
+    run_auto_complete: bool = False,
+) -> list[AdminBookingRow]:
+    capped = max(1, min(int(limit or 100), 500))
+    status_key = ",".join(statuses) if statuses else "all"
+    cache_key = f"bookings:{status_key}:{capped}:{int(run_auto_complete)}"
+    cached = _admin_bookings_cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    supabase = get_supabase_admin()
+    if run_auto_complete:
+        _maybe_run_admin_auto_complete(supabase)
+
     try:
-        result = (
+        query = (
             supabase.table("bookings")
             .select(BOOKING_SELECT)
             .order("created_at", desc=True)
-            .limit(limit)
-            .execute()
+            .limit(capped)
         )
+        if statuses:
+            query = query.in_("booking_status", statuses)
+        result = query.execute()
     except Exception:
         return []
 
@@ -319,7 +362,6 @@ def list_admin_bookings(limit: int = 500) -> list[AdminBookingRow]:
         summary = _map_booking_row(row)
         exp = row.get("experiences") or {}
         host = exp.get("hosts") or {}
-        currency = row.get("currency_code") or "INR"
         rows.append(
             AdminBookingRow(
                 id=summary.id,
@@ -338,6 +380,7 @@ def list_admin_bookings(limit: int = 500) -> list[AdminBookingRow]:
                 isPaused=summary.isPaused,
             )
         )
+    _admin_bookings_cache.set(cache_key, rows)
     return rows
 
 

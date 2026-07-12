@@ -47,7 +47,10 @@ async def admin_stats(request: Request) -> JSONResponse:
             status_code=503,
         )
     try:
-        return JSONResponse(get_admin_stats().model_dump(mode="json"))
+        return JSONResponse(
+            get_admin_stats().model_dump(mode="json"),
+            headers={"Cache-Control": "private, max-age=20"},
+        )
     except Exception as exc:
         from app.models.schemas import AdminStats
 
@@ -98,8 +101,30 @@ async def admin_bookings(request: Request) -> JSONResponse:
     auth = require_admin_request(request)
     if isinstance(auth, JSONResponse):
         return auth
-    rows = [row.model_dump(mode="json") for row in list_admin_bookings()]
-    return JSONResponse(rows)
+    status_raw = (request.query_params.get("status") or "").strip()
+    statuses = [part.strip() for part in status_raw.split(",") if part.strip()] or None
+    try:
+        limit = int(request.query_params.get("limit") or 100)
+    except ValueError:
+        limit = 100
+    # Full bookings page may refresh auto-complete; alert polls must stay cheap.
+    run_auto = (request.query_params.get("autoComplete") or "").lower() in {
+        "1",
+        "true",
+        "yes",
+    }
+    rows = [
+        row.model_dump(mode="json")
+        for row in list_admin_bookings(
+            limit=limit,
+            statuses=statuses,
+            run_auto_complete=run_auto and not statuses,
+        )
+    ]
+    return JSONResponse(
+        rows,
+        headers={"Cache-Control": "private, max-age=10"},
+    )
 
 
 async def admin_booking_detail(request: Request) -> JSONResponse:
@@ -134,8 +159,18 @@ async def admin_experiences(request: Request) -> JSONResponse:
     auth = require_admin_request(request)
     if isinstance(auth, JSONResponse):
         return auth
-    rows = [row.model_dump(mode="json") for row in list_pending_experiences()]
-    return JSONResponse(rows)
+    try:
+        limit = int(request.query_params.get("limit") or 50)
+    except ValueError:
+        limit = 50
+    rows = [
+        row.model_dump(mode="json")
+        for row in list_pending_experiences(limit=limit)
+    ]
+    return JSONResponse(
+        rows,
+        headers={"Cache-Control": "private, max-age=15"},
+    )
 
 
 async def admin_experience_detail(request: Request) -> JSONResponse:

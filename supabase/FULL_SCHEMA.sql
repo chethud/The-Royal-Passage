@@ -188,6 +188,11 @@ create index if not exists idx_experiences_host on public.experiences (host_id);
 create index if not exists idx_experiences_city on public.experiences (city);
 create index if not exists idx_experiences_category on public.experiences (category_slug);
 create index if not exists idx_experiences_status on public.experiences (status);
+create index if not exists idx_experiences_status_created
+  on public.experiences (status, created_at desc);
+create index if not exists idx_experiences_pending_review
+  on public.experiences (created_at desc)
+  where status = 'pending_review';
 
 drop trigger if exists trg_experiences_updated on public.experiences;
 create trigger trg_experiences_updated
@@ -375,6 +380,8 @@ where subtotal_minor > 0
 create index if not exists idx_bookings_slot on public.bookings (slot_id);
 create index if not exists idx_bookings_guest on public.bookings (guest_id);
 create index if not exists idx_bookings_experience on public.bookings (experience_id);
+create index if not exists idx_bookings_status_created
+  on public.bookings (booking_status, created_at desc);
 create index if not exists idx_bookings_booking_status on public.bookings (booking_status);
 create index if not exists idx_bookings_payment_status on public.bookings (payment_status);
 
@@ -592,6 +599,9 @@ create table if not exists public.notifications (
 );
 
 create index if not exists idx_notifications_user on public.notifications (user_id, created_at desc);
+create index if not exists idx_notifications_user_unread
+  on public.notifications (user_id, created_at desc)
+  where read_at is null;
 
 alter table public.notifications drop constraint if exists notifications_type_check;
 alter table public.notifications

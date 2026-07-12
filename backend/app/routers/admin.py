@@ -48,10 +48,20 @@ def admin_homestay_stats(_auth=Depends(require_admin)):
 
 
 @router.get("/bookings", response_model=list[AdminBookingRow])
-def admin_bookings(_auth=Depends(require_admin)):
+def admin_bookings(
+    status: str | None = None,
+    limit: int = 100,
+    autoComplete: bool = False,
+    _auth=Depends(require_admin),
+):
     if not settings.supabase_configured:
         raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
-    return list_admin_bookings()
+    statuses = [part.strip() for part in (status or "").split(",") if part.strip()] or None
+    return list_admin_bookings(
+        limit=limit,
+        statuses=statuses,
+        run_auto_complete=autoComplete and not statuses,
+    )
 
 
 @router.get("/bookings/{booking_id}", response_model=BookingSummary)
@@ -89,10 +99,10 @@ def admin_create_host(payload: CreateHostRequest, _auth=Depends(require_admin)):
 
 
 @router.get("/experiences", response_model=list[AdminExperienceSummary])
-def admin_pending_experiences(_auth=Depends(require_admin)):
+def admin_pending_experiences(limit: int = 50, _auth=Depends(require_admin)):
     if not settings.supabase_configured:
         raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
-    return list_pending_experiences()
+    return list_pending_experiences(limit=limit)
 
 
 @router.get("/experiences/{experience_id}", response_model=AdminExperienceDetail)

@@ -1,5 +1,5 @@
 import { Bell } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,27 +15,45 @@ import {
   type NotificationSummary,
 } from "@/lib/api/notifications";
 
+const POLL_MS = 90_000;
+const CLIENT_FRESH_MS = 20_000;
+
 export function NotificationBell() {
   const { user, accessToken } = useAuthUser();
   const [items, setItems] = useState<NotificationSummary[]>([]);
   const [loading, setLoading] = useState(false);
+  const lastLoadedAt = useRef(0);
+  const inFlight = useRef<Promise<void> | null>(null);
 
-  const load = useCallback(async () => {
-    if (!user || !accessToken || !isApiConfigured()) return;
-    setLoading(true);
-    try {
-      const rows = await fetchNotifications(accessToken);
-      setItems(rows);
-    } catch {
-      // optional UI
-    } finally {
-      setLoading(false);
-    }
-  }, [accessToken, user?.id]);
+  const load = useCallback(
+    async (options?: { force?: boolean }) => {
+      if (!user || !accessToken || !isApiConfigured()) return;
+      const now = Date.now();
+      if (!options?.force && now - lastLoadedAt.current < CLIENT_FRESH_MS) return;
+      if (inFlight.current) return inFlight.current;
+
+      setLoading(true);
+      const request = (async () => {
+        try {
+          const rows = await fetchNotifications(accessToken, 20);
+          setItems(rows);
+          lastLoadedAt.current = Date.now();
+        } catch {
+          // optional UI
+        } finally {
+          setLoading(false);
+          inFlight.current = null;
+        }
+      })();
+      inFlight.current = request;
+      return request;
+    },
+    [accessToken, user],
+  );
 
   useEffect(() => {
-    void load();
-    const id = window.setInterval(() => void load(), 60_000);
+    void load({ force: true });
+    const id = window.setInterval(() => void load({ force: true }), POLL_MS);
     return () => window.clearInterval(id);
   }, [load]);
 
@@ -49,14 +67,26 @@ export function NotificationBell() {
 
   const markRead = async (id: string) => {
     if (!accessToken) return;
-    await markNotificationRead(accessToken, id);
-    await load();
+    const readAt = new Date().toISOString();
+    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, readAt } : item)));
+    try {
+      await markNotificationRead(accessToken, id);
+      lastLoadedAt.current = 0;
+    } catch {
+      await load({ force: true });
+    }
   };
 
   const markAll = async () => {
     if (!accessToken) return;
-    await markAllNotificationsRead(accessToken);
-    await load();
+    const readAt = new Date().toISOString();
+    setItems((prev) => prev.map((item) => ({ ...item, readAt: item.readAt ?? readAt })));
+    try {
+      await markAllNotificationsRead(accessToken);
+      lastLoadedAt.current = 0;
+    } catch {
+      await load({ force: true });
+    }
   };
 
   return (
@@ -81,7 +111,7 @@ export function NotificationBell() {
             </button>
           ) : null}
         </div>
-        {loading ? (
+        {loading && items.length === 0 ? (
           <div className="px-3 py-4 text-sm text-muted-foreground">Loading…</div>
         ) : items.length === 0 ? (
           <div className="px-3 py-4 text-sm text-muted-foreground">No notifications yet.</div>

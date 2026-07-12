@@ -1,6 +1,7 @@
 from app.dependencies.supabase import get_supabase_admin
 from app.models.schemas import AdminExperienceDetail, AdminExperienceSummary
 from app.services.host_experiences import _load_slots, _map_host_experience
+from app.services.ttl_cache import TtlCache
 
 ADMIN_EXP_SELECT = """
 *,
@@ -8,19 +9,43 @@ hosts ( display_name, email, phone, bio, verified ),
 experience_categories ( slug, label )
 """
 
+DEFAULT_PENDING_LIMIT = 50
+MAX_PENDING_LIMIT = 100
 
-def list_pending_experience_reviews() -> list[AdminExperienceSummary]:
+_pending_reviews_cache: TtlCache[list[AdminExperienceSummary]] = TtlCache(
+    ttl_seconds=15.0,
+    max_size=16,
+)
+
+
+def _invalidate_pending_cache() -> None:
+    _pending_reviews_cache.delete_prefix("pending:")
+
+
+def list_pending_experience_reviews(limit: int | None = None) -> list[AdminExperienceSummary]:
     """Host submissions awaiting admin review only."""
+    try:
+        capped = int(limit) if limit is not None else DEFAULT_PENDING_LIMIT
+    except (TypeError, ValueError):
+        capped = DEFAULT_PENDING_LIMIT
+    capped = max(1, min(capped, MAX_PENDING_LIMIT))
+
+    cache_key = f"pending:{capped}"
+    cached = _pending_reviews_cache.get(cache_key)
+    if cached is not None:
+        return cached
+
     supabase = get_supabase_admin()
     result = (
         supabase.table("experiences")
         .select("id, slug, title, city, status, created_at, hosts ( display_name )")
         .eq("status", "pending_review")
         .order("created_at", desc=True)
+        .limit(capped)
         .execute()
     )
     rows = result.data or []
-    return [
+    mapped = [
         AdminExperienceSummary(
             id=row["id"],
             slug=row["slug"],
@@ -32,16 +57,18 @@ def list_pending_experience_reviews() -> list[AdminExperienceSummary]:
         )
         for row in rows
     ]
+    _pending_reviews_cache.set(cache_key, mapped)
+    return mapped
 
 
-def list_admin_experience_approvals() -> list[AdminExperienceSummary]:
+def list_admin_experience_approvals(limit: int | None = None) -> list[AdminExperienceSummary]:
     """Pending submissions only — for the approve experiences page."""
-    return list_pending_experience_reviews()
+    return list_pending_experience_reviews(limit=limit)
 
 
-def list_pending_experiences() -> list[AdminExperienceSummary]:
+def list_pending_experiences(limit: int | None = None) -> list[AdminExperienceSummary]:
     """Backward-compatible alias."""
-    return list_pending_experience_reviews()
+    return list_pending_experience_reviews(limit=limit)
 
 
 def get_admin_experience(experience_id: str) -> AdminExperienceDetail:
@@ -105,6 +132,7 @@ def publish_experience(experience_id: str) -> AdminExperienceSummary:
             {"approval_status": "approved", "verified": True}
         ).eq("id", host_id).execute()
 
+    _invalidate_pending_cache()
     row["status"] = "published"
     return AdminExperienceSummary(
         id=row["id"],
@@ -137,6 +165,7 @@ def reject_experience(experience_id: str) -> AdminExperienceSummary:
     from app.services.notifications import mark_experience_review_notifications_read
 
     mark_experience_review_notifications_read(experience_id)
+    _invalidate_pending_cache()
     return AdminExperienceSummary(
         id=row["id"],
         slug=row["slug"],
