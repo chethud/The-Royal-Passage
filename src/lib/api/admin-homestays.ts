@@ -72,8 +72,30 @@ export type AdminHomestayStats = {
   commissionPercent: number;
 };
 
+export type AdminHomestayBookingRow = {
+  id: string;
+  homestayId: string;
+  homestayTitle: string;
+  guestName: string | null;
+  checkIn: string;
+  checkOut: string;
+  bookingStatus: string;
+  createdAt: string;
+};
+
 export function fetchAdminHomestayStats(accessToken: string) {
   return apiFetch<AdminHomestayStats>("/api/v1/admin/homestay-stats", { accessToken });
+}
+
+export function fetchAdminHomestayBookings(
+  accessToken: string,
+  status?: string | string[],
+) {
+  const statuses = Array.isArray(status) ? status.join(",") : status;
+  const query = statuses ? `?status=${encodeURIComponent(statuses)}` : "";
+  return apiFetch<AdminHomestayBookingRow[]>(`/api/v1/admin/homestay-bookings${query}`, {
+    accessToken,
+  });
 }
 
 export function fetchAdminHomestayApprovals(accessToken: string) {

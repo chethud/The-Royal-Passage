@@ -92,14 +92,14 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
                   <a
                     href={alertHref(primaryAlert)}
                     className="marketplace-module-nav__badge"
-                    aria-label={`${pendingTotal} new items for ${module.label}`}
+                    aria-label={`${pendingTotal} updates for ${module.label}`}
                     title="View latest updates"
                     onClick={(event) => {
                       event.preventDefault();
                       goTo(primaryAlert);
                     }}
                   >
-                    {pendingTotal > 9 ? "9+" : pendingTotal}
+                    {pendingTotal}
                   </a>
                 ) : null}
               </div>
@@ -116,10 +116,11 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
                           goTo(alert);
                         }}
                       >
-                        <span className="marketplace-module-nav__alert-count">
-                          {alert.count > 9 ? "9+" : alert.count}
+                        <span className="marketplace-module-nav__alert-status">{alert.status}</span>
+                        <span className="marketplace-module-nav__alert-copy">
+                          <span className="marketplace-module-nav__alert-label">{alert.label}</span>
+                          <span className="marketplace-module-nav__alert-detail">{alert.detail}</span>
                         </span>
-                        <span className="marketplace-module-nav__alert-label">{alert.label}</span>
                       </a>
                     </li>
                   ))}

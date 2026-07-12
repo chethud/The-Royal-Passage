@@ -1,5 +1,5 @@
 from app.dependencies.supabase import get_supabase_admin
-from app.models.schemas import AdminBookingRow, AdminHomestayStats, AdminStats
+from app.models.schemas import AdminBookingRow, AdminHomestayBookingRow, AdminHomestayStats, AdminStats
 from app.services.audit import list_recent_audit_logs
 from app.services.booking_auto_complete import (
     auto_complete_booking_if_due,
@@ -251,6 +251,50 @@ def get_admin_homestay_stats() -> AdminHomestayStats:
         )
     except Exception:
         return AdminHomestayStats(currencySymbol="₹")
+
+
+def list_admin_homestay_bookings(
+    *,
+    statuses: list[str] | None = None,
+    limit: int = 100,
+) -> list[AdminHomestayBookingRow]:
+    """Recent homestay stays for admin module alerts (pending / cancelled, etc.)."""
+    try:
+        supabase = get_supabase_admin()
+        query = (
+            supabase.table("homestay_bookings")
+            .select(
+                "id, homestay_id, check_in, check_out, booking_status, created_at, "
+                "homestays ( id, title ), profiles ( full_name )"
+            )
+            .order("created_at", desc=True)
+            .limit(limit)
+        )
+        if statuses:
+            query = query.in_("booking_status", statuses)
+        result = query.execute()
+    except Exception:
+        return []
+
+    rows: list[AdminHomestayBookingRow] = []
+    for row in result.data or []:
+        if not isinstance(row, dict):
+            continue
+        stay = row.get("homestays") or {}
+        guest = row.get("profiles") or {}
+        rows.append(
+            AdminHomestayBookingRow(
+                id=str(row.get("id") or ""),
+                homestayId=str(stay.get("id") or row.get("homestay_id") or ""),
+                homestayTitle=str(stay.get("title") or "Homestay"),
+                guestName=guest.get("full_name"),
+                checkIn=str(row.get("check_in") or "")[:10],
+                checkOut=str(row.get("check_out") or "")[:10],
+                bookingStatus=str(row.get("booking_status") or "pending"),
+                createdAt=str(row.get("created_at") or ""),
+            )
+        )
+    return rows
 
 
 def list_admin_bookings(limit: int = 500) -> list[AdminBookingRow]:

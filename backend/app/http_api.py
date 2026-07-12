@@ -11,6 +11,7 @@ from app.services.admin_analytics import (
     get_admin_stats,
     list_admin_activity,
     list_admin_bookings,
+    list_admin_homestay_bookings,
 )
 from app.services.admin_experiences import (
     get_admin_experience,
@@ -78,6 +79,19 @@ async def admin_homestay_stats(request: Request) -> JSONResponse:
         return JSONResponse(get_admin_homestay_stats().model_dump(mode="json"))
     except Exception as exc:
         return JSONResponse({"detail": f"Failed to load homestay stats: {exc}"}, status_code=500)
+
+
+async def admin_homestay_bookings(request: Request) -> JSONResponse:
+    auth = require_admin_request(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    status_raw = (request.query_params.get("status") or "").strip()
+    statuses = [part.strip() for part in status_raw.split(",") if part.strip()] or None
+    rows = [
+        row.model_dump(mode="json")
+        for row in list_admin_homestay_bookings(statuses=statuses, limit=100)
+    ]
+    return JSONResponse(rows)
 
 
 async def admin_bookings(request: Request) -> JSONResponse:

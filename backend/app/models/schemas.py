@@ -1179,6 +1179,17 @@ class AdminHomestayStats(BaseModel):
     commissionPercent: float = 10.0
 
 
+class AdminHomestayBookingRow(BaseModel):
+    id: str
+    homestayId: str
+    homestayTitle: str
+    guestName: str | None = None
+    checkIn: str
+    checkOut: str
+    bookingStatus: str
+    createdAt: str = ""
+
+
 class AdminBookingRow(BaseModel):
     id: str
     guestName: str | None
