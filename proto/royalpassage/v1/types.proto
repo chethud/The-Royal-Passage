@@ -901,6 +901,7 @@ message HomestayBookingSummary {
   int32 room_count = 22;
   int32 extra_bed_count = 23;
   optional string rejection_reason = 24;
+  optional string homestay_image_url = 25;
 }
 
 message ListHomestayBookingsResponse {

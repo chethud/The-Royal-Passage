@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 BOOKING_SELECT = """
 *,
-homestays ( id, slug, title, owner_id, check_in_time, check_out_time, address ),
+homestays ( id, slug, title, owner_id, check_in_time, check_out_time, address, hero_image_url ),
 homestay_rooms ( name ),
 profiles ( full_name )
 """
@@ -62,6 +62,7 @@ def _map_homestay_booking(row: dict) -> HomestayBookingSummary:
         roomCount=int(row.get("room_count") or 1),
         extraBedCount=int(row.get("extra_bed_count") or 0),
         rejectionReason=row.get("rejection_reason"),
+        homestayImageUrl=stay.get("hero_image_url"),
     )
 
 

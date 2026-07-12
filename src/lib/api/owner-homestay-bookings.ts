@@ -55,6 +55,9 @@ export type HomestayBookingSummary = {
   checkInTime: string | null;
   checkOutTime: string | null;
   homestayAddress: string | null;
+  roomCount?: number;
+  extraBedCount?: number;
+  homestayImageUrl?: string | null;
 };
 
 export function fetchOwnerDashboard(accessToken: string) {

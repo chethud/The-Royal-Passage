@@ -535,6 +535,7 @@ class HomestayBookingSummary(BaseModel):
     roomCount: int = 1
     extraBedCount: int = 0
     rejectionReason: str | None = None
+    homestayImageUrl: str | None = None
 
 
 class ListHomestayBookingsResponse(BaseModel):
