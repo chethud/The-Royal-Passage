@@ -36,7 +36,12 @@ export function HomestayBookingCard({ booking, surface = "light" }: HomestayBook
       <div className={isLight ? bookingCardLayoutClass : "space-y-4"}>
         {isLight ? (
           imageUrl ? (
-            <img src={imageUrl} alt="" className={bookingCardThumbClass} loading="lazy" />
+            <img
+              src={imageUrl}
+              alt={booking.homestayTitle}
+              className={`${bookingCardThumbClass} object-center`}
+              loading="lazy"
+            />
           ) : (
             <div
               className={`${bookingCardThumbPlaceholderClass} flex items-center justify-center`}

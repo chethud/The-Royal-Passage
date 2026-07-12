@@ -75,6 +75,12 @@ function mapHomestayBooking(row: Record<string, unknown>): HomestayBookingSummar
     Number(row.nights) ||
     Math.max(0, Math.round((Date.parse(checkOut) - Date.parse(checkIn)) / 86_400_000));
 
+  const gallery = Array.isArray(stay.gallery_urls)
+    ? stay.gallery_urls.filter((url): url is string => typeof url === "string" && Boolean(url.trim()))
+    : [];
+  const heroImage =
+    (typeof stay.hero_image_url === "string" && stay.hero_image_url.trim()) || gallery[0] || null;
+
   return {
     id: String(row.id ?? ""),
     homestayId: String(stay.id ?? row.homestay_id ?? ""),
@@ -98,6 +104,7 @@ function mapHomestayBooking(row: Record<string, unknown>): HomestayBookingSummar
     checkInTime: formatTime(String(stay.check_in_time ?? "")),
     checkOutTime: formatTime(String(stay.check_out_time ?? "")),
     homestayAddress: (stay.address as string | null) ?? null,
+    homestayImageUrl: heroImage,
   };
 }
 
@@ -166,7 +173,7 @@ export async function fetchGuestHomestayBookingsFromSupabase(
     .select(
       `
       *,
-      homestays ( id, slug, title, check_in_time, check_out_time, address ),
+      homestays ( id, slug, title, check_in_time, check_out_time, address, hero_image_url, gallery_urls ),
       homestay_rooms ( name )
     `,
     )

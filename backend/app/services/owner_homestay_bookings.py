@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 BOOKING_SELECT = """
 *,
-homestays ( id, slug, title, owner_id, check_in_time, check_out_time, address, hero_image_url ),
+homestays ( id, slug, title, owner_id, check_in_time, check_out_time, address, hero_image_url, gallery_urls ),
 homestay_rooms ( name ),
 profiles ( full_name )
 """
@@ -37,6 +37,13 @@ def _map_homestay_booking(row: dict) -> HomestayBookingSummary:
     room = row.get("homestay_rooms") or {}
     guest = row.get("profiles") or {}
     currency = row.get("currency_code") or "INR"
+    gallery = stay.get("gallery_urls") or []
+    if not isinstance(gallery, list):
+        gallery = []
+    hero = (stay.get("hero_image_url") or "").strip()
+    if not hero and gallery:
+        first = gallery[0]
+        hero = first.strip() if isinstance(first, str) else ""
     return HomestayBookingSummary(
         id=row["id"],
         homestayId=stay.get("id") or row.get("homestay_id") or "",
@@ -62,7 +69,7 @@ def _map_homestay_booking(row: dict) -> HomestayBookingSummary:
         roomCount=int(row.get("room_count") or 1),
         extraBedCount=int(row.get("extra_bed_count") or 0),
         rejectionReason=row.get("rejection_reason"),
-        homestayImageUrl=stay.get("hero_image_url"),
+        homestayImageUrl=hero or None,
     )
 
 
