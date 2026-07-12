@@ -30,7 +30,7 @@ export function DashboardShell({
   return (
     <div className="pt-[var(--header-height)] text-foreground">
       <Header />
-      <section className="container-page py-8 sm:py-20 md:py-24">
+      <section className="container-page w-full py-6 sm:py-16 md:py-24">
         {isIvoryShell ? (
           <div className="mb-6 sm:mb-8">
             <AdminModuleNav />

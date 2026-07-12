@@ -129,7 +129,12 @@ export function AccountDropdownMenu({
           <ProfileNavIcon size={40} />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="header-account-menu z-[100] w-64 p-0">
+      <DropdownMenuContent
+        align="end"
+        sideOffset={8}
+        collisionPadding={12}
+        className="header-account-menu z-[100] w-[min(22rem,calc(100vw-1.25rem))] max-w-[calc(100vw-1.25rem)] p-0"
+      >
         <div className="header-account-menu__header">
           <span className="header-account-menu__avatar" aria-hidden>
             {accountInitials(displayName, email)}

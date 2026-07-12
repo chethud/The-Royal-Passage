@@ -366,6 +366,8 @@
 /* Account profile dropdown — royal glass panel */
 .header-account-menu {
   overflow: hidden;
+  max-height: min(85dvh, 40rem);
+  overflow-y: auto;
   border: 1px solid oklch(0.76 0.1 78 / 0.28);
   border-radius: 10px;
   background:
@@ -1097,12 +1099,17 @@
 }
 
 /* Marketplace module switcher — Experiences | Homestays | VIP */
+.marketplace-module-nav {
+  width: 100%;
+}
+
 .marketplace-module-nav__inner {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.65rem;
-  max-width: 56rem;
-  margin-inline: auto;
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
 }
 
 .marketplace-module-nav__column {
@@ -1118,6 +1125,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0.15rem;
+  width: 100%;
   padding: 0.85rem 1rem;
   border: 1px solid rgb(200 162 90 / 0.22);
   border-radius: var(--radius-md);
@@ -1330,6 +1338,11 @@
 }
 
 @media (min-width: 640px) {
+  .marketplace-module-nav__inner {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
   .marketplace-module-nav__item,
   .marketplace-module-nav__link {
     flex-direction: row;
@@ -1359,37 +1372,40 @@
 }
 
 @media (max-width: 639px) {
-  .marketplace-module-nav__inner {
-    gap: 0.4rem;
-  }
-
-  .marketplace-module-nav__hint,
-  .marketplace-module-nav__alerts,
-  .marketplace-module-nav__alerts-empty {
-    display: none;
-  }
-
   .marketplace-module-nav__item {
-    align-items: center;
-    padding: 0.7rem 0.45rem;
+    padding: 0.85rem 0.9rem;
   }
 
   .marketplace-module-nav__link {
+    flex-direction: row;
     align-items: center;
-    text-align: center;
+    gap: 0.55rem;
   }
 
   .marketplace-module-nav__label {
-    font-size: 0.7rem;
-    letter-spacing: 0.06em;
+    font-size: 0.82rem;
+    letter-spacing: 0.07em;
+  }
+
+  .marketplace-module-nav__hint {
+    margin-left: auto;
+    text-align: right;
+    padding-right: 1.35rem;
+    max-width: 55%;
   }
 
   .marketplace-module-nav__badge {
-    top: 0.3rem;
-    right: 0.3rem;
-    min-width: 1.1rem;
-    height: 1.1rem;
-    font-size: 0.55rem;
+    top: 50%;
+    right: 0.55rem;
+    transform: translateY(-50%);
+  }
+
+  .marketplace-module-nav__badge:hover {
+    transform: translateY(-50%) scale(1.08);
+  }
+
+  .marketplace-module-nav__alerts-empty {
+    padding-inline: 0.35rem;
   }
 }
 
