@@ -27,7 +27,7 @@ export function bookingCardSubtitleClass(surface: BookingCardSurface) {
 }
 
 export function bookingCardMetaLabelClass(surface: BookingCardSurface) {
-  return `eyebrow text-[0.55rem] tracking-[0.14em] sm:text-[0.7rem] ${
+  return `eyebrow text-[0.62rem] tracking-[0.12em] sm:text-[0.7rem] sm:tracking-[0.14em] ${
     surface === "light" ? "luxury-panel-label" : "text-muted-foreground"
   }`;
 }
@@ -70,7 +70,7 @@ export function BookingCardMetaGrid({
 }) {
   return (
     <dl
-      className={`grid grid-cols-3 gap-2 text-[0.7rem] sm:gap-2 sm:text-sm ${
+      className={`grid grid-cols-2 gap-3 text-xs sm:grid-cols-3 sm:gap-2 sm:text-sm ${
         surface === "light" ? "" : ""
       }`}
     >

@@ -26,7 +26,7 @@ export function DashboardTableSection({
 }
 
 export function DashboardTableFilters({ children }: { children: ReactNode }) {
-  return <div className="flex flex-wrap gap-2">{children}</div>;
+  return <div className="flex flex-wrap gap-1.5 sm:gap-2">{children}</div>;
 }
 
 export function DashboardTableEmpty({ children }: { children: ReactNode }) {
@@ -34,7 +34,11 @@ export function DashboardTableEmpty({ children }: { children: ReactNode }) {
 }
 
 export function DashboardTableScroll({ children }: { children: ReactNode }) {
-  return <div className="overflow-x-auto">{children}</div>;
+  return (
+    <div className="-mx-1 overflow-x-auto overscroll-x-contain px-1 sm:mx-0 sm:px-0">
+      {children}
+    </div>
+  );
 }
 
 export function DashboardTable({

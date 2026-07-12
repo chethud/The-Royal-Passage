@@ -70,8 +70,8 @@ export function HomestaysSearchWidget({
         onSubmit();
       }}
     >
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-[1.4fr_repeat(3,minmax(0,0.85fr))_auto] lg:items-end lg:gap-3">
-        <label className="col-span-2 block lg:col-span-1">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 lg:grid-cols-[1.4fr_repeat(3,minmax(0,0.85fr))_auto] lg:items-end lg:gap-3">
+        <label className="block sm:col-span-2 lg:col-span-1">
           <span className="eyebrow mb-1 block text-[0.55rem] text-[#4A0000]/70 sm:mb-1.5 sm:text-[0.58rem]">
             Property
           </span>
@@ -112,7 +112,7 @@ export function HomestaysSearchWidget({
           />
         </label>
 
-        <div className="col-span-2 block sm:col-span-1">
+        <div className="block sm:col-span-1">
           <span className="eyebrow mb-1 block text-[0.55rem] text-[#4A0000]/70 sm:mb-1.5 sm:text-[0.58rem]">
             Guests
           </span>
@@ -151,7 +151,7 @@ export function HomestaysSearchWidget({
 
         <button
           type="submit"
-          className="luxury-btn-sm luxury-btn-primary col-span-2 w-full py-2.5 text-[0.62rem] sm:col-span-1 sm:py-3 lg:col-span-1 lg:w-auto lg:min-w-[8.5rem]"
+          className="luxury-btn-sm luxury-btn-primary w-full py-2.5 text-[0.62rem] sm:col-span-1 sm:py-3 lg:col-span-1 lg:w-auto lg:min-w-[8.5rem]"
         >
           {submitLabel}
         </button>

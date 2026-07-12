@@ -59,8 +59,8 @@ export function VipsSearchWidget({
         onSubmit();
       }}
     >
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))_auto] lg:items-end">
-        <label className="col-span-2 block lg:col-span-1">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))_auto] lg:items-end">
+        <label className="block sm:col-span-2 lg:col-span-1">
           <span className="eyebrow mb-1.5 block text-[0.58rem] text-[#4A0000]/70 sm:mb-2">
             Package
           </span>
@@ -103,7 +103,7 @@ export function VipsSearchWidget({
           />
         </label>
 
-        <div className="col-span-2 block sm:col-span-1">
+        <div className="block sm:col-span-1">
           <span className="eyebrow mb-1.5 block text-[0.58rem] text-[#4A0000]/70 sm:mb-2">Guests</span>
           <div className="flex h-[42px] items-center justify-between rounded-sm border border-[rgb(74_0_0/0.14)] bg-white px-2 sm:h-[46px] sm:px-3">
             <button
@@ -130,7 +130,7 @@ export function VipsSearchWidget({
 
         <button
           type="submit"
-          className="luxury-btn-sm luxury-btn-primary col-span-2 w-full py-3.5 sm:col-span-1 lg:col-span-1 lg:w-auto lg:min-w-[9.5rem]"
+          className="luxury-btn-sm luxury-btn-primary w-full py-3.5 sm:col-span-1 lg:col-span-1 lg:w-auto lg:min-w-[9.5rem]"
         >
           {submitLabel}
         </button>

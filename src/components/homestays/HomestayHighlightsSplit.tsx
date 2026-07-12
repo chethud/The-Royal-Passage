@@ -189,14 +189,16 @@ export function HomestayHighlightsSplit() {
             <CornerFiligree className="pointer-events-none absolute bottom-3 left-3 z-40 h-10 w-10 -rotate-90 sm:h-12 sm:w-12" />
             <CornerFiligree className="pointer-events-none absolute right-3 bottom-3 z-40 h-10 w-10 rotate-180 sm:h-12 sm:w-12" />
 
-            <div className="relative min-h-0 md:min-h-[480px]">
+            <div className="relative md:min-h-[480px]">
               {slides.map((item, index) => {
                 const isActive = index === activeIndex;
                 return (
                   <div
                     key={item.id}
-                    className={`royal-slide-layer absolute inset-0 grid grid-cols-1 transition-opacity duration-500 md:grid-cols-2 ${
-                      isActive ? "z-10 opacity-100" : "z-0 opacity-0"
+                    className={`royal-slide-layer grid grid-cols-1 transition-opacity duration-500 md:absolute md:inset-0 md:grid-cols-2 ${
+                      isActive
+                        ? "relative z-10 opacity-100"
+                        : "pointer-events-none absolute inset-0 z-0 h-0 overflow-hidden opacity-0 md:h-auto md:overflow-visible"
                     }`}
                     aria-hidden={!isActive}
                   >

@@ -8,7 +8,7 @@ export const detailBackLinkClass =
   "inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]";
 
 export const detailSectionLabelClass =
-  "text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A]/85";
+  "text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 sm:text-[0.58rem] sm:tracking-[0.16em]";
 
 export const detailEyebrowClass =
   "text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]";
@@ -137,7 +137,7 @@ export function DetailDivider() {
 
 export function DetailStatGrid({ children }: { children: ReactNode }) {
   return (
-    <dl className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,0.75fr)_minmax(0,0.85fr)] divide-x divide-[rgb(200_162_90/0.28)] text-center sm:grid-cols-3 sm:text-left">
+    <dl className="grid grid-cols-1 gap-3 divide-y divide-[rgb(200_162_90/0.28)] text-left sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-y-0">
       {children}
     </dl>
   );
@@ -153,12 +153,12 @@ export function DetailStatItem({
   valueClassName?: string;
 }) {
   return (
-    <div className="min-w-0 px-1 first:pl-0 last:pr-0 sm:px-5">
+    <div className="min-w-0 px-0 py-2 first:pt-0 last:pb-0 sm:px-5 sm:py-0 sm:first:pl-0 sm:last:pr-0">
       <dt className={detailSectionLabelClass}>{label}</dt>
       <dd
         className={
           valueClassName ??
-          "mt-1 break-words font-display text-[0.85rem] uppercase leading-snug tracking-[0.02em] text-[#F7F1E8] sm:mt-1.5 sm:text-lg md:text-xl"
+          "mt-1 break-words font-display text-base uppercase leading-snug tracking-[0.02em] text-[#F7F1E8] sm:mt-1.5 sm:text-lg md:text-xl"
         }
       >
         {children}

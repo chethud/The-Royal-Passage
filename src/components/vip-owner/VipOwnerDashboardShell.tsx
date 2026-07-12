@@ -20,19 +20,19 @@ export function VipOwnerDashboardShell({
   return (
     <div className="pt-[var(--header-height)] text-foreground">
       <Header />
-      <section className="container-page py-14 sm:py-20 md:py-24">
-        <div className="mb-8 flex flex-wrap items-center gap-3">
+      <section className="container-page py-8 sm:py-20 md:py-24">
+        <div className="mb-6 flex flex-wrap items-center gap-3 sm:mb-8">
           <RoleBadge role="vip_owner" />
           <span className="text-sm text-muted-foreground">{ROLE_LABELS.vip_owner} dashboard</span>
         </div>
-        <h1 className="font-display text-4xl tracking-tight md:text-5xl">{title}</h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">{subtitle}</p>
+        <h1 className="font-display text-2xl tracking-tight sm:text-4xl md:text-5xl">{title}</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:mt-4 sm:text-base">{subtitle}</p>
         {showRoleDescription ? (
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground/90">
             {ROLE_DESCRIPTIONS.vip_owner}
           </p>
         ) : null}
-        <div className="mt-10">{children}</div>
+        <div className="mt-8 sm:mt-10">{children}</div>
       </section>
       <Footer />
     </div>

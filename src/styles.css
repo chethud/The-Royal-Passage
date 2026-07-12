@@ -141,6 +141,7 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overflow-x: clip;
   }
   @media (min-width: 640px) {
     html {
@@ -166,6 +167,11 @@
       radial-gradient(ellipse 45% 40% at 0% 85%, oklch(0.28 0.12 22 / 0.35), transparent 48%),
       linear-gradient(180deg, oklch(0.2 0.09 22) 0%, oklch(0.14 0.07 20) 100%);
     background-attachment: fixed;
+  }
+  @media (max-width: 639px) {
+    body {
+      background-attachment: scroll;
+    }
   }
   button,
   input,
@@ -205,7 +211,7 @@
 @utility container-page {
   margin-inline: auto;
   max-width: 1280px;
-  padding-inline: 1.1rem;
+  padding-inline: 1rem;
   @media (min-width: 640px) {
     padding-inline: 1.5rem;
   }
@@ -656,8 +662,8 @@
   .luxury-checkout-panel .luxury-btn-sm,
   .luxury-checkout-panel .luxury-btn-panel-danger,
   .luxury-checkout-panel .dashboard-chrome-btn.luxury-btn-sm {
-    padding: 0.35rem 0.55rem;
-    font-size: 0.55rem;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.62rem;
     letter-spacing: 0.08em;
   }
 }
@@ -1327,7 +1333,36 @@
 
 @media (max-width: 639px) {
   .marketplace-module-nav__inner {
-    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+
+  .marketplace-module-nav__hint,
+  .marketplace-module-nav__alerts,
+  .marketplace-module-nav__alerts-empty {
+    display: none;
+  }
+
+  .marketplace-module-nav__item {
+    align-items: center;
+    padding: 0.7rem 0.45rem;
+  }
+
+  .marketplace-module-nav__link {
+    align-items: center;
+    text-align: center;
+  }
+
+  .marketplace-module-nav__label {
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+  }
+
+  .marketplace-module-nav__badge {
+    top: 0.3rem;
+    right: 0.3rem;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    font-size: 0.55rem;
   }
 }
 

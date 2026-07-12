@@ -72,7 +72,7 @@ export function NotificationBell() {
           </span>
         ) : null}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto">
+      <DropdownMenuContent align="end" className="w-[min(20rem,calc(100vw-1.5rem))] max-h-96 overflow-y-auto">
         <div className="flex items-center justify-between px-2 py-1.5">
           <span className="text-xs font-semibold uppercase tracking-[0.14em]">Notifications</span>
           {unread > 0 ? (
