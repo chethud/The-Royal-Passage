@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   fetchAdminHomestayApprovals,
   fetchAdminHomestayBookings,
@@ -33,19 +33,54 @@ const EMPTY_ALERTS: AdminModuleAlertsMap = {
   vip: [],
 };
 
+const DISMISSED_ALERTS_KEY = "rp_admin_module_alerts_dismissed_v1";
+
 function formatStayDates(checkIn: string, checkOut: string): string {
   if (checkIn && checkOut) return `${checkIn} → ${checkOut}`;
   return checkIn || checkOut || "Dates TBD";
 }
 
-export function useAdminModuleAlerts(): AdminModuleAlertsMap {
+function readDismissedAlertIds(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(DISMISSED_ALERTS_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return new Set();
+    return new Set(parsed.filter((id): id is string => typeof id === "string"));
+  } catch {
+    return new Set();
+  }
+}
+
+function writeDismissedAlertIds(ids: Set<string>) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(DISMISSED_ALERTS_KEY, JSON.stringify([...ids]));
+}
+
+function withoutDismissed(
+  alerts: AdminModuleAlertsMap,
+  dismissed: Set<string>,
+): AdminModuleAlertsMap {
+  return {
+    experiences: alerts.experiences.filter((alert) => !dismissed.has(alert.id)),
+    homestays: alerts.homestays.filter((alert) => !dismissed.has(alert.id)),
+    vip: alerts.vip.filter((alert) => !dismissed.has(alert.id)),
+  };
+}
+
+export function useAdminModuleAlerts(): {
+  alerts: AdminModuleAlertsMap;
+  dismissAlert: (alertId: string) => void;
+} {
   const { accessToken, role, roles } = useAuthUser();
-  const [alerts, setAlerts] = useState<AdminModuleAlertsMap>(EMPTY_ALERTS);
+  const [rawAlerts, setRawAlerts] = useState<AdminModuleAlertsMap>(EMPTY_ALERTS);
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => readDismissedAlertIds());
   const isAdmin = hasRole(roles, "admin", role);
 
   useEffect(() => {
     if (!accessToken || !isApiConfigured() || !isAdmin) {
-      setAlerts(EMPTY_ALERTS);
+      setRawAlerts(EMPTY_ALERTS);
       return;
     }
 
@@ -136,9 +171,9 @@ export function useAdminModuleAlerts(): AdminModuleAlertsMap {
           to: `/admin/vip-packages/${row.id}`,
         }));
 
-        setAlerts({ experiences, homestays, vip });
+        setRawAlerts({ experiences, homestays, vip });
       } catch {
-        if (!cancelled) setAlerts(EMPTY_ALERTS);
+        if (!cancelled) setRawAlerts(EMPTY_ALERTS);
       }
     };
 
@@ -150,7 +185,22 @@ export function useAdminModuleAlerts(): AdminModuleAlertsMap {
     };
   }, [accessToken, isAdmin]);
 
-  return alerts;
+  const dismissAlert = useCallback((alertId: string) => {
+    setDismissedIds((prev) => {
+      if (prev.has(alertId)) return prev;
+      const next = new Set(prev);
+      next.add(alertId);
+      writeDismissedAlertIds(next);
+      return next;
+    });
+  }, []);
+
+  const alerts = useMemo(
+    () => withoutDismissed(rawAlerts, dismissedIds),
+    [dismissedIds, rawAlerts],
+  );
+
+  return { alerts, dismissAlert };
 }
 
 export function adminModuleAlertTotal(alerts: AdminModuleAlert[]): number {

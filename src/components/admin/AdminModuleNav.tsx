@@ -52,13 +52,18 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const activeModule = resolveAdminModule(pathname);
-  const alertsByModule = useAdminModuleAlerts();
+  const { alerts: alertsByModule, dismissAlert } = useAdminModuleAlerts();
 
   const goTo = (target: Pick<AdminModuleAlert, "to" | "search">) => {
     void navigate({
       to: target.to,
       search: target.search,
     });
+  };
+
+  const openAlert = (alert: AdminModuleAlert) => {
+    dismissAlert(alert.id);
+    goTo(alert);
   };
 
   return (
@@ -71,7 +76,7 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
           const queuePath = adminModuleQueuePath(module.id);
           const alerts = alertsByModule[module.id];
           const pendingTotal = adminModuleAlertTotal(alerts);
-          const primaryAlert = alerts[0] ?? { to: queuePath, search: undefined };
+          const primaryAlert = alerts[0];
 
           return (
             <div key={module.id} className="marketplace-module-nav__column">
@@ -88,7 +93,7 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
                   <span className="marketplace-module-nav__label">{module.label}</span>
                   <span className="marketplace-module-nav__hint">{module.description}</span>
                 </button>
-                {pendingTotal > 0 ? (
+                {pendingTotal > 0 && primaryAlert ? (
                   <a
                     href={alertHref(primaryAlert)}
                     className="marketplace-module-nav__badge"
@@ -96,7 +101,7 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
                     title="View latest updates"
                     onClick={(event) => {
                       event.preventDefault();
-                      goTo(primaryAlert);
+                      openAlert(primaryAlert);
                     }}
                   >
                     {pendingTotal}
@@ -113,7 +118,7 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
                         className="marketplace-module-nav__alert"
                         onClick={(event) => {
                           event.preventDefault();
-                          goTo(alert);
+                          openAlert(alert);
                         }}
                       >
                         <span className="marketplace-module-nav__alert-status">{alert.status}</span>
