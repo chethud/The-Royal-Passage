@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { BedDouble, Star, Users } from "lucide-react";
 import { ExperienceDetailGallery } from "@/components/experiences/ExperienceDetailGallery";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
@@ -20,7 +20,11 @@ import {
 } from "@/components/detail/DetailPageLayout";
 import type { Experience } from "@/data/experiences";
 import { useAuthUser } from "@/lib/auth-user";
-import { bookHomestayPath, parseHomestayBookSearch } from "@/lib/homestay-booking-url";
+import {
+  bookHomestayPath,
+  buildHomestayBookSearch,
+  parseHomestayBookSearch,
+} from "@/lib/homestay-booking-url";
 import {
   formatWeekdayWeekendRates,
   weekdayPriceMajor,
@@ -62,6 +66,7 @@ export const Route = createFileRoute("/homestays/$slug/")({
 function HomestayDetailPage() {
   const { homestay: stay, source } = Route.useLoaderData();
   const search = Route.useSearch();
+  const navigate = useNavigate();
   const { user, role } = useAuthUser();
   const checkout = useHomestayCheckout(stay, {
     initialCheckIn: search.checkIn,
@@ -82,7 +87,7 @@ function HomestayDetailPage() {
     galleryUrls: stay.galleryUrls,
   } as Pick<Experience, "slug" | "title" | "category" | "image" | "galleryUrls"> as Experience;
 
-  const bookPath = bookHomestayPath(stay.slug, {
+  const bookSearch = buildHomestayBookSearch({
     checkIn: checkout.checkIn,
     checkOut: checkout.checkOut,
     guests: checkout.guests,
@@ -90,6 +95,16 @@ function HomestayDetailPage() {
     roomCount: checkout.roomCount,
     extraBeds: checkout.extraBedCount,
   });
+  const bookPath = bookHomestayPath(stay.slug, bookSearch);
+  const canContinue = bookable && checkout.nights >= 1;
+
+  const continueToBook = () => {
+    void navigate({
+      to: "/homestays/$slug/book",
+      params: { slug: stay.slug },
+      search: bookSearch,
+    });
+  };
 
   return (
     <DetailPageShell>
@@ -212,31 +227,35 @@ function HomestayDetailPage() {
                 <Link
                   to="/sign-in"
                   search={{ redirect: bookPath }}
-                  className="luxury-btn-sm luxury-btn-primary mt-6 inline-flex w-full items-center justify-center"
+                  className={`luxury-btn-sm luxury-btn-primary mt-6 inline-flex w-full items-center justify-center ${
+                    canContinue ? "" : "pointer-events-none opacity-50"
+                  }`}
+                  aria-disabled={!canContinue}
+                  onClick={(event) => {
+                    if (!canContinue) event.preventDefault();
+                  }}
                 >
                   Sign in to book
                 </Link>
               ) : isGuestAccount(role) ? (
-                <Link
-                  to="/homestays/$slug/book"
-                  params={{ slug: stay.slug }}
-                  search={{
-                    checkIn: checkout.checkIn,
-                    checkOut: checkout.checkOut,
-                    guests: checkout.guests,
-                    roomId: checkout.roomId,
-                    roomCount: checkout.roomCount,
-                    extraBeds: checkout.extraBedCount,
-                  }}
-                  className="luxury-btn-sm luxury-btn-primary mt-6 inline-flex w-full items-center justify-center"
+                <button
+                  type="button"
+                  disabled={!canContinue}
+                  onClick={continueToBook}
+                  className="luxury-btn-sm luxury-btn-primary mt-6 inline-flex w-full items-center justify-center disabled:opacity-50"
                 >
                   Continue to book
-                </Link>
+                </button>
               ) : (
                 <p className="luxury-panel-body mt-6 text-center text-sm">
                   Sign in with a guest account to book this homestay.
                 </p>
               )
+            ) : null}
+            {bookable && !canContinue ? (
+              <p className="luxury-panel-body mt-3 text-center text-xs">
+                Select check-in and check-out dates to continue.
+              </p>
             ) : null}
           </div>
         </LuxuryCheckoutPanel>

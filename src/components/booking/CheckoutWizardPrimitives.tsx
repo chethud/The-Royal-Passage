@@ -88,6 +88,7 @@ type CheckoutWizardBackLink = {
   onClick?: () => void;
   to?: ComponentProps<typeof Link>["to"];
   params?: ComponentProps<typeof Link>["params"];
+  search?: ComponentProps<typeof Link>["search"];
   hash?: string;
 };
 
@@ -120,6 +121,7 @@ export function CheckoutWizardStepFooter({
           <Link
             to={back.to}
             params={back.params}
+            search={back.search}
             hash={back.hash}
             className="checkout-wizard-back-link"
           >

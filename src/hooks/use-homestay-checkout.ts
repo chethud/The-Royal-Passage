@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { HomestayPaymentMethod } from "@/components/homestays/HomestayCashPaymentSelector";
 import type { Homestay } from "@/data/homestays";
 import { createHomestayBooking } from "@/lib/api/homestay-bookings";
@@ -41,7 +41,7 @@ export function useHomestayCheckout(
     initialRoomId?: string;
     initialRoomCount?: number;
     initialExtraBeds?: number;
-  },
+  } = {},
 ) {
   const rooms = getActiveRooms(homestay);
   const defaultRoomId =
@@ -58,6 +58,36 @@ export function useHomestayCheckout(
   const [paymentMethod, setPaymentMethod] = useState<HomestayPaymentMethod>("cod");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const hydratedKey = useRef<string>("");
+
+  // Re-apply URL / navigation search when it arrives or changes (e.g. after auth gate).
+  useEffect(() => {
+    const key = [
+      options.initialCheckIn ?? "",
+      options.initialCheckOut ?? "",
+      options.initialGuests ?? "",
+      options.initialRoomId ?? "",
+      options.initialRoomCount ?? "",
+      options.initialExtraBeds ?? "",
+    ].join("|");
+    if (!key || key === "|||||") return;
+    if (hydratedKey.current === key) return;
+    hydratedKey.current = key;
+
+    if (options.initialCheckIn) setCheckIn(options.initialCheckIn);
+    if (options.initialCheckOut) setCheckOut(options.initialCheckOut);
+    if (options.initialGuests) setGuests(options.initialGuests);
+    if (options.initialRoomId) setRoomId(options.initialRoomId);
+    if (options.initialRoomCount) setRoomCount(options.initialRoomCount);
+    if (options.initialExtraBeds != null) setExtraBedCount(options.initialExtraBeds);
+  }, [
+    options.initialCheckIn,
+    options.initialCheckOut,
+    options.initialExtraBeds,
+    options.initialGuests,
+    options.initialRoomCount,
+    options.initialRoomId,
+  ]);
 
   const selectedRoom = useMemo(() => getSelectedRoom(homestay, roomId), [homestay, roomId]);
   const maxRooms = maxRoomCount(selectedRoom);
@@ -88,7 +118,7 @@ export function useHomestayCheckout(
   }, [maxExtra]);
 
   useEffect(() => {
-    setGuests((current) => Math.min(Math.max(1, current), maxGuests));
+    setGuests((current) => Math.min(Math.max(1, current), Math.max(1, maxGuests)));
   }, [maxGuests]);
 
   useEffect(() => {

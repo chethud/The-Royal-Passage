@@ -5,7 +5,11 @@ import { HomestayCheckoutWizard } from "@/components/homestays/HomestayCheckoutW
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { useAuthUser } from "@/lib/auth-user";
-import { bookHomestayPath, parseHomestayBookSearch } from "@/lib/homestay-booking-url";
+import {
+  bookHomestayPath,
+  buildHomestayBookSearch,
+  parseHomestayBookSearch,
+} from "@/lib/homestay-booking-url";
 import { getHomestayForDetail } from "@/lib/homestay-fns";
 import { dashboardPathForRole, isGuestAccount, isStaffRole } from "@/lib/roles";
 
@@ -34,14 +38,8 @@ function BookHomestayPage() {
   const navigate = useNavigate();
   const { user, role, loading } = useAuthUser();
 
-  const redirectPath = bookHomestayPath(stay.slug, {
-    checkIn: search.checkIn,
-    checkOut: search.checkOut,
-    guests: search.guests,
-    roomId: search.roomId,
-    roomCount: search.roomCount,
-    extraBeds: search.extraBeds,
-  });
+  const bookSearch = buildHomestayBookSearch(search);
+  const redirectPath = bookHomestayPath(stay.slug, bookSearch);
 
   useEffect(() => {
     if (loading) return;
@@ -75,6 +73,7 @@ function BookHomestayPage() {
           <Link
             to="/homestays/$slug"
             params={{ slug: stay.slug }}
+            search={bookSearch}
             hash="book"
             className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
           >
@@ -92,12 +91,12 @@ function BookHomestayPage() {
           <HomestayCheckoutWizard
             stay={stay}
             source={source}
-            initialCheckIn={search.checkIn}
-            initialCheckOut={search.checkOut}
-            initialGuests={search.guests}
-            initialRoomId={search.roomId}
-            initialRoomCount={search.roomCount}
-            initialExtraBeds={search.extraBeds}
+            initialCheckIn={bookSearch.checkIn}
+            initialCheckOut={bookSearch.checkOut}
+            initialGuests={bookSearch.guests}
+            initialRoomId={bookSearch.roomId}
+            initialRoomCount={bookSearch.roomCount}
+            initialExtraBeds={bookSearch.extraBeds}
             backLink={{
               to: "/homestays/$slug",
               params: { slug: stay.slug },

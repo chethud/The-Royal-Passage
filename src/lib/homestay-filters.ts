@@ -12,13 +12,29 @@ export type HomestayBrowseSearch = {
 };
 
 export function parseHomestayBrowseSearch(search: Record<string, unknown>): HomestayBrowseSearch {
-  const num = (value: unknown) => (typeof value === "string" && value ? Number(value) : undefined);
+  const readPositiveInt = (value: unknown): number | undefined => {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      const n = Math.trunc(value);
+      return n > 0 ? n : undefined;
+    }
+    if (typeof value === "string" && value.trim()) {
+      const n = Number.parseInt(value, 10);
+      return Number.isFinite(n) && n > 0 ? n : undefined;
+    }
+    return undefined;
+  };
+  const readDate = (value: unknown): string | undefined => {
+    if (typeof value !== "string") return undefined;
+    const trimmed = value.trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(trimmed) ? trimmed : undefined;
+  };
+
   return {
     q: typeof search.q === "string" ? search.q : undefined,
     propertyType: typeof search.propertyType === "string" ? search.propertyType : undefined,
-    checkIn: typeof search.checkIn === "string" ? search.checkIn : undefined,
-    checkOut: typeof search.checkOut === "string" ? search.checkOut : undefined,
-    guests: num(search.guests),
+    checkIn: readDate(search.checkIn),
+    checkOut: readDate(search.checkOut),
+    guests: readPositiveInt(search.guests),
   };
 }
 

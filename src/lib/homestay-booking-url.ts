@@ -7,26 +7,84 @@ export type HomestayBookSearch = {
   extraBeds?: number;
 };
 
+function readDate(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return undefined;
+  return trimmed;
+}
+
+function readPositiveInt(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    const n = Math.trunc(value);
+    return n > 0 ? n : undefined;
+  }
+  if (typeof value === "string" && value.trim()) {
+    const n = Number.parseInt(value, 10);
+    return Number.isFinite(n) && n > 0 ? n : undefined;
+  }
+  return undefined;
+}
+
+function readNonNegativeInt(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    const n = Math.trunc(value);
+    return n >= 0 ? n : undefined;
+  }
+  if (typeof value === "string" && value.trim()) {
+    const n = Number.parseInt(value, 10);
+    return Number.isFinite(n) && n >= 0 ? n : undefined;
+  }
+  return undefined;
+}
+
 export function parseHomestayBookSearch(search: Record<string, unknown>): HomestayBookSearch {
-  const num = (value: unknown) => (typeof value === "string" && value ? Number(value) : undefined);
   return {
-    checkIn: typeof search.checkIn === "string" ? search.checkIn : undefined,
-    checkOut: typeof search.checkOut === "string" ? search.checkOut : undefined,
-    guests: num(search.guests),
-    roomId: typeof search.roomId === "string" ? search.roomId : undefined,
-    roomCount: num(search.roomCount),
-    extraBeds: num(search.extraBeds),
+    checkIn: readDate(search.checkIn),
+    checkOut: readDate(search.checkOut),
+    guests: readPositiveInt(search.guests),
+    roomId: typeof search.roomId === "string" && search.roomId.trim() ? search.roomId.trim() : undefined,
+    roomCount: readPositiveInt(search.roomCount),
+    extraBeds: readNonNegativeInt(search.extraBeds),
+  };
+}
+
+/** Build a clean search object for Links / navigate (omit empty / default-only fields). */
+export function buildHomestayBookSearch(input: {
+  checkIn?: string;
+  checkOut?: string;
+  guests?: number;
+  roomId?: string;
+  roomCount?: number;
+  extraBeds?: number;
+}): HomestayBookSearch {
+  const checkIn = readDate(input.checkIn);
+  const checkOut = readDate(input.checkOut);
+  const guests = readPositiveInt(input.guests);
+  const roomId =
+    typeof input.roomId === "string" && input.roomId.trim() ? input.roomId.trim() : undefined;
+  const roomCount = readPositiveInt(input.roomCount);
+  const extraBeds = readNonNegativeInt(input.extraBeds);
+
+  return {
+    ...(checkIn ? { checkIn } : {}),
+    ...(checkOut ? { checkOut } : {}),
+    ...(guests ? { guests } : {}),
+    ...(roomId ? { roomId } : {}),
+    ...(roomCount && roomCount > 1 ? { roomCount } : {}),
+    ...(extraBeds && extraBeds > 0 ? { extraBeds } : {}),
   };
 }
 
 export function bookHomestayPath(slug: string, search?: HomestayBookSearch) {
+  const clean = buildHomestayBookSearch(search ?? {});
   const params = new URLSearchParams();
-  if (search?.checkIn) params.set("checkIn", search.checkIn);
-  if (search?.checkOut) params.set("checkOut", search.checkOut);
-  if (search?.guests) params.set("guests", String(search.guests));
-  if (search?.roomId) params.set("roomId", search.roomId);
-  if (search?.roomCount && search.roomCount > 1) params.set("roomCount", String(search.roomCount));
-  if (search?.extraBeds) params.set("extraBeds", String(search.extraBeds));
+  if (clean.checkIn) params.set("checkIn", clean.checkIn);
+  if (clean.checkOut) params.set("checkOut", clean.checkOut);
+  if (clean.guests) params.set("guests", String(clean.guests));
+  if (clean.roomId) params.set("roomId", clean.roomId);
+  if (clean.roomCount) params.set("roomCount", String(clean.roomCount));
+  if (clean.extraBeds) params.set("extraBeds", String(clean.extraBeds));
   const query = params.toString();
   return query ? `/homestays/${slug}/book?${query}` : `/homestays/${slug}/book`;
 }

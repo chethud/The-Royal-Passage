@@ -1,3 +1,5 @@
+import { useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import {
   CheckoutWizardConfirmRow,
@@ -14,6 +16,7 @@ import { PayAtHomestayBadge } from "@/components/homestays/PayAtHomestayBadge";
 import type { Homestay } from "@/data/homestays";
 import { useHomestayCheckout } from "@/hooks/use-homestay-checkout";
 import { formatDateLong } from "@/lib/date-format";
+import { buildHomestayBookSearch } from "@/lib/homestay-booking-url";
 import { formatMoney } from "@/lib/money";
 
 type HomestayCheckoutWizardProps = {
@@ -51,6 +54,7 @@ export function HomestayCheckoutWizard({
   onSuccess,
   backLink,
 }: HomestayCheckoutWizardProps) {
+  const navigate = useNavigate();
   const checkout = useHomestayCheckout(stay, {
     initialCheckIn,
     initialCheckOut,
@@ -61,6 +65,33 @@ export function HomestayCheckoutWizard({
   });
   const bookable = source === "live" && !stay.id.startsWith("stay-");
   const sym = stay.currencySymbol ?? "₹";
+
+  // Keep dates/guests in the URL so the next step (and refresh) keeps the same selection.
+  useEffect(() => {
+    if (!checkout.checkIn || !checkout.checkOut) return;
+    void navigate({
+      to: "/homestays/$slug/book",
+      params: { slug: stay.slug },
+      search: buildHomestayBookSearch({
+        checkIn: checkout.checkIn,
+        checkOut: checkout.checkOut,
+        guests: checkout.guests,
+        roomId: checkout.roomId,
+        roomCount: checkout.roomCount,
+        extraBeds: checkout.extraBedCount,
+      }),
+      replace: true,
+    });
+  }, [
+    checkout.checkIn,
+    checkout.checkOut,
+    checkout.extraBedCount,
+    checkout.guests,
+    checkout.roomCount,
+    checkout.roomId,
+    navigate,
+    stay.slug,
+  ]);
 
   const handleSubmit = async () => {
     const bookingId = await checkout.submit();
@@ -138,6 +169,20 @@ export function HomestayCheckoutWizard({
             description="Homestays on Royal Passage use cash payment only — no cards or online checkout."
           />
           <CheckoutWizardStepBody>
+            <dl className="luxury-panel-body mb-6 space-y-0 text-sm">
+              <CheckoutWizardConfirmRow
+                label="Dates"
+                value={
+                  <>
+                    {formatDateLong(checkout.checkIn)} → {formatDateLong(checkout.checkOut)}
+                  </>
+                }
+              />
+              <CheckoutWizardConfirmRow label="Guests" value={String(checkout.guests)} />
+              {checkout.selectedRoom ? (
+                <CheckoutWizardConfirmRow label="Room" value={roomSummary} />
+              ) : null}
+            </dl>
             <HomestayCashPaymentSelector
               value={checkout.paymentMethod}
               onChange={checkout.setPaymentMethod}
