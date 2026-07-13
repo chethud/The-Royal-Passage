@@ -7,9 +7,13 @@ import { cn } from "@/lib/utils";
 
 type ExperienceDetailGalleryProps = {
   exp: Experience;
+  showTitleOnHover?: boolean;
 };
 
-export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
+export function ExperienceDetailGallery({
+  exp,
+  showTitleOnHover = false,
+}: ExperienceDetailGalleryProps) {
   const photos = getExperienceGalleryImages(exp);
   const [activeIndex, setActiveIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<"next" | "prev">("next");
@@ -28,7 +32,7 @@ export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
   return (
     <div className="space-y-3">
       <div
-        className="experience-detail-gallery-main relative w-full overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]"
+        className="experience-detail-gallery-main group relative w-full overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]"
         aria-label={`${exp.title} photos`}
       >
         <div className="experience-detail-gallery__frame">
@@ -50,6 +54,17 @@ export function ExperienceDetailGallery({ exp }: ExperienceDetailGalleryProps) {
             />
           </div>
         </div>
+
+        {showTitleOnHover ? (
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] bg-gradient-to-t from-[oklch(0.12_0.06_22_/_0.92)] via-[oklch(0.12_0.06_22_/_0.55)] to-transparent px-4 pb-5 pt-16 opacity-100 transition-opacity duration-300 md:pb-6 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+            aria-hidden
+          >
+            <p className="font-display text-[1.15rem] uppercase leading-[1.08] tracking-[0.03em] text-[#F7F1E8] drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] sm:text-2xl md:text-[1.85rem]">
+              {exp.title}
+            </p>
+          </div>
+        ) : null}
 
         <div className="absolute left-3.5 top-3.5 z-10">
           <span

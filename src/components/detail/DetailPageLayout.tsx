@@ -70,7 +70,22 @@ export function DetailHeroGrid({
 }
 
 export function DetailCategoryBadge({ children }: { children: ReactNode }) {
-  return <div className={`mb-3 inline-flex items-center gap-2 sm:mb-5 ${detailEyebrowClass}`}>{children}</div>;
+  return <div className={`inline-flex items-center gap-2 ${detailEyebrowClass}`}>{children}</div>;
+}
+
+export function DetailCategoryActionsRow({
+  badge,
+  actions,
+}: {
+  badge: ReactNode;
+  actions?: ReactNode;
+}) {
+  return (
+    <div className="mb-3 flex items-start justify-between gap-3 sm:mb-5">
+      <div className="min-w-0">{badge}</div>
+      {actions ? <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">{actions}</div> : null}
+    </div>
+  );
 }
 
 type DetailLocationBlockProps = {
@@ -121,9 +136,17 @@ export function DetailTitleRow({
   );
 }
 
-export function DetailTagline({ children }: { children: ReactNode }) {
+export function DetailTagline({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <p className="mt-2 font-display text-[0.9rem] italic leading-relaxed text-[#D6C8B5]/90 sm:mt-4 sm:text-base md:text-lg">
+    <p
+      className={`mt-2 font-display text-[0.9rem] italic leading-relaxed text-[#D6C8B5]/90 sm:mt-4 sm:text-base md:text-lg ${className}`.trim()}
+    >
       {children}
     </p>
   );

@@ -273,7 +273,7 @@ export function Header() {
               </button>
             </SheetTrigger>
             <SheetContent side="right" className={headerMobileSheetClass}>
-              <SheetHeader className="space-y-1 text-left">
+              <SheetHeader className="shrink-0 space-y-1 text-left">
                 <SheetTitle className="font-display text-xl tracking-wide">The Royal Passage</SheetTitle>
                 {displayName ? (
                   <p className="text-sm text-muted-foreground">{displayName}</p>

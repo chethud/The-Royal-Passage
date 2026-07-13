@@ -5,6 +5,7 @@ import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DetailListPanel } from "@/components/detail/DetailListPanel";
 import {
   DetailBookingSection,
+  DetailCategoryActionsRow,
   DetailCategoryBadge,
   DetailDarkSection,
   DetailDivider,
@@ -16,7 +17,6 @@ import {
   DetailStatGrid,
   DetailStatItem,
   DetailTagline,
-  DetailTitleRow,
 } from "@/components/detail/DetailPageLayout";
 import { ExperienceDetailGallery } from "@/components/experiences/ExperienceDetailGallery";
 import { ExperienceReviewsSection } from "@/components/reviews/ExperienceReviewsSection";
@@ -123,23 +123,17 @@ function ExperienceDetail() {
         </DetailBackLink>
 
         <DetailHeroGrid
-          gallery={<ExperienceDetailGallery exp={exp} />}
+          gallery={<ExperienceDetailGallery exp={exp} showTitleOnHover />}
           content={
             <>
               <div>
-                <DetailCategoryBadge>
-                  <CategoryIcon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
-                  {exp.category}
-                </DetailCategoryBadge>
-
-                <DetailLocationBlock
-                  locationLine={locationLine}
-                  address={exp.address}
-                  mapLink={exp.mapLink}
-                />
-
-                <DetailTitleRow
-                  title={exp.title}
+                <DetailCategoryActionsRow
+                  badge={
+                    <DetailCategoryBadge>
+                      <CategoryIcon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+                      {exp.category}
+                    </DetailCategoryBadge>
+                  }
                   actions={
                     <>
                       <AddToCartButton
@@ -155,7 +149,9 @@ function ExperienceDetail() {
                   }
                 />
 
-                {exp.tagline ? <DetailTagline>{exp.tagline}</DetailTagline> : null}
+                <h1 className="sr-only">{exp.title}</h1>
+
+                {exp.tagline ? <DetailTagline className="mt-0 sm:mt-0">{exp.tagline}</DetailTagline> : null}
 
                 <DetailDivider />
 
@@ -197,6 +193,12 @@ function ExperienceDetail() {
                       Check availability
                     </a>
                   ) : null}
+
+                  <DetailLocationBlock
+                    locationLine={locationLine}
+                    address={exp.address}
+                    mapLink={exp.mapLink}
+                  />
                 </div>
               </div>
 
