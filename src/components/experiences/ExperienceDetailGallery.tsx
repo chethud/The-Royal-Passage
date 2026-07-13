@@ -48,7 +48,7 @@ export function ExperienceDetailGallery({
               <img
                 src={activePhoto}
                 alt={`${exp.title} photo ${activeIndex + 1} of ${photos.length}`}
-                className="experience-detail-gallery__image aspect-[4/4] w-full object-cover sm:aspect-[4/5] md:aspect-auto md:h-[min(70vh,640px)]"
+                className="experience-detail-gallery__image aspect-[4/4] w-full object-cover sm:aspect-[4/5] md:aspect-auto md:h-[min(58vh,520px)]"
                 width={1200}
                 height={1500}
                 decoding="async"

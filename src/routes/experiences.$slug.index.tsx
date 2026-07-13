@@ -158,21 +158,21 @@ function ExperienceDetail() {
                   </DetailStatItem>
                 </DetailStatGrid>
 
+                {canBook ? (
+                  <a
+                    href="#book"
+                    className="luxury-btn-sm luxury-btn-primary mt-5 inline-flex w-fit items-center no-underline sm:mt-6"
+                  >
+                    Buy now
+                  </a>
+                ) : null}
+
                 <div className="mt-5 space-y-5 sm:mt-8 sm:space-y-6">
                   <DetailDarkSection label="About this experience" className="">
                     <p className="text-sm leading-relaxed text-[#D6C8B5]/92 whitespace-pre-line sm:text-[0.9375rem]">
                       {exp.description}
                     </p>
                   </DetailDarkSection>
-
-                  {canBook ? (
-                    <a
-                      href="#book"
-                      className="luxury-btn-sm luxury-btn-primary inline-flex w-fit items-center no-underline"
-                    >
-                      Buy now
-                    </a>
-                  ) : null}
 
                   <DetailDarkSection label="Hosted by" className="">
                     <div className="font-display text-base uppercase tracking-[0.04em] text-[#F7F1E8] sm:text-lg">
