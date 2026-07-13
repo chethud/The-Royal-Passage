@@ -53,7 +53,7 @@ export function DetailBackLink({ className = "", ...props }: DetailBackLinkProps
 export function DetailHeroGrid({
   gallery,
   content,
-  contentClassName = "flex w-full min-w-0 flex-col space-y-6 md:pt-2",
+  contentClassName = "flex w-full min-w-0 flex-col space-y-6",
 }: {
   gallery: ReactNode;
   content: ReactNode;
@@ -129,11 +129,13 @@ export function DetailTitleRow({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mt-2.5 flex items-start justify-between gap-3 sm:mt-5 sm:gap-4">
-      <h1 className="font-display text-[1.45rem] uppercase leading-[1.08] tracking-[0.03em] text-[#F7F1E8] sm:text-3xl sm:leading-[1.08] md:text-[2.65rem]">
+    <div className="flex items-start justify-between gap-3 sm:gap-4">
+      <h1 className="font-display text-[1.45rem] uppercase leading-none tracking-[0.03em] text-[#F7F1E8] sm:text-3xl md:text-[2.65rem]">
         {title}
       </h1>
-      {actions ? <div className="flex shrink-0 items-center gap-1.5 pt-0.5 sm:gap-2 sm:pt-1">{actions}</div> : null}
+      {actions ? (
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">{actions}</div>
+      ) : null}
     </div>
   );
 }
