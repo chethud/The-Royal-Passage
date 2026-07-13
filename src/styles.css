@@ -6,7 +6,7 @@
 
 @theme inline {
   --font-display: "Cinzel", ui-serif, Georgia, serif;
-  --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Cormorant Garamond", "Times New Roman", ui-serif, Georgia, serif;
   --font-royal: "Cinzel Decorative", "Cinzel", ui-serif, Georgia, serif;
 
   --radius-sm: 2px;
@@ -182,8 +182,8 @@
   }
   button,
   [role="button"] {
-    font-family: var(--font-display);
-    letter-spacing: 0.06em;
+    font-family: var(--font-sans);
+    letter-spacing: 0.04em;
   }
   h1 {
     font-family: var(--font-royal);
@@ -199,8 +199,8 @@
   }
   label,
   legend {
-    font-family: var(--font-display);
-    letter-spacing: 0.08em;
+    font-family: var(--font-sans);
+    letter-spacing: 0.04em;
   }
   ::selection {
     background-color: oklch(0.62 0.1 78 / 0.45);
@@ -221,7 +221,7 @@
 }
 
 @utility eyebrow {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 0.7rem;
   letter-spacing: 0.24em;
   text-transform: uppercase;
@@ -253,7 +253,7 @@
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
   border-bottom: 1px solid oklch(0.72 0.09 78 / 0.14);
   box-shadow: 0 0 0 transparent;
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
 }
 .site-header[data-elevated="true"] {
   background-color: oklch(0.17 0.08 22 / 0.92);
@@ -847,9 +847,9 @@
 }
 
 .luxury-panel-label {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   color: #4a0000;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
 }
 
 /* Plain number fields — no browser up/down spinners */
@@ -4936,6 +4936,49 @@ a.royal-passport-book__vip-label:hover {
   outline: 2px solid rgb(200 162 90 / 0.55);
   outline-offset: 2px;
   border-radius: 999px;
+}
+
+.experiences-filter-range-h__labels {
+  position: relative;
+  margin-top: 0.35rem;
+  height: 2.6rem;
+}
+
+.experiences-filter-range-h__label {
+  position: absolute;
+  top: 0;
+  left: calc(0.35rem + (100% - 0.7rem) * var(--range-stop, 0));
+  display: flex;
+  width: max-content;
+  max-width: 3.25rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  transform: translateX(-50%);
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.experiences-filter-range-h__label:focus-visible {
+  outline: 2px solid rgb(200 162 90 / 0.5);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.experiences-filter-range-h__label-text {
+  display: block;
+  width: 100%;
+  font-size: 0.58rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {

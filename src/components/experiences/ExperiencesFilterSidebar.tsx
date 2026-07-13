@@ -321,13 +321,11 @@ function HorizontalRangeFilter({
         <div className="experiences-filter-range-h__knob" aria-hidden />
       </div>
 
-      <div
-        className="mt-2 grid"
-        style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
-      >
-        {options.map((option) => {
+      <div className="experiences-filter-range-h__labels">
+        {options.map((option, index) => {
           const active = option.key === activeKey;
           const Icon = option.Icon;
+          const stop = options.length <= 1 ? 0 : index / (options.length - 1);
           return (
             <button
               key={option.key}
@@ -335,8 +333,9 @@ function HorizontalRangeFilter({
               aria-label={option.label}
               aria-pressed={active}
               onClick={() => onSelect(option.key)}
-              className={`flex flex-col items-center gap-1 px-0.5 py-1 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]/50 ${
-                active ? "text-[#F7F1E8]" : "text-[#F7F1E8]/55 hover:text-[#F7F1E8]"
+              style={{ ["--range-stop" as string]: String(stop) }}
+              className={`experiences-filter-range-h__label ${
+                active ? "is-active text-[#F7F1E8]" : "text-[#F7F1E8]/55 hover:text-[#F7F1E8]"
               }`}
             >
               <Icon
@@ -345,9 +344,7 @@ function HorizontalRangeFilter({
                   active ? "text-[#D4AF6A]" : "text-[#D4AF6A]/65"
                 }`}
               />
-              <span className="w-full truncate text-[0.58rem] font-medium leading-tight tracking-[0.02em]">
-                {option.shortLabel}
-              </span>
+              <span className="experiences-filter-range-h__label-text">{option.shortLabel}</span>
             </button>
           );
         })}

@@ -71,10 +71,14 @@ export function HomeHero({
         />
       </div>
 
-      <div className="relative z-10 flex min-h-[max(640px,100dvh)] flex-col pt-[var(--header-height)]">
-        <SiteBannerStrip />
-        <div className="container-page flex flex-1 flex-col justify-center py-14 md:py-20">
-          <motion.div className="max-w-2xl" variants={revealParent} initial="hidden" animate="show">
+      <div className="container-page relative z-10 flex min-h-[max(640px,100dvh)] flex-col justify-center pt-[var(--header-height)]">
+        <div className="pointer-events-none absolute inset-x-0 top-[var(--header-height)] z-20 w-full">
+          <div className="pointer-events-auto">
+            <SiteBannerStrip />
+          </div>
+        </div>
+        <div className="py-14 md:py-20">
+          <motion.div className="max-w-2xl text-left" variants={revealParent} initial="hidden" animate="show">
             <motion.div variants={revealItem} className="eyebrow mb-5 text-ember/95">
               Curated Experiences
             </motion.div>
@@ -99,7 +103,7 @@ export function HomeHero({
             </motion.p>
             <motion.div
               variants={revealItem}
-              className="mt-7 flex flex-wrap items-center gap-3 sm:mt-9 sm:gap-4"
+              className="mt-7 flex flex-wrap items-center justify-start gap-3 sm:mt-9 sm:gap-4"
             >
               <Link
                 to="/experiences"
