@@ -43,7 +43,7 @@ export function HomeHero({
   const [activeSlide, setActiveSlide] = useState(0);
 
   const cinematic = Boolean(intro) && !editable;
-  const chromeRevealed = !cinematic || Boolean(intro?.chromeRevealed) || reduceMotion;
+  const copyRevealed = !cinematic || Boolean(intro?.copyRevealed) || reduceMotion;
   const splashDone = !cinematic || Boolean(intro?.splashDone) || reduceMotion;
 
   const heroSlides = slides.map((slide) => ({
@@ -58,7 +58,18 @@ export function HomeHero({
 
   return (
     <section className="relative min-h-[max(640px,100dvh)] w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)]">
-      <div className="absolute inset-0 z-0">
+      <motion.div
+        className="absolute inset-0 z-0 origin-center"
+        initial={false}
+        animate={
+          cinematic && !reduceMotion && splashDone
+            ? copyRevealed
+              ? { scale: 1.04 }
+              : { scale: 1.08 }
+            : { scale: 1 }
+        }
+        transition={{ duration: 1.4, ease: softEase }}
+      >
         <HeroSlideshow
           images={heroSlides}
           reduceMotion={reduceMotion}
@@ -75,16 +86,16 @@ export function HomeHero({
           className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent"
           aria-hidden
         />
-      </div>
+      </motion.div>
 
       <div className="container-page relative z-10 flex min-h-[max(640px,100dvh)] flex-col justify-center pt-[var(--header-height)]">
-        {chromeRevealed ? (
+        {copyRevealed ? (
           <div className="pointer-events-none absolute inset-x-0 top-[var(--header-height)] z-20 w-full">
             <motion.div
               className="pointer-events-auto"
               initial={cinematic && !reduceMotion ? { opacity: 0, y: -12 } : false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: softEase, delay: 0.15 }}
+              transition={{ duration: 0.7, ease: softEase, delay: 0.55 }}
             >
               <SiteBannerStrip />
             </motion.div>
@@ -92,7 +103,7 @@ export function HomeHero({
         ) : null}
 
         <div className="py-14 md:py-20">
-          {chromeRevealed ? (
+          {copyRevealed ? (
             <motion.div
               className="max-w-2xl text-left"
               variants={reduceMotion ? undefined : revealParent}
@@ -163,7 +174,7 @@ export function HomeHero({
           </div>
         ) : null}
 
-        {!editable && splashDone ? (
+        {!editable && copyRevealed ? (
           reduceMotion ? (
             <a
               href="#experiences"
@@ -179,9 +190,9 @@ export function HomeHero({
               href="#experiences"
               aria-label="Scroll to experiences"
               className="pointer-events-auto absolute inset-x-0 bottom-[4.75rem] z-20 flex justify-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: chromeRevealed ? 0.55 : 1 }}
-              transition={{ duration: 0.7, delay: 0.2, ease: softEase }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 0.7, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.45, ease: softEase }}
             >
               <motion.span
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] bg-[oklch(0.12_0.06_22_/_0.45)] text-ink/80 backdrop-blur-md"
@@ -194,23 +205,26 @@ export function HomeHero({
           )
         ) : null}
 
-        <div
-          className={`pointer-events-auto absolute inset-x-0 bottom-8 z-20 flex items-center justify-center gap-2 transition-opacity duration-500 ${
-            splashDone ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          {heroSlides.map((slide, i) => (
-            <button
-              key={`${slide.src}-${i}`}
-              type="button"
-              onClick={() => setActiveSlide(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              className={`h-1 transition-all ${
-                i === activeSlide ? "w-10 bg-ember" : "w-6 bg-ink/30 hover:bg-ink/55"
-              }`}
-            />
-          ))}
-        </div>
+        {copyRevealed ? (
+          <motion.div
+            className="pointer-events-auto absolute inset-x-0 bottom-8 z-20 flex items-center justify-center gap-2"
+            initial={cinematic && !reduceMotion ? { opacity: 0, y: 10 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.4, ease: softEase }}
+          >
+            {heroSlides.map((slide, i) => (
+              <button
+                key={`${slide.src}-${i}`}
+                type="button"
+                onClick={() => setActiveSlide(i)}
+                aria-label={`Go to slide ${i + 1}`}
+                className={`h-1 transition-all ${
+                  i === activeSlide ? "w-10 bg-ember" : "w-6 bg-ink/30 hover:bg-ink/55"
+                }`}
+              />
+            ))}
+          </motion.div>
+        ) : null}
       </div>
     </section>
   );

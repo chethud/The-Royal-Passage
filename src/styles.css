@@ -259,10 +259,11 @@
     oklch(0.14 0.06 22);
 }
 .home-brand-splash__logo {
-  width: min(72vw, 17.5rem);
+  width: min(78vw, 20rem);
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 0 28px oklch(0.75 0.12 86 / 0.4));
+  image-rendering: auto;
+  filter: drop-shadow(0 8px 28px oklch(0.08 0.04 22 / 0.55));
 }
 .brand-logo-loader {
   position: fixed;
@@ -276,17 +277,18 @@
     oklch(0.14 0.06 22);
 }
 .brand-logo-loader__logo {
-  width: min(64vw, 13.75rem);
+  width: min(72vw, 16.5rem);
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 0 28px oklch(0.75 0.12 86 / 0.4));
-  animation: brand-logo-breathe 1.8s ease-in-out infinite;
+  image-rendering: auto;
+  filter: drop-shadow(0 8px 28px oklch(0.08 0.04 22 / 0.55));
+  animation: brand-logo-breathe 2.2s ease-in-out infinite;
 }
 @keyframes brand-logo-breathe {
   0%,
   100% {
-    opacity: 0.72;
-    transform: scale(0.97);
+    opacity: 0.88;
+    transform: scale(0.985);
   }
   50% {
     opacity: 1;

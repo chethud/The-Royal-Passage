@@ -12,7 +12,10 @@ import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 type HomeIntroContextValue = {
   splashDone: boolean;
-  chromeRevealed: boolean;
+  /** Hero copy + controls revealed after first scroll */
+  copyRevealed: boolean;
+  /** Navbar arrives after copy animation */
+  navRevealed: boolean;
 };
 
 const HomeIntroContext = createContext<HomeIntroContextValue | null>(null);
@@ -23,16 +26,20 @@ export function useHomeIntro() {
 
 const SPLASH_MS = 1800;
 const REVEAL_SCROLL_PX = 48;
+/** Delay before navbar slides in after hero copy starts */
+const NAV_AFTER_COPY_MS = 780;
 
 export function HomeIntroProvider({ children }: { children: ReactNode }) {
   const reduceMotion = usePrefersReducedMotion();
   const [splashDone, setSplashDone] = useState(reduceMotion);
-  const [chromeRevealed, setChromeRevealed] = useState(reduceMotion);
+  const [copyRevealed, setCopyRevealed] = useState(reduceMotion);
+  const [navRevealed, setNavRevealed] = useState(reduceMotion);
 
   useEffect(() => {
     if (reduceMotion) {
       setSplashDone(true);
-      setChromeRevealed(true);
+      setCopyRevealed(true);
+      setNavRevealed(true);
       return;
     }
     const previousOverflow = document.body.style.overflow;
@@ -48,22 +55,28 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
   }, [reduceMotion]);
 
   useEffect(() => {
-    if (!splashDone || chromeRevealed || reduceMotion) return;
+    if (!splashDone || copyRevealed || reduceMotion) return;
 
     const onScroll = () => {
       if (window.scrollY >= REVEAL_SCROLL_PX) {
-        setChromeRevealed(true);
+        setCopyRevealed(true);
       }
     };
 
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [splashDone, chromeRevealed, reduceMotion]);
+  }, [splashDone, copyRevealed, reduceMotion]);
+
+  useEffect(() => {
+    if (!copyRevealed || navRevealed || reduceMotion) return;
+    const timer = window.setTimeout(() => setNavRevealed(true), NAV_AFTER_COPY_MS);
+    return () => window.clearTimeout(timer);
+  }, [copyRevealed, navRevealed, reduceMotion]);
 
   const value = useMemo(
-    () => ({ splashDone, chromeRevealed }),
-    [splashDone, chromeRevealed],
+    () => ({ splashDone, copyRevealed, navRevealed }),
+    [splashDone, copyRevealed, navRevealed],
   );
 
   return <HomeIntroContext.Provider value={value}>{children}</HomeIntroContext.Provider>;
@@ -89,12 +102,12 @@ export function HomeBrandSplash() {
           <motion.img
             src={logoUrl}
             alt=""
-            width={280}
-            height={96}
+            width={320}
+            height={110}
             className="home-brand-splash__logo"
-            initial={{ opacity: 0, scale: 0.92 }}
+            initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
           />
         </motion.div>
       ) : null}
@@ -109,8 +122,8 @@ export function BrandLogoLoader({ label = "Loading" }: { label?: string }) {
       <img
         src={logoUrl}
         alt=""
-        width={220}
-        height={76}
+        width={260}
+        height={90}
         className="brand-logo-loader__logo"
       />
     </div>

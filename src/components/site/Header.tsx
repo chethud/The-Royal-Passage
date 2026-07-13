@@ -113,7 +113,7 @@ export function Header() {
   const homeIntro = useHomeIntro();
   const cinematicState =
     homeIntro && homeIntro.splashDone
-      ? homeIntro.chromeRevealed
+      ? homeIntro.navRevealed
         ? "revealed"
         : "pending"
       : homeIntro && !homeIntro.splashDone
