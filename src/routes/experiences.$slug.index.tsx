@@ -5,8 +5,6 @@ import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DetailListPanel } from "@/components/detail/DetailListPanel";
 import {
   DetailBookingSection,
-  DetailCategoryActionsRow,
-  DetailCategoryBadge,
   DetailDarkSection,
   DetailDivider,
   DetailHeroGrid,
@@ -17,6 +15,7 @@ import {
   DetailStatGrid,
   DetailStatItem,
   DetailTagline,
+  DetailTitleRow,
 } from "@/components/detail/DetailPageLayout";
 import { ExperienceDetailGallery } from "@/components/experiences/ExperienceDetailGallery";
 import { ExperienceReviewsSection } from "@/components/reviews/ExperienceReviewsSection";
@@ -29,7 +28,6 @@ import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
 import { useBookingClock } from "@/hooks/use-today-iso-date";
 import { getExperienceForDetail } from "@/lib/marketplace-fns";
 import { getExperienceReviews } from "@/lib/review-fns";
-import { categoryIconForLabel } from "@/lib/experience-category-icons";
 import { buildExperienceJsonLd, SITE_URL } from "@/lib/seo";
 import { canonicalLink } from "@/lib/seo-helpers";
 
@@ -113,7 +111,6 @@ function ExperienceDetail() {
   const ldJson = buildExperienceJsonLd(exp, reviews);
   const locationLine = [exp.region, exp.city].filter(Boolean).join(" · ");
   const canBook = bookableSlots.some((slot) => slot.available > 0);
-  const CategoryIcon = categoryIconForLabel(exp.category);
 
   return (
     <DetailPageShell jsonLd={ldJson}>
@@ -127,13 +124,8 @@ function ExperienceDetail() {
           content={
             <>
               <div>
-                <DetailCategoryActionsRow
-                  badge={
-                    <DetailCategoryBadge>
-                      <CategoryIcon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
-                      {exp.category}
-                    </DetailCategoryBadge>
-                  }
+                <DetailTitleRow
+                  title={exp.title}
                   actions={
                     <>
                       <AddToCartButton
@@ -148,9 +140,7 @@ function ExperienceDetail() {
                   }
                 />
 
-                <h1 className="sr-only">{exp.title}</h1>
-
-                {exp.tagline ? <DetailTagline className="mt-0 sm:mt-0">{exp.tagline}</DetailTagline> : null}
+                {exp.tagline ? <DetailTagline>{exp.tagline}</DetailTagline> : null}
 
                 <DetailDivider />
 
