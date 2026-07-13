@@ -138,21 +138,12 @@ function ExperienceDetail() {
                     <>
                       <AddToCartButton
                         exp={exp}
-                        showLabel
-                        className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] font-display text-[#F7F1E8] hover:border-[#D4AF6A]"
+                        className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
                       />
                       <WishlistButton
                         experienceId={exp.id}
                         className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
                       />
-                      {canBook ? (
-                        <a
-                          href="#book"
-                          className="luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
-                        >
-                          Buy now
-                        </a>
-                      ) : null}
                     </>
                   }
                 />
@@ -183,6 +174,15 @@ function ExperienceDetail() {
                       {exp.description}
                     </p>
                   </DetailDarkSection>
+
+                  {canBook ? (
+                    <a
+                      href="#book"
+                      className="luxury-btn-sm luxury-btn-primary inline-flex w-fit items-center no-underline"
+                    >
+                      Buy now
+                    </a>
+                  ) : null}
 
                   <DetailDarkSection label="Hosted by" className="">
                     <div className="font-display text-base uppercase tracking-[0.04em] text-[#F7F1E8] sm:text-lg">
