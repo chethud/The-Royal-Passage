@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { motion } from "motion/react";
-import { useState } from "react";
+import { motion, useScroll, useSpring, useTransform } from "motion/react";
+import { useRef, useState } from "react";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { EditablePhotoField } from "@/components/editor/EditableHomepageFields";
 import { HeroSlideshow } from "@/components/site/HeroSlideshow";
@@ -39,6 +39,25 @@ export function HomeHero({
   const reduceMotion = usePrefersReducedMotion();
   const { user } = useAuthUser();
   const [activeSlide, setActiveSlide] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 28,
+    mass: 0.35,
+  });
+
+  const textOpacity = useTransform(smoothProgress, [0, 0.18, 0.42], [1, 0.85, 0]);
+  const textY = useTransform(smoothProgress, [0, 0.42], [0, -72]);
+  const textWipe = useTransform(
+    smoothProgress,
+    [0, 0.12, 0.42],
+    ["inset(0% 0% 0% 0%)", "inset(0% 0% 8% 0%)", "inset(0% 0% 100% 0%)"],
+  );
 
   const heroSlides = slides.map((slide) => ({
     src: withHomepageCacheBust(slide.imageUrl, imageVersion),
@@ -50,8 +69,13 @@ export function HomeHero({
     onSlidesChange(slides.map((slide, idx) => (idx === index ? { ...slide, ...patch } : slide)));
   };
 
+  const wipeEnabled = !reduceMotion && !editable;
+
   return (
-    <section className="relative min-h-[max(640px,100dvh)] w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)]">
+    <section
+      ref={sectionRef}
+      className="relative min-h-[max(640px,100dvh)] w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)]"
+    >
       <div className="absolute inset-0 z-0">
         <HeroSlideshow
           images={heroSlides}
@@ -78,7 +102,21 @@ export function HomeHero({
           </div>
         </div>
         <div className="py-14 md:py-20">
-          <motion.div className="max-w-2xl text-left" variants={revealParent} initial="hidden" animate="show">
+          <motion.div
+            className="max-w-2xl text-left will-change-transform"
+            variants={revealParent}
+            initial="hidden"
+            animate="show"
+            style={
+              wipeEnabled
+                ? {
+                    opacity: textOpacity,
+                    y: textY,
+                    clipPath: textWipe,
+                  }
+                : undefined
+            }
+          >
             <motion.div variants={revealItem} className="eyebrow mb-5 text-ember/95">
               Curated Experiences
             </motion.div>
@@ -156,7 +194,8 @@ export function HomeHero({
               aria-label="Scroll to experiences"
               className="pointer-events-auto absolute inset-x-0 bottom-[4.75rem] z-20 flex justify-center"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={wipeEnabled ? undefined : { opacity: 1 }}
+              style={wipeEnabled ? { opacity: textOpacity } : undefined}
               transition={{ duration: 0.7, delay: 1.1, ease: softEase }}
             >
               <motion.span
