@@ -4846,6 +4846,26 @@ a.royal-passport-book__vip-label:hover {
   background: rgb(212 175 106 / 0.22);
 }
 
+.experiences-filter-rail__scrub {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: 1.35rem;
+  cursor: ns-resize;
+  touch-action: none;
+  border: 0;
+  background: transparent;
+  appearance: none;
+}
+
+.experiences-filter-rail__scrub:focus-visible {
+  outline: 2px solid rgb(200 162 90 / 0.55);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
 .experiences-filter-rail__thumb {
   position: absolute;
   top: 0;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentType, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import {
   CalendarDays,
   CalendarRange,
@@ -34,6 +34,9 @@ const AVAILABILITY_OPTIONS = [
   { id: "week" as const, label: "This week", Icon: CalendarDays },
   { id: "weekend" as const, label: "Weekend", Icon: Moon },
 ] as const;
+
+const DURATION_RANGE_KEYS = ["__all__", ...DURATION_OPTIONS.map((option) => option.id)] as const;
+const AVAILABILITY_RANGE_KEYS = ["__all__", ...AVAILABILITY_OPTIONS.map((option) => option.id)] as const;
 
 function countActiveFilters(search: ExperienceSearch): number {
   let n = 0;
@@ -152,6 +155,13 @@ function FilterPanels({
         title="Duration"
         activeKey={search.duration ?? "__all__"}
         variant="range"
+        rangeKeys={DURATION_RANGE_KEYS}
+        onRangeSelect={(key) =>
+          onUpdate({
+            duration: key === "__all__" ? undefined : (key as ExperienceSearch["duration"]),
+            page: 1,
+          })
+        }
       >
         <FilterOption
           optionKey="__all__"
@@ -183,6 +193,13 @@ function FilterPanels({
         title="When"
         activeKey={search.availability ?? "__all__"}
         variant="range"
+        rangeKeys={AVAILABILITY_RANGE_KEYS}
+        onRangeSelect={(key) =>
+          onUpdate({
+            availability: key === "__all__" ? undefined : (key as ExperienceSearch["availability"]),
+            page: 1,
+          })
+        }
       >
         <FilterOption
           optionKey="__all__"
@@ -217,14 +234,20 @@ function FilterSection({
   children,
   activeKey,
   variant = "segment",
+  rangeKeys,
+  onRangeSelect,
 }: {
   title: string;
   children: ReactNode;
   activeKey?: string;
   /** segment = highlight active row; range = fill from top to selection + knob */
   variant?: "segment" | "range";
+  rangeKeys?: readonly string[];
+  onRangeSelect?: (key: string) => void;
 }) {
   const listRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
+  const lastKeyRef = useRef<string | null>(null);
   const [indicator, setIndicator] = useState<{ top: number; height: number } | null>(null);
 
   useEffect(() => {
@@ -266,8 +289,66 @@ function FilterSection({
     };
   }, [activeKey]);
 
+  const selectNearestFromClientY = (clientY: number) => {
+    const list = listRef.current;
+    if (!list || !rangeKeys?.length || !onRangeSelect) return;
+
+    const options = rangeKeys
+      .map((key) => {
+        const el = list.querySelector<HTMLElement>(
+          `[data-filter-key="${key.replace(/"/g, '\\"')}"]`,
+        );
+        if (!el) return null;
+        const rect = el.getBoundingClientRect();
+        return { key, center: rect.top + rect.height / 2 };
+      })
+      .filter((item): item is { key: string; center: number } => item != null);
+
+    if (options.length === 0) return;
+
+    let nearest = options[0];
+    let best = Math.abs(clientY - nearest.center);
+    for (let i = 1; i < options.length; i += 1) {
+      const distance = Math.abs(clientY - options[i].center);
+      if (distance < best) {
+        best = distance;
+        nearest = options[i];
+      }
+    }
+
+    if (lastKeyRef.current === nearest.key) return;
+    lastKeyRef.current = nearest.key;
+    onRangeSelect(nearest.key);
+  };
+
+  const endScrub = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    lastKeyRef.current = null;
+    try {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    } catch {
+      // already released
+    }
+  };
+
+  const startScrub = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (variant !== "range" || !onRangeSelect) return;
+    event.preventDefault();
+    draggingRef.current = true;
+    lastKeyRef.current = null;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    selectNearestFromClientY(event.clientY);
+  };
+
+  const moveScrub = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    selectNearestFromClientY(event.clientY);
+  };
+
   const knobCenter = indicator ? indicator.top + indicator.height / 2 : 0;
   const isRange = variant === "range";
+  const activeIndex = Math.max(rangeKeys?.indexOf(activeKey ?? "__all__") ?? 0, 0);
 
   return (
     <div>
@@ -275,6 +356,43 @@ function FilterSection({
       <div
         className={`experiences-filter-rail relative ${isRange ? "experiences-filter-rail--range pl-4" : "pl-3"}`}
       >
+        {isRange ? (
+          <div
+            className="experiences-filter-rail__scrub"
+            role="slider"
+            aria-label={`${title} range`}
+            aria-orientation="vertical"
+            aria-valuemin={0}
+            aria-valuemax={Math.max((rangeKeys?.length ?? 1) - 1, 0)}
+            aria-valuenow={activeIndex}
+            aria-valuetext={activeKey === "__all__" ? "Any" : activeKey}
+            tabIndex={0}
+            onPointerDown={startScrub}
+            onPointerMove={moveScrub}
+            onPointerUp={endScrub}
+            onPointerCancel={endScrub}
+            onKeyDown={(event) => {
+              if (!rangeKeys?.length || !onRangeSelect || !activeKey) return;
+              const index = rangeKeys.indexOf(activeKey);
+              if (index < 0) return;
+              if (event.key === "ArrowDown" || event.key === "ArrowRight") {
+                event.preventDefault();
+                const next = rangeKeys[Math.min(index + 1, rangeKeys.length - 1)];
+                if (next) onRangeSelect(next);
+              } else if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
+                event.preventDefault();
+                const prev = rangeKeys[Math.max(index - 1, 0)];
+                if (prev) onRangeSelect(prev);
+              } else if (event.key === "Home") {
+                event.preventDefault();
+                onRangeSelect(rangeKeys[0]);
+              } else if (event.key === "End") {
+                event.preventDefault();
+                onRangeSelect(rangeKeys[rangeKeys.length - 1]);
+              }
+            }}
+          />
+        ) : null}
         <div className="experiences-filter-rail__track" aria-hidden />
         {indicator && isRange ? (
           <>
