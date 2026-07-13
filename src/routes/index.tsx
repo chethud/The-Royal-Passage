@@ -1,7 +1,8 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { HomeHero } from "@/components/site/HomeHero";
+import { HomeBrandSplash, HomeIntroProvider } from "@/components/site/home-intro";
 import { ExperiencesShowcase } from "@/components/site/ExperiencesShowcase";
 import { JourneysSplit } from "@/components/site/JourneysSplit";
 import { PillarsRow } from "@/components/site/PillarsRow";
@@ -73,28 +74,31 @@ function Index() {
   const ldJson = buildHomeJsonLd(experiences);
 
   return (
-    <div className="overflow-x-hidden bg-background text-foreground">
-      <Header />
+    <HomeIntroProvider>
+      <div className="overflow-x-hidden bg-background text-foreground">
+        <HomeBrandSplash />
+        <Header />
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
-      />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
+        />
 
-      <HomeHero slides={publicContent.hero} imageVersion={publicContent.version} />
-      <ScrollParallaxSection>
-        <ExperiencesShowcase items={publicContent.showcase} imageVersion={publicContent.version} />
-      </ScrollParallaxSection>
-      <ScrollParallaxSection intensity="subtle">
-        <JourneysSplit slides={publicContent.journeys} />
-      </ScrollParallaxSection>
-      <ScrollParallaxSection intensity="subtle">
-        <PillarsRow />
-      </ScrollParallaxSection>
-      <ScrollParallaxSection>
-        <JournalPreview items={publicContent.journal} imageVersion={publicContent.version} />
-      </ScrollParallaxSection>
-      <Footer />
-    </div>
+        <HomeHero slides={publicContent.hero} imageVersion={publicContent.version} />
+        <ScrollParallaxSection>
+          <ExperiencesShowcase items={publicContent.showcase} imageVersion={publicContent.version} />
+        </ScrollParallaxSection>
+        <ScrollParallaxSection intensity="subtle">
+          <JourneysSplit slides={publicContent.journeys} />
+        </ScrollParallaxSection>
+        <ScrollParallaxSection intensity="subtle">
+          <PillarsRow />
+        </ScrollParallaxSection>
+        <ScrollParallaxSection>
+          <JournalPreview items={publicContent.journal} imageVersion={publicContent.version} />
+        </ScrollParallaxSection>
+        <Footer />
+      </div>
+    </HomeIntroProvider>
   );
 }

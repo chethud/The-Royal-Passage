@@ -1,20 +1,6 @@
-import { Footer } from "@/components/site/Footer";
-import { Header } from "@/components/site/Header";
+import { BrandLogoLoader } from "@/components/site/home-intro";
 
-/** Full-page auth gate loading — preserves header/footer without changing route logic. */
+/** Full-page auth gate loading — brand logo splash while session/route resolves. */
 export function PageLoadingGate() {
-  return (
-    <div className="min-h-screen pt-[var(--header-height)] text-foreground">
-      <Header />
-      <section className="container-page page-section">
-        <div className="mx-auto max-w-3xl stack-6" aria-busy="true" aria-label="Loading page">
-          <div className="luxury-shimmer dashboard-skeleton dashboard-skeleton--badge" />
-          <div className="luxury-shimmer dashboard-skeleton dashboard-skeleton--title" />
-          <div className="luxury-shimmer dashboard-skeleton dashboard-skeleton--subtitle" />
-          <div className="luxury-shimmer dashboard-skeleton dashboard-skeleton--panel" />
-        </div>
-      </section>
-      <Footer />
-    </div>
-  );
+  return <BrandLogoLoader label="Loading page" />;
 }

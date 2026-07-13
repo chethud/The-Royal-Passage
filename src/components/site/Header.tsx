@@ -46,6 +46,8 @@ import {
   MobileNavLink,
   MobileNavSectionLabel,
 } from "@/components/site/header-mobile-nav";
+import { useHomeIntro } from "@/components/site/home-intro";
+
 type NavItem = { label: string; to: string };
 
 function navItemsForUser(
@@ -108,6 +110,15 @@ export function Header() {
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const homeIntro = useHomeIntro();
+  const cinematicState =
+    homeIntro && homeIntro.splashDone
+      ? homeIntro.chromeRevealed
+        ? "revealed"
+        : "pending"
+      : homeIntro && !homeIntro.splashDone
+        ? "pending"
+        : undefined;
   const navItems = navItemsForUser(role, Boolean(user), pathname);
   const isHomestaySection = isHomestayPublicSection(pathname);
   const isVipSection = isVipPublicSection(pathname);
@@ -167,7 +178,9 @@ export function Header() {
   return (
     <header
       data-elevated={elevated ? "true" : "false"}
+      data-cinematic={cinematicState}
       className="site-header fixed inset-x-0 top-0 z-50 w-full transition-[background-color,backdrop-filter,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      aria-hidden={cinematicState === "pending" ? true : undefined}
     >
       <div className="mx-auto flex h-[var(--header-height)] max-w-[1280px] items-center justify-between gap-2 pl-3 pr-3 sm:gap-4 sm:pl-2 sm:pr-4 md:gap-6 md:pl-3 md:pr-10">
         <Link

@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { motion, useScroll, useSpring, useTransform } from "motion/react";
-import { useRef, useState } from "react";
+import { motion } from "motion/react";
+import { useState } from "react";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { EditablePhotoField } from "@/components/editor/EditableHomepageFields";
 import { HeroSlideshow } from "@/components/site/HeroSlideshow";
 import { SiteBannerStrip } from "@/components/site/SiteBannerStrip";
+import { useHomeIntro } from "@/components/site/home-intro";
 import type { HomepageHeroSlide } from "@/lib/homepage-content";
 import { withHomepageCacheBust } from "@/lib/homepage-content";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
@@ -14,11 +15,11 @@ const softEase = [0.22, 1, 0.36, 1] as const;
 
 const revealParent = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
 };
 const revealItem = {
-  hidden: { opacity: 0, y: 28 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.75, ease: softEase } },
+  hidden: { opacity: 0, x: 72 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.85, ease: softEase } },
 };
 
 type HomeHeroProps = {
@@ -37,27 +38,13 @@ export function HomeHero({
   uploadPhoto,
 }: HomeHeroProps) {
   const reduceMotion = usePrefersReducedMotion();
+  const intro = useHomeIntro();
   const { user } = useAuthUser();
   const [activeSlide, setActiveSlide] = useState(0);
-  const sectionRef = useRef<HTMLElement>(null);
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 28,
-    mass: 0.35,
-  });
-
-  const textOpacity = useTransform(smoothProgress, [0, 0.18, 0.42], [1, 0.85, 0]);
-  const textY = useTransform(smoothProgress, [0, 0.42], [0, -72]);
-  const textWipe = useTransform(
-    smoothProgress,
-    [0, 0.12, 0.42],
-    ["inset(0% 0% 0% 0%)", "inset(0% 0% 8% 0%)", "inset(0% 0% 100% 0%)"],
-  );
+  const cinematic = Boolean(intro) && !editable;
+  const chromeRevealed = !cinematic || Boolean(intro?.chromeRevealed) || reduceMotion;
+  const splashDone = !cinematic || Boolean(intro?.splashDone) || reduceMotion;
 
   const heroSlides = slides.map((slide) => ({
     src: withHomepageCacheBust(slide.imageUrl, imageVersion),
@@ -69,13 +56,8 @@ export function HomeHero({
     onSlidesChange(slides.map((slide, idx) => (idx === index ? { ...slide, ...patch } : slide)));
   };
 
-  const wipeEnabled = !reduceMotion && !editable;
-
   return (
-    <section
-      ref={sectionRef}
-      className="relative min-h-[max(640px,100dvh)] w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)]"
-    >
+    <section className="relative min-h-[max(640px,100dvh)] w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)]">
       <div className="absolute inset-0 z-0">
         <HeroSlideshow
           images={heroSlides}
@@ -96,70 +78,74 @@ export function HomeHero({
       </div>
 
       <div className="container-page relative z-10 flex min-h-[max(640px,100dvh)] flex-col justify-center pt-[var(--header-height)]">
-        <div className="pointer-events-none absolute inset-x-0 top-[var(--header-height)] z-20 w-full">
-          <div className="pointer-events-auto">
-            <SiteBannerStrip />
-          </div>
-        </div>
-        <div className="py-14 md:py-20">
-          <motion.div
-            className="max-w-2xl text-left will-change-transform"
-            variants={revealParent}
-            initial="hidden"
-            animate="show"
-            style={
-              wipeEnabled
-                ? {
-                    opacity: textOpacity,
-                    y: textY,
-                    clipPath: textWipe,
-                  }
-                : undefined
-            }
-          >
-            <motion.div variants={revealItem} className="eyebrow mb-5 text-ember/95">
-              Curated Experiences
-            </motion.div>
-            <motion.h1
-              variants={revealItem}
-              className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-[0.95] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]"
-            >
-              Experience
-              <br />
-              <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-                Mysuru,
-              </span>
-              <br />
-              Royally
-            </motion.h1>
-            <motion.p
-              variants={revealItem}
-              className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg"
-            >
-              Step into the cultural heart of Karnataka. From heritage walks to culinary journeys,
-              we craft experiences that connect you with the soul of Mysuru.
-            </motion.p>
+        {chromeRevealed ? (
+          <div className="pointer-events-none absolute inset-x-0 top-[var(--header-height)] z-20 w-full">
             <motion.div
-              variants={revealItem}
-              className="mt-7 flex flex-wrap items-center justify-start gap-3 sm:mt-9 sm:gap-4"
+              className="pointer-events-auto"
+              initial={cinematic && !reduceMotion ? { opacity: 0, y: -12 } : false}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: softEase, delay: 0.15 }}
             >
-              <Link
-                to="/experiences"
-                className="group inline-flex items-center gap-2 rounded-sm bg-ember px-6 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-8 sm:py-4 sm:text-xs"
-              >
-                Explore Experiences
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-              {!user ? (
-                <Link
-                  to="/sign-in"
-                  className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-transparent px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink/85 backdrop-blur-md transition-colors hover:border-ember/55 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
-                >
-                  Sign in
-                </Link>
-              ) : null}
+              <SiteBannerStrip />
             </motion.div>
-          </motion.div>
+          </div>
+        ) : null}
+
+        <div className="py-14 md:py-20">
+          {chromeRevealed ? (
+            <motion.div
+              className="max-w-2xl text-left"
+              variants={reduceMotion ? undefined : revealParent}
+              initial={reduceMotion || !cinematic ? false : "hidden"}
+              animate="show"
+            >
+              <motion.div
+                variants={reduceMotion ? undefined : revealItem}
+                className="eyebrow mb-5 text-ember/95"
+              >
+                Curated Experiences
+              </motion.div>
+              <motion.h1
+                variants={reduceMotion ? undefined : revealItem}
+                className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-[0.95] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]"
+              >
+                Experience
+                <br />
+                <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
+                  Mysuru,
+                </span>
+                <br />
+                Royally
+              </motion.h1>
+              <motion.p
+                variants={reduceMotion ? undefined : revealItem}
+                className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg"
+              >
+                Step into the cultural heart of Karnataka. From heritage walks to culinary journeys,
+                we craft experiences that connect you with the soul of Mysuru.
+              </motion.p>
+              <motion.div
+                variants={reduceMotion ? undefined : revealItem}
+                className="mt-7 flex flex-wrap items-center justify-start gap-3 sm:mt-9 sm:gap-4"
+              >
+                <Link
+                  to="/experiences"
+                  className="group inline-flex items-center gap-2 rounded-sm bg-ember px-6 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-8 sm:py-4 sm:text-xs"
+                >
+                  Explore Experiences
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+                {!user ? (
+                  <Link
+                    to="/sign-in"
+                    className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-transparent px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink/85 backdrop-blur-md transition-colors hover:border-ember/55 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
+                  >
+                    Sign in
+                  </Link>
+                ) : null}
+              </motion.div>
+            </motion.div>
+          ) : null}
         </div>
 
         {editable && uploadPhoto ? (
@@ -177,7 +163,7 @@ export function HomeHero({
           </div>
         ) : null}
 
-        {!editable ? (
+        {!editable && splashDone ? (
           reduceMotion ? (
             <a
               href="#experiences"
@@ -194,9 +180,8 @@ export function HomeHero({
               aria-label="Scroll to experiences"
               className="pointer-events-auto absolute inset-x-0 bottom-[4.75rem] z-20 flex justify-center"
               initial={{ opacity: 0 }}
-              animate={wipeEnabled ? undefined : { opacity: 1 }}
-              style={wipeEnabled ? { opacity: textOpacity } : undefined}
-              transition={{ duration: 0.7, delay: 1.1, ease: softEase }}
+              animate={{ opacity: chromeRevealed ? 0.55 : 1 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: softEase }}
             >
               <motion.span
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] bg-[oklch(0.12_0.06_22_/_0.45)] text-ink/80 backdrop-blur-md"
@@ -209,7 +194,11 @@ export function HomeHero({
           )
         ) : null}
 
-        <div className="pointer-events-auto absolute inset-x-0 bottom-8 z-20 flex items-center justify-center gap-2">
+        <div
+          className={`pointer-events-auto absolute inset-x-0 bottom-8 z-20 flex items-center justify-center gap-2 transition-opacity duration-500 ${
+            splashDone ? "opacity-100" : "opacity-0"
+          }`}
+        >
           {heroSlides.map((slide, i) => (
             <button
               key={`${slide.src}-${i}`}
