@@ -21,22 +21,28 @@ type ExperiencesFilterSidebarProps = {
   onReset: () => void;
 };
 
-const DURATION_OPTIONS = [
-  { id: "short" as const, label: "1–2 hours", shortLabel: "1–2h", Icon: Clock },
-  { id: "half" as const, label: "Half day", shortLabel: "Half day", Icon: Sun },
-  { id: "full" as const, label: "Full day", shortLabel: "Full day", Icon: Sunrise },
-  { id: "multi" as const, label: "Multi day", shortLabel: "Multi day", Icon: CalendarRange },
-] as const;
+type RangeOption = {
+  key: string;
+  label: string;
+  shortLabel: string;
+  Icon: ComponentType<{ className?: string; strokeWidth?: number }>;
+};
 
-const AVAILABILITY_OPTIONS = [
-  { id: "today" as const, label: "Today", Icon: Sparkles },
-  { id: "tomorrow" as const, label: "Tomorrow", Icon: Sun },
-  { id: "week" as const, label: "This week", Icon: CalendarDays },
-  { id: "weekend" as const, label: "Weekend", Icon: Moon },
-] as const;
+const DURATION_RANGE_OPTIONS: RangeOption[] = [
+  { key: "__all__", label: "Any duration", shortLabel: "Any", Icon: Clock },
+  { key: "short", label: "1–2 hours", shortLabel: "1–2h", Icon: Clock },
+  { key: "half", label: "Half day", shortLabel: "Half", Icon: Sun },
+  { key: "full", label: "Full day", shortLabel: "Full", Icon: Sunrise },
+  { key: "multi", label: "Multi day", shortLabel: "Multi", Icon: CalendarRange },
+];
 
-const DURATION_RANGE_KEYS = ["__all__", ...DURATION_OPTIONS.map((option) => option.id)] as const;
-const AVAILABILITY_RANGE_KEYS = ["__all__", ...AVAILABILITY_OPTIONS.map((option) => option.id)] as const;
+const AVAILABILITY_RANGE_OPTIONS: RangeOption[] = [
+  { key: "__all__", label: "Any time", shortLabel: "Any", Icon: CalendarDays },
+  { key: "today", label: "Today", shortLabel: "Today", Icon: Sparkles },
+  { key: "tomorrow", label: "Tomorrow", shortLabel: "Tmrw", Icon: Sun },
+  { key: "week", label: "This week", shortLabel: "Week", Icon: CalendarDays },
+  { key: "weekend", label: "Weekend", shortLabel: "Wknd", Icon: Moon },
+];
 
 function countActiveFilters(search: ExperienceSearch): number {
   let n = 0;
@@ -126,10 +132,7 @@ function FilterPanels({
 }) {
   return (
     <>
-      <FilterSection
-        title="Category"
-        activeKey={search.category ?? "__all__"}
-      >
+      <FilterSection title="Category" activeKey={search.category ?? "__all__"}>
         <FilterOption
           optionKey="__all__"
           active={!search.category}
@@ -151,81 +154,205 @@ function FilterPanels({
         ))}
       </FilterSection>
 
-      <FilterSection
+      <HorizontalRangeFilter
         title="Duration"
+        options={DURATION_RANGE_OPTIONS}
         activeKey={search.duration ?? "__all__"}
-        variant="range"
-        rangeKeys={DURATION_RANGE_KEYS}
-        onRangeSelect={(key) =>
+        onSelect={(key) =>
           onUpdate({
             duration: key === "__all__" ? undefined : (key as ExperienceSearch["duration"]),
             page: 1,
           })
         }
-      >
-        <FilterOption
-          optionKey="__all__"
-          active={!search.duration}
-          label="Any duration"
-          displayLabel="Any"
-          Icon={Clock}
-          onClick={() => onUpdate({ duration: undefined, page: 1 })}
-        />
-        {DURATION_OPTIONS.map(({ id, label, shortLabel, Icon }) => (
-          <FilterOption
-            key={id}
-            optionKey={id}
-            active={search.duration === id}
-            label={label}
-            displayLabel={shortLabel}
-            Icon={Icon}
-            onClick={() =>
-              onUpdate({
-                duration: search.duration === id ? undefined : id,
-                page: 1,
-              })
-            }
-          />
-        ))}
-      </FilterSection>
+      />
 
-      <FilterSection
+      <HorizontalRangeFilter
         title="When"
+        options={AVAILABILITY_RANGE_OPTIONS}
         activeKey={search.availability ?? "__all__"}
-        variant="range"
-        rangeKeys={AVAILABILITY_RANGE_KEYS}
-        onRangeSelect={(key) =>
+        onSelect={(key) =>
           onUpdate({
             availability: key === "__all__" ? undefined : (key as ExperienceSearch["availability"]),
             page: 1,
           })
         }
-      >
-        <FilterOption
-          optionKey="__all__"
-          active={!search.availability}
-          label="Any time"
-          displayLabel="Any"
-          Icon={CalendarDays}
-          onClick={() => onUpdate({ availability: undefined, page: 1 })}
-        />
-        {AVAILABILITY_OPTIONS.map(({ id, label, Icon }) => (
-          <FilterOption
-            key={id}
-            optionKey={id}
-            active={search.availability === id}
-            label={label}
-            Icon={Icon}
-            onClick={() =>
-              onUpdate({
-                availability: search.availability === id ? undefined : id,
-                page: 1,
-              })
-            }
-          />
-        ))}
-      </FilterSection>
+      />
     </>
+  );
+}
+
+function HorizontalRangeFilter({
+  title,
+  options,
+  activeKey,
+  onSelect,
+}: {
+  title: string;
+  options: RangeOption[];
+  activeKey: string;
+  onSelect: (key: string) => void;
+}) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const scrubRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
+  const lastKeyRef = useRef<string | null>(null);
+  const activeIndexRef = useRef(0);
+  const optionsRef = useRef(options);
+  const onSelectRef = useRef(onSelect);
+  const [dragging, setDragging] = useState(false);
+
+  optionsRef.current = options;
+  onSelectRef.current = onSelect;
+
+  const activeIndex = Math.max(
+    options.findIndex((option) => option.key === activeKey),
+    0,
+  );
+  activeIndexRef.current = activeIndex;
+  const progress = options.length <= 1 ? 0 : activeIndex / (options.length - 1);
+
+  const selectNearestFromClientX = (clientX: number) => {
+    const rail = railRef.current;
+    const currentOptions = optionsRef.current;
+    if (!rail || currentOptions.length === 0) return;
+    const rect = rail.getBoundingClientRect();
+    const inset = 6; // matches 0.35rem track inset
+    const left = rect.left + inset;
+    const width = Math.max(rect.width - inset * 2, 1);
+    const ratio = Math.min(1, Math.max(0, (clientX - left) / width));
+    const index = Math.round(ratio * (currentOptions.length - 1));
+    const next = currentOptions[index];
+    if (!next || lastKeyRef.current === next.key) return;
+    lastKeyRef.current = next.key;
+    onSelectRef.current(next.key);
+  };
+
+  const stepBy = (delta: number) => {
+    const currentOptions = optionsRef.current;
+    const index = activeIndexRef.current;
+    const next = currentOptions[Math.min(currentOptions.length - 1, Math.max(0, index + delta))];
+    if (next && next.key !== currentOptions[index]?.key) onSelectRef.current(next.key);
+  };
+
+  useEffect(() => {
+    const scrub = scrubRef.current;
+    if (!scrub) return;
+
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      const delta =
+        Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+      if (delta === 0) return;
+      stepBy(delta > 0 ? 1 : -1);
+    };
+
+    scrub.addEventListener("wheel", onWheel, { passive: false });
+    return () => scrub.removeEventListener("wheel", onWheel);
+  }, []);
+
+  const endScrub = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    setDragging(false);
+    lastKeyRef.current = null;
+    try {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    } catch {
+      // already released
+    }
+  };
+
+  const startScrub = (event: ReactPointerEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    draggingRef.current = true;
+    setDragging(true);
+    lastKeyRef.current = null;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    selectNearestFromClientX(event.clientX);
+  };
+
+  const moveScrub = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    selectNearestFromClientX(event.clientX);
+  };
+
+  return (
+    <div>
+      <h3 className="eyebrow mb-3 text-[0.62rem] tracking-[0.2em] text-[#D4AF6A]/90">{title}</h3>
+
+      <div
+        ref={railRef}
+        className={`experiences-filter-range-h${dragging ? " is-dragging" : ""}`}
+        style={{ ["--range-progress" as string]: String(progress) }}
+      >
+        <div
+          ref={scrubRef}
+          className="experiences-filter-range-h__scrub"
+          role="slider"
+          aria-label={`${title} range`}
+          aria-orientation="horizontal"
+          aria-valuemin={0}
+          aria-valuemax={Math.max(options.length - 1, 0)}
+          aria-valuenow={activeIndex}
+          aria-valuetext={options[activeIndex]?.label ?? "Any"}
+          tabIndex={0}
+          onPointerDown={startScrub}
+          onPointerMove={moveScrub}
+          onPointerUp={endScrub}
+          onPointerCancel={endScrub}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+              event.preventDefault();
+              stepBy(1);
+            } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+              event.preventDefault();
+              stepBy(-1);
+            } else if (event.key === "Home") {
+              event.preventDefault();
+              onSelect(options[0].key);
+            } else if (event.key === "End") {
+              event.preventDefault();
+              onSelect(options[options.length - 1].key);
+            }
+          }}
+        />
+        <div className="experiences-filter-range-h__track" aria-hidden />
+        <div className="experiences-filter-range-h__fill" aria-hidden />
+        <div className="experiences-filter-range-h__knob" aria-hidden />
+      </div>
+
+      <div
+        className="mt-2 grid"
+        style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
+      >
+        {options.map((option) => {
+          const active = option.key === activeKey;
+          const Icon = option.Icon;
+          return (
+            <button
+              key={option.key}
+              type="button"
+              aria-label={option.label}
+              aria-pressed={active}
+              onClick={() => onSelect(option.key)}
+              className={`flex flex-col items-center gap-1 px-0.5 py-1 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]/50 ${
+                active ? "text-[#F7F1E8]" : "text-[#F7F1E8]/55 hover:text-[#F7F1E8]"
+              }`}
+            >
+              <Icon
+                strokeWidth={1.5}
+                className={`h-3.5 w-3.5 shrink-0 ${
+                  active ? "text-[#D4AF6A]" : "text-[#D4AF6A]/65"
+                }`}
+              />
+              <span className="w-full truncate text-[0.58rem] font-medium leading-tight tracking-[0.02em]">
+                {option.shortLabel}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -233,21 +360,12 @@ function FilterSection({
   title,
   children,
   activeKey,
-  variant = "segment",
-  rangeKeys,
-  onRangeSelect,
 }: {
   title: string;
   children: ReactNode;
   activeKey?: string;
-  /** segment = highlight active row; range = fill from top to selection + knob */
-  variant?: "segment" | "range";
-  rangeKeys?: readonly string[];
-  onRangeSelect?: (key: string) => void;
 }) {
   const listRef = useRef<HTMLDivElement>(null);
-  const draggingRef = useRef(false);
-  const lastKeyRef = useRef<string | null>(null);
   const [indicator, setIndicator] = useState<{ top: number; height: number } | null>(null);
 
   useEffect(() => {
@@ -270,7 +388,6 @@ function FilterSection({
           setIndicator(null);
           return;
         }
-        // Read geometry in one frame, then write — avoids forced sync reflow.
         const top = active.offsetTop;
         const height = active.offsetHeight;
         setIndicator({ top, height });
@@ -289,126 +406,12 @@ function FilterSection({
     };
   }, [activeKey]);
 
-  const selectNearestFromClientY = (clientY: number) => {
-    const list = listRef.current;
-    if (!list || !rangeKeys?.length || !onRangeSelect) return;
-
-    const options = rangeKeys
-      .map((key) => {
-        const el = list.querySelector<HTMLElement>(
-          `[data-filter-key="${key.replace(/"/g, '\\"')}"]`,
-        );
-        if (!el) return null;
-        const rect = el.getBoundingClientRect();
-        return { key, center: rect.top + rect.height / 2 };
-      })
-      .filter((item): item is { key: string; center: number } => item != null);
-
-    if (options.length === 0) return;
-
-    let nearest = options[0];
-    let best = Math.abs(clientY - nearest.center);
-    for (let i = 1; i < options.length; i += 1) {
-      const distance = Math.abs(clientY - options[i].center);
-      if (distance < best) {
-        best = distance;
-        nearest = options[i];
-      }
-    }
-
-    if (lastKeyRef.current === nearest.key) return;
-    lastKeyRef.current = nearest.key;
-    onRangeSelect(nearest.key);
-  };
-
-  const endScrub = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!draggingRef.current) return;
-    draggingRef.current = false;
-    lastKeyRef.current = null;
-    try {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    } catch {
-      // already released
-    }
-  };
-
-  const startScrub = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (variant !== "range" || !onRangeSelect) return;
-    event.preventDefault();
-    draggingRef.current = true;
-    lastKeyRef.current = null;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    selectNearestFromClientY(event.clientY);
-  };
-
-  const moveScrub = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!draggingRef.current) return;
-    selectNearestFromClientY(event.clientY);
-  };
-
-  const knobCenter = indicator ? indicator.top + indicator.height / 2 : 0;
-  const isRange = variant === "range";
-  const activeIndex = Math.max(rangeKeys?.indexOf(activeKey ?? "__all__") ?? 0, 0);
-
   return (
     <div>
       <h3 className="eyebrow mb-3 text-[0.62rem] tracking-[0.2em] text-[#D4AF6A]/90">{title}</h3>
-      <div
-        className={`experiences-filter-rail relative ${isRange ? "experiences-filter-rail--range pl-4" : "pl-3"}`}
-      >
-        {isRange ? (
-          <div
-            className="experiences-filter-rail__scrub"
-            role="slider"
-            aria-label={`${title} range`}
-            aria-orientation="vertical"
-            aria-valuemin={0}
-            aria-valuemax={Math.max((rangeKeys?.length ?? 1) - 1, 0)}
-            aria-valuenow={activeIndex}
-            aria-valuetext={activeKey === "__all__" ? "Any" : activeKey}
-            tabIndex={0}
-            onPointerDown={startScrub}
-            onPointerMove={moveScrub}
-            onPointerUp={endScrub}
-            onPointerCancel={endScrub}
-            onKeyDown={(event) => {
-              if (!rangeKeys?.length || !onRangeSelect || !activeKey) return;
-              const index = rangeKeys.indexOf(activeKey);
-              if (index < 0) return;
-              if (event.key === "ArrowDown" || event.key === "ArrowRight") {
-                event.preventDefault();
-                const next = rangeKeys[Math.min(index + 1, rangeKeys.length - 1)];
-                if (next) onRangeSelect(next);
-              } else if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
-                event.preventDefault();
-                const prev = rangeKeys[Math.max(index - 1, 0)];
-                if (prev) onRangeSelect(prev);
-              } else if (event.key === "Home") {
-                event.preventDefault();
-                onRangeSelect(rangeKeys[0]);
-              } else if (event.key === "End") {
-                event.preventDefault();
-                onRangeSelect(rangeKeys[rangeKeys.length - 1]);
-              }
-            }}
-          />
-        ) : null}
+      <div className="experiences-filter-rail relative pl-3">
         <div className="experiences-filter-rail__track" aria-hidden />
-        {indicator && isRange ? (
-          <>
-            <div
-              className="experiences-filter-rail__fill"
-              aria-hidden
-              style={{ height: `${Math.max(knobCenter, 2)}px` }}
-            />
-            <div
-              className="experiences-filter-rail__knob"
-              aria-hidden
-              style={{ transform: `translateY(${knobCenter}px) translate(-50%, -50%)` }}
-            />
-          </>
-        ) : null}
-        {indicator && !isRange ? (
+        {indicator ? (
           <div
             className="experiences-filter-rail__thumb"
             aria-hidden

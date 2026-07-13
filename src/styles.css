@@ -4828,7 +4828,7 @@ a.royal-passport-book__vip-label:hover {
   }
 }
 
-/* Experiences refine filters — vertical selection rail */
+/* Experiences refine filters — vertical selection rail (Category) */
 .experiences-filter-rail__track {
   position: absolute;
   top: 0;
@@ -4837,33 +4837,6 @@ a.royal-passport-book__vip-label:hover {
   width: 1px;
   background: rgb(212 175 106 / 0.28);
   pointer-events: none;
-}
-
-.experiences-filter-rail--range .experiences-filter-rail__track {
-  left: 0.35rem;
-  width: 3px;
-  border-radius: 999px;
-  background: rgb(212 175 106 / 0.22);
-}
-
-.experiences-filter-rail__scrub {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 2;
-  width: 1.35rem;
-  cursor: ns-resize;
-  touch-action: none;
-  border: 0;
-  background: transparent;
-  appearance: none;
-}
-
-.experiences-filter-rail__scrub:focus-visible {
-  outline: 2px solid rgb(200 162 90 / 0.55);
-  outline-offset: 2px;
-  border-radius: 999px;
 }
 
 .experiences-filter-rail__thumb {
@@ -4881,24 +4854,49 @@ a.royal-passport-book__vip-label:hover {
     opacity 0.2s ease;
 }
 
-.experiences-filter-rail__fill {
+/* Experiences refine filters — horizontal single-sided range (Duration / When) */
+.experiences-filter-range-h {
+  position: relative;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  padding-inline: 0.35rem;
+  user-select: none;
+}
+
+.experiences-filter-range-h__track {
   position: absolute;
-  top: 0;
   left: 0.35rem;
-  width: 3px;
+  right: 0.35rem;
+  top: 50%;
+  height: 3px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: rgb(212 175 106 / 0.22);
+  pointer-events: none;
+}
+
+.experiences-filter-range-h__fill {
+  position: absolute;
+  left: 0.35rem;
+  top: 50%;
+  height: 3px;
+  width: calc((100% - 0.7rem) * var(--range-progress, 0));
+  min-width: 2px;
+  transform: translateY(-50%);
   border-radius: 999px;
   background: #d4af6a;
   box-shadow: 0 0 12px rgb(212 175 106 / 0.4);
   pointer-events: none;
-  transition: height 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.experiences-filter-rail__knob {
+.experiences-filter-range-h__knob {
   position: absolute;
-  top: 0;
-  left: calc(0.35rem + 1.5px);
-  width: 0.72rem;
-  height: 0.72rem;
+  top: 50%;
+  left: calc(0.35rem + (100% - 0.7rem) * var(--range-progress, 0));
+  width: 0.9rem;
+  height: 0.9rem;
   border-radius: 999px;
   background: #f7f1e8;
   border: 2px solid #d4af6a;
@@ -4906,13 +4904,44 @@ a.royal-passport-book__vip-label:hover {
     0 0 0 3px rgb(212 175 106 / 0.18),
     0 2px 8px rgb(0 0 0 / 0.35);
   pointer-events: none;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate(-50%, -50%);
+  transition: left 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.experiences-filter-range-h.is-dragging .experiences-filter-range-h__fill,
+.experiences-filter-range-h.is-dragging .experiences-filter-range-h__knob {
+  transition: none;
+}
+
+.experiences-filter-range-h__scrub {
+  position: absolute;
+  inset: -0.35rem 0;
+  z-index: 2;
+  cursor: ew-resize;
+  touch-action: none;
+  border: 0;
+  background: transparent;
+  appearance: none;
+}
+
+.experiences-filter-range-h__scrub:hover ~ .experiences-filter-range-h__knob,
+.experiences-filter-range-h.is-dragging .experiences-filter-range-h__knob {
+  box-shadow:
+    0 0 0 4px rgb(212 175 106 / 0.28),
+    0 2px 10px rgb(0 0 0 / 0.4);
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.experiences-filter-range-h__scrub:focus-visible {
+  outline: 2px solid rgb(200 162 90 / 0.55);
+  outline-offset: 2px;
+  border-radius: 999px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .experiences-filter-rail__thumb,
-  .experiences-filter-rail__fill,
-  .experiences-filter-rail__knob {
+  .experiences-filter-range-h__fill,
+  .experiences-filter-range-h__knob {
     transition: none;
   }
 }
