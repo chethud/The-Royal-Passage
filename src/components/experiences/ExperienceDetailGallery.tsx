@@ -30,10 +30,10 @@ export function ExperienceDetailGallery({
   };
 
   return (
-    <div className="flex items-stretch gap-2.5 sm:gap-3">
+    <div className="flex items-start gap-2.5 sm:gap-3">
       {hasMultiple ? (
         <div
-          className="flex w-[4.25rem] shrink-0 flex-col gap-2 overflow-y-auto sm:w-[5.25rem] md:w-24"
+          className="flex shrink-0 flex-col gap-2"
           role="tablist"
           aria-label={`${exp.title} photo thumbnails`}
         >
@@ -46,7 +46,7 @@ export function ExperienceDetailGallery({
               aria-label={`Show photo ${index + 1}`}
               onClick={() => goTo(index, index >= activeIndex ? "next" : "prev")}
               className={cn(
-                "relative min-h-[4.5rem] flex-1 overflow-hidden rounded-sm border transition-colors sm:min-h-[5.5rem]",
+                "relative h-16 w-20 shrink-0 overflow-hidden rounded-sm border transition-colors sm:h-20 sm:w-24",
                 index === activeIndex
                   ? "border-[#D4AF6A] ring-1 ring-[#D4AF6A]/60"
                   : "border-[rgb(200_162_90/0.25)] opacity-80 hover:opacity-100",
