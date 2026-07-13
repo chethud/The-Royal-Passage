@@ -276,10 +276,6 @@ function FooterLegalLinks({ className = "" }: { className?: string }) {
       >
         {PRIVACY_POLICY_LINK.label}
       </Link>
-      <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
-        ·
-      </span>
-      <span className="text-ember/70">Crafted with intention.</span>
     </div>
   );
 }
