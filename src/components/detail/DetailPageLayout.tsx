@@ -54,13 +54,22 @@ export function DetailHeroGrid({
   gallery,
   content,
   contentClassName = "flex w-full min-w-0 flex-col space-y-6",
+  galleryWide = false,
 }: {
   gallery: ReactNode;
   content: ReactNode;
   contentClassName?: string;
+  /** Give the photo column more horizontal room than the copy column. */
+  galleryWide?: boolean;
 }) {
   return (
-    <div className="mt-6 grid gap-6 md:grid-cols-2 md:items-start md:gap-8 lg:gap-10 sm:mt-8">
+    <div
+      className={
+        galleryWide
+          ? "mt-6 grid gap-6 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-start md:gap-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] lg:gap-10 sm:mt-8"
+          : "mt-6 grid gap-6 md:grid-cols-2 md:items-start md:gap-8 lg:gap-10 sm:mt-8"
+      }
+    >
       <div className="w-full md:sticky md:top-[calc(var(--header-height)+1.5rem)] md:self-start">
         {gallery}
       </div>

@@ -120,6 +120,7 @@ function ExperienceDetail() {
         </DetailBackLink>
 
         <DetailHeroGrid
+          galleryWide
           gallery={<ExperienceDetailGallery exp={exp} showTitleOnHover />}
           content={
             <>
