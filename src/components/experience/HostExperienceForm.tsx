@@ -28,7 +28,6 @@ type HostExperienceFormProps = {
     inclusions: string[];
     exclusions: string[];
     requirements: string[];
-    cancellationPolicy?: string;
     minGuestsPerBooking: number;
     maxGuestsPerBooking: number;
     submitForReview: boolean;
@@ -78,7 +77,6 @@ export function HostExperienceForm({
   const [inclusions, setInclusions] = useState(joinLines(initial?.inclusions ?? []));
   const [exclusions, setExclusions] = useState(joinLines(initial?.exclusions ?? []));
   const [requirements, setRequirements] = useState(joinLines(initial?.requirements ?? []));
-  const [cancellationPolicy, setCancellationPolicy] = useState(initial?.cancellationPolicy ?? "");
   const [minGuests, setMinGuests] = useState(initial?.minGuestsPerBooking ?? 1);
   const [maxGuests, setMaxGuests] = useState(initial?.maxGuestsPerBooking ?? 10);
   const [submitForReview, setSubmitForReview] = useState(false);
@@ -115,7 +113,6 @@ export function HostExperienceForm({
       inclusions: splitLines(inclusions),
       exclusions: splitLines(exclusions),
       requirements: splitLines(requirements),
-      cancellationPolicy: cancellationPolicy.trim() || undefined,
       minGuestsPerBooking: minGuests,
       maxGuestsPerBooking: maxGuests,
       submitForReview,
@@ -320,16 +317,6 @@ export function HostExperienceForm({
             rows={3}
             value={requirements}
             onChange={(e) => setRequirements(e.target.value)}
-            className={inputClass}
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="eyebrow text-muted-foreground">Cancellation policy</span>
-          <textarea
-            disabled={readOnly}
-            rows={3}
-            value={cancellationPolicy}
-            onChange={(e) => setCancellationPolicy(e.target.value)}
             className={inputClass}
           />
         </label>

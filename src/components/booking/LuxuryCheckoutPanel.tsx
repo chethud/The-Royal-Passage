@@ -13,7 +13,7 @@ export function LuxuryCheckoutPanel({
   return (
     <div
       className={`luxury-checkout-panel ${
-        compact ? "p-3 sm:p-3.5 md:p-4" : "p-3 sm:p-7 md:p-9"
+        compact ? "p-2 sm:p-2.5 md:p-3" : "p-3 sm:p-7 md:p-9"
       } ${className}`.trim()}
     >
       {children}

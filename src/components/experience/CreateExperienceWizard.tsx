@@ -33,7 +33,6 @@ type CreateExperienceWizardProps = {
       inclusions: string[];
       exclusions: string[];
       requirements: string[];
-      cancellationPolicy?: string;
       minGuestsPerBooking: number;
       maxGuestsPerBooking: number;
       submitForReview: boolean;
@@ -101,7 +100,6 @@ export function CreateExperienceWizard({
   const [inclusions, setInclusions] = useState("");
   const [exclusions, setExclusions] = useState("");
   const [requirements, setRequirements] = useState("");
-  const [cancellationPolicy, setCancellationPolicy] = useState("");
   const [minGuests, setMinGuests] = useState(1);
   const [maxGuests, setMaxGuests] = useState(10);
   const [submitForReview, setSubmitForReview] = useState(false);
@@ -258,7 +256,6 @@ export function CreateExperienceWizard({
           inclusions: splitLines(inclusions),
           exclusions: splitLines(exclusions),
           requirements: splitLines(requirements),
-          cancellationPolicy: cancellationPolicy.trim() || undefined,
           minGuestsPerBooking: minGuests,
           maxGuestsPerBooking: maxGuests,
           submitForReview,
@@ -486,15 +483,6 @@ export function CreateExperienceWizard({
               rows={3}
               value={requirements}
               onChange={(e) => setRequirements(e.target.value)}
-              className={inputClass}
-            />
-          </label>
-          <label className="block text-sm">
-            <span className="eyebrow luxury-panel-label">Cancellation policy</span>
-            <textarea
-              rows={3}
-              value={cancellationPolicy}
-              onChange={(e) => setCancellationPolicy(e.target.value)}
               className={inputClass}
             />
           </label>

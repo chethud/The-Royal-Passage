@@ -167,13 +167,6 @@ export function AdminExperienceReview({ experience }: AdminExperienceReviewProps
           <ListBlock label="Exclusions" items={experience.exclusions} />
           <ListBlock label="Requirements" items={experience.requirements} />
         </div>
-        {experience.cancellationPolicy ? (
-          <div className="mt-6 border-t luxury-panel-divider pt-5">
-            <DetailBlock label="Cancellation policy">
-              <span className="whitespace-pre-wrap">{experience.cancellationPolicy}</span>
-            </DetailBlock>
-          </div>
-        ) : null}
       </LuxuryCheckoutPanel>
 
       <LuxuryCheckoutPanel>
