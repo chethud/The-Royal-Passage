@@ -5,7 +5,6 @@ export const ADMIN_EXPERIENCE_NAV_ITEMS = [
   { to: "/admin/bookings", label: "Bookings" },
   { to: "/admin/experiences", label: "Approve experiences" },
   { to: "/admin/activity", label: "Live activity" },
-  { to: "/admin/trust", label: "Fraud center" },
   { to: "/admin/banners", label: "Banners" },
   { to: "/experiences", label: "Live catalog" },
 ] as const;

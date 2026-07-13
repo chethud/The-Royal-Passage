@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { EditablePhotoField } from "@/components/editor/EditableHomepageFields";
 import { HeroSlideshow } from "@/components/site/HeroSlideshow";
+import { SiteBannerStrip } from "@/components/site/SiteBannerStrip";
 import type { HomepageHeroSlide } from "@/lib/homepage-content";
 import { withHomepageCacheBust } from "@/lib/homepage-content";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
@@ -70,8 +71,9 @@ export function HomeHero({
         />
       </div>
 
-      <div className="container-page relative z-10 flex min-h-[max(640px,100dvh)] flex-col justify-center pt-[var(--header-height)]">
-        <div className="py-14 md:py-20">
+      <div className="relative z-10 flex min-h-[max(640px,100dvh)] flex-col pt-[var(--header-height)]">
+        <SiteBannerStrip />
+        <div className="container-page flex flex-1 flex-col justify-center py-14 md:py-20">
           <motion.div className="max-w-2xl" variants={revealParent} initial="hidden" animate="show">
             <motion.div variants={revealItem} className="eyebrow mb-5 text-ember/95">
               Curated Experiences
