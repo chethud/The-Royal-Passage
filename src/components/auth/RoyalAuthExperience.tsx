@@ -4,6 +4,15 @@ import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { AuthTermsAcceptance } from "@/components/auth/AuthTermsAcceptance";
 import { RoleBadge } from "@/components/auth/RoleBadge";
 import { AuthPageLayout } from "@/components/auth/AuthPageLayout";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAuthUser } from "@/lib/auth-user";
 import { dashboardPathForRoles, isGuestAccount, isStaffRole, ROLE_LABELS } from "@/lib/roles";
 import {
@@ -44,6 +53,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [termsPromptOpen, setTermsPromptOpen] = useState(false);
   const browserConfigured = isSupabaseBrowserConfigured();
   const { user, displayName, role, roles, loading } = useAuthUser();
   const supabase = useMemo(() => {
@@ -90,13 +100,16 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
 
   const isEmailNotConfirmedError = (message: string) => /email not confirmed/i.test(message);
 
+  const requireAcceptedTerms = () => {
+    if (acceptedTerms) return true;
+    setTermsPromptOpen(true);
+    return false;
+  };
+
   const signInWithGoogle = async () => {
     setError(null);
     setNotice(null);
-    if (!acceptedTerms) {
-      setError("Please accept the terms and conditions to continue.");
-      return;
-    }
+    if (!requireAcceptedTerms()) return;
     if (!supabase) {
       setError("Supabase browser auth is not configured.");
       return;
@@ -119,10 +132,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     setError(null);
     setNotice(null);
     setEmailNotConfirmed(false);
-    if (!acceptedTerms) {
-      setError("Please accept the terms and conditions to continue.");
-      return;
-    }
+    if (!requireAcceptedTerms()) return;
     if (!supabase) {
       setError("Supabase browser auth is not configured.");
       return;
@@ -211,10 +221,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     e.preventDefault();
     setError(null);
     setNotice(null);
-    if (!acceptedTerms) {
-      setError("Please accept the terms and conditions to continue.");
-      return;
-    }
+    if (!requireAcceptedTerms()) return;
     if (!supabase) {
       setError("Supabase browser auth is not configured.");
       return;
@@ -672,6 +679,24 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
             {notice}
           </p>
         ) : null}
+
+        <AlertDialog open={termsPromptOpen} onOpenChange={setTermsPromptOpen}>
+          <AlertDialogContent className="border-[oklch(0.88_0.08_86_/_0.35)] bg-[oklch(0.18_0.05_22)] text-ink">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="font-display text-xl tracking-tight text-ink">
+                Terms &amp; Conditions
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-ink/80">
+                Please accept the Terms and Conditions to continue.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction className="bg-ember text-primary-foreground hover:brightness-110">
+                OK
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
     </AuthPageLayout>
   );
 }
