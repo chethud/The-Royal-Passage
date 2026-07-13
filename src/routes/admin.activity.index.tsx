@@ -50,9 +50,9 @@ function AdminActivityPage() {
       });
   }, [user]);
 
-  const loadActivity = useCallback(async () => {
+  const loadActivity = useCallback(async (opts?: { silent?: boolean }) => {
     if (!accessToken) return;
-    setPageLoading(true);
+    if (!opts?.silent) setPageLoading(true);
     setPageError(null);
     try {
       if (!isApiConfigured()) {
@@ -63,13 +63,15 @@ function AdminActivityPage() {
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to load activity."));
     } finally {
-      setPageLoading(false);
+      if (!opts?.silent) setPageLoading(false);
     }
   }, [accessToken]);
 
   useEffect(() => {
     if (!accessToken) return;
     void loadActivity();
+    const id = window.setInterval(() => void loadActivity({ silent: true }), 30_000);
+    return () => window.clearInterval(id);
   }, [accessToken, loadActivity]);
 
   if (loading || !user || role !== "admin" || !accessToken) {
@@ -79,8 +81,8 @@ function AdminActivityPage() {
   return (
     <DashboardShell
       role="admin"
-      title="Activity log"
-      subtitle="Recent platform actions and audit events."
+      title="Live activity"
+      subtitle="New bookings, reviews, host signups, approvals, and cancellations — refreshing every 30 seconds."
       showRoleDescription={false}
     >
       <Link

@@ -39,6 +39,14 @@ const EMPTY_STATS: AdminStats = {
   hostPayoutDueMinor: 0,
   codPendingCollectionMinor: 0,
   commissionPercent: 10,
+  conversionRatePercent: 0,
+  cancelRatePercent: 0,
+  bookingsLast30Days: 0,
+  bookingsPrev30Days: 0,
+  bookingGrowthPercent: 0,
+  gmvLast30DaysMinor: 0,
+  gmvPrev30DaysMinor: 0,
+  gmvGrowthPercent: 0,
 };
 
 function AdminOverviewPage() {
@@ -131,8 +139,12 @@ function AdminOverviewPage() {
                 }
               />
               <QuickLink to="/admin/bookings" label="All bookings" detail="Guest reservations & payouts" />
+              <QuickLink to="/admin/activity" label="Live activity" detail="Bookings, reviews, approvals" />
+              <QuickLink to="/admin/trust" label="Fraud center" detail="Duplicates, spam, suspicious bookings" />
+              <QuickLink to="/admin/banners" label="Banner scheduler" detail="Festival banners, offers, events" />
+              <QuickLink to="/admin/homepage-edit" label="Homepage CMS" detail="Edit hero, showcase, journeys" />
               <QuickLink to="/admin/profile/users" label="Users" detail="Create logins & assign access roles" />
-              <QuickLink to="/admin/activity" label="Activity log" detail="Recent platform events" />
+              <QuickLink to="/admin/reviews" label="Reviews" detail="Moderate guest feedback" />
             </div>
           </LuxuryCheckoutPanel>
         ) : null}

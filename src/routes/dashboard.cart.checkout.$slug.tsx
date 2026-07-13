@@ -42,7 +42,12 @@ function CartCheckoutPage() {
   }, []);
 
   const cartItem = useMemo(
-    () => cartItems.find((item) => item.slug === exp.slug || item.experienceId === exp.id),
+    () =>
+      cartItems.find(
+        (item) =>
+          item.kind === "experience" &&
+          (item.slug === exp.slug || item.experienceId === exp.id),
+      ),
     [cartItems, exp.id, exp.slug],
   );
 

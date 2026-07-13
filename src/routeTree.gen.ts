@@ -77,6 +77,7 @@ import { Route as BookingsBookingIdIndexRouteImport } from './routes/bookings.$b
 import { Route as AdminVipIndexRouteImport } from './routes/admin.vip.index'
 import { Route as AdminVipPackagesIndexRouteImport } from './routes/admin.vip-packages.index'
 import { Route as AdminVipOwnersIndexRouteImport } from './routes/admin.vip-owners.index'
+import { Route as AdminTrustIndexRouteImport } from './routes/admin.trust.index'
 import { Route as AdminReviewsIndexRouteImport } from './routes/admin.reviews.index'
 import { Route as AdminProfileIndexRouteImport } from './routes/admin.profile.index'
 import { Route as AdminHostsIndexRouteImport } from './routes/admin.hosts.index'
@@ -85,6 +86,7 @@ import { Route as AdminHomestayIndexRouteImport } from './routes/admin.homestay.
 import { Route as AdminHomestayOwnersIndexRouteImport } from './routes/admin.homestay-owners.index'
 import { Route as AdminExperiencesIndexRouteImport } from './routes/admin.experiences.index'
 import { Route as AdminBookingsIndexRouteImport } from './routes/admin.bookings.index'
+import { Route as AdminBannersIndexRouteImport } from './routes/admin.banners.index'
 import { Route as AdminActivityIndexRouteImport } from './routes/admin.activity.index'
 import { Route as VipListingsNewRouteImport } from './routes/vip.listings.new'
 import { Route as VipListingsPackageIdRouteImport } from './routes/vip.listings.$packageId'
@@ -446,6 +448,11 @@ const AdminVipOwnersIndexRoute = AdminVipOwnersIndexRouteImport.update({
   path: '/vip-owners/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTrustIndexRoute = AdminTrustIndexRouteImport.update({
+  id: '/trust/',
+  path: '/trust/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReviewsIndexRoute = AdminReviewsIndexRouteImport.update({
   id: '/reviews/',
   path: '/reviews/',
@@ -485,6 +492,11 @@ const AdminExperiencesIndexRoute = AdminExperiencesIndexRouteImport.update({
 const AdminBookingsIndexRoute = AdminBookingsIndexRouteImport.update({
   id: '/bookings/',
   path: '/bookings/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBannersIndexRoute = AdminBannersIndexRouteImport.update({
+  id: '/banners/',
+  path: '/banners/',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminActivityIndexRoute = AdminActivityIndexRouteImport.update({
@@ -664,6 +676,7 @@ export interface FileRoutesByFullPath {
   '/vip/listings/$packageId': typeof VipListingsPackageIdRoute
   '/vip/listings/new': typeof VipListingsNewRoute
   '/admin/activity/': typeof AdminActivityIndexRoute
+  '/admin/banners/': typeof AdminBannersIndexRoute
   '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
   '/admin/homestay-owners/': typeof AdminHomestayOwnersIndexRoute
@@ -672,6 +685,7 @@ export interface FileRoutesByFullPath {
   '/admin/hosts/': typeof AdminHostsIndexRoute
   '/admin/profile/': typeof AdminProfileIndexRoute
   '/admin/reviews/': typeof AdminReviewsIndexRoute
+  '/admin/trust/': typeof AdminTrustIndexRoute
   '/admin/vip-owners/': typeof AdminVipOwnersIndexRoute
   '/admin/vip-packages/': typeof AdminVipPackagesIndexRoute
   '/admin/vip/': typeof AdminVipIndexRoute
@@ -747,6 +761,7 @@ export interface FileRoutesByTo {
   '/vip/listings/$packageId': typeof VipListingsPackageIdRoute
   '/vip/listings/new': typeof VipListingsNewRoute
   '/admin/activity': typeof AdminActivityIndexRoute
+  '/admin/banners': typeof AdminBannersIndexRoute
   '/admin/bookings': typeof AdminBookingsIndexRoute
   '/admin/experiences': typeof AdminExperiencesIndexRoute
   '/admin/homestay-owners': typeof AdminHomestayOwnersIndexRoute
@@ -755,6 +770,7 @@ export interface FileRoutesByTo {
   '/admin/hosts': typeof AdminHostsIndexRoute
   '/admin/profile': typeof AdminProfileIndexRoute
   '/admin/reviews': typeof AdminReviewsIndexRoute
+  '/admin/trust': typeof AdminTrustIndexRoute
   '/admin/vip-owners': typeof AdminVipOwnersIndexRoute
   '/admin/vip-packages': typeof AdminVipPackagesIndexRoute
   '/admin/vip': typeof AdminVipIndexRoute
@@ -846,6 +862,7 @@ export interface FileRoutesById {
   '/vip/listings/$packageId': typeof VipListingsPackageIdRoute
   '/vip/listings/new': typeof VipListingsNewRoute
   '/admin/activity/': typeof AdminActivityIndexRoute
+  '/admin/banners/': typeof AdminBannersIndexRoute
   '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/experiences/': typeof AdminExperiencesIndexRoute
   '/admin/homestay-owners/': typeof AdminHomestayOwnersIndexRoute
@@ -854,6 +871,7 @@ export interface FileRoutesById {
   '/admin/hosts/': typeof AdminHostsIndexRoute
   '/admin/profile/': typeof AdminProfileIndexRoute
   '/admin/reviews/': typeof AdminReviewsIndexRoute
+  '/admin/trust/': typeof AdminTrustIndexRoute
   '/admin/vip-owners/': typeof AdminVipOwnersIndexRoute
   '/admin/vip-packages/': typeof AdminVipPackagesIndexRoute
   '/admin/vip/': typeof AdminVipIndexRoute
@@ -946,6 +964,7 @@ export interface FileRouteTypes {
     | '/vip/listings/$packageId'
     | '/vip/listings/new'
     | '/admin/activity/'
+    | '/admin/banners/'
     | '/admin/bookings/'
     | '/admin/experiences/'
     | '/admin/homestay-owners/'
@@ -954,6 +973,7 @@ export interface FileRouteTypes {
     | '/admin/hosts/'
     | '/admin/profile/'
     | '/admin/reviews/'
+    | '/admin/trust/'
     | '/admin/vip-owners/'
     | '/admin/vip-packages/'
     | '/admin/vip/'
@@ -1029,6 +1049,7 @@ export interface FileRouteTypes {
     | '/vip/listings/$packageId'
     | '/vip/listings/new'
     | '/admin/activity'
+    | '/admin/banners'
     | '/admin/bookings'
     | '/admin/experiences'
     | '/admin/homestay-owners'
@@ -1037,6 +1058,7 @@ export interface FileRouteTypes {
     | '/admin/hosts'
     | '/admin/profile'
     | '/admin/reviews'
+    | '/admin/trust'
     | '/admin/vip-owners'
     | '/admin/vip-packages'
     | '/admin/vip'
@@ -1127,6 +1149,7 @@ export interface FileRouteTypes {
     | '/vip/listings/$packageId'
     | '/vip/listings/new'
     | '/admin/activity/'
+    | '/admin/banners/'
     | '/admin/bookings/'
     | '/admin/experiences/'
     | '/admin/homestay-owners/'
@@ -1135,6 +1158,7 @@ export interface FileRouteTypes {
     | '/admin/hosts/'
     | '/admin/profile/'
     | '/admin/reviews/'
+    | '/admin/trust/'
     | '/admin/vip-owners/'
     | '/admin/vip-packages/'
     | '/admin/vip/'
@@ -1680,6 +1704,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminVipOwnersIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/trust/': {
+      id: '/admin/trust/'
+      path: '/trust'
+      fullPath: '/admin/trust/'
+      preLoaderRoute: typeof AdminTrustIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reviews/': {
       id: '/admin/reviews/'
       path: '/reviews'
@@ -1734,6 +1765,13 @@ declare module '@tanstack/react-router' {
       path: '/bookings'
       fullPath: '/admin/bookings/'
       preLoaderRoute: typeof AdminBookingsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/banners/': {
+      id: '/admin/banners/'
+      path: '/banners'
+      fullPath: '/admin/banners/'
+      preLoaderRoute: typeof AdminBannersIndexRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/activity/': {
@@ -1905,6 +1943,7 @@ interface AdminRouteChildren {
   AdminHomestaysHomestayIdRoute: typeof AdminHomestaysHomestayIdRoute
   AdminVipPackagesPackageIdRoute: typeof AdminVipPackagesPackageIdRoute
   AdminActivityIndexRoute: typeof AdminActivityIndexRoute
+  AdminBannersIndexRoute: typeof AdminBannersIndexRoute
   AdminBookingsIndexRoute: typeof AdminBookingsIndexRoute
   AdminExperiencesIndexRoute: typeof AdminExperiencesIndexRoute
   AdminHomestayOwnersIndexRoute: typeof AdminHomestayOwnersIndexRoute
@@ -1912,6 +1951,7 @@ interface AdminRouteChildren {
   AdminHomestaysIndexRoute: typeof AdminHomestaysIndexRoute
   AdminHostsIndexRoute: typeof AdminHostsIndexRoute
   AdminReviewsIndexRoute: typeof AdminReviewsIndexRoute
+  AdminTrustIndexRoute: typeof AdminTrustIndexRoute
   AdminVipOwnersIndexRoute: typeof AdminVipOwnersIndexRoute
   AdminVipPackagesIndexRoute: typeof AdminVipPackagesIndexRoute
   AdminVipIndexRoute: typeof AdminVipIndexRoute
@@ -1927,6 +1967,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHomestaysHomestayIdRoute: AdminHomestaysHomestayIdRoute,
   AdminVipPackagesPackageIdRoute: AdminVipPackagesPackageIdRoute,
   AdminActivityIndexRoute: AdminActivityIndexRoute,
+  AdminBannersIndexRoute: AdminBannersIndexRoute,
   AdminBookingsIndexRoute: AdminBookingsIndexRoute,
   AdminExperiencesIndexRoute: AdminExperiencesIndexRoute,
   AdminHomestayOwnersIndexRoute: AdminHomestayOwnersIndexRoute,
@@ -1934,6 +1975,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHomestaysIndexRoute: AdminHomestaysIndexRoute,
   AdminHostsIndexRoute: AdminHostsIndexRoute,
   AdminReviewsIndexRoute: AdminReviewsIndexRoute,
+  AdminTrustIndexRoute: AdminTrustIndexRoute,
   AdminVipOwnersIndexRoute: AdminVipOwnersIndexRoute,
   AdminVipPackagesIndexRoute: AdminVipPackagesIndexRoute,
   AdminVipIndexRoute: AdminVipIndexRoute,

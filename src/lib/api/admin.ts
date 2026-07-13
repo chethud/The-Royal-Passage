@@ -191,6 +191,36 @@ export type AdminStats = {
   hostPayoutDueMinor: number;
   codPendingCollectionMinor: number;
   commissionPercent: number;
+  conversionRatePercent?: number;
+  cancelRatePercent?: number;
+  bookingsLast30Days?: number;
+  bookingsPrev30Days?: number;
+  bookingGrowthPercent?: number;
+  gmvLast30DaysMinor?: number;
+  gmvPrev30DaysMinor?: number;
+  gmvGrowthPercent?: number;
+};
+
+export type AdminRiskSignal = {
+  id: string;
+  category: string;
+  severity: string;
+  title: string;
+  detail: string;
+  entityType: string | null;
+  entityId: string | null;
+  href: string | null;
+};
+
+export type SiteBanner = {
+  id: string;
+  title: string;
+  body: string | null;
+  href: string | null;
+  placement: string;
+  startsAt: string;
+  endsAt: string;
+  active: boolean;
 };
 
 export type AdminBookingRow = {
@@ -263,4 +293,36 @@ export function fetchAdminBooking(accessToken: string, bookingId: string) {
 
 export function fetchAdminActivity(accessToken: string) {
   return apiFetch<AuditLogEntry[]>("/api/v1/admin/activity", { accessToken });
+}
+
+export function fetchAdminRiskSignals(accessToken: string) {
+  return apiFetch<AdminRiskSignal[]>("/api/v1/admin/risk-signals", { accessToken });
+}
+
+export function fetchAdminSiteBanners(accessToken: string) {
+  return apiFetch<{ banners: SiteBanner[] }>("/api/v1/admin/banners", { accessToken });
+}
+
+export function upsertAdminSiteBanner(
+  accessToken: string,
+  payload: Omit<SiteBanner, "id"> & { id?: string },
+) {
+  return apiFetch<SiteBanner>("/api/v1/admin/banners", {
+    accessToken,
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteAdminSiteBanner(accessToken: string, bannerId: string) {
+  return apiFetch<{ ok: boolean }>(`/api/v1/admin/banners/${bannerId}`, {
+    accessToken,
+    method: "DELETE",
+  });
+}
+
+export function fetchActiveSiteBanners(placement = "home_top") {
+  return apiFetch<{ banners: SiteBanner[] }>(
+    `/api/v1/banners/active?placement=${encodeURIComponent(placement)}`,
+  );
 }

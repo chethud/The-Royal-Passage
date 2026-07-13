@@ -6,7 +6,8 @@ import {
   weekdayPriceMajor,
   weekendPriceMajor,
 } from "@/lib/homestay-day-pricing";
-import { MarketplaceCard } from "@/components/site/MarketplaceCard";
+import { AddHomestayToCartButton } from "@/components/cart/AddHomestayToCartButton";
+import { MarketplaceCard, marketplaceCardActionClass } from "@/components/site/MarketplaceCard";
 
 export function HomestayCard({
   stay,
@@ -39,6 +40,9 @@ export function HomestayCard({
           {stay.propertyType}
         </span>
       }
+      topRight={
+        <AddHomestayToCartButton stay={stay} search={search} className={marketplaceCardActionClass} />
+      }
       meta={
         <>
           <span className="inline-flex items-center gap-1.5">
@@ -57,9 +61,7 @@ export function HomestayCard({
       }
       footer={
         <div className="flex items-center justify-between gap-3">
-          <span className="font-display text-base text-[#F7F1E8]">
-            {rateLabel}
-          </span>
+          <span className="font-display text-base text-[#F7F1E8]">{rateLabel}</span>
           <span className="inline-flex items-center gap-1 text-[0.62rem] text-[#D4AF6A]">
             <Star className="h-3.5 w-3.5 fill-current" aria-hidden />
             {stay.rating}

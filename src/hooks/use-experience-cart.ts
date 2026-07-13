@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import {
   addCartItem,
   cartItemCount,
+  isExperienceInCart,
+  isHomestayInCart,
   isInCart,
   listCartItems,
   removeCartItem,
@@ -28,12 +30,14 @@ export function useExperienceCart() {
     setCount(cartItemCount());
   }, []);
 
-  const remove = useCallback((experienceId: string) => {
-    setItems(removeCartItem(experienceId));
+  const remove = useCallback((id: string) => {
+    setItems(removeCartItem(id));
     setCount(cartItemCount());
   }, []);
 
-  const has = useCallback((experienceId: string) => isInCart(experienceId), [items]);
+  const has = useCallback((id: string) => isInCart(id), [items]);
+  const hasExperience = useCallback((experienceId: string) => isExperienceInCart(experienceId), [items]);
+  const hasHomestay = useCallback((homestayId: string) => isHomestayInCart(homestayId), [items]);
 
-  return { items, count, add, remove, has, sync };
+  return { items, count, add, remove, has, hasExperience, hasHomestay, sync };
 }

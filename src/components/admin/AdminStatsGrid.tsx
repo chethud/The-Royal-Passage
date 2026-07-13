@@ -9,6 +9,14 @@ type AdminStatsGridProps = {
   stats: AdminStats;
 };
 
+function growthLabel(value?: number) {
+  if (value == null || Number.isNaN(value)) return "—";
+  const rounded = Math.round(value * 10) / 10;
+  if (rounded > 0) return `+${rounded}%`;
+  if (rounded < 0) return `${rounded}%`;
+  return "0%";
+}
+
 export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
   const sym = stats.currencySymbol;
   const commission = stats.commissionPercent ?? 10;
@@ -16,15 +24,61 @@ export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
 
   return (
     <div className="space-y-8">
-      <StatCardSection title="Platform overview" surface={surface}>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <ClickableStatCard label="Guests" value={String(stats.totalGuests)} surface={surface} />
+      <StatCardSection
+        title="Platform analytics"
+        description="GMV, revenue, conversion, and 30-day growth across experience bookings."
+        surface={surface}
+      >
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ClickableStatCard
+            label="GMV"
+            value={formatMoney(stats.grossBookingValueMinor, sym)}
+            hint="Gross booking value (non-cancelled)"
+            to="/admin/bookings"
+            search={{ status: "all" }}
+            surface={surface}
+          />
+          <ClickableStatCard
+            label="Revenue"
+            value={formatMoney(stats.platformRevenueMinor, sym)}
+            hint={`Platform margin (${commission}%)`}
+            to="/admin/bookings"
+            search={{ status: "confirmed" }}
+            surface={surface}
+          />
+          <ClickableStatCard
+            label="Bookings"
+            value={String(stats.totalBookings)}
+            to="/admin/bookings"
+            search={{ status: "all" }}
+            surface={surface}
+          />
           <ClickableStatCard
             label="Hosts"
             value={String(stats.totalHosts)}
             to="/admin/profile/users"
             surface={surface}
           />
+          <ClickableStatCard
+            label="Conversion"
+            value={`${stats.conversionRatePercent ?? 0}%`}
+            hint="Confirmed + completed ÷ decided bookings"
+            to="/admin/bookings"
+            search={{ status: "confirmed" }}
+            surface={surface}
+          />
+          <ClickableStatCard
+            label="Growth"
+            value={growthLabel(stats.bookingGrowthPercent)}
+            hint={`Bookings last 30d (${stats.bookingsLast30Days ?? 0}) vs prior 30d`}
+            surface={surface}
+          />
+        </div>
+      </StatCardSection>
+
+      <StatCardSection title="Platform overview" surface={surface}>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ClickableStatCard label="Guests" value={String(stats.totalGuests)} surface={surface} />
           <ClickableStatCard
             label="Published experiences"
             value={String(stats.publishedExperiences)}
@@ -35,6 +89,12 @@ export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
             label="Pending approvals"
             value={String(stats.pendingExperienceReviews)}
             to="/admin/experiences"
+            surface={surface}
+          />
+          <ClickableStatCard
+            label="GMV growth"
+            value={growthLabel(stats.gmvGrowthPercent)}
+            hint={`Last 30d ${formatMoney(stats.gmvLast30DaysMinor ?? 0, sym)}`}
             surface={surface}
           />
         </div>
@@ -77,6 +137,7 @@ export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
           <ClickableStatCard
             label="Cancelled"
             value={String(stats.cancelledBookings)}
+            hint={`Cancel rate ${stats.cancelRatePercent ?? 0}%`}
             to="/admin/bookings"
             search={{ status: "cancelled" }}
             surface={surface}
@@ -91,27 +152,11 @@ export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ClickableStatCard
-            label="Gross booking value"
-            value={formatMoney(stats.grossBookingValueMinor, sym)}
-            hint="All non-cancelled bookings"
-            to="/admin/bookings"
-            search={{ status: "all" }}
-            surface={surface}
-          />
-          <ClickableStatCard
             label="Collected from guests"
             value={formatMoney(stats.revenueCollectedMinor, sym)}
             hint="Payment received at venue"
             to="/admin/bookings"
             search={{ payment: "collected" }}
-            surface={surface}
-          />
-          <ClickableStatCard
-            label={`Platform margin (${commission}%)`}
-            value={formatMoney(stats.platformRevenueMinor, sym)}
-            hint="Royal Passage share on confirmed & completed"
-            to="/admin/bookings"
-            search={{ status: "confirmed" }}
             surface={surface}
           />
           <ClickableStatCard

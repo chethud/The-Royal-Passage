@@ -29,7 +29,12 @@ function GuestCartPage() {
   const [addingWishlistId, setAddingWishlistId] = useState<string | null>(null);
 
   const cartExperienceIds = useMemo(
-    () => new Set(cartItems.map((item) => item.experienceId)),
+    () =>
+      new Set(
+        cartItems
+          .filter((item) => item.kind === "experience")
+          .map((item) => item.experienceId),
+      ),
     [cartItems],
   );
 
@@ -84,7 +89,7 @@ function GuestCartPage() {
   return (
     <GuestDashboardShell
       title="Cart"
-      subtitle="Your selected experiences, ready to reserve."
+      subtitle="Build a Mysuru itinerary — experiences and a stay, booked when you're ready."
       showRoleDescription={false}
     >
       {pageError ? <p className="mb-6 text-sm text-destructive">{pageError}</p> : null}

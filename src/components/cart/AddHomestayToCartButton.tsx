@@ -1,30 +1,29 @@
 import { CartIcon } from "@/components/cart/CartIcon";
 import { useState, type MouseEvent } from "react";
-import type { Experience } from "@/data/experiences";
+import type { Homestay } from "@/data/homestays";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
-import { cartItemFromExperience } from "@/lib/cart-storage";
+import { cartItemFromHomestay } from "@/lib/cart-storage";
 import { useAuthUser } from "@/lib/auth-user";
-import { hasBookableSlot } from "@/lib/experience-filters";
+import type { HomestayBrowseSearch } from "@/lib/homestay-filters";
 import { isGuestAccount } from "@/lib/roles";
 
-type AddToCartButtonProps = {
-  exp: Experience;
+type AddHomestayToCartButtonProps = {
+  stay: Homestay;
+  search?: HomestayBrowseSearch;
   className?: string;
-  showLabel?: boolean;
 };
 
-export function AddToCartButton({ exp, className = "", showLabel = false }: AddToCartButtonProps) {
+export function AddHomestayToCartButton({
+  stay,
+  search,
+  className = "",
+}: AddHomestayToCartButtonProps) {
   const { user, role } = useAuthUser();
-  const { add, hasExperience } = useExperienceCart();
+  const { add, hasHomestay } = useExperienceCart();
   const [busy, setBusy] = useState(false);
-  const inCart = hasExperience(exp.id);
-  const canBook = hasBookableSlot(exp);
+  const inCart = hasHomestay(stay.id);
 
   if (user && !isGuestAccount(role)) {
-    return null;
-  }
-
-  if (!canBook) {
     return null;
   }
 
@@ -33,7 +32,7 @@ export function AddToCartButton({ exp, className = "", showLabel = false }: AddT
     event.stopPropagation();
     if (inCart) return;
     setBusy(true);
-    add(cartItemFromExperience(exp));
+    add(cartItemFromHomestay(stay, search));
     window.setTimeout(() => setBusy(false), 350);
   };
 
@@ -43,17 +42,10 @@ export function AddToCartButton({ exp, className = "", showLabel = false }: AddT
       disabled={busy || inCart}
       onClick={handleClick}
       className={`rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/80 p-2.5 text-foreground backdrop-blur-sm transition-colors hover:border-ember/50 disabled:cursor-default disabled:opacity-100 ${inCart ? "border-ember/50 text-ember" : ""} ${className}`}
-      aria-label={inCart ? "Already in cart" : "Add to cart"}
+      aria-label={inCart ? "Already in cart" : "Add stay to cart"}
       aria-pressed={inCart}
     >
-      <span className="flex items-center gap-1.5">
-        <CartIcon size={20} className={inCart ? "brightness-110" : "opacity-95"} />
-        {showLabel ? (
-          <span className="text-[0.65rem] font-semibold uppercase tracking-[0.12em]">
-            {inCart ? "In cart" : "Add to cart"}
-          </span>
-        ) : null}
-      </span>
+      <CartIcon size={20} className={inCart ? "brightness-110" : "opacity-95"} />
     </button>
   );
 }

@@ -20,8 +20,15 @@ from app.services.admin_experiences import (
     reject_experience,
 )
 from app.services.admin_users import create_host_account, list_managed_users
+from app.services.admin_risk import list_admin_risk_signals
 from app.services.audit import log_audit
-from app.models.schemas import CreateHostRequest
+from app.services.site_banners import (
+    delete_site_banner,
+    list_active_site_banners,
+    list_site_banners,
+    upsert_site_banner,
+)
+from app.models.schemas import CreateHostRequest, UpsertSiteBannerRequest
 
 
 async def healthz(_request: Request) -> JSONResponse:
@@ -205,6 +212,7 @@ async def admin_reject_experience(request: Request) -> JSONResponse:
     experience_id = request.path_params["experience_id"]
     try:
         result = reject_experience(experience_id)
+        log_audit(auth["user"].id, "experience_rejected", "experience", experience_id, {})
     except ValueError as exc:
         return JSONResponse({"detail": str(exc)}, status_code=400)
     return JSONResponse(result.model_dump(mode="json"))
@@ -217,8 +225,63 @@ async def admin_create_host(request: Request) -> JSONResponse:
     try:
         payload = CreateHostRequest.model_validate(await request.json())
         result = create_host_account(payload)
+        log_audit(
+            auth["user"].id,
+            "host_signup",
+            "host",
+            result.hostId,
+            {"email": payload.email},
+        )
     except ValueError as exc:
         return JSONResponse({"detail": str(exc)}, status_code=400)
     except Exception as exc:
         return JSONResponse({"detail": str(exc)}, status_code=400)
     return JSONResponse(result.model_dump(mode="json"))
+
+
+async def admin_risk_signals(request: Request) -> JSONResponse:
+    auth = require_admin_request(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    rows = [row.model_dump(mode="json") for row in list_admin_risk_signals()]
+    return JSONResponse(rows, headers={"Cache-Control": "private, max-age=30"})
+
+
+async def admin_site_banners(request: Request) -> JSONResponse:
+    auth = require_admin_request(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    rows = [row.model_dump(mode="json") for row in list_site_banners()]
+    return JSONResponse({"banners": rows})
+
+
+async def admin_upsert_site_banner(request: Request) -> JSONResponse:
+    auth = require_admin_request(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    try:
+        payload = UpsertSiteBannerRequest.model_validate(await request.json())
+        banner = upsert_site_banner(payload)
+        log_audit(auth["user"].id, "banner_scheduled", "banner", banner.id, {"title": banner.title})
+    except Exception as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=400)
+    return JSONResponse(banner.model_dump(mode="json"))
+
+
+async def admin_delete_site_banner(request: Request) -> JSONResponse:
+    auth = require_admin_request(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    banner_id = request.path_params["banner_id"]
+    delete_site_banner(banner_id)
+    log_audit(auth["user"].id, "banner_deleted", "banner", banner_id, {})
+    return JSONResponse({"ok": True})
+
+
+async def public_active_site_banners(request: Request) -> JSONResponse:
+    placement = (request.query_params.get("placement") or "home_top").strip()
+    rows = [row.model_dump(mode="json") for row in list_active_site_banners(placement)]
+    return JSONResponse(
+        {"banners": rows},
+        headers={"Cache-Control": "public, max-age=60"},
+    )

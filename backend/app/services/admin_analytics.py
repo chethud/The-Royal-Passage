@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 import time
 
 from app.dependencies.supabase import get_supabase_admin
@@ -65,6 +66,22 @@ def _count_rows(supabase, table: str, **filters) -> int:
     return run_supabase_query(_load, fallback=0)
 
 
+def _growth_percent(current: float, previous: float) -> float:
+    if previous <= 0:
+        return 100.0 if current > 0 else 0.0
+    return round(((current - previous) / previous) * 100.0, 1)
+
+
+def _parse_created_at(value) -> datetime | None:
+    if not value:
+        return None
+    try:
+        raw = str(value).replace("Z", "+00:00")
+        return datetime.fromisoformat(raw)
+    except Exception:
+        return None
+
+
 def get_admin_stats() -> AdminStats:
     cached = _admin_stats_cache.get("stats")
     if cached is not None:
@@ -85,7 +102,7 @@ def get_admin_stats() -> AdminStats:
                 supabase.table("bookings")
                 .select(
                     "booking_status, payment_status, total_amount, subtotal_minor, "
-                    "platform_fee_minor, host_payout_minor"
+                    "platform_fee_minor, host_payout_minor, created_at"
                 )
                 .limit(2000)
                 .execute()
@@ -104,6 +121,14 @@ def get_admin_stats() -> AdminStats:
         host_payout_due_minor = 0
         cod_pending_collection_minor = 0
 
+        now = datetime.now(timezone.utc)
+        last_30_start = now - timedelta(days=30)
+        prev_30_start = now - timedelta(days=60)
+        bookings_last_30 = 0
+        bookings_prev_30 = 0
+        gmv_last_30 = 0
+        gmv_prev_30 = 0
+
         for row in rows:
             if not isinstance(row, dict):
                 continue
@@ -112,6 +137,7 @@ def get_admin_stats() -> AdminStats:
             total = _booking_total(row)
             platform_fee = _as_int(row.get("platform_fee_minor"))
             host_payout = _as_int(row.get("host_payout_minor"))
+            created_at = _parse_created_at(row.get("created_at"))
 
             if status == "pending":
                 pending_bookings += 1
@@ -121,6 +147,16 @@ def get_admin_stats() -> AdminStats:
                 completed_bookings += 1
             elif status == "cancelled":
                 cancelled_bookings += 1
+
+            if created_at is not None:
+                if created_at >= last_30_start:
+                    bookings_last_30 += 1
+                    if status != "cancelled":
+                        gmv_last_30 += total
+                elif created_at >= prev_30_start:
+                    bookings_prev_30 += 1
+                    if status != "cancelled":
+                        gmv_prev_30 += total
 
             if status == "cancelled":
                 continue
@@ -135,11 +171,22 @@ def get_admin_stats() -> AdminStats:
                 else:
                     cod_pending_collection_minor += total
 
+        total_bookings = len(rows)
+        decided = confirmed_bookings + completed_bookings + cancelled_bookings
+        conversion = (
+            round(((confirmed_bookings + completed_bookings) / decided) * 100.0, 1)
+            if decided > 0
+            else 0.0
+        )
+        cancel_rate = (
+            round((cancelled_bookings / total_bookings) * 100.0, 1) if total_bookings > 0 else 0.0
+        )
+
         stats = AdminStats(
             totalGuests=total_guests,
             totalHosts=total_hosts,
             publishedExperiences=published_experiences,
-            totalBookings=len(rows),
+            totalBookings=total_bookings,
             revenueCollectedMinor=revenue_collected_minor,
             pendingExperienceReviews=pending_reviews,
             currencySymbol="₹",
@@ -152,6 +199,14 @@ def get_admin_stats() -> AdminStats:
             hostPayoutDueMinor=host_payout_due_minor,
             codPendingCollectionMinor=cod_pending_collection_minor,
             commissionPercent=commission_percent,
+            conversionRatePercent=conversion,
+            cancelRatePercent=cancel_rate,
+            bookingsLast30Days=bookings_last_30,
+            bookingsPrev30Days=bookings_prev_30,
+            bookingGrowthPercent=_growth_percent(bookings_last_30, bookings_prev_30),
+            gmvLast30DaysMinor=gmv_last_30,
+            gmvPrev30DaysMinor=gmv_prev_30,
+            gmvGrowthPercent=_growth_percent(gmv_last_30, gmv_prev_30),
         )
         _admin_stats_cache.set("stats", stats)
         return stats
@@ -400,5 +455,5 @@ def get_admin_booking_by_id(booking_id: str):
     return _map_booking_row(row)
 
 
-def list_admin_activity(limit: int = 20):
+def list_admin_activity(limit: int = 40):
     return list_recent_audit_logs(limit)

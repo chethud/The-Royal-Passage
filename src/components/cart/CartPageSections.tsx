@@ -2,14 +2,15 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Heart, ShoppingCart, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { WishlistItem } from "@/lib/api/wishlist";
-import type { CartItem } from "@/lib/cart-storage";
+import type { CartItem, ExperienceCartItem } from "@/lib/cart-storage";
+import { buildHomestayBookSearch } from "@/lib/homestay-booking-url";
 
 type Surface = "light" | "dark";
 
 type CartItemsSectionProps = {
   items: CartItem[];
   removingId: string | null;
-  onRemove: (experienceId: string) => void;
+  onRemove: (id: string) => void;
   surface?: Surface;
 };
 
@@ -32,15 +33,23 @@ export function CartItemsSection({
           Your cart is empty
         </p>
         <p className={`mt-2 text-xs leading-relaxed ${isLight ? "luxury-panel-body" : "text-muted-foreground/90"}`}>
-          Tap the cart icon on any experience to save it here before booking.
+          Add experiences and a homestay to build a Mysuru itinerary, then book each when ready.
         </p>
-        <Link
-          to="/experiences"
-          className="luxury-btn-sm luxury-btn-primary mt-6 inline-flex items-center gap-2"
-        >
-          Browse experiences
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            to="/experiences"
+            className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2"
+          >
+            Browse experiences
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+          <Link
+            to="/homestays"
+            className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center gap-2 no-underline"
+          >
+            Browse stays
+          </Link>
+        </div>
       </div>
     );
   }
@@ -48,29 +57,110 @@ export function CartItemsSection({
   return (
     <ul className={isLight ? "divide-y divide-[#C8A25A]/22" : "divide-y divide-[#C8A25A]/12"}>
       {items.map((item) => (
-        <li key={item.experienceId}>
-          <CartRow
-            item={item}
-            surface={surface}
-            removing={removingId === item.experienceId}
-            onRemove={() => onRemove(item.experienceId)}
-            primaryAction={
-              <Link
-                to="/dashboard/cart/checkout/$slug"
-                params={{ slug: item.slug }}
-                search={
-                  item.slotId ? { slotId: item.slotId, guests: item.guests ?? 1 } : undefined
-                }
-                className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2"
-              >
-                Buy
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            }
-          />
+        <li key={`${item.kind}-${item.id}`}>
+          {item.kind === "experience" ? (
+            <ExperienceCartRow
+              item={item}
+              surface={surface}
+              removing={removingId === item.id}
+              onRemove={() => onRemove(item.id)}
+            />
+          ) : (
+            <HomestayCartRow
+              item={item}
+              surface={surface}
+              removing={removingId === item.id}
+              onRemove={() => onRemove(item.id)}
+            />
+          )}
         </li>
       ))}
     </ul>
+  );
+}
+
+function ExperienceCartRow({
+  item,
+  surface,
+  removing,
+  onRemove,
+}: {
+  item: ExperienceCartItem;
+  surface: Surface;
+  removing: boolean;
+  onRemove: () => void;
+}) {
+  return (
+    <CartRow
+      kindLabel="Experience"
+      title={item.title}
+      tagline={item.tagline}
+      city={item.city}
+      image={item.image}
+      priceLabel={`From ${item.currencySymbol}${item.pricePerPerson.toLocaleString("en-IN")}`}
+      detailTo="/experiences/$slug"
+      detailParams={{ slug: item.slug }}
+      surface={surface}
+      removing={removing}
+      onRemove={onRemove}
+      primaryAction={
+        <Link
+          to="/dashboard/cart/checkout/$slug"
+          params={{ slug: item.slug }}
+          search={item.slotId ? { slotId: item.slotId, guests: item.guests ?? 1 } : undefined}
+          className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2"
+        >
+          Book
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      }
+    />
+  );
+}
+
+function HomestayCartRow({
+  item,
+  surface,
+  removing,
+  onRemove,
+}: {
+  item: Extract<CartItem, { kind: "homestay" }>;
+  surface: Surface;
+  removing: boolean;
+  onRemove: () => void;
+}) {
+  const dates =
+    item.checkIn && item.checkOut ? `${item.checkIn} → ${item.checkOut}` : item.tagline;
+
+  return (
+    <CartRow
+      kindLabel="Homestay"
+      title={item.title}
+      tagline={dates}
+      city={item.city}
+      image={item.image}
+      priceLabel={`From ${item.currencySymbol}${item.pricePerNight.toLocaleString("en-IN")}/night`}
+      detailTo="/homestays/$slug"
+      detailParams={{ slug: item.slug }}
+      surface={surface}
+      removing={removing}
+      onRemove={onRemove}
+      primaryAction={
+        <Link
+          to="/homestays/$slug/book"
+          params={{ slug: item.slug }}
+          search={buildHomestayBookSearch({
+            checkIn: item.checkIn,
+            checkOut: item.checkOut,
+            guests: item.guests,
+          })}
+          className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2"
+        >
+          Book stay
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      }
+    />
   );
 }
 
@@ -119,17 +209,14 @@ export function WishlistCartSection({
         return (
           <li key={item.experienceId}>
             <CartRow
-              item={{
-                experienceId: item.experienceId,
-                slug: item.experience.slug,
-                title: item.experience.title,
-                tagline: item.experience.tagline ?? undefined,
-                city: item.experience.city,
-                image: item.experience.image,
-                pricePerPerson: item.experience.pricePerPerson,
-                currencySymbol: item.experience.currencySymbol,
-                addedAt: item.savedAt,
-              }}
+              kindLabel="Experience"
+              title={item.experience.title}
+              tagline={item.experience.tagline ?? undefined}
+              city={item.experience.city}
+              image={item.experience.image}
+              priceLabel={`From ${item.experience.currencySymbol}${item.experience.pricePerPerson.toLocaleString("en-IN")}`}
+              detailTo="/experiences/$slug"
+              detailParams={{ slug: item.experience.slug }}
               surface={surface}
               removing={removingId === item.experienceId}
               onRemove={() => onRemove(item.experienceId)}
@@ -163,7 +250,14 @@ export function WishlistCartSection({
 }
 
 type CartRowProps = {
-  item: CartItem;
+  kindLabel: string;
+  title: string;
+  tagline?: string;
+  city: string;
+  image: string;
+  priceLabel: string;
+  detailTo: "/experiences/$slug" | "/homestays/$slug";
+  detailParams: { slug: string };
   surface?: Surface;
   removing: boolean;
   onRemove: () => void;
@@ -173,7 +267,14 @@ type CartRowProps = {
 };
 
 function CartRow({
-  item,
+  kindLabel,
+  title,
+  tagline,
+  city,
+  image,
+  priceLabel,
+  detailTo,
+  detailParams,
   surface = "dark",
   removing,
   onRemove,
@@ -187,13 +288,13 @@ function CartRow({
     <article className="group py-6 sm:py-7">
       <div className="flex gap-5 sm:gap-7">
         <Link
-          to="/experiences/$slug"
-          params={{ slug: item.slug }}
-          className="relative h-[5.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-sm sm:h-28 sm:w-[6.5rem] border border-[rgb(200_162_90/0.28)]"
+          to={detailTo}
+          params={detailParams}
+          className="relative h-[5.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-sm border border-[rgb(200_162_90/0.28)] sm:h-28 sm:w-[6.5rem]"
         >
-          {item.image ? (
+          {image ? (
             <img
-              src={item.image}
+              src={image}
               alt=""
               className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
             />
@@ -204,30 +305,33 @@ function CartRow({
         <div className="flex min-w-0 flex-1 flex-col justify-between gap-4">
           <div className="min-w-0">
             <div className={`eyebrow text-[0.62rem] ${isLight ? "luxury-panel-label" : "text-[#D4AF6A]/85"}`}>
-              {item.city}
+              {kindLabel} · {city}
             </div>
             <Link
-              to="/experiences/$slug"
-              params={{ slug: item.slug }}
+              to={detailTo}
+              params={detailParams}
               className={`mt-1 block font-display text-base uppercase leading-snug tracking-[0.05em] transition-colors sm:text-lg ${
                 isLight
                   ? "luxury-panel-heading hover:text-[#9A7228]"
                   : "text-[#F7F1E8] hover:text-[#D4AF6A]"
               }`}
             >
-              {item.title}
+              {title}
             </Link>
-            {item.tagline ? (
-              <p className={`mt-1.5 line-clamp-2 text-xs leading-relaxed ${isLight ? "luxury-panel-body" : "text-muted-foreground/90"}`}>
-                {item.tagline}
+            {tagline ? (
+              <p
+                className={`mt-1.5 line-clamp-2 text-xs leading-relaxed ${isLight ? "luxury-panel-body" : "text-muted-foreground/90"}`}
+              >
+                {tagline}
               </p>
             ) : null}
           </div>
 
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <span className={`font-display text-xl tracking-tight sm:text-2xl ${isLight ? "luxury-panel-heading" : "text-[#F7F1E8]"}`}>
-              From {item.currencySymbol}
-              {item.pricePerPerson.toLocaleString("en-IN")}
+            <span
+              className={`font-display text-xl tracking-tight sm:text-2xl ${isLight ? "luxury-panel-heading" : "text-[#F7F1E8]"}`}
+            >
+              {priceLabel}
             </span>
             <div className="flex items-center gap-4">
               {primaryAction}

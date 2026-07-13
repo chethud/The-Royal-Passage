@@ -1160,6 +1160,52 @@ class AdminStats(BaseModel):
     hostPayoutDueMinor: int = 0
     codPendingCollectionMinor: int = 0
     commissionPercent: float = 10.0
+    # Derived platform analytics
+    conversionRatePercent: float = 0.0
+    cancelRatePercent: float = 0.0
+    bookingsLast30Days: int = 0
+    bookingsPrev30Days: int = 0
+    bookingGrowthPercent: float = 0.0
+    gmvLast30DaysMinor: int = 0
+    gmvPrev30DaysMinor: int = 0
+    gmvGrowthPercent: float = 0.0
+
+
+class AdminRiskSignal(BaseModel):
+    id: str
+    category: str
+    severity: str
+    title: str
+    detail: str
+    entityType: str | None = None
+    entityId: str | None = None
+    href: str | None = None
+
+
+class SiteBanner(BaseModel):
+    id: str
+    title: str
+    body: str | None = None
+    href: str | None = None
+    placement: str = "home_top"
+    startsAt: str
+    endsAt: str
+    active: bool = True
+
+
+class ListSiteBannersResponse(BaseModel):
+    banners: list[SiteBanner] = []
+
+
+class UpsertSiteBannerRequest(BaseModel):
+    id: str | None = None
+    title: str
+    body: str | None = None
+    href: str | None = None
+    placement: str = "home_top"
+    startsAt: str
+    endsAt: str
+    active: bool = True
 
 
 class AdminHomestayStats(BaseModel):
