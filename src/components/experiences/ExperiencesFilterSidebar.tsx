@@ -151,6 +151,7 @@ function FilterPanels({
       <FilterSection
         title="Duration"
         activeKey={search.duration ?? "__all__"}
+        variant="range"
       >
         <FilterOption
           optionKey="__all__"
@@ -181,6 +182,7 @@ function FilterPanels({
       <FilterSection
         title="When"
         activeKey={search.availability ?? "__all__"}
+        variant="range"
       >
         <FilterOption
           optionKey="__all__"
@@ -214,10 +216,13 @@ function FilterSection({
   title,
   children,
   activeKey,
+  variant = "segment",
 }: {
   title: string;
   children: ReactNode;
   activeKey?: string;
+  /** segment = highlight active row; range = fill from top to selection + knob */
+  variant?: "segment" | "range";
 }) {
   const listRef = useRef<HTMLDivElement>(null);
   const [indicator, setIndicator] = useState<{ top: number; height: number } | null>(null);
@@ -261,12 +266,31 @@ function FilterSection({
     };
   }, [activeKey]);
 
+  const knobCenter = indicator ? indicator.top + indicator.height / 2 : 0;
+  const isRange = variant === "range";
+
   return (
     <div>
       <h3 className="eyebrow mb-3 text-[0.62rem] tracking-[0.2em] text-[#D4AF6A]/90">{title}</h3>
-      <div className="experiences-filter-rail relative pl-3">
+      <div
+        className={`experiences-filter-rail relative ${isRange ? "experiences-filter-rail--range pl-4" : "pl-3"}`}
+      >
         <div className="experiences-filter-rail__track" aria-hidden />
-        {indicator ? (
+        {indicator && isRange ? (
+          <>
+            <div
+              className="experiences-filter-rail__fill"
+              aria-hidden
+              style={{ height: `${Math.max(knobCenter, 2)}px` }}
+            />
+            <div
+              className="experiences-filter-rail__knob"
+              aria-hidden
+              style={{ transform: `translateY(${knobCenter}px) translate(-50%, -50%)` }}
+            />
+          </>
+        ) : null}
+        {indicator && !isRange ? (
           <div
             className="experiences-filter-rail__thumb"
             aria-hidden
