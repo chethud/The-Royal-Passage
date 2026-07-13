@@ -148,7 +148,18 @@ function FilterPanels({
         ))}
       </FilterSection>
 
-      <FilterSection title="Duration" activeKey={search.duration}>
+      <FilterSection
+        title="Duration"
+        activeKey={search.duration ?? "__all__"}
+      >
+        <FilterOption
+          optionKey="__all__"
+          active={!search.duration}
+          label="Any duration"
+          displayLabel="Any"
+          Icon={Clock}
+          onClick={() => onUpdate({ duration: undefined, page: 1 })}
+        />
         {DURATION_OPTIONS.map(({ id, label, shortLabel, Icon }) => (
           <FilterOption
             key={id}
@@ -167,7 +178,18 @@ function FilterPanels({
         ))}
       </FilterSection>
 
-      <FilterSection title="When" activeKey={search.availability}>
+      <FilterSection
+        title="When"
+        activeKey={search.availability ?? "__all__"}
+      >
+        <FilterOption
+          optionKey="__all__"
+          active={!search.availability}
+          label="Any time"
+          displayLabel="Any"
+          Icon={CalendarDays}
+          onClick={() => onUpdate({ availability: undefined, page: 1 })}
+        />
         {AVAILABILITY_OPTIONS.map(({ id, label, Icon }) => (
           <FilterOption
             key={id}
