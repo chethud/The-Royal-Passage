@@ -30,27 +30,60 @@ export function ExperienceDetailGallery({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="flex items-stretch gap-2.5 sm:gap-3">
+      {hasMultiple ? (
+        <div
+          className="flex w-[4.25rem] shrink-0 flex-col gap-2 overflow-y-auto sm:w-[5.25rem] md:w-24"
+          role="tablist"
+          aria-label={`${exp.title} photo thumbnails`}
+        >
+          {photos.map((url, index) => (
+            <button
+              key={url}
+              type="button"
+              role="tab"
+              aria-selected={index === activeIndex}
+              aria-label={`Show photo ${index + 1}`}
+              onClick={() => goTo(index, index >= activeIndex ? "next" : "prev")}
+              className={cn(
+                "relative min-h-[4.5rem] flex-1 overflow-hidden rounded-sm border transition-colors sm:min-h-[5.5rem]",
+                index === activeIndex
+                  ? "border-[#D4AF6A] ring-1 ring-[#D4AF6A]/60"
+                  : "border-[rgb(200_162_90/0.25)] opacity-80 hover:opacity-100",
+              )}
+            >
+              <img
+                src={url}
+                alt=""
+                className="h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       <div
-        className="experience-detail-gallery-main relative w-full overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]"
+        className="experience-detail-gallery-main relative min-w-0 flex-1 overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]"
         aria-label={`${exp.title} photos`}
       >
         {/* Hover target is only the photo — not arrows / counter / category chip */}
-        <div className="group/photo relative">
-          <div className="experience-detail-gallery__frame">
+        <div className="group/photo relative h-full">
+          <div className="experience-detail-gallery__frame h-full">
             <div
               key={activePhoto}
               className={cn(
-                "experience-detail-gallery__slide",
+                "experience-detail-gallery__slide h-full",
                 slideDirection === "prev" && "experience-detail-gallery__slide--prev",
               )}
             >
               <img
                 src={activePhoto}
                 alt={`${exp.title} photo ${activeIndex + 1} of ${photos.length}`}
-                className="experience-detail-gallery__image aspect-[4/4] w-full object-cover sm:aspect-[4/5] md:aspect-auto md:h-[min(58vh,520px)]"
+                className="experience-detail-gallery__image aspect-[3/4] h-full w-full object-cover sm:aspect-[3/4] md:aspect-auto md:h-[min(78vh,720px)]"
                 width={1200}
-                height={1500}
+                height={1600}
                 decoding="async"
                 fetchPriority={activeIndex === 0 ? "high" : "auto"}
               />
@@ -107,33 +140,6 @@ export function ExperienceDetailGallery({
           </>
         ) : null}
       </div>
-
-      {hasMultiple ? (
-        <div
-          className="flex gap-2 overflow-x-auto pb-1"
-          role="tablist"
-          aria-label={`${exp.title} photo thumbnails`}
-        >
-          {photos.map((url, index) => (
-            <button
-              key={url}
-              type="button"
-              role="tab"
-              aria-selected={index === activeIndex}
-              aria-label={`Show photo ${index + 1}`}
-              onClick={() => goTo(index, index >= activeIndex ? "next" : "prev")}
-              className={cn(
-                "relative h-16 w-20 shrink-0 overflow-hidden rounded-sm border transition-colors sm:h-20 sm:w-24",
-                index === activeIndex
-                  ? "border-[#D4AF6A] ring-1 ring-[#D4AF6A]/60"
-                  : "border-[rgb(200_162_90/0.25)] opacity-80 hover:opacity-100",
-              )}
-            >
-              <img src={url} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
-            </button>
-          ))}
-        </div>
-      ) : null}
     </div>
   );
 }
