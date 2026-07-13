@@ -204,8 +204,8 @@ function ExperienceDetail() {
                 <DetailListPanel label="What to bring & know" items={exp.requirements ?? []} />
               ) : null}
 
-              <LuxuryCheckoutPanel>
-                <h2 className="eyebrow luxury-panel-label mb-3">Cancellation policy</h2>
+              <LuxuryCheckoutPanel compact>
+                <h2 className="eyebrow luxury-panel-label mb-2 sm:mb-2.5">Cancellation policy</h2>
                 <p className="luxury-panel-body max-w-3xl text-sm leading-relaxed sm:text-base">
                   {exp.cancellation?.trim() ||
                     "Standard cancellation terms apply. Your host will confirm the full policy in your booking confirmation."}
