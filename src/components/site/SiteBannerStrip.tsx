@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { fetchActiveSiteBanners, type SiteBanner } from "@/lib/api/admin";
 import { isApiConfigured } from "@/lib/api/client";
@@ -53,16 +52,10 @@ export function SiteBannerStrip({ className = "" }: SiteBannerStripProps) {
           </span>
         ) : null}
       </span>
-      {banner.href ? (
-        <span className="inline-flex shrink-0 items-center gap-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-ember">
-          View
-          <ArrowRight className="h-3 w-3" strokeWidth={1.75} />
-        </span>
-      ) : null}
     </span>
   );
 
-  const shellClass = `mx-auto mt-2 w-fit max-w-[min(92vw,32rem)] overflow-hidden rounded-sm border border-[oklch(0.76_0.1_78_/_0.32)] bg-[oklch(0.14_0.06_22_/_0.78)] shadow-[0_12px_32px_-16px_oklch(0.05_0.04_18_/_0.7)] backdrop-blur-md transition-colors hover:border-[oklch(0.76_0.1_78_/_0.48)] hover:bg-[oklch(0.17_0.07_22_/_0.88)] ${className}`;
+  const shellClass = `mx-auto mt-2 w-fit max-w-[min(92vw,32rem)] overflow-hidden rounded-sm bg-[oklch(0.14_0.06_22_/_0.78)] shadow-[0_12px_32px_-16px_oklch(0.05_0.04_18_/_0.7)] backdrop-blur-md transition-colors hover:bg-[oklch(0.17_0.07_22_/_0.88)] ${className}`;
 
   if (banner.href?.startsWith("/")) {
     return (
