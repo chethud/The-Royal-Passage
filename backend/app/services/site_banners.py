@@ -20,11 +20,13 @@ def _parse_iso(value: str | None) -> datetime | None:
 
 def _row_to_banner(raw: dict) -> SiteBanner | None:
     try:
+        image_raw = raw.get("imageUrl") or raw.get("image_url")
         return SiteBanner(
             id=str(raw.get("id") or uuid4()),
             title=str(raw.get("title") or "").strip() or "Banner",
             body=(str(raw["body"]).strip() if raw.get("body") else None),
             href=(str(raw["href"]).strip() if raw.get("href") else None),
+            imageUrl=(str(image_raw).strip() if image_raw else None),
             placement=str(raw.get("placement") or "home_top"),
             startsAt=str(raw.get("startsAt") or raw.get("starts_at") or ""),
             endsAt=str(raw.get("endsAt") or raw.get("ends_at") or ""),
@@ -102,6 +104,7 @@ def upsert_site_banner(payload: UpsertSiteBannerRequest) -> SiteBanner:
         title=payload.title.strip(),
         body=(payload.body.strip() if payload.body else None),
         href=(payload.href.strip() if payload.href else None),
+        imageUrl=(payload.imageUrl.strip() if payload.imageUrl else None),
         placement=payload.placement or "home_top",
         startsAt=payload.startsAt,
         endsAt=payload.endsAt,

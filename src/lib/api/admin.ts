@@ -217,6 +217,7 @@ export type SiteBanner = {
   title: string;
   body: string | null;
   href: string | null;
+  imageUrl: string | null;
   placement: string;
   startsAt: string;
   endsAt: string;

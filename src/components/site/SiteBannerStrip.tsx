@@ -28,35 +28,46 @@ export function SiteBannerStrip({ className = "" }: SiteBannerStripProps) {
 
   if (banners.length === 0) return null;
   const banner = banners[0];
+  const hasImage = Boolean(banner.imageUrl);
 
   const content = (
-    <div className="mx-auto flex w-full max-w-[1280px] flex-wrap items-center justify-center gap-x-4 gap-y-1.5 px-4 py-3 text-center sm:justify-between sm:px-6 sm:text-left md:px-10">
-      <div className="min-w-0 space-y-0.5">
-        <p className="font-display text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-ember sm:text-[0.75rem]">
+    <span
+      className={`inline-flex max-w-full items-center gap-3 text-left ${
+        hasImage ? "p-1.5 pr-3 sm:pr-4" : "px-4 py-2.5 sm:px-5"
+      }`}
+    >
+      {banner.imageUrl ? (
+        <img
+          src={banner.imageUrl}
+          alt=""
+          className="h-14 w-20 shrink-0 rounded-[2px] object-cover sm:h-16 sm:w-24"
+        />
+      ) : null}
+      <span className="min-w-0 space-y-0.5">
+        <span className="block font-display text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-ember sm:text-[0.7rem]">
           {banner.title}
-        </p>
+        </span>
         {banner.body ? (
-          <p className="text-[0.8rem] leading-snug text-[#F7F1E8]/88 sm:text-[0.85rem]">{banner.body}</p>
+          <span className="block text-[0.78rem] leading-snug text-[#F7F1E8]/90 sm:text-[0.82rem]">
+            {banner.body}
+          </span>
         ) : null}
-      </div>
+      </span>
       {banner.href ? (
-        <span className="inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-ember">
+        <span className="inline-flex shrink-0 items-center gap-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-ember">
           View
-          <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+          <ArrowRight className="h-3 w-3" strokeWidth={1.75} />
         </span>
       ) : null}
-    </div>
+    </span>
   );
 
-  const shellClass = `relative w-full border-b border-[oklch(0.76_0.1_78_/_0.28)] bg-[oklch(0.14_0.06_22_/_0.72)] backdrop-blur-md ${className}`;
+  const shellClass = `mx-auto mt-2 w-fit max-w-[min(92vw,32rem)] overflow-hidden rounded-sm border border-[oklch(0.76_0.1_78_/_0.32)] bg-[oklch(0.14_0.06_22_/_0.78)] shadow-[0_12px_32px_-16px_oklch(0.05_0.04_18_/_0.7)] backdrop-blur-md transition-colors hover:border-[oklch(0.76_0.1_78_/_0.48)] hover:bg-[oklch(0.17_0.07_22_/_0.88)] ${className}`;
 
   if (banner.href?.startsWith("/")) {
     return (
-      <div className={shellClass}>
-        <Link
-          to={banner.href}
-          className="block transition-colors hover:bg-[oklch(0.18_0.07_22_/_0.55)]"
-        >
+      <div className="pointer-events-none flex w-full justify-center px-3 sm:px-4">
+        <Link to={banner.href} className={`pointer-events-auto block ${shellClass}`}>
           {content}
         </Link>
       </div>
@@ -65,12 +76,12 @@ export function SiteBannerStrip({ className = "" }: SiteBannerStripProps) {
 
   if (banner.href) {
     return (
-      <div className={shellClass}>
+      <div className="pointer-events-none flex w-full justify-center px-3 sm:px-4">
         <a
           href={banner.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="block transition-colors hover:bg-[oklch(0.18_0.07_22_/_0.55)]"
+          className={`pointer-events-auto block ${shellClass}`}
         >
           {content}
         </a>
@@ -78,5 +89,9 @@ export function SiteBannerStrip({ className = "" }: SiteBannerStripProps) {
     );
   }
 
-  return <div className={shellClass}>{content}</div>;
+  return (
+    <div className="flex w-full justify-center px-3 sm:px-4">
+      <div className={shellClass}>{content}</div>
+    </div>
+  );
 }

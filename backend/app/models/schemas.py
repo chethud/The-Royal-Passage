@@ -1187,6 +1187,7 @@ class SiteBanner(BaseModel):
     title: str
     body: str | None = None
     href: str | None = None
+    imageUrl: str | None = None
     placement: str = "home_top"
     startsAt: str
     endsAt: str
@@ -1202,6 +1203,7 @@ class UpsertSiteBannerRequest(BaseModel):
     title: str
     body: str | None = None
     href: str | None = None
+    imageUrl: str | None = None
     placement: str = "home_top"
     startsAt: str
     endsAt: str
