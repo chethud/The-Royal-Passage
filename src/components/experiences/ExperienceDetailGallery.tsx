@@ -32,41 +32,44 @@ export function ExperienceDetailGallery({
   return (
     <div className="space-y-3">
       <div
-        className="experience-detail-gallery-main group relative w-full overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]"
+        className="experience-detail-gallery-main relative w-full overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]"
         aria-label={`${exp.title} photos`}
       >
-        <div className="experience-detail-gallery__frame">
-          <div
-            key={activePhoto}
-            className={cn(
-              "experience-detail-gallery__slide",
-              slideDirection === "prev" && "experience-detail-gallery__slide--prev",
-            )}
-          >
-            <img
-              src={activePhoto}
-              alt={`${exp.title} photo ${activeIndex + 1} of ${photos.length}`}
-              className="experience-detail-gallery__image aspect-[4/4] w-full object-cover sm:aspect-[4/5] md:aspect-auto md:h-[min(70vh,640px)]"
-              width={1200}
-              height={1500}
-              decoding="async"
-              fetchPriority={activeIndex === 0 ? "high" : "auto"}
-            />
+        {/* Hover target is only the photo — not arrows / counter / category chip */}
+        <div className="group/photo relative">
+          <div className="experience-detail-gallery__frame">
+            <div
+              key={activePhoto}
+              className={cn(
+                "experience-detail-gallery__slide",
+                slideDirection === "prev" && "experience-detail-gallery__slide--prev",
+              )}
+            >
+              <img
+                src={activePhoto}
+                alt={`${exp.title} photo ${activeIndex + 1} of ${photos.length}`}
+                className="experience-detail-gallery__image aspect-[4/4] w-full object-cover sm:aspect-[4/5] md:aspect-auto md:h-[min(70vh,640px)]"
+                width={1200}
+                height={1500}
+                decoding="async"
+                fetchPriority={activeIndex === 0 ? "high" : "auto"}
+              />
+            </div>
           </div>
+
+          {showTitleOnHover ? (
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] bg-gradient-to-t from-[oklch(0.12_0.06_22_/_0.92)] via-[oklch(0.12_0.06_22_/_0.55)] to-transparent px-4 pb-5 pt-16 opacity-0 transition-opacity duration-200 group-hover/photo:opacity-100 sm:pb-6"
+              aria-hidden
+            >
+              <p className="font-display text-[1.15rem] uppercase leading-[1.08] tracking-[0.03em] text-[#F7F1E8] drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] sm:text-2xl md:text-[1.85rem]">
+                {exp.title}
+              </p>
+            </div>
+          ) : null}
         </div>
 
-        {showTitleOnHover ? (
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] bg-gradient-to-t from-[oklch(0.12_0.06_22_/_0.92)] via-[oklch(0.12_0.06_22_/_0.55)] to-transparent px-4 pb-5 pt-16 opacity-100 transition-opacity duration-300 md:pb-6 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
-            aria-hidden
-          >
-            <p className="font-display text-[1.15rem] uppercase leading-[1.08] tracking-[0.03em] text-[#F7F1E8] drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] sm:text-2xl md:text-[1.85rem]">
-              {exp.title}
-            </p>
-          </div>
-        ) : null}
-
-        <div className="absolute left-3.5 top-3.5 z-10">
+        <div className="pointer-events-none absolute left-3.5 top-3.5 z-10">
           <span
             className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/35 text-[#D4AF6A] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
             aria-label={exp.category}
@@ -80,7 +83,7 @@ export function ExperienceDetailGallery({
           <>
             <button
               type="button"
-              className="absolute left-3 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[rgb(200_162_90/0.35)] bg-black/45 text-[#E8DCC8] backdrop-blur-sm transition-colors hover:bg-black/60"
+              className="absolute left-3 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[rgb(200_162_90/0.35)] bg-black/45 text-[#E8DCC8] backdrop-blur-sm transition-colors hover:bg-black/60"
               aria-label="Previous photo"
               onClick={() =>
                 goTo(activeIndex <= 0 ? photos.length - 1 : activeIndex - 1, "prev")
@@ -90,7 +93,7 @@ export function ExperienceDetailGallery({
             </button>
             <button
               type="button"
-              className="absolute right-3 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[rgb(200_162_90/0.35)] bg-black/45 text-[#E8DCC8] backdrop-blur-sm transition-colors hover:bg-black/60"
+              className="absolute right-3 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[rgb(200_162_90/0.35)] bg-black/45 text-[#E8DCC8] backdrop-blur-sm transition-colors hover:bg-black/60"
               aria-label="Next photo"
               onClick={() =>
                 goTo(activeIndex >= photos.length - 1 ? 0 : activeIndex + 1, "next")
@@ -98,7 +101,7 @@ export function ExperienceDetailGallery({
             >
               <ChevronRight className="h-5 w-5" aria-hidden />
             </button>
-            <div className="absolute bottom-3 right-3 z-10 rounded-full bg-black/50 px-2.5 py-1 text-[0.65rem] font-medium uppercase tracking-[0.12em] text-[#E8DCC8] backdrop-blur-sm">
+            <div className="pointer-events-none absolute bottom-3 right-3 z-20 rounded-full bg-black/50 px-2.5 py-1 text-[0.65rem] font-medium uppercase tracking-[0.12em] text-[#E8DCC8] backdrop-blur-sm">
               {activeIndex + 1} / {photos.length}
             </div>
           </>

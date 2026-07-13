@@ -139,12 +139,20 @@ function ExperienceDetail() {
                       <AddToCartButton
                         exp={exp}
                         showLabel
-                        className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
+                        className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] font-display text-[#F7F1E8] hover:border-[#D4AF6A]"
                       />
                       <WishlistButton
                         experienceId={exp.id}
                         className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
                       />
+                      {canBook ? (
+                        <a
+                          href="#book"
+                          className="luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
+                        >
+                          Buy now
+                        </a>
+                      ) : null}
                     </>
                   }
                 />
@@ -184,15 +192,6 @@ function ExperienceDetail() {
                       <p className="mt-2 text-sm leading-relaxed text-[#D6C8B5]/85">{exp.hostBio}</p>
                     ) : null}
                   </DetailDarkSection>
-
-                  {canBook ? (
-                    <a
-                      href="#book"
-                      className="luxury-btn-sm luxury-btn-primary inline-flex w-fit items-center px-4 py-2 text-[0.62rem] no-underline sm:px-5 sm:py-2.5 sm:text-[0.65rem]"
-                    >
-                      Check availability
-                    </a>
-                  ) : null}
 
                   <DetailLocationBlock
                     locationLine={locationLine}

@@ -81,9 +81,11 @@ export function DetailCategoryActionsRow({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mb-3 flex items-start justify-between gap-3 sm:mb-5">
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mb-5">
       <div className="min-w-0">{badge}</div>
-      {actions ? <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">{actions}</div> : null}
+      {actions ? (
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5 sm:gap-2">{actions}</div>
+      ) : null}
     </div>
   );
 }
