@@ -168,16 +168,18 @@ export function DetailTagline({
 }) {
   return (
     <p
-      className={`mt-2 font-display text-[0.9rem] italic leading-relaxed text-[#D6C8B5]/90 sm:mt-4 sm:text-base md:text-lg ${className}`.trim()}
+      className={`mt-1.5 font-display text-[0.9rem] italic leading-snug text-[#D6C8B5]/90 sm:mt-2 sm:text-base md:text-lg ${className}`.trim()}
     >
       {children}
     </p>
   );
 }
 
-export function DetailDivider() {
+export function DetailDivider({ className = "" }: { className?: string }) {
   return (
-    <div className="my-4 h-px bg-gradient-to-r from-transparent via-[rgb(200_162_90/0.35)] to-transparent sm:my-7" />
+    <div
+      className={`my-2.5 h-px bg-gradient-to-r from-transparent via-[rgb(200_162_90/0.35)] to-transparent sm:my-3.5 ${className}`.trim()}
+    />
   );
 }
 
@@ -223,7 +225,7 @@ export function DetailDarkSection({
   return (
     <div className={className}>
       <h2 className={detailSectionLabelClass}>{label}</h2>
-      <div className="mt-3">{children}</div>
+      <div className="mt-2">{children}</div>
     </div>
   );
 }

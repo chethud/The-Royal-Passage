@@ -122,52 +122,56 @@ function HomestayDetailPage() {
 
         <DetailHeroGrid
           gallery={<ExperienceDetailGallery exp={galleryExp} maxThumbnails={6} />}
-          contentClassName="flex w-full min-w-0 flex-col space-y-6 md:pt-2"
+          contentClassName="flex w-full min-w-0 flex-col gap-2 md:pt-0"
           content={
             <>
               <DetailCategoryBadge>{stay.propertyType}</DetailCategoryBadge>
 
-              <DetailTitleRow title={stay.title} />
+              <div className="space-y-1">
+                <DetailTitleRow title={stay.title} />
+                {stay.tagline ? <DetailTagline className="!mt-0">{stay.tagline}</DetailTagline> : null}
+              </div>
 
-              {stay.tagline ? <DetailTagline>{stay.tagline}</DetailTagline> : null}
+              <div className="space-y-2.5">
+                <DetailDivider className="!my-0" />
+                <DetailStatGrid>
+                  <DetailStatItem
+                    label="From"
+                    valueClassName="mt-1 space-y-0.5 text-[#F7F1E8] normal-case tracking-normal"
+                  >
+                    <HomestayRateStat
+                      symbol={sym}
+                      weekday={weekdayPriceMajor(stay)}
+                      weekend={weekendPriceMajor(stay)}
+                    />
+                  </DetailStatItem>
+                  <DetailStatItem label="Beds">
+                    <span className="inline-flex items-center gap-1.5">
+                      <BedDouble className="h-5 w-5 shrink-0 text-[#D4AF6A]" aria-hidden />
+                      {stay.bedrooms}
+                    </span>
+                  </DetailStatItem>
+                  <DetailStatItem label="Rating">
+                    <span className="inline-flex items-center gap-1 text-[#D4AF6A]">
+                      <Star className="h-4 w-4 shrink-0 fill-current" aria-hidden />
+                      {stay.rating}
+                    </span>
+                  </DetailStatItem>
+                </DetailStatGrid>
+                <DetailDivider className="!my-0" />
+              </div>
 
-              <DetailDivider />
-
-              <DetailStatGrid>
-                <DetailStatItem
-                  label="From"
-                  valueClassName="mt-1 space-y-1 text-[#F7F1E8] normal-case tracking-normal"
-                >
-                  <HomestayRateStat
-                    symbol={sym}
-                    weekday={weekdayPriceMajor(stay)}
-                    weekend={weekendPriceMajor(stay)}
-                  />
-                </DetailStatItem>
-                <DetailStatItem label="Beds">
-                  <span className="inline-flex items-center gap-1.5">
-                    <BedDouble className="h-5 w-5 shrink-0 text-[#D4AF6A]" aria-hidden />
-                    {stay.bedrooms}
-                  </span>
-                </DetailStatItem>
-                <DetailStatItem label="Rating">
-                  <span className="inline-flex items-center gap-1 text-[#D4AF6A]">
-                    <Star className="h-4 w-4 shrink-0 fill-current" aria-hidden />
-                    {stay.rating}
-                  </span>
-                </DetailStatItem>
-              </DetailStatGrid>
-
-              <DetailExpandableCopy label="About this stay">{stay.description}</DetailExpandableCopy>
-
-              <DetailLocationBlock
-                locationLine={locationLine}
-                address={stay.address}
-                mapLink={stay.mapLink}
-              />
+              <div className="space-y-2">
+                <DetailExpandableCopy label="About this stay">{stay.description}</DetailExpandableCopy>
+                <DetailLocationBlock
+                  locationLine={locationLine}
+                  address={stay.address}
+                  mapLink={stay.mapLink}
+                />
+              </div>
 
               {stay.amenities.length > 0 ? (
-                <DetailDarkSection label="Amenities" className="">
+                <DetailDarkSection label="Amenities" className="!mt-0">
                   <div className="flex flex-wrap gap-2">
                     {stay.amenities.map((item) => (
                       <span

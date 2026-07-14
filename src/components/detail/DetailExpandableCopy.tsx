@@ -36,12 +36,12 @@ export function DetailExpandableCopy({ label, children, className = "" }: Detail
   return (
     <div className={cn("flex flex-col", className)}>
       <h2 className={detailSectionLabelClass}>{label}</h2>
-      <div className="relative mt-3">
+      <div className="relative mt-1.5">
         <p
           id={textId}
           ref={copyRef}
           className={cn(
-            "text-sm leading-relaxed text-[#D6C8B5]/90 whitespace-pre-line sm:text-[0.9375rem]",
+            "text-sm leading-snug text-[#D6C8B5]/90 whitespace-pre-line sm:text-[0.9375rem] sm:leading-relaxed",
             !expanded && "line-clamp-6",
             !expanded &&
               overflows &&
@@ -54,7 +54,7 @@ export function DetailExpandableCopy({ label, children, className = "" }: Detail
       {overflows || expanded ? (
         <button
           type="button"
-          className="mt-3 self-start text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
+          className="mt-1.5 self-start text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
           aria-expanded={expanded}
           aria-controls={textId}
           onClick={() => setExpanded((value) => !value)}
