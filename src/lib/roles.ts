@@ -138,6 +138,45 @@ export function dashboardPathForRoles(
   return dashboardPathForRole(pickPrimaryRole(roles, primaryRole));
 }
 
+export type RoleWorkspaceLink = {
+  role: UserRole;
+  label: string;
+  description: string;
+  to: string;
+};
+
+const WORKSPACE_META: Record<
+  Exclude<UserRole, "guest">,
+  { label: string; description: string }
+> = {
+  admin: { label: "Admin dashboard", description: "Manage the full platform" },
+  host: { label: "Host dashboard", description: "Experiences, bookings & revenue" },
+  homestay_owner: { label: "Homestay dashboard", description: "Properties & stay bookings" },
+  vip_owner: { label: "VIP dashboard", description: "VIP packages & members" },
+  editor: { label: "Editor tools", description: "Homepage journal & heritage video" },
+};
+
+/** Every staff workspace the account may open (in priority order). */
+export function workspaceLinksForRoles(
+  roles: readonly UserRole[] | null | undefined,
+  primaryRole?: UserRole | null,
+): RoleWorkspaceLink[] {
+  const resolved = resolveUserRoles(roles, primaryRole ?? null);
+  const links: RoleWorkspaceLink[] = [];
+  for (const role of ROLE_PRIORITY) {
+    if (role === "guest") continue;
+    if (!resolved.includes(role)) continue;
+    const meta = WORKSPACE_META[role];
+    links.push({
+      role,
+      label: meta.label,
+      description: meta.description,
+      to: ROLE_DASHBOARD_PATH[role],
+    });
+  }
+  return links;
+}
+
 export function isEditorRole(role: UserRole | null | undefined): boolean {
   return role === "editor";
 }

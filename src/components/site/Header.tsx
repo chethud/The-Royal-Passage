@@ -28,7 +28,7 @@ import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
 import { isHomestayOwnerNavItemActive } from "@/lib/homestay-owner-nav-active";
 import { isVipOwnerNavItemActive } from "@/lib/vip-owner-nav-active";
-import { dashboardPathForRoles, isAdminRole, isGuestAccount, pickPrimaryRole, profilePathForRole, type UserRole } from "@/lib/roles";
+import { dashboardPathForRoles, isAdminRole, isGuestAccount, pickPrimaryRole, profilePathForRole, workspaceLinksForRoles, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 import {
@@ -129,6 +129,7 @@ export function Header() {
         ? "pending"
         : undefined;
   const primaryRole = pickPrimaryRole(roles, role);
+  const workspaces = workspaceLinksForRoles(roles, primaryRole);
   const navItems = navItemsForUser(primaryRole, roles, Boolean(user), pathname);
   const isHomestaySection = isHomestayPublicSection(pathname);
   const isVipSection = isVipPublicSection(pathname);
@@ -259,6 +260,7 @@ export function Header() {
               displayName={displayName}
               email={user?.email}
               role={primaryRole}
+              roles={roles}
               isGuest={isGuest}
               isAdmin={isAdmin}
               isVipSection={isVipSection}
@@ -329,9 +331,21 @@ export function Header() {
                 {showAccountMenu ? (
                   <>
                     <MobileNavDivider />
-                    <MobileNavSectionLabel>Account</MobileNavSectionLabel>
-                    {isAdmin ? (
+                    {!isGuest && !isAdmin ? (
                       <>
+                        <MobileNavSectionLabel>
+                          {workspaces.length > 1 ? "Your workspaces" : "Account"}
+                        </MobileNavSectionLabel>
+                        {workspaces.map((workspace) => (
+                          <MobileNavLink key={workspace.role} to={workspace.to}>
+                            {workspace.label}
+                          </MobileNavLink>
+                        ))}
+                        <MobileNavLink to={profilePathForRole(primaryRole)}>Profile</MobileNavLink>
+                      </>
+                    ) : isAdmin ? (
+                      <>
+                        <MobileNavSectionLabel>Account</MobileNavSectionLabel>
                         <MobileNavLink to={dashboardPath}>Dashboard</MobileNavLink>
                         <MobileNavSectionLabel>Administration</MobileNavSectionLabel>
                         <MobileNavLink to="/admin/reviews">Reviews</MobileNavLink>
@@ -341,16 +355,12 @@ export function Header() {
                         <MobileNavLink to="/admin/profile/users">Users</MobileNavLink>
                         <MobileNavLink to="/admin/profile/homepage-photos">Homepage photos</MobileNavLink>
                       </>
-                    ) : isGuest ? (
+                    ) : (
                       <>
+                        <MobileNavSectionLabel>Account</MobileNavSectionLabel>
                         <MobileNavLink to="/dashboard/history">
                           {isVipSection ? "My bookings" : isHomestaySection ? "My stays" : "History"}
                         </MobileNavLink>
-                        <MobileNavLink to={profilePathForRole(primaryRole)}>Profile</MobileNavLink>
-                      </>
-                    ) : (
-                      <>
-                        <MobileNavLink to={dashboardPath}>Dashboard</MobileNavLink>
                         <MobileNavLink to={profilePathForRole(primaryRole)}>Profile</MobileNavLink>
                       </>
                     )}

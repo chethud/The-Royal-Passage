@@ -20,12 +20,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ProfileNavIcon } from "@/components/account/ProfileNavIcon";
-import { ROLE_LABELS, type UserRole } from "@/lib/roles";
+import {
+  ROLE_LABELS,
+  workspaceLinksForRoles,
+  type RoleWorkspaceLink,
+  type UserRole,
+} from "@/lib/roles";
 
 type AccountDropdownMenuProps = {
   displayName: string | null;
   email: string | null | undefined;
   role: UserRole | null;
+  roles: UserRole[];
   isGuest: boolean;
   isAdmin: boolean;
   isVipSection: boolean;
@@ -101,6 +107,7 @@ export function AccountDropdownMenu({
   displayName,
   email,
   role,
+  roles,
   isGuest,
   isAdmin,
   isVipSection,
@@ -116,7 +123,13 @@ export function AccountDropdownMenu({
     : isHomestaySection
       ? "Homestay reservations"
       : "Experience bookings";
-  const roleLabel = role ? ROLE_LABELS[role] : "Account";
+  const workspaces: RoleWorkspaceLink[] = workspaceLinksForRoles(roles, role);
+  const roleLabels =
+    roles.length > 0
+      ? roles.map((value) => ROLE_LABELS[value]).join(" · ")
+      : role
+        ? ROLE_LABELS[role]
+        : "Account";
 
   return (
     <DropdownMenu>
@@ -142,34 +155,46 @@ export function AccountDropdownMenu({
           <div className="min-w-0 flex-1">
             <p className="header-account-menu__name truncate">{displayName?.trim() || "Royal guest"}</p>
             {email ? <p className="header-account-menu__email truncate">{email}</p> : null}
-            <p className="header-account-menu__role">{roleLabel}</p>
+            <p className="header-account-menu__role">{roleLabels}</p>
           </div>
         </div>
 
         <div className="header-account-menu__body">
-          <DropdownMenuLabel className="header-account-menu__section">Navigate</DropdownMenuLabel>
-
-          {isAdmin ? (
-            <AccountMenuItem
-              icon={LayoutDashboard}
-              label="Dashboard"
-              description="Your workspace overview"
-              to={dashboardPath}
-            />
-          ) : isGuest ? (
-            <AccountMenuItem
-              icon={History}
-              label={historyLabel}
-              description={historyDescription}
-              to="/dashboard/history"
-            />
+          {isGuest ? (
+            <>
+              <DropdownMenuLabel className="header-account-menu__section">Navigate</DropdownMenuLabel>
+              <AccountMenuItem
+                icon={History}
+                label={historyLabel}
+                description={historyDescription}
+                to="/dashboard/history"
+              />
+            </>
+          ) : workspaces.length > 0 ? (
+            <>
+              <DropdownMenuLabel className="header-account-menu__section">
+                {workspaces.length > 1 ? "Your workspaces" : "Navigate"}
+              </DropdownMenuLabel>
+              {workspaces.map((workspace) => (
+                <AccountMenuItem
+                  key={workspace.role}
+                  icon={workspace.role === "editor" ? Pencil : LayoutDashboard}
+                  label={workspace.label}
+                  description={workspace.description}
+                  to={workspace.to}
+                />
+              ))}
+            </>
           ) : (
-            <AccountMenuItem
-              icon={LayoutDashboard}
-              label="Dashboard"
-              description="Your workspace overview"
-              to={dashboardPath}
-            />
+            <>
+              <DropdownMenuLabel className="header-account-menu__section">Navigate</DropdownMenuLabel>
+              <AccountMenuItem
+                icon={LayoutDashboard}
+                label="Dashboard"
+                description="Your workspace overview"
+                to={dashboardPath}
+              />
+            </>
           )}
 
           {isAdmin ? (
