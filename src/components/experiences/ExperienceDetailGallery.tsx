@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Experience } from "@/data/experiences";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { categoryIconForLabel } from "@/lib/experience-category-icons";
 import { getExperienceGalleryImages } from "@/lib/experience-cover-image";
 import { cn } from "@/lib/utils";
+
+const AUTO_ADVANCE_MS = 3000;
 
 type ExperienceDetailGalleryProps = {
   exp: Experience;
@@ -15,14 +18,30 @@ export function ExperienceDetailGallery({
   showTitleOnHover = false,
 }: ExperienceDetailGalleryProps) {
   const photos = getExperienceGalleryImages(exp);
+  const reduceMotion = usePrefersReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<"next" | "prev">("next");
   const CategoryIcon = categoryIconForLabel(exp.category);
+  const hasMultiple = photos.length > 1;
+
+  useEffect(() => {
+    if (activeIndex >= photos.length) {
+      setActiveIndex(0);
+    }
+  }, [activeIndex, photos.length]);
+
+  useEffect(() => {
+    if (reduceMotion || photos.length <= 1) return;
+    const id = window.setInterval(() => {
+      setSlideDirection("next");
+      setActiveIndex((current) => (current >= photos.length - 1 ? 0 : current + 1));
+    }, AUTO_ADVANCE_MS);
+    return () => window.clearInterval(id);
+  }, [activeIndex, photos.length, reduceMotion]);
 
   if (photos.length === 0) return null;
 
   const activePhoto = photos[activeIndex] ?? photos[0];
-  const hasMultiple = photos.length > 1;
 
   const goTo = (index: number, direction: "next" | "prev") => {
     setSlideDirection(direction);
