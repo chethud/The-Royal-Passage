@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   LogOut,
   Pencil,
-  ScrollText,
   Star,
   UserCircle,
   Users,
@@ -205,12 +204,6 @@ export function AccountDropdownMenu({
               <DropdownMenuSeparator className="header-account-menu__divider" />
               <DropdownMenuLabel className="header-account-menu__section">Administration</DropdownMenuLabel>
               <AccountMenuItem icon={Star} label="Reviews" description="Moderate guest reviews" to="/admin/reviews" />
-              <AccountMenuItem
-                icon={ScrollText}
-                label="Activity log"
-                description="Platform audit trail"
-                to="/admin/activity"
-              />
               <AccountMenuItem
                 icon={Pencil}
                 label="Edit homepage"

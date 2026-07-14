@@ -4,7 +4,6 @@ export const ADMIN_EXPERIENCE_NAV_ITEMS = [
   { to: "/admin", label: "Overview" },
   { to: "/admin/bookings", label: "Bookings" },
   { to: "/admin/experiences", label: "Approve experiences" },
-  { to: "/admin/activity", label: "Live activity" },
   { to: "/admin/banners", label: "Banners" },
   { to: "/experiences", label: "Live catalog" },
 ] as const;
@@ -55,6 +54,18 @@ export function adminModuleHome(module: AdminModule): string {
   if (module === "homestays") return "/admin/homestay";
   if (module === "vip") return "/admin/vip";
   return "/admin";
+}
+
+/** Module switcher (Experiences / Homestays / VIP) only on marketplace overview pages. */
+export function isAdminOverviewPath(pathname: string): boolean {
+  return (
+    pathname === "/admin" ||
+    pathname === "/admin/" ||
+    pathname === "/admin/homestay" ||
+    pathname === "/admin/homestay/" ||
+    pathname === "/admin/vip" ||
+    pathname === "/admin/vip/"
+  );
 }
 
 /** Pending-approval queue for each admin marketplace module. */

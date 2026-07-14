@@ -168,7 +168,7 @@ export function AdminHomepagePhotoEditor({
 
   return (
     <div className="space-y-8">
-      <p className="max-w-2xl text-sm text-muted-foreground">
+      <p className="max-w-2xl text-sm leading-relaxed text-ink-soft">
         Replace homepage images here. Photos save instantly when you upload. Use Save on each section
         after editing alt text.
       </p>
@@ -184,7 +184,7 @@ export function AdminHomepagePhotoEditor({
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Hero headings</h2>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-xs leading-relaxed text-[#4A0000]/80">
               Heading 1 is priority. All three rotate on each homepage refresh or return visit.
             </p>
           </div>
@@ -206,12 +206,13 @@ export function AdminHomepagePhotoEditor({
           {content.heroHeadings.map((heading, index) => (
             <div
               key={heading.id}
-              className="space-y-2 rounded-sm border border-ember/30 bg-black/20 p-3"
+              className="space-y-2 rounded-sm border border-[rgb(74_0_0/0.16)] bg-[rgb(255_252_244/0.9)] p-3"
             >
-              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-ember">
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#2A0000]">
                 {index === 0 ? "Heading 1 · Priority" : `Heading ${index + 1}`}
               </p>
               <EditableTextField
+                surface="panel"
                 label="Eyebrow"
                 value={heading.eyebrow}
                 onChange={(eyebrow) =>
@@ -224,6 +225,7 @@ export function AdminHomepagePhotoEditor({
                 }
               />
               <EditableTextField
+                surface="panel"
                 label="Line 1"
                 value={heading.line1}
                 onChange={(line1) =>
@@ -236,6 +238,7 @@ export function AdminHomepagePhotoEditor({
                 }
               />
               <EditableTextField
+                surface="panel"
                 label="Accent line"
                 value={heading.line2}
                 onChange={(line2) =>
@@ -248,6 +251,7 @@ export function AdminHomepagePhotoEditor({
                 }
               />
               <EditableTextField
+                surface="panel"
                 label="Line 3"
                 value={heading.line3}
                 onChange={(line3) =>
@@ -260,6 +264,7 @@ export function AdminHomepagePhotoEditor({
                 }
               />
               <EditableTextField
+                surface="panel"
                 label="Body"
                 value={heading.body}
                 multiline
@@ -281,7 +286,7 @@ export function AdminHomepagePhotoEditor({
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Hero slideshows</h2>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-xs leading-relaxed text-[#4A0000]/80">
               Slideshow 1 is constant (priority fallback). On each homepage refresh or return visit,
               slideshow 2 or 3 is chosen at random. Set different photos in 2 and 3 so the hero changes.
             </p>
@@ -300,9 +305,9 @@ export function AdminHomepagePhotoEditor({
           {content.heroSlideshows.map((pack, packIndex) => (
             <div
               key={pack.id}
-              className="space-y-3 rounded-sm border border-ember/30 bg-black/20 p-3"
+              className="space-y-3 rounded-sm border border-[rgb(74_0_0/0.16)] bg-[rgb(255_252_244/0.9)] p-3"
             >
-              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-ember">
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#2A0000]">
                 {packIndex === 0
                   ? "Slideshow 1 · Constant"
                   : `Slideshow ${packIndex + 1} · Random`}
@@ -313,6 +318,7 @@ export function AdminHomepagePhotoEditor({
                   return (
                     <EditablePhotoField
                       key={slide.id}
+                      surface="panel"
                       label={`Photo ${slideIndex + 1}`}
                       imageUrl={withHomepageCacheBust(slide.imageUrl, content.version)}
                       alt={slide.alt}
@@ -368,7 +374,7 @@ export function AdminHomepagePhotoEditor({
             <h2 className="luxury-panel-heading font-display text-xl tracking-wide">
               Homestay hero photos
             </h2>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-xs leading-relaxed text-[#4A0000]/80">
               Slideshow on the Royal Homestays landing page (/homestays). Upload up to five photos.
             </p>
           </div>
@@ -390,6 +396,7 @@ export function AdminHomepagePhotoEditor({
           {content.homestayHero.map((slide, index) => (
             <EditablePhotoField
               key={slide.id}
+              surface="panel"
               label={`Photo ${index + 1}`}
               imageUrl={withHomepageCacheBust(slide.imageUrl, content.version)}
               alt={slide.alt}
@@ -419,7 +426,7 @@ export function AdminHomepagePhotoEditor({
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Top experiences</h2>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-xs leading-relaxed text-[#4A0000]/80">
               Pick a published host experience for each slot, or keep a custom photo.
             </p>
           </div>
@@ -454,6 +461,7 @@ export function AdminHomepagePhotoEditor({
                 }
               />
               <EditablePhotoField
+                surface="panel"
                 label={item.title}
                 imageUrl={withHomepageCacheBust(item.imageUrl, content.version)}
                 alt={item.alt}
@@ -474,7 +482,7 @@ export function AdminHomepagePhotoEditor({
                 uploadPhoto={createUploader("showcase", index)}
               />
               {item.href.startsWith("/experiences/") ? (
-                <p className="text-[0.65rem] text-ink/55">Links to {item.href}</p>
+                <p className="text-[0.65rem] text-[#4A0000]/70">Links to {item.href}</p>
               ) : null}
             </div>
           ))}
@@ -502,6 +510,7 @@ export function AdminHomepagePhotoEditor({
           {content.journal.map((item, index) => (
             <EditablePhotoField
               key={item.id}
+              surface="panel"
               label={item.title}
               imageUrl={withHomepageCacheBust(item.imageUrl, content.version)}
               alt={item.alt}

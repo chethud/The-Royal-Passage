@@ -101,7 +101,7 @@ function HomepagePhotosPage() {
         <section className="space-y-4 border-t border-[rgb(200_162_90/0.22)] pt-8">
           <div>
             <h2 className="font-display text-2xl tracking-wide text-ink">Featured homestays</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">
               Pick the three stays shown in &ldquo;Rest Where Stories Live&rdquo; on the public
               homestays page.
             </p>

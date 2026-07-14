@@ -19,7 +19,7 @@ export function ShowcaseExperiencePicker({
 
   if (experiences.length === 0) {
     return (
-      <p className="text-[0.68rem] text-ink/60">
+      <p className="text-[0.68rem] text-[#4A0000]/70">
         No published host experiences available yet.
       </p>
     );
@@ -29,7 +29,7 @@ export function ShowcaseExperiencePicker({
 
   return (
     <label className="block space-y-1">
-      <span className="text-[0.62rem] uppercase tracking-[0.14em] text-ink/70">
+      <span className="text-[0.62rem] uppercase tracking-[0.14em] text-[#4A0000]/75">
         Host experience
       </span>
       <select
@@ -39,7 +39,7 @@ export function ShowcaseExperiencePicker({
           const next = experiences.find((exp) => exp.id === event.target.value);
           if (next) onSelect(next);
         }}
-        className="w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.25)] bg-background/80 px-2 py-1.5 text-xs text-ink disabled:opacity-50"
+        className="w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-white px-2 py-1.5 text-xs text-[#2A0000] disabled:opacity-50"
       >
         <option value="">Choose a hosted experience…</option>
         {sorted.map((exp) => (

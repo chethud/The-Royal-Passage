@@ -42,10 +42,9 @@ const experiences = ["Pottery Experience", "Outdoor Cooking", "Heritage Walks"];
 export function Footer() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isHomepage = pathname === "/";
-  const isExperiencesPage = pathname === "/experiences" || pathname.startsWith("/experiences/");
 
   if (!isHomepage) {
-    return <FooterSimple showLegalLinks={isExperiencesPage} />;
+    return <FooterSimple />;
   }
 
   return <FooterFull />;
@@ -53,38 +52,9 @@ export function Footer() {
 
 function FooterBrandBlock({
   logoClassName = "h-28 w-auto object-contain sm:h-32 md:h-40",
-  layout = "inline",
 }: {
   logoClassName?: string;
-  layout?: "inline" | "row";
 }) {
-  if (layout === "row") {
-    return (
-      <div className="flex max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center sm:justify-start sm:text-left sm:gap-x-4">
-        <img
-          src={logoUrl}
-          alt="The Royal Passage"
-          width={320}
-          height={110}
-          loading="lazy"
-          decoding="async"
-          className={`logo-breathe shrink-0 ${logoClassName}`}
-        />
-        <div className="flex shrink-0 items-center gap-2">
-          {SOCIAL_LINKS.map(({ label, Icon, href }) => (
-            <SocialIcon key={label} label={label} Icon={Icon} href={href} compact />
-          ))}
-        </div>
-        <p
-          className="w-full shrink-0 text-center text-[0.65rem] text-muted-foreground/75 sm:w-auto sm:text-[0.68rem]"
-          suppressHydrationWarning
-        >
-          © {new Date().getFullYear()} The Royal Passage. All rights reserved.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="flex w-full flex-col items-center text-center sm:items-start sm:text-left">
       <img
@@ -96,21 +66,50 @@ function FooterBrandBlock({
         decoding="async"
         className={`logo-breathe object-contain ${logoClassName} sm:origin-left sm:-translate-x-1.5 sm:object-left`}
       />
-      <div className="mt-3 flex items-center justify-center gap-2.5 sm:justify-start">
+    </div>
+  );
+}
+
+function FooterCenterCluster({ compactSocial = false }: { compactSocial?: boolean }) {
+  return (
+    <div className="flex flex-col items-center gap-2.5">
+      <FooterLegalLinks className="justify-center" />
+      <div className="flex items-center gap-2">
         {SOCIAL_LINKS.map(({ label, Icon, href }) => (
-          <SocialIcon key={label} label={label} Icon={Icon} href={href} />
+          <SocialIcon key={label} label={label} Icon={Icon} href={href} compact={compactSocial} />
         ))}
       </div>
     </div>
   );
 }
 
-function FooterSimple({ showLegalLinks = false }: { showLegalLinks?: boolean }) {
+function FooterSimple() {
   return (
     <footer className="border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
-      <div className="container-page py-2.5 sm:py-5">
-        <FooterBrandBlock layout="row" logoClassName="h-14 w-auto object-contain sm:h-14 md:h-16" />
-        {showLegalLinks ? <FooterLegalLinks className="mt-3 justify-center sm:justify-start" /> : null}
+      <div className="container-page relative grid grid-cols-1 items-center gap-4 py-3 sm:grid-cols-[1fr_auto_1fr] sm:gap-6 sm:py-5">
+        <div className="flex flex-col items-center gap-1.5 sm:items-start">
+          <img
+            src={logoUrl}
+            alt="The Royal Passage"
+            width={320}
+            height={110}
+            loading="lazy"
+            decoding="async"
+            className="logo-breathe h-14 w-auto object-contain sm:h-14 md:h-16"
+          />
+          <p
+            className="text-[0.65rem] text-muted-foreground/75 sm:text-[0.68rem]"
+            suppressHydrationWarning
+          >
+            © {new Date().getFullYear()} The Royal Passage. All rights reserved.
+          </p>
+        </div>
+
+        <div className="sm:col-start-2">
+          <FooterCenterCluster compactSocial />
+        </div>
+
+        <div className="hidden sm:block" aria-hidden />
       </div>
     </footer>
   );
@@ -213,9 +212,14 @@ function FooterFull() {
         </div>
       </div>
 
-      <div className="container-page relative z-10 flex flex-wrap items-center justify-center gap-1.5 border-t border-[oklch(0.88_0.08_86_/_0.12)] py-3 text-[0.68rem] text-muted-foreground text-center sm:justify-between sm:gap-3 sm:py-6 sm:text-xs sm:text-left">
-        <span suppressHydrationWarning>© {new Date().getFullYear()} The Royal Passage. All rights reserved.</span>
-        <FooterLegalLinks className="w-full justify-center sm:w-auto" />
+      <div className="container-page relative z-10 flex flex-col items-center gap-3 border-t border-[oklch(0.88_0.08_86_/_0.12)] py-3 text-[0.68rem] text-muted-foreground sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6 sm:py-6 sm:text-xs">
+        <span className="text-center sm:text-left" suppressHydrationWarning>
+          © {new Date().getFullYear()} The Royal Passage. All rights reserved.
+        </span>
+        <div className="sm:col-start-2">
+          <FooterCenterCluster compactSocial />
+        </div>
+        <div className="hidden sm:block" aria-hidden />
       </div>
 
       <img
@@ -251,7 +255,7 @@ function FooterLegalLinks({ className = "" }: { className?: string }) {
       >
         {EXPERIENCE_TERMS_LINK.label}
       </Link>
-      <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
+      <span className="text-muted-foreground/50" aria-hidden>
         ·
       </span>
       <Link
@@ -260,7 +264,7 @@ function FooterLegalLinks({ className = "" }: { className?: string }) {
       >
         {PAYMENT_POLICY_LINK.label}
       </Link>
-      <span className="hidden text-muted-foreground/50 sm:inline" aria-hidden>
+      <span className="text-muted-foreground/50" aria-hidden>
         ·
       </span>
       <Link

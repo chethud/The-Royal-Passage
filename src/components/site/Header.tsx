@@ -352,7 +352,6 @@ export function Header() {
                         <MobileNavLink to={dashboardPath}>Dashboard</MobileNavLink>
                         <MobileNavSectionLabel>Administration</MobileNavSectionLabel>
                         <MobileNavLink to="/admin/reviews">Reviews</MobileNavLink>
-                        <MobileNavLink to="/admin/activity">Activity log</MobileNavLink>
                         <MobileNavLink to="/admin/homepage-edit">Edit homepage</MobileNavLink>
                         <MobileNavLink to="/admin/profile">Account</MobileNavLink>
                         <MobileNavLink to="/admin/profile/users">Users</MobileNavLink>

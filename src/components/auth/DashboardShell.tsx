@@ -1,7 +1,11 @@
 import type { ReactNode } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { AdminModuleNav } from "@/components/admin/AdminModuleNav";
-import { adminModuleLabel, resolveAdminModule } from "@/components/admin/admin-nav";
+import {
+  adminModuleLabel,
+  isAdminOverviewPath,
+  resolveAdminModule,
+} from "@/components/admin/admin-nav";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 import { RoleBadge } from "@/components/auth/RoleBadge";
@@ -31,7 +35,7 @@ export function DashboardShell({
     <div className="pt-[var(--header-height)] text-foreground">
       <Header />
       <section className="container-page w-full py-6 sm:py-16 md:py-24">
-        {isIvoryShell ? (
+        {isIvoryShell && isAdminOverviewPath(pathname) ? (
           <div className="mb-6 sm:mb-8">
             <AdminModuleNav />
           </div>
