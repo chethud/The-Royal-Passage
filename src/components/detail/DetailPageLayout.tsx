@@ -173,7 +173,7 @@ export function DetailDivider() {
 
 export function DetailStatGrid({ children }: { children: ReactNode }) {
   return (
-    <dl className="grid grid-cols-1 gap-3 divide-y divide-[rgb(200_162_90/0.28)] text-left sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-y-0">
+    <dl className="grid grid-cols-3 gap-0 divide-x divide-[rgb(200_162_90/0.28)] text-left">
       {children}
     </dl>
   );
@@ -189,12 +189,12 @@ export function DetailStatItem({
   valueClassName?: string;
 }) {
   return (
-    <div className="min-w-0 px-0 py-2 first:pt-0 last:pb-0 sm:px-5 sm:py-0 sm:first:pl-0 sm:last:pr-0">
+    <div className="min-w-0 px-1.5 py-0 first:pl-0 last:pr-0 sm:px-5">
       <dt className={detailSectionLabelClass}>{label}</dt>
       <dd
         className={
           valueClassName ??
-          "mt-1 break-words font-display text-base uppercase leading-snug tracking-[0.02em] text-[#F7F1E8] sm:mt-1.5 sm:text-lg md:text-xl"
+          "mt-1 break-words font-display text-[0.95rem] uppercase leading-snug tracking-[0.02em] text-[#F7F1E8] sm:mt-1.5 sm:text-lg md:text-xl"
         }
       >
         {children}

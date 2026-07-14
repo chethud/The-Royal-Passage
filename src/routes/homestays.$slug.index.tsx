@@ -144,13 +144,13 @@ function HomestayDetailPage() {
                   {formatWeekdayWeekendRates(sym, weekdayPriceMajor(stay), weekendPriceMajor(stay))}
                 </DetailStatItem>
                 <DetailStatItem label="Beds">
-                  <span className="inline-flex items-center justify-center gap-1.5 sm:justify-start">
+                  <span className="inline-flex items-center gap-1.5">
                     <BedDouble className="h-5 w-5 shrink-0 text-[#D4AF6A]" aria-hidden />
                     {stay.bedrooms}
                   </span>
                 </DetailStatItem>
                 <DetailStatItem label="Rating">
-                  <span className="inline-flex items-center justify-center gap-1 text-[#D4AF6A] sm:justify-start">
+                  <span className="inline-flex items-center gap-1 text-[#D4AF6A]">
                     <Star className="h-4 w-4 shrink-0 fill-current" aria-hidden />
                     {stay.rating}
                   </span>
