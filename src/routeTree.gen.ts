@@ -55,8 +55,8 @@ import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookin
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminHomestayFeaturedRouteImport } from './routes/admin.homestay-featured'
-import { Route as AdminHomepageEditRouteImport } from './routes/admin.homepage-edit'
 import { Route as AdminHomepagePhotosRouteImport } from './routes/admin.homepage-photos'
+import { Route as AdminHomepageEditRouteImport } from './routes/admin.homepage-edit'
 import { Route as AccountVipApplyRouteImport } from './routes/account.vip-apply'
 import { Route as AccountProfileRouteImport } from './routes/account.profile'
 import { Route as VipsBrowseIndexRouteImport } from './routes/vips.browse.index'
@@ -339,14 +339,14 @@ const AdminHomestayFeaturedRoute = AdminHomestayFeaturedRouteImport.update({
   path: '/homestay-featured',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminHomepageEditRoute = AdminHomepageEditRouteImport.update({
-  id: '/homepage-edit',
-  path: '/homepage-edit',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminHomepagePhotosRoute = AdminHomepagePhotosRouteImport.update({
   id: '/homepage-photos',
   path: '/homepage-photos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHomepageEditRoute = AdminHomepageEditRouteImport.update({
+  id: '/homepage-edit',
+  path: '/homepage-edit',
   getParentRoute: () => AdminRoute,
 } as any)
 const AccountVipApplyRoute = AccountVipApplyRouteImport.update({
@@ -1562,18 +1562,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminHomestayFeaturedRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/homepage-edit': {
-      id: '/admin/homepage-edit'
-      path: '/homepage-edit'
-      fullPath: '/admin/homepage-edit'
-      preLoaderRoute: typeof AdminHomepageEditRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/homepage-photos': {
       id: '/admin/homepage-photos'
       path: '/homepage-photos'
       fullPath: '/admin/homepage-photos'
       preLoaderRoute: typeof AdminHomepagePhotosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/homepage-edit': {
+      id: '/admin/homepage-edit'
+      path: '/homepage-edit'
+      fullPath: '/admin/homepage-edit'
+      preLoaderRoute: typeof AdminHomepageEditRouteImport
       parentRoute: typeof AdminRoute
     }
     '/account/vip-apply': {

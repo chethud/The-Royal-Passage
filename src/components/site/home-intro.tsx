@@ -12,7 +12,7 @@ import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 type HomeIntroContextValue = {
   splashDone: boolean;
-  /** Hero chrome unlocked after a tiny scroll (never auto). */
+  /** Hero chrome unlocked after photo zoom beat (or early scroll). */
   copyRevealed: boolean;
   /** Hero text wiped left after 5s idle; restored on scroll / interaction. */
   copyWiped: boolean;
@@ -27,7 +27,9 @@ export function useHomeIntro() {
 }
 
 const SPLASH_MS = 1800;
-/** Tiny threshold — any near-immediate scroll unlocks the hero chrome. */
+/** Photo-only zoom beat after splash before hero text arrives. */
+const PHOTO_ZOOM_BEFORE_COPY_MS = 2500;
+/** Tiny threshold — scroll can unlock text early during the zoom beat. */
 const REVEAL_SCROLL_PX = 2;
 /** After text is on screen, idle wipe to the left. */
 const IDLE_WIPE_MS = 5000;
@@ -61,11 +63,18 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
     };
   }, [reduceMotion]);
 
-  // Unlock chrome only on intentional tiny scroll / wheel / touch / keys — never by timer.
+  // After splash: photo zooms alone ~2.5s, then text arrives automatically.
+  // Scroll / wheel / touch / keys can still unlock earlier.
   useEffect(() => {
     if (!splashDone || copyRevealed || reduceMotion) return;
 
+    const timer = window.setTimeout(() => {
+      setCopyRevealed(true);
+      setCopyWiped(false);
+    }, PHOTO_ZOOM_BEFORE_COPY_MS);
+
     const reveal = () => {
+      window.clearTimeout(timer);
       setCopyRevealed(true);
       setCopyWiped(false);
     };
@@ -100,6 +109,7 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
     window.addEventListener("touchmove", onTouchMove, { passive: true });
     window.addEventListener("keydown", onKeyDown);
     return () => {
+      window.clearTimeout(timer);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchmove", onTouchMove);

@@ -4,9 +4,6 @@ import logoUrl from "@/assets/logo/logo.png";
 import footerHeroImg from "@/assets/hero-image.png";
 import { CONTACT_EMAIL } from "@/lib/seo";
 
-const TAGLINE =
-  "The Royal Passage is an experience-led travel company curating immersive journeys in and around Mysuru.";
-
 const SOCIAL_LINKS = [
   { label: "Instagram", Icon: Instagram, href: "https://www.instagram.com/" },
   { label: "Facebook", Icon: Facebook, href: "https://www.facebook.com/" },
@@ -73,9 +70,6 @@ function FooterBrandBlock({
           decoding="async"
           className={`logo-breathe shrink-0 ${logoClassName}`}
         />
-        <p className="max-w-[18rem] text-xs leading-snug text-muted-foreground sm:max-w-xs sm:text-sm md:max-w-sm lg:max-w-md">
-          {TAGLINE}
-        </p>
         <div className="flex shrink-0 items-center gap-2">
           {SOCIAL_LINKS.map(({ label, Icon, href }) => (
             <SocialIcon key={label} label={label} Icon={Icon} href={href} compact />
@@ -102,7 +96,6 @@ function FooterBrandBlock({
         decoding="async"
         className={`logo-breathe object-contain ${logoClassName} sm:origin-left sm:-translate-x-1.5 sm:object-left`}
       />
-      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{TAGLINE}</p>
       <div className="mt-3 flex items-center justify-center gap-2.5 sm:justify-start">
         {SOCIAL_LINKS.map(({ label, Icon, href }) => (
           <SocialIcon key={label} label={label} Icon={Icon} href={href} />

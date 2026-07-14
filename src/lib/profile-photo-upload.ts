@@ -2,7 +2,8 @@ import {
   extensionForFile,
   validateExperiencePhotoFile,
 } from "@/lib/experience-photo-upload";
-import { EXPERIENCE_PHOTOS_BUCKET } from "@/lib/experience-photos-config";
+import { EXPERIENCE_PHOTOS_BUCKET, MAX_EXPERIENCE_PHOTO_BYTES } from "@/lib/experience-photos-config";
+import { fileToWebpFile } from "@/lib/image-to-webp";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
 export async function uploadProfilePhoto(file: File): Promise<string> {
@@ -15,6 +16,11 @@ export async function uploadProfilePhoto(file: File): Promise<string> {
     throw new Error(validationError);
   }
 
+  const webpFile = await fileToWebpFile(file);
+  if (webpFile.size > MAX_EXPERIENCE_PHOTO_BYTES) {
+    throw new Error("Profile photo must be 5 MB or smaller after WebP conversion.");
+  }
+
   const supabase = getSupabaseBrowser();
   const {
     data: { user },
@@ -23,13 +29,13 @@ export async function uploadProfilePhoto(file: File): Promise<string> {
     throw new Error("Sign in before uploading a profile photo.");
   }
 
-  const ext = extensionForFile(file);
+  const ext = extensionForFile(webpFile);
   const path = `${user.id}/profile-${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
 
-  const { error } = await supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).upload(path, file, {
+  const { error } = await supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).upload(path, webpFile, {
     cacheControl: "3600",
     upsert: false,
-    contentType: file.type,
+    contentType: webpFile.type,
   });
   if (error) {
     throw new Error(error.message);

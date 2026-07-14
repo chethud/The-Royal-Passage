@@ -149,10 +149,13 @@ export function HomeHero({
           cinematic && !reduceMotion && splashDone
             ? chromeRevealed
               ? { scale: 1.04 }
-              : { scale: 1.08 }
+              : { scale: 1.1 }
             : { scale: 1 }
         }
-        transition={{ duration: 1.4, ease: softEase }}
+        transition={{
+          duration: chromeRevealed ? 1.2 : 2.5,
+          ease: softEase,
+        }}
       >
         <HeroSlideshow
           images={heroSlides}

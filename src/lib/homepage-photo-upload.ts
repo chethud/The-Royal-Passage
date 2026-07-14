@@ -1,5 +1,6 @@
 import { resolveAccessToken } from "@/lib/auth-session";
 import { validateExperiencePhotoFile } from "@/lib/experience-photo-upload";
+import { fileToWebpFile } from "@/lib/image-to-webp";
 
 import type { HomepagePhotoSection } from "@/lib/homepage-content-keys";
 
@@ -46,7 +47,7 @@ async function saveHomepagePhotoViaApi(
       "Content-Type": file.type || "application/octet-stream",
       "X-Section": section,
       "X-Item-Index": String(itemIndex),
-      "X-File-Name": encodeURIComponent(file.name || "photo.jpg"),
+      "X-File-Name": encodeURIComponent(file.name || "photo.webp"),
     },
     body: file,
   });
@@ -77,5 +78,10 @@ export async function commitHomepagePhotoForEditor(
     throw new Error(validationError);
   }
 
-  return saveHomepagePhotoViaApi(section, itemIndex, file);
+  const webpFile = await fileToWebpFile(file);
+  if (webpFile.size > MAX_HOMEPAGE_PHOTO_BYTES) {
+    throw new Error(`${file.name}: must be 4 MB or smaller after WebP conversion.`);
+  }
+
+  return saveHomepagePhotoViaApi(section, itemIndex, webpFile);
 }

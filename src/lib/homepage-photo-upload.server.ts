@@ -24,6 +24,7 @@ import {
 } from "@/lib/experience-photos-config";
 import { getSupabaseConfigError } from "@/lib/env.server";
 import { verifySupabaseAccessToken } from "@/lib/auth-verify.server";
+import { bytesToWebp } from "@/lib/image-to-webp.server";
 import { fetchUserProfile } from "@/lib/profiles";
 import { hasAnyRole, hasRole } from "@/lib/roles";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -99,15 +100,22 @@ async function uploadHomepagePhotoAdminBytes(
     throw new Error("Image must be 5 MB or smaller.");
   }
 
+  const converted = await bytesToWebp(bytes, fileName, mimeType);
+  if (converted.bytes.byteLength > MAX_EXPERIENCE_PHOTO_BYTES) {
+    throw new Error("Image must be 5 MB or smaller after WebP conversion.");
+  }
+
   const supabase = getSupabaseAdmin();
-  const ext = extensionForMime(mimeType, fileName);
+  const ext = extensionForMime(converted.mimeType, converted.fileName);
   const path = `homepage/${userId}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
 
-  const { error } = await supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).upload(path, bytes, {
-    cacheControl: "60",
-    upsert: false,
-    contentType: mimeType,
-  });
+  const { error } = await supabase.storage
+    .from(EXPERIENCE_PHOTOS_BUCKET)
+    .upload(path, converted.bytes, {
+      cacheControl: "60",
+      upsert: false,
+      contentType: converted.mimeType,
+    });
 
   if (error) throw new Error(error.message);
 
