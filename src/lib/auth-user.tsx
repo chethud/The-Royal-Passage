@@ -10,7 +10,7 @@ import type { User } from "@supabase/supabase-js";
 import { isApiConfigured } from "@/lib/api/client";
 import { fetchGuestProfile } from "@/lib/api/guest";
 import { ensureGuestProfile, fetchUserProfile, type UserProfile } from "@/lib/profiles";
-import { isUserRole, pickPrimaryRole, resolveUserRoles, type UserRole } from "@/lib/roles";
+import { isUserRole, pickPrimaryRole, resolveUserRoles, isGuestAccount, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 import { markVipSignupPromptPending } from "@/lib/vip-membership-prompt-storage";
 
@@ -115,12 +115,28 @@ async function loadProfileForUser(user: User, accessToken?: string | null): Prom
     (await fetchUserProfile(supabase, user.id)) ??
     (await ensureGuestProfile(supabase, user.id, { fullName, phone }));
 
-  if (!profile && accessToken && isApiConfigured()) {
+  // Prefer staff roles from the API when the browser profile still looks like a guest
+  // (e.g. stale cache after admin provisioning, or delayed role sync).
+  if (
+    profile &&
+    isGuestAccount(profile.role, profile.roles) &&
+    accessToken &&
+    isApiConfigured()
+  ) {
     try {
       const apiProfile = await fetchGuestProfile(accessToken);
-      profile = mapApiGuestProfile(apiProfile);
+      const mapped = mapApiGuestProfile(apiProfile);
+      if (!isGuestAccount(mapped.role, mapped.roles)) {
+        profile = mapped;
+      } else if (isUserRole(apiProfile.role) && apiProfile.role !== "guest") {
+        profile = {
+          ...profile,
+          role: apiProfile.role,
+          roles: resolveUserRoles(profile.roles, apiProfile.role),
+        };
+      }
     } catch {
-      // API profile sync is best-effort; local profile may still work.
+      // Best-effort only.
     }
   }
 

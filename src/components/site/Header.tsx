@@ -28,7 +28,7 @@ import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
 import { isHomestayOwnerNavItemActive } from "@/lib/homestay-owner-nav-active";
 import { isVipOwnerNavItemActive } from "@/lib/vip-owner-nav-active";
-import { dashboardPathForRole, isAdminRole, isGuestAccount, profilePathForRole, type UserRole } from "@/lib/roles";
+import { dashboardPathForRoles, isAdminRole, isGuestAccount, pickPrimaryRole, profilePathForRole, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 import {
@@ -52,23 +52,32 @@ type NavItem = { label: string; to: string };
 
 function navItemsForUser(
   role: UserRole | null | undefined,
+  roles: readonly UserRole[],
   signedIn: boolean,
   pathname: string,
 ): NavItem[] {
-  if (!signedIn || !role) return publicGuestNavItems();
-  if (role === "admin") {
+  if (!signedIn) return publicGuestNavItems();
+  const primary = pickPrimaryRole(roles, role);
+  if (!primary) return publicGuestNavItems();
+  if (primary === "admin") {
     return adminNavItemsForModule(resolveAdminModule(pathname));
   }
-  if (role === "host") {
+  if (primary === "host") {
     return HOST_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
-  if (role === "homestay_owner") {
+  if (primary === "homestay_owner") {
     return HOMESTAY_OWNER_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
-  if (role === "vip_owner") {
+  if (primary === "vip_owner") {
     return VIP_OWNER_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
-  if (role === "guest") {
+  if (primary === "editor") {
+    return [
+      { label: "Edit homepage", to: "/admin/homepage-edit" },
+      ...publicGuestNavItems(),
+    ];
+  }
+  if (primary === "guest") {
     return GUEST_SIGNED_IN_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
   return publicGuestNavItems();
@@ -105,8 +114,8 @@ function isHeaderNavItemActive(
 
 export function Header() {
   const [elevated, setElevated] = useState(false);
-  const { displayName, user, role } = useAuthUser();
-  const dashboardPath = role ? dashboardPathForRole(role) : "/sign-in";
+  const { displayName, user, role, roles } = useAuthUser();
+  const dashboardPath = dashboardPathForRoles(roles, role);
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -119,22 +128,23 @@ export function Header() {
       : homeIntro && !homeIntro.splashDone
         ? "pending"
         : undefined;
-  const navItems = navItemsForUser(role, Boolean(user), pathname);
+  const primaryRole = pickPrimaryRole(roles, role);
+  const navItems = navItemsForUser(primaryRole, roles, Boolean(user), pathname);
   const isHomestaySection = isHomestayPublicSection(pathname);
   const isVipSection = isVipPublicSection(pathname);
   const isMarketplaceSection = isHomestaySection || isVipSection;
   const logoPath =
-    user && role && role !== "guest"
+    user && primaryRole && primaryRole !== "guest"
       ? dashboardPath
       : isMarketplaceSection
         ? marketplaceHomePath(pathname)
         : "/";
-  const isGuest = role === "guest";
-  const isAdmin = isAdminRole(role);
-  const isHost = role === "host";
+  const isGuest = isGuestAccount(primaryRole, roles);
+  const isAdmin = isAdminRole(primaryRole) || roles.includes("admin");
+  const isHost = primaryRole === "host" || roles.includes("host");
   const showStaffNotifications = Boolean(user) && (isAdmin || isHost);
   const navBadges = useNavBadges();
-  const showGuestCart = Boolean(user) && isGuestAccount(role) && !isMarketplaceSection;
+  const showGuestCart = Boolean(user) && isGuest && !isMarketplaceSection;
   const { count: cartCount } = useExperienceCart();
   const showSignIn = !user;
   const showAccountMenu = Boolean(user);
@@ -172,7 +182,7 @@ export function Header() {
   };
 
   const goToProfile = () => {
-    void router.navigate({ to: profilePathForRole(role) });
+    void router.navigate({ to: profilePathForRole(primaryRole) });
   };
 
   return (
@@ -187,11 +197,11 @@ export function Header() {
           to={logoPath}
           className="flex min-h-11 min-w-0 shrink items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember/60"
           aria-label={
-            isVipSection && (!user || role === "guest")
+            isVipSection && (!user || isGuest)
               ? "The Royal Passage — VIP home"
-              : isHomestaySection && (!user || role === "guest")
+              : isHomestaySection && (!user || isGuest)
                 ? "The Royal Passage — Homestays home"
-                : user && role !== "guest"
+                : user && !isGuest
                   ? "Go to dashboard"
                   : "The Royal Passage — Home"
           }
@@ -210,7 +220,7 @@ export function Header() {
 
         <nav className="hidden items-center gap-5 text-[0.72rem] font-medium uppercase tracking-[0.14em] md:flex lg:gap-7 lg:text-[0.76rem] lg:tracking-[0.16em]">
           {navItems.map((item) => {
-            const active = isHeaderNavItemActive(role, pathname, item.to);
+            const active = isHeaderNavItemActive(primaryRole, pathname, item.to);
             return (
               <Link
                 key={`${item.to}-${item.label}`}
@@ -248,7 +258,7 @@ export function Header() {
             <AccountDropdownMenu
               displayName={displayName}
               email={user?.email}
-              role={role}
+              role={primaryRole}
               isGuest={isGuest}
               isAdmin={isAdmin}
               isVipSection={isVipSection}
@@ -296,7 +306,7 @@ export function Header() {
 
               <nav className="header-mobile-nav mt-6" aria-label="Mobile navigation">
                 {navItems.map((item) => {
-                  const active = isHeaderNavItemActive(role, pathname, item.to);
+                  const active = isHeaderNavItemActive(primaryRole, pathname, item.to);
                   return (
                     <MobileNavLink
                       key={`${item.to}-${item.label}`}
@@ -336,12 +346,12 @@ export function Header() {
                         <MobileNavLink to="/dashboard/history">
                           {isVipSection ? "My bookings" : isHomestaySection ? "My stays" : "History"}
                         </MobileNavLink>
-                        <MobileNavLink to={profilePathForRole(role)}>Profile</MobileNavLink>
+                        <MobileNavLink to={profilePathForRole(primaryRole)}>Profile</MobileNavLink>
                       </>
                     ) : (
                       <>
                         <MobileNavLink to={dashboardPath}>Dashboard</MobileNavLink>
-                        <MobileNavLink to={profilePathForRole(role)}>Profile</MobileNavLink>
+                        <MobileNavLink to={profilePathForRole(primaryRole)}>Profile</MobileNavLink>
                       </>
                     )}
                     <MobileNavLink

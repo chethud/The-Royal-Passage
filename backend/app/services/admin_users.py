@@ -284,11 +284,58 @@ def create_platform_user(payload: CreatePlatformUserRequest) -> CreatePlatformUs
         if vip_owner_id:
             profile_patch["vip_owner_id"] = vip_owner_id
 
+        # Upsert then force-update so a concurrent guest signup trigger cannot leave role=guest.
         profile_result = supabase.table("profiles").upsert(profile_patch).execute()
         if not profile_result.data:
             raise ValueError("Failed to create profile record.")
 
+        role_update = {
+            "role": primary_role,
+            "full_name": payload.fullName,
+            "phone": payload.phone,
+        }
+        if host_id:
+            role_update["host_id"] = host_id
+        if homestay_owner_id:
+            role_update["homestay_owner_id"] = homestay_owner_id
+        if vip_owner_id:
+            role_update["vip_owner_id"] = vip_owner_id
+
+        supabase.table("profiles").update(role_update).eq("id", user_id).execute()
         sync_user_roles(supabase, user_id, roles)
+
+        stored_roles = fetch_user_roles(supabase, user_id)
+        if set(stored_roles) != set(roles):
+            raise ValueError(
+                "Failed to assign access roles. Stored roles: "
+                + (", ".join(stored_roles) if stored_roles else "none")
+            )
+
+        profile_check = (
+            supabase.table("profiles")
+            .select("role")
+            .eq("id", user_id)
+            .maybe_single()
+            .execute()
+        )
+        stored_primary = (profile_check.data or {}).get("role")
+        if stored_primary != primary_role:
+            raise ValueError(
+                f"Failed to set primary role (expected {primary_role}, got {stored_primary})."
+            )
+
+        try:
+            supabase.auth.admin.update_user_by_id(
+                user_id,
+                {
+                    "app_metadata": {
+                        "role": primary_role,
+                        "roles": roles,
+                    },
+                },
+            )
+        except Exception:
+            pass
 
         if "homestay_owner" in roles:
             try:

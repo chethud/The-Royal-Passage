@@ -10,10 +10,10 @@ ALLOWED_ROLES = frozenset(
 
 ROLE_PRIORITY = (
     "admin",
-    "editor",
     "host",
     "homestay_owner",
     "vip_owner",
+    "editor",
     "guest",
 )
 

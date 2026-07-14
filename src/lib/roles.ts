@@ -27,7 +27,7 @@ export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
   homestay_owner: "/homestay/dashboard",
   vip_owner: "/vip/dashboard",
   admin: "/admin",
-  editor: "/",
+  editor: "/admin/homepage-edit",
 };
 
 export const ROLE_PROFILE_PATH: Record<UserRole, string> = {
@@ -92,12 +92,13 @@ export function resolveUserRoles(
   return [];
 }
 
+/** Workspace priority for multi-role accounts (admin wins; editor is not above hosts). */
 const ROLE_PRIORITY: UserRole[] = [
   "admin",
-  "editor",
   "host",
   "homestay_owner",
   "vip_owner",
+  "editor",
   "guest",
 ];
 

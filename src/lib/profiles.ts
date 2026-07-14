@@ -79,9 +79,19 @@ export async function ensureGuestProfile(
     .select("id, full_name, phone, role, host_id")
     .single();
 
-  if (error || !data) return null;
+  if (error) {
+    // Profile may already exist from the auth trigger / admin provisioning.
+    return fetchUserProfile(supabase, userId);
+  }
+  if (!data) return null;
 
-  await supabase.from("user_roles").insert({ user_id: userId, role: "guest" });
+  const { error: roleError } = await supabase
+    .from("user_roles")
+    .insert({ user_id: userId, role: "guest" });
+  if (roleError) {
+    // Admin may already have assigned staff roles — reload rather than forcing guest.
+    return fetchUserProfile(supabase, userId);
+  }
 
   return mapProfile(data as ProfileRow, ["guest"]);
 }

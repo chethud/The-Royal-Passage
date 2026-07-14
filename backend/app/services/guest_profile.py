@@ -34,6 +34,7 @@ def _vip_membership_rejected_at(user_id: str, status: str) -> str | None:
 
 def get_guest_profile(auth: dict) -> GuestProfile:
     from app.services.transactional_emails import maybe_send_welcome_email
+    from app.services.user_roles import pick_primary_role, profile_roles
 
     try:
         maybe_send_welcome_email(auth)
@@ -43,13 +44,15 @@ def get_guest_profile(auth: dict) -> GuestProfile:
     profile = auth["profile"]
     user = auth["user"]
     vip_status = profile.get("vip_membership_status") or "none"
+    roles = profile_roles(profile, get_supabase_admin())
+    primary = pick_primary_role(roles) if roles else (profile.get("role") or "guest")
 
     return GuestProfile(
         id=user.id,
         email=user.email,
         fullName=profile.get("full_name"),
         phone=profile.get("phone"),
-        role=profile.get("role") or "guest",
+        role=primary,
         createdAt=profile.get("created_at") or "",
         avatarUrl=profile.get("avatar_url"),
         dateOfBirth=_normalize_date_of_birth(profile.get("date_of_birth")),
