@@ -73,6 +73,7 @@ function navItemsForWorkspace(
     return [
       { label: "Edit homepage", to: "/admin/homepage-edit" },
       { label: "Homepage photos", to: "/admin/homepage-photos" },
+      { label: "Featured homestays", to: "/admin/homestay-featured" },
       ...publicGuestNavItems(),
     ];
   }

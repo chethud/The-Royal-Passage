@@ -3,19 +3,20 @@ import { useCallback, useEffect, useState } from "react";
 import { AdminHomestayFeaturedEditor } from "@/components/admin/AdminHomestayFeaturedEditor";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
-import {
-  fetchFeaturedHomestaySlugs,
-} from "@/lib/homestay-featured-fns";
-import { resolveFeaturedHomestays } from "@/lib/homestay-featured";
+import { fetchFeaturedHomestaySlugs } from "@/lib/homestay-featured-fns";
 import { getHomestaysForUi } from "@/lib/homestay-fns";
-import { dashboardPathForRole } from "@/lib/roles";
+import {
+  dashboardPathForRoles,
+  hasAdminAccess,
+  hasEditorAccess,
+} from "@/lib/roles";
 import { NOINDEX_META } from "@/lib/seo-helpers";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
 export const Route = createFileRoute("/admin/homestay-featured")({
   head: () => ({
     meta: [
-      { title: "Featured homestays — Admin" },
+      { title: "Featured homestays — The Royal Passage" },
       { name: "description", content: "Choose the top three homestays for the homestays homepage." },
       ...NOINDEX_META,
     ],
@@ -29,7 +30,6 @@ export const Route = createFileRoute("/admin/homestay-featured")({
     return {
       homestays,
       featuredSlugs,
-      featured: resolveFeaturedHomestays(homestays, featuredSlugs),
     };
   },
   component: AdminHomestayFeaturedPage,
@@ -38,9 +38,15 @@ export const Route = createFileRoute("/admin/homestay-featured")({
 function AdminHomestayFeaturedPage() {
   const navigate = useNavigate();
   const router = useRouter();
-  const { user, role, loading } = useAuthUser();
+  const { user, role, roles, loading } = useAuthUser();
   const { homestays, featuredSlugs } = Route.useLoaderData();
   const [savedSlugs, setSavedSlugs] = useState(featuredSlugs);
+  const canEdit = hasEditorAccess(roles, role);
+  const shellRole = hasAdminAccess(roles, role) ? "admin" : "editor";
+
+  useEffect(() => {
+    setSavedSlugs(featuredSlugs);
+  }, [featuredSlugs]);
 
   useEffect(() => {
     if (loading) return;
@@ -48,29 +54,29 @@ function AdminHomestayFeaturedPage() {
       void navigate({ to: "/sign-in", search: { redirect: "/admin/homestay-featured" } });
       return;
     }
-    if (role && role !== "admin") {
-      void navigate({ to: dashboardPathForRole(role) });
+    if (!canEdit) {
+      void navigate({ to: dashboardPathForRoles(roles, role) });
     }
-  }, [loading, navigate, role, user]);
+  }, [canEdit, loading, navigate, role, roles, user]);
 
   const refresh = useCallback(() => {
     void router.invalidate();
   }, [router]);
 
-  if (loading || !user || role !== "admin") {
+  if (loading || !user || !canEdit) {
     return <PageLoadingGate />;
   }
 
   return (
     <DashboardShell
-      role="admin"
+      role={shellRole}
       title="Featured homestays"
       subtitle="Pick the three homestays shown on the public homestays page."
       showRoleDescription={false}
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Link to="/admin/homestay" className="dashboard-chrome-link">
-          ← Homestay control
+        <Link to="/admin/homepage-photos" className="dashboard-chrome-link">
+          ← Homepage photos
         </Link>
         <Link to="/homestays" className="dashboard-chrome-link">
           View live homestays page →

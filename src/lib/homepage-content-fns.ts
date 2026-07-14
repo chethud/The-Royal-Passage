@@ -4,7 +4,6 @@ import {
   applyHomepagePhotoCore,
   bumpHomepageVersion,
   fetchHomepageContentFromDb,
-  requireHomepageAdmin,
   requireHomepageJournalEditor,
   writePlatformSetting,
 } from "@/lib/homepage-photo.server";
@@ -227,7 +226,7 @@ export const saveFeaturedHomestays = createServerFn({ method: "POST" })
       throw new Error("Each featured slot must be a different homestay.");
     }
 
-    await requireHomepageAdmin(data.accessToken);
+    await requireHomepageJournalEditor(data.accessToken);
     const supabase = getSupabaseAdmin();
     await writePlatformSetting(supabase, HOMESTAY_FEATURED_KEY, data.slugs);
     invalidateHomestayCatalogCache();

@@ -163,7 +163,9 @@ export function activeWorkspaceRole(
     return "vip_owner";
   }
   if (
-    (pathname.startsWith("/admin/homepage-edit") || pathname.startsWith("/admin/homepage-photos")) &&
+    (pathname.startsWith("/admin/homepage-edit") ||
+      pathname.startsWith("/admin/homepage-photos") ||
+      pathname.startsWith("/admin/homestay-featured")) &&
     hasAnyRole(resolved, ["editor", "admin"], primary)
   ) {
     return hasRole(resolved, "admin", primary) ? "admin" : "editor";

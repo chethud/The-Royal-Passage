@@ -231,8 +231,14 @@ export function AccountDropdownMenu({
               <AccountMenuItem
                 icon={Image}
                 label="Homepage photos"
-                description="Hero, showcase & journal imagery"
+                description="Hero, showcase, journal & featured stays"
                 to="/admin/homepage-photos"
+              />
+              <AccountMenuItem
+                icon={Home}
+                label="Featured homestays"
+                description="Top 3 stays on /homestays"
+                to="/admin/homestay-featured"
               />
             </>
           ) : null}
