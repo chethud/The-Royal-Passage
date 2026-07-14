@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Experience } from "@/data/experiences";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
@@ -65,10 +65,10 @@ export function ExperienceDetailGallery({
   };
 
   return (
-    <div className="flex h-full items-stretch gap-2.5 sm:gap-3">
+    <div className="flex items-start gap-2.5 sm:gap-3">
       {hasMultiple ? (
         <div
-          className="flex shrink-0 flex-col gap-2 self-stretch"
+          className="flex max-h-[min(78vh,720px)] shrink-0 flex-col gap-2 overflow-y-auto"
           role="tablist"
           aria-label={`${exp.title} photo thumbnails`}
         >
@@ -100,7 +100,7 @@ export function ExperienceDetailGallery({
             );
           })}
           {photos.length > thumbLimit ? (
-            <p className="mt-auto max-w-20 text-center text-[0.58rem] uppercase tracking-[0.12em] text-[#D6C8B5]/70 sm:max-w-24">
+            <p className="max-w-20 text-center text-[0.58rem] uppercase tracking-[0.12em] text-[#D6C8B5]/70 sm:max-w-24">
               +{photos.length - thumbLimit} more
             </p>
           ) : null}
