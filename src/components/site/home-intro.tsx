@@ -3,6 +3,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -33,8 +34,8 @@ const PHOTO_ZOOM_BEFORE_COPY_MS = 2500;
 const REVEAL_SCROLL_PX = 2;
 /** After text is on screen, idle wipe to the left. */
 const IDLE_WIPE_MS = 5000;
-/** Navbar follows copy almost immediately. */
-const NAV_AFTER_COPY_MS = 120;
+/** Navbar slides in shortly after text starts. */
+const NAV_AFTER_COPY_MS = 450;
 
 export function HomeIntroProvider({ children }: { children: ReactNode }) {
   const reduceMotion = usePrefersReducedMotion();
@@ -42,6 +43,14 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
   const [copyRevealed, setCopyRevealed] = useState(reduceMotion);
   const [copyWiped, setCopyWiped] = useState(false);
   const [navRevealed, setNavRevealed] = useState(reduceMotion);
+  const navTimerRef = useRef<number | undefined>(undefined);
+
+  const scheduleNavReveal = () => {
+    window.clearTimeout(navTimerRef.current);
+    navTimerRef.current = window.setTimeout(() => {
+      setNavRevealed(true);
+    }, NAV_AFTER_COPY_MS);
+  };
 
   useEffect(() => {
     if (reduceMotion) {
@@ -63,31 +72,33 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
     };
   }, [reduceMotion]);
 
-  // After splash: photo zooms alone ~2.5s, then text arrives automatically.
+  // After splash: photo zooms alone ~2.5s, then text + navbar arrive automatically.
   // Scroll / wheel / touch / keys can still unlock earlier.
   useEffect(() => {
     if (!splashDone || copyRevealed || reduceMotion) return;
 
-    const timer = window.setTimeout(() => {
+    const revealChrome = () => {
       setCopyRevealed(true);
       setCopyWiped(false);
-    }, PHOTO_ZOOM_BEFORE_COPY_MS);
+      scheduleNavReveal();
+    };
 
-    const reveal = () => {
+    const timer = window.setTimeout(revealChrome, PHOTO_ZOOM_BEFORE_COPY_MS);
+
+    const revealEarly = () => {
       window.clearTimeout(timer);
-      setCopyRevealed(true);
-      setCopyWiped(false);
+      revealChrome();
     };
 
     const onScroll = () => {
-      if (window.scrollY >= REVEAL_SCROLL_PX) reveal();
+      if (window.scrollY >= REVEAL_SCROLL_PX) revealEarly();
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) >= 1 || Math.abs(event.deltaX) >= 1) reveal();
+      if (Math.abs(event.deltaY) >= 1 || Math.abs(event.deltaX) >= 1) revealEarly();
     };
 
-    const onTouchMove = () => reveal();
+    const onTouchMove = () => revealEarly();
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (
@@ -99,7 +110,7 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
         event.key === "Home" ||
         event.key === "End"
       ) {
-        reveal();
+        revealEarly();
       }
     };
 
@@ -117,11 +128,15 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
     };
   }, [splashDone, copyRevealed, reduceMotion]);
 
+  // Safety net if copy unlocks without going through revealChrome.
   useEffect(() => {
     if (!copyRevealed || navRevealed || reduceMotion) return;
-    const timer = window.setTimeout(() => setNavRevealed(true), NAV_AFTER_COPY_MS);
-    return () => window.clearTimeout(timer);
+    scheduleNavReveal();
   }, [copyRevealed, navRevealed, reduceMotion]);
+
+  useEffect(() => {
+    return () => window.clearTimeout(navTimerRef.current);
+  }, []);
 
   // Once text is showing, wipe it left if the visitor stays still for 5s.
   // Scroll / wheel / touch / keys restore it and restart the idle timer.

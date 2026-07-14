@@ -3,10 +3,14 @@ import {
   ALLOWED_EXPERIENCE_PHOTO_MIME,
   EXPERIENCE_PHOTOS_BUCKET,
   MAX_EXPERIENCE_PHOTO_BYTES,
+  PHOTO_CACHE_CONTROL,
 } from "@/lib/experience-photos-config";
-import { fileToWebpFile } from "@/lib/image-to-webp";
 
-export { EXPERIENCE_PHOTOS_BUCKET, MAX_EXPERIENCE_PHOTO_BYTES } from "@/lib/experience-photos-config";
+export {
+  EXPERIENCE_PHOTOS_BUCKET,
+  MAX_EXPERIENCE_PHOTO_BYTES,
+  PHOTO_CACHE_CONTROL,
+} from "@/lib/experience-photos-config";
 
 const ALLOWED_MIME = ALLOWED_EXPERIENCE_PHOTO_MIME;
 
@@ -51,11 +55,6 @@ export async function uploadExperiencePhoto(file: File): Promise<string> {
     throw new Error(validationError);
   }
 
-  const webpFile = await fileToWebpFile(file);
-  if (webpFile.size > MAX_EXPERIENCE_PHOTO_BYTES) {
-    throw new Error(`${file.name}: must be 5 MB or smaller after WebP conversion.`);
-  }
-
   const supabase = getSupabaseBrowser();
   const {
     data: { user },
@@ -64,13 +63,13 @@ export async function uploadExperiencePhoto(file: File): Promise<string> {
     throw new Error("Sign in before uploading photos.");
   }
 
-  const ext = extensionForFile(webpFile);
+  const ext = extensionForFile(file);
   const path = `${user.id}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
 
-  const { error } = await supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).upload(path, webpFile, {
-    cacheControl: "3600",
+  const { error } = await supabase.storage.from(EXPERIENCE_PHOTOS_BUCKET).upload(path, file, {
+    cacheControl: PHOTO_CACHE_CONTROL,
     upsert: false,
-    contentType: webpFile.type,
+    contentType: file.type,
   });
   if (error) {
     throw new Error(error.message);

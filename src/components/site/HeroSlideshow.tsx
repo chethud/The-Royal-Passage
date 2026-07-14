@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { warmPhotoCache } from "@/lib/photo-memory-cache";
 import { cn } from "@/lib/utils";
 
 type HeroSlideshowProps = {
@@ -39,20 +40,9 @@ export function HeroSlideshow({
     [onActiveIndexChange, safeImages.length],
   );
 
-  // Keep upcoming slides decoded so a fade never lands on an empty decode frame.
+  // Keep slideshow frames warm in memory cache for instant fades.
   useEffect(() => {
-    if (safeImages.length <= 1) return;
-    const preload = safeImages.map((image) => {
-      const img = new Image();
-      img.decoding = "async";
-      img.src = image.src;
-      return img;
-    });
-    return () => {
-      for (const img of preload) {
-        img.src = "";
-      }
-    };
+    warmPhotoCache(safeImages.map((image) => image.src));
   }, [safeImages]);
 
   useEffect(() => {

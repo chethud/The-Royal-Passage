@@ -4,6 +4,7 @@ import type { Experience } from "@/data/experiences";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { categoryIconForLabel } from "@/lib/experience-category-icons";
 import { getExperienceGalleryImages } from "@/lib/experience-cover-image";
+import { warmPhotoCache } from "@/lib/photo-memory-cache";
 import { cn } from "@/lib/utils";
 
 const AUTO_ADVANCE_MS = 3000;
@@ -34,6 +35,10 @@ export function ExperienceDetailGallery({
       setActiveIndex(0);
     }
   }, [activeIndex, photos.length]);
+
+  useEffect(() => {
+    warmPhotoCache(photos);
+  }, [photos]);
 
   useEffect(() => {
     if (reduceMotion || photos.length <= 1) return;

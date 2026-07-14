@@ -1,28 +1,22 @@
 /**
- * Convert existing Supabase storage photos to WebP and rewrite stored URLs.
+ * Convert existing Supabase storage .webp photos back to JPEG and rewrite URLs.
  *
  * Usage:
- *   node --env-file=.env.local --env-file=.env scripts/convert-storage-photos-to-webp.mjs
- *
- * Optional dry run:
- *   DRY_RUN=1 node --env-file=.env.local --env-file=.env scripts/convert-storage-photos-to-webp.mjs
+ *   node --env-file=.env --env-file=.env.local scripts/convert-storage-webp-to-jpeg.mjs
  */
 
 import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
 
 const BUCKET = "experience-photos";
+const JPEG_QUALITY = 90;
 const MAX_EDGE = 2400;
-const WEBP_QUALITY = 82;
-const DRY_RUN = process.env.DRY_RUN === "1" || process.env.DRY_RUN === "true";
 
 const url = process.env.VITE_SUPABASE_URL ?? process.env.SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!url || !serviceKey) {
-  console.error(
-    "Missing VITE_SUPABASE_URL (or SUPABASE_URL) or SUPABASE_SERVICE_ROLE_KEY in .env.local",
-  );
+  console.error("Missing VITE_SUPABASE_URL (or SUPABASE_URL) or SUPABASE_SERVICE_ROLE_KEY");
   process.exit(1);
 }
 
@@ -35,12 +29,8 @@ function publicUrlFor(path) {
   return data.publicUrl;
 }
 
-function toWebpPath(path) {
-  return path.replace(/\.(jpe?g|png|gif|avif|heic)$/i, ".webp");
-}
-
-function isRasterForConvert(path) {
-  return /\.(jpe?g|png|avif|heic)$/i.test(path);
+function toJpegPath(path) {
+  return path.replace(/\.webp$/i, ".jpg");
 }
 
 async function listAllObjects(prefix = "") {
@@ -59,7 +49,6 @@ async function listAllObjects(prefix = "") {
 
     for (const item of data) {
       const fullPath = prefix ? `${prefix}/${item.name}` : item.name;
-      // Folders have id null and no metadata size in some responses
       if (item.id == null && !item.metadata) {
         out.push(...(await listAllObjects(fullPath)));
       } else if (item.name && !item.name.endsWith("/")) {
@@ -75,11 +64,11 @@ async function listAllObjects(prefix = "") {
 }
 
 async function convertObject(path) {
-  if (!isRasterForConvert(path)) {
-    return { skipped: true, reason: "not a convertible raster" };
+  if (!/\.webp$/i.test(path)) {
+    return { skipped: true };
   }
 
-  const nextPath = toWebpPath(path);
+  const nextPath = toJpegPath(path);
   const oldUrl = publicUrlFor(path);
   const newUrl = publicUrlFor(nextPath);
 
@@ -87,13 +76,12 @@ async function convertObject(path) {
   if (downloadError) throw downloadError;
 
   const input = Buffer.from(await blob.arrayBuffer());
-  const image = sharp(input, { failOn: "none" }).rotate();
-  const meta = await image.metadata();
+  let pipeline = sharp(input, { failOn: "none" }).rotate();
+  const meta = await pipeline.metadata();
   const width = meta.width ?? 0;
   const height = meta.height ?? 0;
   const longest = Math.max(width, height);
 
-  let pipeline = image;
   if (longest > MAX_EDGE && longest > 0) {
     pipeline = pipeline.resize({
       width: width >= height ? MAX_EDGE : undefined,
@@ -103,31 +91,20 @@ async function convertObject(path) {
     });
   }
 
-  const webpBytes = await pipeline.webp({ quality: WEBP_QUALITY, effort: 4 }).toBuffer();
+  const jpegBytes = await pipeline
+    .jpeg({ quality: JPEG_QUALITY, mozjpeg: true })
+    .toBuffer();
 
-  if (DRY_RUN) {
-    return {
-      skipped: false,
-      dryRun: true,
-      path,
-      nextPath,
-      oldUrl,
-      newUrl,
-      bytes: webpBytes.byteLength,
-    };
-  }
-
-  const { error: uploadError } = await supabase.storage.from(BUCKET).upload(nextPath, webpBytes, {
-    contentType: "image/webp",
-    cacheControl: "3600",
+  const { error: uploadError } = await supabase.storage.from(BUCKET).upload(nextPath, jpegBytes, {
+    contentType: "image/jpeg",
+    cacheControl: "31536000",
     upsert: true,
   });
   if (uploadError) throw uploadError;
 
-  // Best-effort remove original (keep if remove fails).
   await supabase.storage.from(BUCKET).remove([path]);
 
-  return { skipped: false, path, nextPath, oldUrl, newUrl, bytes: webpBytes.byteLength };
+  return { skipped: false, path, nextPath, oldUrl, newUrl, bytes: jpegBytes.byteLength };
 }
 
 function replaceUrlDeep(value, replacements) {
@@ -136,11 +113,14 @@ function replaceUrlDeep(value, replacements) {
     for (const [from, to] of replacements) {
       if (next.includes(from)) next = next.split(from).join(to);
     }
+    // Also fix any leftover .webp storage URLs generically
+    next = next.replace(
+      /(\/storage\/v1\/object\/public\/experience-photos\/[^\s"'\\]+)\.webp/gi,
+      "$1.jpg",
+    );
     return next;
   }
-  if (Array.isArray(value)) {
-    return value.map((item) => replaceUrlDeep(item, replacements));
-  }
+  if (Array.isArray(value)) return value.map((item) => replaceUrlDeep(item, replacements));
   if (value && typeof value === "object") {
     const out = {};
     for (const [key, child] of Object.entries(value)) {
@@ -164,10 +144,6 @@ async function rewriteTableColumn(table, column, replacements) {
     if (current == null) continue;
     const next = replaceUrlDeep(current, replacements);
     if (JSON.stringify(next) === JSON.stringify(current)) continue;
-    if (DRY_RUN) {
-      updated += 1;
-      continue;
-    }
     const { error: updateError } = await supabase
       .from(table)
       .update({ [column]: next })
@@ -192,10 +168,6 @@ async function rewritePlatformSettings(replacements) {
   for (const row of data ?? []) {
     const next = replaceUrlDeep(row.value, replacements);
     if (JSON.stringify(next) === JSON.stringify(row.value)) continue;
-    if (DRY_RUN) {
-      updated += 1;
-      continue;
-    }
     const { error: updateError } = await supabase
       .from("platform_settings")
       .update({ value: next })
@@ -204,22 +176,22 @@ async function rewritePlatformSettings(replacements) {
       console.warn(`  failed platform_settings ${row.key}: ${updateError.message}`);
       continue;
     }
+    console.log(`  updated ${row.key}`);
     updated += 1;
   }
 
-  if (!DRY_RUN && updated > 0) {
-    const versionKey = "homepage_content_version";
+  if (updated > 0) {
     const { data: versionRow } = await supabase
       .from("platform_settings")
       .select("value")
-      .eq("key", versionKey)
+      .eq("key", "homepage_content_version")
       .maybeSingle();
     const current =
       typeof versionRow?.value === "number"
         ? versionRow.value
         : Number(versionRow?.value) || 1;
     await supabase.from("platform_settings").upsert({
-      key: versionKey,
+      key: "homepage_content_version",
       value: current + 1,
     });
   }
@@ -228,38 +200,29 @@ async function rewritePlatformSettings(replacements) {
 }
 
 async function main() {
-  console.log(DRY_RUN ? "DRY RUN — no writes" : "Converting storage photos to WebP…");
+  console.log("Converting storage WebP photos back to JPEG…");
   const objects = await listAllObjects();
-  console.log(`Found ${objects.length} objects in ${BUCKET}`);
+  const webps = objects.filter((path) => /\.webp$/i.test(path));
+  console.log(`Found ${webps.length} WebP objects (of ${objects.length} total)`);
 
   const replacements = [];
   let converted = 0;
-  let skipped = 0;
 
-  for (const path of objects) {
+  for (const path of webps) {
     try {
       const result = await convertObject(path);
-      if (result.skipped) {
-        skipped += 1;
-        continue;
-      }
+      if (result.skipped) continue;
       converted += 1;
       replacements.push([result.oldUrl, result.newUrl]);
-      console.log(
-        `  ${result.dryRun ? "[dry] " : ""}${path} → ${result.nextPath} (${result.bytes} bytes)`,
-      );
+      console.log(`  ${path} → ${result.nextPath} (${result.bytes} bytes)`);
     } catch (err) {
       console.warn(`  failed ${path}: ${err instanceof Error ? err.message : err}`);
     }
   }
 
-  console.log(`Converted ${converted}, skipped ${skipped}`);
-  if (replacements.length === 0) {
-    console.log("No URL rewrites needed.");
-    return;
-  }
-
+  console.log(`Converted ${converted} files`);
   console.log("Rewriting stored URLs…");
+
   const counts = await Promise.all([
     rewritePlatformSettings(replacements),
     rewriteTableColumn("experiences", "hero_image_url", replacements),
@@ -278,7 +241,7 @@ async function main() {
     ),
   ]);
 
-  console.log(`Updated ${counts.reduce((a, b) => a + b, 0)} records${DRY_RUN ? " (dry run)" : ""}.`);
+  console.log(`Updated ${counts.reduce((a, b) => a + b, 0)} records.`);
   console.log("Done.");
 }
 
