@@ -13,7 +13,7 @@ type VercelResponse = {
 
 type HomepagePhotoRequest = {
   accessToken?: string;
-  section?: "showcase" | "journal" | "hero";
+  section?: "showcase" | "journal" | "hero" | "homestayHero";
   itemIndex?: number;
   publicUrl?: string;
   fileName?: string;
@@ -25,7 +25,7 @@ type HomepagePhotoApi = {
   getSupabaseConfigError: () => string | null;
   commitHomepagePhotoWithUploadBytes: (input: {
     accessToken: string;
-    section: "showcase" | "journal" | "hero";
+    section: "showcase" | "journal" | "hero" | "homestayHero";
     itemIndex: number;
     fileName: string;
     mimeType: string;
@@ -33,7 +33,7 @@ type HomepagePhotoApi = {
   }) => Promise<{ publicUrl: string; version: number }>;
   commitHomepagePhotoWithUpload: (input: {
     accessToken: string;
-    section: "showcase" | "journal" | "hero";
+    section: "showcase" | "journal" | "hero" | "homestayHero";
     itemIndex: number;
     fileName: string;
     mimeType: string;
@@ -41,7 +41,7 @@ type HomepagePhotoApi = {
   }) => Promise<{ publicUrl: string; version: number }>;
   applyHomepagePhotoCore: (input: {
     accessToken: string;
-    section: "showcase" | "journal" | "hero";
+    section: "showcase" | "journal" | "hero" | "homestayHero";
     itemIndex: number;
     publicUrl: string;
   }) => Promise<{ publicUrl: string; version: number }>;
@@ -96,15 +96,22 @@ async function readRawBody(req: VercelRequest): Promise<Buffer> {
   return Buffer.alloc(0);
 }
 
-function parseSection(raw: string | undefined): "showcase" | "journal" | "hero" | null {
-  if (raw === "showcase" || raw === "journal" || raw === "hero") return raw;
+function parseSection(
+  raw: string | undefined,
+): "showcase" | "journal" | "hero" | "homestayHero" | null {
+  if (raw === "showcase" || raw === "journal" || raw === "hero" || raw === "homestayHero") {
+    return raw;
+  }
   return null;
 }
 
-function parseItemIndex(raw: string | undefined, section: "showcase" | "journal" | "hero"): number | null {
+function parseItemIndex(
+  raw: string | undefined,
+  section: "showcase" | "journal" | "hero" | "homestayHero",
+): number | null {
   if (!raw) return null;
   const value = Number.parseInt(raw, 10);
-  const max = section === "hero" ? 11 : 2;
+  const max = section === "hero" ? 11 : section === "homestayHero" ? 4 : 2;
   if (!Number.isInteger(value) || value < 0 || value > max) return null;
   return value;
 }
@@ -195,11 +202,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return jsonError(res, 400, "Missing required fields.");
       }
 
-      if (section !== "showcase" && section !== "journal" && section !== "hero") {
+      if (
+        section !== "showcase" &&
+        section !== "journal" &&
+        section !== "hero" &&
+        section !== "homestayHero"
+      ) {
         return jsonError(res, 400, "Invalid section.");
       }
 
-      const maxIndex = section === "hero" ? 11 : 2;
+      const maxIndex = section === "hero" ? 11 : section === "homestayHero" ? 4 : 2;
       if (!Number.isInteger(itemIndex) || itemIndex < 0 || itemIndex > maxIndex) {
         return jsonError(res, 400, "Invalid item index.");
       }

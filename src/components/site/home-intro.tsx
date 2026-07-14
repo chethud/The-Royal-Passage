@@ -14,7 +14,7 @@ type HomeIntroContextValue = {
   splashDone: boolean;
   /** Hero chrome unlocked after a tiny scroll (never auto). */
   copyRevealed: boolean;
-  /** Hero text wiped left after 5s idle while visible. */
+  /** Hero text wiped left after 5s idle; restored on scroll / interaction. */
   copyWiped: boolean;
   /** Navbar arrives after copy animation */
   navRevealed: boolean;
@@ -114,34 +114,42 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
   }, [copyRevealed, navRevealed, reduceMotion]);
 
   // Once text is showing, wipe it left if the visitor stays still for 5s.
-  // After wipe, stay wiped for this visit — do not restore on slideshow/layout scroll noise.
+  // Scroll / wheel / touch / keys restore it and restart the idle timer.
   useEffect(() => {
-    if (!copyRevealed || copyWiped || reduceMotion) return;
+    if (!copyRevealed || reduceMotion) return;
 
-    let wipeTimer = window.setTimeout(() => setCopyWiped(true), IDLE_WIPE_MS);
+    let wipeTimer: number | undefined;
 
-    const bumpIdle = () => {
+    const scheduleWipe = () => {
       window.clearTimeout(wipeTimer);
       wipeTimer = window.setTimeout(() => setCopyWiped(true), IDLE_WIPE_MS);
     };
 
-    const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) >= 1 || Math.abs(event.deltaX) >= 1) bumpIdle();
+    const onActivity = (event?: Event) => {
+      if (event instanceof WheelEvent) {
+        if (Math.abs(event.deltaY) < 1 && Math.abs(event.deltaX) < 1) return;
+      }
+      setCopyWiped(false);
+      scheduleWipe();
     };
 
-    window.addEventListener("scroll", bumpIdle, { passive: true });
-    window.addEventListener("wheel", onWheel, { passive: true });
-    window.addEventListener("touchmove", bumpIdle, { passive: true });
-    window.addEventListener("pointerdown", bumpIdle, { passive: true });
-    window.addEventListener("keydown", bumpIdle);
+    if (!copyWiped) {
+      scheduleWipe();
+    }
+
+    window.addEventListener("scroll", onActivity, { passive: true });
+    window.addEventListener("wheel", onActivity, { passive: true });
+    window.addEventListener("touchmove", onActivity, { passive: true });
+    window.addEventListener("pointerdown", onActivity, { passive: true });
+    window.addEventListener("keydown", onActivity);
 
     return () => {
       window.clearTimeout(wipeTimer);
-      window.removeEventListener("scroll", bumpIdle);
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchmove", bumpIdle);
-      window.removeEventListener("pointerdown", bumpIdle);
-      window.removeEventListener("keydown", bumpIdle);
+      window.removeEventListener("scroll", onActivity);
+      window.removeEventListener("wheel", onActivity);
+      window.removeEventListener("touchmove", onActivity);
+      window.removeEventListener("pointerdown", onActivity);
+      window.removeEventListener("keydown", onActivity);
     };
   }, [copyRevealed, copyWiped, reduceMotion]);
 

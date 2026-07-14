@@ -9,22 +9,27 @@ import {
   fetchFeaturedHomestaySlugs,
 } from "@/lib/homestay-featured-fns";
 import { resolveFeaturedHomestays } from "@/lib/homestay-featured";
+import { getHomepageContent } from "@/lib/homepage-content-fns";
+import { normalizeHomepageContent } from "@/lib/homepage-content";
 import { canonicalLink } from "@/lib/seo-helpers";
 import { SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/homestays/")({
   loader: async () => {
-    const [catalog, featuredSlugs] = await Promise.all([
+    const [catalog, featuredSlugs, homepage] = await Promise.all([
       getHomestaysForUi(),
       fetchFeaturedHomestaySlugs(),
+      getHomepageContent().catch(() => normalizeHomepageContent({})),
     ]);
     const homestays = catalog.homestays ?? [];
     return {
       homestays,
       featured: resolveFeaturedHomestays(homestays, featuredSlugs),
       mode: catalog.mode,
+      homepage: normalizeHomepageContent(homepage ?? {}),
     };
   },
+  staleTime: 0,
   head: () => ({
     meta: [
       { title: "Royal Homestays — Stay in Mysuru, Royally" },
@@ -44,13 +49,14 @@ export const Route = createFileRoute("/homestays/")({
 });
 
 function HomestaysHomePage() {
-  const { featured } = Route.useLoaderData();
+  const { featured, homepage } = Route.useLoaderData();
+  const content = normalizeHomepageContent(homepage ?? {});
 
   return (
     <div className="overflow-x-hidden bg-background text-foreground">
       <Header />
 
-      <HomestaysHomeHero />
+      <HomestaysHomeHero slides={content.homestayHero} imageVersion={content.version} />
       <HomestaysShowcase featured={featured} />
       <HomestayPillarsRow />
       <Footer />

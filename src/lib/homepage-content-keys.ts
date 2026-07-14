@@ -1,12 +1,15 @@
 export const HOMEPAGE_SHOWCASE_KEY = "homepage_showcase";
 export const HOMEPAGE_JOURNAL_KEY = "homepage_journal";
 export const HOMEPAGE_HERO_KEY = "homepage_hero";
+export const HOMEPAGE_HOMESTAY_HERO_KEY = "homepage_homestay_hero";
 export const HOMEPAGE_HERO_HEADINGS_KEY = "homepage_hero_headings";
 export const HOMEPAGE_JOURNEYS_KEY = "homepage_journeys";
 export const HOMEPAGE_VERSION_KEY = "homepage_content_version";
 export const HOMEPAGE_CACHE_KEY = "homepage-content-v1";
 export const HERO_HEADING_ROTATION_KEY = "trp-hero-heading-rotation";
 export const HERO_SLIDESHOW_PICK_KEY = "trp-hero-slideshow-pick";
+
+export const HOMESTAY_HERO_SLIDE_COUNT = 5;
 
 export type ShowcaseIconKey = "pottery" | "flame" | "heritage";
 
@@ -68,12 +71,14 @@ export type HomepageContent = {
   hero: HomepageHeroSlide[];
   /** Three slideshow packs (4 photos each). Pack 0 = priority/constant; 1–2 randomize on visit. */
   heroSlideshows: HomepageHeroSlideshow[];
+  /** Homestays landing hero slideshow photos. */
+  homestayHero: HomepageHeroSlide[];
   heroHeadings: HomepageHeroHeading[];
   journeys: HomepageJourneySlide[];
   version: number;
 };
 
-export type HomepagePhotoSection = "showcase" | "journal" | "hero";
+export type HomepagePhotoSection = "showcase" | "journal" | "hero" | "homestayHero";
 
 const FALLBACK_SHOWCASE: HomepageShowcaseItem[] = [
   {
@@ -137,6 +142,34 @@ const FALLBACK_HERO_SLIDESHOWS: HomepageHeroSlideshow[] = [
   { id: "slideshow-priority", slides: FALLBACK_HERO.map((s) => ({ ...s, id: `p0-${s.id}` })) },
   { id: "slideshow-alt-1", slides: FALLBACK_HERO.map((s) => ({ ...s, id: `p1-${s.id}` })) },
   { id: "slideshow-alt-2", slides: FALLBACK_HERO.map((s) => ({ ...s, id: `p2-${s.id}` })) },
+];
+
+const FALLBACK_HOMESTAY_HERO: HomepageHeroSlide[] = [
+  {
+    id: "homestay-hero-1",
+    imageUrl: "",
+    alt: "Heritage homestay with courtyard and warm evening light",
+  },
+  {
+    id: "homestay-hero-2",
+    imageUrl: "",
+    alt: "Villa with terraced gardens at the Chamundi foothills",
+  },
+  {
+    id: "homestay-hero-3",
+    imageUrl: "",
+    alt: "Boutique guest house bedroom with premium linens",
+  },
+  {
+    id: "homestay-hero-4",
+    imageUrl: "",
+    alt: "Cozy homestay bedroom with soft natural light",
+  },
+  {
+    id: "homestay-hero-5",
+    imageUrl: "",
+    alt: "Elegant suite interior in a Mysuru guest house",
+  },
 ];
 
 const FALLBACK_HERO_HEADINGS: HomepageHeroHeading[] = [
@@ -368,6 +401,7 @@ export function normalizeHomepageContent(
     journal?: unknown;
     hero?: unknown;
     heroSlideshows?: unknown;
+    homestayHero?: unknown;
     heroHeadings?: unknown;
     journeys?: unknown;
     version?: unknown;
@@ -377,6 +411,7 @@ export function normalizeHomepageContent(
     journalFallbacks?: HomepageJournalItem[];
     heroFallbacks?: HomepageHeroSlide[];
     heroSlideshowsFallbacks?: HomepageHeroSlideshow[];
+    homestayHeroFallbacks?: HomepageHeroSlide[];
     heroHeadingsFallbacks?: HomepageHeroHeading[];
     journeysFallbacks?: HomepageJourneySlide[];
   },
@@ -386,6 +421,7 @@ export function normalizeHomepageContent(
   const heroFallbacks = options?.heroFallbacks ?? FALLBACK_HERO;
   const heroSlideshowsFallbacks =
     options?.heroSlideshowsFallbacks ?? buildHeroSlideshowFallbacks(heroFallbacks);
+  const homestayHeroFallbacks = options?.homestayHeroFallbacks ?? FALLBACK_HOMESTAY_HERO;
   const heroHeadingsFallbacks = options?.heroHeadingsFallbacks ?? FALLBACK_HERO_HEADINGS;
   const journeysFallbacks = options?.journeysFallbacks ?? FALLBACK_JOURNEYS;
   const showcaseRaw = Array.isArray(raw.showcase) ? raw.showcase : null;
@@ -394,6 +430,7 @@ export function normalizeHomepageContent(
     Array.isArray(raw.heroSlideshows) && raw.heroSlideshows.length > 0
       ? raw.heroSlideshows
       : raw.hero;
+  const homestayHeroRaw = Array.isArray(raw.homestayHero) ? raw.homestayHero : null;
   const heroHeadingsRaw = Array.isArray(raw.heroHeadings) ? raw.heroHeadings : null;
   const journeysRaw = Array.isArray(raw.journeys) ? raw.journeys : null;
 
@@ -412,6 +449,9 @@ export function normalizeHomepageContent(
     ),
     heroSlideshows,
     hero: heroSlideshows[0]?.slides ?? heroFallbacks,
+    homestayHero: homestayHeroFallbacks.map((fallback, index) =>
+      normalizeHeroSlide(homestayHeroRaw?.[index], fallback),
+    ),
     heroHeadings: heroHeadingsFallbacks.map((fallback, index) =>
       normalizeHeroHeading(heroHeadingsRaw?.[index], fallback),
     ),

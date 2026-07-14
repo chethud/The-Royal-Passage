@@ -9,6 +9,7 @@ import {
   HOMEPAGE_CACHE_KEY,
   HOMEPAGE_HERO_HEADINGS_KEY,
   HOMEPAGE_HERO_KEY,
+  HOMEPAGE_HOMESTAY_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
   HOMEPAGE_JOURNEYS_KEY,
   HOMEPAGE_SHOWCASE_KEY,
@@ -28,11 +29,13 @@ import {
   type HomepageShowcaseItem,
   type ShowcaseIconKey,
 } from "@/lib/homepage-content-keys";
+import { HOMESTAY_HERO_SLIDES } from "@/lib/homestay-home-content";
 
 export {
   HOMEPAGE_CACHE_KEY,
   HOMEPAGE_HERO_HEADINGS_KEY,
   HOMEPAGE_HERO_KEY,
+  HOMEPAGE_HOMESTAY_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
   HOMEPAGE_JOURNEYS_KEY,
   HOMEPAGE_SHOWCASE_KEY,
@@ -57,6 +60,7 @@ export function normalizeHomepageContent(raw: {
   journal?: unknown;
   hero?: unknown;
   heroSlideshows?: unknown;
+  homestayHero?: unknown;
   heroHeadings?: unknown;
   journeys?: unknown;
   version?: unknown;
@@ -66,6 +70,7 @@ export function normalizeHomepageContent(raw: {
     journalFallbacks: DEFAULT_HOMEPAGE_JOURNAL,
     heroFallbacks: DEFAULT_HOMEPAGE_HERO,
     heroSlideshowsFallbacks: DEFAULT_HOMEPAGE_HERO_SLIDESHOWS,
+    homestayHeroFallbacks: DEFAULT_HOMESTAY_HERO,
     heroHeadingsFallbacks: DEFAULT_HOMEPAGE_HERO_HEADINGS,
     journeysFallbacks: DEFAULT_HOMEPAGE_JOURNEYS,
   });
@@ -227,11 +232,18 @@ export const DEFAULT_HOMEPAGE_JOURNEYS: HomepageJourneySlide[] = [
   },
 ];
 
+export const DEFAULT_HOMESTAY_HERO: HomepageHeroSlide[] = HOMESTAY_HERO_SLIDES.map((slide, index) => ({
+  id: `homestay-hero-${index + 1}`,
+  imageUrl: slide.src,
+  alt: slide.alt,
+}));
+
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   showcase: DEFAULT_HOMEPAGE_SHOWCASE,
   journal: DEFAULT_HOMEPAGE_JOURNAL,
   hero: DEFAULT_HOMEPAGE_HERO_SLIDESHOWS[0]!.slides,
   heroSlideshows: DEFAULT_HOMEPAGE_HERO_SLIDESHOWS,
+  homestayHero: DEFAULT_HOMESTAY_HERO,
   heroHeadings: DEFAULT_HOMEPAGE_HERO_HEADINGS,
   journeys: DEFAULT_HOMEPAGE_JOURNEYS,
   version: 0,

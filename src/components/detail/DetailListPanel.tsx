@@ -19,7 +19,7 @@ export function DetailListPanel({
           <ul className="space-y-1">
             {items.map((item) => (
               <li key={item} className="luxury-panel-body flex gap-2 text-[0.8125rem] leading-snug">
-                <span className="shrink-0 text-[#4A0000]/75">—</span>
+                <span className="shrink-0 text-[#3a0000]/80">—</span>
                 {item}
               </li>
             ))}

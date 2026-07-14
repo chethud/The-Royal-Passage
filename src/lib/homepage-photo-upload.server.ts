@@ -7,11 +7,13 @@ import {
   HOMEPAGE_CACHE_KEY,
   HOMEPAGE_HERO_HEADINGS_KEY,
   HOMEPAGE_HERO_KEY,
+  HOMEPAGE_HOMESTAY_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
   HOMEPAGE_JOURNEYS_KEY,
   HOMEPAGE_SHOWCASE_KEY,
   HOMEPAGE_VERSION_KEY,
   heroPhotoCoords,
+  HOMESTAY_HERO_SLIDE_COUNT,
   parseVersionValue,
   type HomepagePhotoSection,
 } from "@/lib/homepage-content-keys";
@@ -207,6 +209,7 @@ async function loadHomepageContentFromDb(supabase: ReturnType<typeof getSupabase
       HOMEPAGE_SHOWCASE_KEY,
       HOMEPAGE_JOURNAL_KEY,
       HOMEPAGE_HERO_KEY,
+      HOMEPAGE_HOMESTAY_HERO_KEY,
       HOMEPAGE_HERO_HEADINGS_KEY,
       HOMEPAGE_JOURNEYS_KEY,
       HOMEPAGE_VERSION_KEY,
@@ -221,6 +224,7 @@ async function loadHomepageContentFromDb(supabase: ReturnType<typeof getSupabase
     !byKey.has(HOMEPAGE_SHOWCASE_KEY) &&
     !byKey.has(HOMEPAGE_JOURNAL_KEY) &&
     !byKey.has(HOMEPAGE_HERO_KEY) &&
+    !byKey.has(HOMEPAGE_HOMESTAY_HERO_KEY) &&
     !byKey.has(HOMEPAGE_HERO_HEADINGS_KEY) &&
     !byKey.has(HOMEPAGE_JOURNEYS_KEY)
   ) {
@@ -231,6 +235,7 @@ async function loadHomepageContentFromDb(supabase: ReturnType<typeof getSupabase
     showcase: byKey.get(HOMEPAGE_SHOWCASE_KEY),
     journal: byKey.get(HOMEPAGE_JOURNAL_KEY),
     hero: byKey.get(HOMEPAGE_HERO_KEY),
+    homestayHero: byKey.get(HOMEPAGE_HOMESTAY_HERO_KEY),
     heroHeadings: byKey.get(HOMEPAGE_HERO_HEADINGS_KEY),
     journeys: byKey.get(HOMEPAGE_JOURNEYS_KEY),
     version: parseVersionValue(byKey.get(HOMEPAGE_VERSION_KEY)),
@@ -277,6 +282,14 @@ export async function applyHomepagePhotoCore(
       index === input.itemIndex ? { ...item, imageUrl: publicUrl } : item,
     );
     await writePlatformSetting(supabase, HOMEPAGE_JOURNAL_KEY, items);
+  } else if (input.section === "homestayHero") {
+    if (input.itemIndex < 0 || input.itemIndex >= HOMESTAY_HERO_SLIDE_COUNT) {
+      throw new Error(`Homestay hero photo index must be between 0 and ${HOMESTAY_HERO_SLIDE_COUNT - 1}.`);
+    }
+    const items = current.homestayHero.map((item, index) =>
+      index === input.itemIndex ? { ...item, imageUrl: publicUrl } : item,
+    );
+    await writePlatformSetting(supabase, HOMEPAGE_HOMESTAY_HERO_KEY, items);
   } else {
     if (input.itemIndex < 0 || input.itemIndex > 11) {
       throw new Error("Hero photo index must be between 0 and 11.");

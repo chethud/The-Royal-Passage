@@ -5,6 +5,7 @@ import {
 import {
   HOMEPAGE_HERO_HEADINGS_KEY,
   HOMEPAGE_HERO_KEY,
+  HOMEPAGE_HOMESTAY_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
   HOMEPAGE_JOURNEYS_KEY,
   HOMEPAGE_SHOWCASE_KEY,
@@ -48,6 +49,7 @@ export async function fetchHomepageContentFromDb(): Promise<HomepageContent> {
       HOMEPAGE_SHOWCASE_KEY,
       HOMEPAGE_JOURNAL_KEY,
       HOMEPAGE_HERO_KEY,
+      HOMEPAGE_HOMESTAY_HERO_KEY,
       HOMEPAGE_HERO_HEADINGS_KEY,
       HOMEPAGE_JOURNEYS_KEY,
       HOMEPAGE_VERSION_KEY,
@@ -62,6 +64,7 @@ export async function fetchHomepageContentFromDb(): Promise<HomepageContent> {
     !byKey.has(HOMEPAGE_SHOWCASE_KEY) &&
     !byKey.has(HOMEPAGE_JOURNAL_KEY) &&
     !byKey.has(HOMEPAGE_HERO_KEY) &&
+    !byKey.has(HOMEPAGE_HOMESTAY_HERO_KEY) &&
     !byKey.has(HOMEPAGE_HERO_HEADINGS_KEY) &&
     !byKey.has(HOMEPAGE_JOURNEYS_KEY)
   ) {
@@ -72,6 +75,7 @@ export async function fetchHomepageContentFromDb(): Promise<HomepageContent> {
     showcase: byKey.get(HOMEPAGE_SHOWCASE_KEY),
     journal: byKey.get(HOMEPAGE_JOURNAL_KEY),
     hero: byKey.get(HOMEPAGE_HERO_KEY),
+    homestayHero: byKey.get(HOMEPAGE_HOMESTAY_HERO_KEY),
     heroHeadings: byKey.get(HOMEPAGE_HERO_HEADINGS_KEY),
     journeys: byKey.get(HOMEPAGE_JOURNEYS_KEY),
     version: parseVersionValue(byKey.get(HOMEPAGE_VERSION_KEY)),

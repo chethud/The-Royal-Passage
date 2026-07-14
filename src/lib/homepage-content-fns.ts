@@ -12,6 +12,7 @@ import {
   DEFAULT_HOMEPAGE_CONTENT,
   HOMEPAGE_HERO_HEADINGS_KEY,
   HOMEPAGE_HERO_KEY,
+  HOMEPAGE_HOMESTAY_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
   HOMEPAGE_JOURNEYS_KEY,
   HOMEPAGE_SHOWCASE_KEY,
@@ -21,6 +22,7 @@ import { getSupabaseConfigError } from "@/lib/env.server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { HOMESTAY_FEATURED_KEY, HOMESTAY_FEATURED_SLOT_COUNT } from "@/lib/homestay-featured-keys";
 import { invalidateHomestayCatalogCache } from "@/lib/homestay-featured-fns";
+import { HOMESTAY_HERO_SLIDE_COUNT } from "@/lib/homepage-content-keys";
 
 const showcaseIconKeySchema = z.enum(["pottery", "flame", "heritage"]);
 const journeyThemeSchema = z.enum(["palace", "manuscript", "dasara"]);
@@ -168,6 +170,26 @@ export const saveHomepageHeroHeadings = createServerFn({ method: "POST" })
     return { version };
   });
 
+export const saveHomepageHomestayHero = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      accessToken: z.string().min(1),
+      items: z.array(heroSlideSchema).length(HOMESTAY_HERO_SLIDE_COUNT),
+    }),
+  )
+  .handler(async ({ data }): Promise<{ version: number }> => {
+    const configError = getSupabaseConfigError();
+    if (configError) {
+      throw new Error(configError);
+    }
+
+    await requireHomepageJournalEditor(data.accessToken);
+    const supabase = getSupabaseAdmin();
+    await writePlatformSetting(supabase, HOMEPAGE_HOMESTAY_HERO_KEY, data.items);
+    const version = await bumpHomepageVersion(supabase);
+    return { version };
+  });
+
 export const saveHomepageJourneys = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({
@@ -216,8 +238,8 @@ export const applyHomepagePhoto = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({
       accessToken: z.string().min(1),
-      section: z.enum(["showcase", "journal", "hero"]),
-      /** Showcase/journal: 0–2. Hero: flat 0–11 across 3 packs × 4 slides. */
+      section: z.enum(["showcase", "journal", "hero", "homestayHero"]),
+      /** Showcase/journal: 0–2. Hero packs: 0–11. Homestay hero: 0–4. */
       itemIndex: z.number().int().min(0).max(11),
       publicUrl: z.string().min(1).max(500),
     }),

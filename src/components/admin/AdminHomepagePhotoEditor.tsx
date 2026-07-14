@@ -16,6 +16,7 @@ import type { HomepagePhotoSection } from "@/lib/homepage-content-keys";
 import {
   saveHomepageHero,
   saveHomepageHeroHeadings,
+  saveHomepageHomestayHero,
   saveHomepageJournal,
   saveHomepageShowcase,
 } from "@/lib/homepage-content-fns";
@@ -50,6 +51,12 @@ function applyPhotoToContent(
       index === itemIndex ? { ...item, imageUrl: publicUrl } : item,
     );
     return { ...prev, journal, version };
+  }
+  if (section === "homestayHero") {
+    const homestayHero = prev.homestayHero.map((item, index) =>
+      index === itemIndex ? { ...item, imageUrl: publicUrl } : item,
+    );
+    return { ...prev, homestayHero, version };
   }
   const { packIndex, slideIndex } = heroPhotoCoords(itemIndex);
   const heroSlideshows = prev.heroSlideshows.map((pack, pi) => {
@@ -109,6 +116,11 @@ export function AdminHomepagePhotoEditor({
           data: { accessToken: token, items: content.heroSlideshows },
         });
         version = result.version;
+      } else if (section === "homestayHero") {
+        const result = await saveHomepageHomestayHero({
+          data: { accessToken: token, items: content.homestayHero },
+        });
+        version = result.version;
       } else if (section === "heroHeadings") {
         const result = await saveHomepageHeroHeadings({
           data: { accessToken: token, items: content.heroHeadings },
@@ -134,7 +146,9 @@ export function AdminHomepagePhotoEditor({
           ? "Hero headings saved — they rotate on each homepage refresh."
           : section === "hero"
             ? "Hero slideshows saved — pack 1 is constant; packs 2 & 3 rotate at random on visit."
-            : "Alt text and details saved.",
+            : section === "homestayHero"
+              ? "Homestay hero photos saved — live on /homestays."
+              : "Alt text and details saved.",
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save section.");
@@ -145,6 +159,8 @@ export function AdminHomepagePhotoEditor({
 
   const heroDirty =
     JSON.stringify(content.heroSlideshows) !== JSON.stringify(savedSnapshot.heroSlideshows);
+  const homestayHeroDirty =
+    JSON.stringify(content.homestayHero) !== JSON.stringify(savedSnapshot.homestayHero);
   const heroHeadingsDirty =
     JSON.stringify(content.heroHeadings) !== JSON.stringify(savedSnapshot.heroHeadings);
   const showcaseDirty = JSON.stringify(content.showcase) !== JSON.stringify(savedSnapshot.showcase);
@@ -342,6 +358,59 @@ export function AdminHomepagePhotoEditor({
                 })}
               </div>
             </div>
+          ))}
+        </div>
+      </LuxuryCheckoutPanel>
+
+      <LuxuryCheckoutPanel>
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="luxury-panel-heading font-display text-xl tracking-wide">
+              Homestay hero photos
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Slideshow on the Royal Homestays landing page (/homestays). Upload up to five photos.
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled={!homestayHeroDirty || busySection !== null}
+            onClick={() => void saveSection("homestayHero")}
+            className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
+          >
+            {busySection === "homestayHero" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Save className="h-3.5 w-3.5" />
+            )}
+            Save homestay hero
+          </button>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {content.homestayHero.map((slide, index) => (
+            <EditablePhotoField
+              key={slide.id}
+              label={`Photo ${index + 1}`}
+              imageUrl={withHomepageCacheBust(slide.imageUrl, content.version)}
+              alt={slide.alt}
+              onImageChange={(url) =>
+                setContent((prev) => ({
+                  ...prev,
+                  homestayHero: prev.homestayHero.map((item, i) =>
+                    i === index ? { ...item, imageUrl: url } : item,
+                  ),
+                }))
+              }
+              onAltChange={(alt) =>
+                setContent((prev) => ({
+                  ...prev,
+                  homestayHero: prev.homestayHero.map((item, i) =>
+                    i === index ? { ...item, alt } : item,
+                  ),
+                }))
+              }
+              uploadPhoto={createUploader("homestayHero", index)}
+            />
           ))}
         </div>
       </LuxuryCheckoutPanel>

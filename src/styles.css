@@ -875,11 +875,25 @@
     var(--cream-surface) 55%,
     var(--cream-warm) 100%
   );
-  color: #4a0000;
+  color: #3a0000;
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.35),
     0 18px 44px -24px var(--cream-shadow),
     0 6px 20px -10px rgb(200 162 90 / 0.08);
+}
+
+/* Beat page-level light ink + .eyebrow muted color on cream surfaces */
+.luxury-checkout-panel .eyebrow,
+.luxury-checkout-panel .luxury-panel-label {
+  color: #3a0000 !important;
+}
+
+.luxury-checkout-panel .luxury-panel-heading {
+  color: #3a0000 !important;
+}
+
+.luxury-checkout-panel .luxury-panel-body {
+  color: rgb(42 8 8 / 0.92) !important;
 }
 
 .luxury-checkout-panel::before {
@@ -910,7 +924,7 @@
   font-family: var(--font-sans);
   font-size: 0.92rem;
   line-height: 1.5;
-  color: rgb(42 8 8 / 0.9);
+  color: rgb(42 8 8 / 0.92);
 }
 
 @media (min-width: 640px) {
@@ -922,7 +936,7 @@
 
 .luxury-panel-label {
   font-family: var(--font-sans);
-  color: #4a0000;
+  color: #3a0000;
   letter-spacing: 0.12em;
 }
 
