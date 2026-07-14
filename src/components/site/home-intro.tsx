@@ -25,9 +25,10 @@ export function useHomeIntro() {
 }
 
 const SPLASH_MS = 1800;
-const REVEAL_SCROLL_PX = 48;
-/** Delay before navbar slides in after hero copy starts */
-const NAV_AFTER_COPY_MS = 780;
+/** Tiny threshold — any near-immediate scroll unlocks the hero chrome. */
+const REVEAL_SCROLL_PX = 2;
+/** Navbar follows copy almost immediately. */
+const NAV_AFTER_COPY_MS = 120;
 
 export function HomeIntroProvider({ children }: { children: ReactNode }) {
   const reduceMotion = usePrefersReducedMotion();
@@ -57,15 +58,43 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!splashDone || copyRevealed || reduceMotion) return;
 
+    const reveal = () => setCopyRevealed(true);
+
     const onScroll = () => {
-      if (window.scrollY >= REVEAL_SCROLL_PX) {
-        setCopyRevealed(true);
+      if (window.scrollY >= REVEAL_SCROLL_PX) reveal();
+    };
+
+    const onWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) >= 1 || Math.abs(event.deltaX) >= 1) reveal();
+    };
+
+    const onTouchMove = () => reveal();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key === "ArrowDown" ||
+        event.key === "ArrowUp" ||
+        event.key === "PageDown" ||
+        event.key === "PageUp" ||
+        event.key === " " ||
+        event.key === "Home" ||
+        event.key === "End"
+      ) {
+        reveal();
       }
     };
 
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("keydown", onKeyDown);
+    };
   }, [splashDone, copyRevealed, reduceMotion]);
 
   useEffect(() => {

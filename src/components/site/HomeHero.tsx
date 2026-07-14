@@ -15,11 +15,11 @@ const softEase = [0.22, 1, 0.36, 1] as const;
 
 const revealParent = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+  show: { transition: { staggerChildren: 0.04, delayChildren: 0 } },
 };
 const revealItem = {
-  hidden: { opacity: 0, x: 72 },
-  show: { opacity: 1, x: 0, transition: { duration: 0.85, ease: softEase } },
+  hidden: { opacity: 0, x: 36 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.35, ease: softEase } },
 };
 
 type HomeHeroProps = {
@@ -95,7 +95,7 @@ export function HomeHero({
               className="pointer-events-auto"
               initial={cinematic && !reduceMotion ? { opacity: 0, y: -12 } : false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: softEase, delay: 0.55 }}
+              transition={{ duration: 0.3, ease: softEase, delay: 0.08 }}
             >
               <SiteBannerStrip />
             </motion.div>
@@ -192,7 +192,7 @@ export function HomeHero({
               className="pointer-events-auto absolute inset-x-0 bottom-[4.75rem] z-20 flex justify-center"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 0.7, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.45, ease: softEase }}
+              transition={{ duration: 0.3, delay: 0.12, ease: softEase }}
             >
               <motion.span
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] bg-[oklch(0.12_0.06_22_/_0.45)] text-ink/80 backdrop-blur-md"
@@ -210,7 +210,7 @@ export function HomeHero({
             className="pointer-events-auto absolute inset-x-0 bottom-8 z-20 flex items-center justify-center gap-2"
             initial={cinematic && !reduceMotion ? { opacity: 0, y: 10 } : false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.4, ease: softEase }}
+            transition={{ duration: 0.28, delay: 0.1, ease: softEase }}
           >
             {heroSlides.map((slide, i) => (
               <button
