@@ -70,14 +70,45 @@ function FooterBrandBlock({
   );
 }
 
-function FooterCenterCluster({ compactSocial = false }: { compactSocial?: boolean }) {
+function FooterCopyright() {
   return (
-    <div className="flex flex-col items-center gap-2.5">
-      <FooterLegalLinks className="justify-center" />
-      <div className="flex items-center gap-2">
-        {SOCIAL_LINKS.map(({ label, Icon, href }) => (
-          <SocialIcon key={label} label={label} Icon={Icon} href={href} compact={compactSocial} />
-        ))}
+    <p className="text-[0.65rem] text-muted-foreground/75 sm:text-[0.68rem]" suppressHydrationWarning>
+      © {new Date().getFullYear()} The Royal Passage. All rights reserved.
+    </p>
+  );
+}
+
+function FooterSocialIcons({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className="flex shrink-0 items-center gap-2">
+      {SOCIAL_LINKS.map(({ label, Icon, href }) => (
+        <SocialIcon key={label} label={label} Icon={Icon} href={href} compact={compact} />
+      ))}
+    </div>
+  );
+}
+
+/** One-line bar: logo left · legal center · copyright + socials right. */
+function FooterBar({ logoClassName = "h-14 w-auto object-contain sm:h-14 md:h-16" }: { logoClassName?: string }) {
+  return (
+    <div className="container-page relative flex flex-col items-center gap-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-5">
+      <div className="flex shrink-0 justify-center sm:justify-start">
+        <img
+          src={logoUrl}
+          alt="The Royal Passage"
+          width={320}
+          height={110}
+          loading="lazy"
+          decoding="async"
+          className={`logo-breathe ${logoClassName}`}
+        />
+      </div>
+
+      <FooterLegalLinks className="justify-center sm:absolute sm:left-1/2 sm:max-w-[min(100%,28rem)] sm:-translate-x-1/2" />
+
+      <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
+        <FooterCopyright />
+        <FooterSocialIcons compact />
       </div>
     </div>
   );
@@ -86,31 +117,7 @@ function FooterCenterCluster({ compactSocial = false }: { compactSocial?: boolea
 function FooterSimple() {
   return (
     <footer className="border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
-      <div className="container-page relative grid grid-cols-1 items-center gap-4 py-3 sm:grid-cols-[1fr_auto_1fr] sm:gap-6 sm:py-5">
-        <div className="flex flex-col items-center gap-1.5 sm:items-start">
-          <img
-            src={logoUrl}
-            alt="The Royal Passage"
-            width={320}
-            height={110}
-            loading="lazy"
-            decoding="async"
-            className="logo-breathe h-14 w-auto object-contain sm:h-14 md:h-16"
-          />
-          <p
-            className="text-[0.65rem] text-muted-foreground/75 sm:text-[0.68rem]"
-            suppressHydrationWarning
-          >
-            © {new Date().getFullYear()} The Royal Passage. All rights reserved.
-          </p>
-        </div>
-
-        <div className="sm:col-start-2">
-          <FooterCenterCluster compactSocial />
-        </div>
-
-        <div className="hidden sm:block" aria-hidden />
-      </div>
+      <FooterBar />
     </footer>
   );
 }
@@ -212,14 +219,8 @@ function FooterFull() {
         </div>
       </div>
 
-      <div className="container-page relative z-10 flex flex-col items-center gap-3 border-t border-[oklch(0.88_0.08_86_/_0.12)] py-3 text-[0.68rem] text-muted-foreground sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6 sm:py-6 sm:text-xs">
-        <span className="text-center sm:text-left" suppressHydrationWarning>
-          © {new Date().getFullYear()} The Royal Passage. All rights reserved.
-        </span>
-        <div className="sm:col-start-2">
-          <FooterCenterCluster compactSocial />
-        </div>
-        <div className="hidden sm:block" aria-hidden />
+      <div className="relative z-10 border-t border-[oklch(0.88_0.08_86_/_0.12)]">
+        <FooterBar logoClassName="h-12 w-auto object-contain sm:h-14" />
       </div>
 
       <img
