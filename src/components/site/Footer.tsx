@@ -73,7 +73,7 @@ function FooterBrandBlock({
 function FooterCopyright() {
   return (
     <p
-      className="max-w-full text-center text-[0.62rem] leading-snug text-muted-foreground/75 sm:text-right sm:text-[0.65rem] lg:whitespace-nowrap"
+      className="shrink-0 whitespace-nowrap text-[0.58rem] leading-none text-muted-foreground/75 sm:text-[0.65rem]"
       suppressHydrationWarning
     >
       © {new Date().getFullYear()} The Royal Passage. All rights reserved.
@@ -83,7 +83,7 @@ function FooterCopyright() {
 
 function FooterSocialIcons({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="flex shrink-0 items-center gap-2">
+    <div className="flex shrink-0 flex-row flex-nowrap items-center gap-1.5 sm:gap-2">
       {SOCIAL_LINKS.map(({ label, Icon, href }) => (
         <SocialIcon key={label} label={label} Icon={Icon} href={href} compact={compact} />
       ))}
@@ -91,11 +91,11 @@ function FooterSocialIcons({ compact = false }: { compact?: boolean }) {
   );
 }
 
-/** One-line bar: logo left · legal center · copyright + socials right. */
-function FooterBar({ logoClassName = "h-14 w-auto object-contain sm:h-14 md:h-16" }: { logoClassName?: string }) {
+/** One-line bar: logo left · legal mid-left · copyright + socials right (same row). */
+function FooterBar({ logoClassName = "h-12 w-auto object-contain sm:h-14 md:h-16" }: { logoClassName?: string }) {
   return (
-    <div className="container-page grid grid-cols-1 items-center gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-4 sm:py-5">
-      <div className="flex justify-center sm:justify-start">
+    <div className="container-page flex flex-row flex-nowrap items-center gap-2 py-3 sm:gap-4 sm:py-5">
+      <div className="shrink-0">
         <img
           src={logoUrl}
           alt="The Royal Passage"
@@ -103,13 +103,15 @@ function FooterBar({ logoClassName = "h-14 w-auto object-contain sm:h-14 md:h-16
           height={110}
           loading="lazy"
           decoding="async"
-          className={`logo-breathe shrink-0 ${logoClassName}`}
+          className={`logo-breathe ${logoClassName}`}
         />
       </div>
 
-      <FooterLegalLinks className="justify-center px-1 text-center" />
+      <div className="min-w-0 flex-1 overflow-hidden">
+        <FooterLegalLinks className="justify-start whitespace-nowrap" />
+      </div>
 
-      <div className="flex min-w-0 flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-x-3 sm:gap-y-1">
+      <div className="ml-auto flex shrink-0 flex-row flex-nowrap items-center gap-2 sm:gap-3">
         <FooterCopyright />
         <FooterSocialIcons compact />
       </div>
@@ -252,7 +254,9 @@ function FooterFull() {
 
 function FooterLegalLinks({ className = "" }: { className?: string }) {
   return (
-    <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.68rem] sm:text-xs ${className}`}>
+    <div
+      className={`flex flex-nowrap items-center gap-x-2 overflow-hidden text-[0.62rem] sm:gap-x-3 sm:text-xs ${className}`}
+    >
       <Link
         to={EXPERIENCE_TERMS_LINK.to}
         className="text-ember/85 underline-offset-4 transition-colors hover:text-ember hover:underline"
