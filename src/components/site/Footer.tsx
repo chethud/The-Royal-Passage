@@ -72,7 +72,10 @@ function FooterBrandBlock({
 
 function FooterCopyright() {
   return (
-    <p className="text-[0.65rem] text-muted-foreground/75 sm:text-[0.68rem]" suppressHydrationWarning>
+    <p
+      className="max-w-full text-center text-[0.62rem] leading-snug text-muted-foreground/75 sm:text-right sm:text-[0.65rem] lg:whitespace-nowrap"
+      suppressHydrationWarning
+    >
       © {new Date().getFullYear()} The Royal Passage. All rights reserved.
     </p>
   );
@@ -91,8 +94,8 @@ function FooterSocialIcons({ compact = false }: { compact?: boolean }) {
 /** One-line bar: logo left · legal center · copyright + socials right. */
 function FooterBar({ logoClassName = "h-14 w-auto object-contain sm:h-14 md:h-16" }: { logoClassName?: string }) {
   return (
-    <div className="container-page relative flex flex-col items-center gap-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-5">
-      <div className="flex shrink-0 justify-center sm:justify-start">
+    <div className="container-page grid grid-cols-1 items-center gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-4 sm:py-5">
+      <div className="flex justify-center sm:justify-start">
         <img
           src={logoUrl}
           alt="The Royal Passage"
@@ -100,13 +103,13 @@ function FooterBar({ logoClassName = "h-14 w-auto object-contain sm:h-14 md:h-16
           height={110}
           loading="lazy"
           decoding="async"
-          className={`logo-breathe ${logoClassName}`}
+          className={`logo-breathe shrink-0 ${logoClassName}`}
         />
       </div>
 
-      <FooterLegalLinks className="justify-center sm:absolute sm:left-1/2 sm:max-w-[min(100%,28rem)] sm:-translate-x-1/2" />
+      <FooterLegalLinks className="justify-center px-1 text-center" />
 
-      <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
+      <div className="flex min-w-0 flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-x-3 sm:gap-y-1">
         <FooterCopyright />
         <FooterSocialIcons compact />
       </div>
