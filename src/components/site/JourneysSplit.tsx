@@ -57,40 +57,48 @@ type SlideContentProps = {
 function SlideContent({ slide, visible }: SlideContentProps) {
   return (
     <div
-      className={`royal-slide-content relative order-2 flex flex-col justify-center px-5 py-8 sm:px-12 sm:py-16 md:order-1 md:px-16 md:py-20 ${visible ? "is-visible" : ""}`}
+      className={`royal-slide-content relative order-2 flex flex-col justify-center px-6 py-8 text-left sm:px-10 sm:py-14 md:order-1 md:px-12 md:py-16 ${visible ? "is-visible" : ""}`}
     >
-      <PalaceArchFrame className="pointer-events-none absolute top-4 right-5 left-5 z-10 h-7 opacity-70 sm:top-8 sm:right-8 sm:left-8 sm:h-8" />
+      <div className="relative z-10 w-full max-w-xl self-start">
+        <PalaceArchFrame className="pointer-events-none absolute -top-1 left-0 z-10 h-7 w-[min(100%,19rem)] opacity-70 sm:-top-2 sm:h-8 sm:w-[min(100%,22rem)]" />
 
-      <div className="pointer-events-none absolute top-6 left-5 z-10 opacity-35 sm:top-10 sm:left-10 md:left-12">
-        {slide.theme === "manuscript" ? (
-          <HeritageCompass className="h-12 w-12 text-[#D4AF37]/40 sm:h-20 sm:w-20" />
-        ) : (
-          <MaharajaEmblem className="h-12 w-12 text-[#D4AF37]/35 sm:h-20 sm:w-20" />
-        )}
-      </div>
+        <div className="pointer-events-none absolute top-1 left-0 z-0 opacity-30 sm:top-2">
+          {slide.theme === "manuscript" ? (
+            <HeritageCompass className="h-11 w-11 text-[#D4AF37]/40 sm:h-14 sm:w-14" />
+          ) : (
+            <MaharajaEmblem className="h-11 w-11 text-[#D4AF37]/35 sm:h-14 sm:w-14" />
+          )}
+        </div>
 
-      <p className="royal-slide-eyebrow relative z-10 mb-3 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-[#C9A227] sm:mb-4 sm:text-[0.68rem]">
-        {slide.subtitle}
-      </p>
+        <p className="royal-slide-eyebrow relative z-10 mb-3 pt-7 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-[#C9A227] sm:mb-4 sm:pt-8 sm:text-[0.68rem]">
+          {slide.subtitle}
+        </p>
 
-      <div className="royal-slide-line royal-slide-line--top relative z-10 mb-4 h-px w-28 bg-gradient-to-r from-[#D4AF37] via-[#C9A227] to-transparent sm:mb-5" aria-hidden />
+        <div
+          className="royal-slide-line royal-slide-line--top relative z-10 mb-4 h-px w-28 bg-gradient-to-r from-[#D4AF37] via-[#C9A227] to-transparent sm:mb-5"
+          aria-hidden
+        />
 
-      <h2 className="royal-slide-title font-display text-[1.45rem] leading-[1.12] tracking-[0.06em] text-balance sm:text-4xl md:text-[2.65rem]">
-        {slide.title}
-      </h2>
+        <h2 className="royal-slide-title font-display text-[1.45rem] leading-[1.12] tracking-[0.06em] text-balance sm:text-4xl md:text-[2.65rem]">
+          {slide.title}
+        </h2>
 
-      <div className="royal-slide-line royal-slide-line--mid relative z-10 my-4 h-px max-w-md bg-gradient-to-r from-[#D4AF37]/60 via-[#C9A227]/25 to-transparent sm:my-5" aria-hidden />
+        <div
+          className="royal-slide-line royal-slide-line--mid relative z-10 my-4 h-px max-w-md bg-gradient-to-r from-[#D4AF37]/60 via-[#C9A227]/25 to-transparent sm:my-5"
+          aria-hidden
+        />
 
-      <div className="relative z-10 space-y-2.5 sm:space-y-3">
-        {slide.lines.map((line, lineIndex) => (
-          <p
-            key={line}
-            className="royal-slide-line max-w-md text-sm leading-[1.75] text-[#F8F4E8]/75 text-balance sm:text-[0.95rem] sm:leading-[1.9]"
-            style={{ "--line-delay": `${0.55 + lineIndex * 0.12}s` } as React.CSSProperties}
-          >
-            {line}
-          </p>
-        ))}
+        <div className="relative z-10 space-y-2.5 sm:space-y-3">
+          {slide.lines.map((line, lineIndex) => (
+            <p
+              key={line}
+              className="royal-slide-line max-w-md text-sm leading-[1.75] text-[#F8F4E8]/75 text-balance sm:text-[0.95rem] sm:leading-[1.9]"
+              style={{ "--line-delay": `${0.55 + lineIndex * 0.12}s` } as React.CSSProperties}
+            >
+              {line}
+            </p>
+          ))}
+        </div>
       </div>
     </div>
   );

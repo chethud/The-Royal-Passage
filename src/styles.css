@@ -2049,6 +2049,7 @@
   background-image:
     radial-gradient(ellipse 90% 80% at 0% 50%, #6b101038 0%, transparent 55%),
     linear-gradient(180deg, #5b000028 0%, transparent 40%, #3b000033 100%);
+  text-align: left;
 }
 
 .royal-slide-media {
