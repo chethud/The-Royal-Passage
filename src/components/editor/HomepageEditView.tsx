@@ -18,15 +18,22 @@ import {
   isAdminRole,
   type UserRole,
 } from "@/lib/roles";
+import type { ShowcaseExperienceOption } from "@/lib/showcase-from-experience";
 
 type HomepageEditViewProps = {
   homepage: HomepageContent;
   onRefresh: () => void;
   /** When set, limits which sections are editable (defaults from role). */
   editorRole?: Extract<UserRole, "editor" | "admin">;
+  experiences?: ShowcaseExperienceOption[];
 };
 
-export function HomepageEditView({ homepage, onRefresh, editorRole }: HomepageEditViewProps) {
+export function HomepageEditView({
+  homepage,
+  onRefresh,
+  editorRole,
+  experiences = [],
+}: HomepageEditViewProps) {
   const { role, accessToken } = useAuthUser();
   const resolvedRole: Extract<UserRole, "editor" | "admin"> =
     editorRole ?? (isAdminRole(role) ? "admin" : "editor");
@@ -139,6 +146,7 @@ export function HomepageEditView({ homepage, onRefresh, editorRole }: HomepageEd
         items={editContent.showcase}
         imageVersion={displayVersion}
         editable={canEditAdminSections}
+        experiences={experiences}
         onItemsChange={(showcase) => setDraft((prev) => ({ ...prev, showcase }))}
         uploadPhoto={
           canEditAdminSections
@@ -172,13 +180,24 @@ type HomepageEditPageShellProps = {
   homepage: HomepageContent;
   onRefresh: () => void;
   editorRole?: Extract<UserRole, "editor" | "admin">;
+  experiences?: ShowcaseExperienceOption[];
 };
 
-export function HomepageEditPageShell({ homepage, onRefresh, editorRole }: HomepageEditPageShellProps) {
+export function HomepageEditPageShell({
+  homepage,
+  onRefresh,
+  editorRole,
+  experiences = [],
+}: HomepageEditPageShellProps) {
   return (
     <div className="overflow-x-hidden bg-background text-foreground">
       <Header />
-      <HomepageEditView homepage={homepage} onRefresh={onRefresh} editorRole={editorRole} />
+      <HomepageEditView
+        homepage={homepage}
+        onRefresh={onRefresh}
+        editorRole={editorRole}
+        experiences={experiences}
+      />
       <Footer />
     </div>
   );

@@ -1,5 +1,6 @@
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
 
 type HeroSlideshowProps = {
   images: Array<{ src: string; alt: string }>;
@@ -38,6 +39,22 @@ export function HeroSlideshow({
     [onActiveIndexChange, safeImages.length],
   );
 
+  // Keep upcoming slides decoded so a fade never lands on an empty decode frame.
+  useEffect(() => {
+    if (safeImages.length <= 1) return;
+    const preload = safeImages.map((image) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = image.src;
+      return img;
+    });
+    return () => {
+      for (const img of preload) {
+        img.src = "";
+      }
+    };
+  }, [safeImages]);
+
   useEffect(() => {
     if (reduceMotion) return;
     if (safeImages.length <= 1) return;
@@ -47,29 +64,36 @@ export function HeroSlideshow({
     return () => window.clearInterval(id);
   }, [active, intervalMs, reduceMotion, safeImages.length, setActive]);
 
-  const current = safeImages[Math.min(active, Math.max(0, safeImages.length - 1))];
-  if (!current) return null;
-
-  const isFirstSlide = current.src === safeImages[0]?.src;
+  if (safeImages.length === 0) return null;
 
   return (
-    <div className={className}>
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.img
-          key={current.src}
-          src={current.src}
-          alt={current.alt}
-          loading={isFirstSlide ? "eager" : "lazy"}
-          decoding={isFirstSlide ? "sync" : "async"}
-          fetchPriority={isFirstSlide ? "high" : "low"}
-          className="h-full w-full object-cover"
-          // Opacity-only transitions avoid filter-driven layout/paint thrash on first paint.
-          initial={reduceMotion || isFirstSlide ? false : { opacity: 0, scale: 1.02 }}
-          animate={{ opacity: 1, scale: 1.04 }}
-          exit={reduceMotion ? undefined : { opacity: 0, scale: 1.01 }}
-          transition={{ duration: 0.9, ease: softEase }}
-        />
-      </AnimatePresence>
+    <div className={cn("overflow-hidden bg-[oklch(0.12_0.06_22)]", className)}>
+      {safeImages.map((image, index) => {
+        const isActive = index === active;
+        return (
+          <motion.img
+            key={image.src}
+            src={image.src}
+            alt={isActive ? image.alt : ""}
+            aria-hidden={!isActive}
+            loading="eager"
+            decoding="async"
+            fetchPriority={index === 0 ? "high" : "low"}
+            className="absolute inset-0 h-full w-full object-cover"
+            initial={false}
+            animate={{
+              opacity: isActive ? 1 : 0,
+              scale: reduceMotion ? 1 : isActive ? 1.04 : 1.02,
+            }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 1.05, ease: softEase }
+            }
+            style={{ zIndex: isActive ? 2 : 1 }}
+          />
+        );
+      })}
     </div>
   );
 }

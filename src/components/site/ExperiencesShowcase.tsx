@@ -5,6 +5,7 @@ import {
   EditablePhotoField,
   EditableTextField,
 } from "@/components/editor/EditableHomepageFields";
+import { ShowcaseExperiencePicker } from "@/components/admin/ShowcaseExperiencePicker";
 import {
   RoyalFlameIcon,
   RoyalHeritageIcon,
@@ -13,7 +14,11 @@ import {
 import type { HomepagePhotoSection } from "@/lib/homepage-content-keys";
 import type { HomepageShowcaseItem, ShowcaseIconKey } from "@/lib/homepage-content";
 import { withHomepageCacheBust } from "@/lib/homepage-content";
-import type { ComponentType, SVGProps } from "react";
+import {
+  showcaseItemFromExperience,
+  type ShowcaseExperienceOption,
+} from "@/lib/showcase-from-experience";
+import type { ComponentType, ReactNode, SVGProps } from "react";
 
 const ICON_BY_KEY: Record<ShowcaseIconKey, ComponentType<SVGProps<SVGSVGElement>>> = {
   pottery: RoyalPotteryIcon,
@@ -25,6 +30,7 @@ type ExperiencesShowcaseProps = {
   items: HomepageShowcaseItem[];
   imageVersion?: number;
   editable?: boolean;
+  experiences?: ShowcaseExperienceOption[];
   onItemsChange?: (items: HomepageShowcaseItem[]) => void;
   uploadPhoto?: (section: HomepagePhotoSection, itemIndex: number) => (file: File) => Promise<string>;
 };
@@ -33,6 +39,7 @@ export function ExperiencesShowcase({
   items,
   imageVersion = 0,
   editable = false,
+  experiences = [],
   onItemsChange,
   uploadPhoto,
 }: ExperiencesShowcaseProps) {
@@ -77,8 +84,17 @@ export function ExperiencesShowcase({
               index={idx}
               imageVersion={imageVersion}
               editable={editable}
+              experiences={experiences}
               uploadPhoto={uploadPhoto ? uploadPhoto("showcase", idx) : undefined}
               onUpdate={(patch) => updateItem(idx, patch)}
+              onPickExperience={(experience) => {
+                if (!onItemsChange) return;
+                onItemsChange(
+                  items.map((item, i) =>
+                    i === idx ? showcaseItemFromExperience(experience, item) : item,
+                  ),
+                );
+              }}
             />
           ))}
         </div>
@@ -87,20 +103,67 @@ export function ExperiencesShowcase({
   );
 }
 
+function ShowcaseCardLink({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  const slugMatch = href.match(/^\/experiences\/([^/?#]+)/);
+  if (slugMatch) {
+    return (
+      <Link to="/experiences/$slug" params={{ slug: slugMatch[1] }} className={className}>
+        {children}
+      </Link>
+    );
+  }
+
+  try {
+    const url = new URL(href, "https://example.invalid");
+    if (url.pathname === "/experiences") {
+      const category = url.searchParams.get("category") ?? undefined;
+      return (
+        <Link
+          to="/experiences"
+          search={category ? { category } : {}}
+          className={className}
+        >
+          {children}
+        </Link>
+      );
+    }
+  } catch {
+    // Fall through to the library.
+  }
+
+  return (
+    <Link to="/experiences" className={className}>
+      {children}
+    </Link>
+  );
+}
+
 function ExperienceShowcaseCard({
   card,
   index,
   imageVersion,
   editable,
+  experiences,
   uploadPhoto,
   onUpdate,
+  onPickExperience,
 }: {
   card: HomepageShowcaseItem;
   index: number;
   imageVersion: number;
   editable: boolean;
+  experiences: ShowcaseExperienceOption[];
   uploadPhoto?: (file: File) => Promise<string>;
   onUpdate: (patch: Partial<HomepageShowcaseItem>) => void;
+  onPickExperience: (experience: ShowcaseExperienceOption) => void;
 }) {
   const Icon = ICON_BY_KEY[card.iconKey];
   const imageSrc = withHomepageCacheBust(card.imageUrl, imageVersion);
@@ -116,6 +179,11 @@ function ExperienceShowcaseCard({
             className="absolute inset-0 h-full w-full object-cover"
           />
           <div className="absolute inset-x-0 bottom-0 space-y-3 bg-gradient-to-t from-black/95 via-black/80 to-transparent p-4">
+            <ShowcaseExperiencePicker
+              experiences={experiences}
+              currentHref={card.href}
+              onSelect={onPickExperience}
+            />
             <EditablePhotoField
               label={`Experience ${index + 1}`}
               imageUrl={card.imageUrl}
@@ -139,8 +207,8 @@ function ExperienceShowcaseCard({
       delay={index * 0.08}
       className="group overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.18)] shadow-soft transition-all duration-500 hover:-translate-y-1 hover:border-ember/55 hover:shadow-[0_28px_60px_-30px_oklch(0.55_0.14_78_/_0.45)]"
     >
-      <Link
-        to={card.href as "/experiences"}
+      <ShowcaseCardLink
+        href={card.href}
         className="relative block aspect-[5/4] overflow-hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:aspect-[4/5] md:aspect-[5/6]"
       >
         <img
@@ -166,7 +234,7 @@ function ExperienceShowcaseCard({
             {card.title}
           </h3>
         </div>
-      </Link>
+      </ShowcaseCardLink>
     </ScrollReveal>
   );
 }

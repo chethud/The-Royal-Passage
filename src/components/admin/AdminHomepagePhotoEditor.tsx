@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Loader2, Save } from "lucide-react";
 import { EditablePhotoField } from "@/components/editor/EditableHomepageFields";
+import { ShowcaseExperiencePicker } from "@/components/admin/ShowcaseExperiencePicker";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { useAuthUser } from "@/lib/auth-user";
 import { resolveAccessToken } from "@/lib/auth-session";
@@ -16,12 +17,20 @@ import {
   saveHomepageShowcase,
 } from "@/lib/homepage-content-fns";
 import { commitHomepagePhotoForEditor } from "@/lib/homepage-photo-upload";
+import {
+  showcaseItemFromExperience,
+  type ShowcaseExperienceOption,
+} from "@/lib/showcase-from-experience";
 
 type AdminHomepagePhotoEditorProps = {
   initialContent: HomepageContent;
+  experiences?: ShowcaseExperienceOption[];
 };
 
-export function AdminHomepagePhotoEditor({ initialContent }: AdminHomepagePhotoEditorProps) {
+export function AdminHomepagePhotoEditor({
+  initialContent,
+  experiences = [],
+}: AdminHomepagePhotoEditorProps) {
   const { accessToken } = useAuthUser();
   const [content, setContent] = useState(() => normalizeHomepageContent(initialContent));
   const [savedSnapshot, setSavedSnapshot] = useState(() => normalizeHomepageContent(initialContent));
@@ -170,7 +179,12 @@ export function AdminHomepagePhotoEditor({ initialContent }: AdminHomepagePhotoE
 
       <LuxuryCheckoutPanel>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Top experiences</h2>
+          <div>
+            <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Top experiences</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Pick a published host experience for each slot, or keep a custom photo.
+            </p>
+          </div>
           <button
             type="button"
             disabled={!showcaseDirty || busySection !== null}
@@ -187,27 +201,44 @@ export function AdminHomepagePhotoEditor({ initialContent }: AdminHomepagePhotoE
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {content.showcase.map((item, index) => (
-            <EditablePhotoField
-              key={item.id}
-              label={item.title}
-              imageUrl={withHomepageCacheBust(item.imageUrl, content.version)}
-              alt={item.alt}
-              onImageChange={(url) =>
-                setContent((prev) => ({
-                  ...prev,
-                  showcase: prev.showcase.map((row, i) =>
-                    i === index ? { ...row, imageUrl: url } : row,
-                  ),
-                }))
-              }
-              onAltChange={(alt) =>
-                setContent((prev) => ({
-                  ...prev,
-                  showcase: prev.showcase.map((row, i) => (i === index ? { ...row, alt } : row)),
-                }))
-              }
-              uploadPhoto={createUploader("showcase", index)}
-            />
+            <div key={item.id} className="space-y-2">
+              <ShowcaseExperiencePicker
+                experiences={experiences}
+                currentHref={item.href}
+                disabled={busySection !== null}
+                onSelect={(experience) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    showcase: prev.showcase.map((row, i) =>
+                      i === index ? showcaseItemFromExperience(experience, row) : row,
+                    ),
+                  }))
+                }
+              />
+              <EditablePhotoField
+                label={item.title}
+                imageUrl={withHomepageCacheBust(item.imageUrl, content.version)}
+                alt={item.alt}
+                onImageChange={(url) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    showcase: prev.showcase.map((row, i) =>
+                      i === index ? { ...row, imageUrl: url } : row,
+                    ),
+                  }))
+                }
+                onAltChange={(alt) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    showcase: prev.showcase.map((row, i) => (i === index ? { ...row, alt } : row)),
+                  }))
+                }
+                uploadPhoto={createUploader("showcase", index)}
+              />
+              {item.href.startsWith("/experiences/") ? (
+                <p className="text-[0.65rem] text-ink/55">Links to {item.href}</p>
+              ) : null}
+            </div>
           ))}
         </div>
       </LuxuryCheckoutPanel>
