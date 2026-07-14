@@ -6,6 +6,8 @@ import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { useAuthUser } from "@/lib/auth-user";
 import { resolveAccessToken } from "@/lib/auth-session";
 import {
+  heroPhotoCoords,
+  heroPhotoFlatIndex,
   normalizeHomepageContent,
   type HomepageContent,
   withHomepageCacheBust,
@@ -30,6 +32,43 @@ type AdminHomepagePhotoEditorProps = {
 
 type BusySection = HomepagePhotoSection | "heroHeadings";
 
+function applyPhotoToContent(
+  prev: HomepageContent,
+  section: HomepagePhotoSection,
+  itemIndex: number,
+  publicUrl: string,
+  version: number,
+): HomepageContent {
+  if (section === "showcase") {
+    const showcase = prev.showcase.map((item, index) =>
+      index === itemIndex ? { ...item, imageUrl: publicUrl } : item,
+    );
+    return { ...prev, showcase, version };
+  }
+  if (section === "journal") {
+    const journal = prev.journal.map((item, index) =>
+      index === itemIndex ? { ...item, imageUrl: publicUrl } : item,
+    );
+    return { ...prev, journal, version };
+  }
+  const { packIndex, slideIndex } = heroPhotoCoords(itemIndex);
+  const heroSlideshows = prev.heroSlideshows.map((pack, pi) => {
+    if (pi !== packIndex) return pack;
+    return {
+      ...pack,
+      slides: pack.slides.map((slide, si) =>
+        si === slideIndex ? { ...slide, imageUrl: publicUrl } : slide,
+      ),
+    };
+  });
+  return {
+    ...prev,
+    heroSlideshows,
+    hero: heroSlideshows[0]?.slides ?? prev.hero,
+    version,
+  };
+}
+
 export function AdminHomepagePhotoEditor({
   initialContent,
   experiences = [],
@@ -46,43 +85,10 @@ export function AdminHomepagePhotoEditor({
       const token = accessToken ?? (await resolveAccessToken());
       const result = await commitHomepagePhotoForEditor(token, file, section, itemIndex);
 
-      setContent((prev) => {
-        if (section === "showcase") {
-          const showcase = prev.showcase.map((item, index) =>
-            index === itemIndex ? { ...item, imageUrl: result.publicUrl } : item,
-          );
-          return { ...prev, showcase, version: result.version };
-        }
-        if (section === "journal") {
-          const journal = prev.journal.map((item, index) =>
-            index === itemIndex ? { ...item, imageUrl: result.publicUrl } : item,
-          );
-          return { ...prev, journal, version: result.version };
-        }
-        const hero = prev.hero.map((item, index) =>
-          index === itemIndex ? { ...item, imageUrl: result.publicUrl } : item,
-        );
-        return { ...prev, hero, version: result.version };
-      });
-
-      setSavedSnapshot((prev) => {
-        if (section === "showcase") {
-          const showcase = prev.showcase.map((item, index) =>
-            index === itemIndex ? { ...item, imageUrl: result.publicUrl } : item,
-          );
-          return { ...prev, showcase, version: result.version };
-        }
-        if (section === "journal") {
-          const journal = prev.journal.map((item, index) =>
-            index === itemIndex ? { ...item, imageUrl: result.publicUrl } : item,
-          );
-          return { ...prev, journal, version: result.version };
-        }
-        const hero = prev.hero.map((item, index) =>
-          index === itemIndex ? { ...item, imageUrl: result.publicUrl } : item,
-        );
-        return { ...prev, hero, version: result.version };
-      });
+      setContent((prev) => applyPhotoToContent(prev, section, itemIndex, result.publicUrl, result.version));
+      setSavedSnapshot((prev) =>
+        applyPhotoToContent(prev, section, itemIndex, result.publicUrl, result.version),
+      );
 
       setMessage("Photo updated — live on the homepage.");
       return result.publicUrl;
@@ -99,7 +105,9 @@ export function AdminHomepagePhotoEditor({
       let version = content.version;
 
       if (section === "hero") {
-        const result = await saveHomepageHero({ data: { accessToken: token, items: content.hero } });
+        const result = await saveHomepageHero({
+          data: { accessToken: token, items: content.heroSlideshows },
+        });
         version = result.version;
       } else if (section === "heroHeadings") {
         const result = await saveHomepageHeroHeadings({
@@ -124,7 +132,9 @@ export function AdminHomepagePhotoEditor({
       setMessage(
         section === "heroHeadings"
           ? "Hero headings saved — they rotate on each homepage refresh."
-          : "Alt text and details saved.",
+          : section === "hero"
+            ? "Hero slideshows saved — pack 1 is constant; packs 2 & 3 rotate at random on visit."
+            : "Alt text and details saved.",
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save section.");
@@ -133,7 +143,8 @@ export function AdminHomepagePhotoEditor({
     }
   };
 
-  const heroDirty = JSON.stringify(content.hero) !== JSON.stringify(savedSnapshot.hero);
+  const heroDirty =
+    JSON.stringify(content.heroSlideshows) !== JSON.stringify(savedSnapshot.heroSlideshows);
   const heroHeadingsDirty =
     JSON.stringify(content.heroHeadings) !== JSON.stringify(savedSnapshot.heroHeadings);
   const showcaseDirty = JSON.stringify(content.showcase) !== JSON.stringify(savedSnapshot.showcase);
@@ -252,7 +263,13 @@ export function AdminHomepagePhotoEditor({
 
       <LuxuryCheckoutPanel>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Hero slideshow</h2>
+          <div>
+            <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Hero slideshows</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Slideshow 1 is constant (priority fallback). On each homepage refresh or return visit,
+              slideshow 2 or 3 is chosen at random. Set different photos in 2 and 3 so the hero changes.
+            </p>
+          </div>
           <button
             type="button"
             disabled={!heroDirty || busySection !== null}
@@ -260,30 +277,71 @@ export function AdminHomepagePhotoEditor({
             className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
           >
             {busySection === "hero" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-            Save hero
+            Save slideshows
           </button>
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          {content.hero.map((slide, index) => (
-            <EditablePhotoField
-              key={slide.id}
-              label={`Slide ${index + 1}`}
-              imageUrl={withHomepageCacheBust(slide.imageUrl, content.version)}
-              alt={slide.alt}
-              onImageChange={(url) =>
-                setContent((prev) => ({
-                  ...prev,
-                  hero: prev.hero.map((item, i) => (i === index ? { ...item, imageUrl: url } : item)),
-                }))
-              }
-              onAltChange={(alt) =>
-                setContent((prev) => ({
-                  ...prev,
-                  hero: prev.hero.map((item, i) => (i === index ? { ...item, alt } : item)),
-                }))
-              }
-              uploadPhoto={createUploader("hero", index)}
-            />
+        <div className="grid gap-4 lg:grid-cols-3">
+          {content.heroSlideshows.map((pack, packIndex) => (
+            <div
+              key={pack.id}
+              className="space-y-3 rounded-sm border border-ember/30 bg-black/20 p-3"
+            >
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-ember">
+                {packIndex === 0
+                  ? "Slideshow 1 · Constant"
+                  : `Slideshow ${packIndex + 1} · Random`}
+              </p>
+              <div className="grid gap-3">
+                {pack.slides.map((slide, slideIndex) => {
+                  const flatIndex = heroPhotoFlatIndex(packIndex, slideIndex);
+                  return (
+                    <EditablePhotoField
+                      key={slide.id}
+                      label={`Photo ${slideIndex + 1}`}
+                      imageUrl={withHomepageCacheBust(slide.imageUrl, content.version)}
+                      alt={slide.alt}
+                      onImageChange={(url) =>
+                        setContent((prev) => {
+                          const heroSlideshows = prev.heroSlideshows.map((row, pi) => {
+                            if (pi !== packIndex) return row;
+                            return {
+                              ...row,
+                              slides: row.slides.map((item, si) =>
+                                si === slideIndex ? { ...item, imageUrl: url } : item,
+                              ),
+                            };
+                          });
+                          return {
+                            ...prev,
+                            heroSlideshows,
+                            hero: heroSlideshows[0]?.slides ?? prev.hero,
+                          };
+                        })
+                      }
+                      onAltChange={(alt) =>
+                        setContent((prev) => {
+                          const heroSlideshows = prev.heroSlideshows.map((row, pi) => {
+                            if (pi !== packIndex) return row;
+                            return {
+                              ...row,
+                              slides: row.slides.map((item, si) =>
+                                si === slideIndex ? { ...item, alt } : item,
+                              ),
+                            };
+                          });
+                          return {
+                            ...prev,
+                            heroSlideshows,
+                            hero: heroSlideshows[0]?.slides ?? prev.hero,
+                          };
+                        })
+                      }
+                      uploadPhoto={createUploader("hero", flatIndex)}
+                    />
+                  );
+                })}
+              </div>
+            </div>
           ))}
         </div>
       </LuxuryCheckoutPanel>

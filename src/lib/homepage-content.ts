@@ -15,10 +15,14 @@ import {
   HOMEPAGE_VERSION_KEY,
   normalizeHomepageContent as normalizeHomepageContentBase,
   parseVersionValue,
+  takeHeroSlideshow,
   takeNextHeroHeading,
+  heroPhotoCoords,
+  heroPhotoFlatIndex,
   type HomepageContent,
   type HomepageHeroHeading,
   type HomepageHeroSlide,
+  type HomepageHeroSlideshow,
   type HomepageJournalItem,
   type HomepageJourneySlide,
   type HomepageShowcaseItem,
@@ -34,10 +38,14 @@ export {
   HOMEPAGE_SHOWCASE_KEY,
   HOMEPAGE_VERSION_KEY,
   parseVersionValue,
+  takeHeroSlideshow,
   takeNextHeroHeading,
+  heroPhotoCoords,
+  heroPhotoFlatIndex,
   type HomepageContent,
   type HomepageHeroHeading,
   type HomepageHeroSlide,
+  type HomepageHeroSlideshow,
   type HomepageJournalItem,
   type HomepageJourneySlide,
   type HomepageShowcaseItem,
@@ -48,6 +56,7 @@ export function normalizeHomepageContent(raw: {
   showcase?: unknown;
   journal?: unknown;
   hero?: unknown;
+  heroSlideshows?: unknown;
   heroHeadings?: unknown;
   journeys?: unknown;
   version?: unknown;
@@ -56,6 +65,7 @@ export function normalizeHomepageContent(raw: {
     showcaseFallbacks: DEFAULT_HOMEPAGE_SHOWCASE,
     journalFallbacks: DEFAULT_HOMEPAGE_JOURNAL,
     heroFallbacks: DEFAULT_HOMEPAGE_HERO,
+    heroSlideshowsFallbacks: DEFAULT_HOMEPAGE_HERO_SLIDESHOWS,
     heroHeadingsFallbacks: DEFAULT_HOMEPAGE_HERO_HEADINGS,
     journeysFallbacks: DEFAULT_HOMEPAGE_JOURNEYS,
   });
@@ -141,6 +151,16 @@ export const DEFAULT_HOMEPAGE_HERO: HomepageHeroSlide[] = [
   },
 ];
 
+function cloneDefaultSlides(prefix: string): HomepageHeroSlide[] {
+  return DEFAULT_HOMEPAGE_HERO.map((slide) => ({ ...slide, id: `${prefix}-${slide.id}` }));
+}
+
+export const DEFAULT_HOMEPAGE_HERO_SLIDESHOWS: HomepageHeroSlideshow[] = [
+  { id: "slideshow-priority", slides: cloneDefaultSlides("p0") },
+  { id: "slideshow-alt-1", slides: cloneDefaultSlides("p1") },
+  { id: "slideshow-alt-2", slides: cloneDefaultSlides("p2") },
+];
+
 export const DEFAULT_HOMEPAGE_HERO_HEADINGS: HomepageHeroHeading[] = [
   {
     id: "heading-priority",
@@ -210,7 +230,8 @@ export const DEFAULT_HOMEPAGE_JOURNEYS: HomepageJourneySlide[] = [
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   showcase: DEFAULT_HOMEPAGE_SHOWCASE,
   journal: DEFAULT_HOMEPAGE_JOURNAL,
-  hero: DEFAULT_HOMEPAGE_HERO,
+  hero: DEFAULT_HOMEPAGE_HERO_SLIDESHOWS[0]!.slides,
+  heroSlideshows: DEFAULT_HOMEPAGE_HERO_SLIDESHOWS,
   heroHeadings: DEFAULT_HOMEPAGE_HERO_HEADINGS,
   journeys: DEFAULT_HOMEPAGE_JOURNEYS,
   version: 0,

@@ -6,6 +6,7 @@ export const HOMEPAGE_JOURNEYS_KEY = "homepage_journeys";
 export const HOMEPAGE_VERSION_KEY = "homepage_content_version";
 export const HOMEPAGE_CACHE_KEY = "homepage-content-v1";
 export const HERO_HEADING_ROTATION_KEY = "trp-hero-heading-rotation";
+export const HERO_SLIDESHOW_PICK_KEY = "trp-hero-slideshow-pick";
 
 export type ShowcaseIconKey = "pottery" | "flame" | "heritage";
 
@@ -30,6 +31,12 @@ export type HomepageHeroSlide = {
   id: string;
   imageUrl: string;
   alt: string;
+};
+
+/** One of 3 hero slideshow packs — each holds 4 photos. */
+export type HomepageHeroSlideshow = {
+  id: string;
+  slides: HomepageHeroSlide[];
 };
 
 /** Homepage hero copy variants — index 0 is priority; all three rotate on refresh/login. */
@@ -57,7 +64,10 @@ export type HomepageJourneySlide = {
 export type HomepageContent = {
   showcase: HomepageShowcaseItem[];
   journal: HomepageJournalItem[];
+  /** @deprecated Prefer heroSlideshows — kept as pack 0 slides for older callers. */
   hero: HomepageHeroSlide[];
+  /** Three slideshow packs (4 photos each). Pack 0 = priority/constant; 1–2 randomize on visit. */
+  heroSlideshows: HomepageHeroSlideshow[];
   heroHeadings: HomepageHeroHeading[];
   journeys: HomepageJourneySlide[];
   version: number;
@@ -121,6 +131,12 @@ const FALLBACK_HERO: HomepageHeroSlide[] = [
   { id: "hero-dinner", imageUrl: "", alt: "A candlelit private dinner under a glasshouse at dusk" },
   { id: "hero-dining", imageUrl: "", alt: "A plated culinary course in dramatic light" },
   { id: "hero-craft", imageUrl: "", alt: "Hands shaping clay on a pottery wheel" },
+];
+
+const FALLBACK_HERO_SLIDESHOWS: HomepageHeroSlideshow[] = [
+  { id: "slideshow-priority", slides: FALLBACK_HERO.map((s) => ({ ...s, id: `p0-${s.id}` })) },
+  { id: "slideshow-alt-1", slides: FALLBACK_HERO.map((s) => ({ ...s, id: `p1-${s.id}` })) },
+  { id: "slideshow-alt-2", slides: FALLBACK_HERO.map((s) => ({ ...s, id: `p2-${s.id}` })) },
 ];
 
 const FALLBACK_HERO_HEADINGS: HomepageHeroHeading[] = [
@@ -235,6 +251,63 @@ function normalizeHeroSlide(raw: unknown, fallback: HomepageHeroSlide): Homepage
   };
 }
 
+function cloneSlidesWithPrefix(slides: HomepageHeroSlide[], prefix: string): HomepageHeroSlide[] {
+  return slides.map((slide) => ({ ...slide, id: `${prefix}-${slide.id}` }));
+}
+
+function buildHeroSlideshowFallbacks(slideFallbacks: HomepageHeroSlide[]): HomepageHeroSlideshow[] {
+  return [
+    { id: "slideshow-priority", slides: cloneSlidesWithPrefix(slideFallbacks, "p0") },
+    { id: "slideshow-alt-1", slides: cloneSlidesWithPrefix(slideFallbacks, "p1") },
+    { id: "slideshow-alt-2", slides: cloneSlidesWithPrefix(slideFallbacks, "p2") },
+  ];
+}
+
+function normalizeHeroSlideshow(
+  raw: unknown,
+  fallback: HomepageHeroSlideshow,
+): HomepageHeroSlideshow {
+  if (!raw || typeof raw !== "object") return fallback;
+  const item = raw as Partial<HomepageHeroSlideshow>;
+  const slidesRaw = Array.isArray(item.slides) ? item.slides : null;
+  return {
+    id: typeof item.id === "string" && item.id.trim() ? item.id : fallback.id,
+    slides: fallback.slides.map((slideFallback, index) =>
+      normalizeHeroSlide(slidesRaw?.[index], slideFallback),
+    ),
+  };
+}
+
+/** Accepts either 3 packs `{ slides }` or legacy flat 4-slide hero array. */
+function normalizeHeroSlideshows(
+  raw: unknown,
+  slideFallbacks: HomepageHeroSlide[],
+  packFallbacksOverride?: HomepageHeroSlideshow[],
+): HomepageHeroSlideshow[] {
+  const packFallbacks =
+    packFallbacksOverride && packFallbacksOverride.length >= 3
+      ? packFallbacksOverride.slice(0, 3)
+      : buildHeroSlideshowFallbacks(slideFallbacks);
+  if (!Array.isArray(raw) || raw.length === 0) return packFallbacks;
+
+  const first = raw[0];
+  const isPackFormat =
+    first &&
+    typeof first === "object" &&
+    Array.isArray((first as { slides?: unknown }).slides);
+
+  if (isPackFormat) {
+    return packFallbacks.map((fallback, index) => normalizeHeroSlideshow(raw[index], fallback));
+  }
+
+  // Legacy flat slides — seed every pack with those 4 photos so alts can diverge later.
+  const seeded = slideFallbacks.map((fallback, index) => normalizeHeroSlide(raw[index], fallback));
+  return packFallbacks.map((fallback, packIndex) => ({
+    id: fallback.id,
+    slides: cloneSlidesWithPrefix(seeded, `p${packIndex}`),
+  }));
+}
+
 function normalizeHeroHeading(raw: unknown, fallback: HomepageHeroHeading): HomepageHeroHeading {
   if (!raw || typeof raw !== "object") return fallback;
   const item = raw as Partial<HomepageHeroHeading>;
@@ -294,6 +367,7 @@ export function normalizeHomepageContent(
     showcase?: unknown;
     journal?: unknown;
     hero?: unknown;
+    heroSlideshows?: unknown;
     heroHeadings?: unknown;
     journeys?: unknown;
     version?: unknown;
@@ -302,6 +376,7 @@ export function normalizeHomepageContent(
     showcaseFallbacks?: HomepageShowcaseItem[];
     journalFallbacks?: HomepageJournalItem[];
     heroFallbacks?: HomepageHeroSlide[];
+    heroSlideshowsFallbacks?: HomepageHeroSlideshow[];
     heroHeadingsFallbacks?: HomepageHeroHeading[];
     journeysFallbacks?: HomepageJourneySlide[];
   },
@@ -309,13 +384,24 @@ export function normalizeHomepageContent(
   const showcaseFallbacks = options?.showcaseFallbacks ?? FALLBACK_SHOWCASE;
   const journalFallbacks = options?.journalFallbacks ?? FALLBACK_JOURNAL;
   const heroFallbacks = options?.heroFallbacks ?? FALLBACK_HERO;
+  const heroSlideshowsFallbacks =
+    options?.heroSlideshowsFallbacks ?? buildHeroSlideshowFallbacks(heroFallbacks);
   const heroHeadingsFallbacks = options?.heroHeadingsFallbacks ?? FALLBACK_HERO_HEADINGS;
   const journeysFallbacks = options?.journeysFallbacks ?? FALLBACK_JOURNEYS;
   const showcaseRaw = Array.isArray(raw.showcase) ? raw.showcase : null;
   const journalRaw = Array.isArray(raw.journal) ? raw.journal : null;
-  const heroRaw = Array.isArray(raw.hero) ? raw.hero : null;
+  const heroSource =
+    Array.isArray(raw.heroSlideshows) && raw.heroSlideshows.length > 0
+      ? raw.heroSlideshows
+      : raw.hero;
   const heroHeadingsRaw = Array.isArray(raw.heroHeadings) ? raw.heroHeadings : null;
   const journeysRaw = Array.isArray(raw.journeys) ? raw.journeys : null;
+
+  const heroSlideshows = normalizeHeroSlideshows(
+    heroSource,
+    options?.heroSlideshowsFallbacks?.[0]?.slides ?? heroFallbacks,
+    heroSlideshowsFallbacks,
+  );
 
   return {
     showcase: showcaseFallbacks.map((fallback, index) =>
@@ -324,7 +410,8 @@ export function normalizeHomepageContent(
     journal: journalFallbacks.map((fallback, index) =>
       normalizeJournalItem(journalRaw?.[index], fallback),
     ),
-    hero: heroFallbacks.map((fallback, index) => normalizeHeroSlide(heroRaw?.[index], fallback)),
+    heroSlideshows,
+    hero: heroSlideshows[0]?.slides ?? heroFallbacks,
     heroHeadings: heroHeadingsFallbacks.map((fallback, index) =>
       normalizeHeroHeading(heroHeadingsRaw?.[index], fallback),
     ),
@@ -366,4 +453,49 @@ export function takeNextHeroHeading(
   } catch {
     return list[0]!;
   }
+}
+
+/**
+ * Homepage hero photos: pack 0 is priority/constant (fallback + live editor).
+ * On each visit, randomly choose pack 1 or pack 2 so the homepage photos change.
+ */
+let lastHeroSlideshowPickAt = 0;
+let lastHeroSlideshowPackIndex = 1;
+
+export function takeHeroSlideshow(
+  slideshows: HomepageHeroSlideshow[],
+  options?: { rotate?: boolean },
+): HomepageHeroSlideshow {
+  const packs =
+    slideshows.length >= 3 ? slideshows : FALLBACK_HERO_SLIDESHOWS;
+  if (options?.rotate === false || typeof window === "undefined") {
+    return packs[0]!;
+  }
+
+  const now = Date.now();
+  if (now - lastHeroSlideshowPickAt <= 800) {
+    return packs[lastHeroSlideshowPackIndex] ?? packs[0]!;
+  }
+  lastHeroSlideshowPickAt = now;
+
+  try {
+    const pick = Math.random() < 0.5 ? 1 : 2;
+    lastHeroSlideshowPackIndex = pick;
+    window.localStorage.setItem(HERO_SLIDESHOW_PICK_KEY, String(pick));
+    return packs[pick] ?? packs[0]!;
+  } catch {
+    return packs[0]!;
+  }
+}
+
+/** Flat photo index 0–11 → pack / slide for the 3×4 hero CMS. */
+export function heroPhotoFlatIndex(packIndex: number, slideIndex: number): number {
+  return packIndex * 4 + slideIndex;
+}
+
+export function heroPhotoCoords(flatIndex: number): { packIndex: number; slideIndex: number } {
+  return {
+    packIndex: Math.floor(flatIndex / 4),
+    slideIndex: flatIndex % 4,
+  };
 }

@@ -10,9 +10,11 @@ import { HeroSlideshow } from "@/components/site/HeroSlideshow";
 import { SiteBannerStrip } from "@/components/site/SiteBannerStrip";
 import { useHomeIntro } from "@/components/site/home-intro";
 import {
+  takeHeroSlideshow,
   takeNextHeroHeading,
   type HomepageHeroHeading,
   type HomepageHeroSlide,
+  type HomepageHeroSlideshow,
   withHomepageCacheBust,
 } from "@/lib/homepage-content";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
@@ -41,7 +43,9 @@ const revealItem = {
 };
 
 type HomeHeroProps = {
-  slides: HomepageHeroSlide[];
+  slides?: HomepageHeroSlide[];
+  /** When set on the public homepage, randomly picks slideshow 2 or 3. */
+  slideshows?: HomepageHeroSlideshow[];
   headings?: HomepageHeroHeading[];
   imageVersion?: number;
   editable?: boolean;
@@ -52,6 +56,7 @@ type HomeHeroProps = {
 
 export function HomeHero({
   slides,
+  slideshows,
   headings = [],
   imageVersion = 0,
   editable = false,
@@ -65,8 +70,12 @@ export function HomeHero({
   const [activeSlide, setActiveSlide] = useState(0);
   const [editHeadingIndex, setEditHeadingIndex] = useState(0);
   const rotatedRef = useRef(false);
+  const slideshowPickedRef = useRef(false);
   const [activeHeading, setActiveHeading] = useState<HomepageHeroHeading | null>(
     () => headings[0] ?? null,
+  );
+  const [displaySlides, setDisplaySlides] = useState<HomepageHeroSlide[]>(
+    () => slides ?? slideshows?.[0]?.slides ?? [],
   );
 
   const cinematic = Boolean(intro) && !editable;
@@ -74,6 +83,28 @@ export function HomeHero({
   const copyVisible =
     !cinematic || reduceMotion || (Boolean(intro?.copyRevealed) && !intro?.copyWiped);
   const splashDone = !cinematic || Boolean(intro?.splashDone) || reduceMotion;
+
+  useEffect(() => {
+    if (editable) {
+      setDisplaySlides(slides ?? slideshows?.[0]?.slides ?? []);
+      return;
+    }
+    if (slideshows && slideshows.length >= 3) {
+      if (!slideshowPickedRef.current) {
+        slideshowPickedRef.current = true;
+        setDisplaySlides(takeHeroSlideshow(slideshows, { rotate: true }).slides);
+        return;
+      }
+      setDisplaySlides((prev) => {
+        const match = slideshows.find(
+          (pack) => pack.slides.length === prev.length && pack.slides[0]?.id === prev[0]?.id,
+        );
+        return match?.slides ?? prev;
+      });
+      return;
+    }
+    setDisplaySlides(slides ?? []);
+  }, [editable, slides, slideshows]);
 
   useEffect(() => {
     if (editable) {
@@ -91,14 +122,15 @@ export function HomeHero({
     });
   }, [editable, editHeadingIndex, headings]);
 
-  const heroSlides = slides.map((slide) => ({
+  const heroSlides = displaySlides.map((slide) => ({
     src: withHomepageCacheBust(slide.imageUrl, imageVersion),
     alt: slide.alt,
   }));
 
   const updateSlide = (index: number, patch: Partial<HomepageHeroSlide>) => {
     if (!onSlidesChange) return;
-    onSlidesChange(slides.map((slide, idx) => (idx === index ? { ...slide, ...patch } : slide)));
+    const base = slides ?? displaySlides;
+    onSlidesChange(base.map((slide, idx) => (idx === index ? { ...slide, ...patch } : slide)));
   };
 
   const updateHeading = (index: number, patch: Partial<HomepageHeroHeading>) => {
@@ -273,9 +305,9 @@ export function HomeHero({
           <div className="pointer-events-auto absolute inset-x-0 bottom-24 z-20 px-4 sm:bottom-28">
             <div className="container-page max-w-md">
               <EditablePhotoField
-                label={`Hero slide ${activeSlide + 1} of ${slides.length}`}
-                imageUrl={slides[activeSlide]?.imageUrl ?? ""}
-                alt={slides[activeSlide]?.alt ?? ""}
+                label={`Hero slide ${activeSlide + 1} of ${displaySlides.length}`}
+                imageUrl={displaySlides[activeSlide]?.imageUrl ?? ""}
+                alt={displaySlides[activeSlide]?.alt ?? ""}
                 uploadPhoto={uploadPhoto(activeSlide)}
                 onImageChange={(imageUrl) => updateSlide(activeSlide, { imageUrl })}
                 onAltChange={(alt) => updateSlide(activeSlide, { alt })}

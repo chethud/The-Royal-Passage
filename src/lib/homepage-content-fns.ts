@@ -48,6 +48,11 @@ const heroSlideSchema = z.object({
   alt: z.string().min(1).max(200),
 });
 
+const heroSlideshowSchema = z.object({
+  id: z.string().min(1),
+  slides: z.array(heroSlideSchema).length(4),
+});
+
 const heroHeadingSchema = z.object({
   id: z.string().min(1),
   eyebrow: z.string().min(1).max(80),
@@ -126,7 +131,8 @@ export const saveHomepageHero = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({
       accessToken: z.string().min(1),
-      items: z.array(heroSlideSchema).length(4),
+      /** Three slideshow packs × 4 photos each. Pack 0 = priority/constant. */
+      items: z.array(heroSlideshowSchema).length(3),
     }),
   )
   .handler(async ({ data }): Promise<{ version: number }> => {
@@ -211,7 +217,8 @@ export const applyHomepagePhoto = createServerFn({ method: "POST" })
     z.object({
       accessToken: z.string().min(1),
       section: z.enum(["showcase", "journal", "hero"]),
-      itemIndex: z.number().int().min(0).max(3),
+      /** Showcase/journal: 0–2. Hero: flat 0–11 across 3 packs × 4 slides. */
+      itemIndex: z.number().int().min(0).max(11),
       publicUrl: z.string().min(1).max(500),
     }),
   )

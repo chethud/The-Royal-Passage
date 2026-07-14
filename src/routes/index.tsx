@@ -85,6 +85,7 @@ function Index() {
         />
 
         <HomeHero
+          slideshows={publicContent.heroSlideshows}
           slides={publicContent.hero}
           headings={publicContent.heroHeadings}
           imageVersion={publicContent.version}

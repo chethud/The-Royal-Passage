@@ -95,10 +95,22 @@ export function HomepageEditView({
           );
           return { ...prev, journal, version: result.version };
         }
-        const hero = prev.hero.map((item, index) =>
-          index === itemIndex ? { ...item, imageUrl: result.publicUrl } : item,
-        );
-        return { ...prev, hero, version: result.version };
+        // Live homepage editor edits slideshow 1 (pack 0) only — flat indices 0–3.
+        const heroSlideshows = prev.heroSlideshows.map((pack, packIndex) => {
+          if (packIndex !== 0) return pack;
+          return {
+            ...pack,
+            slides: pack.slides.map((slide, slideIndex) =>
+              slideIndex === itemIndex ? { ...slide, imageUrl: result.publicUrl } : slide,
+            ),
+          };
+        });
+        return {
+          ...prev,
+          heroSlideshows,
+          hero: heroSlideshows[0]?.slides ?? prev.hero,
+          version: result.version,
+        };
       };
 
       setDraft(applyPhoto);
@@ -135,11 +147,19 @@ export function HomepageEditView({
       />
 
       <HomeHero
-        slides={editContent.hero}
+        slides={editContent.heroSlideshows[0]?.slides ?? editContent.hero}
+        slideshows={editContent.heroSlideshows}
         headings={editContent.heroHeadings}
         imageVersion={displayVersion}
         editable={canEditAdminSections}
-        onSlidesChange={(hero) => setDraft((prev) => ({ ...prev, hero }))}
+        onSlidesChange={(hero) =>
+          setDraft((prev) => {
+            const heroSlideshows = prev.heroSlideshows.map((pack, packIndex) =>
+              packIndex === 0 ? { ...pack, slides: hero } : pack,
+            );
+            return { ...prev, hero, heroSlideshows };
+          })
+        }
         onHeadingsChange={(heroHeadings) => setDraft((prev) => ({ ...prev, heroHeadings }))}
         uploadPhoto={
           canEditAdminSections ? (itemIndex) => createPhotoUploader("hero", itemIndex) : undefined

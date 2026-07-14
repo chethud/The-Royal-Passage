@@ -104,7 +104,7 @@ function parseSection(raw: string | undefined): "showcase" | "journal" | "hero" 
 function parseItemIndex(raw: string | undefined, section: "showcase" | "journal" | "hero"): number | null {
   if (!raw) return null;
   const value = Number.parseInt(raw, 10);
-  const max = section === "hero" ? 3 : 2;
+  const max = section === "hero" ? 11 : 2;
   if (!Number.isInteger(value) || value < 0 || value > max) return null;
   return value;
 }
@@ -199,7 +199,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return jsonError(res, 400, "Invalid section.");
       }
 
-      const maxIndex = section === "hero" ? 3 : 2;
+      const maxIndex = section === "hero" ? 11 : 2;
       if (!Number.isInteger(itemIndex) || itemIndex < 0 || itemIndex > maxIndex) {
         return jsonError(res, 400, "Invalid item index.");
       }

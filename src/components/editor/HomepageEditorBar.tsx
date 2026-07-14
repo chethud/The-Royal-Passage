@@ -26,7 +26,8 @@ export function HomepageEditorBar({ role, draft, savedSnapshot, onSaved }: Homep
 
   const journalDirty = JSON.stringify(draft.journal) !== JSON.stringify(savedSnapshot.journal);
   const showcaseDirty = JSON.stringify(draft.showcase) !== JSON.stringify(savedSnapshot.showcase);
-  const heroDirty = JSON.stringify(draft.hero) !== JSON.stringify(savedSnapshot.hero);
+  const heroDirty =
+    JSON.stringify(draft.heroSlideshows) !== JSON.stringify(savedSnapshot.heroSlideshows);
   const heroHeadingsDirty =
     JSON.stringify(draft.heroHeadings) !== JSON.stringify(savedSnapshot.heroHeadings);
   const journeysDirty = JSON.stringify(draft.journeys) !== JSON.stringify(savedSnapshot.journeys);
@@ -66,7 +67,7 @@ export function HomepageEditorBar({ role, draft, savedSnapshot, onSaved }: Homep
       }
       if (heroDirty) {
         const heroResult = await saveHomepageHero({
-          data: { accessToken: token, items: draft.hero },
+          data: { accessToken: token, items: draft.heroSlideshows },
         });
         versions.push(heroResult.version);
       }

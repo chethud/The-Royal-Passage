@@ -114,6 +114,7 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
   }, [copyRevealed, navRevealed, reduceMotion]);
 
   // Once text is showing, wipe it left if the visitor stays still for 5s.
+  // After wipe, stay wiped for this visit — do not restore on slideshow/layout scroll noise.
   useEffect(() => {
     if (!copyRevealed || copyWiped || reduceMotion) return;
 
@@ -124,51 +125,23 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
       wipeTimer = window.setTimeout(() => setCopyWiped(true), IDLE_WIPE_MS);
     };
 
-    const onActivity = () => {
-      if (copyWiped) return;
-      bumpIdle();
-    };
-
     const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) >= 1 || Math.abs(event.deltaX) >= 1) onActivity();
+      if (Math.abs(event.deltaY) >= 1 || Math.abs(event.deltaX) >= 1) bumpIdle();
     };
 
-    window.addEventListener("scroll", onActivity, { passive: true });
+    window.addEventListener("scroll", bumpIdle, { passive: true });
     window.addEventListener("wheel", onWheel, { passive: true });
-    window.addEventListener("touchmove", onActivity, { passive: true });
-    window.addEventListener("pointerdown", onActivity, { passive: true });
-    window.addEventListener("keydown", onActivity);
+    window.addEventListener("touchmove", bumpIdle, { passive: true });
+    window.addEventListener("pointerdown", bumpIdle, { passive: true });
+    window.addEventListener("keydown", bumpIdle);
 
     return () => {
       window.clearTimeout(wipeTimer);
-      window.removeEventListener("scroll", onActivity);
+      window.removeEventListener("scroll", bumpIdle);
       window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchmove", onActivity);
-      window.removeEventListener("pointerdown", onActivity);
-      window.removeEventListener("keydown", onActivity);
-    };
-  }, [copyRevealed, copyWiped, reduceMotion]);
-
-  // After a wipe, another tiny scroll can bring the text back.
-  useEffect(() => {
-    if (!copyRevealed || !copyWiped || reduceMotion) return;
-
-    const restore = () => setCopyWiped(false);
-
-    const onScroll = () => {
-      if (window.scrollY >= REVEAL_SCROLL_PX) restore();
-    };
-    const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) >= 1 || Math.abs(event.deltaX) >= 1) restore();
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("wheel", onWheel, { passive: true });
-    window.addEventListener("touchmove", restore, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchmove", restore);
+      window.removeEventListener("touchmove", bumpIdle);
+      window.removeEventListener("pointerdown", bumpIdle);
+      window.removeEventListener("keydown", bumpIdle);
     };
   }, [copyRevealed, copyWiped, reduceMotion]);
 

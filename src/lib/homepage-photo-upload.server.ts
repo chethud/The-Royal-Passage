@@ -11,6 +11,7 @@ import {
   HOMEPAGE_JOURNEYS_KEY,
   HOMEPAGE_SHOWCASE_KEY,
   HOMEPAGE_VERSION_KEY,
+  heroPhotoCoords,
   parseVersionValue,
   type HomepagePhotoSection,
 } from "@/lib/homepage-content-keys";
@@ -261,20 +262,36 @@ export async function applyHomepagePhotoCore(
   const publicUrl = input.publicUrl.trim();
 
   if (input.section === "showcase") {
+    if (input.itemIndex < 0 || input.itemIndex > 2) {
+      throw new Error("Showcase photo index must be between 0 and 2.");
+    }
     const items = current.showcase.map((item, index) =>
       index === input.itemIndex ? { ...item, imageUrl: publicUrl } : item,
     );
     await writePlatformSetting(supabase, HOMEPAGE_SHOWCASE_KEY, items);
   } else if (input.section === "journal") {
+    if (input.itemIndex < 0 || input.itemIndex > 2) {
+      throw new Error("Journal photo index must be between 0 and 2.");
+    }
     const items = current.journal.map((item, index) =>
       index === input.itemIndex ? { ...item, imageUrl: publicUrl } : item,
     );
     await writePlatformSetting(supabase, HOMEPAGE_JOURNAL_KEY, items);
   } else {
-    const items = current.hero.map((item, index) =>
-      index === input.itemIndex ? { ...item, imageUrl: publicUrl } : item,
-    );
-    await writePlatformSetting(supabase, HOMEPAGE_HERO_KEY, items);
+    if (input.itemIndex < 0 || input.itemIndex > 11) {
+      throw new Error("Hero photo index must be between 0 and 11.");
+    }
+    const { packIndex, slideIndex } = heroPhotoCoords(input.itemIndex);
+    const packs = current.heroSlideshows.map((pack, pi) => {
+      if (pi !== packIndex) return pack;
+      return {
+        ...pack,
+        slides: pack.slides.map((slide, si) =>
+          si === slideIndex ? { ...slide, imageUrl: publicUrl } : slide,
+        ),
+      };
+    });
+    await writePlatformSetting(supabase, HOMEPAGE_HERO_KEY, packs);
   }
 
   const version = await bumpHomepageVersion(supabase);

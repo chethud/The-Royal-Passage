@@ -910,7 +910,7 @@
   font-family: var(--font-sans);
   font-size: 0.92rem;
   line-height: 1.5;
-  color: rgb(58 0 0 / 0.58);
+  color: rgb(42 8 8 / 0.9);
 }
 
 @media (min-width: 640px) {
