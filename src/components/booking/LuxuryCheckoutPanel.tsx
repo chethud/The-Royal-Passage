@@ -12,7 +12,7 @@ export function LuxuryCheckoutPanel({
 }) {
   return (
     <div
-      className={`luxury-checkout-panel ${
+      className={`luxury-checkout-panel text-[#2A0000] ${
         compact ? "p-2 sm:p-2.5 md:p-3" : "p-3 sm:p-7 md:p-9"
       } ${className}`.trim()}
     >

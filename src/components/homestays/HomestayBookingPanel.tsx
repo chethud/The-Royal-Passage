@@ -55,7 +55,7 @@ type HomestayBookingPanelProps = {
 };
 
 const dateFieldClass =
-  "w-full min-w-0 rounded-sm border border-[rgb(74_0_0/0.14)] bg-white px-2.5 py-2 text-sm text-[#3A0000] focus:border-[#4A0000]/35 focus:outline-none";
+  "w-full min-w-0 rounded-sm border border-[rgb(74_0_0/0.22)] bg-white px-2.5 py-2 text-sm text-[#2A0000] focus:border-[#2A0000]/45 focus:outline-none";
 
 export function HomestayBookingPanel({
   stay,
@@ -116,12 +116,12 @@ export function HomestayBookingPanel({
 
       <div>
         <BookingFieldLabel>Stay dates</BookingFieldLabel>
-        <p className="luxury-panel-body mb-3 mt-1 text-xs leading-relaxed">
+        <p className="luxury-panel-body mb-3 mt-1 leading-relaxed text-[#2A0000]/90">
           Choose your check-in and check-out dates. Weekend and holiday prices apply automatically.
         </p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label className="block min-w-0">
-            <span className="eyebrow luxury-panel-label mb-1.5 block">Check-in</span>
+            <span className="eyebrow luxury-panel-label mb-1.5 block text-[#2A0000]">Check-in</span>
             <input
               type="date"
               min={today}
@@ -131,7 +131,7 @@ export function HomestayBookingPanel({
             />
           </label>
           <label className="block min-w-0">
-            <span className="eyebrow luxury-panel-label mb-1.5 block">Check-out</span>
+            <span className="eyebrow luxury-panel-label mb-1.5 block text-[#2A0000]">Check-out</span>
             <input
               type="date"
               min={checkOutMin}
@@ -142,7 +142,7 @@ export function HomestayBookingPanel({
           </label>
         </div>
         {checkIn && checkOut && checkOut > checkIn ? (
-          <p className="luxury-panel-body mt-2 text-xs">
+          <p className="luxury-panel-body mt-2">
             {formatDateLong(checkIn)} → {formatDateLong(checkOut)} · {nights} night
             {nights === 1 ? "" : "s"}
           </p>

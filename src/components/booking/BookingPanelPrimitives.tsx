@@ -23,11 +23,11 @@ type BookingSurface = "light" | "dark";
 function stepperTone(surface: BookingSurface) {
   if (surface === "light") {
     return {
-      label: "eyebrow luxury-panel-label",
-      hint: "luxury-panel-body mt-0.5 text-[0.66rem] leading-snug sm:mt-1 sm:text-xs sm:leading-relaxed",
+      label: "eyebrow luxury-panel-label text-[#2A0000]",
+      hint: "luxury-panel-body mt-0.5 leading-snug text-[#2A0000]/90 sm:mt-1",
       button:
-        "inline-flex h-7 w-7 items-center justify-center text-[#4A0000]/80 transition-colors hover:text-[#4A0000] disabled:opacity-35 sm:h-9 sm:w-9",
-      value: "w-7 text-center font-display text-xl text-[#4A0000] sm:w-8 sm:text-2xl",
+        "inline-flex h-7 w-7 items-center justify-center text-[#2A0000] transition-colors hover:text-[#1A0000] disabled:opacity-35 sm:h-9 sm:w-9",
+      value: "w-7 text-center font-display text-xl text-[#2A0000] sm:w-8 sm:text-2xl",
     };
   }
 
@@ -70,7 +70,7 @@ export function BookingIntro({
       <p
         className={
           surface === "light"
-            ? "luxury-panel-body text-[0.68rem] leading-snug sm:text-xs sm:leading-relaxed"
+            ? "luxury-panel-body leading-snug text-[#2A0000]/90"
             : "text-[0.68rem] leading-snug text-muted-foreground/90 sm:text-xs sm:leading-relaxed"
         }
       >
@@ -82,7 +82,7 @@ export function BookingIntro({
 
 export function BookingFieldLabel({ children }: { children: ReactNode }) {
   return (
-    <span className="eyebrow luxury-panel-label mb-1 block text-[0.55rem] sm:mb-2 sm:text-[0.7rem]">
+    <span className="eyebrow luxury-panel-label mb-1 block text-[#2A0000] sm:mb-2">
       {children}
     </span>
   );
@@ -160,13 +160,13 @@ export function BookingNotesField({
   if (surface === "light") {
     return (
       <div>
-        <div className="eyebrow luxury-panel-label mb-2 sm:mb-3">{label}</div>
+        <div className="eyebrow luxury-panel-label mb-2 text-[#2A0000] sm:mb-3">{label}</div>
         <textarea
           value={value}
           onChange={(event) => onChange(event.target.value)}
           rows={2}
           placeholder={placeholder}
-          className={`${bookingPanelTextareaClass} placeholder:text-[rgb(58_0_0/0.4)]`}
+          className={`${bookingPanelTextareaClass} text-[#2A0000] placeholder:text-[rgb(42_8_8/0.4)]`}
         />
       </div>
     );
@@ -199,14 +199,14 @@ export function BookingTotalSummary({
   footer?: ReactNode;
   surface?: BookingSurface;
 }) {
-  const labelClass = surface === "light" ? "eyebrow luxury-panel-label" : "eyebrow text-muted-foreground";
+  const labelClass = surface === "light" ? "eyebrow luxury-panel-label text-[#2A0000]" : "eyebrow text-muted-foreground";
   const bodyClass =
     surface === "light"
-      ? "luxury-panel-body mt-0.5 text-[0.64rem] leading-snug sm:mt-1 sm:text-xs"
+      ? "luxury-panel-body mt-0.5 leading-snug text-[#2A0000]/90 sm:mt-1"
       : "mt-0.5 text-[0.64rem] leading-snug text-muted-foreground sm:mt-1 sm:text-xs";
   const totalClass =
     surface === "light"
-      ? "shrink-0 font-display text-[1.7rem] tracking-tight text-[#4A0000] sm:text-2xl md:text-3xl"
+      ? "shrink-0 font-display text-[1.7rem] tracking-tight text-[#2A0000] sm:text-2xl md:text-3xl"
       : "shrink-0 font-display text-[1.7rem] tracking-tight text-[#F7F1E8] sm:text-2xl md:text-3xl";
 
   return (
