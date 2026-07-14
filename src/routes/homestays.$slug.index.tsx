@@ -127,12 +127,6 @@ function HomestayDetailPage() {
             <>
               <DetailCategoryBadge>{stay.propertyType}</DetailCategoryBadge>
 
-              <DetailLocationBlock
-                locationLine={locationLine}
-                address={stay.address}
-                mapLink={stay.mapLink}
-              />
-
               <DetailTitleRow title={stay.title} />
 
               {stay.tagline ? <DetailTagline>{stay.tagline}</DetailTagline> : null}
@@ -165,6 +159,12 @@ function HomestayDetailPage() {
               </DetailStatGrid>
 
               <DetailExpandableCopy label="About this stay">{stay.description}</DetailExpandableCopy>
+
+              <DetailLocationBlock
+                locationLine={locationLine}
+                address={stay.address}
+                mapLink={stay.mapLink}
+              />
 
               {stay.amenities.length > 0 ? (
                 <DetailDarkSection label="Amenities" className="">

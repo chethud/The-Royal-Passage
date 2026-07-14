@@ -68,7 +68,7 @@ export function ExperienceDetailGallery({
     <div className="flex items-start gap-2.5 sm:gap-3">
       {hasMultiple ? (
         <div
-          className="flex max-h-[min(78vh,720px)] shrink-0 flex-col gap-2 overflow-y-auto"
+          className="flex shrink-0 flex-col gap-2"
           role="tablist"
           aria-label={`${exp.title} photo thumbnails`}
         >
