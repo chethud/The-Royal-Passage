@@ -10,6 +10,7 @@ import {
   isAdminNavItemActive,
   resolveAdminModule,
 } from "@/components/admin/admin-nav";
+import { writeAdminModulePreference } from "@/lib/admin-module-selection";
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
 import { HOMESTAY_OWNER_NAV_ITEMS } from "@/components/homestay-owner/homestay-owner-nav";
 import { VIP_OWNER_NAV_ITEMS } from "@/components/vip-owner/vip-owner-nav";
@@ -58,7 +59,8 @@ function navItemsForWorkspace(
   if (!signedIn) return publicGuestNavItems();
   if (!workspace) return publicGuestNavItems();
   if (workspace === "admin") {
-    return adminNavItemsForModule(resolveAdminModule(pathname));
+    const module = resolveAdminModule(pathname);
+    return adminNavItemsForModule(module);
   }
   if (workspace === "host") {
     return HOST_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
@@ -133,6 +135,8 @@ export function Header() {
   const dashboardPath = workspaceRole
     ? dashboardPathForRole(workspaceRole)
     : dashboardPathForRoles(roles, role);
+  const adminModule =
+    workspaceRole === "admin" ? resolveAdminModule(pathname) : null;
   const navItems = navItemsForWorkspace(workspaceRole, Boolean(user), pathname);
   const isHomestaySection = isHomestayPublicSection(pathname);
   const isVipSection = isVipPublicSection(pathname);
@@ -173,6 +177,10 @@ export function Header() {
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
+
+  useEffect(() => {
+    if (adminModule) writeAdminModulePreference(adminModule);
+  }, [adminModule]);
 
   const handleLogout = async () => {
     try {
@@ -222,12 +230,16 @@ export function Header() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-5 text-[0.72rem] font-medium uppercase tracking-[0.14em] md:flex lg:gap-7 lg:text-[0.76rem] lg:tracking-[0.16em]">
+        <nav
+          key={adminModule ?? workspaceRole ?? "public"}
+          className="hidden items-center gap-5 text-[0.72rem] font-medium uppercase tracking-[0.14em] md:flex lg:gap-7 lg:text-[0.76rem] lg:tracking-[0.16em]"
+          aria-label={adminModule ? `${adminModule} admin` : "Main"}
+        >
           {navItems.map((item) => {
             const active = isHeaderNavItemActive(workspaceRole, pathname, item.to);
             return (
               <Link
-                key={`${item.to}-${item.label}`}
+                key={`${adminModule ?? "nav"}-${item.to}-${item.label}`}
                 to={item.to as "/experiences"}
                 className={`${navLinkClass}${active ? " text-ember header-nav-link--active" : ""}`}
               >

@@ -25,24 +25,33 @@ export const ADMIN_VIP_NAV_ITEMS = [
 /** @deprecated Use adminNavItemsForModule(resolveAdminModule(pathname)) instead. */
 export const ADMIN_NAV_ITEMS = ADMIN_EXPERIENCE_NAV_ITEMS;
 
+function normalizeAdminPath(pathname: string): string {
+  if (pathname.length > 1 && pathname.endsWith("/")) {
+    return pathname.slice(0, -1);
+  }
+  return pathname;
+}
+
 export function resolveAdminModule(pathname: string): AdminModule {
-  if (pathname === "/admin/profile" || pathname.startsWith("/admin/profile/")) {
+  const path = normalizeAdminPath(pathname);
+
+  if (path === "/admin/profile" || path.startsWith("/admin/profile/")) {
     return "experiences";
   }
   if (
-    pathname === "/admin/vip" ||
-    pathname.startsWith("/admin/vip/") ||
-    pathname.startsWith("/admin/vip-packages") ||
-    pathname.startsWith("/admin/vip-owners")
+    path === "/admin/vip" ||
+    path.startsWith("/admin/vip/") ||
+    path.startsWith("/admin/vip-packages") ||
+    path.startsWith("/admin/vip-owners")
   ) {
     return "vip";
   }
   if (
-    pathname === "/admin/homestay" ||
-    pathname.startsWith("/admin/homestay/") ||
-    pathname.startsWith("/admin/homestays") ||
-    pathname.startsWith("/admin/homestay-owners") ||
-    pathname.startsWith("/admin/homestay-featured")
+    path === "/admin/homestay" ||
+    path.startsWith("/admin/homestay/") ||
+    path.startsWith("/admin/homestays") ||
+    path.startsWith("/admin/homestay-owners") ||
+    path.startsWith("/admin/homestay-featured")
   ) {
     return "homestays";
   }
@@ -57,14 +66,8 @@ export function adminModuleHome(module: AdminModule): string {
 
 /** Module switcher (Experiences / Homestays / VIP) only on marketplace overview pages. */
 export function isAdminOverviewPath(pathname: string): boolean {
-  return (
-    pathname === "/admin" ||
-    pathname === "/admin/" ||
-    pathname === "/admin/homestay" ||
-    pathname === "/admin/homestay/" ||
-    pathname === "/admin/vip" ||
-    pathname === "/admin/vip/"
-  );
+  const path = normalizeAdminPath(pathname);
+  return path === "/admin" || path === "/admin/homestay" || path === "/admin/vip";
 }
 
 /** Pending-approval queue for each admin marketplace module. */
@@ -91,20 +94,23 @@ export function adminNavItemsForModule(module: AdminModule) {
 }
 
 export function isAdminNavItemActive(pathname: string, to: string): boolean {
-  if (to === "/admin") {
-    return pathname === "/admin" || pathname === "/admin/";
+  const path = normalizeAdminPath(pathname);
+  const target = normalizeAdminPath(to);
+
+  if (target === "/admin") {
+    return path === "/admin";
   }
-  if (to === "/admin/homestay") {
-    return pathname === "/admin/homestay" || pathname === "/admin/homestay/";
+  if (target === "/admin/homestay") {
+    return path === "/admin/homestay";
   }
-  if (to === "/admin/homestay-featured") {
-    return pathname === "/admin/homestay-featured" || pathname.startsWith("/admin/homestay-featured/");
+  if (target === "/admin/homestay-featured") {
+    return path === "/admin/homestay-featured" || path.startsWith("/admin/homestay-featured/");
   }
-  if (to === "/admin/vip") {
-    return pathname === "/admin/vip" || pathname === "/admin/vip/";
+  if (target === "/admin/vip") {
+    return path === "/admin/vip";
   }
-  if (to === "/admin/profile") {
-    return pathname === "/admin/profile" || pathname.startsWith("/admin/profile/");
+  if (target === "/admin/profile") {
+    return path === "/admin/profile" || path.startsWith("/admin/profile/");
   }
-  return pathname === to || pathname.startsWith(`${to}/`);
+  return path === target || path.startsWith(`${target}/`);
 }

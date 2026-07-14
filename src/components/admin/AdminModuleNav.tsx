@@ -1,4 +1,4 @@
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Compass, Crown, Home } from "lucide-react";
 import {
   adminModuleHome,
@@ -10,6 +10,7 @@ import {
   useAdminModuleAlerts,
   type AdminModuleAlert,
 } from "@/hooks/use-admin-module-alerts";
+import { writeAdminModulePreference } from "@/lib/admin-module-selection";
 
 const modules: {
   id: AdminModule;
@@ -53,11 +54,24 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
   const activeModule = resolveAdminModule(pathname);
   const { alerts: alertsByModule } = useAdminModuleAlerts();
 
-  const goTo = (target: Pick<AdminModuleAlert, "to" | "search">) => {
-    void navigate({
-      to: target.to,
-      search: target.search,
-    });
+  const selectModule = (module: AdminModule) => {
+    writeAdminModulePreference(module);
+  };
+
+  const goToAlert = (target: Pick<AdminModuleAlert, "to" | "search">) => {
+    if (target.to.startsWith("/admin/homestay") || target.to.startsWith("/admin/homestays")) {
+      writeAdminModulePreference("homestays");
+    } else if (target.to.startsWith("/admin/vip")) {
+      writeAdminModulePreference("vip");
+    } else {
+      writeAdminModulePreference("experiences");
+    }
+
+    if (target.search && Object.keys(target.search).length > 0) {
+      void navigate({ to: target.to, search: target.search });
+      return;
+    }
+    void navigate({ to: target.to });
   };
 
   return (
@@ -76,16 +90,16 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
               <div
                 className={`marketplace-module-nav__item${active ? " marketplace-module-nav__item--active" : ""}`}
               >
-                <button
-                  type="button"
+                <Link
+                  to={homePath}
                   className="marketplace-module-nav__link"
                   aria-current={active ? "page" : undefined}
-                  onClick={() => goTo({ to: homePath })}
+                  onClick={() => selectModule(module.id)}
                 >
                   <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
                   <span className="marketplace-module-nav__label">{module.label}</span>
                   <span className="marketplace-module-nav__hint">{module.description}</span>
-                </button>
+                </Link>
                 {pendingTotal > 0 && primaryAlert ? (
                   <a
                     href={alertHref(primaryAlert)}
@@ -94,7 +108,7 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
                     title="View latest request"
                     onClick={(event) => {
                       event.preventDefault();
-                      goTo(primaryAlert);
+                      goToAlert(primaryAlert);
                     }}
                   >
                     {pendingTotal}
@@ -111,7 +125,7 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
                         className="marketplace-module-nav__alert"
                         onClick={(event) => {
                           event.preventDefault();
-                          goTo(alert);
+                          goToAlert(alert);
                         }}
                       >
                         <span className="marketplace-module-nav__alert-status">{alert.status}</span>
