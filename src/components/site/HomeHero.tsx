@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import {
@@ -23,14 +23,20 @@ const softEase = [0.22, 1, 0.36, 1] as const;
 const revealParent = {
   hidden: {},
   show: { transition: { staggerChildren: 0.07, delayChildren: 0.02 } },
+  exit: { transition: { staggerChildren: 0.04, staggerDirection: -1 } },
 };
-/** Sweep in from the right and settle on the left-aligned hero copy. */
+/** Sweep in from the right; wipe out to the left when idle. */
 const revealItem = {
   hidden: { opacity: 0, x: 88 },
   show: {
     opacity: 1,
     x: 0,
     transition: { duration: 0.55, ease: softEase },
+  },
+  exit: {
+    opacity: 0,
+    x: -72,
+    transition: { duration: 0.45, ease: softEase },
   },
 };
 
@@ -64,7 +70,9 @@ export function HomeHero({
   );
 
   const cinematic = Boolean(intro) && !editable;
-  const copyRevealed = !cinematic || Boolean(intro?.copyRevealed) || reduceMotion;
+  const chromeRevealed = !cinematic || Boolean(intro?.copyRevealed) || reduceMotion;
+  const copyVisible =
+    !cinematic || reduceMotion || (Boolean(intro?.copyRevealed) && !intro?.copyWiped);
   const splashDone = !cinematic || Boolean(intro?.splashDone) || reduceMotion;
 
   useEffect(() => {
@@ -107,7 +115,7 @@ export function HomeHero({
         initial={false}
         animate={
           cinematic && !reduceMotion && splashDone
-            ? copyRevealed
+            ? chromeRevealed
               ? { scale: 1.04 }
               : { scale: 1.08 }
             : { scale: 1 }
@@ -133,7 +141,7 @@ export function HomeHero({
       </motion.div>
 
       <div className="container-page relative z-10 flex min-h-[max(640px,100dvh)] flex-col justify-center pt-[var(--header-height)]">
-        {copyRevealed ? (
+        {chromeRevealed ? (
           <div className="pointer-events-none absolute inset-x-0 top-[var(--header-height)] z-20 w-full">
             <motion.div
               className="pointer-events-auto"
@@ -147,60 +155,63 @@ export function HomeHero({
         ) : null}
 
         <div className="py-14 md:py-20">
-          {copyRevealed && heading ? (
-            <motion.div
-              key={heading.id}
-              className="max-w-2xl text-left"
-              variants={reduceMotion ? undefined : revealParent}
-              initial={reduceMotion || !cinematic ? false : "hidden"}
-              animate="show"
-            >
+          <AnimatePresence mode="wait">
+            {copyVisible && heading ? (
               <motion.div
-                variants={reduceMotion ? undefined : revealItem}
-                className="eyebrow mb-5 text-ember/95"
+                key={heading.id}
+                className="max-w-2xl text-left"
+                variants={reduceMotion ? undefined : revealParent}
+                initial={reduceMotion || !cinematic ? false : "hidden"}
+                animate="show"
+                exit={reduceMotion || !cinematic ? undefined : "exit"}
               >
-                {heading.eyebrow}
-              </motion.div>
-              <motion.h1
-                variants={reduceMotion ? undefined : revealItem}
-                className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-[0.95] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]"
-              >
-                {heading.line1}
-                <br />
-                <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-                  {heading.line2}
-                </span>
-                <br />
-                {heading.line3}
-              </motion.h1>
-              <motion.p
-                variants={reduceMotion ? undefined : revealItem}
-                className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg"
-              >
-                {heading.body}
-              </motion.p>
-              <motion.div
-                variants={reduceMotion ? undefined : revealItem}
-                className="mt-7 flex flex-wrap items-center justify-start gap-3 sm:mt-9 sm:gap-4"
-              >
-                <Link
-                  to="/experiences"
-                  className="group inline-flex items-center gap-2 rounded-sm bg-ember px-6 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-8 sm:py-4 sm:text-xs"
+                <motion.div
+                  variants={reduceMotion ? undefined : revealItem}
+                  className="eyebrow mb-5 text-ember/95"
                 >
-                  Explore Experiences
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-                {!user ? (
+                  {heading.eyebrow}
+                </motion.div>
+                <motion.h1
+                  variants={reduceMotion ? undefined : revealItem}
+                  className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-[0.95] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]"
+                >
+                  {heading.line1}
+                  <br />
+                  <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
+                    {heading.line2}
+                  </span>
+                  <br />
+                  {heading.line3}
+                </motion.h1>
+                <motion.p
+                  variants={reduceMotion ? undefined : revealItem}
+                  className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg"
+                >
+                  {heading.body}
+                </motion.p>
+                <motion.div
+                  variants={reduceMotion ? undefined : revealItem}
+                  className="mt-7 flex flex-wrap items-center justify-start gap-3 sm:mt-9 sm:gap-4"
+                >
                   <Link
-                    to="/sign-in"
-                    className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-transparent px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink/85 backdrop-blur-md transition-colors hover:border-ember/55 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
+                    to="/experiences"
+                    className="group inline-flex items-center gap-2 rounded-sm bg-ember px-6 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-8 sm:py-4 sm:text-xs"
                   >
-                    Sign in
+                    Explore Experiences
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
-                ) : null}
+                  {!user ? (
+                    <Link
+                      to="/sign-in"
+                      className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-transparent px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink/85 backdrop-blur-md transition-colors hover:border-ember/55 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
+                    >
+                      Sign in
+                    </Link>
+                  ) : null}
+                </motion.div>
               </motion.div>
-            </motion.div>
-          ) : null}
+            ) : null}
+          </AnimatePresence>
         </div>
 
         {editable && onHeadingsChange ? (
@@ -273,7 +284,7 @@ export function HomeHero({
           </div>
         ) : null}
 
-        {!editable && copyRevealed ? (
+        {!editable && chromeRevealed ? (
           reduceMotion ? (
             <a
               href="#experiences"
@@ -304,7 +315,7 @@ export function HomeHero({
           )
         ) : null}
 
-        {copyRevealed ? (
+        {chromeRevealed ? (
           <motion.div
             className="pointer-events-auto absolute inset-x-0 bottom-8 z-20 flex items-center justify-center gap-2"
             initial={cinematic && !reduceMotion ? { opacity: 0, y: 10 } : false}
