@@ -27,6 +27,8 @@ export function useHomeIntro() {
 const SPLASH_MS = 1800;
 /** Tiny threshold — any near-immediate scroll unlocks the hero chrome. */
 const REVEAL_SCROLL_PX = 2;
+/** If the visitor stays still after splash, auto-reveal hero copy. */
+const STAGNANT_REVEAL_MS = 5000;
 /** Navbar follows copy almost immediately. */
 const NAV_AFTER_COPY_MS = 120;
 
@@ -85,11 +87,13 @@ export function HomeIntroProvider({ children }: { children: ReactNode }) {
     };
 
     onScroll();
+    const idleTimer = window.setTimeout(reveal, STAGNANT_REVEAL_MS);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("wheel", onWheel, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: true });
     window.addEventListener("keydown", onKeyDown);
     return () => {
+      window.clearTimeout(idleTimer);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchmove", onTouchMove);

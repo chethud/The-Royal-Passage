@@ -1,9 +1,11 @@
 export const HOMEPAGE_SHOWCASE_KEY = "homepage_showcase";
 export const HOMEPAGE_JOURNAL_KEY = "homepage_journal";
 export const HOMEPAGE_HERO_KEY = "homepage_hero";
+export const HOMEPAGE_HERO_HEADINGS_KEY = "homepage_hero_headings";
 export const HOMEPAGE_JOURNEYS_KEY = "homepage_journeys";
 export const HOMEPAGE_VERSION_KEY = "homepage_content_version";
 export const HOMEPAGE_CACHE_KEY = "homepage-content-v1";
+export const HERO_HEADING_ROTATION_KEY = "trp-hero-heading-rotation";
 
 export type ShowcaseIconKey = "pottery" | "flame" | "heritage";
 
@@ -30,6 +32,17 @@ export type HomepageHeroSlide = {
   alt: string;
 };
 
+/** Homepage hero copy variants — index 0 is priority; all three rotate on refresh/login. */
+export type HomepageHeroHeading = {
+  id: string;
+  eyebrow: string;
+  line1: string;
+  /** Accent line (ember). */
+  line2: string;
+  line3: string;
+  body: string;
+};
+
 export type JourneySlideTheme = "palace" | "manuscript" | "dasara";
 
 export type HomepageJourneySlide = {
@@ -45,6 +58,7 @@ export type HomepageContent = {
   showcase: HomepageShowcaseItem[];
   journal: HomepageJournalItem[];
   hero: HomepageHeroSlide[];
+  heroHeadings: HomepageHeroHeading[];
   journeys: HomepageJourneySlide[];
   version: number;
 };
@@ -107,6 +121,33 @@ const FALLBACK_HERO: HomepageHeroSlide[] = [
   { id: "hero-dinner", imageUrl: "", alt: "A candlelit private dinner under a glasshouse at dusk" },
   { id: "hero-dining", imageUrl: "", alt: "A plated culinary course in dramatic light" },
   { id: "hero-craft", imageUrl: "", alt: "Hands shaping clay on a pottery wheel" },
+];
+
+const FALLBACK_HERO_HEADINGS: HomepageHeroHeading[] = [
+  {
+    id: "heading-priority",
+    eyebrow: "Curated Experiences",
+    line1: "Experience",
+    line2: "Mysuru,",
+    line3: "Royally",
+    body: "Step into the cultural heart of Karnataka. From heritage walks to culinary journeys, we craft experiences that connect you with the soul of Mysuru.",
+  },
+  {
+    id: "heading-alt-1",
+    eyebrow: "Royal Journeys",
+    line1: "Discover",
+    line2: "Mysuru,",
+    line3: "Unhurried",
+    body: "Walk palace corridors, taste heritage kitchens, and meet the craftspeople who keep Mysuru’s living traditions alive.",
+  },
+  {
+    id: "heading-alt-2",
+    eyebrow: "Immersive Stays",
+    line1: "Live",
+    line2: "Mysuru,",
+    line3: "Like Royalty",
+    body: "From sunset heritage walks to candlelit courtyards, every journey is curated for travellers who seek something rare.",
+  },
 ];
 
 const FALLBACK_JOURNEYS: HomepageJourneySlide[] = [
@@ -194,6 +235,19 @@ function normalizeHeroSlide(raw: unknown, fallback: HomepageHeroSlide): Homepage
   };
 }
 
+function normalizeHeroHeading(raw: unknown, fallback: HomepageHeroHeading): HomepageHeroHeading {
+  if (!raw || typeof raw !== "object") return fallback;
+  const item = raw as Partial<HomepageHeroHeading>;
+  return {
+    id: typeof item.id === "string" && item.id.trim() ? item.id : fallback.id,
+    eyebrow: typeof item.eyebrow === "string" && item.eyebrow.trim() ? item.eyebrow : fallback.eyebrow,
+    line1: typeof item.line1 === "string" && item.line1.trim() ? item.line1 : fallback.line1,
+    line2: typeof item.line2 === "string" && item.line2.trim() ? item.line2 : fallback.line2,
+    line3: typeof item.line3 === "string" && item.line3.trim() ? item.line3 : fallback.line3,
+    body: typeof item.body === "string" && item.body.trim() ? item.body : fallback.body,
+  };
+}
+
 function normalizeJourneySlide(raw: unknown, fallback: HomepageJourneySlide): HomepageJourneySlide {
   if (!raw || typeof raw !== "object") return fallback;
   const item = raw as Partial<HomepageJourneySlide>;
@@ -240,6 +294,7 @@ export function normalizeHomepageContent(
     showcase?: unknown;
     journal?: unknown;
     hero?: unknown;
+    heroHeadings?: unknown;
     journeys?: unknown;
     version?: unknown;
   },
@@ -247,16 +302,19 @@ export function normalizeHomepageContent(
     showcaseFallbacks?: HomepageShowcaseItem[];
     journalFallbacks?: HomepageJournalItem[];
     heroFallbacks?: HomepageHeroSlide[];
+    heroHeadingsFallbacks?: HomepageHeroHeading[];
     journeysFallbacks?: HomepageJourneySlide[];
   },
 ): HomepageContent {
   const showcaseFallbacks = options?.showcaseFallbacks ?? FALLBACK_SHOWCASE;
   const journalFallbacks = options?.journalFallbacks ?? FALLBACK_JOURNAL;
   const heroFallbacks = options?.heroFallbacks ?? FALLBACK_HERO;
+  const heroHeadingsFallbacks = options?.heroHeadingsFallbacks ?? FALLBACK_HERO_HEADINGS;
   const journeysFallbacks = options?.journeysFallbacks ?? FALLBACK_JOURNEYS;
   const showcaseRaw = Array.isArray(raw.showcase) ? raw.showcase : null;
   const journalRaw = Array.isArray(raw.journal) ? raw.journal : null;
   const heroRaw = Array.isArray(raw.hero) ? raw.hero : null;
+  const heroHeadingsRaw = Array.isArray(raw.heroHeadings) ? raw.heroHeadings : null;
   const journeysRaw = Array.isArray(raw.journeys) ? raw.journeys : null;
 
   return {
@@ -267,9 +325,45 @@ export function normalizeHomepageContent(
       normalizeJournalItem(journalRaw?.[index], fallback),
     ),
     hero: heroFallbacks.map((fallback, index) => normalizeHeroSlide(heroRaw?.[index], fallback)),
+    heroHeadings: heroHeadingsFallbacks.map((fallback, index) =>
+      normalizeHeroHeading(heroHeadingsRaw?.[index], fallback),
+    ),
     journeys: journeysFallbacks.map((fallback, index) =>
       normalizeJourneySlide(journeysRaw?.[index], fallback),
     ),
     version: parseVersionValue(raw.version),
   };
+}
+
+/**
+ * Advance through the 3 headings on each homepage load (refresh / new visit).
+ * Index 0 is the priority heading and leads the rotation cycle.
+ * Debounced so React Strict Mode remounts do not skip a heading.
+ */
+let lastHeroHeadingRotateAt = 0;
+
+export function takeNextHeroHeading(
+  headings: HomepageHeroHeading[],
+  options?: { rotate?: boolean },
+): HomepageHeroHeading {
+  const list = headings.length > 0 ? headings : FALLBACK_HERO_HEADINGS;
+  if (options?.rotate === false || typeof window === "undefined") {
+    return list[0]!;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(HERO_HEADING_ROTATION_KEY);
+    const stored = raw ? Number.parseInt(raw, 10) : 0;
+    const current = Number.isFinite(stored) ? ((stored % list.length) + list.length) % list.length : 0;
+    const now = Date.now();
+    if (now - lastHeroHeadingRotateAt > 800) {
+      lastHeroHeadingRotateAt = now;
+      const next = (current + 1) % list.length;
+      window.localStorage.setItem(HERO_HEADING_ROTATION_KEY, String(next));
+      return list[current]!;
+    }
+    return list[current]!;
+  } catch {
+    return list[0]!;
+  }
 }

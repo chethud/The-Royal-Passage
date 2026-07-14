@@ -8,12 +8,12 @@ import appCss from "../styles.css?url";
 
 /** Slimmed family set — display=swap avoids invisible text while fonts load. */
 const GOOGLE_FONTS_HREF =
-  "https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap";
+  "https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;500;600;700&display=swap";
 
 /** Above-the-fold paint without waiting on the full stylesheet. */
 const CRITICAL_CSS = `
 html{background:#2a0808;color:#f7f1e8}
-body{margin:0;min-height:100%;background:#2a0808;color:#f7f1e8;font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif}
+body{margin:0;min-height:100%;background:#2a0808;color:#f7f1e8;font-family:"Cinzel",Georgia,"Times New Roman",serif}
 `.replace(/\s+/g, " ").trim();
 
 function NotFoundComponent() {
@@ -63,17 +63,17 @@ export const Route = createRootRoute({
     links: [
       {
         rel: "icon",
-        href: "/favicon.png",
+        href: "/favicon.png?v=2",
         type: "image/png",
       },
       {
         rel: "shortcut icon",
-        href: "/favicon.png",
+        href: "/favicon.png?v=2",
         type: "image/png",
       },
       {
         rel: "apple-touch-icon",
-        href: "/apple-touch-icon.png",
+        href: "/apple-touch-icon.png?v=2",
       },
       {
         rel: "preload",

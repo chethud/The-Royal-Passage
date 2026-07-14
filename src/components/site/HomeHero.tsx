@@ -1,13 +1,20 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ChevronDown } from "lucide-react";
-import { EditablePhotoField } from "@/components/editor/EditableHomepageFields";
+import {
+  EditablePhotoField,
+  EditableTextField,
+} from "@/components/editor/EditableHomepageFields";
 import { HeroSlideshow } from "@/components/site/HeroSlideshow";
 import { SiteBannerStrip } from "@/components/site/SiteBannerStrip";
 import { useHomeIntro } from "@/components/site/home-intro";
-import type { HomepageHeroSlide } from "@/lib/homepage-content";
-import { withHomepageCacheBust } from "@/lib/homepage-content";
+import {
+  takeNextHeroHeading,
+  type HomepageHeroHeading,
+  type HomepageHeroSlide,
+  withHomepageCacheBust,
+} from "@/lib/homepage-content";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { useAuthUser } from "@/lib/auth-user";
 
@@ -15,36 +22,66 @@ const softEase = [0.22, 1, 0.36, 1] as const;
 
 const revealParent = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.04, delayChildren: 0 } },
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.02 } },
 };
+/** Sweep in from the right and settle on the left-aligned hero copy. */
 const revealItem = {
-  hidden: { opacity: 0, x: 36 },
-  show: { opacity: 1, x: 0, transition: { duration: 0.35, ease: softEase } },
+  hidden: { opacity: 0, x: 88 },
+  show: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.55, ease: softEase },
+  },
 };
 
 type HomeHeroProps = {
   slides: HomepageHeroSlide[];
+  headings?: HomepageHeroHeading[];
   imageVersion?: number;
   editable?: boolean;
   onSlidesChange?: (slides: HomepageHeroSlide[]) => void;
+  onHeadingsChange?: (headings: HomepageHeroHeading[]) => void;
   uploadPhoto?: (itemIndex: number) => (file: File) => Promise<string>;
 };
 
 export function HomeHero({
   slides,
+  headings = [],
   imageVersion = 0,
   editable = false,
   onSlidesChange,
+  onHeadingsChange,
   uploadPhoto,
 }: HomeHeroProps) {
   const reduceMotion = usePrefersReducedMotion();
   const intro = useHomeIntro();
   const { user } = useAuthUser();
   const [activeSlide, setActiveSlide] = useState(0);
+  const [editHeadingIndex, setEditHeadingIndex] = useState(0);
+  const rotatedRef = useRef(false);
+  const [activeHeading, setActiveHeading] = useState<HomepageHeroHeading | null>(
+    () => headings[0] ?? null,
+  );
 
   const cinematic = Boolean(intro) && !editable;
   const copyRevealed = !cinematic || Boolean(intro?.copyRevealed) || reduceMotion;
   const splashDone = !cinematic || Boolean(intro?.splashDone) || reduceMotion;
+
+  useEffect(() => {
+    if (editable) {
+      setActiveHeading(headings[editHeadingIndex] ?? headings[0] ?? null);
+      return;
+    }
+    if (!rotatedRef.current) {
+      rotatedRef.current = true;
+      setActiveHeading(takeNextHeroHeading(headings, { rotate: true }));
+      return;
+    }
+    setActiveHeading((prev) => {
+      if (!prev) return headings[0] ?? null;
+      return headings.find((item) => item.id === prev.id) ?? headings[0] ?? null;
+    });
+  }, [editable, editHeadingIndex, headings]);
 
   const heroSlides = slides.map((slide) => ({
     src: withHomepageCacheBust(slide.imageUrl, imageVersion),
@@ -55,6 +92,13 @@ export function HomeHero({
     if (!onSlidesChange) return;
     onSlidesChange(slides.map((slide, idx) => (idx === index ? { ...slide, ...patch } : slide)));
   };
+
+  const updateHeading = (index: number, patch: Partial<HomepageHeroHeading>) => {
+    if (!onHeadingsChange) return;
+    onHeadingsChange(headings.map((item, idx) => (idx === index ? { ...item, ...patch } : item)));
+  };
+
+  const heading = activeHeading ?? headings[0];
 
   return (
     <section className="relative min-h-[max(640px,100dvh)] w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)]">
@@ -103,8 +147,9 @@ export function HomeHero({
         ) : null}
 
         <div className="py-14 md:py-20">
-          {copyRevealed ? (
+          {copyRevealed && heading ? (
             <motion.div
+              key={heading.id}
               className="max-w-2xl text-left"
               variants={reduceMotion ? undefined : revealParent}
               initial={reduceMotion || !cinematic ? false : "hidden"}
@@ -114,26 +159,25 @@ export function HomeHero({
                 variants={reduceMotion ? undefined : revealItem}
                 className="eyebrow mb-5 text-ember/95"
               >
-                Curated Experiences
+                {heading.eyebrow}
               </motion.div>
               <motion.h1
                 variants={reduceMotion ? undefined : revealItem}
                 className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-[0.95] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]"
               >
-                Experience
+                {heading.line1}
                 <br />
                 <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-                  Mysuru,
+                  {heading.line2}
                 </span>
                 <br />
-                Royally
+                {heading.line3}
               </motion.h1>
               <motion.p
                 variants={reduceMotion ? undefined : revealItem}
                 className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg"
               >
-                Step into the cultural heart of Karnataka. From heritage walks to culinary journeys,
-                we craft experiences that connect you with the soul of Mysuru.
+                {heading.body}
               </motion.p>
               <motion.div
                 variants={reduceMotion ? undefined : revealItem}
@@ -158,6 +202,61 @@ export function HomeHero({
             </motion.div>
           ) : null}
         </div>
+
+        {editable && onHeadingsChange ? (
+          <div className="pointer-events-auto absolute inset-x-0 top-[calc(var(--header-height)+1rem)] z-30 px-4">
+            <div className="container-page max-w-xl space-y-3 rounded-sm border border-ember/35 bg-black/55 p-3 backdrop-blur-md">
+              <div className="flex flex-wrap gap-2">
+                {headings.map((item, index) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setEditHeadingIndex(index)}
+                    className={`rounded-sm border px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] transition-colors ${
+                      editHeadingIndex === index
+                        ? "border-ember bg-ember/20 text-ember"
+                        : "border-ember/30 text-ink/70 hover:border-ember/55 hover:text-ember"
+                    }`}
+                  >
+                    {index === 0 ? "Priority" : `Heading ${index + 1}`}
+                  </button>
+                ))}
+              </div>
+              {headings[editHeadingIndex] ? (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <EditableTextField
+                    label="Eyebrow"
+                    value={headings[editHeadingIndex]!.eyebrow}
+                    onChange={(eyebrow) => updateHeading(editHeadingIndex, { eyebrow })}
+                  />
+                  <EditableTextField
+                    label="Line 1"
+                    value={headings[editHeadingIndex]!.line1}
+                    onChange={(line1) => updateHeading(editHeadingIndex, { line1 })}
+                  />
+                  <EditableTextField
+                    label="Accent line"
+                    value={headings[editHeadingIndex]!.line2}
+                    onChange={(line2) => updateHeading(editHeadingIndex, { line2 })}
+                  />
+                  <EditableTextField
+                    label="Line 3"
+                    value={headings[editHeadingIndex]!.line3}
+                    onChange={(line3) => updateHeading(editHeadingIndex, { line3 })}
+                  />
+                  <div className="sm:col-span-2">
+                    <EditableTextField
+                      label="Body"
+                      value={headings[editHeadingIndex]!.body}
+                      onChange={(body) => updateHeading(editHeadingIndex, { body })}
+                      multiline
+                    />
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
 
         {editable && uploadPhoto ? (
           <div className="pointer-events-auto absolute inset-x-0 bottom-24 z-20 px-4 sm:bottom-28">

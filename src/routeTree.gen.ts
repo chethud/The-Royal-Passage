@@ -56,6 +56,7 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminHomestayFeaturedRouteImport } from './routes/admin.homestay-featured'
 import { Route as AdminHomepageEditRouteImport } from './routes/admin.homepage-edit'
+import { Route as AdminHomepagePhotosRouteImport } from './routes/admin.homepage-photos'
 import { Route as AccountVipApplyRouteImport } from './routes/account.vip-apply'
 import { Route as AccountProfileRouteImport } from './routes/account.profile'
 import { Route as VipsBrowseIndexRouteImport } from './routes/vips.browse.index'
@@ -343,6 +344,11 @@ const AdminHomepageEditRoute = AdminHomepageEditRouteImport.update({
   path: '/homepage-edit',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHomepagePhotosRoute = AdminHomepagePhotosRouteImport.update({
+  id: '/homepage-photos',
+  path: '/homepage-photos',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AccountVipApplyRoute = AccountVipApplyRouteImport.update({
   id: '/account/vip-apply',
   path: '/account/vip-apply',
@@ -622,6 +628,7 @@ export interface FileRoutesByFullPath {
   '/account/profile': typeof AccountProfileRoute
   '/account/vip-apply': typeof AccountVipApplyRoute
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
+  '/admin/homepage-photos': typeof AdminHomepagePhotosRoute
   '/admin/homestay-featured': typeof AdminHomestayFeaturedRoute
   '/admin/profile': typeof AdminProfileRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
@@ -719,6 +726,7 @@ export interface FileRoutesByTo {
   '/account/profile': typeof AccountProfileRoute
   '/account/vip-apply': typeof AccountVipApplyRoute
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
+  '/admin/homepage-photos': typeof AdminHomepagePhotosRoute
   '/admin/homestay-featured': typeof AdminHomestayFeaturedRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/cities/$slug': typeof CitiesSlugRoute
@@ -808,6 +816,7 @@ export interface FileRoutesById {
   '/account/profile': typeof AccountProfileRoute
   '/account/vip-apply': typeof AccountVipApplyRoute
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
+  '/admin/homepage-photos': typeof AdminHomepagePhotosRoute
   '/admin/homestay-featured': typeof AdminHomestayFeaturedRoute
   '/admin/profile': typeof AdminProfileRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
@@ -910,6 +919,7 @@ export interface FileRouteTypes {
     | '/account/profile'
     | '/account/vip-apply'
     | '/admin/homepage-edit'
+    | '/admin/homepage-photos'
     | '/admin/homestay-featured'
     | '/admin/profile'
     | '/auth/callback'
@@ -1007,6 +1017,7 @@ export interface FileRouteTypes {
     | '/account/profile'
     | '/account/vip-apply'
     | '/admin/homepage-edit'
+    | '/admin/homepage-photos'
     | '/admin/homestay-featured'
     | '/auth/callback'
     | '/cities/$slug'
@@ -1095,6 +1106,7 @@ export interface FileRouteTypes {
     | '/account/profile'
     | '/account/vip-apply'
     | '/admin/homepage-edit'
+    | '/admin/homepage-photos'
     | '/admin/homestay-featured'
     | '/admin/profile'
     | '/auth/callback'
@@ -1557,6 +1569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminHomepageEditRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/homepage-photos': {
+      id: '/admin/homepage-photos'
+      path: '/homepage-photos'
+      fullPath: '/admin/homepage-photos'
+      preLoaderRoute: typeof AdminHomepagePhotosRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/account/vip-apply': {
       id: '/account/vip-apply'
       path: '/account/vip-apply'
@@ -1935,6 +1954,7 @@ const AdminProfileRouteWithChildren = AdminProfileRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminHomepageEditRoute: typeof AdminHomepageEditRoute
+  AdminHomepagePhotosRoute: typeof AdminHomepagePhotosRoute
   AdminHomestayFeaturedRoute: typeof AdminHomestayFeaturedRoute
   AdminProfileRoute: typeof AdminProfileRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1959,6 +1979,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminHomepageEditRoute: AdminHomepageEditRoute,
+  AdminHomepagePhotosRoute: AdminHomepagePhotosRoute,
   AdminHomestayFeaturedRoute: AdminHomestayFeaturedRoute,
   AdminProfileRoute: AdminProfileRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,

@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Loader2, Save } from "lucide-react";
-import { EditablePhotoField } from "@/components/editor/EditableHomepageFields";
+import { EditablePhotoField, EditableTextField } from "@/components/editor/EditableHomepageFields";
 import { ShowcaseExperiencePicker } from "@/components/admin/ShowcaseExperiencePicker";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { useAuthUser } from "@/lib/auth-user";
@@ -13,6 +13,7 @@ import {
 import type { HomepagePhotoSection } from "@/lib/homepage-content-keys";
 import {
   saveHomepageHero,
+  saveHomepageHeroHeadings,
   saveHomepageJournal,
   saveHomepageShowcase,
 } from "@/lib/homepage-content-fns";
@@ -27,6 +28,8 @@ type AdminHomepagePhotoEditorProps = {
   experiences?: ShowcaseExperienceOption[];
 };
 
+type BusySection = HomepagePhotoSection | "heroHeadings";
+
 export function AdminHomepagePhotoEditor({
   initialContent,
   experiences = [],
@@ -34,7 +37,7 @@ export function AdminHomepagePhotoEditor({
   const { accessToken } = useAuthUser();
   const [content, setContent] = useState(() => normalizeHomepageContent(initialContent));
   const [savedSnapshot, setSavedSnapshot] = useState(() => normalizeHomepageContent(initialContent));
-  const [busySection, setBusySection] = useState<HomepagePhotoSection | null>(null);
+  const [busySection, setBusySection] = useState<BusySection | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -87,7 +90,7 @@ export function AdminHomepagePhotoEditor({
     [accessToken],
   );
 
-  const saveSection = async (section: HomepagePhotoSection) => {
+  const saveSection = async (section: BusySection) => {
     setBusySection(section);
     setError(null);
     setMessage(null);
@@ -97,6 +100,11 @@ export function AdminHomepagePhotoEditor({
 
       if (section === "hero") {
         const result = await saveHomepageHero({ data: { accessToken: token, items: content.hero } });
+        version = result.version;
+      } else if (section === "heroHeadings") {
+        const result = await saveHomepageHeroHeadings({
+          data: { accessToken: token, items: content.heroHeadings },
+        });
         version = result.version;
       } else if (section === "showcase") {
         const result = await saveHomepageShowcase({
@@ -113,7 +121,11 @@ export function AdminHomepagePhotoEditor({
       const next = { ...content, version };
       setContent(next);
       setSavedSnapshot(next);
-      setMessage("Alt text and details saved.");
+      setMessage(
+        section === "heroHeadings"
+          ? "Hero headings saved — they rotate on each homepage refresh."
+          : "Alt text and details saved.",
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save section.");
     } finally {
@@ -122,6 +134,8 @@ export function AdminHomepagePhotoEditor({
   };
 
   const heroDirty = JSON.stringify(content.hero) !== JSON.stringify(savedSnapshot.hero);
+  const heroHeadingsDirty =
+    JSON.stringify(content.heroHeadings) !== JSON.stringify(savedSnapshot.heroHeadings);
   const showcaseDirty = JSON.stringify(content.showcase) !== JSON.stringify(savedSnapshot.showcase);
   const journalDirty = JSON.stringify(content.journal) !== JSON.stringify(savedSnapshot.journal);
 
@@ -138,6 +152,103 @@ export function AdminHomepagePhotoEditor({
           {error}
         </p>
       ) : null}
+
+      <LuxuryCheckoutPanel>
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Hero headings</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Heading 1 is priority. All three rotate on each homepage refresh or return visit.
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled={!heroHeadingsDirty || busySection !== null}
+            onClick={() => void saveSection("heroHeadings")}
+            className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
+          >
+            {busySection === "heroHeadings" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Save className="h-3.5 w-3.5" />
+            )}
+            Save headings
+          </button>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {content.heroHeadings.map((heading, index) => (
+            <div
+              key={heading.id}
+              className="space-y-2 rounded-sm border border-ember/30 bg-black/20 p-3"
+            >
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-ember">
+                {index === 0 ? "Heading 1 · Priority" : `Heading ${index + 1}`}
+              </p>
+              <EditableTextField
+                label="Eyebrow"
+                value={heading.eyebrow}
+                onChange={(eyebrow) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    heroHeadings: prev.heroHeadings.map((item, i) =>
+                      i === index ? { ...item, eyebrow } : item,
+                    ),
+                  }))
+                }
+              />
+              <EditableTextField
+                label="Line 1"
+                value={heading.line1}
+                onChange={(line1) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    heroHeadings: prev.heroHeadings.map((item, i) =>
+                      i === index ? { ...item, line1 } : item,
+                    ),
+                  }))
+                }
+              />
+              <EditableTextField
+                label="Accent line"
+                value={heading.line2}
+                onChange={(line2) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    heroHeadings: prev.heroHeadings.map((item, i) =>
+                      i === index ? { ...item, line2 } : item,
+                    ),
+                  }))
+                }
+              />
+              <EditableTextField
+                label="Line 3"
+                value={heading.line3}
+                onChange={(line3) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    heroHeadings: prev.heroHeadings.map((item, i) =>
+                      i === index ? { ...item, line3 } : item,
+                    ),
+                  }))
+                }
+              />
+              <EditableTextField
+                label="Body"
+                value={heading.body}
+                multiline
+                onChange={(body) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    heroHeadings: prev.heroHeadings.map((item, i) =>
+                      i === index ? { ...item, body } : item,
+                    ),
+                  }))
+                }
+              />
+            </div>
+          ))}
+        </div>
+      </LuxuryCheckoutPanel>
 
       <LuxuryCheckoutPanel>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">

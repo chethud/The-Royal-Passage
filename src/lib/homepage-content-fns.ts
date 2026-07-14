@@ -10,6 +10,7 @@ import {
 } from "@/lib/homepage-photo.server";
 import {
   DEFAULT_HOMEPAGE_CONTENT,
+  HOMEPAGE_HERO_HEADINGS_KEY,
   HOMEPAGE_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
   HOMEPAGE_JOURNEYS_KEY,
@@ -45,6 +46,15 @@ const heroSlideSchema = z.object({
   id: z.string().min(1),
   imageUrl: z.string().min(1),
   alt: z.string().min(1).max(200),
+});
+
+const heroHeadingSchema = z.object({
+  id: z.string().min(1),
+  eyebrow: z.string().min(1).max(80),
+  line1: z.string().min(1).max(80),
+  line2: z.string().min(1).max(80),
+  line3: z.string().min(1).max(80),
+  body: z.string().min(1).max(500),
 });
 
 const journeySlideSchema = z.object({
@@ -85,7 +95,7 @@ export const saveHomepageShowcase = createServerFn({ method: "POST" })
       throw new Error(configError);
     }
 
-    await requireHomepageAdmin(data.accessToken);
+    await requireHomepageJournalEditor(data.accessToken);
     const supabase = getSupabaseAdmin();
     await writePlatformSetting(supabase, HOMEPAGE_SHOWCASE_KEY, data.items);
     const version = await bumpHomepageVersion(supabase);
@@ -125,9 +135,29 @@ export const saveHomepageHero = createServerFn({ method: "POST" })
       throw new Error(configError);
     }
 
-    await requireHomepageAdmin(data.accessToken);
+    await requireHomepageJournalEditor(data.accessToken);
     const supabase = getSupabaseAdmin();
     await writePlatformSetting(supabase, HOMEPAGE_HERO_KEY, data.items);
+    const version = await bumpHomepageVersion(supabase);
+    return { version };
+  });
+
+export const saveHomepageHeroHeadings = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      accessToken: z.string().min(1),
+      items: z.array(heroHeadingSchema).length(3),
+    }),
+  )
+  .handler(async ({ data }): Promise<{ version: number }> => {
+    const configError = getSupabaseConfigError();
+    if (configError) {
+      throw new Error(configError);
+    }
+
+    await requireHomepageJournalEditor(data.accessToken);
+    const supabase = getSupabaseAdmin();
+    await writePlatformSetting(supabase, HOMEPAGE_HERO_HEADINGS_KEY, data.items);
     const version = await bumpHomepageVersion(supabase);
     return { version };
   });

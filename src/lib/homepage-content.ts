@@ -7,6 +7,7 @@ import natureWalksImg from "@/assets/nature-walks.png";
 import outdoorCookingImg from "@/assets/outdoor-cooking.png";
 import {
   HOMEPAGE_CACHE_KEY,
+  HOMEPAGE_HERO_HEADINGS_KEY,
   HOMEPAGE_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
   HOMEPAGE_JOURNEYS_KEY,
@@ -14,7 +15,9 @@ import {
   HOMEPAGE_VERSION_KEY,
   normalizeHomepageContent as normalizeHomepageContentBase,
   parseVersionValue,
+  takeNextHeroHeading,
   type HomepageContent,
+  type HomepageHeroHeading,
   type HomepageHeroSlide,
   type HomepageJournalItem,
   type HomepageJourneySlide,
@@ -24,13 +27,16 @@ import {
 
 export {
   HOMEPAGE_CACHE_KEY,
+  HOMEPAGE_HERO_HEADINGS_KEY,
   HOMEPAGE_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
   HOMEPAGE_JOURNEYS_KEY,
   HOMEPAGE_SHOWCASE_KEY,
   HOMEPAGE_VERSION_KEY,
   parseVersionValue,
+  takeNextHeroHeading,
   type HomepageContent,
+  type HomepageHeroHeading,
   type HomepageHeroSlide,
   type HomepageJournalItem,
   type HomepageJourneySlide,
@@ -42,6 +48,7 @@ export function normalizeHomepageContent(raw: {
   showcase?: unknown;
   journal?: unknown;
   hero?: unknown;
+  heroHeadings?: unknown;
   journeys?: unknown;
   version?: unknown;
 }): HomepageContent {
@@ -49,6 +56,7 @@ export function normalizeHomepageContent(raw: {
     showcaseFallbacks: DEFAULT_HOMEPAGE_SHOWCASE,
     journalFallbacks: DEFAULT_HOMEPAGE_JOURNAL,
     heroFallbacks: DEFAULT_HOMEPAGE_HERO,
+    heroHeadingsFallbacks: DEFAULT_HOMEPAGE_HERO_HEADINGS,
     journeysFallbacks: DEFAULT_HOMEPAGE_JOURNEYS,
   });
 }
@@ -133,6 +141,33 @@ export const DEFAULT_HOMEPAGE_HERO: HomepageHeroSlide[] = [
   },
 ];
 
+export const DEFAULT_HOMEPAGE_HERO_HEADINGS: HomepageHeroHeading[] = [
+  {
+    id: "heading-priority",
+    eyebrow: "Curated Experiences",
+    line1: "Experience",
+    line2: "Mysuru,",
+    line3: "Royally",
+    body: "Step into the cultural heart of Karnataka. From heritage walks to culinary journeys, we craft experiences that connect you with the soul of Mysuru.",
+  },
+  {
+    id: "heading-alt-1",
+    eyebrow: "Royal Journeys",
+    line1: "Discover",
+    line2: "Mysuru,",
+    line3: "Unhurried",
+    body: "Walk palace corridors, taste heritage kitchens, and meet the craftspeople who keep Mysuru’s living traditions alive.",
+  },
+  {
+    id: "heading-alt-2",
+    eyebrow: "Immersive Stays",
+    line1: "Live",
+    line2: "Mysuru,",
+    line3: "Like Royalty",
+    body: "From sunset heritage walks to candlelit courtyards, every journey is curated for travellers who seek something rare.",
+  },
+];
+
 export const DEFAULT_HOMEPAGE_JOURNEYS: HomepageJourneySlide[] = [
   {
     id: "palace",
@@ -176,6 +211,7 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   showcase: DEFAULT_HOMEPAGE_SHOWCASE,
   journal: DEFAULT_HOMEPAGE_JOURNAL,
   hero: DEFAULT_HOMEPAGE_HERO,
+  heroHeadings: DEFAULT_HOMEPAGE_HERO_HEADINGS,
   journeys: DEFAULT_HOMEPAGE_JOURNEYS,
   version: 0,
 };

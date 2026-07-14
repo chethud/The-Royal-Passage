@@ -84,7 +84,11 @@ function Index() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
         />
 
-        <HomeHero slides={publicContent.hero} imageVersion={publicContent.version} />
+        <HomeHero
+          slides={publicContent.hero}
+          headings={publicContent.heroHeadings}
+          imageVersion={publicContent.version}
+        />
         <ScrollParallaxSection>
           <ExperiencesShowcase items={publicContent.showcase} imageVersion={publicContent.version} />
         </ScrollParallaxSection>

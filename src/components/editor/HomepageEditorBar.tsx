@@ -4,6 +4,7 @@ import { RoleBadge } from "@/components/auth/RoleBadge";
 import { resolveAccessToken } from "@/lib/auth-session";
 import {
   saveHomepageHero,
+  saveHomepageHeroHeadings,
   saveHomepageJournal,
   saveHomepageJourneys,
   saveHomepageShowcase,
@@ -26,12 +27,14 @@ export function HomepageEditorBar({ role, draft, savedSnapshot, onSaved }: Homep
   const journalDirty = JSON.stringify(draft.journal) !== JSON.stringify(savedSnapshot.journal);
   const showcaseDirty = JSON.stringify(draft.showcase) !== JSON.stringify(savedSnapshot.showcase);
   const heroDirty = JSON.stringify(draft.hero) !== JSON.stringify(savedSnapshot.hero);
+  const heroHeadingsDirty =
+    JSON.stringify(draft.heroHeadings) !== JSON.stringify(savedSnapshot.heroHeadings);
   const journeysDirty = JSON.stringify(draft.journeys) !== JSON.stringify(savedSnapshot.journeys);
 
   const dirty =
     role === "admin"
-      ? journalDirty || showcaseDirty || heroDirty || journeysDirty
-      : journalDirty || journeysDirty;
+      ? journalDirty || showcaseDirty || heroDirty || heroHeadingsDirty || journeysDirty
+      : journalDirty || showcaseDirty || heroDirty || heroHeadingsDirty || journeysDirty;
 
   const save = async () => {
     setBusy(true);
@@ -41,33 +44,37 @@ export function HomepageEditorBar({ role, draft, savedSnapshot, onSaved }: Homep
       const token = await resolveAccessToken();
       const versions: number[] = [];
 
-      if (role === "admin" || journalDirty) {
+      if (journalDirty) {
         const journalResult = await saveHomepageJournal({
           data: { accessToken: token, items: draft.journal },
         });
         versions.push(journalResult.version);
       }
 
-      if (role === "admin" || journeysDirty) {
+      if (journeysDirty) {
         const journeysResult = await saveHomepageJourneys({
           data: { accessToken: token, items: draft.journeys },
         });
         versions.push(journeysResult.version);
       }
 
-      if (role === "admin") {
-        if (showcaseDirty) {
-          const showcaseResult = await saveHomepageShowcase({
-            data: { accessToken: token, items: draft.showcase },
-          });
-          versions.push(showcaseResult.version);
-        }
-        if (heroDirty) {
-          const heroResult = await saveHomepageHero({
-            data: { accessToken: token, items: draft.hero },
-          });
-          versions.push(heroResult.version);
-        }
+      if (showcaseDirty) {
+        const showcaseResult = await saveHomepageShowcase({
+          data: { accessToken: token, items: draft.showcase },
+        });
+        versions.push(showcaseResult.version);
+      }
+      if (heroDirty) {
+        const heroResult = await saveHomepageHero({
+          data: { accessToken: token, items: draft.hero },
+        });
+        versions.push(heroResult.version);
+      }
+      if (heroHeadingsDirty) {
+        const headingsResult = await saveHomepageHeroHeadings({
+          data: { accessToken: token, items: draft.heroHeadings },
+        });
+        versions.push(headingsResult.version);
       }
 
       const version = versions.length > 0 ? Math.max(...versions) : draft.version;
@@ -82,8 +89,8 @@ export function HomepageEditorBar({ role, draft, savedSnapshot, onSaved }: Homep
 
   const hint =
     role === "admin"
-      ? "Admin edit mode — journal, hero slideshow, top 3 experiences, and heritage video section. Photos save instantly; use Save for text and video links."
-      : "Editor mode — journal and heritage video section (title, description, YouTube link). Photos save automatically; use Save for text and video links.";
+      ? "Admin edit mode — journal, hero headings, slideshow, top 3 experiences, and heritage video. Photos save instantly; use Save for text and video links."
+      : "Editor mode — homepage photos, hero headings, journal, top experiences, and heritage video. Photos save automatically; use Save for text and video links.";
 
   return (
     <div className="sticky top-0 z-50 border-b border-ember/35 bg-[oklch(0.14_0.06_22_/_0.96)] backdrop-blur-md">

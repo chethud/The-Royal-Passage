@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
-import { useCallback, useEffect } from "react";
-import { HomepageEditPageShell } from "@/components/editor/HomepageEditView";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { AdminHomepagePhotoEditor } from "@/components/admin/AdminHomepagePhotoEditor";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import { getHomepageContent } from "@/lib/homepage-content-fns";
@@ -14,9 +14,9 @@ import {
 import { toShowcaseExperienceOption } from "@/lib/showcase-from-experience";
 import { NOINDEX_META } from "@/lib/seo-helpers";
 
-export const Route = createFileRoute("/admin/homepage-edit")({
+export const Route = createFileRoute("/admin/homepage-photos")({
   head: () => ({
-    meta: [{ title: "Edit homepage — The Royal Passage" }, ...NOINDEX_META],
+    meta: [{ title: "Homepage photos — The Royal Passage" }, ...NOINDEX_META],
   }),
   loader: async () => {
     const [homepage, catalog] = await Promise.all([
@@ -28,21 +28,20 @@ export const Route = createFileRoute("/admin/homepage-edit")({
       experiences: (catalog.experiences ?? []).map(toShowcaseExperienceOption),
     };
   },
-  component: AdminHomepageEditPage,
+  component: HomepagePhotosPage,
 });
 
-function AdminHomepageEditPage() {
+function HomepagePhotosPage() {
   const navigate = useNavigate();
-  const router = useRouter();
   const { user, role, roles, loading, accessToken } = useAuthUser();
   const { homepage, experiences } = Route.useLoaderData();
   const canEdit = hasEditorAccess(roles, role);
-  const editorRole = hasAdminAccess(roles, role) ? "admin" : "editor";
+  const shellRole = hasAdminAccess(roles, role) ? "admin" : "editor";
 
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      void navigate({ to: "/sign-in", search: { redirect: "/admin/homepage-edit" } });
+      void navigate({ to: "/sign-in", search: { redirect: "/admin/homepage-photos" } });
       return;
     }
     if (!canEdit) {
@@ -50,33 +49,29 @@ function AdminHomepageEditPage() {
     }
   }, [canEdit, loading, navigate, role, roles, user]);
 
-  const refreshHomepage = useCallback(() => {
-    void router.invalidate().catch(() => {
-      // Local editor state is already updated.
-    });
-  }, [router]);
-
   if (loading || !user || !canEdit || !accessToken) {
     return (
       <DashboardShell
-        role={editorRole}
-        title="Edit homepage"
+        role={shellRole}
+        title="Homepage photos"
         subtitle="Loading…"
         showRoleDescription={false}
       >
-        <p className="text-sm text-muted-foreground">Loading editor…</p>
+        <p className="text-sm text-muted-foreground">Loading photo editor…</p>
       </DashboardShell>
     );
   }
 
   return (
-    <div className="pt-[var(--header-height)]">
-      <HomepageEditPageShell
-        homepage={homepage}
-        onRefresh={refreshHomepage}
-        editorRole={editorRole}
-        experiences={experiences}
-      />
-    </div>
+    <DashboardShell
+      role={shellRole}
+      title="Homepage photos"
+      subtitle="Update hero, heading, showcase, and journal imagery for the public homepage."
+      showRoleDescription={false}
+    >
+      <div className="pt-2">
+        <AdminHomepagePhotoEditor initialContent={homepage} experiences={experiences} />
+      </div>
+    </DashboardShell>
   );
 }

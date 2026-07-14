@@ -6,7 +6,7 @@
 
 @theme inline {
   --font-display: "Cinzel", ui-serif, Georgia, serif;
-  --font-sans: "Cormorant Garamond", "Times New Roman", ui-serif, Georgia, serif;
+  --font-sans: "Cinzel", ui-serif, Georgia, serif;
   --font-royal: "Cinzel Decorative", "Cinzel", ui-serif, Georgia, serif;
 
   --radius-sm: 2px;
@@ -185,17 +185,13 @@
     font-family: var(--font-sans);
     letter-spacing: 0.04em;
   }
-  h1 {
-    font-family: var(--font-royal);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
+  h1,
   h2,
   h3,
   h4 {
-    font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: 0.03em;
+    font-family: var(--font-royal);
+    font-weight: 700;
+    letter-spacing: 0.04em;
   }
   label,
   legend {

@@ -15,6 +15,7 @@ import {
   canEditHomepageAdminSections,
   canEditHomepageJournal,
   canEditHomepageJourneys,
+  hasAdminAccess,
   isAdminRole,
   type UserRole,
 } from "@/lib/roles";
@@ -34,13 +35,14 @@ export function HomepageEditView({
   editorRole,
   experiences = [],
 }: HomepageEditViewProps) {
-  const { role, accessToken } = useAuthUser();
+  const { role, roles, accessToken } = useAuthUser();
   const resolvedRole: Extract<UserRole, "editor" | "admin"> =
-    editorRole ?? (isAdminRole(role) ? "admin" : "editor");
+    editorRole ?? (isAdminRole(role) || hasAdminAccess(roles, role) ? "admin" : "editor");
 
-  const canEditJournal = canEditHomepageJournal(resolvedRole) && Boolean(accessToken);
-  const canEditJourneys = canEditHomepageJourneys(resolvedRole) && Boolean(accessToken);
-  const canEditAdminSections = canEditHomepageAdminSections(resolvedRole) && Boolean(accessToken);
+  const canEditJournal = canEditHomepageJournal(resolvedRole, roles) && Boolean(accessToken);
+  const canEditJourneys = canEditHomepageJourneys(resolvedRole, roles) && Boolean(accessToken);
+  const canEditAdminSections =
+    canEditHomepageAdminSections(resolvedRole, roles) && Boolean(accessToken);
 
   const normalizedHomepage = normalizeHomepageContent(homepage);
   const [draft, setDraft] = useState<HomepageContent>(normalizedHomepage);
@@ -73,7 +75,7 @@ export function HomepageEditView({
         throw new Error("You do not have permission to edit journal photos.");
       }
       if (section !== "journal" && !canEditAdminSections) {
-        throw new Error("Only admins can edit this homepage section.");
+        throw new Error("You do not have permission to edit this homepage section.");
       }
       if (!accessToken) throw new Error("Sign in again to upload photos.");
 
@@ -134,9 +136,11 @@ export function HomepageEditView({
 
       <HomeHero
         slides={editContent.hero}
+        headings={editContent.heroHeadings}
         imageVersion={displayVersion}
         editable={canEditAdminSections}
         onSlidesChange={(hero) => setDraft((prev) => ({ ...prev, hero }))}
+        onHeadingsChange={(heroHeadings) => setDraft((prev) => ({ ...prev, heroHeadings }))}
         uploadPhoto={
           canEditAdminSections ? (itemIndex) => createPhotoUploader("hero", itemIndex) : undefined
         }

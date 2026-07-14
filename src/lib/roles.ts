@@ -18,7 +18,7 @@ export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
   homestay_owner: "Sign in with homestay owner credentials provided by Royal Passage.",
   vip_owner: "Sign in with VIP owner credentials provided by Royal Passage.",
   admin: "Sign in with your admin credentials — manage bookings, experiences, and homepage hero, showcase, and video sections.",
-  editor: "Sign in to edit journal stories and the heritage video section on the homepage.",
+  editor: "Sign in to edit homepage photos, hero headings, journal stories, and the heritage video section.",
 };
 
 export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
@@ -138,6 +138,43 @@ export function dashboardPathForRoles(
   return dashboardPathForRole(pickPrimaryRole(roles, primaryRole));
 }
 
+/**
+ * Which staff workspace the header/nav should mirror based on the current URL.
+ * Multi-role accounts switch chrome when they open Homestay / VIP / Editor tools.
+ */
+export function activeWorkspaceRole(
+  pathname: string,
+  roles: readonly UserRole[] | null | undefined,
+  primaryRole?: UserRole | null,
+): UserRole | null {
+  const resolved = resolveUserRoles(roles, primaryRole ?? null);
+  const primary = pickPrimaryRole(roles, primaryRole);
+
+  if (
+    (pathname === "/homestay" || pathname.startsWith("/homestay/")) &&
+    resolved.includes("homestay_owner")
+  ) {
+    return "homestay_owner";
+  }
+  if ((pathname === "/host" || pathname.startsWith("/host/")) && resolved.includes("host")) {
+    return "host";
+  }
+  if ((pathname === "/vip" || pathname.startsWith("/vip/")) && resolved.includes("vip_owner")) {
+    return "vip_owner";
+  }
+  if (
+    (pathname.startsWith("/admin/homepage-edit") || pathname.startsWith("/admin/homepage-photos")) &&
+    hasAnyRole(resolved, ["editor", "admin"], primary)
+  ) {
+    return hasRole(resolved, "admin", primary) ? "admin" : "editor";
+  }
+  if (pathname.startsWith("/admin") && resolved.includes("admin")) {
+    return "admin";
+  }
+
+  return primary;
+}
+
 export type RoleWorkspaceLink = {
   role: UserRole;
   label: string;
@@ -153,7 +190,7 @@ const WORKSPACE_META: Record<
   host: { label: "Host dashboard", description: "Experiences, bookings & revenue" },
   homestay_owner: { label: "Homestay dashboard", description: "Properties & stay bookings" },
   vip_owner: { label: "VIP dashboard", description: "VIP packages & members" },
-  editor: { label: "Editor tools", description: "Homepage journal & heritage video" },
+  editor: { label: "Editor tools", description: "Homepage photos, headings & journal" },
 };
 
 /** Every staff workspace the account may open (in priority order). */
@@ -185,6 +222,22 @@ export function isAdminRole(role: UserRole | null | undefined): boolean {
   return role === "admin";
 }
 
+/** True when the account includes editor (multi-role safe). */
+export function hasEditorAccess(
+  roles?: readonly UserRole[] | null,
+  primaryRole?: UserRole | null,
+): boolean {
+  return hasAnyRole(roles, ["editor", "admin"], primaryRole);
+}
+
+/** True when the account includes admin (multi-role safe). */
+export function hasAdminAccess(
+  roles?: readonly UserRole[] | null,
+  primaryRole?: UserRole | null,
+): boolean {
+  return hasRole(roles, "admin", primaryRole);
+}
+
 /** Journal section — editors and admins. */
 export function canEditHomepageJournal(
   role: UserRole | null | undefined,
@@ -201,12 +254,12 @@ export function canEditHomepageJourneys(
   return hasAnyRole(roles, ["editor", "admin"], role);
 }
 
-/** Hero and top experiences — admins only. */
+/** Hero photos, headings, and top experiences — editors and admins. */
 export function canEditHomepageAdminSections(
   role: UserRole | null | undefined,
   roles?: readonly UserRole[] | null,
 ): boolean {
-  return hasRole(roles, "admin", role);
+  return hasAnyRole(roles, ["editor", "admin"], role);
 }
 
 /** Signed-in user who may book experiences (guest, or profile still loading). */

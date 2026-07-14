@@ -22,6 +22,7 @@ import {
 import { ProfileNavIcon } from "@/components/account/ProfileNavIcon";
 import {
   ROLE_LABELS,
+  hasEditorAccess,
   workspaceLinksForRoles,
   type RoleWorkspaceLink,
   type UserRole,
@@ -124,6 +125,7 @@ export function AccountDropdownMenu({
       ? "Homestay reservations"
       : "Experience bookings";
   const workspaces: RoleWorkspaceLink[] = workspaceLinksForRoles(roles, role);
+  const canEditHomepage = hasEditorAccess(roles, role);
   const roleLabels =
     roles.length > 0
       ? roles.map((value) => ROLE_LABELS[value]).join(" · ")
@@ -215,6 +217,23 @@ export function AccountDropdownMenu({
                 to="/admin/homepage-edit"
               />
             </>
+          ) : canEditHomepage ? (
+            <>
+              <DropdownMenuSeparator className="header-account-menu__divider" />
+              <DropdownMenuLabel className="header-account-menu__section">Editor</DropdownMenuLabel>
+              <AccountMenuItem
+                icon={Pencil}
+                label="Edit homepage"
+                description="Headings, journal & heritage video"
+                to="/admin/homepage-edit"
+              />
+              <AccountMenuItem
+                icon={Image}
+                label="Homepage photos"
+                description="Hero, showcase & journal imagery"
+                to="/admin/homepage-photos"
+              />
+            </>
           ) : null}
 
           <DropdownMenuSeparator className="header-account-menu__divider" />
@@ -237,7 +256,7 @@ export function AccountDropdownMenu({
                 icon={Image}
                 label="Homepage photos"
                 description="Manage homepage imagery"
-                to="/admin/profile/homepage-photos"
+                to="/admin/homepage-photos"
               />
             </>
           ) : (

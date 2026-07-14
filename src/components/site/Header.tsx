@@ -28,7 +28,7 @@ import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
 import { isHomestayOwnerNavItemActive } from "@/lib/homestay-owner-nav-active";
 import { isVipOwnerNavItemActive } from "@/lib/vip-owner-nav-active";
-import { dashboardPathForRoles, isAdminRole, isGuestAccount, pickPrimaryRole, profilePathForRole, workspaceLinksForRoles, type UserRole } from "@/lib/roles";
+import { dashboardPathForRole, dashboardPathForRoles, activeWorkspaceRole, isAdminRole, isGuestAccount, pickPrimaryRole, profilePathForRole, workspaceLinksForRoles, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 import {
@@ -50,34 +50,33 @@ import { useHomeIntro } from "@/components/site/home-intro";
 
 type NavItem = { label: string; to: string };
 
-function navItemsForUser(
-  role: UserRole | null | undefined,
-  roles: readonly UserRole[],
+function navItemsForWorkspace(
+  workspace: UserRole | null | undefined,
   signedIn: boolean,
   pathname: string,
 ): NavItem[] {
   if (!signedIn) return publicGuestNavItems();
-  const primary = pickPrimaryRole(roles, role);
-  if (!primary) return publicGuestNavItems();
-  if (primary === "admin") {
+  if (!workspace) return publicGuestNavItems();
+  if (workspace === "admin") {
     return adminNavItemsForModule(resolveAdminModule(pathname));
   }
-  if (primary === "host") {
+  if (workspace === "host") {
     return HOST_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
-  if (primary === "homestay_owner") {
+  if (workspace === "homestay_owner") {
     return HOMESTAY_OWNER_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
-  if (primary === "vip_owner") {
+  if (workspace === "vip_owner") {
     return VIP_OWNER_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
-  if (primary === "editor") {
+  if (workspace === "editor") {
     return [
       { label: "Edit homepage", to: "/admin/homepage-edit" },
+      { label: "Homepage photos", to: "/admin/homepage-photos" },
       ...publicGuestNavItems(),
     ];
   }
-  if (primary === "guest") {
+  if (workspace === "guest") {
     return GUEST_SIGNED_IN_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
   return publicGuestNavItems();
@@ -96,17 +95,17 @@ function NavCountBadge({ count }: { count?: number }) {
 }
 
 function isHeaderNavItemActive(
-  role: UserRole | null | undefined,
+  workspace: UserRole | null | undefined,
   pathname: string,
   to: string,
 ): boolean {
-  if (role === "host") return isHostNavItemActive(pathname, to);
-  if (role === "homestay_owner") return isHomestayOwnerNavItemActive(pathname, to);
-  if (role === "vip_owner") return isVipOwnerNavItemActive(pathname, to);
-  if (role === "admin") {
+  if (workspace === "host") return isHostNavItemActive(pathname, to);
+  if (workspace === "homestay_owner") return isHomestayOwnerNavItemActive(pathname, to);
+  if (workspace === "vip_owner") return isVipOwnerNavItemActive(pathname, to);
+  if (workspace === "admin") {
     return isAdminNavItemActive(pathname, to);
   }
-  if (!role || role === "guest") {
+  if (!workspace || workspace === "guest") {
     return isPublicNavItemActive(pathname, to);
   }
   return pathname === to || pathname.startsWith(`${to}/`);
@@ -115,7 +114,6 @@ function isHeaderNavItemActive(
 export function Header() {
   const [elevated, setElevated] = useState(false);
   const { displayName, user, role, roles } = useAuthUser();
-  const dashboardPath = dashboardPathForRoles(roles, role);
   const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -129,13 +127,17 @@ export function Header() {
         ? "pending"
         : undefined;
   const primaryRole = pickPrimaryRole(roles, role);
+  const workspaceRole = activeWorkspaceRole(pathname, roles, primaryRole);
   const workspaces = workspaceLinksForRoles(roles, primaryRole);
-  const navItems = navItemsForUser(primaryRole, roles, Boolean(user), pathname);
+  const dashboardPath = workspaceRole
+    ? dashboardPathForRole(workspaceRole)
+    : dashboardPathForRoles(roles, role);
+  const navItems = navItemsForWorkspace(workspaceRole, Boolean(user), pathname);
   const isHomestaySection = isHomestayPublicSection(pathname);
   const isVipSection = isVipPublicSection(pathname);
   const isMarketplaceSection = isHomestaySection || isVipSection;
   const logoPath =
-    user && primaryRole && primaryRole !== "guest"
+    user && workspaceRole && workspaceRole !== "guest"
       ? dashboardPath
       : isMarketplaceSection
         ? marketplaceHomePath(pathname)
@@ -221,7 +223,7 @@ export function Header() {
 
         <nav className="hidden items-center gap-5 text-[0.72rem] font-medium uppercase tracking-[0.14em] md:flex lg:gap-7 lg:text-[0.76rem] lg:tracking-[0.16em]">
           {navItems.map((item) => {
-            const active = isHeaderNavItemActive(primaryRole, pathname, item.to);
+            const active = isHeaderNavItemActive(workspaceRole, pathname, item.to);
             return (
               <Link
                 key={`${item.to}-${item.label}`}
@@ -308,7 +310,7 @@ export function Header() {
 
               <nav className="header-mobile-nav mt-6" aria-label="Mobile navigation">
                 {navItems.map((item) => {
-                  const active = isHeaderNavItemActive(primaryRole, pathname, item.to);
+                  const active = isHeaderNavItemActive(workspaceRole, pathname, item.to);
                   return (
                     <MobileNavLink
                       key={`${item.to}-${item.label}`}

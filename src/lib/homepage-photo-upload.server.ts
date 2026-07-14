@@ -5,6 +5,7 @@ import {
 } from "@/lib/homepage-content";
 import {
   HOMEPAGE_CACHE_KEY,
+  HOMEPAGE_HERO_HEADINGS_KEY,
   HOMEPAGE_HERO_KEY,
   HOMEPAGE_JOURNAL_KEY,
   HOMEPAGE_JOURNEYS_KEY,
@@ -20,6 +21,8 @@ import {
 } from "@/lib/experience-photos-config";
 import { getSupabaseConfigError } from "@/lib/env.server";
 import { verifySupabaseAccessToken } from "@/lib/auth-verify.server";
+import { fetchUserProfile } from "@/lib/profiles";
+import { hasAnyRole, hasRole } from "@/lib/roles";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export type ApplyHomepagePhotoInput = {
@@ -121,65 +124,47 @@ async function uploadHomepagePhotoAdmin(
 export async function requireHomepagePhotoAccess(accessToken: string, section: HomepagePhotoSection) {
   const verified = await verifySupabaseAccessToken(accessToken);
   const supabase = getSupabaseAdmin();
+  const profile = await fetchUserProfile(supabase, verified.id);
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", verified.id)
-    .maybeSingle();
-
-  if (profileError) {
+  if (!profile) {
     throw new Error("Could not verify your account role.");
   }
 
-  const role = profile?.role;
-  if (section === "journal") {
-    if (role !== "editor" && role !== "admin") {
-      throw new Error("Only editors or admins can edit journal photos.");
-    }
-  } else if (role !== "admin") {
-    throw new Error("Only admins can edit this homepage section.");
+  if (!hasAnyRole(profile.roles, ["editor", "admin"], profile.role)) {
+    throw new Error("Only editors or admins can edit homepage photos.");
   }
 
-  return { id: verified.id, email: verified.email ?? undefined, role: role as string };
+  // All homepage photo sections are available to editors and admins.
+  void section;
+
+  return { id: verified.id, email: verified.email ?? undefined, role: profile.role };
 }
 
 /** @deprecated Use requireHomepagePhotoAccess */
 export async function requireEditor(accessToken: string) {
-  const user = await requireHomepagePhotoAccess(accessToken, "journal");
-  if (user.role !== "editor") {
-    throw new Error("Only editors can perform this action.");
-  }
-  return user;
+  return requireHomepagePhotoAccess(accessToken, "journal");
 }
 
 export async function requireHomepageAdmin(accessToken: string) {
   const verified = await verifySupabaseAccessToken(accessToken);
   const supabase = getSupabaseAdmin();
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", verified.id)
-    .maybeSingle();
+  const profile = await fetchUserProfile(supabase, verified.id);
 
-  if (profileError || profile?.role !== "admin") {
+  if (!profile || !hasRole(profile.roles, "admin", profile.role)) {
     throw new Error("Only admins can perform this action.");
   }
 
   return { id: verified.id, email: verified.email ?? undefined };
 }
 
+/** Editors and admins — multi-role accounts included via user_roles. */
 export async function requireHomepageJournalEditor(accessToken: string) {
   const verified = await verifySupabaseAccessToken(accessToken);
   const supabase = getSupabaseAdmin();
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", verified.id)
-    .maybeSingle();
+  const profile = await fetchUserProfile(supabase, verified.id);
 
-  if (profileError || (profile?.role !== "editor" && profile?.role !== "admin")) {
-    throw new Error("Only editors or admins can edit journal content.");
+  if (!profile || !hasAnyRole(profile.roles, ["editor", "admin"], profile.role)) {
+    throw new Error("Only editors or admins can edit homepage content.");
   }
 
   return { id: verified.id, email: verified.email ?? undefined };
@@ -221,6 +206,7 @@ async function loadHomepageContentFromDb(supabase: ReturnType<typeof getSupabase
       HOMEPAGE_SHOWCASE_KEY,
       HOMEPAGE_JOURNAL_KEY,
       HOMEPAGE_HERO_KEY,
+      HOMEPAGE_HERO_HEADINGS_KEY,
       HOMEPAGE_JOURNEYS_KEY,
       HOMEPAGE_VERSION_KEY,
     ]);
@@ -234,6 +220,7 @@ async function loadHomepageContentFromDb(supabase: ReturnType<typeof getSupabase
     !byKey.has(HOMEPAGE_SHOWCASE_KEY) &&
     !byKey.has(HOMEPAGE_JOURNAL_KEY) &&
     !byKey.has(HOMEPAGE_HERO_KEY) &&
+    !byKey.has(HOMEPAGE_HERO_HEADINGS_KEY) &&
     !byKey.has(HOMEPAGE_JOURNEYS_KEY)
   ) {
     return DEFAULT_HOMEPAGE_CONTENT;
@@ -243,6 +230,7 @@ async function loadHomepageContentFromDb(supabase: ReturnType<typeof getSupabase
     showcase: byKey.get(HOMEPAGE_SHOWCASE_KEY),
     journal: byKey.get(HOMEPAGE_JOURNAL_KEY),
     hero: byKey.get(HOMEPAGE_HERO_KEY),
+    heroHeadings: byKey.get(HOMEPAGE_HERO_HEADINGS_KEY),
     journeys: byKey.get(HOMEPAGE_JOURNEYS_KEY),
     version: parseVersionValue(byKey.get(HOMEPAGE_VERSION_KEY)),
   });
