@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   History,
+  Home,
   Image,
   LayoutDashboard,
   LogOut,
@@ -257,6 +258,12 @@ export function AccountDropdownMenu({
                 label="Homepage photos"
                 description="Manage homepage imagery"
                 to="/admin/homepage-photos"
+              />
+              <AccountMenuItem
+                icon={Home}
+                label="Featured homestays"
+                description="Top 3 stays on /homestays"
+                to="/admin/homestay-featured"
               />
             </>
           ) : (

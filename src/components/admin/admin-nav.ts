@@ -13,6 +13,7 @@ export const ADMIN_HOMESTAY_NAV_ITEMS = [
   { to: "/admin/homestay", label: "Overview" },
   { to: "/admin/homestays", label: "Approve homestays" },
   { to: "/admin/homestay-owners", label: "Homestay owners" },
+  { to: "/admin/homestay-featured", label: "Featured homestays" },
   { to: "/homestays", label: "Live catalog" },
 ] as const;
 
@@ -42,7 +43,8 @@ export function resolveAdminModule(pathname: string): AdminModule {
     pathname === "/admin/homestay" ||
     pathname.startsWith("/admin/homestay/") ||
     pathname.startsWith("/admin/homestays") ||
-    pathname.startsWith("/admin/homestay-owners")
+    pathname.startsWith("/admin/homestay-owners") ||
+    pathname.startsWith("/admin/homestay-featured")
   ) {
     return "homestays";
   }
@@ -84,6 +86,9 @@ export function isAdminNavItemActive(pathname: string, to: string): boolean {
   }
   if (to === "/admin/homestay") {
     return pathname === "/admin/homestay" || pathname === "/admin/homestay/";
+  }
+  if (to === "/admin/homestay-featured") {
+    return pathname === "/admin/homestay-featured" || pathname.startsWith("/admin/homestay-featured/");
   }
   if (to === "/admin/vip") {
     return pathname === "/admin/vip" || pathname === "/admin/vip/";

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { AdminHomepagePhotoEditor } from "@/components/admin/AdminHomepagePhotoEditor";
 import { DashboardShell } from "@/components/auth/DashboardShell";
@@ -66,9 +66,16 @@ function HomepagePhotosPage() {
     <DashboardShell
       role={shellRole}
       title="Homepage photos"
-      subtitle="Update hero, heading, showcase, and journal imagery for the public homepage."
+      subtitle="Update hero, heading, showcase, journal, and homestay hero imagery for the public site."
       showRoleDescription={false}
     >
+      {hasAdminAccess(roles, role) ? (
+        <div className="mb-5 flex flex-wrap gap-3">
+          <Link to="/admin/homestay-featured" className="dashboard-chrome-link">
+            Featured homestays →
+          </Link>
+        </div>
+      ) : null}
       <div className="pt-2">
         <AdminHomepagePhotoEditor initialContent={homepage} experiences={experiences} />
       </div>

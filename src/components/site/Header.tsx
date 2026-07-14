@@ -356,6 +356,7 @@ export function Header() {
                         <MobileNavLink to="/admin/profile">Account</MobileNavLink>
                         <MobileNavLink to="/admin/profile/users">Users</MobileNavLink>
                         <MobileNavLink to="/admin/profile/homepage-photos">Homepage photos</MobileNavLink>
+                        <MobileNavLink to="/admin/homestay-featured">Featured homestays</MobileNavLink>
                       </>
                     ) : (
                       <>

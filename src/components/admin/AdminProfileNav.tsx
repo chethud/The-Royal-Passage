@@ -4,6 +4,7 @@ const ADMIN_PROFILE_NAV = [
   { to: "/admin/profile", label: "Account" },
   { to: "/admin/profile/users", label: "Users" },
   { to: "/admin/homepage-photos", label: "Homepage photos" },
+  { to: "/admin/homestay-featured", label: "Featured homestays" },
 ] as const;
 
 const linkClass =

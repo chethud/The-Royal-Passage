@@ -4,10 +4,13 @@ import { ExperienceDetailGallery } from "@/components/experiences/ExperienceDeta
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { HomestayBookingPanel } from "@/components/homestays/HomestayBookingPanel";
 import {
+  DetailGalleryAboutRow,
+  DetailExpandableCopy,
+} from "@/components/detail/DetailExpandableCopy";
+import {
   DetailCategoryBadge,
   DetailDarkSection,
   DetailDivider,
-  DetailHeroGrid,
   DetailHomestayBookingSection,
   DetailLocationBlock,
   DetailMainSection,
@@ -26,7 +29,6 @@ import {
   parseHomestayBookSearch,
 } from "@/lib/homestay-booking-url";
 import {
-  formatWeekdayWeekendRates,
   weekdayPriceMajor,
   weekendPriceMajor,
 } from "@/lib/homestay-day-pricing";
@@ -120,69 +122,79 @@ function HomestayDetailPage() {
           ← Back to all stays
         </DetailBackLink>
 
-        <DetailHeroGrid
-          gallery={<ExperienceDetailGallery exp={galleryExp} />}
-          contentClassName="flex w-full min-w-0 flex-col md:pt-2"
-          content={
-            <>
-              <DetailCategoryBadge>{stay.propertyType}</DetailCategoryBadge>
+        <div className="mt-6 space-y-6 sm:mt-8">
+          <div>
+            <DetailCategoryBadge>{stay.propertyType}</DetailCategoryBadge>
 
+            <div className="mt-3">
               <DetailLocationBlock
                 locationLine={locationLine}
                 address={stay.address}
                 mapLink={stay.mapLink}
               />
+            </div>
 
+            <div className="mt-4">
               <DetailTitleRow title={stay.title} />
+            </div>
 
-              {stay.tagline ? <DetailTagline>{stay.tagline}</DetailTagline> : null}
+            {stay.tagline ? <DetailTagline>{stay.tagline}</DetailTagline> : null}
 
-              <DetailDivider />
+            <DetailDivider />
 
-              <DetailStatGrid>
-                <DetailStatItem label="From">
-                  {formatWeekdayWeekendRates(sym, weekdayPriceMajor(stay), weekendPriceMajor(stay))}
-                </DetailStatItem>
-                <DetailStatItem label="Beds">
-                  <span className="inline-flex items-center gap-1.5">
-                    <BedDouble className="h-5 w-5 shrink-0 text-[#D4AF6A]" aria-hidden />
-                    {stay.bedrooms}
+            <DetailStatGrid>
+              <DetailStatItem
+                label="From"
+                valueClassName="mt-1 space-y-1 text-[#F7F1E8] normal-case tracking-normal"
+              >
+                <HomestayRateStat
+                  symbol={sym}
+                  weekday={weekdayPriceMajor(stay)}
+                  weekend={weekendPriceMajor(stay)}
+                />
+              </DetailStatItem>
+              <DetailStatItem label="Beds">
+                <span className="inline-flex items-center gap-1.5">
+                  <BedDouble className="h-5 w-5 shrink-0 text-[#D4AF6A]" aria-hidden />
+                  {stay.bedrooms}
+                </span>
+              </DetailStatItem>
+              <DetailStatItem label="Rating">
+                <span className="inline-flex items-center gap-1 text-[#D4AF6A]">
+                  <Star className="h-4 w-4 shrink-0 fill-current" aria-hidden />
+                  {stay.rating}
+                </span>
+              </DetailStatItem>
+            </DetailStatGrid>
+          </div>
+
+          <DetailGalleryAboutRow
+            gallery={<ExperienceDetailGallery exp={galleryExp} maxThumbnails={6} />}
+            about={
+              <DetailExpandableCopy label="About this stay">{stay.description}</DetailExpandableCopy>
+            }
+          />
+
+          {stay.amenities.length > 0 ? (
+            <DetailDarkSection label="Amenities" className="">
+              <div className="flex flex-wrap gap-2">
+                {stay.amenities.map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-full border border-[rgb(200_162_90/0.35)] px-3 py-1 text-[0.65rem] uppercase tracking-[0.12em] text-[#E8DCC8]/90"
+                  >
+                    {item}
                   </span>
-                </DetailStatItem>
-                <DetailStatItem label="Rating">
-                  <span className="inline-flex items-center gap-1 text-[#D4AF6A]">
-                    <Star className="h-4 w-4 shrink-0 fill-current" aria-hidden />
-                    {stay.rating}
-                  </span>
-                </DetailStatItem>
-              </DetailStatGrid>
-
-              <DetailDarkSection label="About this stay">
-                <p className="text-sm leading-relaxed text-[#D6C8B5]/90">{stay.description}</p>
-              </DetailDarkSection>
-
-              {stay.amenities.length > 0 ? (
-                <DetailDarkSection label="Amenities">
-                  <div className="flex flex-wrap gap-2">
-                    {stay.amenities.map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full border border-[rgb(200_162_90/0.35)] px-3 py-1 text-[0.65rem] uppercase tracking-[0.12em] text-[#E8DCC8]/90"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </DetailDarkSection>
-              ) : null}
-
-              <div className="mt-8 flex items-center gap-2 text-sm text-[#D6C8B5]/85">
-                <Users className="h-4 w-4 text-[#D4AF6A]" aria-hidden />
-                Up to {stay.maxGuests} guests · {stay.bathrooms} bath
+                ))}
               </div>
-            </>
-          }
-        />
+            </DetailDarkSection>
+          ) : null}
+
+          <div className="flex items-center gap-2 text-sm text-[#D6C8B5]/85">
+            <Users className="h-4 w-4 text-[#D4AF6A]" aria-hidden />
+            Up to {stay.maxGuests} guests · {stay.bathrooms} bath
+          </div>
+        </div>
       </DetailMainSection>
 
       <DetailHomestayBookingSection>
@@ -261,5 +273,46 @@ function HomestayDetailPage() {
         </LuxuryCheckoutPanel>
       </DetailHomestayBookingSection>
     </DetailPageShell>
+  );
+}
+
+function HomestayRateStat({
+  symbol,
+  weekday,
+  weekend,
+}: {
+  symbol: string;
+  weekday: number;
+  weekend: number;
+}) {
+  const weekdayLabel = `${symbol}${weekday.toLocaleString("en-IN")}`;
+  const weekendLabel = `${symbol}${weekend.toLocaleString("en-IN")}`;
+
+  if (weekday === weekend) {
+    return (
+      <p className="font-display text-[0.95rem] uppercase leading-none tracking-[0.02em] sm:text-lg md:text-xl">
+        {weekdayLabel}
+        <span className="ml-1.5 text-[0.58rem] font-sans font-semibold normal-case tracking-[0.14em] text-[#D6C8B5]/75 sm:text-[0.62rem]">
+          / night
+        </span>
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <p className="whitespace-nowrap font-display text-[0.95rem] uppercase leading-none tracking-[0.02em] sm:text-lg md:text-xl">
+        {weekdayLabel}
+        <span className="ml-1.5 text-[0.58rem] font-sans font-semibold normal-case tracking-[0.14em] text-[#D6C8B5]/75 sm:text-[0.62rem]">
+          weekdays
+        </span>
+      </p>
+      <p className="whitespace-nowrap font-display text-[0.95rem] uppercase leading-none tracking-[0.02em] sm:text-lg md:text-xl">
+        {weekendLabel}
+        <span className="ml-1.5 text-[0.58rem] font-sans font-semibold normal-case tracking-[0.14em] text-[#D6C8B5]/75 sm:text-[0.62rem]">
+          weekends
+        </span>
+      </p>
+    </div>
   );
 }

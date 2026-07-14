@@ -62,7 +62,7 @@ export function HomestaysHomeHero({ slides, imageVersion = 0 }: HomestaysHomeHer
 
   return (
     <>
-      <section className="relative w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)] lg:min-h-[max(520px,72dvh)]">
+      <section className="homestays-home-hero relative w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)] lg:min-h-[max(520px,72dvh)]">
         <div className="absolute inset-0 z-0 min-h-full">
           <HeroSlideshow
             images={heroImages}
@@ -73,47 +73,40 @@ export function HomestaysHomeHero({ slides, imageVersion = 0 }: HomestaysHomeHer
             className="absolute inset-0 h-full w-full"
           />
           <div
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(95deg,oklch(0.12_0.06_22_/_0.86)_0%,oklch(0.12_0.06_22_/_0.62)_42%,oklch(0.12_0.06_22_/_0.28)_72%,oklch(0.12_0.06_22_/_0.55)_100%)]"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(95deg,oklch(0.12_0.06_22_/_0.88)_0%,oklch(0.12_0.06_22_/_0.68)_40%,oklch(0.12_0.06_22_/_0.3)_70%,oklch(0.12_0.06_22_/_0.55)_100%)]"
             aria-hidden
           />
         </div>
 
-        <div className="relative z-10 flex flex-col lg:min-h-[max(520px,72dvh)]">
-          <div className="container-page flex flex-1 flex-col items-start justify-center pt-[var(--header-height)]">
-            <div className="w-full py-10 text-left sm:py-14 md:py-20">
-              <motion.div
-                className="mr-auto max-w-2xl text-left"
-                variants={revealParent}
-                initial="hidden"
-                animate="show"
+        <div className="homestays-home-hero__content container-page relative z-10 flex min-h-[max(420px,58dvh)] flex-col justify-center pt-[var(--header-height)] lg:min-h-[max(520px,72dvh)]">
+          <div className="homestays-home-hero__copy py-10 sm:py-14 md:py-20">
+            <motion.div
+              className="homestays-home-hero__copy-inner"
+              variants={revealParent}
+              initial="hidden"
+              animate="show"
+            >
+              <motion.p
+                variants={revealItem}
+                className="homestays-home-hero__eyebrow eyebrow mb-4 text-ember/95 sm:mb-5"
               >
-                <motion.div variants={revealItem} className="eyebrow mb-4 text-left text-ember/95 sm:mb-5">
-                  Royal Homestays
-                </motion.div>
-                <motion.h1
-                  variants={revealItem}
-                  className="text-left font-display text-[clamp(2rem,10vw,5.5rem)] font-semibold leading-[0.95] tracking-tight text-ink [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]"
-                >
-                  Stay in
-                  <br />
-                  <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-                    Mysuru,
-                  </span>
-                  <br />
-                  Royally
-                </motion.h1>
-                <motion.p
-                  variants={revealItem}
-                  className="mt-5 max-w-md text-left text-[0.9rem] leading-relaxed text-ink/85 sm:mt-7 sm:text-[1.05rem] md:max-w-lg"
-                >
-                  Heritage havelis, villas, and guest houses in Mysuru — each vetted for warmth, location,
-                  and Royal Passage hospitality.
-                </motion.p>
-              </motion.div>
-            </div>
+                Royal Homestays
+              </motion.p>
+              <motion.h1 variants={revealItem} className="homestays-home-hero__title font-display">
+                Stay in
+                <br />
+                <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">Mysuru,</span>
+                <br />
+                Royally
+              </motion.h1>
+              <motion.p variants={revealItem} className="homestays-home-hero__body mt-5 sm:mt-7">
+                Heritage havelis, villas, and guest houses in Mysuru — each vetted for warmth, location, and
+                Royal Passage hospitality.
+              </motion.p>
+            </motion.div>
           </div>
 
-          <div className="pointer-events-auto relative z-20 container-page flex items-center justify-start gap-2 pb-8 sm:pb-10">
+          <div className="homestays-home-hero__dots pointer-events-auto relative z-20 mt-auto flex gap-2 pb-8 sm:pb-10">
             {heroImages.map((slide, i) => (
               <button
                 key={`${slide.src}-${i}`}

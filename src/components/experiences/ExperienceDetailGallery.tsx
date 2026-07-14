@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Experience } from "@/data/experiences";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
@@ -7,15 +7,19 @@ import { getExperienceGalleryImages } from "@/lib/experience-cover-image";
 import { cn } from "@/lib/utils";
 
 const AUTO_ADVANCE_MS = 3000;
+const DEFAULT_MAX_THUMBNAILS = 6;
 
 type ExperienceDetailGalleryProps = {
   exp: Experience;
   showTitleOnHover?: boolean;
+  /** How many thumbs to show in the left rail (extras via arrows / autoplay). */
+  maxThumbnails?: number;
 };
 
 export function ExperienceDetailGallery({
   exp,
   showTitleOnHover = false,
+  maxThumbnails = DEFAULT_MAX_THUMBNAILS,
 }: ExperienceDetailGalleryProps) {
   const photos = getExperienceGalleryImages(exp);
   const reduceMotion = usePrefersReducedMotion();
@@ -23,6 +27,7 @@ export function ExperienceDetailGallery({
   const [slideDirection, setSlideDirection] = useState<"next" | "prev">("next");
   const CategoryIcon = categoryIconForLabel(exp.category);
   const hasMultiple = photos.length > 1;
+  const thumbLimit = Math.max(1, maxThumbnails);
 
   useEffect(() => {
     if (activeIndex >= photos.length) {
@@ -43,43 +48,62 @@ export function ExperienceDetailGallery({
 
   const activePhoto = photos[activeIndex] ?? photos[0];
 
+  const thumbStart =
+    photos.length <= thumbLimit
+      ? 0
+      : Math.min(
+          Math.max(0, activeIndex - Math.floor((thumbLimit - 1) / 2)),
+          photos.length - thumbLimit,
+        );
+  const thumbIndexes = photos
+    .slice(thumbStart, thumbStart + Math.min(thumbLimit, photos.length))
+    .map((_, offset) => thumbStart + offset);
+
   const goTo = (index: number, direction: "next" | "prev") => {
     setSlideDirection(direction);
     setActiveIndex(index);
   };
 
   return (
-    <div className="flex items-start gap-2.5 sm:gap-3">
+    <div className="flex h-full items-stretch gap-2.5 sm:gap-3">
       {hasMultiple ? (
         <div
-          className="flex shrink-0 flex-col gap-2"
+          className="flex shrink-0 flex-col gap-2 self-stretch"
           role="tablist"
           aria-label={`${exp.title} photo thumbnails`}
         >
-          {photos.map((url, index) => (
-            <button
-              key={url}
-              type="button"
-              role="tab"
-              aria-selected={index === activeIndex}
-              aria-label={`Show photo ${index + 1}`}
-              onClick={() => goTo(index, index >= activeIndex ? "next" : "prev")}
-              className={cn(
-                "relative h-16 w-20 shrink-0 overflow-hidden rounded-sm border transition-colors sm:h-20 sm:w-24",
-                index === activeIndex
-                  ? "border-[#D4AF6A] ring-1 ring-[#D4AF6A]/60"
-                  : "border-[rgb(200_162_90/0.25)] opacity-80 hover:opacity-100",
-              )}
-            >
-              <img
-                src={url}
-                alt=""
-                className="h-full w-full object-cover"
-                loading="lazy"
-                decoding="async"
-              />
-            </button>
-          ))}
+          {thumbIndexes.map((index) => {
+            const url = photos[index]!;
+            return (
+              <button
+                key={`${url}-${index}`}
+                type="button"
+                role="tab"
+                aria-selected={index === activeIndex}
+                aria-label={`Show photo ${index + 1}`}
+                onClick={() => goTo(index, index >= activeIndex ? "next" : "prev")}
+                className={cn(
+                  "relative h-16 w-20 shrink-0 overflow-hidden rounded-sm border transition-colors sm:h-20 sm:w-24",
+                  index === activeIndex
+                    ? "border-[#D4AF6A] ring-1 ring-[#D4AF6A]/60"
+                    : "border-[rgb(200_162_90/0.25)] opacity-80 hover:opacity-100",
+                )}
+              >
+                <img
+                  src={url}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </button>
+            );
+          })}
+          {photos.length > thumbLimit ? (
+            <p className="mt-auto max-w-20 text-center text-[0.58rem] uppercase tracking-[0.12em] text-[#D6C8B5]/70 sm:max-w-24">
+              +{photos.length - thumbLimit} more
+            </p>
+          ) : null}
         </div>
       ) : null}
 
@@ -87,7 +111,6 @@ export function ExperienceDetailGallery({
         className="experience-detail-gallery-main relative min-w-0 flex-1 overflow-hidden rounded-md border border-[rgb(200_162_90/0.32)] bg-[rgb(0_0_0/0.2)] shadow-[0_24px_56px_-28px_rgb(0_0_0/0.65)]"
         aria-label={`${exp.title} photos`}
       >
-        {/* Hover target is only the photo — not arrows / counter / category chip */}
         <div className="group/photo relative h-full">
           <div className="experience-detail-gallery__frame h-full">
             <div

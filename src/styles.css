@@ -242,6 +242,54 @@
   -webkit-backface-visibility: hidden;
 }
 
+/* Homestays landing hero — pin copy to the left like the main homepage hero */
+.homestays-home-hero__copy {
+  width: 100%;
+  text-align: left;
+}
+
+.homestays-home-hero__copy-inner {
+  display: block;
+  width: 100%;
+  max-width: 42rem;
+  margin-left: 0;
+  margin-right: auto;
+  text-align: left;
+}
+
+.homestays-home-hero__eyebrow,
+.homestays-home-hero__title,
+.homestays-home-hero__body {
+  text-align: left !important;
+}
+
+.homestays-home-hero__title {
+  font-size: clamp(2rem, 10vw, 5.5rem);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--color-ink, oklch(0.97 0.01 88));
+  text-shadow: 0 0.06em 0.4em oklch(0.05 0.04 18 / 0.85);
+}
+
+.homestays-home-hero__body {
+  max-width: 28rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: color-mix(in oklch, var(--color-ink, oklch(0.97 0.01 88)) 85%, transparent);
+}
+
+@media (min-width: 640px) {
+  .homestays-home-hero__body {
+    font-size: 1.05rem;
+    max-width: 32rem;
+  }
+}
+
+.homestays-home-hero__dots {
+  justify-content: flex-start;
+}
+
 /* Home cinematic intro — logo splash + chrome reveal */
 .home-brand-splash {
   position: fixed;
