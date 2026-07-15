@@ -222,7 +222,7 @@ export function OwnerHolidayPricingManager({
 
       <form
         onSubmit={(e) => void handleSubmit(e)}
-        className="grid gap-4 rounded-sm border border-[rgb(74_0_0/0.12)] bg-[rgb(255_255_255/0.35)] p-4 md:grid-cols-2"
+        className="dashboard-panel-card grid gap-4 p-4 md:grid-cols-2"
       >
         <div className="md:col-span-2">
           <h3 className="eyebrow luxury-panel-label">

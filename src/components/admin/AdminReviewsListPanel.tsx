@@ -98,7 +98,7 @@ export function AdminReviewsListPanel({
               return (
                 <li
                   key={review.id}
-                  className="flex flex-wrap items-start justify-between gap-4 rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4"
+                  className="dashboard-panel-card flex flex-wrap items-start justify-between gap-4 p-4"
                 >
                   <div>
                     <div className="luxury-panel-heading font-display text-lg">

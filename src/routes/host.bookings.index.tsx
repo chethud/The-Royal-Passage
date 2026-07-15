@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import type { BookingDecisionPayload } from "@/components/booking/BookingDecisionDialog";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { HostBookingTable } from "@/components/host/HostBookingTable";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
@@ -69,9 +70,28 @@ function HostBookingsPage() {
     try {
       const updated = await action(accessToken, bookingId);
       setBookings((rows) => rows.map((row) => (row.id === bookingId ? updated : row)));
-      await loadPage();
     } catch (err) {
       setPageError(toErrorMessage(err, "Action failed."));
+      throw err;
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const runDecision = async (
+    bookingId: string,
+    decision: BookingDecisionPayload,
+    action: typeof confirmHostBooking,
+  ) => {
+    if (!accessToken) return;
+    setBusyId(bookingId);
+    setPageError(null);
+    try {
+      const updated = await action(accessToken, bookingId, decision);
+      setBookings((rows) => rows.map((row) => (row.id === bookingId ? updated : row)));
+    } catch (err) {
+      setPageError(toErrorMessage(err, "Action failed."));
+      throw err;
     } finally {
       setBusyId(null);
     }
@@ -91,22 +111,21 @@ function HostBookingsPage() {
         <LuxuryCheckoutPanel>
           <p className="luxury-panel-body py-8 text-sm">Loading bookings…</p>
         </LuxuryCheckoutPanel>
-      ) : pageError ? (
-        <LuxuryCheckoutPanel>
-          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {pageError}
-          </p>
-        </LuxuryCheckoutPanel>
       ) : (
         <LuxuryCheckoutPanel>
+          {pageError ? (
+            <p className="mb-4 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {pageError}
+            </p>
+          ) : null}
           <HostBookingTable
             bookings={bookings}
             busyId={busyId}
             initialStatus={status ?? "all"}
             initialPayment={payment ?? "all"}
             initialDateView={dateView ?? "week"}
-            onConfirm={(id) => void runAction(id, confirmHostBooking)}
-            onReject={(id) => void runAction(id, rejectHostBooking)}
+            onConfirm={(id, decision) => runDecision(id, decision, confirmHostBooking)}
+            onReject={(id, decision) => runDecision(id, decision, rejectHostBooking)}
             onMarkPaid={(id) => void runAction(id, markHostBookingPaid)}
             onComplete={(id) => void runAction(id, completeHostBooking)}
             onPause={(id) => void runAction(id, pauseHostBooking)}

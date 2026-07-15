@@ -506,6 +506,11 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                   </Link>
                 </p>
               </div>
+              <AuthTermsAcceptance
+                id="signin-terms"
+                checked={acceptedTerms}
+                onCheckedChange={setAcceptedTerms}
+              />
               <button
                 type="submit"
                 disabled={busy || !email.trim() || !password}
@@ -513,11 +518,6 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
               >
                 {busy ? "Signing in…" : "Sign in"}
               </button>
-              <AuthTermsAcceptance
-                id="signin-terms"
-                checked={acceptedTerms}
-                onCheckedChange={setAcceptedTerms}
-              />
               {emailNotConfirmed ? (
                 <button
                   type="button"
@@ -639,6 +639,11 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                   </button>
                 </div>
               </div>
+              <AuthTermsAcceptance
+                id="signup-terms"
+                checked={acceptedTerms}
+                onCheckedChange={setAcceptedTerms}
+              />
               <button
                 type="submit"
                 disabled={busy || !email.trim() || !password || !fullName.trim()}
@@ -646,11 +651,6 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
               >
                 {busy ? "Creating account…" : "Create guest account"}
               </button>
-              <AuthTermsAcceptance
-                id="signup-terms"
-                checked={acceptedTerms}
-                onCheckedChange={setAcceptedTerms}
-              />
             </form>
 
             <p className="mt-6 text-center text-sm text-ink/70">

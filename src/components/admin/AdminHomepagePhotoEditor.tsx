@@ -210,7 +210,7 @@ export function AdminHomepagePhotoEditor({
           {content.heroHeadings.map((heading, index) => (
             <div
               key={heading.id}
-              className="space-y-2 rounded-sm border border-[rgb(74_0_0/0.16)] bg-[rgb(255_252_244/0.9)] p-3"
+              className="dashboard-panel-card space-y-2 p-3"
             >
               <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#2A0000]">
                 {index === 0 ? "Heading 1 · Priority" : `Heading ${index + 1}`}
@@ -312,7 +312,7 @@ export function AdminHomepagePhotoEditor({
           {content.heroSlideshows.map((pack, packIndex) => (
             <div
               key={pack.id}
-              className="space-y-3 rounded-sm border border-[rgb(74_0_0/0.16)] bg-[rgb(255_252_244/0.9)] p-3"
+              className="dashboard-panel-card space-y-3 p-3"
             >
               <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#2A0000]">
                 {packIndex === 0

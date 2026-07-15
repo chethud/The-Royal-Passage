@@ -1,6 +1,9 @@
 import { useState } from "react";
+import {
+  BookingDecisionDialog,
+  type BookingDecisionPayload,
+} from "@/components/booking/BookingDecisionDialog";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
-import { OwnerHomestayRejectDialog } from "@/components/homestay-owner/OwnerHomestayRejectDialog";
 import {
   DashboardTable,
   DashboardTableBody,
@@ -22,8 +25,8 @@ import { formatMoney } from "@/lib/money";
 type OwnerHomestayBookingTableProps = {
   bookings: HomestayBookingSummary[];
   busyId: string | null;
-  onConfirm: (id: string) => void;
-  onReject: (id: string, reason: string) => Promise<void>;
+  onConfirm: (id: string, decision: BookingDecisionPayload) => Promise<void>;
+  onReject: (id: string, decision: BookingDecisionPayload) => Promise<void>;
   onMarkPaid: (id: string) => void;
   onComplete: (id: string) => void;
 };
@@ -37,7 +40,10 @@ export function OwnerHomestayBookingTable({
   onComplete,
 }: OwnerHomestayBookingTableProps) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [rejectBooking, setRejectBooking] = useState<HomestayBookingSummary | null>(null);
+  const [decision, setDecision] = useState<{
+    booking: HomestayBookingSummary;
+    mode: "accept" | "reject";
+  } | null>(null);
 
   const filtered = bookings.filter((b) => {
     if (statusFilter === "all") return true;
@@ -71,6 +77,7 @@ export function OwnerHomestayBookingTable({
                 <DashboardTableHeadCell>Dates</DashboardTableHeadCell>
                 <DashboardTableHeadCell>Amount</DashboardTableHeadCell>
                 <DashboardTableHeadCell>Status</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Reason</DashboardTableHeadCell>
                 <DashboardTableHeadCell>Actions</DashboardTableHeadCell>
               </DashboardTableHeadRow>
             </DashboardTableHead>
@@ -108,6 +115,13 @@ export function OwnerHomestayBookingTable({
                       ) : null}
                     </DashboardTableCell>
                     <DashboardTableCell>
+                      {booking.rejectionReason ? (
+                        <span className="text-xs leading-snug">{booking.rejectionReason}</span>
+                      ) : (
+                        <span className="text-xs opacity-50">—</span>
+                      )}
+                    </DashboardTableCell>
+                    <DashboardTableCell>
                       <div className="flex flex-wrap gap-2">
                         {booking.bookingStatus === "pending" ? (
                           <>
@@ -115,15 +129,15 @@ export function OwnerHomestayBookingTable({
                               type="button"
                               disabled={busy}
                               className="luxury-btn-sm luxury-btn-primary"
-                              onClick={() => onConfirm(booking.id)}
+                              onClick={() => setDecision({ booking, mode: "accept" })}
                             >
-                              Confirm
+                              Accept
                             </button>
                             <button
                               type="button"
                               disabled={busy}
                               className="luxury-btn-sm luxury-btn-panel-outline"
-                              onClick={() => setRejectBooking(booking)}
+                              onClick={() => setDecision({ booking, mode: "reject" })}
                             >
                               Reject
                             </button>
@@ -159,14 +173,26 @@ export function OwnerHomestayBookingTable({
         </DashboardTableScroll>
       )}
 
-      <OwnerHomestayRejectDialog
-        booking={rejectBooking}
-        busy={Boolean(rejectBooking && busyId === rejectBooking.id)}
-        onClose={() => setRejectBooking(null)}
-        onConfirm={async (reason) => {
-          if (!rejectBooking) return;
-          await onReject(rejectBooking.id, reason);
-          setRejectBooking(null);
+      <BookingDecisionDialog
+        open={Boolean(decision)}
+        mode={decision?.mode ?? "accept"}
+        title={decision?.mode === "reject" ? "Reject stay request" : "Accept stay request"}
+        description={
+          decision
+            ? decision.mode === "reject"
+              ? `Decline ${decision.booking.guestName ?? "the guest"}'s request for ${decision.booking.homestayTitle}. Enter your contact details and a reason.`
+              : `Accept ${decision.booking.guestName ?? "the guest"}'s request for ${decision.booking.homestayTitle}. Enter your contact details to confirm.`
+            : ""
+        }
+        busy={Boolean(decision && busyId === decision.booking.id)}
+        onClose={() => setDecision(null)}
+        onConfirm={async (payload) => {
+          if (!decision) return;
+          if (decision.mode === "reject") {
+            await onReject(decision.booking.id, payload);
+          } else {
+            await onConfirm(decision.booking.id, payload);
+          }
         }}
       />
     </DashboardTableSection>

@@ -22,7 +22,7 @@ function ReviewNavCard({
     <Link
       to={to}
       search={search}
-      className="block rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-5 transition-colors hover:border-[rgb(74_0_0/0.28)] no-underline"
+      className="dashboard-panel-card block p-5 no-underline"
     >
       <div className="luxury-panel-heading font-display text-lg">{title}</div>
       <p className="luxury-panel-body mt-1 text-sm">{detail}</p>

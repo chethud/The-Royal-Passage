@@ -58,6 +58,14 @@ export type HomestayBookingSummary = {
   roomCount?: number;
   extraBedCount?: number;
   homestayImageUrl?: string | null;
+  decisionByName?: string | null;
+  decisionByPhone?: string | null;
+};
+
+export type OwnerBookingDecisionPayload = {
+  decisionName: string;
+  decisionPhone: string;
+  rejectionReason?: string;
 };
 
 export function fetchOwnerDashboard(accessToken: string) {
@@ -89,12 +97,14 @@ function ownerBookingAction(
   accessToken: string,
   bookingId: string,
   method: "confirm" | "reject" | "markPaid" | "complete",
-  reason?: string,
+  decision?: OwnerBookingDecisionPayload,
 ) {
   const client = createRoyalPassageClient(accessToken);
   const request = create(OwnerHomestayBookingActionRequestSchema, {
     bookingId,
-    ...(reason ? { reason } : {}),
+    ...(decision?.rejectionReason ? { reason: decision.rejectionReason } : {}),
+    ...(decision?.decisionName ? { decisionName: decision.decisionName } : {}),
+    ...(decision?.decisionPhone ? { decisionPhone: decision.decisionPhone } : {}),
   });
   const call =
     method === "confirm"
@@ -107,10 +117,16 @@ function ownerBookingAction(
   return rpcCall(() => call(request)) as Promise<HomestayBookingSummary>;
 }
 
-export const confirmOwnerHomestayBooking = (token: string, id: string) =>
-  ownerBookingAction(token, id, "confirm");
-export const rejectOwnerHomestayBooking = (token: string, id: string, reason: string) =>
-  ownerBookingAction(token, id, "reject", reason);
+export const confirmOwnerHomestayBooking = (
+  token: string,
+  id: string,
+  decision: OwnerBookingDecisionPayload,
+) => ownerBookingAction(token, id, "confirm", decision);
+export const rejectOwnerHomestayBooking = (
+  token: string,
+  id: string,
+  decision: OwnerBookingDecisionPayload,
+) => ownerBookingAction(token, id, "reject", decision);
 export const markOwnerHomestayBookingPaid = (token: string, id: string) =>
   ownerBookingAction(token, id, "markPaid");
 export const completeOwnerHomestayBooking = (token: string, id: string) =>

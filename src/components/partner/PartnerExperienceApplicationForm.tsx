@@ -67,6 +67,7 @@ export function PartnerExperienceApplicationForm() {
   const [panNumber, setPanNumber] = useState("");
   const [passportPhotoUrl, setPassportPhotoUrl] = useState("");
   const [tradeLicenseUrl, setTradeLicenseUrl] = useState("");
+  const [tradeLicenseExpiresOn, setTradeLicenseExpiresOn] = useState("");
   const [uploadingPassport, setUploadingPassport] = useState(false);
   const [uploadingTradeLicense, setUploadingTradeLicense] = useState(false);
 
@@ -143,6 +144,10 @@ export function PartnerExperienceApplicationForm() {
       setError("Upload your trade licence.");
       return;
     }
+    if (!tradeLicenseExpiresOn.trim()) {
+      setError("Enter the trade licence expiry date.");
+      return;
+    }
 
     const galleryUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
 
@@ -158,6 +163,7 @@ export function PartnerExperienceApplicationForm() {
           panNumber: panNumber.trim().toUpperCase(),
           passportPhotoUrl: passportPhotoUrl.trim(),
           tradeLicenseUrl: tradeLicenseUrl.trim(),
+          tradeLicenseExpiresOn: tradeLicenseExpiresOn.trim(),
           title: title.trim(),
           tagline: tagline.trim() || undefined,
           description: description.trim(),
@@ -307,19 +313,35 @@ export function PartnerExperienceApplicationForm() {
                 className="sr-only"
                 onChange={(e) => void handleTradeLicenseSelect(e.target.files?.[0] ?? null)}
               />
-              <button
-                type="button"
-                className="luxury-btn-sm dashboard-chrome-btn"
-                disabled={uploadingTradeLicense}
-                onClick={() => tradeLicenseInputRef.current?.click()}
-              >
-                {uploadingTradeLicense ? "Uploading…" : "Upload trade licence"}
-              </button>
-              {tradeLicenseUrl ? (
-                <p className="luxury-panel-body mt-2 text-xs">Trade licence uploaded.</p>
-              ) : (
-                <p className="luxury-panel-body mt-2 text-xs">Required — your trade licence document.</p>
-              )}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <button
+                    type="button"
+                    className="luxury-btn-sm dashboard-chrome-btn"
+                    disabled={uploadingTradeLicense}
+                    onClick={() => tradeLicenseInputRef.current?.click()}
+                  >
+                    {uploadingTradeLicense ? "Uploading…" : "Upload trade licence"}
+                  </button>
+                  {tradeLicenseUrl ? (
+                    <p className="luxury-panel-body mt-2 text-xs">Trade licence uploaded.</p>
+                  ) : (
+                    <p className="luxury-panel-body mt-2 text-xs">
+                      Required — your trade licence document.
+                    </p>
+                  )}
+                </div>
+                <label className="text-sm">
+                  <span className="eyebrow luxury-panel-label">Expiry date</span>
+                  <input
+                    required
+                    type="date"
+                    value={tradeLicenseExpiresOn}
+                    onChange={(e) => setTradeLicenseExpiresOn(e.target.value)}
+                    className={inputClass}
+                  />
+                </label>
+              </div>
             </div>
             <label className="text-sm sm:col-span-2">
               <span className="eyebrow luxury-panel-label">Short bio (optional)</span>

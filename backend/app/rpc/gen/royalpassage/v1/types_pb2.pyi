@@ -178,7 +178,7 @@ class BookingExperienceSummary(_message.Message):
     def __init__(self, id: _Optional[str] = ..., slug: _Optional[str] = ..., title: _Optional[str] = ..., city: _Optional[str] = ..., address: _Optional[str] = ..., image: _Optional[str] = ..., host_name: _Optional[str] = ...) -> None: ...
 
 class BookingSummary(_message.Message):
-    __slots__ = ("id", "experience", "slot", "participant_count", "total_amount", "currency_code", "currency_symbol", "booking_status", "payment_status", "payment_method", "notes", "created_at", "confirmed_at", "guest_name", "guest_email", "guest_phone", "is_paused", "paused_at")
+    __slots__ = ("id", "experience", "slot", "participant_count", "total_amount", "currency_code", "currency_symbol", "booking_status", "payment_status", "payment_method", "notes", "created_at", "confirmed_at", "guest_name", "guest_email", "guest_phone", "is_paused", "paused_at", "decision_by_name", "decision_by_phone", "rejection_reason")
     ID_FIELD_NUMBER: _ClassVar[int]
     EXPERIENCE_FIELD_NUMBER: _ClassVar[int]
     SLOT_FIELD_NUMBER: _ClassVar[int]
@@ -197,6 +197,9 @@ class BookingSummary(_message.Message):
     GUEST_PHONE_FIELD_NUMBER: _ClassVar[int]
     IS_PAUSED_FIELD_NUMBER: _ClassVar[int]
     PAUSED_AT_FIELD_NUMBER: _ClassVar[int]
+    DECISION_BY_NAME_FIELD_NUMBER: _ClassVar[int]
+    DECISION_BY_PHONE_FIELD_NUMBER: _ClassVar[int]
+    REJECTION_REASON_FIELD_NUMBER: _ClassVar[int]
     id: str
     experience: BookingExperienceSummary
     slot: BookingSlotSummary
@@ -215,7 +218,10 @@ class BookingSummary(_message.Message):
     guest_phone: str
     is_paused: bool
     paused_at: str
-    def __init__(self, id: _Optional[str] = ..., experience: _Optional[_Union[BookingExperienceSummary, _Mapping]] = ..., slot: _Optional[_Union[BookingSlotSummary, _Mapping]] = ..., participant_count: _Optional[int] = ..., total_amount: _Optional[int] = ..., currency_code: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., booking_status: _Optional[str] = ..., payment_status: _Optional[str] = ..., payment_method: _Optional[str] = ..., notes: _Optional[str] = ..., created_at: _Optional[str] = ..., confirmed_at: _Optional[str] = ..., guest_name: _Optional[str] = ..., guest_email: _Optional[str] = ..., guest_phone: _Optional[str] = ..., is_paused: _Optional[bool] = ..., paused_at: _Optional[str] = ...) -> None: ...
+    decision_by_name: str
+    decision_by_phone: str
+    rejection_reason: str
+    def __init__(self, id: _Optional[str] = ..., experience: _Optional[_Union[BookingExperienceSummary, _Mapping]] = ..., slot: _Optional[_Union[BookingSlotSummary, _Mapping]] = ..., participant_count: _Optional[int] = ..., total_amount: _Optional[int] = ..., currency_code: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., booking_status: _Optional[str] = ..., payment_status: _Optional[str] = ..., payment_method: _Optional[str] = ..., notes: _Optional[str] = ..., created_at: _Optional[str] = ..., confirmed_at: _Optional[str] = ..., guest_name: _Optional[str] = ..., guest_email: _Optional[str] = ..., guest_phone: _Optional[str] = ..., is_paused: _Optional[bool] = ..., paused_at: _Optional[str] = ..., decision_by_name: _Optional[str] = ..., decision_by_phone: _Optional[str] = ..., rejection_reason: _Optional[str] = ...) -> None: ...
 
 class HostDashboardStats(_message.Message):
     __slots__ = ("pending_bookings", "confirmed_bookings", "completed_bookings", "revenue_collected_minor", "revenue_pending_minor", "week_revenue_estimate_minor", "upcoming_bookings", "today_bookings", "published_experiences", "currency_symbol", "total_bookings")
@@ -1596,7 +1602,7 @@ class OwnerDashboardStats(_message.Message):
     def __init__(self, pending_bookings: _Optional[int] = ..., confirmed_bookings: _Optional[int] = ..., completed_bookings: _Optional[int] = ..., revenue_collected_minor: _Optional[int] = ..., revenue_pending_minor: _Optional[int] = ..., upcoming_bookings: _Optional[int] = ..., check_in_today: _Optional[int] = ..., published_homestays: _Optional[int] = ..., currency_symbol: _Optional[str] = ..., total_bookings: _Optional[int] = ...) -> None: ...
 
 class HomestayBookingSummary(_message.Message):
-    __slots__ = ("id", "homestay_id", "homestay_title", "homestay_slug", "room_name", "check_in", "check_out", "nights", "guest_count", "total_amount", "currency_code", "currency_symbol", "booking_status", "payment_status", "payment_method", "guest_name", "notes", "created_at", "check_in_time", "check_out_time", "homestay_address", "room_count", "extra_bed_count", "rejection_reason", "homestay_image_url")
+    __slots__ = ("id", "homestay_id", "homestay_title", "homestay_slug", "room_name", "check_in", "check_out", "nights", "guest_count", "total_amount", "currency_code", "currency_symbol", "booking_status", "payment_status", "payment_method", "guest_name", "notes", "created_at", "check_in_time", "check_out_time", "homestay_address", "room_count", "extra_bed_count", "rejection_reason", "homestay_image_url", "decision_by_name", "decision_by_phone")
     ID_FIELD_NUMBER: _ClassVar[int]
     HOMESTAY_ID_FIELD_NUMBER: _ClassVar[int]
     HOMESTAY_TITLE_FIELD_NUMBER: _ClassVar[int]
@@ -1622,6 +1628,8 @@ class HomestayBookingSummary(_message.Message):
     EXTRA_BED_COUNT_FIELD_NUMBER: _ClassVar[int]
     REJECTION_REASON_FIELD_NUMBER: _ClassVar[int]
     HOMESTAY_IMAGE_URL_FIELD_NUMBER: _ClassVar[int]
+    DECISION_BY_NAME_FIELD_NUMBER: _ClassVar[int]
+    DECISION_BY_PHONE_FIELD_NUMBER: _ClassVar[int]
     id: str
     homestay_id: str
     homestay_title: str
@@ -1647,7 +1655,9 @@ class HomestayBookingSummary(_message.Message):
     extra_bed_count: int
     rejection_reason: str
     homestay_image_url: str
-    def __init__(self, id: _Optional[str] = ..., homestay_id: _Optional[str] = ..., homestay_title: _Optional[str] = ..., homestay_slug: _Optional[str] = ..., room_name: _Optional[str] = ..., check_in: _Optional[str] = ..., check_out: _Optional[str] = ..., nights: _Optional[int] = ..., guest_count: _Optional[int] = ..., total_amount: _Optional[int] = ..., currency_code: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., booking_status: _Optional[str] = ..., payment_status: _Optional[str] = ..., payment_method: _Optional[str] = ..., guest_name: _Optional[str] = ..., notes: _Optional[str] = ..., created_at: _Optional[str] = ..., check_in_time: _Optional[str] = ..., check_out_time: _Optional[str] = ..., homestay_address: _Optional[str] = ..., room_count: _Optional[int] = ..., extra_bed_count: _Optional[int] = ..., rejection_reason: _Optional[str] = ..., homestay_image_url: _Optional[str] = ...) -> None: ...
+    decision_by_name: str
+    decision_by_phone: str
+    def __init__(self, id: _Optional[str] = ..., homestay_id: _Optional[str] = ..., homestay_title: _Optional[str] = ..., homestay_slug: _Optional[str] = ..., room_name: _Optional[str] = ..., check_in: _Optional[str] = ..., check_out: _Optional[str] = ..., nights: _Optional[int] = ..., guest_count: _Optional[int] = ..., total_amount: _Optional[int] = ..., currency_code: _Optional[str] = ..., currency_symbol: _Optional[str] = ..., booking_status: _Optional[str] = ..., payment_status: _Optional[str] = ..., payment_method: _Optional[str] = ..., guest_name: _Optional[str] = ..., notes: _Optional[str] = ..., created_at: _Optional[str] = ..., check_in_time: _Optional[str] = ..., check_out_time: _Optional[str] = ..., homestay_address: _Optional[str] = ..., room_count: _Optional[int] = ..., extra_bed_count: _Optional[int] = ..., rejection_reason: _Optional[str] = ..., homestay_image_url: _Optional[str] = ..., decision_by_name: _Optional[str] = ..., decision_by_phone: _Optional[str] = ...) -> None: ...
 
 class ListHomestayBookingsResponse(_message.Message):
     __slots__ = ("bookings",)

@@ -118,10 +118,16 @@ class DeleteHostSlotRequest(_message.Message):
     def __init__(self, experience_id: _Optional[str] = ..., slot_id: _Optional[str] = ...) -> None: ...
 
 class HostBookingActionRequest(_message.Message):
-    __slots__ = ("booking_id",)
+    __slots__ = ("booking_id", "decision_name", "decision_phone", "reason")
     BOOKING_ID_FIELD_NUMBER: _ClassVar[int]
+    DECISION_NAME_FIELD_NUMBER: _ClassVar[int]
+    DECISION_PHONE_FIELD_NUMBER: _ClassVar[int]
+    REASON_FIELD_NUMBER: _ClassVar[int]
     booking_id: str
-    def __init__(self, booking_id: _Optional[str] = ...) -> None: ...
+    decision_name: str
+    decision_phone: str
+    reason: str
+    def __init__(self, booking_id: _Optional[str] = ..., decision_name: _Optional[str] = ..., decision_phone: _Optional[str] = ..., reason: _Optional[str] = ...) -> None: ...
 
 class AdminExperienceActionRequest(_message.Message):
     __slots__ = ("experience_id",)
@@ -256,12 +262,16 @@ class GetOwnerHomestayBookingRequest(_message.Message):
     def __init__(self, booking_id: _Optional[str] = ...) -> None: ...
 
 class OwnerHomestayBookingActionRequest(_message.Message):
-    __slots__ = ("booking_id", "reason")
+    __slots__ = ("booking_id", "reason", "decision_name", "decision_phone")
     BOOKING_ID_FIELD_NUMBER: _ClassVar[int]
     REASON_FIELD_NUMBER: _ClassVar[int]
+    DECISION_NAME_FIELD_NUMBER: _ClassVar[int]
+    DECISION_PHONE_FIELD_NUMBER: _ClassVar[int]
     booking_id: str
     reason: str
-    def __init__(self, booking_id: _Optional[str] = ..., reason: _Optional[str] = ...) -> None: ...
+    decision_name: str
+    decision_phone: str
+    def __init__(self, booking_id: _Optional[str] = ..., reason: _Optional[str] = ..., decision_name: _Optional[str] = ..., decision_phone: _Optional[str] = ...) -> None: ...
 
 class AdminHomestayActionRequest(_message.Message):
     __slots__ = ("homestay_id",)

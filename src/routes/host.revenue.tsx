@@ -87,7 +87,7 @@ function HostRevenuePage() {
           <section>
             <h2 className="font-display text-2xl">Weekly breakdown</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Collected vs pending COD by session date.
+              Collected, pending COD, and estimated totals by session date for the last 7 days.
             </p>
             <div className="mt-6">
               <RevenueChart week={revenue.week} currencySymbol={revenue.currencySymbol} />

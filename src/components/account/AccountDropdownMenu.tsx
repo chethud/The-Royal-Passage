@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   LogOut,
   Pencil,
+  PlusCircle,
   Star,
   UserCircle,
   UserCog,
@@ -124,8 +125,11 @@ export function AccountDropdownMenu({
     : isHomestaySection
       ? "Homestay reservations"
       : "Experience bookings";
-  const workspaces: RoleWorkspaceLink[] = workspaceLinksForRoles(roles, role);
+  const workspaces: RoleWorkspaceLink[] = workspaceLinksForRoles(roles, role).filter(
+    (workspace) => workspace.role !== "host",
+  );
   const canEditHomepage = hasEditorAccess(roles, role);
+  const isHost = role === "host" || roles.includes("host");
   const roleLabels =
     roles.length > 0
       ? roles.map((value) => ROLE_LABELS[value]).join(" · ")
@@ -187,7 +191,7 @@ export function AccountDropdownMenu({
                 />
               ))}
             </>
-          ) : (
+          ) : !isHost ? (
             <>
               <DropdownMenuLabel className="header-account-menu__section">Navigate</DropdownMenuLabel>
               <AccountMenuItem
@@ -197,7 +201,7 @@ export function AccountDropdownMenu({
                 to={dashboardPath}
               />
             </>
-          )}
+          ) : null}
 
           {isAdmin ? (
             <>
@@ -226,6 +230,19 @@ export function AccountDropdownMenu({
                 label="Homepage photos"
                 description="Hero, showcase, journal & featured stays"
                 to="/admin/profile/homepage-photos"
+              />
+            </>
+          ) : null}
+
+          {isHost ? (
+            <>
+              <DropdownMenuSeparator className="header-account-menu__divider" />
+              <DropdownMenuLabel className="header-account-menu__section">Host</DropdownMenuLabel>
+              <AccountMenuItem
+                icon={PlusCircle}
+                label="Add experience"
+                description="Create a new listing"
+                to="/host/experiences/new"
               />
             </>
           ) : null}

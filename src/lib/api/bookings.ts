@@ -49,6 +49,9 @@ export type BookingSummary = {
   guestPhone?: string | null;
   isPaused?: boolean;
   pausedAt?: string | null;
+  decisionByName?: string | null;
+  decisionByPhone?: string | null;
+  rejectionReason?: string | null;
 };
 
 async function hydrateBookingExperienceSlug(booking: BookingSummary): Promise<BookingSummary> {

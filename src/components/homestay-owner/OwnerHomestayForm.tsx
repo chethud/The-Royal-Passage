@@ -399,7 +399,7 @@ export function OwnerHomestayForm({
             gallery.
           </p>
         </div>
-        <div className="rounded-sm border border-[rgb(74_0_0/0.15)] bg-[rgb(255_255_255/0.35)] p-4 sm:p-5">
+        <div className="dashboard-panel-card p-4 sm:p-5">
           <ExperiencePhotoGallery
             photoUrls={photoUrls}
             onChange={setPhotoUrls}
@@ -422,7 +422,7 @@ export function OwnerHomestayForm({
             license. Required for every listing.
           </p>
         </div>
-        <div className="rounded-sm border border-[rgb(74_0_0/0.15)] bg-[rgb(255_255_255/0.35)] p-4 sm:p-5">
+        <div className="dashboard-panel-card p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"

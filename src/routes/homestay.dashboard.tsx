@@ -42,8 +42,9 @@ function HomestayOwnerOverviewPage() {
     setBusyId(bookingId);
     setPageWarning(null);
     try {
-      await action(accessToken, bookingId);
-      await loadPage();
+      const updated = await action(accessToken, bookingId);
+      setPendingBookings((rows) => rows.map((row) => (row.id === bookingId ? updated : row)));
+      setTodayBookings((rows) => rows.map((row) => (row.id === bookingId ? updated : row)));
     } catch (err) {
       setPageWarning(toErrorMessage(err, "Action failed."));
       throw err;
@@ -52,13 +53,22 @@ function HomestayOwnerOverviewPage() {
     }
   };
 
-  const runReject = async (bookingId: string, reason: string) => {
+  const runDecision = async (
+    bookingId: string,
+    decision: import("@/components/booking/BookingDecisionDialog").BookingDecisionPayload,
+    action: typeof confirmOwnerHomestayBooking,
+  ) => {
     if (!accessToken) return;
     setBusyId(bookingId);
     setPageWarning(null);
     try {
-      await rejectOwnerHomestayBooking(accessToken, bookingId, reason);
-      await loadPage();
+      const updated = await action(accessToken, bookingId, decision);
+      setPendingBookings((rows) =>
+        rows
+          .map((row) => (row.id === bookingId ? updated : row))
+          .filter((row) => row.bookingStatus === "pending"),
+      );
+      setTodayBookings((rows) => rows.map((row) => (row.id === bookingId ? updated : row)));
     } catch (err) {
       setPageWarning(toErrorMessage(err, "Action failed."));
       throw err;
@@ -170,7 +180,7 @@ function HomestayOwnerOverviewPage() {
                 <OwnerHomestayBookingTable
                   bookings={todayBookings}
                   busyId={null}
-                  onConfirm={() => undefined}
+                  onConfirm={async () => undefined}
                   onReject={async () => undefined}
                   onMarkPaid={() => undefined}
                   onComplete={() => undefined}
@@ -200,8 +210,8 @@ function HomestayOwnerOverviewPage() {
                 <OwnerHomestayBookingTable
                   bookings={pendingBookings.slice(0, 5)}
                   busyId={busyId}
-                  onConfirm={(id) => void runAction(id, confirmOwnerHomestayBooking)}
-                  onReject={(id, reason) => runReject(id, reason)}
+                  onConfirm={(id, decision) => runDecision(id, decision, confirmOwnerHomestayBooking)}
+                  onReject={(id, decision) => runDecision(id, decision, rejectOwnerHomestayBooking)}
                   onMarkPaid={() => undefined}
                   onComplete={() => undefined}
                 />

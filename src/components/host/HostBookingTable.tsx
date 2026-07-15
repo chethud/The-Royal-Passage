@@ -1,5 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import {
+  BookingDecisionDialog,
+  type BookingDecisionPayload,
+} from "@/components/booking/BookingDecisionDialog";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
 import { HostBookingActions } from "@/components/host/HostBookingActions";
 import {
@@ -29,8 +33,8 @@ type HostBookingTableProps = {
   initialStatus?: BookingListStatus;
   initialPayment?: BookingPaymentFilter;
   initialDateView?: BookingDateView;
-  onConfirm: (id: string) => void;
-  onReject: (id: string) => void;
+  onConfirm: (id: string, decision: BookingDecisionPayload) => Promise<void>;
+  onReject: (id: string, decision: BookingDecisionPayload) => Promise<void>;
   onMarkPaid: (id: string) => void;
   onComplete: (id: string) => void;
   onPause: (id: string) => void;
@@ -87,6 +91,10 @@ export function HostBookingTable({
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialStatus);
   const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>(initialPayment);
   const [dateView, setDateView] = useState<BookingDateView>(initialDateView);
+  const [decision, setDecision] = useState<{
+    booking: BookingSummary;
+    mode: "accept" | "reject";
+  } | null>(null);
 
   useEffect(() => {
     setStatusFilter(initialStatus);
@@ -106,8 +114,8 @@ export function HostBookingTable({
   );
 
   const dateViewButtons: { value: BookingDateView; label: string }[] = [
-    { value: "week", label: "Next 7 days" },
     { value: "all", label: "All dates" },
+    { value: "week", label: "Next 7 days" },
     { value: "history", label: "History" },
   ];
 
@@ -174,6 +182,7 @@ export function HostBookingTable({
                 <DashboardTableHeadCell>Guests</DashboardTableHeadCell>
                 <DashboardTableHeadCell>Total</DashboardTableHeadCell>
                 <DashboardTableHeadCell>Status</DashboardTableHeadCell>
+                <DashboardTableHeadCell>Reason</DashboardTableHeadCell>
                 <DashboardTableHeadCell>Actions</DashboardTableHeadCell>
               </DashboardTableHeadRow>
             </DashboardTableHead>
@@ -213,12 +222,19 @@ export function HostBookingTable({
                     />
                   </DashboardTableCell>
                   <DashboardTableCell>
+                    {booking.rejectionReason ? (
+                      <span className="text-xs leading-snug">{booking.rejectionReason}</span>
+                    ) : (
+                      <span className="text-xs opacity-50">—</span>
+                    )}
+                  </DashboardTableCell>
+                  <DashboardTableCell>
                     <HostBookingActions
                       booking={booking}
                       busy={busyId === booking.id}
                       surface="light"
-                      onConfirm={onConfirm}
-                      onReject={onReject}
+                      onConfirm={() => setDecision({ booking, mode: "accept" })}
+                      onReject={() => setDecision({ booking, mode: "reject" })}
                       onMarkPaid={onMarkPaid}
                       onComplete={onComplete}
                       onPause={onPause}
@@ -231,6 +247,29 @@ export function HostBookingTable({
           </DashboardTable>
         </DashboardTableScroll>
       )}
+
+      <BookingDecisionDialog
+        open={Boolean(decision)}
+        mode={decision?.mode ?? "accept"}
+        title={decision?.mode === "reject" ? "Reject booking" : "Accept booking"}
+        description={
+          decision
+            ? decision.mode === "reject"
+              ? `Decline ${decision.booking.guestName ?? "the guest"}'s request for ${decision.booking.experience.title}. Enter your contact details and a reason.`
+              : `Accept ${decision.booking.guestName ?? "the guest"}'s request for ${decision.booking.experience.title}. Enter your contact details to confirm.`
+            : ""
+        }
+        busy={Boolean(decision && busyId === decision.booking.id)}
+        onClose={() => setDecision(null)}
+        onConfirm={async (payload) => {
+          if (!decision) return;
+          if (decision.mode === "reject") {
+            await onReject(decision.booking.id, payload);
+          } else {
+            await onConfirm(decision.booking.id, payload);
+          }
+        }}
+      />
     </DashboardTableSection>
   );
 }

@@ -70,6 +70,8 @@ def _map_homestay_booking(row: dict) -> HomestayBookingSummary:
         extraBedCount=int(row.get("extra_bed_count") or 0),
         rejectionReason=row.get("rejection_reason"),
         homestayImageUrl=hero or None,
+        decisionByName=row.get("decision_by_name"),
+        decisionByPhone=row.get("decision_by_phone"),
     )
 
 
@@ -232,7 +234,20 @@ def _update_owner_booking(booking_id: str, auth: dict, updates: dict) -> Homesta
     return _map_homestay_booking(row)
 
 
-def confirm_owner_homestay_booking(booking_id: str, auth: dict) -> HomestayBookingSummary:
+def confirm_owner_homestay_booking(
+    booking_id: str,
+    auth: dict,
+    *,
+    decision_name: str | None = None,
+    decision_phone: str | None = None,
+) -> HomestayBookingSummary:
+    from app.services.booking_decision import normalize_decision_contact
+
+    name, phone, _ = normalize_decision_contact(
+        decision_name=decision_name,
+        decision_phone=decision_phone,
+    )
+
     supabase = get_supabase_admin()
     owner_id = _resolve_owner_id(auth)
     row = _fetch_owner_booking_row(supabase, booking_id, owner_id)
@@ -240,7 +255,16 @@ def confirm_owner_homestay_booking(booking_id: str, auth: dict) -> HomestayBooki
     if row.get("booking_status") != "pending":
         raise ValueError("Only pending bookings can be confirmed.")
 
-    updated = _update_owner_booking(booking_id, auth, {"booking_status": "confirmed"})
+    updated = _update_owner_booking(
+        booking_id,
+        auth,
+        {
+            "booking_status": "confirmed",
+            "decision_by_name": name,
+            "decision_by_phone": phone,
+            "rejection_reason": None,
+        },
+    )
 
     from app.services.notifications import create_notification
 
@@ -290,19 +314,24 @@ def reject_owner_homestay_booking(
     auth: dict,
     *,
     reason: str | None = None,
+    decision_name: str | None = None,
+    decision_phone: str | None = None,
 ) -> HomestayBookingSummary:
+    from app.services.booking_decision import normalize_decision_contact
+
+    name, phone, reason_text = normalize_decision_contact(
+        decision_name=decision_name,
+        decision_phone=decision_phone,
+        rejection_reason=reason,
+        require_reason=True,
+    )
+
     supabase = get_supabase_admin()
     owner_id = _resolve_owner_id(auth)
     row = _fetch_owner_booking_row(supabase, booking_id, owner_id)
 
     if row.get("booking_status") != "pending":
         raise ValueError("Only pending bookings can be rejected.")
-
-    reason_text = (reason or "").strip()
-    if len(reason_text) < 3:
-        raise ValueError("A rejection reason is required.")
-    if len(reason_text) > 500:
-        raise ValueError("Rejection reason must be 500 characters or fewer.")
 
     now = datetime.now(timezone.utc).isoformat()
     updated = _update_owner_booking(
@@ -312,6 +341,8 @@ def reject_owner_homestay_booking(
             "booking_status": "cancelled",
             "cancelled_at": now,
             "rejection_reason": reason_text,
+            "decision_by_name": name,
+            "decision_by_phone": phone,
         },
     )
 

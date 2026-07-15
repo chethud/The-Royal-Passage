@@ -29,6 +29,7 @@ const submitSchema = z.object({
     .regex(/^[A-Z]{5}[0-9]{4}[A-Z]$/, "Enter a valid PAN (e.g. ABCDE1234F)."),
   passportPhotoUrl: z.string().url().max(2000),
   tradeLicenseUrl: z.string().url().max(2000),
+  tradeLicenseExpiresOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter trade licence expiry date."),
   title: z.string().trim().min(3).max(200),
   tagline: z.string().trim().max(280).optional(),
   description: z.string().trim().min(20).max(8000),
@@ -84,6 +85,7 @@ export type PartnerExperienceApplication = {
   panNumber: string | null;
   passportPhotoUrl: string | null;
   tradeLicenseUrl: string | null;
+  tradeLicenseExpiresOn: string | null;
   title: string;
   tagline: string | null;
   description: string;
@@ -118,6 +120,8 @@ function mapRow(row: Record<string, unknown>): PartnerExperienceApplication {
     panNumber: row.pan_number == null ? null : String(row.pan_number),
     passportPhotoUrl: row.passport_photo_url == null ? null : String(row.passport_photo_url),
     tradeLicenseUrl: row.trade_license_url == null ? null : String(row.trade_license_url),
+    tradeLicenseExpiresOn:
+      row.trade_license_expires_on == null ? null : String(row.trade_license_expires_on).slice(0, 10),
     title: String(row.title ?? ""),
     tagline: row.tagline == null ? null : String(row.tagline),
     description: String(row.description ?? ""),
@@ -249,6 +253,7 @@ export const submitPartnerExperienceApplication = createServerFn({ method: "POST
         pan_number: data.panNumber.trim().toUpperCase(),
         passport_photo_url: data.passportPhotoUrl,
         trade_license_url: data.tradeLicenseUrl,
+        trade_license_expires_on: data.tradeLicenseExpiresOn,
         title: data.title,
         tagline: data.tagline?.trim() || null,
         description: data.description,

@@ -432,7 +432,7 @@ export function AdminPartnerHomestayApplicationsQueue({
                     ) : null}
                   </section>
 
-                  <div className="space-y-3 rounded-sm border border-[rgb(74_0_0/0.12)] bg-[rgb(255_255_255/0.4)] p-4">
+                  <div className="dashboard-panel-card space-y-3 p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="eyebrow luxury-panel-label">Rooms to publish</p>
                       <button

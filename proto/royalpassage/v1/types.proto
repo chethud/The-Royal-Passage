@@ -117,6 +117,9 @@ message BookingSummary {
   optional string guest_phone = 16;
   bool is_paused = 17;
   optional string paused_at = 18;
+  optional string decision_by_name = 19;
+  optional string decision_by_phone = 20;
+  optional string rejection_reason = 21;
 }
 
 message HostDashboardStats {
@@ -902,6 +905,8 @@ message HomestayBookingSummary {
   int32 extra_bed_count = 23;
   optional string rejection_reason = 24;
   optional string homestay_image_url = 25;
+  optional string decision_by_name = 26;
+  optional string decision_by_phone = 27;
 }
 
 message ListHomestayBookingsResponse {

@@ -11,6 +11,7 @@ create table if not exists public.partner_experience_applications (
   pan_number text,
   passport_photo_url text,
   trade_license_url text,
+  trade_license_expires_on date,
   -- Experience details
   title text not null,
   tagline text,

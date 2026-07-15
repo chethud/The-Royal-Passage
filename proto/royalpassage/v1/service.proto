@@ -359,6 +359,9 @@ message DeleteHostSlotRequest {
 
 message HostBookingActionRequest {
   string booking_id = 1;
+  optional string decision_name = 2;
+  optional string decision_phone = 3;
+  optional string reason = 4;
 }
 
 message AdminExperienceActionRequest {
@@ -449,6 +452,8 @@ message GetOwnerHomestayBookingRequest {
 message OwnerHomestayBookingActionRequest {
   string booking_id = 1;
   optional string reason = 2;
+  optional string decision_name = 3;
+  optional string decision_phone = 4;
 }
 
 message AdminHomestayActionRequest {

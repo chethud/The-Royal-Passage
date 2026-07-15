@@ -19,7 +19,7 @@ export function OwnerHomestayStatsGrid({ stats }: OwnerHomestayStatsGridProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
-        <div key={item.label} className="rounded-sm border luxury-panel-divider px-4 py-5">
+        <div key={item.label} className="dashboard-panel-card px-4 py-5">
           <p className="luxury-panel-label text-[0.65rem] uppercase tracking-[0.14em]">{item.label}</p>
           <p className="luxury-panel-heading mt-2 font-display text-3xl">{item.value}</p>
         </div>

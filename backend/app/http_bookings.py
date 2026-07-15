@@ -22,7 +22,8 @@ _GUEST_BOOKING_STATUSES = frozenset({"upcoming", "past", "cancelled"})
 
 def _value_error(exc: ValueError, *, forbidden: bool = False) -> JSONResponse:
     msg = str(exc)
-    if forbidden or "access" in msg.lower():
+    lowered = msg.lower()
+    if forbidden or "access" in lowered or "frozen" in lowered:
         return JSONResponse({"detail": msg}, status_code=403)
     return JSONResponse({"detail": msg}, status_code=400)
 

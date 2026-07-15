@@ -176,7 +176,14 @@ def _rpc(fn: F) -> F:
         except ConnectError:
             raise
         except ValueError as exc:
-            raise ConnectError(Code.INVALID_ARGUMENT, str(exc)) from exc
+            msg = str(exc)
+            lowered = msg.lower()
+            code = (
+                Code.PERMISSION_DENIED
+                if "frozen" in lowered or "access" in lowered
+                else Code.INVALID_ARGUMENT
+            )
+            raise ConnectError(code, msg) from exc
         except Exception as exc:
             from postgrest.exceptions import APIError
 
@@ -422,7 +429,13 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         _ensure_supabase()
         auth = require_homestay_owner(ctx)
         return pydantic_to_proto(
-            confirm_owner_homestay_booking(request.booking_id, auth), types_pb2.HomestayBookingSummary
+            confirm_owner_homestay_booking(
+                request.booking_id,
+                auth,
+                decision_name=request.decision_name or None,
+                decision_phone=request.decision_phone or None,
+            ),
+            types_pb2.HomestayBookingSummary,
         )
 
     @_rpc
@@ -436,6 +449,8 @@ class RoyalPassageServiceImpl(RoyalPassageService):
                 request.booking_id,
                 auth,
                 reason=request.reason or None,
+                decision_name=request.decision_name or None,
+                decision_phone=request.decision_phone or None,
             ),
             types_pb2.HomestayBookingSummary,
         )
@@ -802,7 +817,15 @@ class RoyalPassageServiceImpl(RoyalPassageService):
     ) -> types_pb2.BookingSummary:
         _ensure_supabase()
         auth = require_host(ctx)
-        return pydantic_to_proto(confirm_host_booking(request.booking_id, auth), types_pb2.BookingSummary)
+        return pydantic_to_proto(
+            confirm_host_booking(
+                request.booking_id,
+                auth,
+                decision_name=request.decision_name or None,
+                decision_phone=request.decision_phone or None,
+            ),
+            types_pb2.BookingSummary,
+        )
 
     @_rpc
     async def reject_host_booking(
@@ -810,7 +833,16 @@ class RoyalPassageServiceImpl(RoyalPassageService):
     ) -> types_pb2.BookingSummary:
         _ensure_supabase()
         auth = require_host(ctx)
-        return pydantic_to_proto(reject_host_booking(request.booking_id, auth), types_pb2.BookingSummary)
+        return pydantic_to_proto(
+            reject_host_booking(
+                request.booking_id,
+                auth,
+                decision_name=request.decision_name or None,
+                decision_phone=request.decision_phone or None,
+                rejection_reason=request.reason or None,
+            ),
+            types_pb2.BookingSummary,
+        )
 
     @_rpc
     async def mark_host_booking_paid(

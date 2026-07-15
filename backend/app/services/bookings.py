@@ -95,6 +95,10 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
     user = auth["user"]
     profile = auth["profile"]
 
+    from app.services.guest_booking_freeze import assert_guest_can_create_booking
+
+    assert_guest_can_create_booking(user.id)
+
     guest_name = profile.get("full_name") or user.email or "Guest"
     guest_email = user.email or ""
     guest_phone = profile.get("phone")
@@ -328,6 +332,9 @@ def _map_booking_row(row: dict) -> BookingSummary:
         guestPhone=row.get("guest_phone"),
         isPaused=bool(row.get("is_paused")),
         pausedAt=row.get("paused_at"),
+        decisionByName=row.get("decision_by_name"),
+        decisionByPhone=row.get("decision_by_phone"),
+        rejectionReason=row.get("rejection_reason"),
     )
 
 
@@ -465,5 +472,13 @@ def cancel_guest_booking(booking_id: str, auth: dict) -> BookingSummary:
         {"bookingId": booking_id},
     )
     log_audit(user_id, "booking_cancelled", "booking", booking_id, {"by": "guest"})
+
+    from app.services.guest_booking_freeze import record_guest_cancel_and_maybe_freeze
+
+    record_guest_cancel_and_maybe_freeze(
+        user_id,
+        booking_id=booking_id,
+        booking_kind="experience",
+    )
 
     return get_booking_by_id(booking_id, auth)

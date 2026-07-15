@@ -620,7 +620,7 @@ export function CreateExperienceWizard({
           </dl>
 
           <label
-            className={`flex items-start gap-3 rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4 text-sm ${
+            className={`dashboard-panel-card flex items-start gap-3 p-4 text-sm ${
               draftSlots.length === 0 ? "opacity-70" : ""
             }`}
           >

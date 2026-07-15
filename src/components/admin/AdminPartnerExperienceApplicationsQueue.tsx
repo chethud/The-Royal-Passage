@@ -260,6 +260,14 @@ export function AdminPartnerExperienceApplicationsQueue({
                           "—"
                         )}
                       </p>
+                      <p>
+                        <span className="eyebrow luxury-panel-label mb-1 block">
+                          Trade licence expiry
+                        </span>
+                        {row.tradeLicenseExpiresOn
+                          ? formatDateLong(row.tradeLicenseExpiresOn)
+                          : "—"}
+                      </p>
                       <div>
                         <span className="eyebrow luxury-panel-label mb-1 block">Passport-size photo</span>
                         {row.passportPhotoUrl ? (
@@ -396,7 +404,7 @@ export function AdminPartnerExperienceApplicationsQueue({
                     ) : null}
                   </section>
 
-                  <div className="space-y-3 rounded-sm border border-[rgb(74_0_0/0.12)] bg-[rgb(255_255_255/0.4)] p-4">
+                  <div className="dashboard-panel-card space-y-3 p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="eyebrow luxury-panel-label">Sessions to publish</p>
                       <button

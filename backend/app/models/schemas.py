@@ -536,6 +536,8 @@ class HomestayBookingSummary(BaseModel):
     extraBedCount: int = 0
     rejectionReason: str | None = None
     homestayImageUrl: str | None = None
+    decisionByName: str | None = None
+    decisionByPhone: str | None = None
 
 
 class ListHomestayBookingsResponse(BaseModel):
@@ -705,9 +707,15 @@ class BookingSummary(BaseModel):
     guestPhone: str | None = None
     isPaused: bool = False
     pausedAt: str | None = None
+    decisionByName: str | None = None
+    decisionByPhone: str | None = None
+    rejectionReason: str | None = None
 
 
-class HostDashboardStats(BaseModel):
+class HostBookingDecisionRequest(BaseModel):
+    decisionName: str = Field(min_length=2, max_length=120)
+    decisionPhone: str = Field(min_length=7, max_length=40)
+    rejectionReason: str | None = Field(default=None, max_length=500)
     pendingBookings: int
     confirmedBookings: int
     completedBookings: int

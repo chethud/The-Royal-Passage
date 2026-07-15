@@ -206,11 +206,33 @@ async def _host_booking_action(request: Request, action: str) -> JSONResponse:
     if isinstance(auth, JSONResponse):
         return auth
     booking_id = request.path_params["booking_id"]
+    body: dict = {}
+    if request.method in ("POST", "PUT", "PATCH"):
+        try:
+            raw = await request.json()
+            if isinstance(raw, dict):
+                body = raw
+        except Exception:
+            body = {}
+    decision_name = body.get("decisionName") or body.get("decision_name")
+    decision_phone = body.get("decisionPhone") or body.get("decision_phone")
+    rejection_reason = body.get("rejectionReason") or body.get("rejection_reason") or body.get("reason")
     try:
         if action == "confirm":
-            row = confirm_host_booking(booking_id, auth)
+            row = confirm_host_booking(
+                booking_id,
+                auth,
+                decision_name=decision_name,
+                decision_phone=decision_phone,
+            )
         elif action == "reject":
-            row = reject_host_booking(booking_id, auth)
+            row = reject_host_booking(
+                booking_id,
+                auth,
+                decision_name=decision_name,
+                decision_phone=decision_phone,
+                rejection_reason=rejection_reason,
+            )
         elif action == "mark-paid":
             row = mark_host_booking_paid(booking_id, auth)
         elif action == "complete":

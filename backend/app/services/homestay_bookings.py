@@ -110,6 +110,11 @@ def create_homestay_booking(
     supabase = get_supabase_admin()
     user = auth["user"]
     profile = auth["profile"]
+
+    from app.services.guest_booking_freeze import assert_guest_can_create_booking
+
+    assert_guest_can_create_booking(user.id)
+
     guest_name = profile.get("full_name") or user.email or "Guest"
     guest_email = user.email or ""
 
@@ -458,6 +463,14 @@ def cancel_guest_homestay_booking(auth: dict, booking_id: str) -> HomestayBookin
     supabase.table("homestay_bookings").update(
         {"booking_status": "cancelled", "cancelled_at": now}
     ).eq("id", booking_id).execute()
+
+    from app.services.guest_booking_freeze import record_guest_cancel_and_maybe_freeze
+
+    record_guest_cancel_and_maybe_freeze(
+        user_id,
+        booking_id=booking_id,
+        booking_kind="homestay",
+    )
 
     refreshed = (
         supabase.table("homestay_bookings")

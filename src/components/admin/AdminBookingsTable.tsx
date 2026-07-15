@@ -86,8 +86,8 @@ export function AdminBookingsTable({
   }
 
   const dateViewButtons: { value: BookingDateView; label: string }[] = [
-    { value: "week", label: "Next 7 days" },
     { value: "all", label: "All dates" },
+    { value: "week", label: "Next 7 days" },
     { value: "history", label: "History" },
   ];
 

@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 import logging
 
 from app.dependencies.supabase import get_supabase_admin
@@ -18,6 +19,11 @@ from app.services.supabase_query import run_supabase_query
 from app.services.transactional_emails import send_experience_booking_confirmed_email
 
 logger = logging.getLogger(__name__)
+HOST_DAY_TZ = ZoneInfo("Asia/Kolkata")
+
+
+def _host_today() -> date:
+    return datetime.now(HOST_DAY_TZ).date()
 
 
 def _resolve_host_id(auth: dict) -> str:
@@ -142,7 +148,7 @@ def get_host_dashboard(auth: dict) -> HostDashboardStats:
 
     bookings = _load_dashboard_bookings(supabase, experience_ids)
 
-    today = date.today()
+    today = _host_today()
     week_end = today + timedelta(days=6)
 
     pending = sum(1 for b in bookings if b.get("booking_status") == "pending")
@@ -270,7 +276,7 @@ def get_host_revenue(auth: dict) -> HostRevenueSummary:
     )
     bookings = result.data or []
 
-    today = date.today()
+    today = _host_today()
     week_start = today - timedelta(days=6)
     day_keys = [(week_start + timedelta(days=offset)).isoformat() for offset in range(7)]
     buckets = {
@@ -286,10 +292,12 @@ def get_host_revenue(auth: dict) -> HostRevenueSummary:
         amount = _booking_amount(row)
         booking_status = row.get("booking_status")
         payment_status = row.get("payment_status")
+        is_paid = payment_status == "paid"
 
-        if payment_status == "paid":
+        if is_paid:
             buckets[key]["collectedMinor"] += amount
-        elif booking_status == "confirmed":
+        elif booking_status in ("confirmed", "completed"):
+            # Confirmed COD still due; completed without paid stays visible as outstanding.
             buckets[key]["pendingMinor"] += amount
 
         if booking_status in ("pending", "confirmed"):
@@ -356,7 +364,20 @@ def _update_host_booking(booking_id: str, auth: dict, updates: dict) -> BookingS
     return _map_booking_row(row)
 
 
-def confirm_host_booking(booking_id: str, auth: dict) -> BookingSummary:
+def confirm_host_booking(
+    booking_id: str,
+    auth: dict,
+    *,
+    decision_name: str | None = None,
+    decision_phone: str | None = None,
+) -> BookingSummary:
+    from app.services.booking_decision import normalize_decision_contact
+
+    name, phone, _ = normalize_decision_contact(
+        decision_name=decision_name,
+        decision_phone=decision_phone,
+    )
+
     supabase = get_supabase_admin()
     host_id = _resolve_host_id(auth)
     row = _fetch_host_booking_row(supabase, booking_id, host_id)
@@ -372,6 +393,9 @@ def confirm_host_booking(booking_id: str, auth: dict) -> BookingSummary:
             "booking_status": "confirmed",
             "status": "confirmed",
             "confirmed_at": now,
+            "decision_by_name": name,
+            "decision_by_phone": phone,
+            "rejection_reason": None,
         },
     )
     from app.services.notifications import create_notification
@@ -417,7 +441,23 @@ def confirm_host_booking(booking_id: str, auth: dict) -> BookingSummary:
     return updated
 
 
-def reject_host_booking(booking_id: str, auth: dict) -> BookingSummary:
+def reject_host_booking(
+    booking_id: str,
+    auth: dict,
+    *,
+    decision_name: str | None = None,
+    decision_phone: str | None = None,
+    rejection_reason: str | None = None,
+) -> BookingSummary:
+    from app.services.booking_decision import normalize_decision_contact
+
+    name, phone, reason = normalize_decision_contact(
+        decision_name=decision_name,
+        decision_phone=decision_phone,
+        rejection_reason=rejection_reason,
+        require_reason=True,
+    )
+
     supabase = get_supabase_admin()
     host_id = _resolve_host_id(auth)
     row = _fetch_host_booking_row(supabase, booking_id, host_id)
@@ -436,6 +476,9 @@ def reject_host_booking(booking_id: str, auth: dict) -> BookingSummary:
             "status": "cancelled_by_host",
             "cancelled_at": now,
             "cancelled_by": "host",
+            "decision_by_name": name,
+            "decision_by_phone": phone,
+            "rejection_reason": reason,
         },
     )
     _release_seats(supabase, row["slot_id"], guest_count)
@@ -446,7 +489,7 @@ def reject_host_booking(booking_id: str, auth: dict) -> BookingSummary:
             row["guest_id"],
             "booking_cancelled",
             "Booking rejected",
-            "The host could not accept your booking request.",
+            f"The host could not accept your booking request. Reason: {reason}",
             {"bookingId": booking_id},
         )
     from app.services.notifications import mark_booking_request_notifications_read

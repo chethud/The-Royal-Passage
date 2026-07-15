@@ -161,7 +161,7 @@ function AdminTrustPage() {
                     {rows.map((signal) => (
                       <li
                         key={signal.id}
-                        className="rounded-sm border border-[rgb(74_0_0/0.12)] bg-[rgb(255_255_255/0.35)] px-4 py-4"
+                        className="dashboard-panel-card px-4 py-4"
                       >
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div className="min-w-0 flex-1">

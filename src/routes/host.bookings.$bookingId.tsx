@@ -1,5 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import {
+  BookingDecisionDialog,
+  type BookingDecisionPayload,
+} from "@/components/booking/BookingDecisionDialog";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { PayAtVenueBadge } from "@/components/booking/PayAtVenueBadge";
@@ -35,6 +39,7 @@ function HostBookingDetailPage() {
   const [pageError, setPageError] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [decisionMode, setDecisionMode] = useState<"accept" | "reject" | null>(null);
 
   const loadBooking = useCallback(async () => {
     if (!accessToken) return;
@@ -74,11 +79,29 @@ function HostBookingDetailPage() {
     }
   };
 
+  const runDecision = async (payload: BookingDecisionPayload) => {
+    if (!accessToken || !decisionMode) return;
+    setBusy(true);
+    setPageError(null);
+    try {
+      const updated =
+        decisionMode === "reject"
+          ? await rejectHostBooking(accessToken, bookingId, payload)
+          : await confirmHostBooking(accessToken, bookingId, payload);
+      setBooking(updated);
+    } catch (err) {
+      setPageError(toErrorMessage(err, "Action failed."));
+      throw err;
+    } finally {
+      setBusy(false);
+    }
+  };
+
   if (loading || !ready || pageLoading) {
     return <PageLoadingGate />;
   }
 
-  if (pageError || !booking) {
+  if (!booking) {
     return (
       <HostDashboardShell title="Booking" subtitle="Booking details and host actions.">
         <LuxuryCheckoutPanel>
@@ -99,6 +122,11 @@ function HostBookingDetailPage() {
       title="Booking detail"
       subtitle="Review guest information and manage this reservation."
     >
+      {pageError ? (
+        <p className="mb-4 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {pageError}
+        </p>
+      ) : null}
       <LuxuryCheckoutPanel>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
@@ -177,8 +205,8 @@ function HostBookingDetailPage() {
           busy={busy}
           layout="stack"
           surface="light"
-          onConfirm={() => void runAction(confirmHostBooking)}
-          onReject={() => void runAction(rejectHostBooking)}
+          onConfirm={() => setDecisionMode("accept")}
+          onReject={() => setDecisionMode("reject")}
           onMarkPaid={() => void runAction(markHostBookingPaid)}
           onComplete={() => void runAction(completeHostBooking)}
           onPause={() => void runAction(pauseHostBooking)}
@@ -191,6 +219,20 @@ function HostBookingDetailPage() {
           Back to bookings
         </Link>
       </div>
+
+      <BookingDecisionDialog
+        open={Boolean(decisionMode)}
+        mode={decisionMode ?? "accept"}
+        title={decisionMode === "reject" ? "Reject booking" : "Accept booking"}
+        description={
+          decisionMode === "reject"
+            ? `Decline ${booking.guestName ?? "the guest"}'s request. Enter your contact details and a reason.`
+            : `Accept ${booking.guestName ?? "the guest"}'s request. Enter your contact details to confirm.`
+        }
+        busy={busy}
+        onClose={() => setDecisionMode(null)}
+        onConfirm={runDecision}
+      />
     </HostDashboardShell>
   );
 }

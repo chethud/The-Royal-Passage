@@ -81,17 +81,40 @@ export function fetchHostReviews(accessToken: string) {
   return apiFetch<HostReviewSummary[]>("/api/v1/host/reviews", { accessToken });
 }
 
-export function confirmHostBooking(accessToken: string, bookingId: string) {
+export type HostBookingDecisionPayload = {
+  decisionName: string;
+  decisionPhone: string;
+  rejectionReason?: string;
+};
+
+export function confirmHostBooking(
+  accessToken: string,
+  bookingId: string,
+  decision: HostBookingDecisionPayload,
+) {
   return apiFetch<BookingSummary>(`/api/v1/host/bookings/${bookingId}/confirm`, {
     accessToken,
     method: "POST",
+    body: JSON.stringify({
+      decisionName: decision.decisionName,
+      decisionPhone: decision.decisionPhone,
+    }),
   });
 }
 
-export function rejectHostBooking(accessToken: string, bookingId: string) {
+export function rejectHostBooking(
+  accessToken: string,
+  bookingId: string,
+  decision: HostBookingDecisionPayload,
+) {
   return apiFetch<BookingSummary>(`/api/v1/host/bookings/${bookingId}/reject`, {
     accessToken,
     method: "POST",
+    body: JSON.stringify({
+      decisionName: decision.decisionName,
+      decisionPhone: decision.decisionPhone,
+      rejectionReason: decision.rejectionReason,
+    }),
   });
 }
 

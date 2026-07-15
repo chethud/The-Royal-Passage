@@ -130,7 +130,7 @@ export function Header() {
         : undefined;
   const primaryRole = pickPrimaryRole(roles, role);
   const workspaceRole = activeWorkspaceRole(pathname, roles, primaryRole);
-  const workspaces = workspaceLinksForRoles(roles, primaryRole);
+  const workspaces = workspaceLinksForRoles(roles, primaryRole).filter((workspace) => workspace.role !== "host");
   const dashboardPath = workspaceRole
     ? dashboardPathForRole(workspaceRole)
     : dashboardPathForRoles(roles, role);
@@ -355,6 +355,9 @@ export function Header() {
                             {workspace.label}
                           </MobileNavLink>
                         ))}
+                        {isHost ? (
+                          <MobileNavLink to="/host/experiences/new">Add experience</MobileNavLink>
+                        ) : null}
                         <MobileNavLink to={profilePathForRole(primaryRole)}>Profile</MobileNavLink>
                       </>
                     ) : isAdmin ? (

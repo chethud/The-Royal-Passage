@@ -58,8 +58,8 @@ function OwnerHomestayBookingsPage() {
     setBusyId(bookingId);
     setPageError(null);
     try {
-      await action(accessToken, bookingId);
-      await loadPage();
+      const updated = await action(accessToken, bookingId);
+      setBookings((rows) => rows.map((row) => (row.id === bookingId ? updated : row)));
     } catch (err) {
       setPageError(toErrorMessage(err, "Action failed."));
       throw err;
@@ -68,13 +68,17 @@ function OwnerHomestayBookingsPage() {
     }
   };
 
-  const runReject = async (bookingId: string, reason: string) => {
+  const runDecision = async (
+    bookingId: string,
+    decision: import("@/components/booking/BookingDecisionDialog").BookingDecisionPayload,
+    action: typeof confirmOwnerHomestayBooking,
+  ) => {
     if (!accessToken) return;
     setBusyId(bookingId);
     setPageError(null);
     try {
-      await rejectOwnerHomestayBooking(accessToken, bookingId, reason);
-      await loadPage();
+      const updated = await action(accessToken, bookingId, decision);
+      setBookings((rows) => rows.map((row) => (row.id === bookingId ? updated : row)));
     } catch (err) {
       setPageError(toErrorMessage(err, "Action failed."));
       throw err;
@@ -97,19 +101,18 @@ function OwnerHomestayBookingsPage() {
         <LuxuryCheckoutPanel>
           <p className="luxury-panel-body py-8 text-sm">Loading bookings…</p>
         </LuxuryCheckoutPanel>
-      ) : pageError ? (
-        <LuxuryCheckoutPanel>
-          <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {pageError}
-          </p>
-        </LuxuryCheckoutPanel>
       ) : (
         <LuxuryCheckoutPanel>
+          {pageError ? (
+            <p className="mb-4 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {pageError}
+            </p>
+          ) : null}
           <OwnerHomestayBookingTable
             bookings={bookings}
             busyId={busyId}
-            onConfirm={(id) => void runAction(id, confirmOwnerHomestayBooking)}
-            onReject={(id, reason) => runReject(id, reason)}
+            onConfirm={(id, decision) => runDecision(id, decision, confirmOwnerHomestayBooking)}
+            onReject={(id, decision) => runDecision(id, decision, rejectOwnerHomestayBooking)}
             onMarkPaid={(id) => void runAction(id, markOwnerHomestayBookingPaid)}
             onComplete={(id) => void runAction(id, completeOwnerHomestayBooking)}
           />

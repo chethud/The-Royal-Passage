@@ -29,7 +29,7 @@ export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
         description="GMV, revenue, conversion, and 30-day growth across experience bookings."
         surface={surface}
       >
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ClickableStatCard
             label="GMV"
             value={formatMoney(stats.grossBookingValueMinor, sym)}
