@@ -130,6 +130,7 @@ export function AccountDropdownMenu({
   );
   const canEditHomepage = hasEditorAccess(roles, role);
   const isHost = role === "host" || roles.includes("host");
+  const isHomestayOwner = role === "homestay_owner" || roles.includes("homestay_owner");
   const roleLabels =
     roles.length > 0
       ? roles.map((value) => ROLE_LABELS[value]).join(" · ")
@@ -243,6 +244,19 @@ export function AccountDropdownMenu({
                 label="Add experience"
                 description="Create a new listing"
                 to="/host/experiences/new"
+              />
+            </>
+          ) : null}
+
+          {isHomestayOwner ? (
+            <>
+              <DropdownMenuSeparator className="header-account-menu__divider" />
+              <DropdownMenuLabel className="header-account-menu__section">Homestay</DropdownMenuLabel>
+              <AccountMenuItem
+                icon={PlusCircle}
+                label="Add property"
+                description="List a new stay"
+                to="/homestay/properties/new"
               />
             </>
           ) : null}

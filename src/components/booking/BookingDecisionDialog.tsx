@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,29 @@ type BookingDecisionDialogProps = {
   onConfirm: (payload: BookingDecisionPayload) => Promise<void>;
 };
 
+const NAME_RE = /^[A-Za-z]+(?: [A-Za-z]+)*$/;
+
+function normalizeName(value: string) {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+/** Digits only; strip leading 91 when pasted as +91XXXXXXXXXX. */
+function normalizeTenDigitPhone(value: string): string | null {
+  let digits = value.replace(/\D/g, "");
+  if (digits.startsWith("91") && digits.length === 12) {
+    digits = digits.slice(2);
+  }
+  return digits.length === 10 ? digits : null;
+}
+
+function sanitizeNameInput(value: string) {
+  return value.replace(/[^A-Za-z ]/g, "");
+}
+
+function sanitizePhoneInput(value: string) {
+  return value.replace(/\D/g, "").slice(0, 10);
+}
+
 export function BookingDecisionDialog({
   open,
   mode,
@@ -47,27 +70,42 @@ export function BookingDecisionDialog({
     setError(null);
   }, [open, mode]);
 
+  const canSubmit = useMemo(() => {
+    const name = normalizeName(decisionName);
+    const phone = normalizeTenDigitPhone(decisionPhone);
+    if (!name || !NAME_RE.test(name)) return false;
+    if (!phone) return false;
+    if (mode === "reject" && !rejectionReason.trim()) return false;
+    return true;
+  }, [decisionName, decisionPhone, rejectionReason, mode]);
+
   const handleConfirm = async () => {
-    const name = decisionName.trim();
-    const phone = decisionPhone.trim();
+    const name = normalizeName(decisionName);
+    const phone = normalizeTenDigitPhone(decisionPhone);
     const reason = rejectionReason.trim();
-    if (name.length < 2) {
-      setError("Please enter your name (at least 2 characters).");
+
+    if (!name) {
+      setError("Name is required.");
       return;
     }
-    if (phone.length < 7) {
-      setError("Please enter a valid phone number.");
+    if (!NAME_RE.test(name)) {
+      setError("Name may only contain alphabetic letters and spaces.");
       return;
     }
-    if (mode === "reject" && reason.length < 3) {
-      setError("Please enter a rejection reason (at least 3 characters).");
+    if (!phone) {
+      setError("Mobile number is required (exactly 10 digits).");
       return;
     }
+    if (mode === "reject" && !reason) {
+      setError("Rejection reason is required.");
+      return;
+    }
+
     setError(null);
     try {
       await onConfirm({
         decisionName: name,
-        decisionPhone: phone,
+        decisionPhone: `+91${phone}`,
         rejectionReason: mode === "reject" ? reason : undefined,
       });
       onClose();
@@ -86,39 +124,65 @@ export function BookingDecisionDialog({
         if (!next && !busy) onClose();
       }}
     >
-      <DialogContent className="max-w-md border-[rgb(74_0_0/0.2)] bg-background">
+      <DialogContent className="max-w-md border-[rgb(74_0_0/0.22)] bg-[#FEF9E7] text-[#2A0000] sm:rounded-md">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl">{title}</DialogTitle>
-          <DialogDescription className="text-sm leading-relaxed">{description}</DialogDescription>
+          <DialogTitle className="font-display text-2xl text-[#2A0000]">{title}</DialogTitle>
+          <DialogDescription className="text-sm leading-relaxed text-[#2A0000]/78">
+            {description}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3">
           <label className="block text-sm">
-            <span className="eyebrow luxury-panel-label text-xs">Your name</span>
+            <span className="block text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#4A0000]/75">
+              Your name <span className="text-[#8B1A1A]">*</span>
+            </span>
             <input
               value={decisionName}
-              onChange={(e) => setDecisionName(e.target.value)}
+              onChange={(e) => setDecisionName(sanitizeNameInput(e.target.value))}
               className={inputClass}
               placeholder="Full name"
               disabled={busy}
               autoComplete="name"
+              inputMode="text"
+              maxLength={120}
+              required
+              aria-required="true"
             />
           </label>
           <label className="block text-sm">
-            <span className="eyebrow luxury-panel-label text-xs">Your phone</span>
-            <input
-              value={decisionPhone}
-              onChange={(e) => setDecisionPhone(e.target.value)}
-              className={inputClass}
-              placeholder="+91 …"
-              disabled={busy}
-              autoComplete="tel"
-            />
+            <span className="block text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#4A0000]/75">
+              Mobile number <span className="text-[#8B1A1A]">*</span>
+            </span>
+            <div className="mt-1 flex overflow-hidden rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.7)] focus-within:border-[#4A0000]/50">
+              <span
+                className="inline-flex shrink-0 items-center border-r border-[rgb(74_0_0/0.15)] bg-[rgb(74_0_0/0.06)] px-3 text-sm font-medium text-[#2A0000]"
+                aria-hidden
+              >
+                +91
+              </span>
+              <input
+                value={decisionPhone}
+                onChange={(e) => setDecisionPhone(sanitizePhoneInput(e.target.value))}
+                className="w-full bg-transparent px-3 py-2 text-sm text-[#2A0000] placeholder:text-[rgb(58_0_0/0.4)] focus:outline-none"
+                placeholder="10-digit number"
+                disabled={busy}
+                autoComplete="tel-national"
+                inputMode="numeric"
+                maxLength={10}
+                aria-label="Mobile number"
+                required
+                aria-required="true"
+              />
+            </div>
           </label>
           {mode === "reject" ? (
             <div className="space-y-2">
-              <label htmlFor="booking-reject-reason" className="eyebrow luxury-panel-label text-xs">
-                Reason for rejection
+              <label
+                htmlFor="booking-reject-reason"
+                className="block text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#4A0000]/75"
+              >
+                Reason for rejection <span className="text-[#8B1A1A]">*</span>
               </label>
               <Textarea
                 id="booking-reject-reason"
@@ -128,9 +192,11 @@ export function BookingDecisionDialog({
                 rows={4}
                 maxLength={500}
                 disabled={busy}
-                className="resize-none border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.7)]"
+                required
+                aria-required="true"
+                className="resize-none border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.7)] text-[#2A0000] placeholder:text-[rgb(58_0_0/0.4)]"
               />
-              <p className="text-xs text-muted-foreground">{rejectionReason.trim().length}/500</p>
+              <p className="text-xs text-[#4A0000]/55">{rejectionReason.trim().length}/500</p>
             </div>
           ) : null}
         </div>
@@ -157,7 +223,7 @@ export function BookingDecisionDialog({
                 ? "luxury-btn-sm luxury-btn-panel-outline w-full border-destructive/40 text-destructive sm:w-auto"
                 : "luxury-btn-sm luxury-btn-primary w-full sm:w-auto"
             }
-            disabled={busy}
+            disabled={busy || !canSubmit}
             onClick={() => void handleConfirm()}
           >
             {busy

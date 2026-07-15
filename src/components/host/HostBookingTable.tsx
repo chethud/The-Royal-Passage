@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   BookingDecisionDialog,
@@ -88,6 +88,7 @@ export function HostBookingTable({
   onPause,
   onResume,
 }: HostBookingTableProps) {
+  const navigate = useNavigate({ from: "/host/bookings/" });
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialStatus);
   const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>(initialPayment);
   const [dateView, setDateView] = useState<BookingDateView>(initialDateView);
@@ -107,6 +108,21 @@ export function HostBookingTable({
   useEffect(() => {
     setDateView(initialDateView);
   }, [initialDateView]);
+
+  const syncSearch = (next: {
+    status: StatusFilter;
+    payment: PaymentFilter;
+    dateView: BookingDateView;
+  }) => {
+    void navigate({
+      search: {
+        status: next.status === "all" ? undefined : next.status,
+        payment: next.payment === "all" ? undefined : next.payment,
+        dateView: next.dateView === "week" ? undefined : next.dateView,
+      },
+      replace: true,
+    });
+  };
 
   const filtered = useMemo(
     () => filterBookings(bookings, statusFilter, paymentFilter, dateView),
@@ -135,7 +151,10 @@ export function HostBookingTable({
           <button
             key={value}
             type="button"
-            onClick={() => setDateView(value)}
+            onClick={() => {
+              setDateView(value);
+              syncSearch({ status: statusFilter, payment: paymentFilter, dateView: value });
+            }}
             className={dashboardFilterBtnClass(dateView === value)}
           >
             {label}
@@ -149,8 +168,10 @@ export function HostBookingTable({
             key={value}
             type="button"
             onClick={() => {
+              const nextPayment = value !== "confirmed" ? "all" : paymentFilter;
               setStatusFilter(value);
               if (value !== "confirmed") setPaymentFilter("all");
+              syncSearch({ status: value, payment: nextPayment, dateView });
             }}
             className={dashboardFilterBtnClass(statusFilter === value && paymentFilter === "all")}
           >
@@ -162,6 +183,7 @@ export function HostBookingTable({
           onClick={() => {
             setStatusFilter("confirmed");
             setPaymentFilter("cod-pending");
+            syncSearch({ status: "confirmed", payment: "cod-pending", dateView });
           }}
           className={dashboardFilterBtnClass(paymentFilter === "cod-pending")}
         >

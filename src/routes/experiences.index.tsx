@@ -1,13 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useTransition } from "react";
-import { motion, AnimatePresence } from "motion/react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ExperienceCard } from "@/components/site/ExperienceCard";
 import { ExperiencesHero } from "@/components/experiences/ExperiencesHero";
 import { ExperiencesFilterSidebar } from "@/components/experiences/ExperiencesFilterSidebar";
 import { ExperiencesEmptyState } from "@/components/experiences/ExperiencesEmptyState";
-import { ExperienceCardSkeleton } from "@/components/experiences/ExperienceCardSkeleton";
 import { listCities } from "@/lib/city-fns";
 import {
   filterExperiences,
@@ -95,20 +93,23 @@ function ExperiencesPage() {
 
   const updateSearch = (patch: Partial<ExperienceSearch>) => {
     startTransition(() => {
-      void navigate({ search: (prev) => ({ ...prev, ...patch }) });
+      void navigate({ search: (prev) => ({ ...prev, ...patch }), replace: true });
     });
   };
 
   const resetFilters = () => {
-    void navigate({
-      search: {
-        category: undefined,
-        city: undefined,
-        q: undefined,
-        duration: undefined,
-        availability: undefined,
-        page: 1,
-      },
+    startTransition(() => {
+      void navigate({
+        search: {
+          category: undefined,
+          city: undefined,
+          q: undefined,
+          duration: undefined,
+          availability: undefined,
+          page: 1,
+        },
+        replace: true,
+      });
     });
   };
 
@@ -147,45 +148,25 @@ function ExperiencesPage() {
             onReset={resetFilters}
           />
 
-          {/* Compact Refine on mobile; full cards stay immediately below */}
-          <div className="order-2 min-w-0 w-full flex-1">
-            <AnimatePresence mode="wait">
-              {pending ? (
-                <motion.div
-                  key="loading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-5 xl:gap-6"
-                >
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <ExperienceCardSkeleton key={i} />
-                  ))}
-                </motion.div>
-              ) : filtered.length === 0 ? (
-                <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  <ExperiencesEmptyState onReset={resetFilters} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key={`grid-${page}-${search.q}-${search.city}-${search.category}`}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.35 }}
-                  className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-5 xl:gap-6"
-                >
-                  {paged.map((e) => (
-                    <ExperienceCard key={e.id} exp={e} />
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+          <div
+            className={`order-2 min-w-0 w-full flex-1 transition-opacity duration-200 ${pending ? "pointer-events-none opacity-55" : "opacity-100"}`}
+            aria-busy={pending}
+          >
+            {filtered.length === 0 ? (
+              <ExperiencesEmptyState onReset={resetFilters} />
+            ) : (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-5 xl:gap-6">
+                {paged.map((e) => (
+                  <ExperienceCard key={e.id} exp={e} />
+                ))}
+              </div>
+            )}
 
             {filtered.length > PAGE_SIZE ? (
               <div className="mt-10 flex items-center justify-center gap-4">
                 <button
                   type="button"
-                  disabled={page <= 1}
+                  disabled={page <= 1 || pending}
                   onClick={() => updateSearch({ page: Math.max(1, page - 1) })}
                   className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
                 >
@@ -196,7 +177,7 @@ function ExperiencesPage() {
                 </span>
                 <button
                   type="button"
-                  disabled={page >= pages}
+                  disabled={page >= pages || pending}
                   onClick={() => updateSearch({ page: Math.min(pages, page + 1) })}
                   className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
                 >

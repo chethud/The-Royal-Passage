@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import type { AdminBookingRow } from "@/lib/api/admin";
 import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
@@ -60,6 +60,7 @@ export function AdminBookingsTable({
   initialPayment = "all",
   initialDateView = "week",
 }: AdminBookingsTableProps) {
+  const navigate = useNavigate({ from: "/admin/bookings/" });
   const [statusFilter, setStatusFilter] = useState<BookingListStatus>(initialStatus);
   const [paymentFilter, setPaymentFilter] = useState<BookingPaymentFilter>(initialPayment);
   const [dateView, setDateView] = useState<BookingDateView>(initialDateView);
@@ -75,6 +76,21 @@ export function AdminBookingsTable({
   useEffect(() => {
     setDateView(initialDateView);
   }, [initialDateView]);
+
+  const syncSearch = (next: {
+    status: BookingListStatus;
+    payment: BookingPaymentFilter;
+    dateView: BookingDateView;
+  }) => {
+    void navigate({
+      search: {
+        status: next.status === "all" ? undefined : next.status,
+        payment: next.payment === "all" ? undefined : next.payment,
+        dateView: next.dateView === "week" ? undefined : next.dateView,
+      },
+      replace: true,
+    });
+  };
 
   const filtered = useMemo(
     () => filterAdminBookings(bookings, statusFilter, paymentFilter, dateView),
@@ -106,7 +122,10 @@ export function AdminBookingsTable({
           <button
             key={value}
             type="button"
-            onClick={() => setDateView(value)}
+            onClick={() => {
+              setDateView(value);
+              syncSearch({ status: statusFilter, payment: paymentFilter, dateView: value });
+            }}
             className={dashboardFilterBtnClass(dateView === value)}
           >
             {label}
@@ -120,8 +139,10 @@ export function AdminBookingsTable({
             key={value}
             type="button"
             onClick={() => {
+              const nextPayment = value !== "confirmed" ? "all" : paymentFilter;
               setStatusFilter(value);
               if (value !== "confirmed") setPaymentFilter("all");
+              syncSearch({ status: value, payment: nextPayment, dateView });
             }}
             className={dashboardFilterBtnClass(statusFilter === value && paymentFilter === "all")}
           >
@@ -133,6 +154,7 @@ export function AdminBookingsTable({
           onClick={() => {
             setStatusFilter("confirmed");
             setPaymentFilter("cod-pending");
+            syncSearch({ status: "confirmed", payment: "cod-pending", dateView });
           }}
           className={dashboardFilterBtnClass(paymentFilter === "cod-pending")}
         >
@@ -143,6 +165,7 @@ export function AdminBookingsTable({
           onClick={() => {
             setStatusFilter("all");
             setPaymentFilter("collected");
+            syncSearch({ status: "all", payment: "collected", dateView });
           }}
           className={dashboardFilterBtnClass(paymentFilter === "collected")}
         >

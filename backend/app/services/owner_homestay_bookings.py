@@ -2,8 +2,20 @@ from datetime import date, datetime, timezone
 import logging
 
 from app.dependencies.supabase import get_supabase_admin
-from app.models.schemas import HomestayBookingSummary, ListHomestayBookingsResponse, OwnerDashboardStats
+from app.models.schemas import (
+    HomestayBookingSummary,
+    HostRevenueDay,
+    HostRevenueSummary,
+    ListHomestayBookingsResponse,
+    OwnerDashboardStats,
+)
 from app.services.owner_homestays import _currency_symbol, _resolve_owner_id
+from app.services.revenue_periods import (
+    REVENUE_PERIODS,
+    revenue_bucket_key,
+    revenue_period_keys,
+    revenue_today,
+)
 from app.services.transactional_emails import send_homestay_booking_confirmed_email, _guest_contact
 
 logger = logging.getLogger(__name__)
@@ -177,6 +189,91 @@ def get_owner_dashboard(auth: dict) -> OwnerDashboardStats:
         checkInToday=check_in_today,
         publishedHomestays=published_count,
         totalBookings=len(bookings),
+    )
+
+
+def _check_in_date(row: dict) -> date | None:
+    raw = row.get("check_in")
+    if not raw:
+        return None
+    if isinstance(raw, date):
+        return raw
+    try:
+        return date.fromisoformat(str(raw)[:10])
+    except ValueError:
+        return None
+
+
+def get_owner_homestay_revenue(auth: dict, period: str = "month") -> HostRevenueSummary:
+    """Pay-at-property collections by check-in date for the owner's stays."""
+    supabase = get_supabase_admin()
+    owner_id = _resolve_owner_id(auth)
+    homestay_ids = _owner_homestay_ids(supabase, owner_id)
+
+    resolved_period = period if period in REVENUE_PERIODS else "month"
+    empty = HostRevenueSummary(
+        collectedMinor=0,
+        pendingMinor=0,
+        estimatedMinor=0,
+        week=[],
+        period=resolved_period,
+        grain="day" if resolved_period == "month" else "month",
+    )
+    if not homestay_ids:
+        return empty
+
+    result = (
+        supabase.table("homestay_bookings")
+        .select("booking_status, payment_status, total_amount, check_in")
+        .in_("homestay_id", homestay_ids)
+        .neq("booking_status", "cancelled")
+        .execute()
+    )
+    bookings = result.data or []
+
+    today = revenue_today()
+    current_keys, previous_keys, grain = revenue_period_keys(today, resolved_period)
+    current_buckets = {
+        key: {"collectedMinor": 0, "pendingMinor": 0, "estimatedMinor": 0} for key in current_keys
+    }
+    previous_buckets = {
+        key: {"collectedMinor": 0, "pendingMinor": 0, "estimatedMinor": 0} for key in previous_keys
+    }
+
+    for row in bookings:
+        check_in = _check_in_date(row)
+        if check_in is None:
+            continue
+        key = revenue_bucket_key(check_in, grain)
+        if key not in current_buckets and key not in previous_buckets:
+            continue
+
+        amount = int(row.get("total_amount") or 0)
+        booking_status = row.get("booking_status")
+        is_paid = row.get("payment_status") == "paid"
+        target = current_buckets if key in current_buckets else previous_buckets
+
+        if is_paid:
+            target[key]["collectedMinor"] += amount
+        elif booking_status in ("confirmed", "completed"):
+            target[key]["pendingMinor"] += amount
+
+        if booking_status in ("pending", "confirmed"):
+            target[key]["estimatedMinor"] += amount
+
+    series = [HostRevenueDay(date=key, **current_buckets[key]) for key in current_keys]
+    previous_series = [HostRevenueDay(date=key, **previous_buckets[key]) for key in previous_keys]
+
+    return HostRevenueSummary(
+        collectedMinor=sum(day.collectedMinor for day in series),
+        pendingMinor=sum(day.pendingMinor for day in series),
+        estimatedMinor=sum(day.estimatedMinor for day in series),
+        week=series,
+        period=resolved_period,
+        grain=grain,
+        previousCollectedMinor=sum(day.collectedMinor for day in previous_series),
+        previousPendingMinor=sum(day.pendingMinor for day in previous_series),
+        previousEstimatedMinor=sum(day.estimatedMinor for day in previous_series),
     )
 
 

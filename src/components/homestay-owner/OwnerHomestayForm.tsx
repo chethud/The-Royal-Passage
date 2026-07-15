@@ -93,8 +93,7 @@ export function OwnerHomestayForm({
   const [submitForReview, setSubmitForReview] = useState(false);
   const licenseInputRef = useRef<HTMLInputElement>(null);
   const bedroomCount = Number.parseInt(bedrooms, 10) || 1;
-  const activeRoomCount = (initial?.rooms ?? []).filter((room) => room.isActive).length;
-  const canSubmitForReview = Boolean(initial) && activeRoomCount > 0;
+  const canSubmitForReview = Boolean(initial) && bedroomCount > 0;
   const uploadAvailable = isSupabaseBrowserConfigured();
 
   const handleLicenseSelect = async (file: File) => {
@@ -271,7 +270,7 @@ export function OwnerHomestayForm({
         <h2 className={sectionHeadingClass}>Capacity</h2>
         <div className="grid gap-4 md:grid-cols-3">
           <label className="block">
-            <span className={labelClass}>Bedrooms</span>
+            <span className={labelClass}>Number of rooms</span>
             <input
               className={numberInputClass}
               type="number"
@@ -507,12 +506,13 @@ export function OwnerHomestayForm({
             </label>
           ) : (
             <p className="luxury-panel-body text-sm">
-              Save as draft first, then add at least one active room before submitting for review.
+              Save your property details to create a draft, then submit for review from the property
+              page.
             </p>
           )}
           {!canSubmitForReview && initial ? (
             <p className="luxury-panel-body text-xs">
-              Add at least one active room in the Rooms tab before submitting for review.
+              Enter your number of rooms before submitting for review.
             </p>
           ) : null}
           <button type="submit" className="luxury-btn-primary" disabled={saving}>

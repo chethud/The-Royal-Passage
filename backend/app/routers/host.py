@@ -86,10 +86,10 @@ def host_revenue(
 ):
     if not settings.supabase_configured:
         raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
-    if period not in {"month", "months_6", "year"}:
+    if period not in {"month", "monthwise", "months_6", "year"}:
         raise HTTPException(
             status_code=400,
-            detail="Invalid revenue period. Use month, months_6, or year.",
+            detail="Invalid revenue period. Use month, monthwise, months_6, or year.",
         )
     try:
         return get_host_revenue(_auth, period)

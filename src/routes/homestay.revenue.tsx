@@ -1,48 +1,48 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
-import { HostDashboardShell } from "@/components/host/HostDashboardShell";
+import { HomestayOwnerDashboardShell } from "@/components/homestay-owner/HomestayOwnerDashboardShell";
 import { RevenueChart } from "@/components/host/RevenueChart";
 import {
-  fetchHostRevenue,
-  type HostRevenuePeriod,
-  type HostRevenueSummary,
-} from "@/lib/api/host";
+  fetchOwnerHomestayRevenue,
+  type OwnerRevenuePeriod,
+  type OwnerRevenueSummary,
+} from "@/lib/api/owner-homestay-bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { formatMoney } from "@/lib/money";
-import { useHostAccess } from "@/lib/use-host-access";
+import { useHomestayOwnerAccess } from "@/lib/use-homestay-owner-access";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 import { dashboardFilterBtnClass } from "@/components/ui/DashboardTable";
 
 const PERIODS = ["month", "monthwise", "months_6", "year"] as const;
 
 type RevenueSearch = {
-  period: HostRevenuePeriod;
+  period: OwnerRevenuePeriod;
 };
 
 function parseRevenueSearch(raw: Record<string, unknown>): RevenueSearch {
   const period = raw.period;
   if (typeof period === "string" && (PERIODS as readonly string[]).includes(period)) {
-    return { period: period as HostRevenuePeriod };
+    return { period: period as OwnerRevenuePeriod };
   }
   return { period: "month" };
 }
 
-export const Route = createFileRoute("/host/revenue")({
+export const Route = createFileRoute("/homestay/revenue")({
   validateSearch: parseRevenueSearch,
   head: () => ({
     meta: [
-      { title: "Host revenue — The Royal Passage" },
+      { title: "Homestay revenue — The Royal Passage" },
       {
         name: "description",
         content: "Compare collected and pending COD by day, monthwise, 6 months, and one year.",
       },
     ],
   }),
-  component: HostRevenuePage,
+  component: HomestayOwnerRevenuePage,
 });
 
 const PERIOD_OPTIONS: {
-  value: HostRevenuePeriod;
+  value: OwnerRevenuePeriod;
   label: string;
   summary: string;
   previous: string;
@@ -50,7 +50,7 @@ const PERIOD_OPTIONS: {
   {
     value: "month",
     label: "This month",
-    summary: "Daily collected vs pending COD for the current month.",
+    summary: "Daily collected vs pending COD by check-in date for the current month.",
     previous: "vs last month",
   },
   {
@@ -82,22 +82,21 @@ function changeLabel(current: number, previous: number) {
   return `${rounded > 0 ? "+" : ""}${rounded}% vs prior period`;
 }
 
-function HostRevenuePage() {
+function HomestayOwnerRevenuePage() {
   const { period } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const { accessToken, ready, loading } = useHostAccess();
-  const [revenue, setRevenue] = useState<HostRevenueSummary | null>(null);
+  const { accessToken, ready, loading } = useHomestayOwnerAccess();
+  const [revenue, setRevenue] = useState<OwnerRevenueSummary | null>(null);
   const [pageError, setPageError] = useState<string | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [, startTransition] = useTransition();
+  const hasLoadedRef = useRef(false);
 
   const activePeriod = PERIOD_OPTIONS.find((option) => option.value === period) ?? PERIOD_OPTIONS[0]!;
 
-  const hasLoadedRef = useRef(false);
-
   const loadPage = useCallback(
-    async (nextPeriod: HostRevenuePeriod) => {
+    async (nextPeriod: OwnerRevenuePeriod) => {
       if (!accessToken) return;
       const soft = hasLoadedRef.current;
       if (soft) setRefreshing(true);
@@ -107,8 +106,8 @@ function HostRevenuePage() {
         if (!isApiConfigured()) {
           throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
         }
-        const summary = await fetchHostRevenue(accessToken, nextPeriod);
-        if (!hasLoadedRef.current) hasLoadedRef.current = true;
+        const summary = await fetchOwnerHomestayRevenue(accessToken, nextPeriod);
+        hasLoadedRef.current = true;
         startTransition(() => {
           setRevenue(summary);
         });
@@ -127,7 +126,7 @@ function HostRevenuePage() {
     void loadPage(period);
   }, [accessToken, period, ready, loadPage]);
 
-  const selectPeriod = (next: HostRevenuePeriod) => {
+  const selectPeriod = (next: OwnerRevenuePeriod) => {
     if (next === period) return;
     void navigate({
       search: (prev) => ({ ...prev, period: next }),
@@ -140,9 +139,10 @@ function HostRevenuePage() {
   }
 
   return (
-    <HostDashboardShell
+    <HomestayOwnerDashboardShell
       title="Revenue"
-      subtitle="Compare pay-at-venue collections and outstanding COD across time."
+      subtitle="Compare pay-at-property collections and outstanding COD across time."
+      showRoleDescription={false}
     >
       <div className="mb-6 flex flex-wrap gap-2">
         {PERIOD_OPTIONS.map((option) => (
@@ -227,6 +227,6 @@ function HostRevenuePage() {
           </section>
         </div>
       ) : null}
-    </HostDashboardShell>
+    </HomestayOwnerDashboardShell>
   );
 }

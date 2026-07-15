@@ -714,8 +714,11 @@ class BookingSummary(BaseModel):
 
 class HostBookingDecisionRequest(BaseModel):
     decisionName: str = Field(min_length=2, max_length=120)
-    decisionPhone: str = Field(min_length=7, max_length=40)
+    decisionPhone: str = Field(min_length=10, max_length=16)
     rejectionReason: str | None = Field(default=None, max_length=500)
+
+
+class HostDashboardStats(BaseModel):
     pendingBookings: int
     confirmedBookings: int
     completedBookings: int

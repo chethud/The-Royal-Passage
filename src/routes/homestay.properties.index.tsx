@@ -49,12 +49,12 @@ function OwnerHomestaysPage() {
   return (
     <HomestayOwnerDashboardShell
       title="My properties"
-      subtitle="Create listings, manage rooms, block dates, and submit for admin review."
+      subtitle="Create listings, block dates, and submit for admin review."
       showRoleDescription={false}
     >
       <LuxuryCheckoutPanel>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="luxury-panel-body text-sm">Draft properties, add rooms, and submit for Royal Passage review.</p>
+          <p className="luxury-panel-body text-sm">Draft properties, finish details, and submit for Royal Passage review.</p>
           <Link to="/homestay/properties/new" className="luxury-btn-sm luxury-btn-primary inline-flex no-underline">
             Add property
           </Link>

@@ -2,10 +2,17 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import type { HostRevenueDay, HostRevenueGrain } from "@/lib/api/host";
 import { formatMoney, minorToMajor } from "@/lib/money";
 
+type RevenuePoint = {
+  date: string;
+  collectedMinor: number;
+  pendingMinor: number;
+  estimatedMinor: number;
+};
+
 type RevenueChartProps = {
-  series: HostRevenueDay[];
+  series: readonly RevenuePoint[] | HostRevenueDay[];
   currencySymbol: string;
-  grain: HostRevenueGrain;
+  grain: HostRevenueGrain | "day" | "month";
 };
 
 const COLORS = {

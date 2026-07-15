@@ -36,7 +36,7 @@ export type HostRevenueDay = {
   estimatedMinor: number;
 };
 
-export type HostRevenuePeriod = "month" | "months_6" | "year";
+export type HostRevenuePeriod = "month" | "monthwise" | "months_6" | "year";
 export type HostRevenueGrain = "day" | "month";
 
 export type HostRevenueSummary = {

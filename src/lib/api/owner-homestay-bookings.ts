@@ -1,4 +1,5 @@
 import { create } from "@bufbuild/protobuf";
+import { apiFetch } from "@/lib/api/client";
 import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
 import {
   GetOwnerHomestayBookingRequestSchema,
@@ -71,6 +72,39 @@ export type OwnerBookingDecisionPayload = {
 export function fetchOwnerDashboard(accessToken: string) {
   const client = createRoyalPassageClient(accessToken);
   return rpcCall(() => client.getOwnerDashboard({})) as Promise<OwnerDashboardStats>;
+}
+
+export type OwnerRevenuePeriod = "month" | "monthwise" | "months_6" | "year";
+export type OwnerRevenueGrain = "day" | "month";
+
+export type OwnerRevenueDay = {
+  date: string;
+  collectedMinor: number;
+  pendingMinor: number;
+  estimatedMinor: number;
+};
+
+export type OwnerRevenueSummary = {
+  collectedMinor: number;
+  pendingMinor: number;
+  estimatedMinor: number;
+  week: OwnerRevenueDay[];
+  currencySymbol: string;
+  period: OwnerRevenuePeriod;
+  grain: OwnerRevenueGrain;
+  previousCollectedMinor: number;
+  previousPendingMinor: number;
+  previousEstimatedMinor: number;
+};
+
+export function fetchOwnerHomestayRevenue(
+  accessToken: string,
+  period: OwnerRevenuePeriod = "month",
+) {
+  const query = `?period=${encodeURIComponent(period)}`;
+  return apiFetch<OwnerRevenueSummary>(`/api/v1/owner/homestay/revenue${query}`, {
+    accessToken,
+  });
 }
 
 export function fetchOwnerHomestayBookings(

@@ -149,6 +149,7 @@ export function Header() {
   const isGuest = isGuestAccount(primaryRole, roles);
   const isAdmin = isAdminRole(primaryRole) || roles.includes("admin");
   const isHost = primaryRole === "host" || roles.includes("host");
+  const isHomestayOwner = primaryRole === "homestay_owner" || roles.includes("homestay_owner");
   const showStaffNotifications = Boolean(user) && (isAdmin || isHost);
   const navBadges = useNavBadges();
   const showGuestCart = Boolean(user) && isGuest && !isMarketplaceSection;
@@ -357,6 +358,9 @@ export function Header() {
                         ))}
                         {isHost ? (
                           <MobileNavLink to="/host/experiences/new">Add experience</MobileNavLink>
+                        ) : null}
+                        {isHomestayOwner ? (
+                          <MobileNavLink to="/homestay/properties/new">Add property</MobileNavLink>
                         ) : null}
                         <MobileNavLink to={profilePathForRole(primaryRole)}>Profile</MobileNavLink>
                       </>

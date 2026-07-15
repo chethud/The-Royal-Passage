@@ -6,16 +6,13 @@ import { HomestayOwnerDashboardShell } from "@/components/homestay-owner/Homesta
 import { OwnerAvailabilityManager } from "@/components/homestay-owner/OwnerAvailabilityManager";
 import { OwnerHolidayPricingManager } from "@/components/homestay-owner/OwnerHolidayPricingManager";
 import { OwnerHomestayForm } from "@/components/homestay-owner/OwnerHomestayForm";
-import { OwnerRoomManager } from "@/components/homestay-owner/OwnerRoomManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { loadCitiesWithFallback } from "@/lib/city-fns";
 import {
-  createOwnerHomestayRoom,
   deleteOwnerAvailability,
   deleteOwnerHomestay,
   fetchOwnerHomestay,
   updateOwnerHomestay,
-  updateOwnerHomestayRoom,
   upsertOwnerAvailability,
   type OwnerHomestayDetail,
 } from "@/lib/api/owner-homestays";
@@ -101,7 +98,7 @@ function OwnerHomestayDetailPage() {
     return (
       <HomestayOwnerDashboardShell
         title="Manage property"
-        subtitle="Edit listing details, rooms, and calendar availability."
+        subtitle="Edit listing details and calendar availability."
         showRoleDescription={false}
       >
         <LuxuryCheckoutPanel>
@@ -114,7 +111,7 @@ function OwnerHomestayDetailPage() {
   return (
     <HomestayOwnerDashboardShell
       title={homestay?.title ?? "Manage property"}
-      subtitle="Edit listing details, rooms, and calendar availability."
+      subtitle="Edit listing details and calendar availability."
       showRoleDescription={false}
     >
       {pageLoading ? (
@@ -155,9 +152,6 @@ function OwnerHomestayDetailPage() {
               <TabsTrigger value="details" className="flex-1 sm:flex-none">
                 Details
               </TabsTrigger>
-              <TabsTrigger value="rooms" className="flex-1 sm:flex-none">
-                Rooms
-              </TabsTrigger>
               <TabsTrigger value="calendar" className="flex-1 sm:flex-none">
                 Calendar
               </TabsTrigger>
@@ -185,44 +179,6 @@ function OwnerHomestayDetailPage() {
                     Archive / delete
                   </button>
                 ) : null}
-              </LuxuryCheckoutPanel>
-            </TabsContent>
-
-            <TabsContent value="rooms">
-              <LuxuryCheckoutPanel>
-                <h2 className="luxury-panel-heading font-display text-xl">Rooms</h2>
-                <div className="mt-4">
-                  <OwnerRoomManager
-                    homestay={homestay}
-                    busy={roomBusy}
-                    onAdd={async (payload) => {
-                      if (!accessToken) return;
-                      setRoomBusy(true);
-                      try {
-                        const updated = await createOwnerHomestayRoom(accessToken, homestayId, payload);
-                        setHomestay(updated);
-                      } catch (err) {
-                        setPageError(toErrorMessage(err, "Failed to add room."));
-                      } finally {
-                        setRoomBusy(false);
-                      }
-                    }}
-                    onDeactivate={async (roomId) => {
-                      if (!accessToken) return;
-                      setRoomBusy(true);
-                      try {
-                        const updated = await updateOwnerHomestayRoom(accessToken, homestayId, roomId, {
-                          isActive: false,
-                        });
-                        setHomestay(updated);
-                      } catch (err) {
-                        setPageError(toErrorMessage(err, "Failed to deactivate room."));
-                      } finally {
-                        setRoomBusy(false);
-                      }
-                    }}
-                  />
-                </div>
               </LuxuryCheckoutPanel>
             </TabsContent>
 

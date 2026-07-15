@@ -18,6 +18,7 @@ from app.services.host_bookings import (
     reject_host_booking,
     resume_host_booking,
 )
+from app.services.revenue_periods import REVENUE_PERIODS
 from app.services.host_experiences import (
     create_host_experience,
     create_host_slot,
@@ -77,9 +78,9 @@ async def host_revenue(request: Request) -> JSONResponse:
     if isinstance(auth, JSONResponse):
         return auth
     period = request.query_params.get("period", "month")
-    if period not in {"month", "months_6", "year"}:
+    if period not in REVENUE_PERIODS:
         return JSONResponse(
-            {"detail": "Invalid revenue period. Use month, months_6, or year."},
+            {"detail": "Invalid revenue period. Use month, monthwise, months_6, or year."},
             status_code=400,
         )
     try:

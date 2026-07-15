@@ -63,6 +63,7 @@ function HomestaysBrowsePage() {
         }
         return next;
       },
+      replace: true,
     });
   };
 

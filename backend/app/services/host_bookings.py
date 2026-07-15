@@ -15,6 +15,12 @@ from app.services.booking_auto_complete import (
     auto_complete_due_confirmed_bookings,
 )
 from app.services.bookings import BOOKING_SELECT, _map_booking_row, _release_seats
+from app.services.revenue_periods import (
+    REVENUE_PERIODS,
+    revenue_bucket_key,
+    revenue_period_keys,
+    revenue_today,
+)
 from app.services.supabase_query import run_supabase_query
 from app.services.transactional_emails import send_experience_booking_confirmed_email
 
@@ -23,7 +29,7 @@ HOST_DAY_TZ = ZoneInfo("Asia/Kolkata")
 
 
 def _host_today() -> date:
-    return datetime.now(HOST_DAY_TZ).date()
+    return revenue_today()
 
 
 def _resolve_host_id(auth: dict) -> str:
@@ -257,7 +263,7 @@ def get_host_revenue(auth: dict, period: str = "month") -> HostRevenueSummary:
     host_id = _resolve_host_id(auth)
     experience_ids = _host_experience_ids(supabase, host_id)
 
-    resolved_period = period if period in {"month", "months_6", "year"} else "month"
+    resolved_period = period if period in REVENUE_PERIODS else "month"
 
     empty = HostRevenueSummary(
         collectedMinor=0,
@@ -282,7 +288,7 @@ def get_host_revenue(auth: dict, period: str = "month") -> HostRevenueSummary:
     bookings = result.data or []
 
     today = _host_today()
-    current_keys, previous_keys, grain = _revenue_period_keys(today, resolved_period)
+    current_keys, previous_keys, grain = revenue_period_keys(today, resolved_period)
 
     current_buckets = {
         key: {"collectedMinor": 0, "pendingMinor": 0, "estimatedMinor": 0} for key in current_keys
@@ -295,7 +301,7 @@ def get_host_revenue(auth: dict, period: str = "month") -> HostRevenueSummary:
         slot_day = _slot_date(row)
         if slot_day is None:
             continue
-        key = _revenue_bucket_key(slot_day, grain)
+        key = revenue_bucket_key(slot_day, grain)
         if key not in current_buckets and key not in previous_buckets:
             continue
 
@@ -326,43 +332,6 @@ def get_host_revenue(auth: dict, period: str = "month") -> HostRevenueSummary:
         previousPendingMinor=sum(day.pendingMinor for day in previous_series),
         previousEstimatedMinor=sum(day.estimatedMinor for day in previous_series),
     )
-
-
-def _add_months(value: date, months: int) -> date:
-    year = value.year + ((value.month - 1 + months) // 12)
-    month = (value.month - 1 + months) % 12 + 1
-    return date(year, month, 1)
-
-
-def _revenue_bucket_key(slot_day: date, grain: str) -> str:
-    if grain == "month":
-        return slot_day.replace(day=1).isoformat()
-    return slot_day.isoformat()
-
-
-def _revenue_period_keys(today: date, period: str) -> tuple[list[str], list[str], str]:
-    if period == "month":
-        start = today.replace(day=1)
-        previous_end = start - timedelta(days=1)
-        previous_start = previous_end.replace(day=1)
-        current_keys = [
-            (start + timedelta(days=offset)).isoformat()
-            for offset in range((today - start).days + 1)
-        ]
-        previous_keys = [
-            (previous_start + timedelta(days=offset)).isoformat()
-            for offset in range((previous_end - previous_start).days + 1)
-        ]
-        return current_keys, previous_keys, "day"
-
-    month_count = 6 if period == "months_6" else 12
-    current_start = _add_months(today.replace(day=1), -(month_count - 1))
-    previous_start = _add_months(current_start, -month_count)
-    current_keys = [_add_months(current_start, offset).isoformat() for offset in range(month_count)]
-    previous_keys = [
-        _add_months(previous_start, offset).isoformat() for offset in range(month_count)
-    ]
-    return current_keys, previous_keys, "month"
 
 
 def list_host_reviews(auth: dict, limit: int = 20) -> list[HostReviewSummary]:

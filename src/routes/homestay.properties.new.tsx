@@ -62,7 +62,7 @@ function OwnerNewHomestayPage() {
     return (
       <HomestayOwnerDashboardShell
         title="New property"
-        subtitle="Add basics and pricing, then add rooms and calendar rules on the next screen."
+        subtitle="Add property details, room count, and pricing."
         showRoleDescription={false}
       >
         <LuxuryCheckoutPanel>
@@ -75,7 +75,7 @@ function OwnerNewHomestayPage() {
   return (
     <HomestayOwnerDashboardShell
       title="New property"
-      subtitle="Add basics and pricing, then add rooms and calendar rules on the next screen."
+      subtitle="Add property details, room count, and pricing."
       showRoleDescription={false}
     >
       <LuxuryCheckoutPanel>

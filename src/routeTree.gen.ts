@@ -42,6 +42,7 @@ import { Route as HostExperiencesRouteImport } from './routes/host.experiences'
 import { Route as HostDashboardRouteImport } from './routes/host.dashboard'
 import { Route as HostBookingsRouteImport } from './routes/host.bookings'
 import { Route as HomestaysSlugRouteImport } from './routes/homestays.$slug'
+import { Route as HomestayRevenueRouteImport } from './routes/homestay.revenue'
 import { Route as HomestayPropertiesRouteImport } from './routes/homestay.properties'
 import { Route as HomestayDashboardRouteImport } from './routes/homestay.dashboard'
 import { Route as HomestayBookingsRouteImport } from './routes/homestay.bookings'
@@ -282,6 +283,11 @@ const HostBookingsRoute = HostBookingsRouteImport.update({
 const HomestaysSlugRoute = HomestaysSlugRouteImport.update({
   id: '/homestays/$slug',
   path: '/homestays/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomestayRevenueRoute = HomestayRevenueRouteImport.update({
+  id: '/homestay/revenue',
+  path: '/homestay/revenue',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomestayPropertiesRoute = HomestayPropertiesRouteImport.update({
@@ -709,6 +715,7 @@ export interface FileRoutesByFullPath {
   '/homestay/bookings': typeof HomestayBookingsRouteWithChildren
   '/homestay/dashboard': typeof HomestayDashboardRoute
   '/homestay/properties': typeof HomestayPropertiesRouteWithChildren
+  '/homestay/revenue': typeof HomestayRevenueRoute
   '/homestays/$slug': typeof HomestaysSlugRouteWithChildren
   '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
@@ -811,6 +818,7 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/wishlist': typeof DashboardWishlistRoute
   '/homestay/dashboard': typeof HomestayDashboardRoute
+  '/homestay/revenue': typeof HomestayRevenueRoute
   '/host/dashboard': typeof HostDashboardRoute
   '/host/profile': typeof HostProfileRoute
   '/host/revenue': typeof HostRevenueRoute
@@ -917,6 +925,7 @@ export interface FileRoutesById {
   '/homestay/bookings': typeof HomestayBookingsRouteWithChildren
   '/homestay/dashboard': typeof HomestayDashboardRoute
   '/homestay/properties': typeof HomestayPropertiesRouteWithChildren
+  '/homestay/revenue': typeof HomestayRevenueRoute
   '/homestays/$slug': typeof HomestaysSlugRouteWithChildren
   '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
@@ -1030,6 +1039,7 @@ export interface FileRouteTypes {
     | '/homestay/bookings'
     | '/homestay/dashboard'
     | '/homestay/properties'
+    | '/homestay/revenue'
     | '/homestays/$slug'
     | '/host/bookings'
     | '/host/dashboard'
@@ -1132,6 +1142,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/wishlist'
     | '/homestay/dashboard'
+    | '/homestay/revenue'
     | '/host/dashboard'
     | '/host/profile'
     | '/host/revenue'
@@ -1237,6 +1248,7 @@ export interface FileRouteTypes {
     | '/homestay/bookings'
     | '/homestay/dashboard'
     | '/homestay/properties'
+    | '/homestay/revenue'
     | '/homestays/$slug'
     | '/host/bookings'
     | '/host/dashboard'
@@ -1337,6 +1349,7 @@ export interface RootRouteChildren {
   HomestayBookingsRoute: typeof HomestayBookingsRouteWithChildren
   HomestayDashboardRoute: typeof HomestayDashboardRoute
   HomestayPropertiesRoute: typeof HomestayPropertiesRouteWithChildren
+  HomestayRevenueRoute: typeof HomestayRevenueRoute
   HomestaysSlugRoute: typeof HomestaysSlugRouteWithChildren
   HostBookingsRoute: typeof HostBookingsRouteWithChildren
   HostDashboardRoute: typeof HostDashboardRoute
@@ -1596,6 +1609,13 @@ declare module '@tanstack/react-router' {
       path: '/homestays/$slug'
       fullPath: '/homestays/$slug'
       preLoaderRoute: typeof HomestaysSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/homestay/revenue': {
+      id: '/homestay/revenue'
+      path: '/homestay/revenue'
+      fullPath: '/homestay/revenue'
+      preLoaderRoute: typeof HomestayRevenueRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/homestay/properties': {
@@ -2436,6 +2456,7 @@ const rootRouteChildren: RootRouteChildren = {
   HomestayBookingsRoute: HomestayBookingsRouteWithChildren,
   HomestayDashboardRoute: HomestayDashboardRoute,
   HomestayPropertiesRoute: HomestayPropertiesRouteWithChildren,
+  HomestayRevenueRoute: HomestayRevenueRoute,
   HomestaysSlugRoute: HomestaysSlugRouteWithChildren,
   HostBookingsRoute: HostBookingsRouteWithChildren,
   HostDashboardRoute: HostDashboardRoute,

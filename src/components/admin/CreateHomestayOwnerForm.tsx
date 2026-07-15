@@ -58,7 +58,7 @@ export function CreateHomestayOwnerForm({ accessToken, onCreated }: CreateHomest
         <div>
           <h2 className="luxury-panel-heading font-display text-2xl">Add homestay owner</h2>
           <p className="luxury-panel-body mt-2 text-sm">
-            Create a login for property owners. They manage listings, rooms, and stay bookings from
+            Create a login for property owners. They manage listings and stay bookings from
             their dashboard (owner portal coming in Phase 3).
           </p>
         </div>

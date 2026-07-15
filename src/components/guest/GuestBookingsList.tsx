@@ -8,7 +8,7 @@ type GuestBookingsListProps = {
   bookings: BookingSummary[];
   accessToken: string;
   allowCancel?: boolean;
-  onUpdated?: () => void;
+  onUpdated?: (bookingId: string) => void;
   surface?: "light" | "dark";
 };
 
@@ -28,7 +28,7 @@ export function GuestBookingsList({
     setError(null);
     try {
       await cancelBooking(accessToken, bookingId);
-      onUpdated?.();
+      onUpdated?.(bookingId);
     } catch (err) {
       setError(toErrorMessage(err, "Failed to cancel booking."));
     } finally {

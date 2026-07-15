@@ -28,6 +28,14 @@ function addDaysIso(iso: string, days: number) {
   return toIsoDate(date);
 }
 
+function shiftMonth(date: Date, delta: number) {
+  return new Date(date.getFullYear(), date.getMonth() + delta, 1, 12, 0, 0, 0);
+}
+
+function formatMonthLabel(date: Date) {
+  return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+}
+
 type HomestayDateCalendarProps = {
   checkIn?: string;
   checkOut?: string;
@@ -126,15 +134,68 @@ export function HomestayDateCalendar({
     onRangeChange(fromIso, toIso);
   };
 
+  const startMonth = startOfMonth(today);
+  const secondMonth = shiftMonth(month, 1);
+  const latestStartMonth = shiftMonth(calendarEndMonth, -1);
+  const canGoBack = month > startMonth;
+  const canGoForward = shiftMonth(month, 1) <= latestStartMonth;
+
+  const navBtnClass = cn(
+    "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.55)] text-[#8B4A2B]",
+    "hover:bg-[rgb(200_162_90/0.22)] hover:text-[#5C2E12] disabled:pointer-events-none disabled:opacity-35",
+  );
+
   return (
-    <div className={cn("space-y-3", className)}>
+    <div
+      className={cn(
+        "mx-auto w-full max-w-3xl space-y-3",
+        showDayPrices
+          ? "[--cell-size:2.4rem] sm:[--cell-size:2.65rem] lg:[--cell-size:2.9rem]"
+          : "[--cell-size:2.15rem] sm:[--cell-size:2.4rem] lg:[--cell-size:2.65rem]",
+        className,
+      )}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <button
+          type="button"
+          className={navBtnClass}
+          aria-label="Previous months"
+          disabled={!canGoBack}
+          onClick={() => setMonth((current) => shiftMonth(current, -1))}
+        >
+          <span aria-hidden className="text-lg leading-none">
+            ←
+          </span>
+        </button>
+        <p className="min-w-0 flex-1 text-center font-display text-sm tracking-[0.06em] text-[#5C2E12]">
+          {formatMonthLabel(month)}
+          <span className="mx-1.5 text-[rgb(74_0_0/0.35)]">–</span>
+          {formatMonthLabel(secondMonth)}
+        </p>
+        <button
+          type="button"
+          className={navBtnClass}
+          aria-label="Next months"
+          disabled={!canGoForward}
+          onClick={() => setMonth((current) => shiftMonth(current, 1))}
+        >
+          <span aria-hidden className="text-lg leading-none">
+            →
+          </span>
+        </button>
+      </div>
+
       <Calendar
         mode="range"
+        numberOfMonths={2}
         month={month}
         onMonthChange={setMonth}
-        startMonth={startOfMonth(today)}
+        startMonth={startMonth}
         endMonth={calendarEndMonth}
-        captionLayout={showDayPrices ? "dropdown" : "label"}
+        hideNavigation
+        captionLayout="label"
+        showOutsideDays
+        fixedWeeks
         selected={selected}
         onSelect={handleSelect}
         disabled={[{ before: today }, blockedMatcher]}
@@ -147,34 +208,43 @@ export function HomestayDateCalendar({
           holiday: "homestay-cal-holiday",
         }}
         className={cn(
-          "w-full rounded-sm border border-[rgb(74_0_0/0.12)] bg-[rgb(255_248_230/0.5)]",
+          "w-full rounded-sm border border-[rgb(74_0_0/0.12)] bg-[rgb(255_248_230/0.5)] p-2.5 sm:p-3",
           showDayPrices
-            ? "[--cell-size:3.1rem] sm:[--cell-size:3.35rem]"
-            : "[--cell-size:2.45rem] sm:[--cell-size:2.7rem]",
+            ? "[--cell-size:2.4rem] sm:[--cell-size:2.65rem] lg:[--cell-size:2.9rem]"
+            : "[--cell-size:2.15rem] sm:[--cell-size:2.4rem] lg:[--cell-size:2.65rem]",
         )}
         classNames={{
-          root: "w-full",
-          months: "w-full",
-          month: "w-full gap-3",
-          nav: "relative flex w-full items-center justify-between gap-2",
-          today: "rounded-md",
-          button_previous: cn(
-            "h-9 w-9 rounded-sm border border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.55)] text-[#8B4A2B]",
-            "hover:bg-[rgb(200_162_90/0.22)] hover:text-[#5C2E12] disabled:opacity-35",
-          ),
-          button_next: cn(
-            "h-9 w-9 rounded-sm border border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.55)] text-[#8B4A2B]",
-            "hover:bg-[rgb(200_162_90/0.22)] hover:text-[#5C2E12] disabled:opacity-35",
-          ),
-          month_caption: "flex h-10 w-full items-center justify-center px-10",
+          root: "w-full max-w-full",
+          months: "flex w-full flex-col gap-6 lg:flex-row lg:gap-5",
+          month: "flex w-full min-w-0 flex-1 flex-col gap-2",
+          month_caption: "flex h-8 w-full items-center justify-center",
           caption_label: "font-display text-sm tracking-[0.08em] text-[#5C2E12]",
-          dropdowns: "flex items-center justify-center gap-2",
-          dropdown_root:
-            "rounded-sm border border-[rgb(74_0_0/0.18)] bg-[rgb(255_255_255/0.7)] text-[#5C2E12] shadow-none",
-          dropdown: "cursor-pointer bg-transparent text-[#5C2E12]",
+          month_grid: "w-full",
+          weekdays: "grid w-full grid-cols-7 gap-0.5",
+          weekday:
+            "flex h-7 select-none items-center justify-center text-center text-[0.7rem] font-medium uppercase tracking-[0.06em] text-[rgb(74_0_0/0.55)]",
+          weeks: "relative flex w-full flex-col gap-0.5",
+          week: "grid w-full grid-cols-7 gap-0.5",
+          day: "relative flex aspect-square min-h-(--cell-size) w-full select-none items-center justify-center p-0 text-center",
+          outside: "pointer-events-none",
+          today: "rounded-md",
         }}
         components={{
           DayButton: ({ day, modifiers, className: dayClassName, ...props }) => {
+            // Keep weekday columns aligned, but never show previous/next month dates.
+            if (modifiers.outside) {
+              return (
+                <button
+                  type="button"
+                  disabled
+                  tabIndex={-1}
+                  aria-hidden
+                  className="aspect-square min-h-(--cell-size) w-full cursor-default opacity-0"
+                  {...props}
+                />
+              );
+            }
+
             const iso = toIsoDate(day.date);
             const holiday = holidayMap.get(iso);
             const weekend = modifiers.weekend && !holiday;
@@ -183,7 +253,7 @@ export function HomestayDateCalendar({
                 type="button"
                 data-day={iso}
                 className={cn(
-                  "relative flex h-full w-full min-w-(--cell-size) flex-col items-center justify-center gap-0.5 rounded-md p-0.5 text-sm leading-none transition-colors",
+                  "relative flex aspect-square min-h-(--cell-size) w-full flex-col items-center justify-center gap-0.5 rounded-md p-0.5 text-sm leading-none transition-colors",
                   "hover:bg-[rgb(200_162_90/0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A]/60",
                   modifiers.selected && "bg-[#C8A25A] text-[#3B2208] hover:bg-[#C8A25A]",
                   modifiers.today && !modifiers.selected && "bg-transparent text-inherit",
@@ -209,7 +279,7 @@ export function HomestayDateCalendar({
                 {showDayPrices && holiday ? (
                   <span
                     className={cn(
-                      "max-w-full truncate px-0.5 text-[0.52rem] leading-none",
+                      "max-w-full truncate px-0.5 text-[0.65rem] leading-none sm:text-xs",
                       modifiers.selected ? "text-[#3B2208]/90" : "text-[#8B1E1E]",
                     )}
                   >
@@ -221,7 +291,7 @@ export function HomestayDateCalendar({
                 ) : holiday ? (
                   <span
                     className={cn(
-                      "h-1 w-1 rounded-full",
+                      "h-1.5 w-1.5 rounded-full",
                       modifiers.selected ? "bg-[#3B2208]" : "bg-[#B33A3A]",
                     )}
                     aria-hidden
@@ -229,13 +299,13 @@ export function HomestayDateCalendar({
                 ) : weekend ? (
                   <span
                     className={cn(
-                      "h-1 w-1 rounded-full",
+                      "h-1.5 w-1.5 rounded-full",
                       modifiers.selected ? "bg-[#3B2208]/70" : "bg-[#C47A4A]",
                     )}
                     aria-hidden
                   />
                 ) : (
-                  <span className={showDayPrices ? "h-3" : "h-1 w-1"} aria-hidden />
+                  <span className={showDayPrices ? "h-3.5" : "h-1.5 w-1.5"} aria-hidden />
                 )}
               </button>
             );

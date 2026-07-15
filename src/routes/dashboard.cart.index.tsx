@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Heart, ShoppingCart } from "lucide-react";
 import { CartItemsSection, WishlistCartSection } from "@/components/cart/CartPageSections";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
@@ -23,10 +23,12 @@ function GuestCartPage() {
   const { items: cartItems, remove: removeFromCart, add: addToCart } = useExperienceCart();
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [pageError, setPageError] = useState<string | null>(null);
-  const [pageLoading, setPageLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [removingCartId, setRemovingCartId] = useState<string | null>(null);
   const [removingWishlistId, setRemovingWishlistId] = useState<string | null>(null);
   const [addingWishlistId, setAddingWishlistId] = useState<string | null>(null);
+  const hasLoadedRef = useRef(false);
 
   const cartExperienceIds = useMemo(
     () =>
@@ -40,15 +42,19 @@ function GuestCartPage() {
 
   const loadWishlist = useCallback(async () => {
     if (!accessToken) return;
-    setPageLoading(true);
+    const soft = hasLoadedRef.current;
+    if (soft) setRefreshing(true);
+    else setInitialLoading(true);
     setPageError(null);
     try {
       const rows = await fetchWishlistBrowser();
+      hasLoadedRef.current = true;
       setWishlistItems(rows);
     } catch (err) {
       setPageError(err instanceof Error ? err.message : "Failed to load wishlist.");
     } finally {
-      setPageLoading(false);
+      setInitialLoading(false);
+      setRefreshing(false);
     }
   }, [accessToken]);
 
@@ -120,23 +126,30 @@ function GuestCartPage() {
             <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Wishlist</h2>
           </div>
           <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
-            {pageLoading ? "…" : `${wishlistItems.length} saved`}
+            {initialLoading && wishlistItems.length === 0
+              ? "…"
+              : `${wishlistItems.length} saved`}
           </span>
         </div>
 
-        {pageLoading ? (
-          <p className="luxury-panel-body py-8 text-sm">Loading wishlist…</p>
-        ) : (
-          <WishlistCartSection
-            items={wishlistItems}
-            cartExperienceIds={cartExperienceIds}
-            removingId={removingWishlistId}
-            addingId={addingWishlistId}
-            onRemove={(id) => void handleRemoveWishlist(id)}
-            onAddToCart={handleAddWishlistToCart}
-            surface="light"
-          />
-        )}
+        <div
+          className={`transition-opacity duration-200 ${refreshing ? "pointer-events-none opacity-55" : "opacity-100"}`}
+          aria-busy={refreshing}
+        >
+          {initialLoading && wishlistItems.length === 0 ? (
+            <p className="luxury-panel-body py-8 text-sm">Loading wishlist…</p>
+          ) : (
+            <WishlistCartSection
+              items={wishlistItems}
+              cartExperienceIds={cartExperienceIds}
+              removingId={removingWishlistId}
+              addingId={addingWishlistId}
+              onRemove={(id) => void handleRemoveWishlist(id)}
+              onAddToCart={handleAddWishlistToCart}
+              surface="light"
+            />
+          )}
+        </div>
       </LuxuryCheckoutPanel>
     </GuestDashboardShell>
   );

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { History } from "lucide-react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DashboardPanelSkeleton } from "@/components/ui/DashboardPanelSkeleton";
@@ -77,23 +77,32 @@ function GuestHistoryPage() {
   const [activeHomestayBookings, setActiveHomestayBookings] = useState<HomestayBookingSummary[]>([]);
   const [homestayBookings, setHomestayBookings] = useState<HomestayBookingSummary[]>([]);
   const [pageError, setPageError] = useState<string | null>(null);
-  const [pageLoading, setPageLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [bookingNotice, setBookingNotice] = useState<string | null>(null);
   const [confirmedBookingId, setConfirmedBookingId] = useState<string | null>(null);
+  const hasLoadedRef = useRef(false);
+  const [, startTransition] = useTransition();
 
   const loadBookings = useCallback(async () => {
-    setPageLoading(true);
+    const soft = hasLoadedRef.current;
+    if (soft) setRefreshing(true);
+    else setInitialLoading(true);
     setPageError(null);
     try {
       const result = await loadHistory(accessToken);
-      setActiveBookings(result.activeBookings);
-      setActiveHomestayBookings(result.activeHomestayBookings);
-      setBookings(result.bookings);
-      setHomestayBookings(result.homestayBookings);
+      hasLoadedRef.current = true;
+      startTransition(() => {
+        setActiveBookings(result.activeBookings);
+        setActiveHomestayBookings(result.activeHomestayBookings);
+        setBookings(result.bookings);
+        setHomestayBookings(result.homestayBookings);
+      });
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to load booking history."));
     } finally {
-      setPageLoading(false);
+      setInitialLoading(false);
+      setRefreshing(false);
     }
   }, [accessToken]);
 
@@ -113,6 +122,21 @@ function GuestHistoryPage() {
     void navigate({ search: (prev) => ({ ...prev, booked: undefined }), replace: true });
   }, [booked, navigate]);
 
+  const handleBookingCancelled = (bookingId: string) => {
+    setActiveBookings((rows) => {
+      const cancelled = rows.find((row) => row.id === bookingId);
+      if (cancelled) {
+        setBookings((past) =>
+          [{ ...cancelled, bookingStatus: "cancelled" as const }, ...past].sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          ),
+        );
+      }
+      return rows.filter((row) => row.id !== bookingId);
+    });
+    void loadBookings();
+  };
+
   const completedCount = useMemo(
     () => bookings.filter((b) => b.bookingStatus === "completed").length,
     [bookings],
@@ -121,6 +145,12 @@ function GuestHistoryPage() {
     () => bookings.filter((b) => b.bookingStatus === "cancelled").length,
     [bookings],
   );
+
+  const hasAny =
+    activeBookings.length > 0 ||
+    bookings.length > 0 ||
+    activeHomestayBookings.length > 0 ||
+    homestayBookings.length > 0;
 
   if (loading || !ready || !accessToken) {
     return <PageLoadingGate />;
@@ -152,20 +182,17 @@ function GuestHistoryPage() {
         </LuxuryCheckoutPanel>
       ) : null}
 
-      {pageLoading ? (
+      {initialLoading && !hasAny ? (
         <LuxuryCheckoutPanel>
           <DashboardPanelSkeleton rows={4} />
         </LuxuryCheckoutPanel>
-      ) : pageError ? (
+      ) : pageError && !hasAny ? (
         <LuxuryCheckoutPanel>
           <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {pageError}
           </p>
         </LuxuryCheckoutPanel>
-      ) : activeBookings.length === 0 &&
-        bookings.length === 0 &&
-        activeHomestayBookings.length === 0 &&
-        homestayBookings.length === 0 ? (
+      ) : !hasAny ? (
         <LuxuryCheckoutPanel>
           <GuestEmptyState
             icon={<History className="h-8 w-8" strokeWidth={1.5} />}
@@ -175,11 +202,27 @@ function GuestHistoryPage() {
           />
         </LuxuryCheckoutPanel>
       ) : (
-        <div className="space-y-4 sm:space-y-8">
+        <div
+          className={`space-y-4 transition-opacity duration-200 sm:space-y-8 ${refreshing ? "pointer-events-none opacity-55" : "opacity-100"}`}
+          aria-busy={refreshing}
+        >
+          {pageError ? (
+            <LuxuryCheckoutPanel>
+              <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {pageError}
+              </p>
+            </LuxuryCheckoutPanel>
+          ) : null}
+          {refreshing ? (
+            <p className="text-sm text-muted-foreground">Updating history…</p>
+          ) : null}
+
           {activeHomestayBookings.length > 0 ? (
             <LuxuryCheckoutPanel>
               <div className="mb-3 flex items-baseline justify-between gap-3 border-b luxury-panel-divider pb-2.5 sm:mb-6 sm:gap-4 sm:pb-5">
-                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">Active stays</h2>
+                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">
+                  Active stays
+                </h2>
                 <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
                   {activeHomestayBookings.length} active
                 </span>
@@ -191,7 +234,9 @@ function GuestHistoryPage() {
           {activeBookings.length > 0 ? (
             <LuxuryCheckoutPanel>
               <div className="mb-3 flex items-baseline justify-between gap-3 border-b luxury-panel-divider pb-2.5 sm:mb-6 sm:gap-4 sm:pb-5">
-                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">Active bookings</h2>
+                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">
+                  Active bookings
+                </h2>
                 <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
                   {activeBookings.length} active
                 </span>
@@ -200,7 +245,7 @@ function GuestHistoryPage() {
                 bookings={activeBookings}
                 accessToken={accessToken}
                 allowCancel
-                onUpdated={() => void loadBookings()}
+                onUpdated={handleBookingCancelled}
                 surface="light"
               />
             </LuxuryCheckoutPanel>
@@ -209,7 +254,9 @@ function GuestHistoryPage() {
           {homestayBookings.length > 0 ? (
             <LuxuryCheckoutPanel>
               <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3 border-b luxury-panel-divider pb-2.5 sm:mb-6 sm:gap-4 sm:pb-5">
-                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">Past & cancelled stays</h2>
+                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">
+                  Past & cancelled stays
+                </h2>
               </div>
               <GuestHomestayBookingsList bookings={homestayBookings} surface="light" />
             </LuxuryCheckoutPanel>
@@ -218,7 +265,9 @@ function GuestHistoryPage() {
           {bookings.length > 0 ? (
             <LuxuryCheckoutPanel>
               <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3 border-b luxury-panel-divider pb-2.5 sm:mb-6 sm:gap-4 sm:pb-5">
-                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">Past & cancelled</h2>
+                <h2 className="luxury-panel-heading font-display text-base tracking-wide sm:text-xl">
+                  Past & cancelled
+                </h2>
                 <span className="luxury-panel-body text-[0.65rem] uppercase tracking-[0.14em]">
                   {completedCount} completed · {cancelledCount} cancelled
                 </span>

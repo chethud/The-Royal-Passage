@@ -140,6 +140,52 @@ def _ensure_has_active_room(supabase, homestay_id: str) -> None:
         raise ValueError("Add at least one active room before submitting for review.")
 
 
+def _seed_rooms_from_property(supabase, homestay_id: str, row: dict) -> None:
+    """Create bookable inventory from the property room count so owners aren't asked twice."""
+    existing = _load_rooms(supabase, homestay_id)
+    if existing:
+        return
+
+    room_count = max(1, int(row.get("bedrooms") or 1))
+    price = int(row.get("price_per_night_minor") or 0)
+    weekend = int(row.get("weekend_price_per_night_minor") or price or 0)
+    extra_bed_available = bool(row.get("extra_bed_available", False))
+    extra_bed_price = int(row.get("extra_bed_price_per_night_minor") or 0) if extra_bed_available else 0
+    extra_bed_weekend = (
+        int(
+            row.get("weekend_extra_bed_price_per_night_minor")
+            or row.get("extra_bed_price_per_night_minor")
+            or 0
+        )
+        if extra_bed_available
+        else 0
+    )
+    max_guests = max(1, int(row.get("max_guests") or 2))
+    # Spread guest capacity across rooms, at least 1 per room.
+    capacity = max(1, (max_guests + room_count - 1) // room_count)
+
+    supabase.table("homestay_rooms").insert(
+        {
+            "homestay_id": homestay_id,
+            "name": "Standard room" if room_count > 1 else "Entire stay",
+            "category": row.get("property_type") or "Home Stay",
+            "capacity": capacity,
+            "price_per_night_minor": price,
+            "weekend_price_per_night_minor": weekend,
+            "total_units": room_count,
+            "amenities": row.get("amenities") or [],
+            "sort_order": 0,
+            "is_active": True,
+            "extra_bed_available": extra_bed_available,
+            "extra_bed_price_per_night_minor": extra_bed_price,
+            "weekend_extra_bed_price_per_night_minor": extra_bed_weekend,
+            "extra_beds_per_room": (
+                _extra_beds_per_room(row.get("extra_beds_per_room")) if extra_bed_available else 1
+            ),
+        }
+    ).execute()
+
+
 def _load_availability(supabase, homestay_id: str) -> list[dict]:
     result = (
         supabase.table("homestay_availability")
@@ -257,7 +303,9 @@ def list_owner_homestays(auth: dict) -> list[OwnerHomestaySummary]:
 
     result = (
         supabase.table("homestays")
-        .select("id, slug, title, city, status, price_per_night_minor, currency_code, hero_image_url")
+        .select(
+            "id, slug, title, city, status, price_per_night_minor, currency_code, hero_image_url, bedrooms"
+        )
         .eq("owner_id", owner_id)
         .neq("status", "archived")
         .order("updated_at", desc=True)
@@ -266,19 +314,6 @@ def list_owner_homestays(auth: dict) -> list[OwnerHomestaySummary]:
     rows = result.data or []
     if not rows:
         return []
-
-    ids = [row["id"] for row in rows]
-    rooms_result = (
-        supabase.table("homestay_rooms")
-        .select("homestay_id")
-        .in_("homestay_id", ids)
-        .eq("is_active", True)
-        .execute()
-    )
-    room_counts: dict[str, int] = {}
-    for room in rooms_result.data or []:
-        stay_id = room["homestay_id"]
-        room_counts[stay_id] = room_counts.get(stay_id, 0) + 1
 
     return [
         OwnerHomestaySummary(
@@ -289,7 +324,7 @@ def list_owner_homestays(auth: dict) -> list[OwnerHomestaySummary]:
             status=row.get("status") or "draft",
             pricePerNightMinor=int(row.get("price_per_night_minor") or 0),
             currencySymbol=_currency_symbol(row.get("currency_code") or "INR"),
-            roomCount=room_counts.get(row["id"], 0),
+            roomCount=max(1, int(row.get("bedrooms") or 1)),
             image=row.get("hero_image_url"),
         )
         for row in rows
@@ -300,7 +335,15 @@ def get_owner_homestay(auth: dict, homestay_id: str) -> OwnerHomestayDetail:
     supabase = get_supabase_admin()
     owner_id = _resolve_owner_id(auth)
     row = _fetch_owner_homestay_row(supabase, homestay_id, owner_id)
+    # Backfill inventory from Details room count for older drafts.
+    _seed_rooms_from_property(supabase, homestay_id, row)
     rooms = _load_rooms(supabase, homestay_id)
+    bedrooms = max(1, int(row.get("bedrooms") or 1))
+    if len(rooms) == 1 and int(rooms[0].get("total_units") or 1) != bedrooms:
+        supabase.table("homestay_rooms").update({"total_units": bedrooms}).eq(
+            "id", rooms[0]["id"]
+        ).eq("homestay_id", homestay_id).execute()
+        rooms = _load_rooms(supabase, homestay_id)
     availability = _load_availability(supabase, homestay_id)
     return _map_owner_homestay(row, rooms, availability)
 
@@ -312,12 +355,7 @@ def create_owner_homestay(auth: dict, payload: CreateOwnerHomestayRequest) -> Ow
     license_url = _validate_license_certificate_url(payload.licenseCertificateUrl)
 
     slug = _ensure_unique_slug(supabase, payload.slug or _slugify(payload.title))
-    if payload.submitForReview:
-        raise ValueError(
-            "Add at least one active room before submitting for review. "
-            "Save as draft, add rooms, then submit."
-        )
-    status = "draft"
+    status = "pending_review" if payload.submitForReview else "draft"
     city_slug, city_name = _resolve_city_fields(payload.citySlug, payload.city)
     gallery_urls = payload.galleryUrls or []
     hero_image_url = payload.heroImageUrl or (gallery_urls[0] if gallery_urls else None)
@@ -367,7 +405,12 @@ def create_owner_homestay(auth: dict, payload: CreateOwnerHomestayRequest) -> Ow
     if not row:
         raise ValueError("Failed to create homestay.")
 
-    return get_owner_homestay(auth, row["id"])
+    homestay_id = row["id"]
+    _seed_rooms_from_property(supabase, homestay_id, {**insert_row, "id": homestay_id})
+    if status == "pending_review":
+        _notify_admins_homestay_submitted(supabase, homestay_id, insert_row["title"], owner_id)
+
+    return get_owner_homestay(auth, homestay_id)
 
 
 def update_owner_homestay(
@@ -423,6 +466,12 @@ def update_owner_homestay(
         updates["house_rules"] = payload.houseRules
     if payload.bedrooms is not None:
         updates["bedrooms"] = payload.bedrooms
+        # Single default inventory row tracks the room count from Details.
+        rooms = _load_rooms(supabase, homestay_id)
+        if len(rooms) == 1:
+            supabase.table("homestay_rooms").update(
+                {"total_units": max(1, int(payload.bedrooms))}
+            ).eq("id", rooms[0]["id"]).eq("homestay_id", homestay_id).execute()
     if payload.bathrooms is not None:
         updates["bathrooms"] = payload.bathrooms
     if payload.maxGuests is not None:
@@ -453,6 +502,9 @@ def update_owner_homestay(
         license_url = updates.get("license_certificate_url") or row.get("license_certificate_url")
         if not license_url:
             raise ValueError("Upload a property certificate or license before submitting for review.")
+        # Rooms are created from the property room count; only seed if still missing.
+        merged = {**row, **updates}
+        _seed_rooms_from_property(supabase, homestay_id, merged)
         _ensure_has_active_room(supabase, homestay_id)
         updates["status"] = "pending_review"
 
@@ -461,6 +513,9 @@ def update_owner_homestay(
         if updates.get("status") == "pending_review":
             title = updates.get("title") or row.get("title") or "Homestay"
             _notify_admins_homestay_submitted(supabase, homestay_id, title, owner_id)
+
+    # Keep bookable rooms in sync when owners only entered the room count on Details.
+    _seed_rooms_from_property(supabase, homestay_id, {**row, **updates})
 
     return get_owner_homestay(auth, homestay_id)
 
