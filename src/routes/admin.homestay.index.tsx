@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { AdminHomestayStatsGrid } from "@/components/admin/AdminHomestayStatsGrid";
+import { AdminReviewsHub } from "@/components/admin/AdminReviewsHub";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
@@ -98,6 +99,8 @@ function AdminHomestayOverviewPage() {
             <AdminHomestayStatsGrid stats={stats} />
           ) : null}
         </LuxuryCheckoutPanel>
+
+        <AdminReviewsHub scope="homestay" />
 
         {stats ? (
           <LuxuryCheckoutPanel>

@@ -70,13 +70,11 @@ function AdminHomepageEditPage() {
   }
 
   return (
-    <div className="pt-[var(--header-height)]">
-      <HomepageEditPageShell
-        homepage={homepage}
-        onRefresh={refreshHomepage}
-        editorRole={editorRole}
-        experiences={experiences}
-      />
-    </div>
+    <HomepageEditPageShell
+      homepage={homepage}
+      onRefresh={refreshHomepage}
+      editorRole={editorRole}
+      experiences={experiences}
+    />
   );
 }

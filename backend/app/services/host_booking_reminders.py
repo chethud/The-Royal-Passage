@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from app.dependencies.supabase import get_supabase_admin
 from app.services.transactional_emails import (
@@ -8,6 +8,7 @@ from app.services.transactional_emails import (
     send_host_new_homestay_booking_email,
     send_host_new_experience_booking_email,
     send_host_experience_booking_reminder_email,
+    send_host_experience_upcoming_email,
 )
 
 REMINDER_STEPS: tuple[tuple[str, timedelta, str], ...] = (
@@ -16,9 +17,21 @@ REMINDER_STEPS: tuple[tuple[str, timedelta, str], ...] = (
     ("host_reminder_24h_at", timedelta(hours=24), "24 hours"),
 )
 
+ADMIN_PENDING_OVERDUE = timedelta(hours=1)
+
+# Countdown emails before a confirmed experience runs.
+UPCOMING_EXPERIENCE_DAYS: tuple[int, ...] = (10, 5, 4, 3, 2, 1)
+
 EXPERIENCE_BOOKING_SELECT = """
 id, created_at, booking_status, guest_name, guest_count, participant_count,
 total_amount, subtotal_minor, currency_code,
+experience_slots ( slot_date, start_time, end_time ),
+experiences ( title, host_id, hosts ( id, display_name, email, auth_user_id ) )
+"""
+
+EXPERIENCE_UPCOMING_SELECT = """
+id, created_at, booking_status, guest_name, guest_count, participant_count,
+total_amount, subtotal_minor, currency_code, host_upcoming_reminders,
 experience_slots ( slot_date, start_time, end_time ),
 experiences ( title, host_id, hosts ( id, display_name, email, auth_user_id ) )
 """
@@ -148,8 +161,6 @@ def _process_homestay_bookings(supabase, now: datetime) -> dict[str, int]:
             check_in = str(row.get("check_in", ""))[:10]
             check_out = str(row.get("check_out", ""))[:10]
             try:
-                from datetime import date
-
                 nights = (date.fromisoformat(check_out) - date.fromisoformat(check_in)).days
             except ValueError:
                 nights = 1
@@ -191,16 +202,193 @@ def _process_homestay_bookings(supabase, now: datetime) -> dict[str, int]:
     return sent
 
 
+def _process_upcoming_experience_reminders(supabase, now: datetime) -> dict[str, int]:
+    """Email + notify hosts at 10/5/4/3/2/1 days before a confirmed experience."""
+    sent = {f"day_{d}": 0 for d in UPCOMING_EXPERIENCE_DAYS}
+    today = now.date()
+
+    try:
+        result = (
+            supabase.table("bookings")
+            .select(EXPERIENCE_UPCOMING_SELECT)
+            .eq("booking_status", "confirmed")
+            .execute()
+        )
+    except Exception as exc:
+        return {**sent, "error": str(exc)}
+
+    for row in result.data or []:
+        slot = row.get("experience_slots") or {}
+        raw_date = str(slot.get("slot_date") or "")[:10]
+        if not raw_date:
+            continue
+        try:
+            slot_date = date.fromisoformat(raw_date)
+        except ValueError:
+            continue
+
+        days_left = (slot_date - today).days
+        if days_left not in UPCOMING_EXPERIENCE_DAYS:
+            continue
+
+        already = row.get("host_upcoming_reminders") or {}
+        if not isinstance(already, dict):
+            already = {}
+        day_key = str(days_left)
+        if already.get(day_key):
+            continue
+
+        exp = row.get("experiences") or {}
+        host = exp.get("hosts") or {}
+        host_email = resolve_host_email(supabase, host.get("auth_user_id"), host.get("email"))
+        if not host_email:
+            continue
+
+        booking_id = row["id"]
+        host_name = host.get("display_name") or "Host"
+        guest_name = _guest_label(row)
+        experience_title = exp.get("title") or "an experience"
+        guest_count = row.get("participant_count") or row.get("guest_count") or 1
+        total_minor = row.get("total_amount") or row.get("subtotal_minor") or 0
+        currency = row.get("currency_code") or "INR"
+
+        ok = send_host_experience_upcoming_email(
+            to=host_email,
+            host_name=host_name,
+            guest_name=guest_name,
+            experience_title=experience_title,
+            slot_date=raw_date,
+            slot_start=slot.get("start_time", ""),
+            slot_end=slot.get("end_time", ""),
+            guest_count=int(guest_count),
+            total_minor=int(total_minor or 0),
+            currency_code=currency,
+            booking_id=booking_id,
+            days_left=days_left,
+        )
+        if not ok:
+            continue
+
+        next_map = {**already, day_key: now.isoformat()}
+        try:
+            supabase.table("bookings").update({"host_upcoming_reminders": next_map}).eq(
+                "id", booking_id
+            ).execute()
+        except Exception:
+            continue
+        sent[f"day_{days_left}"] += 1
+
+        host_user_id = host.get("auth_user_id")
+        if host_user_id:
+            try:
+                from app.services.notifications import create_notification
+
+                day_label = "1 day" if days_left == 1 else f"{days_left} days"
+                create_notification(
+                    host_user_id,
+                    "experience_upcoming",
+                    f"Experience in {day_label}",
+                    f'"{experience_title}" with {guest_name} starts in {day_label}.',
+                    {"bookingId": booking_id, "daysLeft": days_left},
+                )
+            except Exception:
+                pass
+
+    return sent
+
+
+def _process_admin_pending_1h_alerts(supabase, now: datetime) -> dict[str, int]:
+    """Notify admins once when a booking is still pending after 1 hour."""
+    from app.services.notifications import notify_admins_pending_booking_overdue
+
+    notified = {"experience": 0, "homestay": 0}
+    cutoff = (now - ADMIN_PENDING_OVERDUE).isoformat()
+
+    try:
+        exp_result = (
+            supabase.table("bookings")
+            .select(
+                "id, created_at, guest_name, experiences ( title )"
+            )
+            .eq("booking_status", "pending")
+            .is_("admin_pending_1h_notified_at", "null")
+            .lte("created_at", cutoff)
+            .execute()
+        )
+    except Exception as exc:
+        return {**notified, "experienceError": str(exc)}
+
+    for row in exp_result.data or []:
+        booking_id = row["id"]
+        exp = row.get("experiences") or {}
+        listing = exp.get("title") or "an experience"
+        guest = row.get("guest_name") or "A guest"
+        try:
+            notify_admins_pending_booking_overdue(
+                booking_id=booking_id,
+                module="experience",
+                title="Experience booking overdue",
+                guest_name=guest,
+                listing_title=listing,
+            )
+            supabase.table("bookings").update(
+                {"admin_pending_1h_notified_at": now.isoformat()}
+            ).eq("id", booking_id).execute()
+            notified["experience"] += 1
+        except Exception:
+            continue
+
+    try:
+        stay_result = (
+            supabase.table("homestay_bookings")
+            .select(
+                "id, created_at, guest_count, homestays ( title ), profiles ( full_name )"
+            )
+            .eq("booking_status", "pending")
+            .is_("admin_pending_1h_notified_at", "null")
+            .lte("created_at", cutoff)
+            .execute()
+        )
+    except Exception as exc:
+        return {**notified, "homestayError": str(exc)}
+
+    for row in stay_result.data or []:
+        booking_id = row["id"]
+        stay = row.get("homestays") or {}
+        listing = stay.get("title") or "a homestay"
+        guest = ((row.get("profiles") or {}).get("full_name")) or "A guest"
+        try:
+            notify_admins_pending_booking_overdue(
+                booking_id=booking_id,
+                module="homestay",
+                title="Homestay booking overdue",
+                guest_name=guest,
+                listing_title=listing,
+            )
+            supabase.table("homestay_bookings").update(
+                {"admin_pending_1h_notified_at": now.isoformat()}
+            ).eq("id", booking_id).execute()
+            notified["homestay"] += 1
+        except Exception:
+            continue
+
+    return notified
+
+
 def process_host_booking_reminders() -> dict:
     supabase = get_supabase_admin()
     now = datetime.now(timezone.utc)
 
     experience = _process_experience_bookings(supabase, now)
     homestay = _process_homestay_bookings(supabase, now)
+    upcoming = _process_upcoming_experience_reminders(supabase, now)
+    admin_pending = _process_admin_pending_1h_alerts(supabase, now)
 
     return {
         "ok": True,
         "processedAt": now.isoformat(),
         "experience": experience,
         "homestay": homestay,
+        "upcomingExperience": upcoming,
+        "adminPendingOverdue": admin_pending,
     }

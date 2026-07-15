@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { CreateExperienceWizard } from "@/components/experience/CreateExperienceWizard";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
-import { createHostExperience, createHostSlot } from "@/lib/api/host-experiences";
+import { createHostExperience, createHostSlot, updateHostExperience } from "@/lib/api/host-experiences";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import {
   getCachedHostFormReferenceData,
@@ -59,13 +59,22 @@ function HostNewExperiencePage() {
     setSaving(true);
     setPageError(null);
     try {
-      const created = await createHostExperience(accessToken, experience);
+      if (experience.submitForReview && slots.length === 0) {
+        throw new Error("Add at least one bookable slot before submitting for review.");
+      }
+      const created = await createHostExperience(accessToken, {
+        ...experience,
+        submitForReview: false,
+      });
       if (!created?.id) {
         throw new Error("Experience was created but no ID was returned. Please refresh and try again.");
       }
       await Promise.all(
         slots.map((slot) => createHostSlot(accessToken, created.id, slot)),
       );
+      if (experience.submitForReview) {
+        await updateHostExperience(accessToken, created.id, { submitForReview: true });
+      }
       void navigate({
         to: "/host/experiences/$experienceId",
         params: { experienceId: created.id },

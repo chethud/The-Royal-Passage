@@ -4,19 +4,22 @@ import { isApiConfigured } from "@/lib/api/client";
 import {
   fetchExperienceReviews,
   hostReplyReview,
-  hideAdminReview,
-  fetchAdminReviews,
+  type AdminModerationReview,
+  type AdminModerationReviews,
   type ReviewSummary,
 } from "@/lib/api/reviews";
 import { isSupabaseConfigured } from "@/lib/env.server";
 import {
   createGuestReviewInDb,
+  hideExperienceReviewInDb,
+  hideHomestayReviewInDb,
   hostReplyToReviewInDb,
+  loadAdminModerationReviews,
   loadPublishedReviewsForSlug,
   loadReviewForBookingId,
 } from "@/lib/reviews-db.server";
 
-export type { ReviewSummary };
+export type { AdminModerationReview, AdminModerationReviews, ReviewSummary };
 
 export const getExperienceReviews = createServerFn({ method: "GET" })
   .inputValidator(z.object({ slug: z.string().min(1) }))
@@ -92,9 +95,24 @@ export const replyToReview = createServerFn({ method: "POST" })
 
 export const listAdminReviews = createServerFn({ method: "POST" })
   .inputValidator(z.object({ accessToken: z.string().min(1) }))
-  .handler(async ({ data }): Promise<ReviewSummary[]> => {
-    if (!isApiConfigured()) throw new Error("API is not configured.");
-    return fetchAdminReviews(data.accessToken);
+  .handler(async ({ data }): Promise<AdminModerationReviews> => {
+    if (!isSupabaseConfigured()) {
+      throw new Error("Supabase is not configured for this deployment.");
+    }
+    const { getSupabaseAdmin } = await import("@/lib/supabase/admin");
+    const { verifySupabaseAccessToken } = await import("@/lib/auth-verify.server");
+    const user = await verifySupabaseAccessToken(data.accessToken);
+    const supabase = getSupabaseAdmin();
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (profile?.role !== "admin") {
+      throw new Error("Only admins can moderate reviews.");
+    }
+    return loadAdminModerationReviews(5);
   });
 
 export const hideReview = createServerFn({ method: "POST" })
@@ -102,6 +120,19 @@ export const hideReview = createServerFn({ method: "POST" })
     z.object({ accessToken: z.string().min(1), reviewId: z.string().min(1) }),
   )
   .handler(async ({ data }): Promise<ReviewSummary> => {
-    if (!isApiConfigured()) throw new Error("API is not configured.");
-    return hideAdminReview(data.accessToken, data.reviewId);
+    if (!isSupabaseConfigured()) {
+      throw new Error("Supabase is not configured for this deployment.");
+    }
+    return hideExperienceReviewInDb(data.accessToken, data.reviewId);
+  });
+
+export const hideHomestayReview = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({ accessToken: z.string().min(1), reviewId: z.string().min(1) }),
+  )
+  .handler(async ({ data }): Promise<AdminModerationReview> => {
+    if (!isSupabaseConfigured()) {
+      throw new Error("Supabase is not configured for this deployment.");
+    }
+    return hideHomestayReviewInDb(data.accessToken, data.reviewId);
   });

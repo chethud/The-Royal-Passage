@@ -28,7 +28,7 @@ export function AdminExperienceApprovalRow({
         ) : null}
       </Link>
       <div className="flex flex-wrap items-center gap-3">
-        <ExperienceStatusBadge status={row.status} />
+        <ExperienceStatusBadge status={row.status} surface="light" />
         <Link
           to="/admin/experiences/$experienceId"
           params={{ experienceId: row.id }}

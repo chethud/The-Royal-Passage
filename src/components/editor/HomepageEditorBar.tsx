@@ -94,7 +94,7 @@ export function HomepageEditorBar({ role, draft, savedSnapshot, onSaved }: Homep
       : "Editor mode — homepage photos, hero headings, journal, top experiences, and heritage video. Photos save automatically; use Save for text and video links.";
 
   return (
-    <div className="sticky top-0 z-50 border-b border-ember/35 bg-[oklch(0.14_0.06_22_/_0.96)] backdrop-blur-md">
+    <div className="sticky top-[var(--header-height)] z-40 border-b border-ember/35 bg-[oklch(0.14_0.06_22_/_0.96)] backdrop-blur-md">
       <div className="container-page flex flex-wrap items-center justify-between gap-3 py-3">
         <div className="flex flex-wrap items-center gap-3">
           <RoleBadge role={role} />

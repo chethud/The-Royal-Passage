@@ -81,7 +81,7 @@ function AdminActivityPage() {
   return (
     <DashboardShell
       role="admin"
-      title="Live activity"
+      title="Activity logs"
       subtitle="New bookings, reviews, host signups, approvals, and cancellations — refreshing every 30 seconds."
       showRoleDescription={false}
     >

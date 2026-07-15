@@ -11,6 +11,8 @@ type HostExperienceFormProps = {
   initial?: HostExperienceDetail;
   readOnly?: boolean;
   saving: boolean;
+  /** Bookable (non-blocked) slots already saved on this listing. */
+  bookableSlotCount?: number;
   onSubmit: (payload: {
     title: string;
     slug?: string;
@@ -51,6 +53,7 @@ export function HostExperienceForm({
   initial,
   readOnly = false,
   saving,
+  bookableSlotCount,
   onSubmit,
 }: HostExperienceFormProps) {
   const [title, setTitle] = useState(initial?.title ?? "");
@@ -83,6 +86,10 @@ export function HostExperienceForm({
 
   const status = initial?.status ?? "draft";
   const canSubmitForReview = status === "draft" || status === "rejected";
+  const resolvedSlotCount =
+    bookableSlotCount ??
+    (initial?.slots?.filter((slot) => !slot.isBlocked).length ?? 0);
+  const canSubmitWithSlots = resolvedSlotCount > 0;
 
   const cityName =
     cities.find((city) => city.slug === citySlug)?.name ??
@@ -95,6 +102,9 @@ export function HostExperienceForm({
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    if (submitForReview && !canSubmitWithSlots) {
+      return;
+    }
     const galleryUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
     onSubmit({
       title: title.trim(),
@@ -325,18 +335,28 @@ export function HostExperienceForm({
       {!readOnly ? (
         <div className="flex flex-wrap items-center gap-4">
           {canSubmitForReview ? (
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={submitForReview}
-                onChange={(e) => setSubmitForReview(e.target.checked)}
-              />
-              Submit for admin review after saving
-            </label>
+            <div className="w-full space-y-2 sm:w-auto sm:flex-1">
+              <label
+                className={`flex items-center gap-2 text-sm ${!canSubmitWithSlots ? "opacity-70" : ""}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={submitForReview && canSubmitWithSlots}
+                  disabled={!canSubmitWithSlots}
+                  onChange={(e) => setSubmitForReview(e.target.checked)}
+                />
+                Submit for admin review after saving
+              </label>
+              {!canSubmitWithSlots ? (
+                <p className="text-xs text-muted-foreground">
+                  Add at least one bookable session under Session timings before submitting for review.
+                </p>
+              ) : null}
+            </div>
           ) : null}
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || (submitForReview && !canSubmitWithSlots)}
             className="rounded-sm bg-ember px-5 py-3 text-sm font-medium text-primary-foreground shadow-[var(--shadow-gold)] disabled:opacity-60"
           >
             {saving ? "Saving…" : initial ? "Save changes" : "Create experience"}

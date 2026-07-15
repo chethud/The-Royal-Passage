@@ -26,13 +26,19 @@ export function BookingStatusChip({
 
   if (isLight) {
     return (
-      <span className="inline-flex max-w-[9.5rem] flex-col items-end gap-0.5 border-l-[2px] border-[#4A0000] pl-1.5 text-right sm:max-w-[12rem] sm:border-l-[3px] sm:pl-2.5">
-        <span className="eyebrow luxury-panel-label text-[0.55rem] leading-snug sm:text-[0.62rem]">{label}</span>
+      <span className="inline-flex max-w-[7.5rem] flex-col items-end gap-0 border-l border-[#4A0000]/70 pl-1.5 text-right sm:max-w-[8.5rem]">
+        <span className="text-[0.58rem] font-semibold uppercase leading-tight tracking-[0.08em] text-[#2A0000]">
+          {label}
+        </span>
         {!isPaused && bookingStatus === "confirmed" && paymentStatus === "pending" ? (
-          <span className="luxury-panel-body text-[0.62rem] normal-case tracking-normal">{pendingPaymentLabel}</span>
+          <span className="text-[0.55rem] leading-tight text-[#2A0000]/75 normal-case tracking-normal">
+            {pendingPaymentLabel}
+          </span>
         ) : null}
         {isPaused ? (
-          <span className="luxury-panel-body text-[0.62rem] normal-case tracking-normal">On hold</span>
+          <span className="text-[0.55rem] leading-tight text-[#2A0000]/75 normal-case tracking-normal">
+            On hold
+          </span>
         ) : null}
       </span>
     );

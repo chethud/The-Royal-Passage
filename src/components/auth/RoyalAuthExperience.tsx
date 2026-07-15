@@ -27,7 +27,8 @@ import { formatAuthError } from "@/lib/format-auth-error";
 import { markVipSignupPromptPending } from "@/lib/vip-membership-prompt-storage";
 
 const inputClass =
-  "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 text-sm text-ink placeholder:text-ink/45 backdrop-blur-sm focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+  "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 font-body text-sm normal-case tracking-normal text-ink placeholder:text-ink/45 backdrop-blur-sm focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+const labelClass = "mb-2 block font-body text-sm font-medium normal-case tracking-normal text-ink/90";
 
 type RoyalAuthExperienceProps = {
   initialMode: "signin" | "signup" | "forgot";
@@ -322,7 +323,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
             </div>
             <form className="space-y-4" onSubmit={updateProfile}>
               <div>
-                <label htmlFor="profile-name" className="eyebrow mb-2 block text-ink/90">
+                <label htmlFor="profile-name" className={labelClass}>
                   Full name
                 </label>
                 <input
@@ -337,7 +338,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                 />
               </div>
               <div>
-                <label htmlFor="profile-email" className="eyebrow mb-2 block text-ink/90">
+                <label htmlFor="profile-email" className={labelClass}>
                   Email
                 </label>
                 <input
@@ -349,7 +350,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                 />
               </div>
               <div>
-                <label htmlFor="profile-phone" className="eyebrow mb-2 block text-ink/90">
+                <label htmlFor="profile-phone" className={labelClass}>
                   Phone
                 </label>
                 <input
@@ -393,7 +394,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
           <>
             <form className="space-y-4" onSubmit={sendPasswordReset}>
               <div>
-                <label htmlFor="forgot-email" className="eyebrow mb-2 block text-ink/90">
+                <label htmlFor="forgot-email" className={labelClass}>
                   Email
                 </label>
                 <input
@@ -401,10 +402,13 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                   name="email"
                   type="email"
                   autoComplete="username"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   required
                   placeholder="you@example.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value.toLowerCase())}
                   className={inputClass}
                 />
               </div>
@@ -450,7 +454,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
 
             <form className="mt-4 space-y-4" onSubmit={signIn}>
               <div>
-                <label htmlFor="signin-email" className="eyebrow mb-2 block text-ink/90">
+                <label htmlFor="signin-email" className={labelClass}>
                   Email
                 </label>
                 <input
@@ -458,15 +462,18 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                   name="email"
                   type="email"
                   autoComplete="username"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   required
                   placeholder="you@example.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value.toLowerCase())}
                   className={inputClass}
                 />
               </div>
               <div>
-                <label htmlFor="signin-password" className="eyebrow mb-2 block text-ink/90">
+                <label htmlFor="signin-password" className={labelClass}>
                   Password
                 </label>
                 <div className="relative">
@@ -557,7 +564,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
 
             <form className="mt-4 space-y-4" onSubmit={signUpGuest}>
               <div>
-                <label htmlFor="signup-name" className="eyebrow mb-2 block text-ink/90">
+                <label htmlFor="signup-name" className={labelClass}>
                   Full name
                 </label>
                 <input
@@ -573,7 +580,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                 />
               </div>
               <div>
-                <label htmlFor="signup-email" className="eyebrow mb-2 block text-ink/90">
+                <label htmlFor="signup-email" className={labelClass}>
                   Email
                 </label>
                 <input
@@ -581,15 +588,18 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                   name="email"
                   type="email"
                   autoComplete="email"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   required
                   placeholder="you@example.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value.toLowerCase())}
                   className={inputClass}
                 />
               </div>
               <div>
-                <label htmlFor="signup-phone" className="eyebrow mb-2 block text-ink/90">
+                <label htmlFor="signup-phone" className={labelClass}>
                   Phone
                 </label>
                 <input
@@ -604,7 +614,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                 />
               </div>
               <div>
-                <label htmlFor="signup-password" className="eyebrow mb-2 block text-ink/90">
+                <label htmlFor="signup-password" className={labelClass}>
                   Password
                 </label>
                 <div className="relative">

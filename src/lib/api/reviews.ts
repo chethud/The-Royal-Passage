@@ -1,7 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import { createRoyalPassageClient, rpcCall } from "@/lib/api/connect";
 import {
-  HideAdminReviewRequestSchema,
   HostReplyToReviewRequestSchema,
   ListExperienceReviewsRequestSchema,
 } from "@/gen/royalpassage/v1/service_pb";
@@ -85,18 +84,19 @@ export function hostReplyReview(accessToken: string, reviewId: string, reply: st
   });
 }
 
-export function fetchAdminReviews(accessToken: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(async () => {
-    const response = await client.listAdminReviews({});
-    return response.reviews as ReviewSummary[];
-  });
-}
+export type AdminModerationReview = {
+  id: string;
+  kind: "experience" | "homestay" | string;
+  listingId: string;
+  listingTitle: string | null;
+  rating: number;
+  comment: string | null;
+  reviewerDisplayName: string | null;
+  status: string;
+  createdAt: string;
+};
 
-export function hideAdminReview(accessToken: string, reviewId: string) {
-  const client = createRoyalPassageClient(accessToken);
-  return rpcCall(async () => {
-    const result = await client.hideAdminReview(create(HideAdminReviewRequestSchema, { reviewId }));
-    return normalizeReviewSummary(result as ReviewSummaryLike);
-  });
-}
+export type AdminModerationReviews = {
+  experiences: AdminModerationReview[];
+  homestays: AdminModerationReview[];
+};

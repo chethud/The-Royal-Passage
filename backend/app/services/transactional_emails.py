@@ -409,6 +409,69 @@ def send_host_experience_booking_reminder_email(
     )
 
 
+def send_host_experience_upcoming_email(
+    *,
+    to: str,
+    host_name: str,
+    guest_name: str,
+    experience_title: str,
+    slot_date: str,
+    slot_start: str,
+    slot_end: str,
+    guest_count: int,
+    total_minor: int,
+    currency_code: str,
+    booking_id: str,
+    days_left: int,
+) -> bool:
+    """Countdown mail for hosts before a confirmed experience runs (10…1 days left)."""
+    amount = _format_amount(total_minor, currency_code)
+    time_range = _format_time(slot_start)
+    if slot_end:
+        time_range = f"{_format_time(slot_start)} – {_format_time(slot_end)}"
+    day_label = "1 day" if days_left == 1 else f"{days_left} days"
+    urgency = "Tomorrow" if days_left == 1 else f"{days_left} days to go"
+    html = render_royal_host_alert_email(
+        RoyalHostAlertContext(
+            host_name=host_name,
+            headline=urgency,
+            badge="Upcoming Experience",
+            preheader=f"{experience_title} is in {day_label} — please prepare for your guests.",
+            message_html=royal_luxury_recipient_message(
+                host_name,
+                lead_html=(
+                    f'<span style="font-size: 16px; color: {EMAIL_INK_MUTED};">'
+                    f'Your confirmed experience '
+                    f'<strong style="color: {EMAIL_GOLD_BRIGHT};">{esc(experience_title)}</strong> '
+                    f"with {esc(guest_name)} begins in <strong>{esc(day_label)}</strong>. "
+                    f"Please review preparations, capacity, and guest notes."
+                    f"</span>"
+                ),
+            ),
+            booking_id=booking_id,
+            hero_label="Upcoming Experience",
+            hero_name=experience_title,
+            detail_rows=[
+                ("Starts in", day_label),
+                ("Date", _format_date(slot_date)),
+                ("Time", time_range),
+                ("Guests", str(guest_count)),
+            ],
+            payment_method="Pay at Venue",
+            highlight_label="Booking total",
+            highlight_value=amount,
+            closing_note="A calm preparation day makes the royal guest journey seamless.",
+            cta_label="View Booking",
+            cta_url=_site_link(f"/host/bookings/{booking_id}"),
+        )
+    )
+    return send_email(
+        to=to,
+        subject=f"{urgency}: {experience_title} — guest {guest_name}",
+        html=html,
+    )
+
+
 def send_host_new_homestay_booking_email(
     *,
     to: str,

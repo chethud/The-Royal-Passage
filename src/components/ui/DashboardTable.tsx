@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ComponentProps, ReactNode } from "react";
 
-export type DashboardTableWidth = "sm" | "md" | "lg" | "xl" | "2xl";
+export type DashboardTableWidth = "sm" | "md" | "lg" | "xl" | "2xl" | "none";
 
 const tableMinWidth: Record<DashboardTableWidth, string> = {
   sm: "min-w-[640px]",
@@ -22,7 +22,7 @@ export function DashboardTableSection({
   children: ReactNode;
   className?: string;
 }) {
-  return <section className={`space-y-4 sm:space-y-5 ${className}`.trim()}>{children}</section>;
+  return <section className={`space-y-2.5 sm:space-y-3 ${className}`.trim()}>{children}</section>;
 }
 
 export function DashboardTableFilters({ children }: { children: ReactNode }) {
@@ -30,10 +30,19 @@ export function DashboardTableFilters({ children }: { children: ReactNode }) {
 }
 
 export function DashboardTableEmpty({ children }: { children: ReactNode }) {
-  return <p className="luxury-panel-body py-8 text-sm">{children}</p>;
+  return <p className="luxury-panel-body py-4 text-sm">{children}</p>;
 }
 
-export function DashboardTableScroll({ children }: { children: ReactNode }) {
+export function DashboardTableScroll({
+  children,
+  scroll = true,
+}: {
+  children: ReactNode;
+  scroll?: boolean;
+}) {
+  if (!scroll) {
+    return <div className="w-full">{children}</div>;
+  }
   return (
     <div className="-mx-1 overflow-x-auto overscroll-x-contain px-1 sm:mx-0 sm:px-0">
       {children}
@@ -44,15 +53,19 @@ export function DashboardTableScroll({ children }: { children: ReactNode }) {
 export function DashboardTable({
   children,
   minWidth = "xl",
+  layout = "auto",
   className = "",
 }: {
   children: ReactNode;
   minWidth?: DashboardTableWidth;
+  layout?: "auto" | "fixed";
   className?: string;
 }) {
+  const minWidthClass = minWidth === "none" ? "" : tableMinWidth[minWidth];
+  const layoutClass = layout === "fixed" ? "table-fixed" : "";
   return (
     <table
-      className={`w-full ${tableMinWidth[minWidth]} text-left text-sm ${className}`.trim()}
+      className={`w-full ${minWidthClass} ${layoutClass} text-left text-sm ${className}`.trim()}
     >
       {children}
     </table>
@@ -63,9 +76,17 @@ export function DashboardTableHead({ children }: { children: ReactNode }) {
   return <thead>{children}</thead>;
 }
 
-export function DashboardTableHeadRow({ children }: { children: ReactNode }) {
+export function DashboardTableHeadRow({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <tr className="border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label">
+    <tr
+      className={`border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label ${className}`.trim()}
+    >
       {children}
     </tr>
   );
@@ -78,7 +99,7 @@ export function DashboardTableHeadCell({
   children: ReactNode;
   className?: string;
 }) {
-  return <th className={`px-3 py-2.5 font-normal ${className}`.trim()}>{children}</th>;
+  return <th className={`px-2.5 py-1.5 font-normal ${className}`.trim()}>{children}</th>;
 }
 
 export function DashboardTableBody({ children }: { children: ReactNode }) {
@@ -118,7 +139,7 @@ export function DashboardTableCell({
   className?: string;
 }) {
   return (
-    <td className={`px-3 py-3 align-top ${cellVariantClass[variant]} ${className}`.trim()}>
+    <td className={`px-2.5 py-2 align-top ${cellVariantClass[variant]} ${className}`.trim()}>
       {children}
     </td>
   );

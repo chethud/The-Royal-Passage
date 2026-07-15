@@ -94,6 +94,24 @@ def _load_slots(supabase, experience_id: str) -> list[dict]:
     return result.data or []
 
 
+def _count_bookable_slots(supabase, experience_id: str) -> int:
+    result = (
+        supabase.table("experience_slots")
+        .select("id", count="exact")
+        .eq("experience_id", experience_id)
+        .eq("is_blocked", False)
+        .execute()
+    )
+    return int(result.count or 0)
+
+
+def _ensure_has_bookable_slot(supabase, experience_id: str) -> None:
+    if _count_bookable_slots(supabase, experience_id) < 1:
+        raise ValueError(
+            "Add at least one bookable slot before submitting for review."
+        )
+
+
 def _map_slot(row: dict) -> HostSlotDetail:
     capacity = row.get("capacity") or 0
     seats_sold = row.get("seats_sold") or 0
@@ -241,7 +259,13 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
         raise ValueError("Invalid category.")
 
     slug = _ensure_unique_slug(supabase, payload.slug or _slugify(payload.title))
-    status = "pending_review" if payload.submitForReview else "draft"
+    # Slots are created after the experience row exists — never open review without them.
+    if payload.submitForReview:
+        raise ValueError(
+            "Add at least one bookable slot before submitting for review. "
+            "Save the listing, add session timings, then submit for review."
+        )
+    status = "draft"
     city_slug, city_name = _resolve_city_fields(payload.citySlug, payload.city)
     gallery_urls = payload.galleryUrls or []
     hero_image_url = payload.heroImageUrl or (gallery_urls[0] if gallery_urls else None)
@@ -278,9 +302,6 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
     row = rows[0] if rows else None
     if not row:
         raise ValueError("Failed to create experience.")
-
-    if status == "pending_review":
-        _notify_admins_experience_submitted(supabase, row["id"], payload.title.strip(), host_id)
 
     return get_host_experience(auth, row["id"])
 
@@ -353,6 +374,7 @@ def update_host_experience(
     _validate_guest_bounds(min_guests, max_guests)
 
     if payload.submitForReview and status in ("draft", "rejected"):
+        _ensure_has_bookable_slot(supabase, experience_id)
         updates["status"] = "pending_review"
 
     if updates:

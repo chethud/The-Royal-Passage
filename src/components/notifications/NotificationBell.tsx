@@ -1,5 +1,6 @@
 import { Bell } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,7 @@ const POLL_MS = 90_000;
 const CLIENT_FRESH_MS = 20_000;
 
 export function NotificationBell() {
+  const navigate = useNavigate();
   const { user, accessToken } = useAuthUser();
   const [items, setItems] = useState<NotificationSummary[]>([]);
   const [loading, setLoading] = useState(false);
@@ -120,7 +122,13 @@ export function NotificationBell() {
             <DropdownMenuItem
               key={item.id}
               className={`flex flex-col items-start gap-1 py-3 ${item.readAt ? "opacity-70" : ""}`}
-              onClick={() => void markRead(item.id)}
+              onClick={() => {
+                void markRead(item.id);
+                const href = item.metadata?.href;
+                if (typeof href === "string" && href.startsWith("/")) {
+                  void navigate({ to: href });
+                }
+              }}
             >
               <span className="font-medium">{item.title}</span>
               <span className="text-xs text-muted-foreground">{item.body}</span>

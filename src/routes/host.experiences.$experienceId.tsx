@@ -286,6 +286,7 @@ function HostExperienceDetailPage() {
           categories={categories}
           cities={cities}
           initial={experience}
+          bookableSlotCount={experience.slots.filter((slot) => !slot.isBlocked).length}
           saving={saving}
           onSubmit={(payload) => void handleSave(payload)}
         />

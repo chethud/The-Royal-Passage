@@ -73,7 +73,7 @@ function FooterBrandBlock({
 function FooterCopyright() {
   return (
     <p
-      className="shrink-0 whitespace-nowrap text-[0.58rem] leading-none text-muted-foreground/75 sm:text-[0.65rem]"
+      className="whitespace-nowrap text-right text-[0.58rem] leading-snug text-muted-foreground/75 sm:text-[0.65rem]"
       suppressHydrationWarning
     >
       © {new Date().getFullYear()} The Royal Passage. All rights reserved.
@@ -83,7 +83,7 @@ function FooterCopyright() {
 
 function FooterSocialIcons({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="flex shrink-0 flex-row flex-nowrap items-center gap-1.5 sm:gap-2">
+    <div className="flex shrink-0 flex-row flex-nowrap items-center justify-end gap-1.5 sm:gap-2">
       {SOCIAL_LINKS.map(({ label, Icon, href }) => (
         <SocialIcon key={label} label={label} Icon={Icon} href={href} compact={compact} />
       ))}
@@ -91,11 +91,11 @@ function FooterSocialIcons({ compact = false }: { compact?: boolean }) {
   );
 }
 
-/** One-line bar: logo left · legal mid-left · copyright + socials right (same row). */
+/** Logo left · legal links truly centered · social icons with copyright below on the right. */
 function FooterBar({ logoClassName = "h-12 w-auto object-contain sm:h-14 md:h-16" }: { logoClassName?: string }) {
   return (
-    <div className="container-page flex flex-row flex-nowrap items-center gap-2 py-3 sm:gap-4 sm:py-5">
-      <div className="shrink-0">
+    <div className="container-page relative flex flex-row flex-nowrap items-center justify-between gap-2 py-3 sm:gap-4 sm:py-4">
+      <div className="relative z-10 shrink-0">
         <img
           src={logoUrl}
           alt="The Royal Passage"
@@ -107,13 +107,15 @@ function FooterBar({ logoClassName = "h-12 w-auto object-contain sm:h-14 md:h-16
         />
       </div>
 
-      <div className="min-w-0 flex-1 overflow-hidden">
-        <FooterLegalLinks className="justify-start whitespace-nowrap" />
+      <div className="pointer-events-none absolute inset-x-0 top-1/2 z-0 flex -translate-y-1/2 justify-center px-2">
+        <div className="pointer-events-auto max-w-[min(100%,28rem)] overflow-hidden">
+          <FooterLegalLinks className="justify-center whitespace-nowrap" />
+        </div>
       </div>
 
-      <div className="ml-auto flex shrink-0 flex-row flex-nowrap items-center gap-2 sm:gap-3">
-        <FooterCopyright />
+      <div className="relative z-10 ml-auto flex shrink-0 flex-col items-end gap-1 sm:gap-1.5">
         <FooterSocialIcons compact />
+        <FooterCopyright />
       </div>
     </div>
   );

@@ -1113,6 +1113,23 @@ class ReviewSummary(BaseModel):
     createdAt: str
 
 
+class AdminModerationReview(BaseModel):
+    id: str
+    kind: str  # experience | homestay
+    listingId: str
+    listingTitle: str | None = None
+    rating: int
+    comment: str | None = None
+    reviewerDisplayName: str | None = None
+    status: str
+    createdAt: str
+
+
+class AdminModerationReviewsResponse(BaseModel):
+    experiences: list[AdminModerationReview]
+    homestays: list[AdminModerationReview]
+
+
 class CreateReviewRequest(BaseModel):
     bookingId: str
     rating: int = Field(ge=1, le=5)
@@ -1177,37 +1194,13 @@ class AdminRiskSignal(BaseModel):
     severity: str
     title: str
     detail: str
+    evidence: list[str] = []
     entityType: str | None = None
     entityId: str | None = None
     href: str | None = None
+    search: dict[str, str] | None = None
 
 
-class SiteBanner(BaseModel):
-    id: str
-    title: str
-    body: str | None = None
-    href: str | None = None
-    imageUrl: str | None = None
-    placement: str = "home_top"
-    startsAt: str
-    endsAt: str
-    active: bool = True
-
-
-class ListSiteBannersResponse(BaseModel):
-    banners: list[SiteBanner] = []
-
-
-class UpsertSiteBannerRequest(BaseModel):
-    id: str | None = None
-    title: str
-    body: str | None = None
-    href: str | None = None
-    imageUrl: str | None = None
-    placement: str = "home_top"
-    startsAt: str
-    endsAt: str
-    active: bool = True
 
 
 class AdminHomestayStats(BaseModel):

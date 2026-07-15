@@ -22,13 +22,7 @@ from app.services.admin_experiences import (
 from app.services.admin_users import create_host_account, list_managed_users
 from app.services.admin_risk import list_admin_risk_signals
 from app.services.audit import log_audit
-from app.services.site_banners import (
-    delete_site_banner,
-    list_active_site_banners,
-    list_site_banners,
-    upsert_site_banner,
-)
-from app.models.schemas import CreateHostRequest, UpsertSiteBannerRequest
+from app.models.schemas import CreateHostRequest
 
 
 async def healthz(_request: Request) -> JSONResponse:
@@ -247,41 +241,52 @@ async def admin_risk_signals(request: Request) -> JSONResponse:
     return JSONResponse(rows, headers={"Cache-Control": "private, max-age=30"})
 
 
-async def admin_site_banners(request: Request) -> JSONResponse:
+async def admin_moderation_reviews(request: Request) -> JSONResponse:
     auth = require_admin_request(request)
     if isinstance(auth, JSONResponse):
         return auth
-    rows = [row.model_dump(mode="json") for row in list_site_banners()]
-    return JSONResponse({"banners": rows})
-
-
-async def admin_upsert_site_banner(request: Request) -> JSONResponse:
-    auth = require_admin_request(request)
-    if isinstance(auth, JSONResponse):
-        return auth
+    if not settings.supabase_configured:
+        return JSONResponse(
+            {"detail": "Supabase is not configured on the API server."},
+            status_code=503,
+        )
     try:
-        payload = UpsertSiteBannerRequest.model_validate(await request.json())
-        banner = upsert_site_banner(payload)
-        log_audit(auth["user"].id, "banner_scheduled", "banner", banner.id, {"title": banner.title})
+        from app.services.reviews import list_admin_moderation_reviews
+
+        return JSONResponse(list_admin_moderation_reviews(5).model_dump(mode="json"))
     except Exception as exc:
-        return JSONResponse({"detail": str(exc)}, status_code=400)
-    return JSONResponse(banner.model_dump(mode="json"))
+        return JSONResponse({"detail": f"Failed to load reviews: {exc}"}, status_code=500)
 
 
-async def admin_delete_site_banner(request: Request) -> JSONResponse:
+async def admin_hide_experience_review(request: Request) -> JSONResponse:
     auth = require_admin_request(request)
     if isinstance(auth, JSONResponse):
         return auth
-    banner_id = request.path_params["banner_id"]
-    delete_site_banner(banner_id)
-    log_audit(auth["user"].id, "banner_deleted", "banner", banner_id, {})
-    return JSONResponse({"ok": True})
+    review_id = request.path_params.get("review_id")
+    if not review_id:
+        return JSONResponse({"detail": "Missing review id."}, status_code=400)
+    try:
+        from app.services.reviews import hide_review
+
+        return JSONResponse(hide_review(auth, review_id).model_dump(mode="json"))
+    except ValueError as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=400)
+    except Exception as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=500)
 
 
-async def public_active_site_banners(request: Request) -> JSONResponse:
-    placement = (request.query_params.get("placement") or "home_top").strip()
-    rows = [row.model_dump(mode="json") for row in list_active_site_banners(placement)]
-    return JSONResponse(
-        {"banners": rows},
-        headers={"Cache-Control": "public, max-age=60"},
-    )
+async def admin_hide_homestay_review(request: Request) -> JSONResponse:
+    auth = require_admin_request(request)
+    if isinstance(auth, JSONResponse):
+        return auth
+    review_id = request.path_params.get("review_id")
+    if not review_id:
+        return JSONResponse({"detail": "Missing review id."}, status_code=400)
+    try:
+        from app.services.reviews import hide_homestay_review
+
+        return JSONResponse(hide_homestay_review(auth, review_id).model_dump(mode="json"))
+    except ValueError as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=400)
+    except Exception as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=500)

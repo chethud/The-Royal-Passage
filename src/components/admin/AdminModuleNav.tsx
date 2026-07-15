@@ -2,13 +2,13 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Compass, Crown, Home } from "lucide-react";
 import {
   adminModuleHome,
+  adminModuleHostRequestsPath,
+  adminModulePendingBookingsPath,
   resolveAdminModule,
   type AdminModule,
 } from "@/components/admin/admin-nav";
 import {
-  adminModuleAlertTotal,
   useAdminModuleAlerts,
-  type AdminModuleAlert,
 } from "@/hooks/use-admin-module-alerts";
 import { writeAdminModulePreference } from "@/lib/admin-module-selection";
 
@@ -42,36 +42,19 @@ type AdminModuleNavProps = {
   className?: string;
 };
 
-function alertHref(alert: Pick<AdminModuleAlert, "to" | "search">): string {
-  if (!alert.search || Object.keys(alert.search).length === 0) return alert.to;
-  const params = new URLSearchParams(alert.search);
-  return `${alert.to}?${params.toString()}`;
+function preferModule(module: AdminModule) {
+  writeAdminModulePreference(module);
 }
 
 export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const activeModule = resolveAdminModule(pathname);
-  const { alerts: alertsByModule } = useAdminModuleAlerts();
+  const { counts: countsByModule } = useAdminModuleAlerts();
 
-  const selectModule = (module: AdminModule) => {
-    writeAdminModulePreference(module);
-  };
-
-  const goToAlert = (target: Pick<AdminModuleAlert, "to" | "search">) => {
-    if (target.to.startsWith("/admin/homestay") || target.to.startsWith("/admin/homestays")) {
-      writeAdminModulePreference("homestays");
-    } else if (target.to.startsWith("/admin/vip")) {
-      writeAdminModulePreference("vip");
-    } else {
-      writeAdminModulePreference("experiences");
-    }
-
-    if (target.search && Object.keys(target.search).length > 0) {
-      void navigate({ to: target.to, search: target.search });
-      return;
-    }
-    void navigate({ to: target.to });
+  const goTo = (module: AdminModule, to: string) => {
+    preferModule(module);
+    void navigate({ to });
   };
 
   return (
@@ -81,9 +64,9 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
           const active = activeModule === module.id;
           const Icon = module.icon;
           const homePath = adminModuleHome(module.id);
-          const alerts = alertsByModule[module.id];
-          const pendingTotal = adminModuleAlertTotal(alerts);
-          const primaryAlert = alerts[0];
+          const counts = countsByModule[module.id];
+          const hostPath = adminModuleHostRequestsPath(module.id);
+          const userPath = adminModulePendingBookingsPath(module.id);
 
           return (
             <div key={module.id} className="marketplace-module-nav__column">
@@ -94,56 +77,68 @@ export function AdminModuleNav({ className = "" }: AdminModuleNavProps) {
                   to={homePath}
                   className="marketplace-module-nav__link"
                   aria-current={active ? "page" : undefined}
-                  onClick={() => selectModule(module.id)}
+                  onClick={() => preferModule(module.id)}
                 >
                   <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
                   <span className="marketplace-module-nav__label">{module.label}</span>
                   <span className="marketplace-module-nav__hint">{module.description}</span>
                 </Link>
-                {pendingTotal > 0 && primaryAlert ? (
-                  <a
-                    href={alertHref(primaryAlert)}
-                    className="marketplace-module-nav__badge"
-                    aria-label={`${pendingTotal} new requests for ${module.label}`}
-                    title="View latest request"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      goToAlert(primaryAlert);
-                    }}
-                  >
-                    {pendingTotal}
-                  </a>
-                ) : null}
               </div>
 
-              {alerts.length > 0 ? (
-                <ul className="marketplace-module-nav__alerts" aria-label={`${module.label} updates`}>
-                  {alerts.map((alert) => (
-                    <li key={alert.id}>
-                      <a
-                        href={alertHref(alert)}
-                        className="marketplace-module-nav__alert"
-                        onClick={(event) => {
-                          event.preventDefault();
-                          goToAlert(alert);
-                        }}
-                      >
-                        <span className="marketplace-module-nav__alert-status">{alert.status}</span>
-                        <span className="marketplace-module-nav__alert-copy">
-                          <span className="marketplace-module-nav__alert-label">{alert.label}</span>
-                          <span className="marketplace-module-nav__alert-detail">{alert.detail}</span>
-                        </span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="marketplace-module-nav__alerts-empty">No new updates</p>
-              )}
+              <div className="marketplace-module-nav__notify" aria-label={`${module.label} notifications`}>
+                <NotifyCard
+                  title="Host requests"
+                  detail="Listing approvals"
+                  count={counts.hostRequests}
+                  onClick={() => goTo(module.id, hostPath)}
+                />
+                <NotifyCard
+                  title="User pending"
+                  detail={
+                    counts.userOverdue > 0
+                      ? `${counts.userOverdue} overdue (1h+)`
+                      : "Bookings awaiting accept"
+                  }
+                  count={counts.userPending}
+                  overdue={counts.userOverdue > 0}
+                  onClick={() => goTo(module.id, userPath)}
+                />
+              </div>
             </div>
           );
         })}
       </div>
     </nav>
+  );
+}
+
+function NotifyCard({
+  title,
+  detail,
+  count,
+  overdue = false,
+  onClick,
+}: {
+  title: string;
+  detail: string;
+  count: number;
+  overdue?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`marketplace-module-nav__notify-card${overdue ? " marketplace-module-nav__notify-card--overdue" : ""}${count > 0 ? " marketplace-module-nav__notify-card--active" : ""}`}
+      onClick={onClick}
+    >
+      <span className="marketplace-module-nav__notify-count">{count}</span>
+      <span className="marketplace-module-nav__notify-copy">
+        <span className="marketplace-module-nav__notify-title">{title}</span>
+        <span className="marketplace-module-nav__notify-detail">{detail}</span>
+      </span>
+      <span className="marketplace-module-nav__notify-arrow" aria-hidden>
+        →
+      </span>
+    </button>
   );
 }

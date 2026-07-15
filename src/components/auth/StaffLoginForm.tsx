@@ -2,7 +2,8 @@ import { useState, type FormEvent } from "react";
 import { ROLE_LABELS, type UserRole } from "@/lib/roles";
 
 const inputClass =
-  "w-full rounded-sm border border-input bg-background/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+  "w-full rounded-sm border border-input bg-background/50 px-4 py-3 font-body text-sm normal-case tracking-normal text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+const labelClass = "mb-2 block font-body text-sm font-medium normal-case tracking-normal text-foreground/90";
 
 type StaffLoginFormProps = {
   role: Extract<UserRole, "host" | "admin">;
@@ -27,7 +28,7 @@ export function StaffLoginForm({ role, busy, onSubmit }: StaffLoginFormProps) {
           : "Admin accounts are created by the platform team. Sign in with your assigned credentials."}
       </p>
       <div>
-        <label htmlFor={`${role}-email`} className="eyebrow mb-2 block text-foreground/90">
+        <label htmlFor={`${role}-email`} className={labelClass}>
           Email
         </label>
         <input
@@ -35,15 +36,18 @@ export function StaffLoginForm({ role, busy, onSubmit }: StaffLoginFormProps) {
           name="email"
           type="email"
           autoComplete="username"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
           required
           placeholder={`${ROLE_LABELS[role].toLowerCase()}@example.com`}
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value.toLowerCase())}
           className={inputClass}
         />
       </div>
       <div>
-        <label htmlFor={`${role}-password`} className="eyebrow mb-2 block text-foreground/90">
+        <label htmlFor={`${role}-password`} className={labelClass}>
           Password
         </label>
         <input

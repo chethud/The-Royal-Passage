@@ -1,23 +1,24 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { AdminReviewsHub } from "@/components/admin/AdminReviewsHub";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import { dashboardPathForRole } from "@/lib/roles";
 import { NOINDEX_META } from "@/lib/seo-helpers";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
-export const Route = createFileRoute("/admin/reviews/")({
+
+export const Route = createFileRoute("/admin/vip/pending-bookings")({
   head: () => ({
     meta: [
-      { title: "Admin reviews — The Royal Passage" },
-      { name: "description", content: "Moderate guest reviews across the marketplace." },
+      { title: "User pending bookings — VIP — The Royal Passage" },
+      { name: "description", content: "VIP package bookings awaiting owner accept." },
       ...NOINDEX_META,
     ],
   }),
-  component: AdminReviewsPage,
+  component: AdminVipPendingBookingsPage,
 });
 
-function AdminReviewsPage() {
+function AdminVipPendingBookingsPage() {
   const navigate = useNavigate();
   const { user, role, loading } = useAuthUser();
 
@@ -39,17 +40,20 @@ function AdminReviewsPage() {
   return (
     <DashboardShell
       role="admin"
-      title="Review moderation"
-      subtitle="Choose a category to view and moderate guest reviews."
+      title="User pending bookings"
+      subtitle="VIP package bookings still waiting for owner accept."
       showRoleDescription={false}
     >
-      <Link
-        to="/admin"
-        className="luxury-btn-sm dashboard-chrome-btn mb-5 inline-flex items-center no-underline"
-      >
-        ← Overview
-      </Link>
-      <AdminReviewsHub scope="both" linkFromHub />
+      <div className="mb-5">
+        <Link to="/admin/vip" className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline">
+          ← Overview
+        </Link>
+      </div>
+      <LuxuryCheckoutPanel>
+        <p className="luxury-panel-body py-8 text-sm">
+          VIP package bookings coming soon. Guest booking accept for VIP packages is not live yet.
+        </p>
+      </LuxuryCheckoutPanel>
     </DashboardShell>
   );
 }

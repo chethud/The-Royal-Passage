@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { AdminReviewsHub } from "@/components/admin/AdminReviewsHub";
 import { AdminStatsGrid } from "@/components/admin/AdminStatsGrid";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
@@ -125,6 +126,8 @@ function AdminOverviewPage() {
           )}
         </LuxuryCheckoutPanel>
 
+        <AdminReviewsHub scope="experience" />
+
         {stats ? (
           <LuxuryCheckoutPanel>
             <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Quick links</h2>
@@ -139,12 +142,11 @@ function AdminOverviewPage() {
                 }
               />
               <QuickLink to="/admin/bookings" label="All bookings" detail="Guest reservations & payouts" />
-              <QuickLink to="/admin/activity" label="Live activity" detail="Bookings, reviews, approvals" />
+              <QuickLink to="/admin/activity" label="Activity logs" detail="Bookings, reviews, approvals" />
               <QuickLink to="/admin/trust" label="Fraud center" detail="Duplicates, spam, suspicious bookings" />
-              <QuickLink to="/admin/banners" label="Banner scheduler" detail="Festival banners, offers, events" />
               <QuickLink to="/admin/homepage-edit" label="Homepage CMS" detail="Edit hero, showcase, journeys" />
               <QuickLink to="/admin/profile/users" label="Users" detail="Create logins & assign access roles" />
-              <QuickLink to="/admin/reviews" label="Reviews" detail="Moderate guest feedback" />
+              <QuickLink to="/admin/reviews" label="All reviews" detail="Experience + homestay feedback" />
             </div>
           </LuxuryCheckoutPanel>
         ) : null}

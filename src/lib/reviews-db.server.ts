@@ -1,4 +1,4 @@
-import type { ReviewSummary } from "@/lib/api/reviews";
+import type { AdminModerationReview, AdminModerationReviews, ReviewSummary } from "@/lib/api/reviews";
 import { verifySupabaseAccessToken } from "@/lib/auth-verify.server";
 import { isSupabaseConfigured } from "@/lib/env.server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -188,4 +188,155 @@ export async function hostReplyToReviewInDb(
 
   if (updateError) throw new Error(updateError.message);
   return mapReviewRow(updated as ReviewRow);
+}
+
+async function requireAdminUser(accessToken: string) {
+  const user = await verifySupabaseAccessToken(accessToken);
+  const supabase = getSupabaseAdmin();
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (profile?.role !== "admin") {
+    throw new Error("Only admins can moderate reviews.");
+  }
+  return user;
+}
+
+export async function loadAdminModerationReviews(limitPerKind = 5): Promise<AdminModerationReviews> {
+  if (!isSupabaseConfigured()) {
+    return { experiences: [], homestays: [] };
+  }
+
+  const supabase = getSupabaseAdmin();
+
+  const { data: expRows, error: expError } = await supabase
+    .from("reviews")
+    .select("id, experience_id, rating, comment, reviewer_display_name, status, created_at, experiences(title)")
+    .order("rating", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(limitPerKind);
+
+  if (expError) throw new Error(expError.message);
+
+  const experiences: AdminModerationReview[] = (expRows ?? []).map((row) => {
+    const exp = row.experiences as { title?: string } | { title?: string }[] | null;
+    const title = Array.isArray(exp) ? exp[0]?.title : exp?.title;
+    return {
+      id: row.id,
+      kind: "experience",
+      listingId: row.experience_id,
+      listingTitle: title ?? null,
+      rating: row.rating,
+      comment: row.comment,
+      reviewerDisplayName: row.reviewer_display_name,
+      status: row.status ?? "published",
+      createdAt: row.created_at,
+    };
+  });
+
+  const { data: hsRows, error: hsError } = await supabase
+    .from("homestay_reviews")
+    .select("id, homestay_id, guest_id, rating, title, body, status, created_at, homestays(title)")
+    .order("rating", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(limitPerKind);
+
+  if (hsError) throw new Error(hsError.message);
+
+  const guestIds = [...new Set((hsRows ?? []).map((r) => r.guest_id).filter(Boolean))];
+  const nameByGuest = new Map<string, string>();
+  if (guestIds.length > 0) {
+    const { data: profiles, error: profileError } = await supabase
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", guestIds);
+    if (profileError) throw new Error(profileError.message);
+    for (const profile of profiles ?? []) {
+      if (profile.full_name) nameByGuest.set(profile.id, profile.full_name);
+    }
+  }
+
+  const homestays: AdminModerationReview[] = (hsRows ?? []).map((row) => {
+    const hs = row.homestays as { title?: string } | { title?: string }[] | null;
+    const title = Array.isArray(hs) ? hs[0]?.title : hs?.title;
+    let comment: string | null = null;
+    if (row.title && row.body) comment = `${row.title} — ${row.body}`;
+    else if (row.title) comment = row.title;
+    else if (row.body) comment = row.body;
+    return {
+      id: row.id,
+      kind: "homestay",
+      listingId: row.homestay_id,
+      listingTitle: title ?? null,
+      rating: row.rating,
+      comment,
+      reviewerDisplayName: nameByGuest.get(row.guest_id) ?? null,
+      status: row.status ?? "pending",
+      createdAt: row.created_at,
+    };
+  });
+
+  return { experiences, homestays };
+}
+
+export async function hideExperienceReviewInDb(
+  accessToken: string,
+  reviewId: string,
+): Promise<ReviewSummary> {
+  await requireAdminUser(accessToken);
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("reviews")
+    .update({ status: "hidden" })
+    .eq("id", reviewId)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return mapReviewRow(data as ReviewRow);
+}
+
+export async function hideHomestayReviewInDb(
+  accessToken: string,
+  reviewId: string,
+): Promise<AdminModerationReview> {
+  await requireAdminUser(accessToken);
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("homestay_reviews")
+    .update({ status: "rejected" })
+    .eq("id", reviewId)
+    .select("id, homestay_id, guest_id, rating, title, body, status, created_at, homestays(title)")
+    .single();
+  if (error) throw new Error(error.message);
+
+  const hs = data.homestays as { title?: string } | { title?: string }[] | null;
+  const title = Array.isArray(hs) ? hs[0]?.title : hs?.title;
+  let comment: string | null = null;
+  if (data.title && data.body) comment = `${data.title} — ${data.body}`;
+  else comment = data.body || data.title || null;
+
+  let reviewerDisplayName: string | null = null;
+  if (data.guest_id) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", data.guest_id)
+      .maybeSingle();
+    reviewerDisplayName = profile?.full_name ?? null;
+  }
+
+  return {
+    id: data.id,
+    kind: "homestay",
+    listingId: data.homestay_id,
+    listingTitle: title ?? null,
+    rating: data.rating,
+    comment,
+    reviewerDisplayName,
+    status: data.status ?? "rejected",
+    createdAt: data.created_at,
+  };
 }

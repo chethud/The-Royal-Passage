@@ -1,45 +1,58 @@
 import { useEffect, useState } from "react";
-import { fetchAdminHomestayApprovals } from "@/lib/api/admin-homestays";
-import { fetchAdminExperienceApprovals } from "@/lib/api/admin";
+import { fetchAdminHomestayApprovals, fetchAdminHomestayBookings } from "@/lib/api/admin-homestays";
+import { fetchAdminVipPackageApprovals } from "@/lib/api/admin-vip-packages";
+import { fetchAdminBookings, fetchAdminExperienceApprovals } from "@/lib/api/admin";
 import { isApiConfigured } from "@/lib/api/client";
 import { useAuthUser } from "@/lib/auth-user";
 import { hasRole } from "@/lib/roles";
 import type { AdminModule } from "@/components/admin/admin-nav";
 
-export type AdminModuleAlert = {
-  id: string;
-  /** Property / experience name */
-  label: string;
-  /** Owner/host and what needs review */
-  detail: string;
-  /** Short status chip */
-  status: string;
-  to: string;
-  search?: Record<string, string>;
+export type ModuleNotifyCounts = {
+  hostRequests: number;
+  userPending: number;
+  /** Pending bookings older than 1 hour awaiting host/owner accept. */
+  userOverdue: number;
 };
 
-export type AdminModuleAlertsMap = Record<AdminModule, AdminModuleAlert[]>;
+export type AdminModuleNotifyMap = Record<AdminModule, ModuleNotifyCounts>;
 
-const EMPTY_ALERTS: AdminModuleAlertsMap = {
-  experiences: [],
-  homestays: [],
-  vip: [],
+const EMPTY_COUNTS: ModuleNotifyCounts = {
+  hostRequests: 0,
+  userPending: 0,
+  userOverdue: 0,
 };
+
+const EMPTY_MAP: AdminModuleNotifyMap = {
+  experiences: { ...EMPTY_COUNTS },
+  homestays: { ...EMPTY_COUNTS },
+  vip: { ...EMPTY_COUNTS },
+};
+
+const ONE_HOUR_MS = 60 * 60 * 1000;
+
+export function isPendingBookingOverdue(createdAt: string, nowMs = Date.now()): boolean {
+  const created = Date.parse(createdAt);
+  if (Number.isNaN(created)) return false;
+  return nowMs - created >= ONE_HOUR_MS;
+}
+
+function countOverdue(createdAts: string[], nowMs: number): number {
+  return createdAts.filter((createdAt) => isPendingBookingOverdue(createdAt, nowMs)).length;
+}
 
 /**
- * Overview notifications for pending listing approvals only.
- * Alerts stay until the admin accepts or rejects (item leaves the approval queue).
+ * Overview notification counts: host listing approvals + guest bookings still pending accept.
  */
 export function useAdminModuleAlerts(): {
-  alerts: AdminModuleAlertsMap;
+  counts: AdminModuleNotifyMap;
 } {
   const { accessToken, role, roles } = useAuthUser();
-  const [alerts, setAlerts] = useState<AdminModuleAlertsMap>(EMPTY_ALERTS);
+  const [counts, setCounts] = useState<AdminModuleNotifyMap>(EMPTY_MAP);
   const isAdmin = hasRole(roles, "admin", role);
 
   useEffect(() => {
     if (!accessToken || !isApiConfigured() || !isAdmin) {
-      setAlerts(EMPTY_ALERTS);
+      setCounts(EMPTY_MAP);
       return;
     }
 
@@ -47,35 +60,51 @@ export function useAdminModuleAlerts(): {
 
     const load = async () => {
       try {
-        const [experienceApprovals, homestayApprovals] = await Promise.all([
-          fetchAdminExperienceApprovals(accessToken, 30).catch(() => []),
+        const nowMs = Date.now();
+        const [
+          experienceApprovals,
+          homestayApprovals,
+          vipApprovals,
+          experiencePendingBookings,
+          homestayPendingBookings,
+        ] = await Promise.all([
+          fetchAdminExperienceApprovals(accessToken, 100).catch(() => []),
           fetchAdminHomestayApprovals(accessToken).catch(() => []),
+          fetchAdminVipPackageApprovals(accessToken).catch(() => []),
+          fetchAdminBookings(accessToken, { status: "pending", limit: 200 }).catch(() => []),
+          fetchAdminHomestayBookings(accessToken, "pending").catch(() => []),
         ]);
         if (cancelled) return;
-
-        const experiences: AdminModuleAlert[] = experienceApprovals.map((row) => ({
-          id: `exp-approval-${row.id}`,
-          label: row.title,
-          detail: `Approve experience · ${row.hostName || "Host"} · ${row.city || "Mysuru"}`,
-          status: "Review",
-          to: `/admin/experiences/${row.id}`,
-        }));
 
         const pendingHomestays = homestayApprovals.filter(
           (row) => row.status === "pending_review" || !row.status,
         );
+        const pendingVip = vipApprovals.filter(
+          (row) => row.status === "pending_review" || !row.status,
+        );
 
-        const homestays: AdminModuleAlert[] = pendingHomestays.map((row) => ({
-          id: `stay-approval-${row.id}`,
-          label: row.title,
-          detail: `Approve homestay · ${row.ownerName || "Owner"} · ${row.city || "Mysuru"}`,
-          status: "Review",
-          to: `/admin/homestays/${row.id}`,
-        }));
+        const expPendingCreated = experiencePendingBookings.map((row) => row.createdAt);
+        const stayPendingCreated = homestayPendingBookings.map((row) => row.createdAt);
 
-        setAlerts({ experiences, homestays, vip: [] });
+        setCounts({
+          experiences: {
+            hostRequests: experienceApprovals.length,
+            userPending: experiencePendingBookings.length,
+            userOverdue: countOverdue(expPendingCreated, nowMs),
+          },
+          homestays: {
+            hostRequests: pendingHomestays.length,
+            userPending: homestayPendingBookings.length,
+            userOverdue: countOverdue(stayPendingCreated, nowMs),
+          },
+          vip: {
+            hostRequests: pendingVip.length,
+            userPending: 0,
+            userOverdue: 0,
+          },
+        });
       } catch {
-        if (!cancelled) setAlerts(EMPTY_ALERTS);
+        if (!cancelled) setCounts(EMPTY_MAP);
       }
     };
 
@@ -87,9 +116,9 @@ export function useAdminModuleAlerts(): {
     };
   }, [accessToken, isAdmin]);
 
-  return { alerts };
+  return { counts };
 }
 
-export function adminModuleAlertTotal(alerts: AdminModuleAlert[]): number {
-  return alerts.length;
+export function adminModuleNotifyTotal(counts: ModuleNotifyCounts): number {
+  return counts.hostRequests + counts.userPending;
 }

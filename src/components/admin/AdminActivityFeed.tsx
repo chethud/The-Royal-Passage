@@ -17,8 +17,6 @@ const ACTION_COPY: Record<string, { label: string; href?: string }> = {
   homestay_published: { label: "Approval — homestay published", href: "/admin/homestays" },
   vip_package_published: { label: "Approval — VIP package", href: "/admin/vip-packages" },
   host_signup: { label: "Host signup", href: "/admin/profile/users" },
-  banner_scheduled: { label: "Banner scheduled", href: "/admin/banners" },
-  banner_deleted: { label: "Banner removed", href: "/admin/banners" },
 };
 
 function resolveAction(entry: AuditLogEntry) {

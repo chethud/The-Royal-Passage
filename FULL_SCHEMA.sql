@@ -1875,3 +1875,11 @@ create index if not exists idx_homestay_bookings_pending_host_reminders
   on public.homestay_bookings (created_at)
   where booking_status = 'pending';
 
+-- Host countdown emails before confirmed experience slots (10 / 5 / 4 / 3 / 2 / 1 days)
+alter table public.bookings
+  add column if not exists host_upcoming_reminders jsonb not null default '{}'::jsonb;
+
+create index if not exists idx_bookings_confirmed_upcoming_reminders
+  on public.bookings (booking_status)
+  where booking_status = 'confirmed';
+

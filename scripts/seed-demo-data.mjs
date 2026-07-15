@@ -1,7 +1,7 @@
 /**
  * Seed comprehensive demo data into Supabase for live admin + guest testing.
  *
- * Covers: published catalogs, pending approvals, bookings, reviews, banners,
+ * Covers: published catalogs, pending approvals, bookings, reviews,
  * demo auth logins (guest / host / homestay owner / vip owner).
  *
  * Usage:
@@ -91,7 +91,6 @@ const IMG = {
   stay4: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&q=80",
   vip1: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80",
   vip2: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&q=80",
-  banner: "https://images.unsplash.com/photo-1524492412937-b280c272500d?w=1600&q=80",
 };
 
 function isoDate(daysFromToday) {
@@ -820,37 +819,15 @@ async function seedVip() {
 }
 
 async function seedBannersAndSettings() {
-  console.log("Seeding homepage settings + banners…");
+  console.log("Seeding homepage settings (clearing banners)…");
   const now = Date.now();
-  const starts = new Date(now - 86400000).toISOString();
-  const ends = new Date(now + 30 * 86400000).toISOString();
 
   const { error } = await supabase.from("platform_settings").upsert(
     [
       { key: "commission_percent", value: 10 },
       { key: "default_currency", value: "INR" },
-      {
-        key: "site_banners",
-        value: {
-          banners: [
-            {
-              id: "demo-banner-diwali",
-              title: "Festival season experiences",
-              body: "Book heritage walks and studio sessions for the festive week.",
-              href: "/experiences",
-              imageUrl: IMG.banner,
-              placement: "home_top",
-              startsAt: starts,
-              endsAt: ends,
-              active: true,
-            },
-          ],
-        },
-      },
-      {
-        key: "homepage_content_version",
-        value: now,
-      },
+      { key: "site_banners", value: { banners: [] } },
+      { key: "homepage_content_version", value: now },
     ],
     { onConflict: "key" },
   );

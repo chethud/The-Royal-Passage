@@ -20,8 +20,8 @@ export function CreateExperienceCta({ variant = "card" }: CreateExperienceCtaPro
     <LuxuryCheckoutPanel className="text-center">
       <h2 className="luxury-panel-heading font-display text-2xl">Create your first experience</h2>
       <p className="luxury-panel-body mx-auto mt-3 max-w-md text-sm">
-        Add a listing with photos, pricing, and bookable slots. Submit for admin review when you are
-        ready to go live.
+        Add a listing with photos, pricing, and bookable slots. At least one session timing is
+        required before you can submit for admin review.
       </p>
       <Link to="/host/experiences/new" resetScroll className={`${buttonClass} mt-6`}>
         Add experience

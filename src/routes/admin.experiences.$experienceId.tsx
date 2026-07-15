@@ -195,7 +195,7 @@ function AdminExperienceReviewPage() {
                     type="button"
                     disabled={busy || !canPublish}
                     title={!canPublish ? "Host must add at least one bookable slot" : undefined}
-                    className="luxury-btn-sm luxury-btn-primary disabled:opacity-50"
+                    className="luxury-btn-sm luxury-btn-primary"
                     onClick={() => void runAction("publish")}
                   >
                     Approve & publish live
@@ -221,7 +221,7 @@ function AdminExperienceReviewPage() {
                 <button
                   type="button"
                   disabled={busy || !canPublish}
-                  className="luxury-btn-sm luxury-btn-primary disabled:opacity-50"
+                  className="luxury-btn-sm luxury-btn-primary"
                   onClick={() => void runAction("publish")}
                 >
                   Approve & publish live

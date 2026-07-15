@@ -64,7 +64,7 @@ export function AdminExperienceReview({ experience }: AdminExperienceReviewProps
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <ExperienceStatusBadge status={experience.status} />
+              <ExperienceStatusBadge status={experience.status} surface="light" />
               <span className="luxury-panel-body text-sm">
                 Submitted {formatDateLong(experience.createdAt.slice(0, 10))}
               </span>

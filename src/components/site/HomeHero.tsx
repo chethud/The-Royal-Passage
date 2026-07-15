@@ -7,7 +7,6 @@ import {
   EditableTextField,
 } from "@/components/editor/EditableHomepageFields";
 import { HeroSlideshow } from "@/components/site/HeroSlideshow";
-import { SiteBannerStrip } from "@/components/site/SiteBannerStrip";
 import { useHomeIntro } from "@/components/site/home-intro";
 import {
   takeHeroSlideshow,
@@ -176,148 +175,176 @@ export function HomeHero({
       </motion.div>
 
       <div className="container-page relative z-10 flex min-h-[max(640px,100dvh)] flex-col justify-center pt-[var(--header-height)]">
-        {chromeRevealed ? (
-          <div className="pointer-events-none absolute inset-x-0 top-[var(--header-height)] z-20 w-full">
-            <motion.div
-              className="pointer-events-auto"
-              initial={cinematic && !reduceMotion ? { opacity: 0, y: -12 } : false}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, ease: softEase, delay: 0.08 }}
-            >
-              <SiteBannerStrip />
-            </motion.div>
-          </div>
-        ) : null}
-
-        <div className="py-14 md:py-20">
-          <AnimatePresence mode="wait">
-            {copyVisible && heading ? (
-              <motion.div
-                key={heading.id}
-                className="max-w-2xl text-left"
-                variants={reduceMotion ? undefined : revealParent}
-                initial={reduceMotion || !cinematic ? false : "hidden"}
-                animate="show"
-                exit={reduceMotion || !cinematic ? undefined : "exit"}
-              >
-                <motion.div
-                  variants={reduceMotion ? undefined : revealItem}
-                  className="eyebrow mb-5 text-ember/95"
-                >
-                  {heading.eyebrow}
-                </motion.div>
-                <motion.h1
-                  variants={reduceMotion ? undefined : revealItem}
-                  className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-[0.95] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]"
-                >
-                  {heading.line1}
-                  <br />
-                  <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-                    {heading.line2}
-                  </span>
-                  <br />
-                  {heading.line3}
-                </motion.h1>
-                <motion.p
-                  variants={reduceMotion ? undefined : revealItem}
-                  className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg"
-                >
-                  {heading.body}
-                </motion.p>
-                <motion.div
-                  variants={reduceMotion ? undefined : revealItem}
-                  className="mt-7 flex flex-wrap items-center justify-start gap-3 sm:mt-9 sm:gap-4"
-                >
-                  <Link
-                    to="/experiences"
-                    className="group inline-flex items-center gap-2 rounded-sm bg-ember px-6 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-8 sm:py-4 sm:text-xs"
-                  >
-                    Explore Experiences
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                  {!user ? (
-                    <Link
-                      to="/sign-in"
-                      className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-transparent px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink/85 backdrop-blur-md transition-colors hover:border-ember/55 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
-                    >
-                      Sign in
-                    </Link>
-                  ) : null}
-                </motion.div>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
-        </div>
-
-        {editable && onHeadingsChange ? (
-          <div className="pointer-events-auto absolute inset-x-0 top-[calc(var(--header-height)+1rem)] z-30 px-4">
-            <div className="container-page max-w-xl space-y-3 rounded-sm border border-ember/35 bg-black/55 p-3 backdrop-blur-md">
-              <div className="flex flex-wrap gap-2">
-                {headings.map((item, index) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setEditHeadingIndex(index)}
-                    className={`rounded-sm border px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] transition-colors ${
-                      editHeadingIndex === index
-                        ? "border-ember bg-ember/20 text-ember"
-                        : "border-ember/30 text-ink/70 hover:border-ember/55 hover:text-ember"
-                    }`}
-                  >
-                    {index === 0 ? "Priority" : `Heading ${index + 1}`}
-                  </button>
-                ))}
-              </div>
-              {headings[editHeadingIndex] ? (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <EditableTextField
-                    label="Eyebrow"
-                    value={headings[editHeadingIndex]!.eyebrow}
-                    onChange={(eyebrow) => updateHeading(editHeadingIndex, { eyebrow })}
-                  />
-                  <EditableTextField
-                    label="Line 1"
-                    value={headings[editHeadingIndex]!.line1}
-                    onChange={(line1) => updateHeading(editHeadingIndex, { line1 })}
-                  />
-                  <EditableTextField
-                    label="Accent line"
-                    value={headings[editHeadingIndex]!.line2}
-                    onChange={(line2) => updateHeading(editHeadingIndex, { line2 })}
-                  />
-                  <EditableTextField
-                    label="Line 3"
-                    value={headings[editHeadingIndex]!.line3}
-                    onChange={(line3) => updateHeading(editHeadingIndex, { line3 })}
-                  />
-                  <div className="sm:col-span-2">
-                    <EditableTextField
-                      label="Body"
-                      value={headings[editHeadingIndex]!.body}
-                      onChange={(body) => updateHeading(editHeadingIndex, { body })}
-                      multiline
-                    />
+        <div className="py-8 md:py-12">
+          {editable && onHeadingsChange ? (
+            <div className="w-full max-w-6xl">
+              <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,22rem)] lg:gap-8">
+                {/* Live preview — matches public hero copy */}
+                <div className="min-w-0 pt-1">
+                  <div className="mb-4 flex flex-wrap gap-2 lg:mb-6">
+                    {headings.map((item, index) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setEditHeadingIndex(index)}
+                        className={`rounded-sm border px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] shadow-[0_2px_10px_rgb(0_0_0/0.35)] transition-colors ${
+                          editHeadingIndex === index
+                            ? "border-ember bg-[oklch(0.14_0.06_22)] text-ember"
+                            : "border-[oklch(0.88_0.08_86_/_0.35)] bg-[oklch(0.12_0.06_22_/_0.88)] text-ink/90 hover:border-ember/60 hover:text-ember"
+                        }`}
+                      >
+                        {index === 0 ? "Priority" : `Heading ${index + 1}`}
+                      </button>
+                    ))}
                   </div>
+                  {headings[editHeadingIndex] ? (
+                    <div className="max-w-xl text-left">
+                      {headings[editHeadingIndex]!.eyebrow ? (
+                        <p className="eyebrow mb-4 text-ember/95">
+                          {headings[editHeadingIndex]!.eyebrow}
+                        </p>
+                      ) : null}
+                      <h1 className="font-display text-[clamp(2.2rem,5vw,4.25rem)] font-semibold leading-[1.02] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]">
+                        <span>{headings[editHeadingIndex]!.line1}</span>
+                        {headings[editHeadingIndex]!.line1 && headings[editHeadingIndex]!.line2
+                          ? " "
+                          : null}
+                        <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
+                          {headings[editHeadingIndex]!.line2}
+                        </span>
+                        {headings[editHeadingIndex]!.line3 ? (
+                          <>
+                            <br />
+                            {headings[editHeadingIndex]!.line3}
+                          </>
+                        ) : null}
+                      </h1>
+                      {headings[editHeadingIndex]!.body ? (
+                        <p className="mt-5 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:text-[1.05rem]">
+                          {headings[editHeadingIndex]!.body}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
 
-        {editable && uploadPhoto ? (
-          <div className="pointer-events-auto absolute inset-x-0 bottom-24 z-20 px-4 sm:bottom-28">
-            <div className="container-page max-w-md">
-              <EditablePhotoField
-                label={`Hero slide ${activeSlide + 1} of ${displaySlides.length}`}
-                imageUrl={displaySlides[activeSlide]?.imageUrl ?? ""}
-                alt={displaySlides[activeSlide]?.alt ?? ""}
-                uploadPhoto={uploadPhoto(activeSlide)}
-                onImageChange={(imageUrl) => updateSlide(activeSlide, { imageUrl })}
-                onAltChange={(alt) => updateSlide(activeSlide, { alt })}
-              />
+                {/* Edit controls: copy + slide photo in one panel */}
+                <div className="min-w-0 space-y-3">
+                  {headings[editHeadingIndex] ? (
+                    <div className="rounded-sm border border-ember/35 bg-black/55 p-3.5 backdrop-blur-md sm:p-4">
+                      <p className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-ember">
+                        Edit hero copy
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <EditableTextField
+                          label="Eyebrow"
+                          value={headings[editHeadingIndex]!.eyebrow}
+                          onChange={(eyebrow) => updateHeading(editHeadingIndex, { eyebrow })}
+                        />
+                        <EditableTextField
+                          label="Line 1"
+                          value={headings[editHeadingIndex]!.line1}
+                          onChange={(line1) => updateHeading(editHeadingIndex, { line1 })}
+                        />
+                        <EditableTextField
+                          label="Accent line"
+                          value={headings[editHeadingIndex]!.line2}
+                          onChange={(line2) => updateHeading(editHeadingIndex, { line2 })}
+                        />
+                        <EditableTextField
+                          label="Line 3"
+                          value={headings[editHeadingIndex]!.line3}
+                          onChange={(line3) => updateHeading(editHeadingIndex, { line3 })}
+                        />
+                        <div className="col-span-2">
+                          <EditableTextField
+                            label="Body"
+                            value={headings[editHeadingIndex]!.body}
+                            onChange={(body) => updateHeading(editHeadingIndex, { body })}
+                            multiline
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {uploadPhoto ? (
+                    <EditablePhotoField
+                      label={`Hero slide ${activeSlide + 1} of ${displaySlides.length}`}
+                      imageUrl={displaySlides[activeSlide]?.imageUrl ?? ""}
+                      alt={displaySlides[activeSlide]?.alt ?? ""}
+                      uploadPhoto={uploadPhoto(activeSlide)}
+                      onImageChange={(imageUrl) => updateSlide(activeSlide, { imageUrl })}
+                      onAltChange={(alt) => updateSlide(activeSlide, { alt })}
+                    />
+                  ) : null}
+                </div>
+              </div>
             </div>
-          </div>
-        ) : null}
+          ) : (
+            <AnimatePresence mode="wait">
+              {copyVisible && heading ? (
+                <motion.div
+                  key={heading.id}
+                  className="max-w-2xl text-left"
+                  variants={reduceMotion ? undefined : revealParent}
+                  initial={reduceMotion || !cinematic ? false : "hidden"}
+                  animate="show"
+                  exit={reduceMotion || !cinematic ? undefined : "exit"}
+                >
+                  <motion.div
+                    variants={reduceMotion ? undefined : revealItem}
+                    className="eyebrow mb-5 text-ember/95"
+                  >
+                    {heading.eyebrow}
+                  </motion.div>
+                  <motion.h1
+                    variants={reduceMotion ? undefined : revealItem}
+                    className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-[1.02] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]"
+                  >
+                    <span>{heading.line1}</span>
+                    {heading.line1 && heading.line2 ? " " : null}
+                    <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
+                      {heading.line2}
+                    </span>
+                    {heading.line3 ? (
+                      <>
+                        <br />
+                        {heading.line3}
+                      </>
+                    ) : null}
+                  </motion.h1>
+                  <motion.p
+                    variants={reduceMotion ? undefined : revealItem}
+                    className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg"
+                  >
+                    {heading.body}
+                  </motion.p>
+                  <motion.div
+                    variants={reduceMotion ? undefined : revealItem}
+                    className="mt-7 flex flex-wrap items-center justify-start gap-3 sm:mt-9 sm:gap-4"
+                  >
+                    <Link
+                      to="/experiences"
+                      className="group inline-flex items-center gap-2 rounded-sm bg-ember px-6 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-8 sm:py-4 sm:text-xs"
+                    >
+                      Explore Experiences
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                    {!user ? (
+                      <Link
+                        to="/sign-in"
+                        className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-transparent px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink/85 backdrop-blur-md transition-colors hover:border-ember/55 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
+                      >
+                        Sign in
+                      </Link>
+                    ) : null}
+                  </motion.div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          )}
+        </div>
 
         {!editable && chromeRevealed ? (
           reduceMotion ? (

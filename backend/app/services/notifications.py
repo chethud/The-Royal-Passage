@@ -101,6 +101,34 @@ def mark_homestay_review_notifications_read(homestay_id: str) -> None:
         _invalidate_user_notification_cache(admin_id)
 
 
+def notify_admins_pending_booking_overdue(
+    *,
+    booking_id: str,
+    module: str,
+    title: str,
+    guest_name: str,
+    listing_title: str,
+) -> None:
+    """Bell alert when a guest booking is still pending host/owner accept after 1 hour."""
+    href = (
+        "/admin/homestay/pending-bookings"
+        if module == "homestay"
+        else "/admin/experiences/pending-bookings"
+    )
+    for admin_id in list_admin_user_ids():
+        create_notification(
+            admin_id,
+            "booking_pending_overdue",
+            title,
+            f'{guest_name} is still waiting on "{listing_title}" (1h+).',
+            {
+                "bookingId": booking_id,
+                "module": module,
+                "href": href,
+            },
+        )
+
+
 def mark_booking_request_notifications_read(user_id: str, booking_id: str) -> None:
     supabase = get_supabase_admin()
     now = datetime.now(timezone.utc).isoformat()

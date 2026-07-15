@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/DashboardTable";
 import type { BookingListStatus, BookingPaymentFilter, BookingDateView } from "@/lib/dashboard-booking-filters";
 import { bookingMatchesDateView } from "@/lib/booking-window";
-import { formatDateLong } from "@/lib/date-format";
+import { formatDateWeekdayShort } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 
 type AdminBookingsTableProps = {
@@ -153,19 +153,34 @@ export function AdminBookingsTable({
       {filtered.length === 0 ? (
         <DashboardTableEmpty>No bookings in this view.</DashboardTableEmpty>
       ) : (
-        <DashboardTableScroll>
-          <DashboardTable minWidth="2xl">
+        <DashboardTableScroll scroll={false}>
+          <DashboardTable minWidth="none" layout="fixed" className="text-xs">
             <DashboardTableHead>
-              <DashboardTableHeadRow>
-                <DashboardTableHeadCell>Guest</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Experience</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Host</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Session</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Booked</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Total</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Platform ({commissionPercent}%)</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Host payout</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Status</DashboardTableHeadCell>
+              <DashboardTableHeadRow className="!text-[0.65rem] !tracking-[0.08em]">
+                <DashboardTableHeadCell className="w-[14%] text-[0.65rem] leading-tight tracking-[0.08em]">
+                  Guest
+                </DashboardTableHeadCell>
+                <DashboardTableHeadCell className="w-[18%] text-[0.65rem] leading-tight tracking-[0.08em]">
+                  Experience
+                </DashboardTableHeadCell>
+                <DashboardTableHeadCell className="w-[12%] text-[0.65rem] leading-tight tracking-[0.08em]">
+                  Session
+                </DashboardTableHeadCell>
+                <DashboardTableHeadCell className="w-[11%] text-[0.65rem] leading-tight tracking-[0.08em]">
+                  Booked
+                </DashboardTableHeadCell>
+                <DashboardTableHeadCell className="w-[9%] text-[0.65rem] leading-tight tracking-[0.08em]">
+                  Total
+                </DashboardTableHeadCell>
+                <DashboardTableHeadCell className="w-[11%] text-[0.65rem] leading-tight tracking-[0.08em]">
+                  Plat. ({commissionPercent}%)
+                </DashboardTableHeadCell>
+                <DashboardTableHeadCell className="w-[11%] text-[0.65rem] leading-tight tracking-[0.08em]">
+                  Payout
+                </DashboardTableHeadCell>
+                <DashboardTableHeadCell className="w-[14%] text-[0.65rem] leading-tight tracking-[0.08em]">
+                  Status
+                </DashboardTableHeadCell>
               </DashboardTableHeadRow>
             </DashboardTableHead>
             <DashboardTableBody>
@@ -174,10 +189,14 @@ export function AdminBookingsTable({
                   <DashboardTableLinkCell
                     to="/admin/bookings/$bookingId"
                     params={{ bookingId: booking.id }}
-                    title={booking.guestName ?? "Guest"}
-                    subtitle={booking.guestEmail}
+                    title={<span className="text-sm leading-snug">{booking.guestName ?? "Guest"}</span>}
+                    subtitle={
+                      booking.guestEmail ? (
+                        <span className="break-all text-[0.65rem] leading-snug">{booking.guestEmail}</span>
+                      ) : undefined
+                    }
                   />
-                  <DashboardTableCell>
+                  <DashboardTableCell className="break-words">
                     <Link
                       to="/admin/bookings/$bookingId"
                       params={{ bookingId: booking.id }}
@@ -186,21 +205,22 @@ export function AdminBookingsTable({
                       {booking.experienceTitle}
                     </Link>
                   </DashboardTableCell>
-                  <DashboardTableCell>{booking.hostName ?? "—"}</DashboardTableCell>
-                  <DashboardTableCell>{formatDateLong(booking.slotDate)}</DashboardTableCell>
-                  <DashboardTableCell>
-                    {formatDateLong(booking.createdAt.slice(0, 10))}
+                  <DashboardTableCell className="whitespace-nowrap">
+                    {formatDateWeekdayShort(booking.slotDate)}
                   </DashboardTableCell>
-                  <DashboardTableCell variant="heading">
+                  <DashboardTableCell className="whitespace-nowrap">
+                    {formatDateWeekdayShort(booking.createdAt.slice(0, 10))}
+                  </DashboardTableCell>
+                  <DashboardTableCell className="whitespace-nowrap font-semibold">
                     {formatMoney(booking.totalAmount, booking.currencySymbol)}
                   </DashboardTableCell>
-                  <DashboardTableCell>
+                  <DashboardTableCell className="whitespace-nowrap">
                     {formatMoney(booking.platformFeeMinor, booking.currencySymbol)}
                   </DashboardTableCell>
-                  <DashboardTableCell>
+                  <DashboardTableCell className="whitespace-nowrap">
                     {formatMoney(booking.hostPayoutMinor, booking.currencySymbol)}
                   </DashboardTableCell>
-                  <DashboardTableCell>
+                  <DashboardTableCell className="align-middle">
                     <BookingStatusChip
                       bookingStatus={booking.bookingStatus}
                       paymentStatus={booking.paymentStatus}

@@ -168,16 +168,103 @@ def host_reply_to_review(auth: dict, review_id: str, payload: HostReplyRequest) 
     return _map_review(updated.data)
 
 
-def list_admin_reviews(limit: int = 50) -> list[ReviewSummary]:
+def list_admin_reviews(limit: int = 5) -> list[ReviewSummary]:
+    """Top experience reviews for admin (highest rating first, capped)."""
     supabase = get_supabase_admin()
     result = (
         supabase.table("reviews")
         .select("*")
+        .order("rating", desc=True)
         .order("created_at", desc=True)
         .limit(limit)
         .execute()
     )
     return [_map_review(row) for row in (result.data or [])]
+
+
+def list_admin_moderation_reviews(limit_per_kind: int = 5):
+    """Top N experience reviews + top N homestay reviews for the admin panel."""
+    from app.models.schemas import AdminModerationReview, AdminModerationReviewsResponse
+
+    supabase = get_supabase_admin()
+
+    exp_result = (
+        supabase.table("reviews")
+        .select("*, experiences(title)")
+        .order("rating", desc=True)
+        .order("created_at", desc=True)
+        .limit(limit_per_kind)
+        .execute()
+    )
+    experiences: list[AdminModerationReview] = []
+    for row in exp_result.data or []:
+        exp = row.get("experiences") or {}
+        if isinstance(exp, list):
+            exp = exp[0] if exp else {}
+        experiences.append(
+            AdminModerationReview(
+                id=row["id"],
+                kind="experience",
+                listingId=row["experience_id"],
+                listingTitle=(exp or {}).get("title"),
+                rating=row["rating"],
+                comment=row.get("comment"),
+                reviewerDisplayName=row.get("reviewer_display_name"),
+                status=row.get("status") or "published",
+                createdAt=row.get("created_at", ""),
+            )
+        )
+
+    hs_result = (
+        supabase.table("homestay_reviews")
+        .select("*, homestays(title)")
+        .order("rating", desc=True)
+        .order("created_at", desc=True)
+        .limit(limit_per_kind)
+        .execute()
+    )
+    hs_rows = hs_result.data or []
+    guest_ids = list({row["guest_id"] for row in hs_rows if row.get("guest_id")})
+    name_by_guest: dict[str, str] = {}
+    if guest_ids:
+        profiles = (
+            supabase.table("profiles")
+            .select("id, full_name")
+            .in_("id", guest_ids)
+            .execute()
+        )
+        for profile in profiles.data or []:
+            if profile.get("full_name"):
+                name_by_guest[profile["id"]] = profile["full_name"]
+
+    homestays: list[AdminModerationReview] = []
+    for row in hs_rows:
+        hs = row.get("homestays") or {}
+        if isinstance(hs, list):
+            hs = hs[0] if hs else {}
+        if row.get("title") and row.get("body"):
+            comment = f"{row['title']} — {row['body']}"
+        elif row.get("title"):
+            comment = row["title"]
+        elif row.get("body"):
+            comment = row["body"]
+        else:
+            comment = None
+        homestays.append(
+            AdminModerationReview(
+                id=row["id"],
+                kind="homestay",
+                listingId=row["homestay_id"],
+                listingTitle=(hs or {}).get("title"),
+                rating=row["rating"],
+                comment=comment,
+                reviewerDisplayName=name_by_guest.get(row.get("guest_id", "")),
+                status=row.get("status") or "pending",
+                createdAt=row.get("created_at", ""),
+            )
+        )
+
+    return AdminModerationReviewsResponse(experiences=experiences, homestays=homestays)
 
 
 def hide_review(auth: dict, review_id: str) -> ReviewSummary:
@@ -204,3 +291,60 @@ def hide_review(auth: dict, review_id: str) -> ReviewSummary:
         .execute()
     )
     return _map_review(updated.data)
+
+
+def hide_homestay_review(auth: dict, review_id: str):
+    from app.models.schemas import AdminModerationReview
+
+    supabase = get_supabase_admin()
+    result = (
+        supabase.table("homestay_reviews")
+        .select("*, homestays(title)")
+        .eq("id", review_id)
+        .maybe_single()
+        .execute()
+    )
+    row = result.data
+    if not row:
+        raise ValueError("Homestay review not found.")
+
+    supabase.table("homestay_reviews").update({"status": "rejected"}).eq("id", review_id).execute()
+    log_audit(auth["user"].id, "homestay_review_hidden", "homestay_review", review_id, {})
+
+    updated = (
+        supabase.table("homestay_reviews")
+        .select("*, homestays(title)")
+        .eq("id", review_id)
+        .maybe_single()
+        .execute()
+    )
+    row = updated.data or row
+    hs = row.get("homestays") or {}
+    if isinstance(hs, list):
+        hs = hs[0] if hs else {}
+    guest_name = None
+    guest_id = row.get("guest_id")
+    if guest_id:
+        profile = (
+            supabase.table("profiles")
+            .select("full_name")
+            .eq("id", guest_id)
+            .maybe_single()
+            .execute()
+        )
+        guest_name = (profile.data or {}).get("full_name")
+    if row.get("title") and row.get("body"):
+        comment = f"{row['title']} — {row['body']}"
+    else:
+        comment = row.get("body") or row.get("title")
+    return AdminModerationReview(
+        id=row["id"],
+        kind="homestay",
+        listingId=row["homestay_id"],
+        listingTitle=(hs or {}).get("title"),
+        rating=row["rating"],
+        comment=comment,
+        reviewerDisplayName=guest_name,
+        status=row.get("status") or "rejected",
+        createdAt=row.get("created_at", ""),
+    )

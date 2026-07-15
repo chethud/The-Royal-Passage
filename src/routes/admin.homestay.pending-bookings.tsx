@@ -1,35 +1,36 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { AdminHomestayPendingBookingsTable } from "@/components/admin/AdminPendingBookingsTables";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
-import { AdminBookingsTable } from "@/components/admin/AdminBookingsTable";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
-import { fetchAdminBookings, type AdminBookingRow } from "@/lib/api/admin";
+import {
+  fetchAdminHomestayBookings,
+  type AdminHomestayBookingRow,
+} from "@/lib/api/admin-homestays";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
-import { parseBookingListSearch } from "@/lib/dashboard-booking-filters";
-import { dashboardPathForRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
+import { dashboardPathForRole } from "@/lib/roles";
 import { NOINDEX_META } from "@/lib/seo-helpers";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
+import { isPendingBookingOverdue } from "@/hooks/use-admin-module-alerts";
 
-export const Route = createFileRoute("/admin/bookings/")({
-  validateSearch: parseBookingListSearch,
+export const Route = createFileRoute("/admin/homestay/pending-bookings")({
   head: () => ({
     meta: [
-      { title: "Admin bookings — The Royal Passage" },
-      { name: "description", content: "All guest reservations across the marketplace." },
+      { title: "User pending bookings — Homestays — The Royal Passage" },
+      { name: "description", content: "Guest stay bookings still waiting for owner accept." },
       ...NOINDEX_META,
     ],
   }),
-  component: AdminBookingsPage,
+  component: AdminHomestayPendingBookingsPage,
 });
 
-function AdminBookingsPage() {
+function AdminHomestayPendingBookingsPage() {
   const navigate = useNavigate();
-  const { status, payment, dateView } = Route.useSearch();
   const { user, role, loading } = useAuthUser();
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [bookings, setBookings] = useState<AdminBookingRow[]>([]);
+  const [bookings, setBookings] = useState<AdminHomestayBookingRow[]>([]);
   const [pageError, setPageError] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -53,7 +54,7 @@ function AdminBookingsPage() {
       });
   }, [user]);
 
-  const loadBookings = useCallback(async () => {
+  const load = useCallback(async () => {
     if (!accessToken) return;
     setPageLoading(true);
     setPageError(null);
@@ -61,13 +62,10 @@ function AdminBookingsPage() {
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
-      const rows = await fetchAdminBookings(accessToken, {
-        limit: 200,
-        autoComplete: true,
-      });
+      const rows = await fetchAdminHomestayBookings(accessToken, "pending");
       setBookings(rows);
     } catch (err) {
-      setPageError(toErrorMessage(err, "Failed to load bookings."));
+      setPageError(toErrorMessage(err, "Failed to load pending bookings."));
     } finally {
       setPageLoading(false);
     }
@@ -75,47 +73,48 @@ function AdminBookingsPage() {
 
   useEffect(() => {
     if (!accessToken) return;
-    void loadBookings();
-  }, [accessToken, loadBookings]);
+    void load();
+  }, [accessToken, load]);
 
   if (loading || !user || role !== "admin" || !accessToken) {
     return <PageLoadingGate />;
   }
 
+  const overdue = bookings.filter((row) => isPendingBookingOverdue(row.createdAt)).length;
+
   return (
     <DashboardShell
       role="admin"
-      title="Bookings"
-      subtitle="Every guest reservation across all hosts — filter by status or payment to review who booked."
+      title="User pending bookings"
+      subtitle="Stay bookings still waiting for the owner to accept. Overdue means pending longer than 1 hour."
       showRoleDescription={false}
     >
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <Link
+          to="/admin/homestay"
+          className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
+        >
+          ← Overview
+        </Link>
+        <p className="text-sm text-muted-foreground">
+          {bookings.length} pending{overdue > 0 ? ` · ${overdue} overdue` : ""}
+        </p>
+      </div>
       {pageLoading ? (
-        <LuxuryCheckoutPanel className="!p-3 sm:!p-4 md:!p-5">
-          <p className="luxury-panel-body py-4 text-sm">Loading bookings…</p>
+        <LuxuryCheckoutPanel>
+          <p className="luxury-panel-body py-8 text-sm">Loading pending bookings…</p>
         </LuxuryCheckoutPanel>
       ) : pageError ? (
-        <LuxuryCheckoutPanel className="!p-3 sm:!p-4 md:!p-5">
+        <LuxuryCheckoutPanel>
           <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {pageError}
           </p>
         </LuxuryCheckoutPanel>
       ) : (
-        <LuxuryCheckoutPanel className="!p-3 sm:!p-4 md:!p-5">
-          <AdminBookingsTable
-            bookings={bookings}
-            initialStatus={status ?? "all"}
-            initialPayment={payment ?? "all"}
-            initialDateView={dateView ?? "week"}
-          />
+        <LuxuryCheckoutPanel>
+          <AdminHomestayPendingBookingsTable bookings={bookings} />
         </LuxuryCheckoutPanel>
       )}
-
-      <Link
-        to="/admin"
-        className="luxury-btn-sm dashboard-chrome-btn mt-5 inline-flex items-center no-underline"
-      >
-        ← Back to overview
-      </Link>
     </DashboardShell>
   );
 }

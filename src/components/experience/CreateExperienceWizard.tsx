@@ -226,13 +226,21 @@ export function CreateExperienceWizard({
   };
 
   const removeDraftSlot = (key: string) => {
-    setDraftSlots((prev) => prev.filter((slot) => slot.key !== key));
+    setDraftSlots((prev) => {
+      const next = prev.filter((slot) => slot.key !== key);
+      if (next.length === 0) setSubmitForReview(false);
+      return next;
+    });
   };
 
   const handleFinalSubmit = async () => {
     const error = validateAll();
     if (error) {
       showError(error);
+      return;
+    }
+    if (submitForReview && draftSlots.length === 0) {
+      showError("Add at least one bookable slot before submitting for review.");
       return;
     }
     setStepError(null);
@@ -495,16 +503,16 @@ export function CreateExperienceWizard({
             <h3 className={sectionTitleClass}>Bookable slots</h3>
             <p className="luxury-panel-body text-sm">
               Create when guests can book your experience: choose weekdays, a date range, session
-              times, and capacity. You can skip this step and add schedules later from your
-              experience page.
+              times, and capacity. You can save a draft without slots, but at least one bookable
+              session is required before submitting for admin review.
             </p>
             <WeekdaySlotBuilder surface="light" onAddSlots={addWeeklySlots} />
           </div>
 
           {sortedDraftSlots.length === 0 ? (
             <p className="luxury-panel-body text-sm">
-              No sessions added yet — optional for now. Use the builder above to generate your
-              weekly schedule.
+              No sessions added yet. Add at least one before you can submit for review (draft save
+              is still allowed).
             </p>
           ) : (
             <div>
@@ -605,23 +613,30 @@ export function CreateExperienceWizard({
               <dt className="eyebrow luxury-panel-label">Bookable slots</dt>
               <dd className="mt-1">
                 {sortedDraftSlots.length === 0
-                  ? "None — add later from your experience page"
+                  ? "None — required before submitting for review"
                   : `${sortedDraftSlots.length} slot${sortedDraftSlots.length === 1 ? "" : "s"}`}
               </dd>
             </div>
           </dl>
 
-          <label className="flex items-start gap-3 rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4 text-sm">
+          <label
+            className={`flex items-start gap-3 rounded-md border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.35)] p-4 text-sm ${
+              draftSlots.length === 0 ? "opacity-70" : ""
+            }`}
+          >
             <input
               type="checkbox"
               className="mt-0.5"
               checked={submitForReview}
+              disabled={draftSlots.length === 0}
               onChange={(e) => setSubmitForReview(e.target.checked)}
             />
             <span>
               <strong className="luxury-panel-heading font-medium">Submit for admin review</strong>
               <span className={hintClass}>
-                Royal Passage will review your listing before it goes live on the marketplace.
+                {draftSlots.length === 0
+                  ? "Add at least one bookable slot in the previous step before you can submit for review."
+                  : "Royal Passage will review your listing before it goes live on the marketplace."}
               </span>
             </span>
           </label>

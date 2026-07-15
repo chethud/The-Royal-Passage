@@ -77,6 +77,20 @@ export function adminModuleQueuePath(module: AdminModule): string {
   return "/admin/experiences";
 }
 
+/** Host listing-approval requests list opened from the module notify strip. */
+export function adminModuleHostRequestsPath(module: AdminModule): string {
+  if (module === "homestays") return "/admin/homestay/requests";
+  if (module === "vip") return "/admin/vip/requests";
+  return "/admin/experiences/requests";
+}
+
+/** Guest bookings still pending host/owner accept. */
+export function adminModulePendingBookingsPath(module: AdminModule): string {
+  if (module === "homestays") return "/admin/homestay/pending-bookings";
+  if (module === "vip") return "/admin/vip/pending-bookings";
+  return "/admin/experiences/pending-bookings";
+}
+
 export function adminModuleLabel(module: AdminModule): string {
   if (module === "homestays") return "Homestays admin";
   if (module === "vip") return "VIP admin";
