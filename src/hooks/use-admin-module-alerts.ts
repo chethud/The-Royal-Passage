@@ -4,6 +4,8 @@ import { fetchAdminVipPackageApprovals } from "@/lib/api/admin-vip-packages";
 import { fetchAdminBookings, fetchAdminExperienceApprovals } from "@/lib/api/admin";
 import { isApiConfigured } from "@/lib/api/client";
 import { useAuthUser } from "@/lib/auth-user";
+import { countPendingPartnerExperienceApplications } from "@/lib/partner-experience-fns";
+import { countPendingPartnerHomestayApplications } from "@/lib/partner-homestay-fns";
 import { hasRole } from "@/lib/roles";
 import type { AdminModule } from "@/components/admin/admin-nav";
 
@@ -63,13 +65,17 @@ export function useAdminModuleAlerts(): {
         const nowMs = Date.now();
         const [
           experienceApprovals,
+          partnerExperienceAppsCount,
           homestayApprovals,
+          partnerHomestayAppsCount,
           vipApprovals,
           experiencePendingBookings,
           homestayPendingBookings,
         ] = await Promise.all([
           fetchAdminExperienceApprovals(accessToken, 100).catch(() => []),
+          countPendingPartnerExperienceApplications({ data: { accessToken } }).catch(() => 0),
           fetchAdminHomestayApprovals(accessToken).catch(() => []),
+          countPendingPartnerHomestayApplications({ data: { accessToken } }).catch(() => 0),
           fetchAdminVipPackageApprovals(accessToken).catch(() => []),
           fetchAdminBookings(accessToken, { status: "pending", limit: 200 }).catch(() => []),
           fetchAdminHomestayBookings(accessToken, "pending").catch(() => []),
@@ -88,12 +94,12 @@ export function useAdminModuleAlerts(): {
 
         setCounts({
           experiences: {
-            hostRequests: experienceApprovals.length,
+            hostRequests: experienceApprovals.length + partnerExperienceAppsCount,
             userPending: experiencePendingBookings.length,
             userOverdue: countOverdue(expPendingCreated, nowMs),
           },
           homestays: {
-            hostRequests: pendingHomestays.length,
+            hostRequests: pendingHomestays.length + partnerHomestayAppsCount,
             userPending: homestayPendingBookings.length,
             userOverdue: countOverdue(stayPendingCreated, nowMs),
           },

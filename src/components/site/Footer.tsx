@@ -31,10 +31,6 @@ const quickLinks = [
   { label: "Experiences", to: "/experiences" },
   { label: "Homestays", to: "/homestays" },
   { label: "Journal", to: "/journal" },
-  { label: "Contact", to: "/contact" },
-  { label: EXPERIENCE_TERMS_LINK.label, to: EXPERIENCE_TERMS_LINK.to },
-  { label: PRIVACY_POLICY_LINK.label, to: PRIVACY_POLICY_LINK.to },
-  { label: PAYMENT_POLICY_LINK.label, to: PAYMENT_POLICY_LINK.to },
 ];
 
 const experiences = ["Pottery Experience", "Outdoor Cooking", "Heritage Walks"];
@@ -56,7 +52,7 @@ function FooterBrandBlock({
   logoClassName?: string;
 }) {
   return (
-    <div className="flex w-full flex-col items-center text-center sm:items-start sm:text-left">
+    <div className="flex shrink-0 items-start justify-center sm:justify-start">
       <img
         src={logoUrl}
         alt="The Royal Passage"
@@ -64,7 +60,7 @@ function FooterBrandBlock({
         height={110}
         loading="lazy"
         decoding="async"
-        className={`logo-breathe object-contain ${logoClassName} sm:origin-left sm:-translate-x-1.5 sm:object-left`}
+        className={`logo-breathe object-contain ${logoClassName}`}
       />
     </div>
   );
@@ -92,20 +88,30 @@ function FooterSocialIcons({ compact = false }: { compact?: boolean }) {
 }
 
 /** Logo left · legal links truly centered · social icons with copyright below on the right. */
-function FooterBar({ logoClassName = "h-12 w-auto object-contain sm:h-14 md:h-16" }: { logoClassName?: string }) {
+function FooterBar({
+  logoClassName = "h-12 w-auto object-contain sm:h-14 md:h-16",
+  showLogo = true,
+}: {
+  logoClassName?: string;
+  showLogo?: boolean;
+}) {
   return (
     <div className="container-page relative flex flex-row flex-nowrap items-center justify-between gap-2 py-3 sm:gap-4 sm:py-4">
-      <div className="relative z-10 shrink-0">
-        <img
-          src={logoUrl}
-          alt="The Royal Passage"
-          width={320}
-          height={110}
-          loading="lazy"
-          decoding="async"
-          className={`logo-breathe ${logoClassName}`}
-        />
-      </div>
+      {showLogo ? (
+        <div className="relative z-10 shrink-0">
+          <img
+            src={logoUrl}
+            alt="The Royal Passage"
+            width={320}
+            height={110}
+            loading="lazy"
+            decoding="async"
+            className={`logo-breathe ${logoClassName}`}
+          />
+        </div>
+      ) : (
+        <div className="relative z-10 w-0 shrink-0 sm:w-16" aria-hidden />
+      )}
 
       <div className="pointer-events-none absolute inset-x-0 top-1/2 z-0 flex -translate-y-1/2 justify-center px-2">
         <div className="pointer-events-auto max-w-[min(100%,28rem)] overflow-hidden">
@@ -150,84 +156,113 @@ function FooterFull() {
   return (
     <footer className="relative overflow-hidden border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
       <div className="container-page relative z-10 py-7 sm:py-12 lg:py-14">
-        <div className="flex flex-col gap-6 sm:gap-10 lg:flex-row lg:items-start lg:gap-8 xl:gap-10">
-          <div className="w-full shrink-0 lg:w-[15rem] xl:w-[16rem]">
-            <FooterBrandBlock logoClassName="h-14 w-auto sm:h-16" />
+        <div className="flex flex-col items-start gap-8 lg:flex-row lg:flex-nowrap lg:items-start lg:justify-between lg:gap-4 xl:gap-6">
+          <div className="w-full shrink-0 lg:w-auto lg:max-w-[14rem] xl:max-w-[18rem]">
+            <FooterBrandBlock logoClassName="h-28 w-auto max-w-full sm:h-32 lg:h-40 xl:h-44" />
           </div>
 
-          <div className="grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-6 sm:gap-x-10 sm:gap-y-10 lg:grid-cols-3 lg:gap-x-8 xl:gap-x-10">
-            <FooterColumn title="Quick Links">
-              <ul className="space-y-2 text-sm">
-                {quickLinks.map((l) => (
-                  <li key={l.label}>
+          <section className="min-w-0 w-full lg:w-auto lg:flex-1 lg:basis-0">
+            <div className="flex flex-col items-start gap-6 sm:gap-7">
+              <div>
+                <h2 className="eyebrow mb-3 text-ember/95">Experience Host</h2>
+                <ul className="space-y-2 text-sm">
+                  <li>
                     <Link
-                      to={l.to as "/experiences"}
+                      to="/partner/experience-host"
                       className="text-muted-foreground transition-colors hover:text-ember"
                     >
-                      {l.label}
+                      Partner with us
                     </Link>
                   </li>
-                ))}
-              </ul>
-            </FooterColumn>
-
-            <FooterColumn title="Experiences">
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                {experiences.map((e) => (
-                  <li key={e} className="transition-colors hover:text-ember">
-                    {e}
+                </ul>
+              </div>
+              <div>
+                <h2 className="eyebrow mb-3 text-ember/95">Homestay Host</h2>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <Link
+                      to="/partner/homestay-host"
+                      className="text-muted-foreground transition-colors hover:text-ember"
+                    >
+                      List your property
+                    </Link>
                   </li>
-                ))}
-              </ul>
-            </FooterColumn>
+                </ul>
+              </div>
+            </div>
+          </section>
 
-            <FooterColumn title="Get in Touch" className="col-span-2 lg:col-span-1">
-              <ul className="space-y-2.5 text-sm text-muted-foreground">
-                <li className="flex items-start gap-2.5">
-                  <Phone className="mt-0.5 h-4 w-4 shrink-0 text-ember/80" />
-                  <a href="tel:+91729588826" className="transition-colors hover:text-ember">
-                    +91 729588826
-                  </a>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-ember/80" />
-                  <a
-                    href="https://wa.me/91729588826"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="transition-colors hover:text-ember"
+          <FooterColumn title="Quick Links" className="min-w-0 w-full lg:w-auto lg:flex-1 lg:basis-0">
+            <ul className="space-y-2 text-sm">
+              {quickLinks.map((l) => (
+                <li key={l.label}>
+                  <Link
+                    to={l.to as "/experiences"}
+                    className="text-muted-foreground transition-colors hover:text-ember"
                   >
-                    WhatsApp: +91 729588826
-                  </a>
+                    {l.label}
+                  </Link>
                 </li>
-                <li className="flex items-start gap-2.5">
-                  <Mail className="mt-0.5 h-4 w-4 shrink-0 text-ember/80" />
-                  <a
-                    href={`mailto:${CONTACT_EMAIL}`}
-                    className="transition-colors hover:text-ember"
-                  >
-                    {CONTACT_EMAIL}
-                  </a>
+              ))}
+            </ul>
+          </FooterColumn>
+
+          <FooterColumn title="Experiences" className="min-w-0 w-full lg:w-auto lg:flex-1 lg:basis-0">
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              {experiences.map((e) => (
+                <li key={e} className="transition-colors hover:text-ember">
+                  {e}
                 </li>
-                <li className="flex items-start gap-2.5">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-ember/80" />
-                  <a
-                    href={MAPS_LINK}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="leading-snug transition-colors hover:text-ember"
-                  >
-                    5th Cross Road, Saraswathipuram, Mysuru, Karnataka 570009
-                  </a>
-                </li>
-              </ul>
-            </FooterColumn>
-          </div>
+              ))}
+            </ul>
+          </FooterColumn>
+
+          <FooterColumn title="Get in Touch" className="min-w-0 w-full lg:w-auto lg:flex-1 lg:basis-0">
+            <ul className="space-y-2.5 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2.5">
+                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-ember/80" />
+                <a href="tel:+91729588826" className="transition-colors hover:text-ember">
+                  +91 729588826
+                </a>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-ember/80" />
+                <a
+                  href="https://wa.me/91729588826"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="transition-colors hover:text-ember"
+                >
+                  WhatsApp: +91 729588826
+                </a>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-ember/80" />
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  className="transition-colors hover:text-ember"
+                >
+                  {CONTACT_EMAIL}
+                </a>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-ember/80" />
+                <a
+                  href={MAPS_LINK}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="leading-snug transition-colors hover:text-ember"
+                >
+                  5th Cross Road, Saraswathipuram, Mysuru, Karnataka 570009
+                </a>
+              </li>
+            </ul>
+          </FooterColumn>
         </div>
       </div>
 
       <div className="relative z-10 border-t border-[oklch(0.88_0.08_86_/_0.12)]">
-        <FooterBar logoClassName="h-12 w-auto object-contain sm:h-14" />
+        <FooterBar showLogo={false} />
       </div>
 
       <img

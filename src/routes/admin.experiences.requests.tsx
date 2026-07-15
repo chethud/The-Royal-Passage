@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AdminExperienceQueue } from "@/components/admin/AdminExperienceQueue";
+import { AdminPartnerExperienceApplicationsQueue } from "@/components/admin/AdminPartnerExperienceApplicationsQueue";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
@@ -13,7 +14,10 @@ export const Route = createFileRoute("/admin/experiences/requests")({
   head: () => ({
     meta: [
       { title: "Host requests — Experiences — The Royal Passage" },
-      { name: "description", content: "Pending host experience submissions awaiting approval." },
+      {
+        name: "description",
+        content: "Pending host listings and partner experience applications awaiting approval.",
+      },
       ...NOINDEX_META,
     ],
   }),
@@ -54,7 +58,7 @@ function AdminExperienceRequestsPage() {
     <DashboardShell
       role="admin"
       title="Host requests"
-      subtitle="Experience listings waiting for admin approval."
+      subtitle="Listing approvals and new partner experience applications."
       showRoleDescription={false}
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -69,9 +73,21 @@ function AdminExperienceRequestsPage() {
           Refresh
         </button>
       </div>
-      <LuxuryCheckoutPanel>
-        <AdminExperienceQueue accessToken={accessToken} refreshKey={refreshKey} />
-      </LuxuryCheckoutPanel>
+
+      <div className="space-y-6">
+        <LuxuryCheckoutPanel>
+          <h2 className="font-display text-xl luxury-panel-heading mb-4">Listing approvals</h2>
+          <AdminExperienceQueue accessToken={accessToken} refreshKey={refreshKey} />
+        </LuxuryCheckoutPanel>
+
+        <LuxuryCheckoutPanel>
+          <h2 className="font-display text-xl luxury-panel-heading mb-4">Partner applications</h2>
+          <AdminPartnerExperienceApplicationsQueue
+            accessToken={accessToken}
+            refreshKey={refreshKey}
+          />
+        </LuxuryCheckoutPanel>
+      </div>
     </DashboardShell>
   );
 }

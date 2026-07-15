@@ -30,6 +30,8 @@ import { Route as VipListingsRouteImport } from './routes/vip.listings'
 import { Route as VipDashboardRouteImport } from './routes/vip.dashboard'
 import { Route as VipBookingsRouteImport } from './routes/vip.bookings'
 import { Route as StaysBookingIdRouteImport } from './routes/stays.$bookingId'
+import { Route as PartnerHomestayHostRouteImport } from './routes/partner.homestay-host'
+import { Route as PartnerExperienceHostRouteImport } from './routes/partner.experience-host'
 import { Route as LegalPrivacyPolicyRouteImport } from './routes/legal.privacy-policy'
 import { Route as LegalPaymentPolicyRouteImport } from './routes/legal.payment-policy'
 import { Route as LegalExperienceTermsRouteImport } from './routes/legal.experience-terms'
@@ -220,6 +222,16 @@ const VipBookingsRoute = VipBookingsRouteImport.update({
 const StaysBookingIdRoute = StaysBookingIdRouteImport.update({
   id: '/stays/$bookingId',
   path: '/stays/$bookingId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerHomestayHostRoute = PartnerHomestayHostRouteImport.update({
+  id: '/partner/homestay-host',
+  path: '/partner/homestay-host',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerExperienceHostRoute = PartnerExperienceHostRouteImport.update({
+  id: '/partner/experience-host',
+  path: '/partner/experience-host',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LegalPrivacyPolicyRoute = LegalPrivacyPolicyRouteImport.update({
@@ -707,6 +719,8 @@ export interface FileRoutesByFullPath {
   '/legal/experience-terms': typeof LegalExperienceTermsRoute
   '/legal/payment-policy': typeof LegalPaymentPolicyRoute
   '/legal/privacy-policy': typeof LegalPrivacyPolicyRoute
+  '/partner/experience-host': typeof PartnerExperienceHostRoute
+  '/partner/homestay-host': typeof PartnerHomestayHostRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
   '/vip/bookings': typeof VipBookingsRouteWithChildren
   '/vip/dashboard': typeof VipDashboardRoute
@@ -804,6 +818,8 @@ export interface FileRoutesByTo {
   '/legal/experience-terms': typeof LegalExperienceTermsRoute
   '/legal/payment-policy': typeof LegalPaymentPolicyRoute
   '/legal/privacy-policy': typeof LegalPrivacyPolicyRoute
+  '/partner/experience-host': typeof PartnerExperienceHostRoute
+  '/partner/homestay-host': typeof PartnerHomestayHostRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
   '/vip/dashboard': typeof VipDashboardRoute
   '/admin': typeof AdminIndexRoute
@@ -911,6 +927,8 @@ export interface FileRoutesById {
   '/legal/experience-terms': typeof LegalExperienceTermsRoute
   '/legal/payment-policy': typeof LegalPaymentPolicyRoute
   '/legal/privacy-policy': typeof LegalPrivacyPolicyRoute
+  '/partner/experience-host': typeof PartnerExperienceHostRoute
+  '/partner/homestay-host': typeof PartnerHomestayHostRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
   '/vip/bookings': typeof VipBookingsRouteWithChildren
   '/vip/dashboard': typeof VipDashboardRoute
@@ -1022,6 +1040,8 @@ export interface FileRouteTypes {
     | '/legal/experience-terms'
     | '/legal/payment-policy'
     | '/legal/privacy-policy'
+    | '/partner/experience-host'
+    | '/partner/homestay-host'
     | '/stays/$bookingId'
     | '/vip/bookings'
     | '/vip/dashboard'
@@ -1119,6 +1139,8 @@ export interface FileRouteTypes {
     | '/legal/experience-terms'
     | '/legal/payment-policy'
     | '/legal/privacy-policy'
+    | '/partner/experience-host'
+    | '/partner/homestay-host'
     | '/stays/$bookingId'
     | '/vip/dashboard'
     | '/admin'
@@ -1225,6 +1247,8 @@ export interface FileRouteTypes {
     | '/legal/experience-terms'
     | '/legal/payment-policy'
     | '/legal/privacy-policy'
+    | '/partner/experience-host'
+    | '/partner/homestay-host'
     | '/stays/$bookingId'
     | '/vip/bookings'
     | '/vip/dashboard'
@@ -1323,6 +1347,8 @@ export interface RootRouteChildren {
   LegalExperienceTermsRoute: typeof LegalExperienceTermsRoute
   LegalPaymentPolicyRoute: typeof LegalPaymentPolicyRoute
   LegalPrivacyPolicyRoute: typeof LegalPrivacyPolicyRoute
+  PartnerExperienceHostRoute: typeof PartnerExperienceHostRoute
+  PartnerHomestayHostRoute: typeof PartnerHomestayHostRoute
   StaysBookingIdRoute: typeof StaysBookingIdRoute
   VipBookingsRoute: typeof VipBookingsRouteWithChildren
   VipDashboardRoute: typeof VipDashboardRoute
@@ -1486,6 +1512,20 @@ declare module '@tanstack/react-router' {
       path: '/stays/$bookingId'
       fullPath: '/stays/$bookingId'
       preLoaderRoute: typeof StaysBookingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner/homestay-host': {
+      id: '/partner/homestay-host'
+      path: '/partner/homestay-host'
+      fullPath: '/partner/homestay-host'
+      preLoaderRoute: typeof PartnerHomestayHostRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner/experience-host': {
+      id: '/partner/experience-host'
+      path: '/partner/experience-host'
+      fullPath: '/partner/experience-host'
+      preLoaderRoute: typeof PartnerExperienceHostRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/legal/privacy-policy': {
@@ -2406,6 +2446,8 @@ const rootRouteChildren: RootRouteChildren = {
   LegalExperienceTermsRoute: LegalExperienceTermsRoute,
   LegalPaymentPolicyRoute: LegalPaymentPolicyRoute,
   LegalPrivacyPolicyRoute: LegalPrivacyPolicyRoute,
+  PartnerExperienceHostRoute: PartnerExperienceHostRoute,
+  PartnerHomestayHostRoute: PartnerHomestayHostRoute,
   StaysBookingIdRoute: StaysBookingIdRoute,
   VipBookingsRoute: VipBookingsRouteWithChildren,
   VipDashboardRoute: VipDashboardRoute,

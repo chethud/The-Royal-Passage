@@ -15,6 +15,9 @@ type ExperiencePhotoGalleryProps = {
   label?: string;
   hint?: string;
   photoAltPrefix?: string;
+  /** Override default signed-in host upload (e.g. public partner applications). */
+  uploadFiles?: (files: File[]) => Promise<string[]>;
+  uploadRequiresAuthHint?: boolean;
 };
 
 export function ExperiencePhotoGallery({
@@ -25,6 +28,8 @@ export function ExperiencePhotoGallery({
   label = "Experience photos",
   hint = "Browse and upload multiple images from your device. The first photo becomes the cover image.",
   photoAltPrefix = "Photo",
+  uploadFiles,
+  uploadRequiresAuthHint = true,
 }: ExperiencePhotoGalleryProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewErrors, setPreviewErrors] = useState<Record<number, boolean>>({});
@@ -34,7 +39,7 @@ export function ExperiencePhotoGallery({
   const [urlDraft, setUrlDraft] = useState("");
 
   const savedPhotos = photoUrls.map((url) => url.trim()).filter(Boolean);
-  const uploadAvailable = isSupabaseBrowserConfigured();
+  const uploadAvailable = Boolean(uploadFiles) || isSupabaseBrowserConfigured();
 
   const appendUrls = (urls: string[]) => {
     if (urls.length === 0) return;
@@ -59,7 +64,10 @@ export function ExperiencePhotoGallery({
     setUploadError(null);
     setUploading(true);
     try {
-      const uploaded = await uploadExperiencePhotos(Array.from(files));
+      const list = Array.from(files);
+      const uploaded = uploadFiles
+        ? await uploadFiles(list)
+        : await uploadExperiencePhotos(list);
       appendUrls(uploaded);
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Failed to upload photos.");
@@ -129,7 +137,7 @@ export function ExperiencePhotoGallery({
               )}
             </button>
 
-            {!uploadAvailable ? (
+            {!uploadAvailable && uploadRequiresAuthHint ? (
               <p className="text-xs text-muted-foreground">
                 Photo upload requires Supabase configuration. Sign in as a host and ensure
                 VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set.

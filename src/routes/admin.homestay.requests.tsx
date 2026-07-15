@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AdminHomestayQueue } from "@/components/admin/AdminHomestayQueue";
+import { AdminPartnerHomestayApplicationsQueue } from "@/components/admin/AdminPartnerHomestayApplicationsQueue";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
@@ -13,7 +14,10 @@ export const Route = createFileRoute("/admin/homestay/requests")({
   head: () => ({
     meta: [
       { title: "Host requests — Homestays — The Royal Passage" },
-      { name: "description", content: "Pending homestay submissions awaiting approval." },
+      {
+        name: "description",
+        content: "Pending homestay listings and partner property applications awaiting approval.",
+      },
       ...NOINDEX_META,
     ],
   }),
@@ -54,7 +58,7 @@ function AdminHomestayRequestsPage() {
     <DashboardShell
       role="admin"
       title="Host requests"
-      subtitle="Homestay listings waiting for admin approval."
+      subtitle="Listing approvals and new partner property applications."
       showRoleDescription={false}
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -72,9 +76,21 @@ function AdminHomestayRequestsPage() {
           Refresh
         </button>
       </div>
-      <LuxuryCheckoutPanel>
-        <AdminHomestayQueue accessToken={accessToken} refreshKey={refreshKey} />
-      </LuxuryCheckoutPanel>
+
+      <div className="space-y-6">
+        <LuxuryCheckoutPanel>
+          <h2 className="mb-4 font-display text-xl luxury-panel-heading">Listing approvals</h2>
+          <AdminHomestayQueue accessToken={accessToken} refreshKey={refreshKey} />
+        </LuxuryCheckoutPanel>
+
+        <LuxuryCheckoutPanel>
+          <h2 className="mb-4 font-display text-xl luxury-panel-heading">Partner applications</h2>
+          <AdminPartnerHomestayApplicationsQueue
+            accessToken={accessToken}
+            refreshKey={refreshKey}
+          />
+        </LuxuryCheckoutPanel>
+      </div>
     </DashboardShell>
   );
 }
