@@ -22,6 +22,13 @@ const submitSchema = z.object({
   phone: z.string().trim().min(7).max(40),
   bio: z.string().trim().max(2000).optional(),
   city: z.string().trim().min(2).max(120),
+  panNumber: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z]{5}[0-9]{4}[A-Z]$/, "Enter a valid PAN (e.g. ABCDE1234F)."),
+  passportPhotoUrl: z.string().url().max(2000),
+  tradeLicenseUrl: z.string().url().max(2000),
   title: z.string().trim().min(3).max(200),
   tagline: z.string().trim().max(280).optional(),
   description: z.string().trim().min(20).max(8000),
@@ -74,6 +81,9 @@ export type PartnerExperienceApplication = {
   phone: string;
   bio: string | null;
   city: string;
+  panNumber: string | null;
+  passportPhotoUrl: string | null;
+  tradeLicenseUrl: string | null;
   title: string;
   tagline: string | null;
   description: string;
@@ -105,6 +115,9 @@ function mapRow(row: Record<string, unknown>): PartnerExperienceApplication {
     phone: String(row.phone ?? ""),
     bio: row.bio == null ? null : String(row.bio),
     city: String(row.city ?? ""),
+    panNumber: row.pan_number == null ? null : String(row.pan_number),
+    passportPhotoUrl: row.passport_photo_url == null ? null : String(row.passport_photo_url),
+    tradeLicenseUrl: row.trade_license_url == null ? null : String(row.trade_license_url),
     title: String(row.title ?? ""),
     tagline: row.tagline == null ? null : String(row.tagline),
     description: String(row.description ?? ""),
@@ -233,6 +246,9 @@ export const submitPartnerExperienceApplication = createServerFn({ method: "POST
         phone: data.phone,
         bio: data.bio?.trim() || null,
         city: data.city,
+        pan_number: data.panNumber.trim().toUpperCase(),
+        passport_photo_url: data.passportPhotoUrl,
+        trade_license_url: data.tradeLicenseUrl,
         title: data.title,
         tagline: data.tagline?.trim() || null,
         description: data.description,

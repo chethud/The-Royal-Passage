@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
@@ -57,11 +57,18 @@ async function uploadPartnerPhotos(files: File[]): Promise<string[]> {
 }
 
 export function PartnerExperienceApplicationForm() {
+  const passportInputRef = useRef<HTMLInputElement>(null);
+  const tradeLicenseInputRef = useRef<HTMLInputElement>(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [applicantCity, setApplicantCity] = useState("Mysuru");
   const [bio, setBio] = useState("");
+  const [panNumber, setPanNumber] = useState("");
+  const [passportPhotoUrl, setPassportPhotoUrl] = useState("");
+  const [tradeLicenseUrl, setTradeLicenseUrl] = useState("");
+  const [uploadingPassport, setUploadingPassport] = useState(false);
+  const [uploadingTradeLicense, setUploadingTradeLicense] = useState(false);
 
   const [title, setTitle] = useState("");
   const [tagline, setTagline] = useState("");
@@ -83,6 +90,39 @@ export function PartnerExperienceApplicationForm() {
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
+  const uploadOne = async (file: File) => {
+    const [url] = await uploadPartnerPhotos([file]);
+    return url;
+  };
+
+  const handlePassportSelect = async (file: File | null) => {
+    if (!file) return;
+    setError(null);
+    setUploadingPassport(true);
+    try {
+      setPassportPhotoUrl(await uploadOne(file));
+    } catch (err) {
+      setError(toErrorMessage(err, "Failed to upload passport photo."));
+    } finally {
+      setUploadingPassport(false);
+      if (passportInputRef.current) passportInputRef.current.value = "";
+    }
+  };
+
+  const handleTradeLicenseSelect = async (file: File | null) => {
+    if (!file) return;
+    setError(null);
+    setUploadingTradeLicense(true);
+    try {
+      setTradeLicenseUrl(await uploadOne(file));
+    } catch (err) {
+      setError(toErrorMessage(err, "Failed to upload trade licence."));
+    } finally {
+      setUploadingTradeLicense(false);
+      if (tradeLicenseInputRef.current) tradeLicenseInputRef.current.value = "";
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
@@ -93,6 +133,14 @@ export function PartnerExperienceApplicationForm() {
     }
     if (maxGuests < minGuests) {
       setError("Maximum guests must be at least the minimum.");
+      return;
+    }
+    if (!passportPhotoUrl.trim()) {
+      setError("Upload a passport-size photo.");
+      return;
+    }
+    if (!tradeLicenseUrl.trim()) {
+      setError("Upload your trade licence.");
       return;
     }
 
@@ -107,6 +155,9 @@ export function PartnerExperienceApplicationForm() {
           phone: phone.trim(),
           bio: bio.trim() || undefined,
           city: applicantCity.trim(),
+          panNumber: panNumber.trim().toUpperCase(),
+          passportPhotoUrl: passportPhotoUrl.trim(),
+          tradeLicenseUrl: tradeLicenseUrl.trim(),
           title: title.trim(),
           tagline: tagline.trim() || undefined,
           description: description.trim(),
@@ -208,6 +259,68 @@ export function PartnerExperienceApplicationForm() {
                 className={inputClass}
               />
             </label>
+            <label className="text-sm">
+              <span className="eyebrow luxury-panel-label">PAN</span>
+              <input
+                required
+                value={panNumber}
+                onChange={(e) => setPanNumber(e.target.value.toUpperCase())}
+                className={inputClass}
+                placeholder="ABCDE1234F"
+                maxLength={10}
+                autoComplete="off"
+              />
+            </label>
+            <div className="text-sm sm:col-span-2">
+              <p className="eyebrow luxury-panel-label mb-2">Passport-size photo</p>
+              <input
+                ref={passportInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="sr-only"
+                onChange={(e) => void handlePassportSelect(e.target.files?.[0] ?? null)}
+              />
+              <div className="flex flex-wrap items-center gap-4">
+                <button
+                  type="button"
+                  className="luxury-btn-sm dashboard-chrome-btn"
+                  disabled={uploadingPassport}
+                  onClick={() => passportInputRef.current?.click()}
+                >
+                  {uploadingPassport ? "Uploading…" : "Upload passport photo"}
+                </button>
+                {passportPhotoUrl ? (
+                  <img
+                    src={passportPhotoUrl}
+                    alt="Passport photo"
+                    className="h-20 w-16 rounded-sm border border-[rgb(74_0_0/0.15)] object-cover"
+                  />
+                ) : null}
+              </div>
+            </div>
+            <div className="text-sm sm:col-span-2">
+              <p className="eyebrow luxury-panel-label mb-2">Trade licence</p>
+              <input
+                ref={tradeLicenseInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="sr-only"
+                onChange={(e) => void handleTradeLicenseSelect(e.target.files?.[0] ?? null)}
+              />
+              <button
+                type="button"
+                className="luxury-btn-sm dashboard-chrome-btn"
+                disabled={uploadingTradeLicense}
+                onClick={() => tradeLicenseInputRef.current?.click()}
+              >
+                {uploadingTradeLicense ? "Uploading…" : "Upload trade licence"}
+              </button>
+              {tradeLicenseUrl ? (
+                <p className="luxury-panel-body mt-2 text-xs">Trade licence uploaded.</p>
+              ) : (
+                <p className="luxury-panel-body mt-2 text-xs">Required — your trade licence document.</p>
+              )}
+            </div>
             <label className="text-sm sm:col-span-2">
               <span className="eyebrow luxury-panel-label">Short bio (optional)</span>
               <textarea
@@ -413,7 +526,7 @@ export function PartnerExperienceApplicationForm() {
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || uploadingPassport || uploadingTradeLicense}
           className="luxury-btn luxury-btn-primary disabled:opacity-60"
         >
           {submitting ? "Submitting…" : "Submit application"}

@@ -8,6 +8,9 @@ create table if not exists public.partner_experience_applications (
   phone text not null,
   bio text,
   city text not null,
+  pan_number text,
+  passport_photo_url text,
+  trade_license_url text,
   -- Experience details
   title text not null,
   tagline text,

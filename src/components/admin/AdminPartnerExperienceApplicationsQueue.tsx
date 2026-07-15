@@ -241,6 +241,39 @@ export function AdminPartnerExperienceApplicationsQueue({
                         <span className="eyebrow luxury-panel-label mb-1 block">Submitted</span>
                         {formatDateLong(row.createdAt.slice(0, 10))}
                       </p>
+                      <p>
+                        <span className="eyebrow luxury-panel-label mb-1 block">PAN</span>
+                        {row.panNumber || "—"}
+                      </p>
+                      <p>
+                        <span className="eyebrow luxury-panel-label mb-1 block">Trade licence</span>
+                        {row.tradeLicenseUrl ? (
+                          <a
+                            href={row.tradeLicenseUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="luxury-panel-link underline"
+                          >
+                            View licence
+                          </a>
+                        ) : (
+                          "—"
+                        )}
+                      </p>
+                      <div>
+                        <span className="eyebrow luxury-panel-label mb-1 block">Passport-size photo</span>
+                        {row.passportPhotoUrl ? (
+                          <a href={row.passportPhotoUrl} target="_blank" rel="noreferrer">
+                            <img
+                              src={row.passportPhotoUrl}
+                              alt="Passport photo"
+                              className="mt-1 h-24 w-20 rounded-sm border border-[rgb(74_0_0/0.12)] object-cover"
+                            />
+                          </a>
+                        ) : (
+                          <span>—</span>
+                        )}
+                      </div>
                     </div>
                     {row.bio ? (
                       <div>
