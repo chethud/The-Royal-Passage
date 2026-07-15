@@ -126,7 +126,7 @@ export function AccountDropdownMenu({
       ? "Homestay reservations"
       : "Experience bookings";
   const workspaces: RoleWorkspaceLink[] = workspaceLinksForRoles(roles, role).filter(
-    (workspace) => workspace.role !== "host",
+    (workspace) => workspace.role !== "host" && workspace.role !== "homestay_owner",
   );
   const canEditHomepage = hasEditorAccess(roles, role);
   const isHost = role === "host" || roles.includes("host");
@@ -192,7 +192,7 @@ export function AccountDropdownMenu({
                 />
               ))}
             </>
-          ) : !isHost ? (
+          ) : !isHost && !isHomestayOwner ? (
             <>
               <DropdownMenuLabel className="header-account-menu__section">Navigate</DropdownMenuLabel>
               <AccountMenuItem

@@ -130,7 +130,9 @@ export function Header() {
         : undefined;
   const primaryRole = pickPrimaryRole(roles, role);
   const workspaceRole = activeWorkspaceRole(pathname, roles, primaryRole);
-  const workspaces = workspaceLinksForRoles(roles, primaryRole).filter((workspace) => workspace.role !== "host");
+  const workspaces = workspaceLinksForRoles(roles, primaryRole).filter(
+    (workspace) => workspace.role !== "host" && workspace.role !== "homestay_owner",
+  );
   const dashboardPath = workspaceRole
     ? dashboardPathForRole(workspaceRole)
     : dashboardPathForRoles(roles, role);
