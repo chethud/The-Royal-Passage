@@ -80,11 +80,19 @@ def host_booking_detail(booking_id: str, _auth=Depends(require_host)):
 
 
 @router.get("/revenue", response_model=HostRevenueSummary)
-def host_revenue(_auth=Depends(require_host)):
+def host_revenue(
+    period: str = "month",
+    _auth=Depends(require_host),
+):
     if not settings.supabase_configured:
         raise HTTPException(status_code=503, detail="Supabase is not configured on the API server.")
+    if period not in {"month", "months_6", "year"}:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid revenue period. Use month, months_6, or year.",
+        )
     try:
-        return get_host_revenue(_auth)
+        return get_host_revenue(_auth, period)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

@@ -36,12 +36,20 @@ export type HostRevenueDay = {
   estimatedMinor: number;
 };
 
+export type HostRevenuePeriod = "month" | "months_6" | "year";
+export type HostRevenueGrain = "day" | "month";
+
 export type HostRevenueSummary = {
   collectedMinor: number;
   pendingMinor: number;
   estimatedMinor: number;
   week: HostRevenueDay[];
   currencySymbol: string;
+  period: HostRevenuePeriod;
+  grain: HostRevenueGrain;
+  previousCollectedMinor: number;
+  previousPendingMinor: number;
+  previousEstimatedMinor: number;
 };
 
 export type HostReviewSummary = {
@@ -73,8 +81,9 @@ export function fetchHostBooking(accessToken: string, bookingId: string) {
   return apiFetch<BookingSummary>(`/api/v1/host/bookings/${bookingId}`, { accessToken });
 }
 
-export function fetchHostRevenue(accessToken: string) {
-  return apiFetch<HostRevenueSummary>("/api/v1/host/revenue", { accessToken });
+export function fetchHostRevenue(accessToken: string, period: HostRevenuePeriod = "month") {
+  const query = `?period=${encodeURIComponent(period)}`;
+  return apiFetch<HostRevenueSummary>(`/api/v1/host/revenue${query}`, { accessToken });
 }
 
 export function fetchHostReviews(accessToken: string) {

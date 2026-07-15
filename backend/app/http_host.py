@@ -76,8 +76,14 @@ async def host_revenue(request: Request) -> JSONResponse:
     auth = require_host_request(request)
     if isinstance(auth, JSONResponse):
         return auth
+    period = request.query_params.get("period", "month")
+    if period not in {"month", "months_6", "year"}:
+        return JSONResponse(
+            {"detail": "Invalid revenue period. Use month, months_6, or year."},
+            status_code=400,
+        )
     try:
-        return JSONResponse(get_host_revenue(auth).model_dump(mode="json"))
+        return JSONResponse(get_host_revenue(auth, period).model_dump(mode="json"))
     except ValueError as exc:
         return _host_value_error(exc)
 

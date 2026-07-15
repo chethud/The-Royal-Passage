@@ -51,10 +51,10 @@ export const getHostBookingDetail = createServerFn({ method: "POST" })
   });
 
 export const getHostRevenue = createServerFn({ method: "POST" })
-  .inputValidator(tokenSchema)
+  .inputValidator(tokenSchema.extend({ period: z.enum(["month", "months_6", "year"]).optional() }))
   .handler(async ({ data }): Promise<HostRevenueSummary> => {
     if (!isApiConfigured()) throw new Error("API is not configured.");
-    return fetchHostRevenue(data.accessToken);
+    return fetchHostRevenue(data.accessToken, data.period ?? "month");
   });
 
 export const listHostReviews = createServerFn({ method: "POST" })

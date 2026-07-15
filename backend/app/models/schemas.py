@@ -742,6 +742,11 @@ class HostRevenueSummary(BaseModel):
     estimatedMinor: int
     week: list[HostRevenueDay]
     currencySymbol: str = "₹"
+    period: str = "month"
+    grain: str = "day"
+    previousCollectedMinor: int = 0
+    previousPendingMinor: int = 0
+    previousEstimatedMinor: int = 0
 
 
 class HostReviewSummary(BaseModel):

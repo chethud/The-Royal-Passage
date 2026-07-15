@@ -252,18 +252,23 @@ def get_host_booking_by_id(booking_id: str, auth: dict) -> BookingSummary:
     return _map_booking_row(row)
 
 
-def get_host_revenue(auth: dict) -> HostRevenueSummary:
+def get_host_revenue(auth: dict, period: str = "month") -> HostRevenueSummary:
     supabase = get_supabase_admin()
     host_id = _resolve_host_id(auth)
     experience_ids = _host_experience_ids(supabase, host_id)
 
+    resolved_period = period if period in {"month", "months_6", "year"} else "month"
+
+    empty = HostRevenueSummary(
+        collectedMinor=0,
+        pendingMinor=0,
+        estimatedMinor=0,
+        week=[],
+        period=resolved_period,
+        grain="day" if resolved_period == "month" else "month",
+    )
     if not experience_ids:
-        return HostRevenueSummary(
-            collectedMinor=0,
-            pendingMinor=0,
-            estimatedMinor=0,
-            week=[],
-        )
+        return empty
 
     result = (
         supabase.table("bookings")
@@ -277,43 +282,87 @@ def get_host_revenue(auth: dict) -> HostRevenueSummary:
     bookings = result.data or []
 
     today = _host_today()
-    week_start = today - timedelta(days=6)
-    day_keys = [(week_start + timedelta(days=offset)).isoformat() for offset in range(7)]
-    buckets = {
-        key: {"collectedMinor": 0, "pendingMinor": 0, "estimatedMinor": 0} for key in day_keys
+    current_keys, previous_keys, grain = _revenue_period_keys(today, resolved_period)
+
+    current_buckets = {
+        key: {"collectedMinor": 0, "pendingMinor": 0, "estimatedMinor": 0} for key in current_keys
+    }
+    previous_buckets = {
+        key: {"collectedMinor": 0, "pendingMinor": 0, "estimatedMinor": 0} for key in previous_keys
     }
 
     for row in bookings:
         slot_day = _slot_date(row)
-        if slot_day is None or slot_day < week_start or slot_day > today:
+        if slot_day is None:
+            continue
+        key = _revenue_bucket_key(slot_day, grain)
+        if key not in current_buckets and key not in previous_buckets:
             continue
 
-        key = slot_day.isoformat()
         amount = _booking_amount(row)
         booking_status = row.get("booking_status")
-        payment_status = row.get("payment_status")
-        is_paid = payment_status == "paid"
+        is_paid = row.get("payment_status") == "paid"
+        target = current_buckets if key in current_buckets else previous_buckets
 
         if is_paid:
-            buckets[key]["collectedMinor"] += amount
+            target[key]["collectedMinor"] += amount
         elif booking_status in ("confirmed", "completed"):
-            # Confirmed COD still due; completed without paid stays visible as outstanding.
-            buckets[key]["pendingMinor"] += amount
+            target[key]["pendingMinor"] += amount
 
         if booking_status in ("pending", "confirmed"):
-            buckets[key]["estimatedMinor"] += amount
+            target[key]["estimatedMinor"] += amount
 
-    week = [
-        HostRevenueDay(date=key, **buckets[key])
-        for key in day_keys
-    ]
+    series = [HostRevenueDay(date=key, **current_buckets[key]) for key in current_keys]
+    previous_series = [HostRevenueDay(date=key, **previous_buckets[key]) for key in previous_keys]
 
     return HostRevenueSummary(
-        collectedMinor=sum(day.collectedMinor for day in week),
-        pendingMinor=sum(day.pendingMinor for day in week),
-        estimatedMinor=sum(day.estimatedMinor for day in week),
-        week=week,
+        collectedMinor=sum(day.collectedMinor for day in series),
+        pendingMinor=sum(day.pendingMinor for day in series),
+        estimatedMinor=sum(day.estimatedMinor for day in series),
+        week=series,
+        period=resolved_period,
+        grain=grain,
+        previousCollectedMinor=sum(day.collectedMinor for day in previous_series),
+        previousPendingMinor=sum(day.pendingMinor for day in previous_series),
+        previousEstimatedMinor=sum(day.estimatedMinor for day in previous_series),
     )
+
+
+def _add_months(value: date, months: int) -> date:
+    year = value.year + ((value.month - 1 + months) // 12)
+    month = (value.month - 1 + months) % 12 + 1
+    return date(year, month, 1)
+
+
+def _revenue_bucket_key(slot_day: date, grain: str) -> str:
+    if grain == "month":
+        return slot_day.replace(day=1).isoformat()
+    return slot_day.isoformat()
+
+
+def _revenue_period_keys(today: date, period: str) -> tuple[list[str], list[str], str]:
+    if period == "month":
+        start = today.replace(day=1)
+        previous_end = start - timedelta(days=1)
+        previous_start = previous_end.replace(day=1)
+        current_keys = [
+            (start + timedelta(days=offset)).isoformat()
+            for offset in range((today - start).days + 1)
+        ]
+        previous_keys = [
+            (previous_start + timedelta(days=offset)).isoformat()
+            for offset in range((previous_end - previous_start).days + 1)
+        ]
+        return current_keys, previous_keys, "day"
+
+    month_count = 6 if period == "months_6" else 12
+    current_start = _add_months(today.replace(day=1), -(month_count - 1))
+    previous_start = _add_months(current_start, -month_count)
+    current_keys = [_add_months(current_start, offset).isoformat() for offset in range(month_count)]
+    previous_keys = [
+        _add_months(previous_start, offset).isoformat() for offset in range(month_count)
+    ]
+    return current_keys, previous_keys, "month"
 
 
 def list_host_reviews(auth: dict, limit: int = 20) -> list[HostReviewSummary]:
