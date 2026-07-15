@@ -1,8 +1,8 @@
-import { marketplaceCardFrameClass } from "@/components/site/MarketplaceCard";
+import { marketplaceCardFrameLargeClass } from "@/components/site/MarketplaceCard";
 
 export function ExperienceCardSkeleton() {
   return (
-    <div className={marketplaceCardFrameClass} aria-hidden>
+    <div className={marketplaceCardFrameLargeClass} aria-hidden>
       <div className="luxury-shimmer absolute inset-0" />
       <div className="absolute inset-x-0 bottom-0 space-y-2.5 p-5">
         <div className="luxury-shimmer h-5 w-4/5 rounded-sm" />

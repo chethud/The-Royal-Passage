@@ -11,6 +11,7 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
 
   return (
     <MarketplaceCard
+      size="large"
       link={{
         to: "/experiences/$slug",
         params: { slug: exp.slug },

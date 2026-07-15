@@ -10,7 +10,13 @@ export const marketplaceCardActionClass =
 export const marketplaceCardFrameClass =
   "relative aspect-[16/11] w-full overflow-hidden rounded-md sm:aspect-[4/5]";
 
+/** Larger portrait frames for the experiences catalog. */
+export const marketplaceCardFrameLargeClass =
+  "relative aspect-[4/3] w-full overflow-hidden rounded-md sm:aspect-[3/4] sm:min-h-[26rem] lg:min-h-[32rem]";
+
 export const marketplaceCardShellClass = `${marketplaceCardFrameClass} shadow-[0_20px_50px_-28px_rgba(0,0,0,0.72)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_28px_56px_-24px_rgba(200,162,90,0.3)]`;
+
+export const marketplaceCardShellLargeClass = `${marketplaceCardFrameLargeClass} shadow-[0_20px_50px_-28px_rgba(0,0,0,0.72)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_28px_56px_-24px_rgba(200,162,90,0.3)]`;
 
 type MarketplaceCardLinkProps = {
   to: string;
@@ -29,6 +35,8 @@ type MarketplaceCardProps = {
   meta: ReactNode;
   topRight?: ReactNode;
   footer?: ReactNode;
+  /** Larger width/height frame — used on the experiences catalog. */
+  size?: "default" | "large";
 };
 
 function MarketplaceCardContent({
@@ -41,9 +49,11 @@ function MarketplaceCardContent({
   meta,
   topRight,
   footer,
+  size = "default",
 }: MarketplaceCardProps) {
+  const large = size === "large";
   return (
-    <article className={`group ${marketplaceCardShellClass}`}>
+    <article className={`group ${large ? marketplaceCardShellLargeClass : marketplaceCardShellClass}`}>
       <Link
         to={link.to}
         params={link.params}
@@ -62,15 +72,29 @@ function MarketplaceCardContent({
 
         <div className="absolute left-2.5 top-2.5 z-20 sm:left-3.5 sm:top-3.5">{topLeft}</div>
 
-        <div className="absolute inset-x-0 bottom-0 z-20 p-3.5 sm:p-5">
-          <h3 className="line-clamp-2 font-display text-base uppercase leading-snug tracking-[0.06em] text-[#F7F1E8] drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] transition-colors group-hover:text-[#D4AF6A] sm:text-lg">
+        <div className={`absolute inset-x-0 bottom-0 z-20 ${large ? "p-4 sm:p-6" : "p-3.5 sm:p-5"}`}>
+          <h3
+            className={`line-clamp-2 font-display uppercase leading-snug tracking-[0.06em] text-[#F7F1E8] drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] transition-colors group-hover:text-[#D4AF6A] ${
+              large
+                ? "text-lg sm:text-xl lg:text-2xl"
+                : "text-base sm:text-lg"
+            }`}
+          >
             {title}
           </h3>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.62rem] text-[#E8DCC8]/90 sm:mt-2.5 sm:gap-x-3.5 sm:text-[0.68rem]">
+          <div
+            className={`mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[#E8DCC8]/90 sm:mt-2.5 sm:gap-x-3.5 ${
+              large ? "text-[0.68rem] sm:text-[0.75rem]" : "text-[0.62rem] sm:text-[0.68rem]"
+            }`}
+          >
             {meta}
           </div>
           {footer ? <div className="mt-2 sm:mt-3">{footer}</div> : null}
-          <span className="mt-2 inline-flex items-center gap-1.5 text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-all duration-300 group-hover:gap-2.5 sm:mt-3 sm:text-[0.62rem]">
+          <span
+            className={`mt-2 inline-flex items-center gap-1.5 font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-all duration-300 group-hover:gap-2.5 sm:mt-3 ${
+              large ? "text-[0.62rem] sm:text-[0.68rem]" : "text-[0.58rem] sm:text-[0.62rem]"
+            }`}
+          >
             {ctaLabel}
             <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
           </span>
