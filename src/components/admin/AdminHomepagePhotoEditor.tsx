@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Loader2, Save } from "lucide-react";
 import { EditablePhotoField, EditableTextField } from "@/components/editor/EditableHomepageFields";
+import { LivePreviewLink } from "@/components/admin/LivePreviewLink";
 import { ShowcaseExperiencePicker } from "@/components/admin/ShowcaseExperiencePicker";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { useAuthUser } from "@/lib/auth-user";
@@ -188,19 +189,22 @@ export function AdminHomepagePhotoEditor({
               Heading 1 is priority. All three rotate on each homepage refresh or return visit.
             </p>
           </div>
-          <button
-            type="button"
-            disabled={!heroHeadingsDirty || busySection !== null}
-            onClick={() => void saveSection("heroHeadings")}
-            className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
-          >
-            {busySection === "heroHeadings" ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Save className="h-3.5 w-3.5" />
-            )}
-            Save headings
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <LivePreviewLink to="/" hash="hero" />
+            <button
+              type="button"
+              disabled={!heroHeadingsDirty || busySection !== null}
+              onClick={() => void saveSection("heroHeadings")}
+              className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              {busySection === "heroHeadings" ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Save className="h-3.5 w-3.5" />
+              )}
+              Save headings
+            </button>
+          </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {content.heroHeadings.map((heading, index) => (
@@ -291,15 +295,18 @@ export function AdminHomepagePhotoEditor({
               slideshow 2 or 3 is chosen at random. Set different photos in 2 and 3 so the hero changes.
             </p>
           </div>
-          <button
-            type="button"
-            disabled={!heroDirty || busySection !== null}
-            onClick={() => void saveSection("hero")}
-            className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
-          >
-            {busySection === "hero" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-            Save slideshows
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <LivePreviewLink to="/" hash="hero" />
+            <button
+              type="button"
+              disabled={!heroDirty || busySection !== null}
+              onClick={() => void saveSection("hero")}
+              className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              {busySection === "hero" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+              Save slideshows
+            </button>
+          </div>
         </div>
         <div className="grid gap-4 lg:grid-cols-3">
           {content.heroSlideshows.map((pack, packIndex) => (
@@ -378,19 +385,22 @@ export function AdminHomepagePhotoEditor({
               Slideshow on the Royal Homestays landing page (/homestays). Upload up to five photos.
             </p>
           </div>
-          <button
-            type="button"
-            disabled={!homestayHeroDirty || busySection !== null}
-            onClick={() => void saveSection("homestayHero")}
-            className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
-          >
-            {busySection === "homestayHero" ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Save className="h-3.5 w-3.5" />
-            )}
-            Save homestay hero
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <LivePreviewLink to="/homestays" />
+            <button
+              type="button"
+              disabled={!homestayHeroDirty || busySection !== null}
+              onClick={() => void saveSection("homestayHero")}
+              className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              {busySection === "homestayHero" ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Save className="h-3.5 w-3.5" />
+              )}
+              Save homestay hero
+            </button>
+          </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {content.homestayHero.map((slide, index) => (
@@ -430,19 +440,22 @@ export function AdminHomepagePhotoEditor({
               Pick a published host experience for each slot, or keep a custom photo.
             </p>
           </div>
-          <button
-            type="button"
-            disabled={!showcaseDirty || busySection !== null}
-            onClick={() => void saveSection("showcase")}
-            className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
-          >
-            {busySection === "showcase" ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Save className="h-3.5 w-3.5" />
-            )}
-            Save showcase
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <LivePreviewLink to="/" hash="experiences" />
+            <button
+              type="button"
+              disabled={!showcaseDirty || busySection !== null}
+              onClick={() => void saveSection("showcase")}
+              className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              {busySection === "showcase" ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Save className="h-3.5 w-3.5" />
+              )}
+              Save showcase
+            </button>
+          </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {content.showcase.map((item, index) => (
@@ -492,19 +505,22 @@ export function AdminHomepagePhotoEditor({
       <LuxuryCheckoutPanel>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Journal stories</h2>
-          <button
-            type="button"
-            disabled={!journalDirty || busySection !== null}
-            onClick={() => void saveSection("journal")}
-            className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
-          >
-            {busySection === "journal" ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Save className="h-3.5 w-3.5" />
-            )}
-            Save journal
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <LivePreviewLink to="/" hash="journal" />
+            <button
+              type="button"
+              disabled={!journalDirty || busySection !== null}
+              onClick={() => void saveSection("journal")}
+              className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              {busySection === "journal" ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Save className="h-3.5 w-3.5" />
+              )}
+              Save journal
+            </button>
+          </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           {content.journal.map((item, index) => (

@@ -27,7 +27,7 @@ export function AdminHomestayStatsGrid({ stats }: AdminHomestayStatsGridProps) {
           <ClickableStatCard
             label="Published properties"
             value={String(stats.publishedHomestays)}
-            to="/homestays"
+            to="/homestays/browse"
             surface={surface}
           />
           <ClickableStatCard

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Loader2, Save } from "lucide-react";
 import { HomestayCard } from "@/components/homestays/HomestayCard";
+import { LivePreviewLink } from "@/components/admin/LivePreviewLink";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import type { Homestay } from "@/data/homestays";
 import { resolveAccessToken } from "@/lib/auth-session";
@@ -115,15 +116,18 @@ export function AdminHomestayFeaturedEditor({
               section on the public homestays page.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => void save()}
-            disabled={busy || !dirty}
-            className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-            Save featured homestays
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <LivePreviewLink to="/homestays" hash="homestays" />
+            <button
+              type="button"
+              onClick={() => void save()}
+              disabled={busy || !dirty}
+              className="luxury-btn-sm luxury-btn-primary inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+              Save featured homestays
+            </button>
+          </div>
         </div>
 
         {message ? <p className="mt-4 text-sm text-emerald-700">{message}</p> : null}

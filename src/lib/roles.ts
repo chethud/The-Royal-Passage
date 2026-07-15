@@ -165,6 +165,7 @@ export function activeWorkspaceRole(
   if (
     (pathname.startsWith("/admin/homepage-edit") ||
       pathname.startsWith("/admin/homepage-photos") ||
+      pathname.startsWith("/admin/profile/homepage-photos") ||
       pathname.startsWith("/admin/homestay-featured")) &&
     hasAnyRole(resolved, ["editor", "admin"], primary)
   ) {

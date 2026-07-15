@@ -40,7 +40,7 @@ function AdminProfileLayout() {
     <DashboardShell
       role="admin"
       title="Profile"
-      subtitle="Your account, platform users, and homepage photo management."
+      subtitle="Admin account, provider users, team dashboards, and homepage photos."
       showRoleDescription={false}
     >
       <AdminProfileNav />

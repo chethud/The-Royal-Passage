@@ -2,28 +2,111 @@ import { useMemo, useState, type FormEvent } from "react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { createPlatformUser } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
-import { ROLE_DESCRIPTIONS, ROLE_LABELS, type UserRole } from "@/lib/roles";
+import type { UserRole } from "@/lib/roles";
 
 const inputClass =
   "w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
 
-const CREATABLE_ROLES = [
+export type CreatePlatformUserAudience = "providers" | "team";
+
+const PROVIDER_ROLES = ["host", "homestay_owner", "vip_owner"] as const satisfies readonly UserRole[];
+const TEAM_ROLES = [
+  "admin",
+  "editor",
   "host",
   "homestay_owner",
   "vip_owner",
-  "admin",
-  "editor",
 ] as const satisfies readonly UserRole[];
 
-type CreatableRole = (typeof CREATABLE_ROLES)[number];
+type ProviderRole = (typeof PROVIDER_ROLES)[number];
+type TeamRole = (typeof TEAM_ROLES)[number];
+type CreatableRole = ProviderRole | TeamRole;
+
+const PROVIDER_ROLE_META: Record<ProviderRole, { label: string; description: string }> = {
+  host: {
+    label: "Experiences",
+    description: "Provider login for experience listings, bookings, and host tools.",
+  },
+  homestay_owner: {
+    label: "Homestay",
+    description: "Provider login for properties, stay bookings, and homestay tools.",
+  },
+  vip_owner: {
+    label: "VIP",
+    description: "Provider login for VIP packages, members, and owner tools.",
+  },
+};
+
+const TEAM_ROLE_META: Record<TeamRole, { label: string; description: string }> = {
+  admin: {
+    label: "Admin",
+    description: "Full platform dashboard — bookings, approvals, users, and site content.",
+  },
+  editor: {
+    label: "Editor",
+    description: "Content dashboard — homepage photos, headings, journal, and heritage video.",
+  },
+  host: {
+    label: "Experiences",
+    description: "Experiences host dashboard — manage listings, sessions, and bookings.",
+  },
+  homestay_owner: {
+    label: "Homestay",
+    description: "Homestay owner dashboard — manage properties and stay bookings.",
+  },
+  vip_owner: {
+    label: "VIP",
+    description: "VIP owner dashboard — manage packages, members, and requests.",
+  },
+};
+
+const AUDIENCE_CONFIG = {
+  providers: {
+    roles: PROVIDER_ROLES,
+    roleMeta: PROVIDER_ROLE_META as Record<CreatableRole, { label: string; description: string }>,
+    defaultRoles: ["host"] as CreatableRole[],
+    title: "Create provider login",
+    subtitle:
+      "Provision Experiences, Homestay, or VIP access for providers. Guests sign up themselves; provider logins are created here by admins.",
+    rolesLegend: "Access areas",
+    rolesHint:
+      "Selected: {summary}. Providers can hold more than one area, such as Experiences and Homestay.",
+    submitIdle: "Create provider login",
+    notice: (email: string, summary: string) =>
+      `Provider login created for ${email} with access: ${summary}. Share these credentials securely.`,
+  },
+  team: {
+    roles: TEAM_ROLES,
+    roleMeta: TEAM_ROLE_META as Record<CreatableRole, { label: string; description: string }>,
+    defaultRoles: ["admin"] as CreatableRole[],
+    title: "Add team member",
+    subtitle:
+      "Create logins for your team so they can open dashboards: Admin, Editor, Experiences, Homestay, or VIP.",
+    rolesLegend: "Dashboard access",
+    rolesHint:
+      "Selected: {summary}. Team members can hold more than one dashboard role when needed.",
+    submitIdle: "Create team login",
+    notice: (email: string, summary: string) =>
+      `Team login created for ${email} with access: ${summary}. Share these credentials securely.`,
+  },
+} as const;
 
 type CreatePlatformUserFormProps = {
   accessToken: string;
   onCreated: () => void;
+  audience?: CreatePlatformUserAudience;
 };
 
-export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatformUserFormProps) {
-  const [roles, setRoles] = useState<CreatableRole[]>(["host"]);
+export function CreatePlatformUserForm({
+  accessToken,
+  onCreated,
+  audience = "providers",
+}: CreatePlatformUserFormProps) {
+  const config = AUDIENCE_CONFIG[audience];
+  const roleMeta = config.roleMeta;
+  const creatableRoles = config.roles as readonly CreatableRole[];
+
+  const [roles, setRoles] = useState<CreatableRole[]>([...config.defaultRoles]);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,8 +121,8 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
   const showAddress = roles.includes("homestay_owner") || roles.includes("vip_owner");
 
   const roleSummary = useMemo(
-    () => roles.map((role) => ROLE_LABELS[role]).join(", "),
-    [roles],
+    () => roles.map((role) => roleMeta[role].label).join(", "),
+    [roleMeta, roles],
   );
 
   const toggleRole = (role: CreatableRole) => {
@@ -73,9 +156,7 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
         bio: showBio ? bio.trim() || undefined : undefined,
         address: showAddress ? address.trim() || undefined : undefined,
       });
-      setNotice(
-        `Login created for ${email.trim()} with access: ${roleSummary}. Share these credentials securely.`,
-      );
+      setNotice(config.notice(email.trim(), roleSummary));
       setFullName("");
       setEmail("");
       setPassword("");
@@ -90,22 +171,22 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
     }
   };
 
+  const fieldPrefix = audience === "team" ? "team-user" : "platform-user";
+
   return (
     <LuxuryCheckoutPanel>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <h2 className="luxury-panel-heading font-display text-2xl">Create platform user</h2>
-          <p className="luxury-panel-body mt-2 text-sm">
-            Create a login and assign one or more access roles. Guests sign up themselves; all
-            other access is provisioned here by admins.
-          </p>
+          <h2 className="luxury-panel-heading font-display text-2xl">{config.title}</h2>
+          <p className="luxury-panel-body mt-2 text-sm">{config.subtitle}</p>
         </div>
 
         <fieldset>
-          <legend className="eyebrow luxury-panel-label mb-3 block">Access roles</legend>
+          <legend className="eyebrow luxury-panel-label mb-3 block">{config.rolesLegend}</legend>
           <div className="grid gap-3 sm:grid-cols-2">
-            {CREATABLE_ROLES.map((value) => {
+            {creatableRoles.map((value) => {
               const checked = roles.includes(value);
+              const meta = roleMeta[value];
               return (
                 <label
                   key={value}
@@ -122,11 +203,9 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
                     className="mt-1"
                   />
                   <span>
-                    <span className="block text-sm font-medium text-[#4A0000]">
-                      {ROLE_LABELS[value]}
-                    </span>
+                    <span className="block text-sm font-medium text-[#4A0000]">{meta.label}</span>
                     <span className="mt-1 block text-xs leading-relaxed text-[rgb(74_0_0/0.72)]">
-                      {ROLE_DESCRIPTIONS[value]}
+                      {meta.description}
                     </span>
                   </span>
                 </label>
@@ -134,17 +213,17 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
             })}
           </div>
           <p className="luxury-panel-body mt-2 text-xs">
-            Selected: {roleSummary}. Users can hold multiple roles, such as host and editor.
+            {config.rolesHint.replace("{summary}", roleSummary)}
           </p>
         </fieldset>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="platform-user-name" className="eyebrow luxury-panel-label mb-2 block">
+            <label htmlFor={`${fieldPrefix}-name`} className="eyebrow luxury-panel-label mb-2 block">
               Full name
             </label>
             <input
-              id="platform-user-name"
+              id={`${fieldPrefix}-name`}
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -153,11 +232,11 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
             />
           </div>
           <div>
-            <label htmlFor="platform-user-email" className="eyebrow luxury-panel-label mb-2 block">
+            <label htmlFor={`${fieldPrefix}-email`} className="eyebrow luxury-panel-label mb-2 block">
               Login email
             </label>
             <input
-              id="platform-user-email"
+              id={`${fieldPrefix}-email`}
               type="email"
               required
               value={email}
@@ -167,11 +246,14 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
             />
           </div>
           <div>
-            <label htmlFor="platform-user-password" className="eyebrow luxury-panel-label mb-2 block">
+            <label
+              htmlFor={`${fieldPrefix}-password`}
+              className="eyebrow luxury-panel-label mb-2 block"
+            >
               Temporary password
             </label>
             <input
-              id="platform-user-password"
+              id={`${fieldPrefix}-password`}
               type="password"
               required
               minLength={8}
@@ -182,11 +264,11 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
             />
           </div>
           <div>
-            <label htmlFor="platform-user-phone" className="eyebrow luxury-panel-label mb-2 block">
+            <label htmlFor={`${fieldPrefix}-phone`} className="eyebrow luxury-panel-label mb-2 block">
               Phone
             </label>
             <input
-              id="platform-user-phone"
+              id={`${fieldPrefix}-phone`}
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -198,11 +280,11 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
 
         {showBio ? (
           <div>
-            <label htmlFor="platform-user-bio" className="eyebrow luxury-panel-label mb-2 block">
+            <label htmlFor={`${fieldPrefix}-bio`} className="eyebrow luxury-panel-label mb-2 block">
               Short bio
             </label>
             <textarea
-              id="platform-user-bio"
+              id={`${fieldPrefix}-bio`}
               rows={3}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
@@ -214,11 +296,14 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
 
         {showAddress ? (
           <div>
-            <label htmlFor="platform-user-address" className="eyebrow luxury-panel-label mb-2 block">
+            <label
+              htmlFor={`${fieldPrefix}-address`}
+              className="eyebrow luxury-panel-label mb-2 block"
+            >
               Address
             </label>
             <textarea
-              id="platform-user-address"
+              id={`${fieldPrefix}-address`}
               rows={2}
               value={address}
               onChange={(e) => setAddress(e.target.value)}
@@ -233,7 +318,7 @@ export function CreatePlatformUserForm({ accessToken, onCreated }: CreatePlatfor
           disabled={busy || roles.length === 0}
           className="luxury-btn-sm luxury-btn-primary disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {busy ? "Creating login…" : "Create user login"}
+          {busy ? "Creating login…" : config.submitIdle}
         </button>
 
         {error ? (

@@ -125,7 +125,7 @@ function AdminHomestayOverviewPage() {
                 label="Featured homestays"
                 detail="Choose the top 3 on the homestays page"
               />
-              <QuickLink to="/homestays" label="Live catalog" detail="Public homestay listings" />
+              <QuickLink to="/homestays/browse" label="Live catalog" detail="Public homestay listings" />
             </div>
           </LuxuryCheckoutPanel>
         ) : null}

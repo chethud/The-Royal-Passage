@@ -6,14 +6,14 @@ import { useAuthUser } from "@/lib/auth-user";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
-export const Route = createFileRoute("/admin/profile/users")({
+export const Route = createFileRoute("/admin/profile/my-team")({
   head: () => ({
-    meta: [{ title: "Platform users — The Royal Passage" }],
+    meta: [{ title: "My team — The Royal Passage" }],
   }),
-  component: AdminProfileUsersPage,
+  component: AdminProfileMyTeamPage,
 });
 
-function AdminProfileUsersPage() {
+function AdminProfileMyTeamPage() {
   const { user } = useAuthUser();
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -34,7 +34,7 @@ function AdminProfileUsersPage() {
   return (
     <div className="space-y-8">
       <CreatePlatformUserForm
-        audience="providers"
+        audience="team"
         accessToken={accessToken}
         onCreated={() => setRefreshKey((value) => value + 1)}
       />

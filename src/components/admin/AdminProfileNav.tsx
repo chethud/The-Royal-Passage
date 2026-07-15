@@ -1,10 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 
 const ADMIN_PROFILE_NAV = [
-  { to: "/admin/profile", label: "Account" },
+  { to: "/admin/profile", label: "Admin" },
   { to: "/admin/profile/users", label: "Users" },
-  { to: "/admin/homepage-photos", label: "Homepage photos" },
-  { to: "/admin/homestay-featured", label: "Featured homestays" },
+  { to: "/admin/profile/my-team", label: "My team" },
+  { to: "/admin/profile/homepage-photos", label: "Homepage photos" },
 ] as const;
 
 const linkClass =

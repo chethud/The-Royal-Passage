@@ -140,7 +140,10 @@ export function HomeHero({
   const heading = activeHeading ?? headings[0];
 
   return (
-    <section className="relative min-h-[max(640px,100dvh)] w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)]">
+    <section
+      id="hero"
+      className="relative min-h-[max(640px,100dvh)] w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)]"
+    >
       <motion.div
         className="absolute inset-0 z-0 origin-center"
         initial={false}

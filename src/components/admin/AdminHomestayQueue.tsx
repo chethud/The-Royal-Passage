@@ -49,7 +49,7 @@ export function AdminHomestayQueue({ accessToken, refreshKey = 0 }: AdminHomesta
     return (
       <div className="py-8 text-center">
         <p className="luxury-panel-body text-sm">No homestays awaiting review.</p>
-        <Link to="/homestays" className="luxury-panel-link mt-3 inline-block text-sm font-medium hover:underline">
+        <Link to="/homestays/browse" className="luxury-panel-link mt-3 inline-block text-sm font-medium hover:underline">
           Browse live catalog →
         </Link>
       </div>

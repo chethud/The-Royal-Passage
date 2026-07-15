@@ -2,13 +2,13 @@ import type { ComponentType } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   History,
-  Home,
   Image,
   LayoutDashboard,
   LogOut,
   Pencil,
   Star,
   UserCircle,
+  UserCog,
   Users,
 } from "lucide-react";
 import {
@@ -225,13 +225,7 @@ export function AccountDropdownMenu({
                 icon={Image}
                 label="Homepage photos"
                 description="Hero, showcase, journal & featured stays"
-                to="/admin/homepage-photos"
-              />
-              <AccountMenuItem
-                icon={Home}
-                label="Featured homestays"
-                description="Top 3 stays on /homestays"
-                to="/admin/homestay-featured"
+                to="/admin/profile/homepage-photos"
               />
             </>
           ) : null}
@@ -242,27 +236,27 @@ export function AccountDropdownMenu({
             <>
               <AccountMenuItem
                 icon={UserCircle}
-                label="Account"
+                label="Admin"
                 description="Your admin profile & settings"
                 to="/admin/profile"
               />
               <AccountMenuItem
                 icon={Users}
                 label="Users"
-                description="Create and manage platform users"
+                description="Create Experiences, Homestay & VIP logins"
                 to="/admin/profile/users"
+              />
+              <AccountMenuItem
+                icon={UserCog}
+                label="My team"
+                description="Create dashboard logins for Admin, Editor, Experiences, Homestay & VIP"
+                to="/admin/profile/my-team"
               />
               <AccountMenuItem
                 icon={Image}
                 label="Homepage photos"
                 description="Manage homepage imagery"
-                to="/admin/homepage-photos"
-              />
-              <AccountMenuItem
-                icon={Home}
-                label="Featured homestays"
-                description="Top 3 stays on /homestays"
-                to="/admin/homestay-featured"
+                to="/admin/profile/homepage-photos"
               />
             </>
           ) : (

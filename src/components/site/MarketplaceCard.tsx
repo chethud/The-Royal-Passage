@@ -10,9 +10,9 @@ export const marketplaceCardActionClass =
 export const marketplaceCardFrameClass =
   "relative aspect-[16/11] w-full overflow-hidden rounded-md sm:aspect-[4/5]";
 
-/** Larger portrait frames for the experiences catalog (fits 3 across). */
+/** Larger frames for the experiences catalog (fits 3 across) — shorter than full-portrait. */
 export const marketplaceCardFrameLargeClass =
-  "relative aspect-[4/3] w-full overflow-hidden rounded-md sm:aspect-[3/4] sm:min-h-[22rem] lg:min-h-[26rem] xl:min-h-[28rem]";
+  "relative aspect-[16/10] w-full overflow-hidden rounded-md sm:aspect-[4/5] sm:min-h-[16rem] lg:min-h-[18rem] xl:min-h-[20rem]";
 
 export const marketplaceCardShellClass = `${marketplaceCardFrameClass} shadow-[0_20px_50px_-28px_rgba(0,0,0,0.72)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_28px_56px_-24px_rgba(200,162,90,0.3)]`;
 

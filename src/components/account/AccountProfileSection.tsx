@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { GuestProfileForm } from "@/components/guest/GuestProfileForm";
+import { StaffAccountForm } from "@/components/account/StaffAccountForm";
 import type { GuestProfile } from "@/lib/api/guest";
+import { useAuthUser } from "@/lib/auth-user";
 import { fetchAccountProfile } from "@/lib/profile-browser";
+import { isGuestAccount } from "@/lib/roles";
 import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 import { toErrorMessage } from "@/lib/api/client";
 
 export function AccountProfileSection() {
+  const { role, roles } = useAuthUser();
+  const showPassport = isGuestAccount(role, roles);
   const [profile, setProfile] = useState<GuestProfile | null>(null);
   const [pageError, setPageError] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
@@ -44,5 +49,9 @@ export function AccountProfileSection() {
 
   if (!profile) return null;
 
-  return <GuestProfileForm profile={profile} onUpdated={(updated) => setProfile(updated)} />;
+  if (showPassport) {
+    return <GuestProfileForm profile={profile} onUpdated={(updated) => setProfile(updated)} />;
+  }
+
+  return <StaffAccountForm profile={profile} onUpdated={(updated) => setProfile(updated)} />;
 }

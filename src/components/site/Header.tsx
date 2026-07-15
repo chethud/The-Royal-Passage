@@ -75,7 +75,6 @@ function navItemsForWorkspace(
     return [
       { label: "Edit homepage", to: "/admin/homepage-edit" },
       { label: "Homepage photos", to: "/admin/homepage-photos" },
-      { label: "Featured homestays", to: "/admin/homestay-featured" },
       ...publicGuestNavItems(),
     ];
   }
@@ -365,10 +364,10 @@ export function Header() {
                         <MobileNavSectionLabel>Administration</MobileNavSectionLabel>
                         <MobileNavLink to="/admin/reviews">Reviews</MobileNavLink>
                         <MobileNavLink to="/admin/homepage-edit">Edit homepage</MobileNavLink>
-                        <MobileNavLink to="/admin/profile">Account</MobileNavLink>
+                        <MobileNavLink to="/admin/profile">Admin</MobileNavLink>
                         <MobileNavLink to="/admin/profile/users">Users</MobileNavLink>
+                        <MobileNavLink to="/admin/profile/my-team">My team</MobileNavLink>
                         <MobileNavLink to="/admin/profile/homepage-photos">Homepage photos</MobileNavLink>
-                        <MobileNavLink to="/admin/homestay-featured">Featured homestays</MobileNavLink>
                       </>
                     ) : (
                       <>

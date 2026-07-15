@@ -58,7 +58,7 @@ function AdminHomestaysPage() {
       showRoleDescription={false}
     >
       <div className="mb-5 flex flex-wrap items-center justify-end gap-3">
-        <Link to="/homestays" className="dashboard-chrome-link">
+        <Link to="/homestays/browse" className="dashboard-chrome-link">
           View live catalog →
         </Link>
       </div>

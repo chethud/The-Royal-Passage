@@ -104,6 +104,7 @@ import { Route as AdminVipRequestsRouteImport } from './routes/admin.vip.request
 import { Route as AdminVipPendingBookingsRouteImport } from './routes/admin.vip.pending-bookings'
 import { Route as AdminVipPackagesPackageIdRouteImport } from './routes/admin.vip-packages.$packageId'
 import { Route as AdminProfileUsersRouteImport } from './routes/admin.profile.users'
+import { Route as AdminProfileMyTeamRouteImport } from './routes/admin.profile.my-team'
 import { Route as AdminProfileHomepagePhotosRouteImport } from './routes/admin.profile.homepage-photos'
 import { Route as AdminHomestaysHomestayIdRouteImport } from './routes/admin.homestays.$homestayId'
 import { Route as AdminHomestayRequestsRouteImport } from './routes/admin.homestay.requests'
@@ -595,6 +596,11 @@ const AdminProfileUsersRoute = AdminProfileUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminProfileRoute,
 } as any)
+const AdminProfileMyTeamRoute = AdminProfileMyTeamRouteImport.update({
+  id: '/my-team',
+  path: '/my-team',
+  getParentRoute: () => AdminProfileRoute,
+} as any)
 const AdminProfileHomepagePhotosRoute =
   AdminProfileHomepagePhotosRouteImport.update({
     id: '/homepage-photos',
@@ -719,6 +725,7 @@ export interface FileRoutesByFullPath {
   '/admin/homestay/requests': typeof AdminHomestayRequestsRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
+  '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
   '/admin/vip/pending-bookings': typeof AdminVipPendingBookingsRoute
@@ -812,6 +819,7 @@ export interface FileRoutesByTo {
   '/admin/homestay/requests': typeof AdminHomestayRequestsRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
+  '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
   '/admin/vip/pending-bookings': typeof AdminVipPendingBookingsRoute
@@ -921,6 +929,7 @@ export interface FileRoutesById {
   '/admin/homestay/requests': typeof AdminHomestayRequestsRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
+  '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
   '/admin/vip/pending-bookings': typeof AdminVipPendingBookingsRoute
@@ -1031,6 +1040,7 @@ export interface FileRouteTypes {
     | '/admin/homestay/requests'
     | '/admin/homestays/$homestayId'
     | '/admin/profile/homepage-photos'
+    | '/admin/profile/my-team'
     | '/admin/profile/users'
     | '/admin/vip-packages/$packageId'
     | '/admin/vip/pending-bookings'
@@ -1124,6 +1134,7 @@ export interface FileRouteTypes {
     | '/admin/homestay/requests'
     | '/admin/homestays/$homestayId'
     | '/admin/profile/homepage-photos'
+    | '/admin/profile/my-team'
     | '/admin/profile/users'
     | '/admin/vip-packages/$packageId'
     | '/admin/vip/pending-bookings'
@@ -1232,6 +1243,7 @@ export interface FileRouteTypes {
     | '/admin/homestay/requests'
     | '/admin/homestays/$homestayId'
     | '/admin/profile/homepage-photos'
+    | '/admin/profile/my-team'
     | '/admin/profile/users'
     | '/admin/vip-packages/$packageId'
     | '/admin/vip/pending-bookings'
@@ -1994,6 +2006,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProfileUsersRouteImport
       parentRoute: typeof AdminProfileRoute
     }
+    '/admin/profile/my-team': {
+      id: '/admin/profile/my-team'
+      path: '/my-team'
+      fullPath: '/admin/profile/my-team'
+      preLoaderRoute: typeof AdminProfileMyTeamRouteImport
+      parentRoute: typeof AdminProfileRoute
+    }
     '/admin/profile/homepage-photos': {
       id: '/admin/profile/homepage-photos'
       path: '/homepage-photos'
@@ -2076,12 +2095,14 @@ declare module '@tanstack/react-router' {
 
 interface AdminProfileRouteChildren {
   AdminProfileHomepagePhotosRoute: typeof AdminProfileHomepagePhotosRoute
+  AdminProfileMyTeamRoute: typeof AdminProfileMyTeamRoute
   AdminProfileUsersRoute: typeof AdminProfileUsersRoute
   AdminProfileIndexRoute: typeof AdminProfileIndexRoute
 }
 
 const AdminProfileRouteChildren: AdminProfileRouteChildren = {
   AdminProfileHomepagePhotosRoute: AdminProfileHomepagePhotosRoute,
+  AdminProfileMyTeamRoute: AdminProfileMyTeamRoute,
   AdminProfileUsersRoute: AdminProfileUsersRoute,
   AdminProfileIndexRoute: AdminProfileIndexRoute,
 }

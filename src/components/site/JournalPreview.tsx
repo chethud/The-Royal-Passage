@@ -30,7 +30,7 @@ export function JournalPreview({
   };
 
   return (
-    <section className="bg-background pt-10 pb-8 sm:pt-12 sm:pb-10 md:pt-14 md:pb-12">
+    <section id="journal" className="bg-background pt-10 pb-8 sm:pt-12 sm:pb-10 md:pt-14 md:pb-12">
       <div className="container-page">
         <ScrollRevealGroup
           depth3d

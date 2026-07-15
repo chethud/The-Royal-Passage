@@ -1,7 +1,6 @@
-import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Navigate, useNavigate, useRouter } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { AdminHomepagePhotoEditor } from "@/components/admin/AdminHomepagePhotoEditor";
-import { AdminHomestayFeaturedEditor } from "@/components/admin/AdminHomestayFeaturedEditor";
+import { HomepagePhotosSection } from "@/components/admin/HomepagePhotosSection";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import { getHomepageContent } from "@/lib/homepage-content-fns";
@@ -45,7 +44,8 @@ function HomepagePhotosPage() {
   const { homepage, experiences, homestays, featuredSlugs } = Route.useLoaderData();
   const [savedFeaturedSlugs, setSavedFeaturedSlugs] = useState(featuredSlugs);
   const canEdit = hasEditorAccess(roles, role);
-  const shellRole = hasAdminAccess(roles, role) ? "admin" : "editor";
+  const isAdmin = hasAdminAccess(roles, role);
+  const shellRole = isAdmin ? "admin" : "editor";
 
   useEffect(() => {
     setSavedFeaturedSlugs(featuredSlugs);
@@ -66,7 +66,15 @@ function HomepagePhotosPage() {
     void router.invalidate();
   }, [router]);
 
-  if (loading || !user || !canEdit || !accessToken) {
+  if (loading || !user || !canEdit) {
+    return null;
+  }
+
+  if (isAdmin) {
+    return <Navigate to="/admin/profile/homepage-photos" replace />;
+  }
+
+  if (!accessToken) {
     return (
       <DashboardShell
         role={shellRole}
@@ -86,36 +94,16 @@ function HomepagePhotosPage() {
       subtitle="Update hero, heading, showcase, journal, homestay hero imagery, and featured homestays for the public site."
       showRoleDescription={false}
     >
-      <div className="mb-5 flex flex-wrap gap-3">
-        <Link to="/homestays" className="dashboard-chrome-link">
-          View live homestays page →
-        </Link>
-        <Link to="/admin/homestay-featured" className="dashboard-chrome-link">
-          Featured page →
-        </Link>
-      </div>
-
-      <div className="space-y-10 pt-2">
-        <AdminHomepagePhotoEditor initialContent={homepage} experiences={experiences} />
-
-        <section className="space-y-4 border-t border-[rgb(200_162_90/0.22)] pt-8">
-          <div>
-            <h2 className="font-display text-2xl tracking-wide text-ink">Featured homestays</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">
-              Pick the three stays shown in &ldquo;Rest Where Stories Live&rdquo; on the public
-              homestays page.
-            </p>
-          </div>
-          <AdminHomestayFeaturedEditor
-            homestays={homestays}
-            initialSlugs={savedFeaturedSlugs}
-            onSaved={(slugs) => {
-              setSavedFeaturedSlugs(slugs);
-              refresh();
-            }}
-          />
-        </section>
-      </div>
+      <HomepagePhotosSection
+        homepage={homepage}
+        experiences={experiences}
+        homestays={homestays}
+        featuredSlugs={savedFeaturedSlugs}
+        onFeaturedSaved={(slugs) => {
+          setSavedFeaturedSlugs(slugs);
+          refresh();
+        }}
+      />
     </DashboardShell>
   );
 }
