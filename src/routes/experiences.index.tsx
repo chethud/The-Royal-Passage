@@ -156,7 +156,7 @@ function ExperiencesPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="grid grid-cols-1 gap-7 sm:grid-cols-2 sm:gap-8"
+                  className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-5 xl:gap-6"
                 >
                   {Array.from({ length: 3 }).map((_, i) => (
                     <ExperienceCardSkeleton key={i} />
@@ -172,7 +172,7 @@ function ExperiencesPage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.35 }}
-                  className="grid grid-cols-1 gap-7 sm:grid-cols-2 sm:gap-8"
+                  className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-5 xl:gap-6"
                 >
                   {paged.map((e) => (
                     <ExperienceCard key={e.id} exp={e} />
