@@ -2,7 +2,6 @@ import { Clock, MapPin } from "lucide-react";
 import type { Experience } from "@/data/experiences";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
-import { ExperienceSmartBadges } from "@/components/experiences/ExperienceSmartBadges";
 import { OfferPrice } from "@/components/pricing/OfferPrice";
 import { categoryIconForLabel } from "@/lib/experience-category-icons";
 import { MarketplaceCard, marketplaceCardActionClass } from "@/components/site/MarketplaceCard";
@@ -24,16 +23,13 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
       title={exp.title}
       ctaLabel="View details"
       topLeft={
-        <div className="flex flex-col items-start gap-1.5">
-          <span
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-[#D4AF6A] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
-            aria-label={exp.category}
-            title={exp.category}
-          >
-            <CategoryIcon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
-          </span>
-          <ExperienceSmartBadges exp={exp} />
-        </div>
+        <span
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-[#D4AF6A] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
+          aria-label={exp.category}
+          title={exp.category}
+        >
+          <CategoryIcon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+        </span>
       }
       topRight={
         <>
