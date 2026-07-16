@@ -28,6 +28,7 @@ type CreateExperienceWizardProps = {
       mapLink?: string;
       durationMinutes: number;
       pricePerPersonMinor: number;
+      compareAtPricePerPersonMinor?: number | null;
       heroImageUrl?: string;
       galleryUrls?: string[];
       inclusions: string[];
@@ -96,6 +97,7 @@ export function CreateExperienceWizard({
   const [mapLink, setMapLink] = useState("");
   const [durationMinutes, setDurationMinutes] = useState(120);
   const [priceMajor, setPriceMajor] = useState(0);
+  const [compareAtMajor, setCompareAtMajor] = useState(0);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [inclusions, setInclusions] = useState("");
   const [exclusions, setExclusions] = useState("");
@@ -259,6 +261,7 @@ export function CreateExperienceWizard({
           mapLink: mapLink.trim() || undefined,
           durationMinutes,
           pricePerPersonMinor: priceMajor * 100,
+          compareAtPricePerPersonMinor: compareAtMajor > 0 ? compareAtMajor * 100 : null,
           heroImageUrl: galleryUrls[0],
           galleryUrls,
           inclusions: splitLines(inclusions),
@@ -428,6 +431,17 @@ export function CreateExperienceWizard({
                 onChange={setPriceMajor}
                 className={inputClass}
               />
+            </label>
+            <label className="text-sm">
+              <span className="eyebrow luxury-panel-label">Original price / was (₹)</span>
+              <RupeeAmountInput
+                value={compareAtMajor}
+                onChange={setCompareAtMajor}
+                className={inputClass}
+              />
+              <span className={hintClass}>
+                Optional. Leave blank for no offer. Must be higher than the selling price.
+              </span>
             </label>
             <label className="text-sm">
               <span className="eyebrow luxury-panel-label">Min guests / booking</span>

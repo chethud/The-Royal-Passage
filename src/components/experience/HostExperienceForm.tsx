@@ -25,6 +25,7 @@ type HostExperienceFormProps = {
     mapLink?: string;
     durationMinutes: number;
     pricePerPersonMinor: number;
+    compareAtPricePerPersonMinor?: number | null;
     heroImageUrl?: string;
     galleryUrls?: string[];
     inclusions: string[];
@@ -68,6 +69,11 @@ export function HostExperienceForm({
   const [durationMinutes, setDurationMinutes] = useState(initial?.durationMinutes ?? 120);
   const [priceMajor, setPriceMajor] = useState(
     initial ? Math.round(initial.pricePerPersonMinor / 100) : 0,
+  );
+  const [compareAtMajor, setCompareAtMajor] = useState(
+    initial?.compareAtPricePerPersonMinor
+      ? Math.round(initial.compareAtPricePerPersonMinor / 100)
+      : 0,
   );
   const [photoUrls, setPhotoUrls] = useState<string[]>(() => {
     const existing = initial?.galleryUrls?.length
@@ -118,6 +124,7 @@ export function HostExperienceForm({
       mapLink: mapLink.trim() || undefined,
       durationMinutes,
       pricePerPersonMinor: priceMajor * 100,
+      compareAtPricePerPersonMinor: compareAtMajor > 0 ? compareAtMajor * 100 : null,
       heroImageUrl: galleryUrls[0],
       galleryUrls,
       inclusions: splitLines(inclusions),
@@ -256,6 +263,18 @@ export function HostExperienceForm({
               onChange={setPriceMajor}
               className={inputClass}
             />
+          </label>
+          <label className="text-sm">
+            <span className="eyebrow text-muted-foreground">Original price / was (₹)</span>
+            <RupeeAmountInput
+              disabled={readOnly}
+              value={compareAtMajor}
+              onChange={setCompareAtMajor}
+              className={inputClass}
+            />
+            <span className="mt-1 block text-xs text-muted-foreground">
+              Optional. Leave blank for no offer. Must be higher than the selling price.
+            </span>
           </label>
           <label className="text-sm">
             <span className="eyebrow text-muted-foreground">Min guests / booking</span>

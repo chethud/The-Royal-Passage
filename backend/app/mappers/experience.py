@@ -54,6 +54,11 @@ def map_row_to_experience(row: dict, slots: list[dict]) -> Experience:
         hostBio=host.get("bio") or "",
         verifiedHost=bool(host.get("verified")),
         pricePerPerson=round(row["price_per_person_minor"] / 100),
+        compareAtPricePerPerson=(
+            round(int(row["compare_at_price_per_person_minor"]) / 100)
+            if row.get("compare_at_price_per_person_minor")
+            else None
+        ),
         rating=float(row.get("average_rating") or 0),
         reviewsCount=int(row.get("review_count") or 0),
         image=hero,

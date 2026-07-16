@@ -59,6 +59,16 @@ def _format_time(value: str) -> str:
     return value[:5] if value and len(value) >= 5 else value or "14:00"
 
 
+def _normalize_compare_at_minor(
+    compare_at: int | None, selling: int, *, label: str = "Original (was) price"
+) -> int | None:
+    if compare_at is None or int(compare_at) <= 0:
+        return None
+    if int(compare_at) <= int(selling):
+        raise ValueError(f"{label} must be higher than the selling price.")
+    return int(compare_at)
+
+
 def _slugify(title: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
     return slug[:80] or f"homestay-{uuid.uuid4().hex[:8]}"
@@ -255,6 +265,8 @@ def _map_owner_homestay(row: dict, rooms: list[dict], availability: list[dict]) 
         mapLink=row.get("map_link"),
         pricePerNightMinor=int(row.get("price_per_night_minor") or 0),
         weekendPricePerNightMinor=row.get("weekend_price_per_night_minor"),
+        compareAtPricePerNightMinor=row.get("compare_at_price_per_night_minor"),
+        compareAtWeekendPricePerNightMinor=row.get("compare_at_weekend_price_per_night_minor"),
         status=row.get("status") or "draft",
         heroImageUrl=row.get("hero_image_url"),
         galleryUrls=row.get("gallery_urls") or [],
@@ -375,6 +387,18 @@ def create_owner_homestay(auth: dict, payload: CreateOwnerHomestayRequest) -> Ow
         "weekend_price_per_night_minor": payload.weekendPricePerNightMinor
         if payload.weekendPricePerNightMinor is not None
         else payload.pricePerNightMinor,
+        "compare_at_price_per_night_minor": _normalize_compare_at_minor(
+            payload.compareAtPricePerNightMinor,
+            payload.pricePerNightMinor,
+            label="Weekday original (was) price",
+        ),
+        "compare_at_weekend_price_per_night_minor": _normalize_compare_at_minor(
+            payload.compareAtWeekendPricePerNightMinor,
+            payload.weekendPricePerNightMinor
+            if payload.weekendPricePerNightMinor is not None
+            else payload.pricePerNightMinor,
+            label="Weekend original (was) price",
+        ),
         "hero_image_url": hero_image_url,
         "gallery_urls": gallery_urls,
         "amenities": payload.amenities,
@@ -454,6 +478,45 @@ def update_owner_homestay(
         updates["price_per_night_minor"] = payload.pricePerNightMinor
     if payload.weekendPricePerNightMinor is not None:
         updates["weekend_price_per_night_minor"] = payload.weekendPricePerNightMinor
+
+    unset = payload.model_fields_set
+    if (
+        "pricePerNightMinor" in unset
+        or "weekendPricePerNightMinor" in unset
+        or "compareAtPricePerNightMinor" in unset
+        or "compareAtWeekendPricePerNightMinor" in unset
+    ):
+        weekday_selling = int(
+            updates.get("price_per_night_minor", row.get("price_per_night_minor") or 0)
+        )
+        weekend_selling = int(
+            updates.get(
+                "weekend_price_per_night_minor",
+                row.get("weekend_price_per_night_minor") or weekday_selling,
+            )
+            or weekday_selling
+        )
+        if "compareAtPricePerNightMinor" in unset:
+            updates["compare_at_price_per_night_minor"] = _normalize_compare_at_minor(
+                payload.compareAtPricePerNightMinor,
+                weekday_selling,
+                label="Weekday original (was) price",
+            )
+        else:
+            existing = row.get("compare_at_price_per_night_minor")
+            if existing is not None and int(existing) <= weekday_selling:
+                updates["compare_at_price_per_night_minor"] = None
+        if "compareAtWeekendPricePerNightMinor" in unset:
+            updates["compare_at_weekend_price_per_night_minor"] = _normalize_compare_at_minor(
+                payload.compareAtWeekendPricePerNightMinor,
+                weekend_selling,
+                label="Weekend original (was) price",
+            )
+        else:
+            existing_weekend = row.get("compare_at_weekend_price_per_night_minor")
+            if existing_weekend is not None and int(existing_weekend) <= weekend_selling:
+                updates["compare_at_weekend_price_per_night_minor"] = None
+
     if payload.heroImageUrl is not None:
         updates["hero_image_url"] = payload.heroImageUrl
     if payload.galleryUrls is not None:

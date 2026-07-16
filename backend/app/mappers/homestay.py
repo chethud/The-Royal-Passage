@@ -83,6 +83,16 @@ def map_row_to_homestay(row: dict, rooms: list[dict]) -> Homestay:
         mapLink=row.get("map_link"),
         pricePerNight=base_night,
         weekendPricePerNight=weekend_night,
+        compareAtPricePerNight=(
+            round(int(row["compare_at_price_per_night_minor"]) / 100)
+            if row.get("compare_at_price_per_night_minor")
+            else None
+        ),
+        compareAtWeekendPricePerNight=(
+            round(int(row["compare_at_weekend_price_per_night_minor"]) / 100)
+            if row.get("compare_at_weekend_price_per_night_minor")
+            else None
+        ),
         rating=float(row.get("rating_avg") or 0),
         reviewsCount=int(row.get("reviews_count") or 0),
         image=hero,

@@ -759,6 +759,8 @@ message OwnerHomestayDetail {
   optional int32 weekend_price_per_night_minor = 32;
   optional string license_certificate_url = 33;
   optional int32 weekend_extra_bed_price_per_night_minor = 34;
+  optional int32 compare_at_price_per_night_minor = 35;
+  optional int32 compare_at_weekend_price_per_night_minor = 36;
 }
 
 message ListOwnerHomestaysResponse {
@@ -793,6 +795,8 @@ message CreateOwnerHomestayRequest {
   optional int32 weekend_price_per_night_minor = 25;
   string license_certificate_url = 26;
   optional int32 weekend_extra_bed_price_per_night_minor = 27;
+  optional int32 compare_at_price_per_night_minor = 28;
+  optional int32 compare_at_weekend_price_per_night_minor = 29;
 }
 
 message UpdateOwnerHomestayRequest {
@@ -823,6 +827,8 @@ message UpdateOwnerHomestayRequest {
   optional int32 weekend_price_per_night_minor = 25;
   optional string license_certificate_url = 26;
   optional int32 weekend_extra_bed_price_per_night_minor = 27;
+  optional int32 compare_at_price_per_night_minor = 28;
+  optional int32 compare_at_weekend_price_per_night_minor = 29;
 }
 
 message CreateOwnerHomestayRoomRequest {

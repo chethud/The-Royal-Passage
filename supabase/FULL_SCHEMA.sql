@@ -164,6 +164,11 @@ create table if not exists public.experiences (
   pricing_model text not null default 'per_person'
     check (pricing_model in ('per_person', 'per_group', 'both')),
   price_per_person_minor int not null check (price_per_person_minor >= 0),
+  compare_at_price_per_person_minor int
+    check (
+      compare_at_price_per_person_minor is null
+      or compare_at_price_per_person_minor > price_per_person_minor
+    ),
   price_per_group_minor int,
   status text not null default 'draft'
     check (status in ('draft', 'pending_review', 'published', 'rejected', 'archived')),
@@ -1890,4 +1895,63 @@ alter table public.bookings
 create index if not exists idx_bookings_confirmed_upcoming_reminders
   on public.bookings (booking_status)
   where booking_status = 'confirmed';
+
+-- =============================================================================
+-- COMPARE-AT / OFFER PRICING (display-only; guests pay selling prices)
+-- =============================================================================
+
+alter table public.experiences
+  add column if not exists compare_at_price_per_person_minor integer;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'experiences_compare_at_price_per_person_minor_check'
+  ) then
+    alter table public.experiences
+      add constraint experiences_compare_at_price_per_person_minor_check
+      check (
+        compare_at_price_per_person_minor is null
+        or compare_at_price_per_person_minor > price_per_person_minor
+      );
+  end if;
+end $$;
+
+alter table public.homestays
+  add column if not exists compare_at_price_per_night_minor integer;
+
+alter table public.homestays
+  add column if not exists compare_at_weekend_price_per_night_minor integer;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'homestays_compare_at_price_per_night_minor_check'
+  ) then
+    alter table public.homestays
+      add constraint homestays_compare_at_price_per_night_minor_check
+      check (
+        compare_at_price_per_night_minor is null
+        or compare_at_price_per_night_minor > price_per_night_minor
+      );
+  end if;
+
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'homestays_compare_at_weekend_price_per_night_minor_check'
+  ) then
+    alter table public.homestays
+      add constraint homestays_compare_at_weekend_price_per_night_minor_check
+      check (
+        compare_at_weekend_price_per_night_minor is null
+        or compare_at_weekend_price_per_night_minor
+          > coalesce(weekend_price_per_night_minor, price_per_night_minor)
+      );
+  end if;
+end $$;
 

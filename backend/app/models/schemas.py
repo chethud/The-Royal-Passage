@@ -36,6 +36,7 @@ class Experience(BaseModel):
     hostBio: str
     verifiedHost: bool
     pricePerPerson: int
+    compareAtPricePerPerson: int | None = None
     rating: float
     reviewsCount: int
     image: str
@@ -101,6 +102,8 @@ class Homestay(BaseModel):
     mapLink: str | None = None
     pricePerNight: int
     weekendPricePerNight: int | None = None
+    compareAtPricePerNight: int | None = None
+    compareAtWeekendPricePerNight: int | None = None
     rating: float
     reviewsCount: int
     image: str
@@ -223,6 +226,8 @@ class OwnerHomestayDetail(BaseModel):
     mapLink: str | None = None
     pricePerNightMinor: int
     weekendPricePerNightMinor: int | None = None
+    compareAtPricePerNightMinor: int | None = None
+    compareAtWeekendPricePerNightMinor: int | None = None
     status: str
     heroImageUrl: str | None = None
     galleryUrls: list[str] = Field(default_factory=list)
@@ -259,6 +264,8 @@ class CreateOwnerHomestayRequest(BaseModel):
     mapLink: str | None = Field(default=None, max_length=500)
     pricePerNightMinor: int = Field(ge=0)
     weekendPricePerNightMinor: int | None = Field(default=None, ge=0)
+    compareAtPricePerNightMinor: int | None = Field(default=None, ge=0)
+    compareAtWeekendPricePerNightMinor: int | None = Field(default=None, ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] = Field(default_factory=list)
     amenities: list[str] = Field(default_factory=list)
@@ -289,6 +296,8 @@ class UpdateOwnerHomestayRequest(BaseModel):
     mapLink: str | None = Field(default=None, max_length=500)
     pricePerNightMinor: int | None = Field(default=None, ge=0)
     weekendPricePerNightMinor: int | None = Field(default=None, ge=0)
+    compareAtPricePerNightMinor: int | None = Field(default=None, ge=0)
+    compareAtWeekendPricePerNightMinor: int | None = Field(default=None, ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] | None = None
     amenities: list[str] | None = None
@@ -935,6 +944,7 @@ class WishlistExperienceSummary(BaseModel):
     city: str
     image: str
     pricePerPerson: int
+    compareAtPricePerPerson: int | None = None
     rating: float
     reviewsCount: int
     currencySymbol: str
@@ -970,6 +980,7 @@ class HostExperienceSummary(BaseModel):
     city: str
     status: str
     pricePerPersonMinor: int
+    compareAtPricePerPersonMinor: int | None = None
     currencySymbol: str
     slotCount: int
     image: str | None
@@ -990,6 +1001,7 @@ class HostExperienceDetail(BaseModel):
     mapLink: str | None = None
     durationMinutes: int
     pricePerPersonMinor: int
+    compareAtPricePerPersonMinor: int | None = None
     status: str
     heroImageUrl: str | None
     galleryUrls: list[str] = Field(default_factory=list)
@@ -1019,6 +1031,7 @@ class CreateHostExperienceRequest(BaseModel):
     mapLink: str | None = Field(default=None, max_length=500)
     durationMinutes: int = Field(ge=30, le=480)
     pricePerPersonMinor: int = Field(ge=0)
+    compareAtPricePerPersonMinor: int | None = Field(default=None, ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] = Field(default_factory=list)
     inclusions: list[str] = Field(default_factory=list)
@@ -1043,6 +1056,7 @@ class UpdateHostExperienceRequest(BaseModel):
     mapLink: str | None = Field(default=None, max_length=500)
     durationMinutes: int | None = Field(default=None, ge=30, le=480)
     pricePerPersonMinor: int | None = Field(default=None, ge=0)
+    compareAtPricePerPersonMinor: int | None = Field(default=None, ge=0)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] | None = None
     inclusions: list[str] | None = None

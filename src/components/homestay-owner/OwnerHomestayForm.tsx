@@ -58,6 +58,12 @@ export function OwnerHomestayForm({
   const [weekendPriceMajor, setWeekendPriceMajor] = useState(
     Math.round((initial?.weekendPricePerNightMinor ?? initial?.pricePerNightMinor ?? 0) / 100) || 0,
   );
+  const [compareAtWeekdayMajor, setCompareAtWeekdayMajor] = useState(
+    Math.round((initial?.compareAtPricePerNightMinor ?? 0) / 100) || 0,
+  );
+  const [compareAtWeekendMajor, setCompareAtWeekendMajor] = useState(
+    Math.round((initial?.compareAtWeekendPricePerNightMinor ?? 0) / 100) || 0,
+  );
   const [photoUrls, setPhotoUrls] = useState<string[]>(() => {
     const existing = initial?.galleryUrls?.length
       ? initial.galleryUrls
@@ -126,6 +132,9 @@ export function OwnerHomestayForm({
       address: address.trim() || undefined,
       pricePerNightMinor: priceMajor * 100,
       weekendPricePerNightMinor: weekendPriceMajor * 100,
+      compareAtPricePerNightMinor: compareAtWeekdayMajor > 0 ? compareAtWeekdayMajor * 100 : null,
+      compareAtWeekendPricePerNightMinor:
+        compareAtWeekendMajor > 0 ? compareAtWeekendMajor * 100 : null,
       heroImageUrl: galleryUrls[0],
       galleryUrls,
       amenities: splitLines(amenitiesText),
@@ -248,6 +257,26 @@ export function OwnerHomestayForm({
               className={inputClass}
               value={weekendPriceMajor}
               onChange={setWeekendPriceMajor}
+              disabled={disabled || saving}
+            />
+          </label>
+          <label className="block">
+            <span className={labelClass}>Weekday original / was (₹)</span>
+            <p className="luxury-panel-body mb-2 text-xs">Optional offer list price</p>
+            <RupeeAmountInput
+              className={inputClass}
+              value={compareAtWeekdayMajor}
+              onChange={setCompareAtWeekdayMajor}
+              disabled={disabled || saving}
+            />
+          </label>
+          <label className="block">
+            <span className={labelClass}>Weekend original / was (₹)</span>
+            <p className="luxury-panel-body mb-2 text-xs">Optional · leave blank for no offer</p>
+            <RupeeAmountInput
+              className={inputClass}
+              value={compareAtWeekendMajor}
+              onChange={setCompareAtWeekendMajor}
               disabled={disabled || saving}
             />
           </label>

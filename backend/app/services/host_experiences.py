@@ -48,6 +48,14 @@ def _format_time(value: str) -> str:
     return value[:5] if value and len(value) >= 5 else value or ""
 
 
+def _normalize_compare_at_minor(compare_at: int | None, selling: int, *, label: str = "Original (was) price") -> int | None:
+    if compare_at is None or int(compare_at) <= 0:
+        return None
+    if int(compare_at) <= int(selling):
+        raise ValueError(f"{label} must be higher than the selling price.")
+    return int(compare_at)
+
+
 def _slugify(title: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
     return slug[:80] or f"experience-{uuid.uuid4().hex[:8]}"
@@ -147,6 +155,7 @@ def _map_host_experience(row: dict, slots: list[dict]) -> HostExperienceDetail:
         mapLink=row.get("map_link"),
         durationMinutes=int(row.get("duration_minutes") or 60),
         pricePerPersonMinor=int(row.get("price_per_person_minor") or 0),
+        compareAtPricePerPersonMinor=row.get("compare_at_price_per_person_minor"),
         status=row.get("status") or "draft",
         heroImageUrl=row.get("hero_image_url"),
         galleryUrls=row.get("gallery_urls") or [],
@@ -184,7 +193,9 @@ def list_host_experiences(auth: dict) -> list[HostExperienceSummary]:
 
     result = (
         supabase.table("experiences")
-        .select("id, slug, title, city, status, price_per_person_minor, currency_code, hero_image_url")
+        .select(
+            "id, slug, title, city, status, price_per_person_minor, compare_at_price_per_person_minor, currency_code, hero_image_url"
+        )
         .eq("host_id", host_id)
         .neq("status", "archived")
         .order("updated_at", desc=True)
@@ -214,6 +225,7 @@ def list_host_experiences(auth: dict) -> list[HostExperienceSummary]:
             city=row.get("city") or "",
             status=row.get("status") or "draft",
             pricePerPersonMinor=int(row.get("price_per_person_minor") or 0),
+            compareAtPricePerPersonMinor=row.get("compare_at_price_per_person_minor"),
             currencySymbol=_currency_symbol(row.get("currency_code") or "INR"),
             slotCount=slot_counts.get(row["id"], 0),
             image=row.get("hero_image_url"),
@@ -283,6 +295,10 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
         "address": payload.address,
         "duration_minutes": payload.durationMinutes,
         "price_per_person_minor": payload.pricePerPersonMinor,
+        "compare_at_price_per_person_minor": _normalize_compare_at_minor(
+            payload.compareAtPricePerPersonMinor,
+            payload.pricePerPersonMinor,
+        ),
         "hero_image_url": hero_image_url,
         "gallery_urls": gallery_urls,
         "inclusions": payload.inclusions,
@@ -350,6 +366,22 @@ def update_host_experience(
         updates["duration_minutes"] = payload.durationMinutes
     if payload.pricePerPersonMinor is not None:
         updates["price_per_person_minor"] = payload.pricePerPersonMinor
+
+    unset = payload.model_fields_set
+    if "pricePerPersonMinor" in unset or "compareAtPricePerPersonMinor" in unset:
+        selling = int(
+            updates.get("price_per_person_minor", row.get("price_per_person_minor") or 0)
+        )
+        if "compareAtPricePerPersonMinor" in unset:
+            updates["compare_at_price_per_person_minor"] = _normalize_compare_at_minor(
+                payload.compareAtPricePerPersonMinor,
+                selling,
+            )
+        else:
+            existing = row.get("compare_at_price_per_person_minor")
+            if existing is not None and int(existing) <= selling:
+                updates["compare_at_price_per_person_minor"] = None
+
     if payload.heroImageUrl is not None:
         updates["hero_image_url"] = payload.heroImageUrl
     if payload.galleryUrls is not None:

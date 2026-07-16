@@ -27,6 +27,11 @@ def _map_wishlist_row(row: dict) -> WishlistItem:
             city=experience.get("city", ""),
             image=experience.get("hero_image_url") or "",
             pricePerPerson=round((experience.get("price_per_person_minor") or 0) / 100),
+            compareAtPricePerPerson=(
+                round(int(experience["compare_at_price_per_person_minor"]) / 100)
+                if experience.get("compare_at_price_per_person_minor")
+                else None
+            ),
             rating=float(experience.get("average_rating") or 0),
             reviewsCount=int(experience.get("review_count") or 0),
             currencySymbol=_currency_symbol(experience.get("currency_code") or "INR"),
@@ -40,7 +45,8 @@ WISHLIST_SELECT = """
     created_at,
     experiences (
       id, slug, title, tagline, city, hero_image_url,
-      price_per_person_minor, average_rating, review_count, currency_code,
+      price_per_person_minor, compare_at_price_per_person_minor,
+      average_rating, review_count, currency_code,
       hosts ( display_name )
     )
 """

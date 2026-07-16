@@ -18,6 +18,7 @@ import {
 } from "@/lib/booking-window";
 import { bookExperiencePath, guestBookingLimits } from "@/lib/booking-url";
 import { formatDateLong } from "@/lib/date-format";
+import { OfferPrice } from "@/components/pricing/OfferPrice";
 import { formatMoney } from "@/lib/money";
 import { isGuestAccount, isStaffRole } from "@/lib/roles";
 import { useBookingClock } from "@/hooks/use-today-iso-date";
@@ -26,7 +27,13 @@ import { formatTime12h } from "@/lib/weekday-slots";
 type ExperienceBookingPanelProps = {
   exp: Pick<
     Experience,
-    "slug" | "pricePerPerson" | "currencySymbol" | "slots" | "minGuestsPerBooking" | "maxGuestsPerBooking"
+    | "slug"
+    | "pricePerPerson"
+    | "compareAtPricePerPerson"
+    | "currencySymbol"
+    | "slots"
+    | "minGuestsPerBooking"
+    | "maxGuestsPerBooking"
   >;
   selectedSlot: Slot | null;
   onSelectSlot: (slot: Slot) => void;
@@ -390,10 +397,18 @@ export function ExperienceBookingPanel({
           <BookingTotalSummary
             surface={surface}
             breakdown={
-              <>
-                {sym}
-                {exp.pricePerPerson} × {guests} guest{guests > 1 ? "s" : ""}
-              </>
+              <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+                <OfferPrice
+                  price={exp.pricePerPerson}
+                  compareAt={exp.compareAtPricePerPerson}
+                  currencySymbol={sym}
+                  tone={surface === "dark" ? "dark" : "light"}
+                  showPercent={false}
+                />
+                <span>
+                  × {guests} guest{guests > 1 ? "s" : ""}
+                </span>
+              </span>
             }
             total={selectedSlot ? formatMoney(totalMinor, sym) : "—"}
           />

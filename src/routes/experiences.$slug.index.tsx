@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPanel";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DetailListPanel } from "@/components/detail/DetailListPanel";
+import { OfferPrice } from "@/components/pricing/OfferPrice";
 import {
   DetailBookingSection,
   DetailDarkSection,
@@ -148,8 +149,13 @@ function ExperienceDetail() {
                 <DetailStatGrid>
                   <DetailStatItem label="Duration">{exp.durationHours}h</DetailStatItem>
                   <DetailStatItem label="From">
-                    {sym}
-                    {exp.pricePerPerson}
+                    <OfferPrice
+                      price={exp.pricePerPerson}
+                      compareAt={exp.compareAtPricePerPerson}
+                      currencySymbol={sym}
+                      tone="dark"
+                      priceClassName="font-display text-[0.95rem] uppercase tracking-[0.02em] sm:text-lg md:text-xl text-[#F7F1E8]"
+                    />
                   </DetailStatItem>
                   <DetailStatItem label="Rating">
                     <span className="text-[#D4AF6A]">

@@ -20,6 +20,7 @@ export type HostExperienceSummary = {
   city: string;
   status: string;
   pricePerPersonMinor: number;
+  compareAtPricePerPersonMinor?: number | null;
   currencySymbol: string;
   slotCount: number;
   image: string | null;
@@ -40,6 +41,7 @@ export type HostExperienceDetail = {
   mapLink: string | null;
   durationMinutes: number;
   pricePerPersonMinor: number;
+  compareAtPricePerPersonMinor?: number | null;
   status: string;
   heroImageUrl: string | null;
   galleryUrls: string[];
@@ -69,6 +71,7 @@ export type CreateHostExperiencePayload = {
   mapLink?: string;
   durationMinutes: number;
   pricePerPersonMinor: number;
+  compareAtPricePerPersonMinor?: number | null;
   heroImageUrl?: string;
   galleryUrls?: string[];
   inclusions?: string[];

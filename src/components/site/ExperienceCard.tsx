@@ -3,11 +3,13 @@ import type { Experience } from "@/data/experiences";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { ExperienceSmartBadges } from "@/components/experiences/ExperienceSmartBadges";
+import { OfferPrice } from "@/components/pricing/OfferPrice";
 import { categoryIconForLabel } from "@/lib/experience-category-icons";
 import { MarketplaceCard, marketplaceCardActionClass } from "@/components/site/MarketplaceCard";
 
 export function ExperienceCard({ exp }: { exp: Experience }) {
   const CategoryIcon = categoryIconForLabel(exp.category);
+  const sym = exp.currencySymbol ?? "₹";
 
   return (
     <MarketplaceCard
@@ -50,6 +52,16 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
             {exp.city}
           </span>
         </>
+      }
+      footer={
+        <OfferPrice
+          price={exp.pricePerPerson}
+          compareAt={exp.compareAtPricePerPerson}
+          currencySymbol={sym}
+          tone="dark"
+          showPercent
+          priceClassName="font-display text-base font-normal text-[#F7F1E8]"
+        />
       }
     />
   );

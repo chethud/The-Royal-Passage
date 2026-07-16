@@ -174,6 +174,11 @@ create table if not exists public.experiences (
   pricing_model text not null default 'per_person'
     check (pricing_model in ('per_person', 'per_group', 'both')),
   price_per_person_minor int not null check (price_per_person_minor >= 0),
+  compare_at_price_per_person_minor int
+    check (
+      compare_at_price_per_person_minor is null
+      or compare_at_price_per_person_minor > price_per_person_minor
+    ),
   price_per_group_minor int,
   status text not null default 'draft'
     check (status in ('draft', 'pending_review', 'published', 'rejected', 'archived')),

@@ -56,6 +56,8 @@ export type Homestay = {
   mapLink?: string;
   pricePerNight: number;
   weekendPricePerNight?: number;
+  compareAtPricePerNight?: number | null;
+  compareAtWeekendPricePerNight?: number | null;
   currencySymbol?: string;
   rating: number;
   reviewsCount: number;

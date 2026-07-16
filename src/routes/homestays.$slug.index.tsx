@@ -30,6 +30,7 @@ import {
   weekdayPriceMajor,
   weekendPriceMajor,
 } from "@/lib/homestay-day-pricing";
+import { HomestayOfferRates } from "@/components/pricing/OfferPrice";
 import { getHomestayForDetail } from "@/lib/homestay-fns";
 import { SITE_URL } from "@/lib/seo";
 import { canonicalLink } from "@/lib/seo-helpers";
@@ -139,10 +140,14 @@ function HomestayDetailPage() {
                     label="From"
                     valueClassName="mt-1 space-y-0.5 text-[#F7F1E8] normal-case tracking-normal"
                   >
-                    <HomestayRateStat
+                    <HomestayOfferRates
                       symbol={sym}
                       weekday={weekdayPriceMajor(stay)}
                       weekend={weekendPriceMajor(stay)}
+                      compareAtWeekday={stay.compareAtPricePerNight}
+                      compareAtWeekend={stay.compareAtWeekendPricePerNight}
+                      tone="dark"
+                      priceClassName="font-display text-[0.95rem] uppercase tracking-[0.02em] sm:text-lg md:text-xl text-[#F7F1E8] font-normal"
                     />
                   </DetailStatItem>
                   <DetailStatItem label="Beds">
@@ -273,43 +278,3 @@ function HomestayDetailPage() {
   );
 }
 
-function HomestayRateStat({
-  symbol,
-  weekday,
-  weekend,
-}: {
-  symbol: string;
-  weekday: number;
-  weekend: number;
-}) {
-  const weekdayLabel = `${symbol}${weekday.toLocaleString("en-IN")}`;
-  const weekendLabel = `${symbol}${weekend.toLocaleString("en-IN")}`;
-
-  if (weekday === weekend) {
-    return (
-      <p className="font-display text-[0.95rem] uppercase leading-none tracking-[0.02em] sm:text-lg md:text-xl">
-        {weekdayLabel}
-        <span className="ml-1.5 text-[0.58rem] font-sans font-semibold normal-case tracking-[0.14em] text-[#D6C8B5]/75 sm:text-[0.62rem]">
-          / night
-        </span>
-      </p>
-    );
-  }
-
-  return (
-    <div className="space-y-1.5">
-      <p className="whitespace-nowrap font-display text-[0.95rem] uppercase leading-none tracking-[0.02em] sm:text-lg md:text-xl">
-        {weekdayLabel}
-        <span className="ml-1.5 text-[0.58rem] font-sans font-semibold normal-case tracking-[0.14em] text-[#D6C8B5]/75 sm:text-[0.62rem]">
-          weekdays
-        </span>
-      </p>
-      <p className="whitespace-nowrap font-display text-[0.95rem] uppercase leading-none tracking-[0.02em] sm:text-lg md:text-xl">
-        {weekendLabel}
-        <span className="ml-1.5 text-[0.58rem] font-sans font-semibold normal-case tracking-[0.14em] text-[#D6C8B5]/75 sm:text-[0.62rem]">
-          weekends
-        </span>
-      </p>
-    </div>
-  );
-}

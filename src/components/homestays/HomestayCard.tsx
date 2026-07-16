@@ -1,12 +1,9 @@
 import { BedDouble, MapPin, Star, Users } from "lucide-react";
 import type { Homestay } from "@/data/homestays";
 import type { HomestayBrowseSearch } from "@/lib/homestay-filters";
-import {
-  formatWeekdayWeekendRates,
-  weekdayPriceMajor,
-  weekendPriceMajor,
-} from "@/lib/homestay-day-pricing";
+import { weekdayPriceMajor, weekendPriceMajor } from "@/lib/homestay-day-pricing";
 import { AddHomestayToCartButton } from "@/components/cart/AddHomestayToCartButton";
+import { HomestayOfferRates } from "@/components/pricing/OfferPrice";
 import { MarketplaceCard, marketplaceCardActionClass } from "@/components/site/MarketplaceCard";
 
 export function HomestayCard({
@@ -17,7 +14,6 @@ export function HomestayCard({
   search?: HomestayBrowseSearch;
 }) {
   const sym = stay.currencySymbol ?? "₹";
-  const rateLabel = formatWeekdayWeekendRates(sym, weekdayPriceMajor(stay), weekendPriceMajor(stay));
 
   return (
     <MarketplaceCard
@@ -60,9 +56,18 @@ export function HomestayCard({
         </>
       }
       footer={
-        <div className="flex items-center justify-between gap-3">
-          <span className="font-display text-base text-[#F7F1E8]">{rateLabel}</span>
-          <span className="inline-flex items-center gap-1 text-[0.62rem] text-[#D4AF6A]">
+        <div className="flex items-end justify-between gap-3">
+          <HomestayOfferRates
+            symbol={sym}
+            weekday={weekdayPriceMajor(stay)}
+            weekend={weekendPriceMajor(stay)}
+            compareAtWeekday={stay.compareAtPricePerNight}
+            compareAtWeekend={stay.compareAtWeekendPricePerNight}
+            tone="dark"
+            showPercent
+            priceClassName="font-display text-base font-normal text-[#F7F1E8]"
+          />
+          <span className="inline-flex shrink-0 items-center gap-1 text-[0.62rem] text-[#D4AF6A]">
             <Star className="h-3.5 w-3.5 fill-current" aria-hidden />
             {stay.rating}
           </span>

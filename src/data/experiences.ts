@@ -31,6 +31,8 @@ export type Experience = {
   hostBio: string;
   verifiedHost: boolean;
   pricePerPerson: number;
+  /** Optional original / "was" price (majors). */
+  compareAtPricePerPerson?: number | null;
   rating: number;
   reviewsCount: number;
   image: string;
