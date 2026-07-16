@@ -8,8 +8,7 @@
   --font-display: "Cinzel", ui-serif, Georgia, serif;
   --font-sans: "Cinzel", ui-serif, Georgia, serif;
   --font-royal: "Cinzel Decorative", "Cinzel", ui-serif, Georgia, serif;
-  /* Real lowercase (Cinzel’s lowercase reads as small caps). */
-  --font-body: "Lora", Georgia, "Times New Roman", serif;
+  --font-body: "Cinzel", ui-serif, Georgia, serif;
 
   --radius-sm: 2px;
   --radius-md: 6px;

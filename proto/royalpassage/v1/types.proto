@@ -51,6 +51,7 @@ message Experience {
   repeated string requirements = 26;
   optional string region = 27;
   optional string map_link = 28;
+  optional int32 compare_at_price_per_person = 29;
 }
 
 message CatalogResponse {

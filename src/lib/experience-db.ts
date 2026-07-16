@@ -26,6 +26,7 @@ export type ExperienceRow = {
   map_link: string | null;
   duration_minutes: number;
   price_per_person_minor: number;
+  compare_at_price_per_person_minor?: number | null;
   hero_image_url: string | null;
   inclusions: string[];
   exclusions: string[];
@@ -83,6 +84,9 @@ export function mapRowToExperience(exp: ExperienceRow, slots: SlotRow[]): Experi
   }));
 
   const rupees = Math.round(exp.price_per_person_minor / 100);
+  const compareAtRupees = exp.compare_at_price_per_person_minor
+    ? Math.round(exp.compare_at_price_per_person_minor / 100)
+    : null;
   const galleryUrls = exp.gallery_urls?.length
     ? exp.gallery_urls
     : exp.hero_image_url
@@ -109,6 +113,8 @@ export function mapRowToExperience(exp: ExperienceRow, slots: SlotRow[]): Experi
     hostBio: host?.bio ?? "",
     verifiedHost: Boolean(host?.verified),
     pricePerPerson: rupees,
+    compareAtPricePerPerson:
+      compareAtRupees != null && compareAtRupees > rupees ? compareAtRupees : null,
     rating: Number(exp.average_rating),
     reviewsCount: exp.review_count,
     image,

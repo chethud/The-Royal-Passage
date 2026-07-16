@@ -67,7 +67,9 @@ export function OfferPrice({
           {wasLabel}
         </span>
       ) : null}
-      <span className={cn("font-medium tabular-nums", priceClassName)}>{sellLabel}</span>
+      <span className={cn("font-medium tabular-nums", priceClassName, hasOffer && (tone === "dark" ? "text-[#D4AF6A]" : "text-[#8B1E1E]"))}>
+        {sellLabel}
+      </span>
       {hasOffer && showPercent ? (
         <span
           className={cn(

@@ -8,7 +8,7 @@ import appCss from "../styles.css?url";
 
 /** Slimmed family set — display=swap avoids invisible text while fonts load. */
 const GOOGLE_FONTS_HREF =
-  "https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap";
+  "https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;500;600;700&display=swap";
 
 /** Above-the-fold paint without waiting on the full stylesheet. */
 const CRITICAL_CSS = `
