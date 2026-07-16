@@ -13,31 +13,30 @@ export function AuthPageLayout({ title, subtitle, children }: AuthPageLayoutProp
   return (
     <div className="min-h-dvh bg-[oklch(0.13_0.06_22)] text-foreground">
       <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-5 sm:px-6">
-        <header className="flex shrink-0 items-center justify-center pt-4 pb-0 sm:pt-5">
-          <Link
-            to="/"
-            className="inline-flex justify-center leading-none"
-            aria-label="The Royal Passage — Home"
-          >
-            <img
-              src={logoUrl}
-              alt="The Royal Passage"
-              width={280}
-              height={96}
-              decoding="async"
-              className="block h-32 w-auto object-contain object-center sm:h-36"
-            />
-          </Link>
-        </header>
-
-        <main className="-mt-2 flex flex-1 flex-col justify-start sm:-mt-3">
-          <div className="glass-strong w-full rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] px-6 pb-8 pt-5 [font-family:Georgia,'Times_New_Roman',serif] sm:px-8 sm:pb-10 sm:pt-6">
-            <div className="mb-6 text-center sm:mb-8">
-              <h1 className="font-display text-2xl tracking-tight text-ink md:text-[1.85rem]">
+        <main className="flex flex-1 flex-col justify-center py-4 sm:py-6">
+          <div className="glass-strong w-full rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] px-6 pb-8 pt-0 [font-family:Georgia,'Times_New_Roman',serif] sm:px-8 sm:pb-10 sm:pt-1">
+            <div className="-mt-1 mb-2 text-center sm:-mt-1.5">
+              <Link
+                to="/"
+                className="mx-auto inline-flex justify-center"
+                aria-label="The Royal Passage — Home"
+              >
+                <span className="block h-[4.5rem] w-full max-w-[8.5rem] overflow-hidden sm:h-[5rem] sm:max-w-[9.5rem]">
+                  <img
+                    src={logoUrl}
+                    alt="The Royal Passage"
+                    width={280}
+                    height={96}
+                    decoding="async"
+                    className="mx-auto block h-[7.5rem] w-auto -translate-y-[1.2rem] sm:h-[8.25rem] sm:-translate-y-[1.35rem]"
+                  />
+                </span>
+              </Link>
+              <h1 className="-mt-5 font-display text-[1.45rem] tracking-tight text-ink sm:-mt-6 md:text-[1.78rem]">
                 {title}
               </h1>
               {subtitle ? (
-                <p className="mt-2 text-sm leading-relaxed normal-case text-ink/75">{subtitle}</p>
+                <p className="mt-0 text-sm leading-snug normal-case text-ink/75">{subtitle}</p>
               ) : null}
             </div>
             {children}
