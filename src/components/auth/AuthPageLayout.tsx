@@ -27,7 +27,7 @@ export function AuthPageLayout({ title, subtitle, children }: AuthPageLayoutProp
         </header>
 
         <main className="flex flex-1 flex-col justify-center py-8 sm:py-10">
-          <div className="glass-strong w-full rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] px-6 py-8 font-body sm:px-8 sm:py-10">
+          <div className="glass-strong w-full rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] px-6 py-8 [font-family:Georgia,'Times_New_Roman',serif] sm:px-8 sm:py-10">
             <div className="mb-6 text-center sm:mb-8">
               <h1 className="font-display text-2xl tracking-tight text-ink md:text-[1.85rem]">
                 {title}

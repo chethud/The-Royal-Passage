@@ -2,8 +2,9 @@ import { useState, type FormEvent } from "react";
 import { ROLE_LABELS, type UserRole } from "@/lib/roles";
 
 const inputClass =
-  "w-full rounded-sm border border-input bg-background/50 px-4 py-3 font-body text-sm normal-case tracking-normal text-foreground placeholder:text-muted-foreground focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
-const labelClass = "mb-2 block font-body text-sm font-medium normal-case tracking-normal text-foreground/90";
+  "w-full rounded-sm border border-input bg-background/50 px-4 py-3 text-sm normal-case tracking-normal text-foreground placeholder:text-muted-foreground [font-family:Georgia,'Times_New_Roman',serif] focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+const labelClass =
+  "mb-2 block text-sm font-medium normal-case tracking-normal text-foreground/90 [font-family:Georgia,'Times_New_Roman',serif]";
 
 type StaffLoginFormProps = {
   role: Extract<UserRole, "host" | "admin">;

@@ -6,8 +6,9 @@ import { formatAuthError } from "@/lib/format-auth-error";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
 const inputClass =
-  "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 font-body text-sm normal-case tracking-normal text-ink placeholder:text-ink/45 backdrop-blur-sm focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
-const labelClass = "mb-2 block font-body text-sm font-medium normal-case tracking-normal text-ink/90";
+  "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 text-sm normal-case tracking-normal text-ink placeholder:text-ink/45 backdrop-blur-sm [font-family:Georgia,'Times_New_Roman',serif] focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
+const labelClass =
+  "mb-2 block text-sm font-medium normal-case tracking-normal text-ink/90 [font-family:Georgia,'Times_New_Roman',serif]";
 
 export function ResetPasswordExperience() {
   const navigate = useNavigate();
