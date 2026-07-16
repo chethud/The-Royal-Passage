@@ -8,7 +8,7 @@ import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/
 const inputClass =
   "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 text-sm normal-case tracking-normal text-ink placeholder:text-ink/45 backdrop-blur-sm [font-family:Georgia,'Times_New_Roman',serif] focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
 const labelClass =
-  "mb-2 block text-sm font-medium normal-case tracking-normal text-ink/90 [font-family:Georgia,'Times_New_Roman',serif]";
+  "block text-sm font-medium leading-normal normal-case tracking-normal text-ink/90 [font-family:Georgia,'Times_New_Roman',serif]";
 
 export function ResetPasswordExperience() {
   const navigate = useNavigate();
@@ -122,8 +122,8 @@ export function ResetPasswordExperience() {
       ) : !ready && !error ? (
         <p className="text-center text-sm text-ink/75">Verifying your reset link…</p>
       ) : ready ? (
-        <form className="space-y-4" onSubmit={submitNewPassword}>
-          <div>
+        <form className="mt-1 flex flex-col gap-5" onSubmit={submitNewPassword}>
+          <div className="flex flex-col gap-2.5">
             <label htmlFor="reset-password" className={labelClass}>
               New password
             </label>
@@ -149,7 +149,7 @@ export function ResetPasswordExperience() {
               </button>
             </div>
           </div>
-          <div>
+          <div className="flex flex-col gap-2.5">
             <label htmlFor="reset-password-confirm" className={labelClass}>
               Confirm password
             </label>
