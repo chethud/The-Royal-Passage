@@ -4,6 +4,7 @@ import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusBadge";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import { OfferPrice } from "@/components/pricing/OfferPrice";
+import { SetOfferDialog } from "@/components/pricing/SetOfferDialog";
 import {
   DashboardTable,
   DashboardTableBody,
@@ -15,7 +16,12 @@ import {
   DashboardTableScroll,
 } from "@/components/ui/DashboardTable";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
-import { fetchHostExperiences, type HostExperienceSummary } from "@/lib/api/host-experiences";
+import { Switch } from "@/components/ui/switch";
+import {
+  fetchHostExperiences,
+  updateHostExperience,
+  type HostExperienceSummary,
+} from "@/lib/api/host-experiences";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHostAccess } from "@/lib/use-host-access";
 
@@ -37,6 +43,12 @@ function HostOffersPage() {
   const [experiences, setExperiences] = useState<HostExperienceSummary[]>([]);
   const [pageError, setPageError] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
+  const [offerTarget, setOfferTarget] = useState<HostExperienceSummary | null>(null);
+  const [offerSaving, setOfferSaving] = useState(false);
+  const [togglingOfferId, setTogglingOfferId] = useState<string | null>(null);
+  const [storedOffers, setStoredOffers] = useState<
+    Record<string, { normalMinor: number; discountedMinor: number }>
+  >({});
 
   const loadPage = useCallback(async () => {
     if (!accessToken) return;
@@ -59,6 +71,60 @@ function HostOffersPage() {
     void loadPage();
   }, [loadPage, ready]);
 
+  const handleOfferToggle = async (exp: HostExperienceSummary, enabled: boolean) => {
+    if (!accessToken || togglingOfferId) return;
+
+    const hasOffer =
+      exp.compareAtPricePerPersonMinor != null &&
+      exp.compareAtPricePerPersonMinor > exp.pricePerPersonMinor;
+
+    if (enabled) {
+      if (hasOffer) return;
+
+      const stored = storedOffers[exp.id];
+      if (!stored) {
+        setOfferTarget(exp);
+        return;
+      }
+
+      setTogglingOfferId(exp.id);
+      try {
+        await updateHostExperience(accessToken, exp.id, {
+          pricePerPersonMinor: stored.discountedMinor,
+          compareAtPricePerPersonMinor: stored.normalMinor,
+        });
+        await loadPage();
+      } catch (err) {
+        setPageError(toErrorMessage(err, "Failed to turn offer on."));
+      } finally {
+        setTogglingOfferId(null);
+      }
+      return;
+    }
+
+    if (!hasOffer) return;
+
+    const normalMinor = exp.compareAtPricePerPersonMinor!;
+    const discountedMinor = exp.pricePerPersonMinor;
+
+    setTogglingOfferId(exp.id);
+    try {
+      setStoredOffers((current) => ({
+        ...current,
+        [exp.id]: { normalMinor, discountedMinor },
+      }));
+      await updateHostExperience(accessToken, exp.id, {
+        pricePerPersonMinor: normalMinor,
+        compareAtPricePerPersonMinor: null,
+      });
+      await loadPage();
+    } catch (err) {
+      setPageError(toErrorMessage(err, "Failed to turn offer off."));
+    } finally {
+      setTogglingOfferId(null);
+    }
+  };
+
   if (loading || !ready) {
     return <PageLoadingGate />;
   }
@@ -71,7 +137,8 @@ function HostOffersPage() {
     >
       <LuxuryCheckoutPanel>
         <p className="luxury-panel-body text-sm">
-          Edit any experience to add or clear an offer. Leave the original price blank for no strike-through.
+          Use Set offer to configure prices, then turn each experience&apos;s offer on or off with the
+          toggle below.
         </p>
 
         <div className="mt-6">
@@ -101,6 +168,7 @@ function HostOffersPage() {
                     <DashboardTableHeadCell>Offer</DashboardTableHeadCell>
                     <DashboardTableHeadCell>Status</DashboardTableHeadCell>
                     <DashboardTableHeadCell>Edit</DashboardTableHeadCell>
+                    <DashboardTableHeadCell>Offer on/off</DashboardTableHeadCell>
                   </DashboardTableHeadRow>
                 </DashboardTableHead>
                 <DashboardTableBody>
@@ -108,6 +176,7 @@ function HostOffersPage() {
                     const hasOffer =
                       exp.compareAtPricePerPersonMinor != null &&
                       exp.compareAtPricePerPersonMinor > exp.pricePerPersonMinor;
+                    const isToggling = togglingOfferId === exp.id;
                     return (
                       <DashboardTableRow key={exp.id}>
                         <DashboardTableCell variant="heading">
@@ -135,14 +204,27 @@ function HostOffersPage() {
                           <ExperienceStatusBadge status={exp.status} surface="light" />
                         </DashboardTableCell>
                         <DashboardTableCell>
-                          <Link
-                            to="/host/experiences/$experienceId"
-                            params={{ experienceId: exp.id }}
-                            search={{ section: "details" }}
-                            className="luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline"
+                          <button
+                            type="button"
+                            className="luxury-btn-sm luxury-btn-primary inline-flex h-7 items-center px-2.5 py-1 text-[0.58rem] leading-none"
+                            onClick={() => setOfferTarget(exp)}
                           >
                             {hasOffer ? "Edit offer" : "Set offer"}
-                          </Link>
+                          </button>
+                        </DashboardTableCell>
+                        <DashboardTableCell>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={hasOffer}
+                              disabled={isToggling || offerSaving}
+                              onCheckedChange={(checked) => void handleOfferToggle(exp, checked)}
+                              aria-label={`${hasOffer ? "Turn off" : "Turn on"} offer for ${exp.title}`}
+                              className="data-[state=checked]:bg-[#8B1E1E] data-[state=unchecked]:bg-[rgb(74_0_0/0.18)]"
+                            />
+                            <span className="luxury-panel-body text-xs font-medium uppercase tracking-[0.08em]">
+                              {isToggling ? "Saving…" : hasOffer ? "On" : "Off"}
+                            </span>
+                          </div>
                         </DashboardTableCell>
                       </DashboardTableRow>
                     );
@@ -153,6 +235,46 @@ function HostOffersPage() {
           )}
         </div>
       </LuxuryCheckoutPanel>
+
+      <SetOfferDialog
+        open={offerTarget != null}
+        busy={offerSaving}
+        title={offerTarget ? `Set offer — ${offerTarget.title}` : "Set offer"}
+        currencySymbol={offerTarget?.currencySymbol ?? "₹"}
+        sellingPriceMinor={offerTarget?.pricePerPersonMinor ?? 0}
+        compareAtMinor={offerTarget?.compareAtPricePerPersonMinor}
+        onClose={() => {
+          if (!offerSaving) setOfferTarget(null);
+        }}
+        onSave={async (payload) => {
+          if (!accessToken || !offerTarget) return;
+          setOfferSaving(true);
+          try {
+            await updateHostExperience(accessToken, offerTarget.id, {
+              pricePerPersonMinor: payload.sellingPriceMinor,
+              compareAtPricePerPersonMinor: payload.compareAtPriceMinor,
+            });
+            if (payload.compareAtPriceMinor != null) {
+              setStoredOffers((current) => ({
+                ...current,
+                [offerTarget.id]: {
+                  normalMinor: payload.compareAtPriceMinor,
+                  discountedMinor: payload.sellingPriceMinor,
+                },
+              }));
+            } else {
+              setStoredOffers((current) => {
+                const next = { ...current };
+                delete next[offerTarget.id];
+                return next;
+              });
+            }
+            await loadPage();
+          } finally {
+            setOfferSaving(false);
+          }
+        }}
+      />
     </HostDashboardShell>
   );
 }
