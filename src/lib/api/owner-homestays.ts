@@ -59,6 +59,9 @@ export type OwnerHomestaySummary = {
   city: string;
   status: string;
   pricePerNightMinor: number;
+  weekendPricePerNightMinor?: number | null;
+  compareAtPricePerNightMinor?: number | null;
+  compareAtWeekendPricePerNightMinor?: number | null;
   currencySymbol: string;
   roomCount: number;
   image: string | null;

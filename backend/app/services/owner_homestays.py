@@ -316,7 +316,9 @@ def list_owner_homestays(auth: dict) -> list[OwnerHomestaySummary]:
     result = (
         supabase.table("homestays")
         .select(
-            "id, slug, title, city, status, price_per_night_minor, currency_code, hero_image_url, bedrooms"
+            "id, slug, title, city, status, price_per_night_minor, weekend_price_per_night_minor, "
+            "compare_at_price_per_night_minor, compare_at_weekend_price_per_night_minor, "
+            "currency_code, hero_image_url, bedrooms"
         )
         .eq("owner_id", owner_id)
         .neq("status", "archived")
@@ -335,6 +337,9 @@ def list_owner_homestays(auth: dict) -> list[OwnerHomestaySummary]:
             city=row.get("city") or "",
             status=row.get("status") or "draft",
             pricePerNightMinor=int(row.get("price_per_night_minor") or 0),
+            weekendPricePerNightMinor=row.get("weekend_price_per_night_minor"),
+            compareAtPricePerNightMinor=row.get("compare_at_price_per_night_minor"),
+            compareAtWeekendPricePerNightMinor=row.get("compare_at_weekend_price_per_night_minor"),
             currencySymbol=_currency_symbol(row.get("currency_code") or "INR"),
             roomCount=max(1, int(row.get("bedrooms") or 1)),
             image=row.get("hero_image_url"),

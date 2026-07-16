@@ -722,6 +722,9 @@ message OwnerHomestaySummary {
   string currency_symbol = 7;
   int32 room_count = 8;
   optional string image = 9;
+  optional int32 weekend_price_per_night_minor = 10;
+  optional int32 compare_at_price_per_night_minor = 11;
+  optional int32 compare_at_weekend_price_per_night_minor = 12;
 }
 
 message OwnerHomestayDetail {

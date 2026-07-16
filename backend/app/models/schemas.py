@@ -207,6 +207,9 @@ class OwnerHomestaySummary(BaseModel):
     city: str
     status: str
     pricePerNightMinor: int
+    weekendPricePerNightMinor: int | None = None
+    compareAtPricePerNightMinor: int | None = None
+    compareAtWeekendPricePerNightMinor: int | None = None
     currencySymbol: str
     roomCount: int
     image: str | None = None
