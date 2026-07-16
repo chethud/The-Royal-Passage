@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 
 const ADMIN_PROFILE_NAV = [
   { to: "/admin/profile", label: "Admin" },
+  { to: "/admin/profile/escalation", label: "Escalation" },
   { to: "/admin/profile/users", label: "Users" },
   { to: "/admin/profile/my-team", label: "My team" },
   { to: "/admin/profile/homepage-photos", label: "Homepage photos" },

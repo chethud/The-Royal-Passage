@@ -27,6 +27,33 @@ export type {
   ManagedUser,
 };
 
+export type EscalationRoleScope = "host" | "homestay_owner" | "vip_owner";
+
+export type EscalationDirectoryMember = {
+  id: string;
+  memberName: string;
+  memberEmail: string;
+  memberMobile: string;
+  designation: string;
+  sortOrder: number;
+};
+
+export type EscalationDirectoryEntry = {
+  profileId: string;
+  roleScope: EscalationRoleScope;
+  ownerName: string;
+  ownerEmail: string | null;
+  ownerPhone: string | null;
+  listingNames: string[];
+  members: EscalationDirectoryMember[];
+};
+
+export type EscalationDirectory = {
+  host: EscalationDirectoryEntry[];
+  homestay_owner: EscalationDirectoryEntry[];
+  vip_owner: EscalationDirectoryEntry[];
+};
+
 async function requireAdmin(accessToken: string) {
   const supabase = getSupabaseAdmin();
   const {
@@ -205,6 +232,150 @@ export const listAdminActivity = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<AuditLogEntry[]> => {
     if (!isApiConfigured()) throw new Error("API is not configured.");
     return fetchAdminActivity(data.accessToken);
+  });
+
+export const listEscalationDirectory = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ accessToken: z.string().min(1) }))
+  .handler(async ({ data }): Promise<EscalationDirectory> => {
+    await requireAdmin(data.accessToken);
+    const supabase = getSupabaseAdmin();
+
+    const [profilesRes, contactsRes, hostsRes, homestayOwnersRes, homestaysRes, vipOwnersRes] =
+      await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, full_name, phone, host_id, homestay_owner_id, vip_owner_id")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("escalation_contacts")
+          .select(
+            "id, profile_id, role_scope, member_name, member_email, member_mobile, designation, sort_order",
+          )
+          .order("sort_order", { ascending: true }),
+        supabase.from("hosts").select("id, display_name, email, phone"),
+        supabase.from("homestay_owners").select("id, full_name, email, phone"),
+        supabase.from("homestays").select("owner_id, title"),
+        supabase.from("vip_owners").select("id, full_name, email, phone"),
+      ]);
+
+    const error =
+      profilesRes.error ||
+      contactsRes.error ||
+      hostsRes.error ||
+      homestayOwnersRes.error ||
+      homestaysRes.error ||
+      vipOwnersRes.error;
+    if (error) throw new Error(error.message);
+
+    const profiles = (profilesRes.data ?? []) as Array<{
+      id: string;
+      full_name: string | null;
+      phone: string | null;
+      host_id: string | null;
+      homestay_owner_id: string | null;
+      vip_owner_id: string | null;
+    }>;
+    const contacts = (contactsRes.data ?? []) as Array<{
+      id: string;
+      profile_id: string;
+      role_scope: EscalationRoleScope;
+      member_name: string;
+      member_email: string;
+      member_mobile: string;
+      designation: string;
+      sort_order: number;
+    }>;
+    const hosts = (hostsRes.data ?? []) as Array<{
+      id: string;
+      display_name: string;
+      email: string | null;
+      phone: string | null;
+    }>;
+    const homestayOwners = (homestayOwnersRes.data ?? []) as Array<{
+      id: string;
+      full_name: string;
+      email: string;
+      phone: string | null;
+    }>;
+    const homestays = (homestaysRes.data ?? []) as Array<{ owner_id: string; title: string }>;
+    const vipOwners = (vipOwnersRes.data ?? []) as Array<{
+      id: string;
+      full_name: string;
+      email: string;
+      phone: string | null;
+    }>;
+
+    const contactsByKey = new Map<string, EscalationDirectoryMember[]>();
+    for (const contact of contacts) {
+      const key = `${contact.profile_id}:${contact.role_scope}`;
+      const list = contactsByKey.get(key) ?? [];
+      list.push({
+        id: contact.id,
+        memberName: contact.member_name,
+        memberEmail: contact.member_email,
+        memberMobile: contact.member_mobile,
+        designation: contact.designation,
+        sortOrder: contact.sort_order,
+      });
+      contactsByKey.set(key, list);
+    }
+
+    const hostById = new Map(hosts.map((row) => [row.id, row]));
+    const homestayOwnerById = new Map(homestayOwners.map((row) => [row.id, row]));
+    const vipOwnerById = new Map(vipOwners.map((row) => [row.id, row]));
+    const homestayNamesByOwnerId = new Map<string, string[]>();
+    for (const stay of homestays) {
+      const list = homestayNamesByOwnerId.get(stay.owner_id) ?? [];
+      list.push(stay.title);
+      homestayNamesByOwnerId.set(stay.owner_id, list);
+    }
+
+    const result: EscalationDirectory = {
+      host: [],
+      homestay_owner: [],
+      vip_owner: [],
+    };
+
+    for (const profile of profiles) {
+      if (profile.host_id) {
+        const owner = hostById.get(profile.host_id);
+        result.host.push({
+          profileId: profile.id,
+          roleScope: "host",
+          ownerName: owner?.display_name ?? profile.full_name ?? "Host",
+          ownerEmail: owner?.email ?? null,
+          ownerPhone: owner?.phone ?? profile.phone ?? null,
+          listingNames: [],
+          members: contactsByKey.get(`${profile.id}:host`) ?? [],
+        });
+      }
+      if (profile.homestay_owner_id) {
+        const owner = homestayOwnerById.get(profile.homestay_owner_id);
+        result.homestay_owner.push({
+          profileId: profile.id,
+          roleScope: "homestay_owner",
+          ownerName: owner?.full_name ?? profile.full_name ?? "Homestay owner",
+          ownerEmail: owner?.email ?? null,
+          ownerPhone: owner?.phone ?? profile.phone ?? null,
+          listingNames: homestayNamesByOwnerId.get(profile.homestay_owner_id) ?? [],
+          members: contactsByKey.get(`${profile.id}:homestay_owner`) ?? [],
+        });
+      }
+      if (profile.vip_owner_id) {
+        const owner = vipOwnerById.get(profile.vip_owner_id);
+        result.vip_owner.push({
+          profileId: profile.id,
+          roleScope: "vip_owner",
+          ownerName: owner?.full_name ?? profile.full_name ?? "VIP owner",
+          ownerEmail: owner?.email ?? null,
+          ownerPhone: owner?.phone ?? profile.phone ?? null,
+          listingNames: [],
+          members: contactsByKey.get(`${profile.id}:vip_owner`) ?? [],
+        });
+      }
+    }
+
+    return result;
   });
 
 export const rejectExperienceFn = createServerFn({ method: "POST" })

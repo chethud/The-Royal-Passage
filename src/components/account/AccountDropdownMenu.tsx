@@ -58,6 +58,7 @@ function AccountMenuItem({
   label,
   description,
   to,
+  search,
   onSelect,
   disabled,
   variant = "default",
@@ -66,6 +67,7 @@ function AccountMenuItem({
   label: string;
   description?: string;
   to?: string;
+  search?: Record<string, unknown>;
   onSelect?: () => void;
   disabled?: boolean;
   variant?: "default" | "danger";
@@ -87,7 +89,7 @@ function AccountMenuItem({
   if (to) {
     return (
       <DropdownMenuItem asChild disabled={disabled}>
-        <Link to={to} className="header-account-menu__item">
+        <Link to={to} search={search ?? {}} className="header-account-menu__item">
           {content}
         </Link>
       </DropdownMenuItem>
@@ -245,6 +247,13 @@ export function AccountDropdownMenu({
                 description="Create a new listing"
                 to="/host/experiences/new"
               />
+              <AccountMenuItem
+                icon={Users}
+                label="Escalation details"
+                description="Add at least 2 host escalation contacts"
+                to="/account/escalation"
+                search={{ scope: "host" }}
+              />
             </>
           ) : null}
 
@@ -257,6 +266,27 @@ export function AccountDropdownMenu({
                 label="Add property"
                 description="List a new stay"
                 to="/homestay/properties/new"
+              />
+              <AccountMenuItem
+                icon={Users}
+                label="Escalation details"
+                description="Add at least 2 homestay escalation contacts"
+                to="/account/escalation"
+                search={{ scope: "homestay_owner" }}
+              />
+            </>
+          ) : null}
+
+          {roles.includes("vip_owner") || role === "vip_owner" ? (
+            <>
+              <DropdownMenuSeparator className="header-account-menu__divider" />
+              <DropdownMenuLabel className="header-account-menu__section">VIP</DropdownMenuLabel>
+              <AccountMenuItem
+                icon={Users}
+                label="Escalation details"
+                description="Add at least 2 VIP escalation contacts"
+                to="/account/escalation"
+                search={{ scope: "vip_owner" }}
               />
             </>
           ) : null}
@@ -288,6 +318,12 @@ export function AccountDropdownMenu({
                 label="Homepage photos"
                 description="Manage homepage imagery"
                 to="/admin/profile/homepage-photos"
+              />
+              <AccountMenuItem
+                icon={Users}
+                label="Escalation"
+                description="View Host, Homestay & VIP escalation contacts"
+                to="/admin/profile/escalation"
               />
             </>
           ) : (

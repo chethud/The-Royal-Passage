@@ -64,6 +64,7 @@ import { Route as AdminHomepagePhotosRouteImport } from './routes/admin.homepage
 import { Route as AdminHomepageEditRouteImport } from './routes/admin.homepage-edit'
 import { Route as AccountVipApplyRouteImport } from './routes/account.vip-apply'
 import { Route as AccountProfileRouteImport } from './routes/account.profile'
+import { Route as AccountEscalationRouteImport } from './routes/account.escalation'
 import { Route as VipsBrowseIndexRouteImport } from './routes/vips.browse.index'
 import { Route as VipsSlugIndexRouteImport } from './routes/vips.$slug.index'
 import { Route as VipMembersIndexRouteImport } from './routes/vip.members.index'
@@ -111,6 +112,7 @@ import { Route as AdminVipPackagesPackageIdRouteImport } from './routes/admin.vi
 import { Route as AdminProfileUsersRouteImport } from './routes/admin.profile.users'
 import { Route as AdminProfileMyTeamRouteImport } from './routes/admin.profile.my-team'
 import { Route as AdminProfileHomepagePhotosRouteImport } from './routes/admin.profile.homepage-photos'
+import { Route as AdminProfileEscalationRouteImport } from './routes/admin.profile.escalation'
 import { Route as AdminHomestaysHomestayIdRouteImport } from './routes/admin.homestays.$homestayId'
 import { Route as AdminHomestayRequestsRouteImport } from './routes/admin.homestay.requests'
 import { Route as AdminHomestayPendingBookingsRouteImport } from './routes/admin.homestay.pending-bookings'
@@ -397,6 +399,11 @@ const AccountProfileRoute = AccountProfileRouteImport.update({
   path: '/account/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountEscalationRoute = AccountEscalationRouteImport.update({
+  id: '/account/escalation',
+  path: '/account/escalation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VipsBrowseIndexRoute = VipsBrowseIndexRouteImport.update({
   id: '/vips/browse/',
   path: '/vips/browse/',
@@ -637,6 +644,11 @@ const AdminProfileHomepagePhotosRoute =
     path: '/homepage-photos',
     getParentRoute: () => AdminProfileRoute,
   } as any)
+const AdminProfileEscalationRoute = AdminProfileEscalationRouteImport.update({
+  id: '/escalation',
+  path: '/escalation',
+  getParentRoute: () => AdminProfileRoute,
+} as any)
 const AdminHomestaysHomestayIdRoute =
   AdminHomestaysHomestayIdRouteImport.update({
     id: '/homestays/$homestayId',
@@ -708,6 +720,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/account/escalation': typeof AccountEscalationRoute
   '/account/profile': typeof AccountProfileRoute
   '/account/vip-apply': typeof AccountVipApplyRoute
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
@@ -759,6 +772,7 @@ export interface FileRoutesByFullPath {
   '/admin/homestay/pending-bookings': typeof AdminHomestayPendingBookingsRoute
   '/admin/homestay/requests': typeof AdminHomestayRequestsRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
+  '/admin/profile/escalation': typeof AdminProfileEscalationRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
   '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
@@ -819,6 +833,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/account/escalation': typeof AccountEscalationRoute
   '/account/profile': typeof AccountProfileRoute
   '/account/vip-apply': typeof AccountVipApplyRoute
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
@@ -858,6 +873,7 @@ export interface FileRoutesByTo {
   '/admin/homestay/pending-bookings': typeof AdminHomestayPendingBookingsRoute
   '/admin/homestay/requests': typeof AdminHomestayRequestsRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
+  '/admin/profile/escalation': typeof AdminProfileEscalationRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
   '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
@@ -922,6 +938,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/account/escalation': typeof AccountEscalationRoute
   '/account/profile': typeof AccountProfileRoute
   '/account/vip-apply': typeof AccountVipApplyRoute
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
@@ -973,6 +990,7 @@ export interface FileRoutesById {
   '/admin/homestay/pending-bookings': typeof AdminHomestayPendingBookingsRoute
   '/admin/homestay/requests': typeof AdminHomestayRequestsRoute
   '/admin/homestays/$homestayId': typeof AdminHomestaysHomestayIdRoute
+  '/admin/profile/escalation': typeof AdminProfileEscalationRoute
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
   '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
@@ -1038,6 +1056,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/account/escalation'
     | '/account/profile'
     | '/account/vip-apply'
     | '/admin/homepage-edit'
@@ -1089,6 +1108,7 @@ export interface FileRouteTypes {
     | '/admin/homestay/pending-bookings'
     | '/admin/homestay/requests'
     | '/admin/homestays/$homestayId'
+    | '/admin/profile/escalation'
     | '/admin/profile/homepage-photos'
     | '/admin/profile/my-team'
     | '/admin/profile/users'
@@ -1149,6 +1169,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/account/escalation'
     | '/account/profile'
     | '/account/vip-apply'
     | '/admin/homepage-edit'
@@ -1188,6 +1209,7 @@ export interface FileRouteTypes {
     | '/admin/homestay/pending-bookings'
     | '/admin/homestay/requests'
     | '/admin/homestays/$homestayId'
+    | '/admin/profile/escalation'
     | '/admin/profile/homepage-photos'
     | '/admin/profile/my-team'
     | '/admin/profile/users'
@@ -1251,6 +1273,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/account/escalation'
     | '/account/profile'
     | '/account/vip-apply'
     | '/admin/homepage-edit'
@@ -1302,6 +1325,7 @@ export interface FileRouteTypes {
     | '/admin/homestay/pending-bookings'
     | '/admin/homestay/requests'
     | '/admin/homestays/$homestayId'
+    | '/admin/profile/escalation'
     | '/admin/profile/homepage-photos'
     | '/admin/profile/my-team'
     | '/admin/profile/users'
@@ -1366,6 +1390,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
+  AccountEscalationRoute: typeof AccountEscalationRoute
   AccountProfileRoute: typeof AccountProfileRoute
   AccountVipApplyRoute: typeof AccountVipApplyRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -1791,6 +1816,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/escalation': {
+      id: '/account/escalation'
+      path: '/account/escalation'
+      fullPath: '/account/escalation'
+      preLoaderRoute: typeof AccountEscalationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vips/browse/': {
       id: '/vips/browse/'
       path: '/vips/browse'
@@ -2120,6 +2152,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProfileHomepagePhotosRouteImport
       parentRoute: typeof AdminProfileRoute
     }
+    '/admin/profile/escalation': {
+      id: '/admin/profile/escalation'
+      path: '/escalation'
+      fullPath: '/admin/profile/escalation'
+      preLoaderRoute: typeof AdminProfileEscalationRouteImport
+      parentRoute: typeof AdminProfileRoute
+    }
     '/admin/homestays/$homestayId': {
       id: '/admin/homestays/$homestayId'
       path: '/homestays/$homestayId'
@@ -2194,6 +2233,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminProfileRouteChildren {
+  AdminProfileEscalationRoute: typeof AdminProfileEscalationRoute
   AdminProfileHomepagePhotosRoute: typeof AdminProfileHomepagePhotosRoute
   AdminProfileMyTeamRoute: typeof AdminProfileMyTeamRoute
   AdminProfileUsersRoute: typeof AdminProfileUsersRoute
@@ -2201,6 +2241,7 @@ interface AdminProfileRouteChildren {
 }
 
 const AdminProfileRouteChildren: AdminProfileRouteChildren = {
+  AdminProfileEscalationRoute: AdminProfileEscalationRoute,
   AdminProfileHomepagePhotosRoute: AdminProfileHomepagePhotosRoute,
   AdminProfileMyTeamRoute: AdminProfileMyTeamRoute,
   AdminProfileUsersRoute: AdminProfileUsersRoute,
@@ -2489,6 +2530,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
+  AccountEscalationRoute: AccountEscalationRoute,
   AccountProfileRoute: AccountProfileRoute,
   AccountVipApplyRoute: AccountVipApplyRoute,
   AuthCallbackRoute: AuthCallbackRoute,

@@ -13,21 +13,25 @@ export function AuthPageLayout({ title, subtitle, children }: AuthPageLayoutProp
   return (
     <div className="min-h-dvh bg-[oklch(0.13_0.06_22)] text-foreground">
       <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-5 sm:px-6">
-        <header className="flex items-center justify-between py-6 sm:py-8">
-          <Link to="/" className="inline-flex" aria-label="The Royal Passage — Home">
+        <header className="flex shrink-0 items-center justify-center pt-4 pb-0 sm:pt-5">
+          <Link
+            to="/"
+            className="inline-flex justify-center leading-none"
+            aria-label="The Royal Passage — Home"
+          >
             <img
               src={logoUrl}
               alt="The Royal Passage"
               width={280}
               height={96}
               decoding="async"
-              className="h-16 w-auto object-contain object-left sm:h-20"
+              className="block h-32 w-auto object-contain object-center sm:h-36"
             />
           </Link>
         </header>
 
-        <main className="flex flex-1 flex-col justify-center py-8 sm:py-10">
-          <div className="glass-strong w-full rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] px-6 py-8 [font-family:Georgia,'Times_New_Roman',serif] sm:px-8 sm:py-10">
+        <main className="-mt-2 flex flex-1 flex-col justify-start sm:-mt-3">
+          <div className="glass-strong w-full rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] px-6 pb-8 pt-5 [font-family:Georgia,'Times_New_Roman',serif] sm:px-8 sm:pb-10 sm:pt-6">
             <div className="mb-6 text-center sm:mb-8">
               <h1 className="font-display text-2xl tracking-tight text-ink md:text-[1.85rem]">
                 {title}

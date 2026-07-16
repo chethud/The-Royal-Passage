@@ -13,6 +13,30 @@ type ProfileRow = {
   registration_number: string | null;
 };
 
+export type EscalationRoleScope = "host" | "homestay_owner" | "vip_owner";
+
+export type EscalationContact = {
+  id: string;
+  profileId: string;
+  roleScope: EscalationRoleScope;
+  memberName: string;
+  memberEmail: string;
+  memberMobile: string;
+  designation: string;
+  sortOrder: number;
+};
+
+type EscalationContactRow = {
+  id: string;
+  profile_id: string;
+  role_scope: EscalationRoleScope;
+  member_name: string;
+  member_email: string;
+  member_mobile: string;
+  designation: string;
+  sort_order: number;
+};
+
 const PROFILE_SELECT =
   "id, full_name, phone, role, created_at, avatar_url, date_of_birth, vip_membership_status, registration_number";
 
@@ -28,6 +52,19 @@ function mapProfileRow(row: ProfileRow, email: string | null): GuestProfile {
     dateOfBirth: row.date_of_birth,
     vipMembershipStatus: row.vip_membership_status ?? "none",
     registrationNumber: row.registration_number,
+  };
+}
+
+function mapEscalationContactRow(row: EscalationContactRow): EscalationContact {
+  return {
+    id: row.id,
+    profileId: row.profile_id,
+    roleScope: row.role_scope,
+    memberName: row.member_name,
+    memberEmail: row.member_email,
+    memberMobile: row.member_mobile,
+    designation: row.designation,
+    sortOrder: row.sort_order,
   };
 }
 
@@ -105,4 +142,85 @@ export async function updateAccountProfile(payload: UpdateGuestProfilePayload): 
   }
 
   return mapProfileRow(data as ProfileRow, user.email ?? null);
+}
+
+export async function fetchMyEscalationContacts(
+  roleScope: EscalationRoleScope,
+): Promise<EscalationContact[]> {
+  const supabase = getSupabaseBrowser();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+  if (userError || !user) {
+    throw new Error("Sign in to view escalation details.");
+  }
+
+  const { data, error } = await supabase
+    .from("escalation_contacts")
+    .select(
+      "id, profile_id, role_scope, member_name, member_email, member_mobile, designation, sort_order",
+    )
+    .eq("profile_id", user.id)
+    .eq("role_scope", roleScope)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []).map((row) => mapEscalationContactRow(row as EscalationContactRow));
+}
+
+export async function saveMyEscalationContacts(
+  roleScope: EscalationRoleScope,
+  contacts: Array<{
+    memberName: string;
+    memberEmail: string;
+    memberMobile: string;
+    designation: string;
+  }>,
+): Promise<EscalationContact[]> {
+  const supabase = getSupabaseBrowser();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+  if (userError || !user) {
+    throw new Error("Sign in to update escalation details.");
+  }
+
+  const payload = contacts.map((contact, index) => ({
+    profile_id: user.id,
+    role_scope: roleScope,
+    member_name: contact.memberName.trim(),
+    member_email: contact.memberEmail.trim().toLowerCase(),
+    member_mobile: contact.memberMobile.trim(),
+    designation: contact.designation.trim(),
+    sort_order: index,
+  }));
+
+  const { error: deleteError } = await supabase
+    .from("escalation_contacts")
+    .delete()
+    .eq("profile_id", user.id)
+    .eq("role_scope", roleScope);
+
+  if (deleteError) {
+    throw new Error(deleteError.message);
+  }
+
+  const { data, error } = await supabase
+    .from("escalation_contacts")
+    .insert(payload)
+    .select(
+      "id, profile_id, role_scope, member_name, member_email, member_mobile, designation, sort_order",
+    )
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []).map((row) => mapEscalationContactRow(row as EscalationContactRow));
 }
