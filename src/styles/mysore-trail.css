@@ -1,0 +1,883 @@
+/* Mysore Trail — immersive royal itinerary */
+
+/* clip (not hidden) so sticky image panel can pin while scrolling */
+.trail-page-shell {
+  overflow-x: clip;
+}
+
+.trail-page {
+  --trail-maroon: #2a080a;
+  --trail-gold: #c9a45c;
+  --trail-ivory: #f4ebdd;
+  --trail-ink: #15100f;
+  --trail-bronze: #8d6b3f;
+  --trail-day-nav-h: 3.25rem;
+  background: var(--trail-maroon);
+  color: var(--trail-ivory);
+}
+
+.trail-container {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+@media (min-width: 640px) {
+  .trail-container {
+    padding-inline: 1.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .trail-container {
+    padding-inline: 2.5rem;
+  }
+}
+
+.trail-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  background: var(--trail-gold);
+  color: var(--trail-ink);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: opacity 0.2s ease;
+}
+.trail-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.trail-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  border: 1px solid color-mix(in oklab, var(--trail-gold) 45%, transparent);
+  color: var(--trail-ivory);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+.trail-btn-ghost:hover {
+  border-color: var(--trail-gold);
+  color: var(--trail-gold);
+}
+
+.trail-hero {
+  position: relative;
+  min-height: calc(100vh - var(--header-height, 5rem));
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+.trail-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+}
+.trail-hero-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, #2a080acc 0%, #2a080a88 40%, #2a080af2 100%),
+    radial-gradient(ellipse 70% 50% at 50% 20%, #c9a45c22 0%, transparent 70%);
+}
+.trail-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding-top: 6rem;
+  padding-bottom: 4rem;
+}
+.trail-hero-title {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 7vw, 5.25rem);
+  line-height: 0.98;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.trail-hero-title em {
+  font-style: italic;
+  color: var(--trail-gold);
+  text-transform: none;
+}
+.trail-hero-sub {
+  margin-top: 1rem;
+  font-size: clamp(0.85rem, 1.6vw, 1.05rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--trail-ivory) 80%, transparent);
+}
+.trail-hero-desc {
+  margin-top: 1.25rem;
+  max-width: 36rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: color-mix(in oklab, var(--trail-ivory) 72%, transparent);
+}
+.trail-hero-actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.trail-hero-scroll {
+  margin-top: 3rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--trail-gold);
+}
+
+.trail-intro {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 5rem 1.25rem 3rem;
+  text-align: center;
+}
+.trail-intro h2 {
+  margin-top: 1.25rem;
+}
+.trail-intro p {
+  margin-top: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: color-mix(in oklab, var(--trail-ivory) 72%, transparent);
+}
+
+.trail-config {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  border-top: 1px solid color-mix(in oklab, var(--trail-gold) 18%, transparent);
+}
+@media (min-width: 640px) {
+  .trail-config {
+    padding-inline: 1.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .trail-config {
+    padding-inline: 2.5rem;
+  }
+}
+.trail-config-intro {
+  margin-bottom: 2rem;
+}
+.trail-config-block {
+  margin-top: 1.5rem;
+}
+.trail-config-block h3 {
+  margin-bottom: 0.75rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--trail-ivory) 55%, transparent);
+}
+.trail-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.trail-chip {
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--trail-gold) 28%, transparent);
+  background: transparent;
+  color: color-mix(in oklab, var(--trail-ivory) 78%, transparent);
+  padding: 0.45rem 0.9rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+.trail-chip.is-on,
+.trail-chip:hover {
+  border-color: var(--trail-gold);
+  background: color-mix(in oklab, var(--trail-gold) 16%, transparent);
+  color: var(--trail-ivory);
+}
+.trail-config-cta {
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--trail-gold);
+  color: var(--trail-gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding-bottom: 0.2rem;
+}
+
+.trail-day-nav {
+  position: sticky;
+  top: var(--header-height);
+  z-index: 30;
+  background: color-mix(in oklab, var(--trail-maroon) 94%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid color-mix(in oklab, var(--trail-gold) 16%, transparent);
+}
+.trail-day-nav-inner {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-block: 0.75rem;
+  scrollbar-width: none;
+}
+.trail-day-nav-inner::-webkit-scrollbar {
+  display: none;
+}
+.trail-day-pill {
+  flex: 0 0 auto;
+  border: 1px solid color-mix(in oklab, var(--trail-gold) 30%, transparent);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--trail-ivory);
+  white-space: nowrap;
+}
+.trail-day-pill:hover {
+  border-color: var(--trail-gold);
+  color: var(--trail-gold);
+}
+
+.trail-journey {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .trail-journey {
+    padding-inline: 1.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .trail-journey {
+    padding-inline: 2.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .trail-journey {
+    grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+    column-gap: 2.75rem;
+    row-gap: 0;
+  }
+}
+
+.trail-journey-left {
+  min-width: 0;
+}
+
+.trail-progress-card {
+  margin-bottom: 1.5rem;
+  padding: 0.85rem 0 1rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--trail-gold) 18%, transparent);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--trail-ivory) 65%, transparent);
+  display: grid;
+  gap: 0.35rem;
+}
+.trail-progress-bar {
+  margin-top: 0.65rem;
+  height: 2px;
+  width: 100%;
+  background: color-mix(in oklab, var(--trail-gold) 18%, transparent);
+  overflow: hidden;
+}
+.trail-progress-bar span {
+  display: block;
+  height: 100%;
+  background: var(--trail-gold);
+  transition: width 0.4s ease;
+}
+
+.trail-day-head {
+  margin: 2.25rem 0 1.25rem;
+}
+.trail-day-head:first-of-type {
+  margin-top: 0.5rem;
+}
+.trail-day-head h2 {
+  margin-top: 0.35rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 1.1;
+}
+.trail-day-head p {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  color: color-mix(in oklab, var(--trail-ivory) 60%, transparent);
+}
+
+.trail-stop {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  column-gap: 1rem;
+  padding: 1.1rem 0 1.75rem;
+  opacity: 0.55;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+.trail-stop.is-active {
+  opacity: 1;
+  transform: none;
+}
+@media (min-width: 1024px) {
+  .trail-stop.is-active {
+    transform: translateX(2px);
+  }
+}
+.trail-stop-rail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.trail-stop-dot {
+  display: block;
+  width: 0.65rem;
+  height: 0.65rem;
+  margin-top: 0.4rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1.5px solid color-mix(in oklab, var(--trail-gold) 50%, transparent);
+  background: transparent;
+}
+.trail-stop.is-active .trail-stop-dot {
+  background: var(--trail-gold);
+  border-color: var(--trail-gold);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--trail-gold) 22%, transparent);
+}
+.trail-stop-line {
+  flex: 1;
+  width: 1px;
+  min-height: 2.5rem;
+  margin-top: 0.45rem;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--trail-gold) 45%, transparent),
+    transparent
+  );
+}
+.trail-stop-body {
+  min-width: 0;
+}
+.trail-stop-time {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--trail-gold);
+}
+.trail-stop-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+}
+.trail-stop-index {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--trail-ivory) 45%, transparent);
+}
+.trail-stop-live {
+  color: var(--trail-gold);
+}
+.trail-stop-title {
+  margin-top: 0.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+}
+.trail-stop-tagline {
+  margin-top: 0.35rem;
+  font-style: italic;
+  color: color-mix(in oklab, var(--trail-ivory) 68%, transparent);
+}
+.trail-stop-travel {
+  margin-top: 0.75rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--trail-bronze);
+}
+.trail-stop-mobile-media {
+  margin-top: 1rem;
+  overflow: hidden;
+  border-radius: 6px;
+  aspect-ratio: 16 / 10;
+  width: 100%;
+}
+.trail-stop-mobile-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.trail-stop-facts-inline {
+  margin-top: 0.85rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: color-mix(in oklab, var(--trail-ivory) 62%, transparent);
+}
+.trail-stop-desc {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: color-mix(in oklab, var(--trail-ivory) 78%, transparent);
+}
+.trail-stop-facts {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1.25rem;
+}
+.trail-stop-facts dt {
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--trail-ivory) 45%, transparent);
+}
+.trail-stop-facts dd {
+  margin-top: 0.2rem;
+  font-size: 0.88rem;
+  color: var(--trail-ivory);
+}
+.trail-stop-highlights {
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.75rem;
+}
+.trail-stop-highlights li {
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  color: color-mix(in oklab, var(--trail-ivory) 82%, transparent);
+}
+.trail-stop-highlights li::before {
+  content: "· ";
+  color: var(--trail-gold);
+}
+.trail-stop-tip {
+  margin-top: 1rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--trail-ivory) 72%, transparent);
+}
+.trail-stop-tip span {
+  display: inline-block;
+  margin-right: 0.4rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--trail-gold);
+}
+.trail-sticky-why {
+  margin-top: 0.75rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: color-mix(in oklab, var(--trail-ivory) 68%, transparent);
+}
+.trail-stop-next {
+  margin-top: 1.25rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--trail-ivory) 45%, transparent);
+}
+
+.trail-journey-right {
+  display: none;
+  min-width: 0;
+}
+@media (min-width: 1024px) {
+  .trail-journey-right {
+    display: block;
+    position: sticky;
+    top: calc(var(--header-height) + var(--trail-day-nav-h) + 0.75rem);
+    align-self: start;
+  }
+}
+
+.trail-sticky-panel {
+  width: 100%;
+  max-width: 36rem;
+  margin-inline: auto;
+}
+.trail-sticky-orb {
+  display: flex;
+  justify-content: center;
+}
+.trail-sticky-frame {
+  position: relative;
+  width: min(100%, min(52vh, 520px));
+  aspect-ratio: 1;
+  height: auto;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow:
+    0 28px 70px -28px #000000cc,
+    0 0 0 1px color-mix(in oklab, var(--trail-gold) 28%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--trail-gold) 18%, transparent);
+  background: #000;
+}
+.trail-sticky-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+.trail-sticky-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.06);
+}
+.trail-sticky-grain {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0.16;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+.trail-sticky-vignette {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, transparent 35%, #2a080a88 100%);
+}
+.trail-sticky-caption {
+  margin-top: 1.15rem;
+  text-align: center;
+}
+.trail-sticky-num {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--trail-gold);
+}
+.trail-sticky-num span {
+  opacity: 0.55;
+}
+.trail-sticky-name {
+  margin-top: 0.35rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2vw, 1.9rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+.trail-sticky-city {
+  margin-top: 0.25rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--trail-ivory) 70%, transparent);
+}
+.trail-sticky-meta {
+  margin-top: 1rem;
+  width: 100%;
+  text-align: center;
+}
+.trail-sticky-tagline {
+  font-style: italic;
+  line-height: 1.5;
+  color: color-mix(in oklab, var(--trail-ivory) 72%, transparent);
+}
+.trail-sticky-stats {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1.25rem;
+  text-align: left;
+}
+.trail-sticky-stats dt {
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--trail-ivory) 45%, transparent);
+}
+.trail-sticky-stats dd {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: var(--trail-ivory);
+}
+
+.trail-recs {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid color-mix(in oklab, var(--trail-gold) 18%, transparent);
+}
+.trail-recs-grid {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+.trail-rec-card {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+  padding: 0.75rem;
+  border: 1px solid color-mix(in oklab, var(--trail-gold) 16%, transparent);
+  border-radius: 4px;
+  background: color-mix(in oklab, #000 16%, transparent);
+}
+.trail-rec-card img {
+  width: 5.5rem;
+  height: 5.5rem;
+  object-fit: cover;
+  border-radius: 3px;
+}
+.trail-rec-cat {
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--trail-gold);
+}
+.trail-rec-card h4 {
+  margin-top: 0.2rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+.trail-rec-card p {
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: color-mix(in oklab, var(--trail-ivory) 65%, transparent);
+}
+.trail-rec-meta {
+  font-size: 0.7rem !important;
+  color: var(--trail-bronze) !important;
+}
+.trail-rec-card button {
+  margin-top: 0.55rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--trail-gold);
+  border-bottom: 1px solid color-mix(in oklab, var(--trail-gold) 50%, transparent);
+}
+
+.trail-map,
+.trail-summary {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  border-top: 1px solid color-mix(in oklab, var(--trail-gold) 16%, transparent);
+}
+@media (min-width: 640px) {
+  .trail-map,
+  .trail-summary {
+    padding-inline: 1.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .trail-map,
+  .trail-summary {
+    padding-inline: 2.5rem;
+  }
+}
+.trail-map--in-plan {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid color-mix(in oklab, var(--trail-gold) 22%, transparent);
+}
+.trail-map--in-plan h3 {
+  margin-top: 0.35rem;
+  margin-bottom: 1.25rem;
+}
+.trail-map-list {
+  margin-top: 1.75rem;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0;
+  list-style: none;
+}
+.trail-map-list > li {
+  display: grid;
+  gap: 0.15rem;
+}
+.trail-map-list button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  text-align: left;
+  padding: 0.85rem 0.25rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--trail-gold) 12%, transparent);
+  color: var(--trail-ivory);
+}
+.trail-map-list button span:first-child {
+  color: var(--trail-gold);
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+.trail-map-list button:hover {
+  color: var(--trail-gold);
+}
+.trail-map-arrow {
+  display: block;
+  padding-left: 2.75rem;
+  color: color-mix(in oklab, var(--trail-gold) 45%, transparent);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.trail-summary-stats {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 640px) {
+  .trail-summary-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.trail-summary-stats dt {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--trail-ivory) 45%, transparent);
+}
+.trail-summary-stats dd {
+  margin-top: 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  text-transform: capitalize;
+  line-height: 1.25;
+}
+.trail-share-card {
+  margin-top: 2rem;
+  padding: 1.75rem;
+  border: 1px solid color-mix(in oklab, var(--trail-gold) 28%, transparent);
+  border-radius: 6px;
+  background:
+    linear-gradient(135deg, color-mix(in oklab, var(--trail-gold) 8%, transparent), transparent),
+    color-mix(in oklab, #000 22%, transparent);
+}
+.trail-share-actions {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.trail-finale {
+  position: relative;
+  min-height: 80vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  text-align: center;
+}
+.trail-finale-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.trail-finale-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #2a080add 0%, #2a080a99 50%, #2a080aee 100%);
+}
+.trail-finale-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 40rem;
+  width: 100%;
+  padding: 4rem 1.25rem;
+}
+.trail-finale-inner p {
+  margin-top: 1rem;
+  font-style: italic;
+  color: color-mix(in oklab, var(--trail-ivory) 75%, transparent);
+}
+.trail-finale-inner .trail-hero-actions {
+  justify-content: center;
+}
+
+.trail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+.trail-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: #000000b8;
+  border: 0;
+}
+.trail-modal-panel {
+  position: relative;
+  z-index: 1;
+  width: min(40rem, 100%);
+  max-height: min(90vh, 900px);
+  overflow: auto;
+  border-radius: 8px;
+  border: 1px solid color-mix(in oklab, var(--trail-gold) 30%, transparent);
+  background: var(--trail-maroon);
+  padding: 1.5rem;
+}
+.trail-config--itinerary .trail-config-intro {
+  margin-bottom: 0;
+}
+.trail-config--modal {
+  padding-inline: 0;
+  border-top: 0;
+  margin-top: 1rem;
+}
+.trail-config--planning {
+  scroll-margin-top: calc(var(--header-height) + 1rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trail-stop,
+  .trail-progress-bar span {
+    transition: none;
+  }
+}

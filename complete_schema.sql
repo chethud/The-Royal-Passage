@@ -962,7 +962,7 @@ insert into public.experiences (
     'Small groups only. Story-led paths with archival imagery and live narration.',
     'cultural_heritage', 'mysuru', 'Mysuru', 'Karnataka', 'Old city core', 105, 'slot_based', 'per_person', 95000, null,
     'published',
-    'https://images.unsplash.com/photo-1524492412937-b280c272500d?w=1200&q=80',
+    'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=80',
     array['Guided walk', 'Printed route map'],
     array['Monument entry tickets'],
     'Full refund up to 24 hours before.',
@@ -1445,7 +1445,7 @@ insert into public.homestays (
     'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80',
     array[
       'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80',
-      'https://images.unsplash.com/photo-1611892440507-42a788e24d32?w=1200&q=80'
+      'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&q=80'
     ],
     380000, 'INR', 4, 4, 8, 4.70, 29, 'published'
   )

@@ -289,7 +289,7 @@ insert into public.homestays (
     'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80',
     array[
       'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80',
-      'https://images.unsplash.com/photo-1611892440507-42a788e24d32?w=1200&q=80'
+      'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&q=80'
     ],
     380000, 'INR', 4, 4, 8, 4.70, 29, 'published'
   )
