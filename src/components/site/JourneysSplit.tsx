@@ -30,10 +30,16 @@ function youtubeEmbedUrl(videoId: string, autoplay: boolean) {
   const params = new URLSearchParams({
     autoplay: autoplay ? "1" : "0",
     mute: "1",
+    controls: "0",
+    disablekb: "1",
+    fs: "0",
     playsinline: "1",
     rel: "0",
     modestbranding: "1",
     iv_load_policy: "3",
+    cc_load_policy: "0",
+    loop: "1",
+    playlist: videoId,
   });
   return `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
 }
@@ -57,7 +63,7 @@ type SlideContentProps = {
 function SlideContent({ slide, visible }: SlideContentProps) {
   return (
     <div
-      className={`royal-slide-content relative order-2 flex flex-col justify-center px-6 py-8 text-left sm:px-10 sm:py-14 md:order-1 md:px-12 md:py-16 ${visible ? "is-visible" : ""}`}
+      className={`royal-slide-content relative order-2 flex flex-col justify-start px-6 py-8 text-left sm:px-10 sm:py-10 md:order-1 md:px-12 md:pb-14 md:pt-10 ${visible ? "is-visible" : ""}`}
     >
       <div className="relative z-10 w-full max-w-xl self-start">
         <PalaceArchFrame className="pointer-events-none absolute -top-1 left-0 z-10 h-7 w-[min(100%,19rem)] opacity-70 sm:-top-2 sm:h-8 sm:w-[min(100%,22rem)]" />
@@ -70,7 +76,7 @@ function SlideContent({ slide, visible }: SlideContentProps) {
           )}
         </div>
 
-        <p className="royal-slide-eyebrow relative z-10 mb-3 pt-7 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-[#C9A227] sm:mb-4 sm:pt-8 sm:text-[0.68rem]">
+        <p className="royal-slide-eyebrow relative z-10 mb-3 pt-6 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-[#C9A227] sm:mb-3.5 sm:pt-7 sm:text-[0.68rem]">
           {slide.subtitle}
         </p>
 
@@ -88,11 +94,11 @@ function SlideContent({ slide, visible }: SlideContentProps) {
           aria-hidden
         />
 
-        <div className="relative z-10 space-y-2.5 sm:space-y-3">
+        <div className="relative z-10 space-y-1 sm:space-y-1.5">
           {slide.lines.map((line, lineIndex) => (
             <p
               key={line}
-              className="royal-slide-line max-w-md text-sm leading-[1.75] text-[#F8F4E8]/75 text-balance sm:text-[0.95rem] sm:leading-[1.9]"
+              className="royal-slide-line max-w-md text-sm leading-[1.55] text-[#F8F4E8]/75 text-balance sm:text-[0.95rem] sm:leading-[1.65]"
               style={{ "--line-delay": `${0.55 + lineIndex * 0.12}s` } as React.CSSProperties}
             >
               {line}
@@ -107,7 +113,6 @@ function SlideContent({ slide, visible }: SlideContentProps) {
 type SlideMediaProps = {
   slide: HomepageJourneySlide;
   isActive: boolean;
-  reducedMotion: boolean;
   editable?: boolean;
   onVideoIdChange?: (videoId: string) => void;
 };
@@ -115,7 +120,6 @@ type SlideMediaProps = {
 function SlideMedia({
   slide,
   isActive,
-  reducedMotion,
   editable,
   onVideoIdChange,
 }: SlideMediaProps) {
@@ -132,20 +136,23 @@ function SlideMedia({
 
   return (
     <div className="royal-slide-media relative order-1 aspect-video w-full min-h-[220px] overflow-hidden bg-black md:order-2 md:aspect-auto md:min-h-[480px]">
-      <div
-        className={`royal-slide-video absolute inset-0 z-[1] ${isActive && !reducedMotion ? "royal-slider-ken-burns" : ""}`}
-      >
+      <div className="royal-slide-video royal-slide-video--youtube absolute inset-0 z-[1] overflow-hidden">
         <iframe
-          key={`${slide.id}-${slide.videoId}`}
+          key={`${slide.id}-${slide.videoId}-${isActive ? "on" : "off"}`}
           title={slide.title}
           src={youtubeEmbedUrl(slide.videoId, isActive)}
-          className="absolute inset-0 h-full w-full border-0"
+          className="royal-slide-youtube-frame"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
           loading={isActive ? "eager" : "lazy"}
           referrerPolicy="strict-origin-when-cross-origin"
+          tabIndex={-1}
         />
       </div>
+
+      <div
+        className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-black/25 via-transparent to-black/15"
+        aria-hidden
+      />
 
       <img
         src={logoUrl}
@@ -366,7 +373,6 @@ export function JourneysSplit({ slides: slidesProp, editable = false, onSlidesCh
                     <SlideMedia
                       slide={item}
                       isActive={isActive}
-                      reducedMotion={reducedMotion}
                       editable={editable}
                       onVideoIdChange={(videoId) => updateSlide(index, { videoId })}
                     />

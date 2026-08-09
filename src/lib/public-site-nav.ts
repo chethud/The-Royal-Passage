@@ -1,9 +1,10 @@
 export type PublicSiteModule = "experiences" | "homestays" | "vip";
 
-/** Fixed public navbar: Experiences and Homestays. */
+/** Fixed public navbar: Experiences, Homestays, Mysore Trail. */
 export const PUBLIC_GUEST_NAV_ITEMS = [
   { label: "Experiences", to: "/experiences" },
   { label: "Homestays", to: "/homestays" },
+  { label: "Mysore Trail", to: "/mysore-trail" },
 ] as const;
 
 export type PublicNavLink = { label: string; to: string };
@@ -50,6 +51,9 @@ export function isPublicNavItemActive(pathname: string, to: string): boolean {
   }
   if (to === "/experiences") {
     return pathname === "/experiences" || pathname.startsWith("/experiences/");
+  }
+  if (to === "/mysore-trail") {
+    return pathname === "/mysore-trail" || pathname.startsWith("/mysore-trail/");
   }
   if (to === "/vips/browse") {
     return (

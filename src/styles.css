@@ -2153,6 +2153,34 @@ a.dashboard-stat-card:hover .dashboard-stat-card__cta {
   will-change: transform;
 }
 
+/* Ambient YouTube: fill panel edge-to-edge; scale crops letterbox + YT chrome */
+.royal-slide-video--youtube {
+  background: #000;
+  container-type: size;
+}
+
+.royal-slide-youtube-frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(1.65);
+  transform-origin: center center;
+  /* Fallback when container queries unavailable */
+  width: 100%;
+  height: 100%;
+}
+
+@supports (width: 1cqw) {
+  .royal-slide-youtube-frame {
+    /* True object-fit: cover for a 16:9 embed inside any panel */
+    width: max(100cqw, calc(100cqh * 16 / 9));
+    height: max(100cqh, calc(100cqw * 9 / 16));
+    transform: translate(-50%, -50%) scale(1.25);
+  }
+}
+
 .royal-slider-particle {
   animation: royal-particle-drift 7s ease-in-out infinite;
   will-change: transform, opacity;

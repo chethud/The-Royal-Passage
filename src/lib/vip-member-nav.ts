@@ -7,6 +7,7 @@ export const VIP_MEMBER_NAV_ITEMS = [
 export const GUEST_SIGNED_IN_NAV_ITEMS = [
   { to: "/experiences", label: "Experiences" },
   { to: "/homestays", label: "Homestays" },
+  { to: "/mysore-trail", label: "Mysore Trail" },
 ] as const;
 
 export function isVipMemberNavItemActive(pathname: string, to: string): boolean {

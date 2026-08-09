@@ -30,6 +30,7 @@ const EXPERIENCE_TERMS_LINK = {
 const quickLinks = [
   { label: "Experiences", to: "/experiences" },
   { label: "Homestays", to: "/homestays" },
+  { label: "Mysore Trail", to: "/mysore-trail" },
   { label: "Journal", to: "/journal" },
 ];
 

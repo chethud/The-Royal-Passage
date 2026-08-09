@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as MysoreTrailRouteImport } from './routes/mysore-trail'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExperiencesRouteImport } from './routes/experiences'
@@ -59,6 +60,7 @@ import { Route as CitiesSlugRouteImport } from './routes/cities.$slug'
 import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookingId'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
+import { Route as AdminMysoreTrailRouteImport } from './routes/admin.mysore-trail'
 import { Route as AdminHomestayFeaturedRouteImport } from './routes/admin.homestay-featured'
 import { Route as AdminHomepagePhotosRouteImport } from './routes/admin.homepage-photos'
 import { Route as AdminHomepageEditRouteImport } from './routes/admin.homepage-edit'
@@ -137,6 +139,11 @@ const SignInRoute = SignInRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MysoreTrailRoute = MysoreTrailRouteImport.update({
+  id: '/mysore-trail',
+  path: '/mysore-trail',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JournalRoute = JournalRouteImport.update({
@@ -372,6 +379,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
 const AdminProfileRoute = AdminProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMysoreTrailRoute = AdminMysoreTrailRouteImport.update({
+  id: '/mysore-trail',
+  path: '/mysore-trail',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminHomestayFeaturedRoute = AdminHomestayFeaturedRouteImport.update({
@@ -717,6 +729,7 @@ export interface FileRoutesByFullPath {
   '/experiences': typeof ExperiencesRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
+  '/mysore-trail': typeof MysoreTrailRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -726,6 +739,7 @@ export interface FileRoutesByFullPath {
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
   '/admin/homepage-photos': typeof AdminHomepagePhotosRoute
   '/admin/homestay-featured': typeof AdminHomestayFeaturedRoute
+  '/admin/mysore-trail': typeof AdminMysoreTrailRoute
   '/admin/profile': typeof AdminProfileRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -830,6 +844,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
+  '/mysore-trail': typeof MysoreTrailRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -839,6 +854,7 @@ export interface FileRoutesByTo {
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
   '/admin/homepage-photos': typeof AdminHomepagePhotosRoute
   '/admin/homestay-featured': typeof AdminHomestayFeaturedRoute
+  '/admin/mysore-trail': typeof AdminMysoreTrailRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/cities/$slug': typeof CitiesSlugRoute
   '/dashboard/cancelled': typeof DashboardCancelledRoute
@@ -935,6 +951,7 @@ export interface FileRoutesById {
   '/experiences': typeof ExperiencesRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
+  '/mysore-trail': typeof MysoreTrailRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -944,6 +961,7 @@ export interface FileRoutesById {
   '/admin/homepage-edit': typeof AdminHomepageEditRoute
   '/admin/homepage-photos': typeof AdminHomepagePhotosRoute
   '/admin/homestay-featured': typeof AdminHomestayFeaturedRoute
+  '/admin/mysore-trail': typeof AdminMysoreTrailRoute
   '/admin/profile': typeof AdminProfileRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/bookings/$bookingId': typeof BookingsBookingIdRouteWithChildren
@@ -1053,6 +1071,7 @@ export interface FileRouteTypes {
     | '/experiences'
     | '/forgot-password'
     | '/journal'
+    | '/mysore-trail'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
@@ -1062,6 +1081,7 @@ export interface FileRouteTypes {
     | '/admin/homepage-edit'
     | '/admin/homepage-photos'
     | '/admin/homestay-featured'
+    | '/admin/mysore-trail'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -1166,6 +1186,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/forgot-password'
     | '/journal'
+    | '/mysore-trail'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
@@ -1175,6 +1196,7 @@ export interface FileRouteTypes {
     | '/admin/homepage-edit'
     | '/admin/homepage-photos'
     | '/admin/homestay-featured'
+    | '/admin/mysore-trail'
     | '/auth/callback'
     | '/cities/$slug'
     | '/dashboard/cancelled'
@@ -1270,6 +1292,7 @@ export interface FileRouteTypes {
     | '/experiences'
     | '/forgot-password'
     | '/journal'
+    | '/mysore-trail'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
@@ -1279,6 +1302,7 @@ export interface FileRouteTypes {
     | '/admin/homepage-edit'
     | '/admin/homepage-photos'
     | '/admin/homestay-featured'
+    | '/admin/mysore-trail'
     | '/admin/profile'
     | '/auth/callback'
     | '/bookings/$bookingId'
@@ -1387,6 +1411,7 @@ export interface RootRouteChildren {
   ExperiencesRoute: typeof ExperiencesRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   JournalRoute: typeof JournalRoute
+  MysoreTrailRoute: typeof MysoreTrailRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
@@ -1450,6 +1475,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mysore-trail': {
+      id: '/mysore-trail'
+      path: '/mysore-trail'
+      fullPath: '/mysore-trail'
+      preLoaderRoute: typeof MysoreTrailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/journal': {
@@ -1779,6 +1811,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/admin/profile'
       preLoaderRoute: typeof AdminProfileRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/mysore-trail': {
+      id: '/admin/mysore-trail'
+      path: '/mysore-trail'
+      fullPath: '/admin/mysore-trail'
+      preLoaderRoute: typeof AdminMysoreTrailRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/homestay-featured': {
@@ -2256,6 +2295,7 @@ interface AdminRouteChildren {
   AdminHomepageEditRoute: typeof AdminHomepageEditRoute
   AdminHomepagePhotosRoute: typeof AdminHomepagePhotosRoute
   AdminHomestayFeaturedRoute: typeof AdminHomestayFeaturedRoute
+  AdminMysoreTrailRoute: typeof AdminMysoreTrailRoute
   AdminProfileRoute: typeof AdminProfileRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBookingsBookingIdRoute: typeof AdminBookingsBookingIdRoute
@@ -2288,6 +2328,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHomepageEditRoute: AdminHomepageEditRoute,
   AdminHomepagePhotosRoute: AdminHomepagePhotosRoute,
   AdminHomestayFeaturedRoute: AdminHomestayFeaturedRoute,
+  AdminMysoreTrailRoute: AdminMysoreTrailRoute,
   AdminProfileRoute: AdminProfileRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   AdminBookingsBookingIdRoute: AdminBookingsBookingIdRoute,
@@ -2527,6 +2568,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExperiencesRoute: ExperiencesRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   JournalRoute: JournalRoute,
+  MysoreTrailRoute: MysoreTrailRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,

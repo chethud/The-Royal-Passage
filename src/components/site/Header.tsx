@@ -75,6 +75,7 @@ function navItemsForWorkspace(
     return [
       { label: "Edit homepage", to: "/admin/homepage-edit" },
       { label: "Homepage photos", to: "/admin/homepage-photos" },
+      { label: "Mysore Trail", to: "/admin/mysore-trail" },
       ...publicGuestNavItems(),
     ];
   }
@@ -373,6 +374,7 @@ export function Header() {
                         <MobileNavSectionLabel>Administration</MobileNavSectionLabel>
                         <MobileNavLink to="/admin/reviews">Reviews</MobileNavLink>
                         <MobileNavLink to="/admin/homepage-edit">Edit homepage</MobileNavLink>
+                        <MobileNavLink to="/admin/mysore-trail">Mysore Trail</MobileNavLink>
                         <MobileNavLink to="/admin/profile">Admin</MobileNavLink>
                         <MobileNavLink to="/admin/profile/users">Users</MobileNavLink>
                         <MobileNavLink to="/admin/profile/my-team">My team</MobileNavLink>

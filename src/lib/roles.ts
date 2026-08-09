@@ -18,7 +18,7 @@ export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
   homestay_owner: "Sign in with homestay owner credentials provided by Royal Passage.",
   vip_owner: "Sign in with VIP owner credentials provided by Royal Passage.",
   admin: "Sign in with your admin credentials — manage bookings, experiences, and homepage hero, showcase, and video sections.",
-  editor: "Sign in to edit homepage photos, hero headings, journal stories, and the heritage video section.",
+  editor: "Sign in to edit homepage photos, hero headings, journal stories, the heritage video section, and Mysore Trail.",
 };
 
 export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
@@ -259,6 +259,14 @@ export function canEditHomepageJourneys(
 
 /** Hero photos, headings, and top experiences — editors and admins. */
 export function canEditHomepageAdminSections(
+  role: UserRole | null | undefined,
+  roles?: readonly UserRole[] | null,
+): boolean {
+  return hasAnyRole(roles, ["editor", "admin"], role);
+}
+
+/** Mysore Trail published itinerary — editors and admins (admin always included). */
+export function canEditMysoreTrail(
   role: UserRole | null | undefined,
   roles?: readonly UserRole[] | null,
 ): boolean {

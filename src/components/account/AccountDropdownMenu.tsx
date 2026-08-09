@@ -5,6 +5,7 @@ import {
   Image,
   LayoutDashboard,
   LogOut,
+  Map,
   Pencil,
   PlusCircle,
   Star,
@@ -23,6 +24,7 @@ import {
 import { ProfileNavIcon } from "@/components/account/ProfileNavIcon";
 import {
   ROLE_LABELS,
+  canEditMysoreTrail,
   hasEditorAccess,
   workspaceLinksForRoles,
   type RoleWorkspaceLink,
@@ -131,6 +133,7 @@ export function AccountDropdownMenu({
     (workspace) => workspace.role !== "host" && workspace.role !== "homestay_owner",
   );
   const canEditHomepage = hasEditorAccess(roles, role);
+  const canEditTrail = canEditMysoreTrail(role, roles);
   const isHost = role === "host" || roles.includes("host");
   const isHomestayOwner = role === "homestay_owner" || roles.includes("homestay_owner");
   const roleLabels =
@@ -217,23 +220,41 @@ export function AccountDropdownMenu({
                 description="Hero, showcase & video sections"
                 to="/admin/homepage-edit"
               />
+              <AccountMenuItem
+                icon={Map}
+                label="Mysore Trail"
+                description="Edit & publish the public itinerary"
+                to="/admin/mysore-trail"
+              />
             </>
-          ) : canEditHomepage ? (
+          ) : canEditHomepage || canEditTrail ? (
             <>
               <DropdownMenuSeparator className="header-account-menu__divider" />
               <DropdownMenuLabel className="header-account-menu__section">Editor</DropdownMenuLabel>
-              <AccountMenuItem
-                icon={Pencil}
-                label="Edit homepage"
-                description="Headings, journal & heritage video"
-                to="/admin/homepage-edit"
-              />
-              <AccountMenuItem
-                icon={Image}
-                label="Homepage photos"
-                description="Hero, showcase, journal & featured stays"
-                to="/admin/profile/homepage-photos"
-              />
+              {canEditHomepage ? (
+                <>
+                  <AccountMenuItem
+                    icon={Pencil}
+                    label="Edit homepage"
+                    description="Headings, journal & heritage video"
+                    to="/admin/homepage-edit"
+                  />
+                  <AccountMenuItem
+                    icon={Image}
+                    label="Homepage photos"
+                    description="Hero, showcase, journal & featured stays"
+                    to="/admin/profile/homepage-photos"
+                  />
+                </>
+              ) : null}
+              {canEditTrail ? (
+                <AccountMenuItem
+                  icon={Map}
+                  label="Mysore Trail"
+                  description="Edit & publish the public itinerary"
+                  to="/admin/mysore-trail"
+                />
+              ) : null}
             </>
           ) : null}
 
