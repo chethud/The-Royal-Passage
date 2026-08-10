@@ -7,7 +7,10 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { HERO_DESTINATIONS } from "@/data/mysore-trail-hero-destinations";
+import {
+  HERO_DESTINATIONS,
+  type HeroDestination,
+} from "@/data/mysore-trail-hero-destinations";
 
 const AUTOPLAY_MS = 4000;
 const TRANSITION_MS = 1250;
@@ -15,7 +18,9 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const VISIBLE_CARDS = 3;
 
 type TrailHeroDiscoveryProps = {
+  destinations?: HeroDestination[];
   onExploreTrail?: () => void;
+  onPlanTrip?: () => void;
 };
 
 type Direction = 1 | -1;
@@ -99,8 +104,12 @@ function flightFromCard(
   };
 }
 
-export function TrailHeroDiscovery({ onExploreTrail }: TrailHeroDiscoveryProps) {
-  const destinations = HERO_DESTINATIONS;
+export function TrailHeroDiscovery({
+  destinations: destinationsProp,
+  onExploreTrail,
+  onPlanTrip,
+}: TrailHeroDiscoveryProps) {
+  const destinations = destinationsProp?.length ? destinationsProp : HERO_DESTINATIONS;
   const total = destinations.length;
   const reduceMotion = useReducedMotion();
 
@@ -280,6 +289,10 @@ export function TrailHeroDiscovery({ onExploreTrail }: TrailHeroDiscoveryProps) 
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const planTrip = () => {
+    onPlanTrip?.();
+  };
+
   const textEnter = reduceMotion
     ? { duration: 0.15 }
     : { duration: 0.5, ease: EASE, delay: 0.45 };
@@ -377,9 +390,9 @@ export function TrailHeroDiscovery({ onExploreTrail }: TrailHeroDiscoveryProps) 
                 <button
                   type="button"
                   className="mt-disco-cta mt-disco-cta--ghost"
-                  onClick={scrollToJourney}
+                  onClick={planTrip}
                 >
-                  View itinerary
+                  Plan trip
                 </button>
               </div>
             </motion.div>

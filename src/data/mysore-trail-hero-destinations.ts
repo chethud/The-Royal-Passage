@@ -74,8 +74,8 @@ export const HERO_DESTINATIONS: HeroDestination[] = [
     description:
       "A quieter royal house turned gallery — Mysuru paintings, Indian art, and palace rooms that reward slow looking.",
     image:
-      "https://images.unsplash.com/photo-1548013146-72479768bada?w=2000&q=85&auto=format&fit=crop",
-    imageAlt: "Heritage palace architecture with warm light",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/A_side_wide_angle_view_of_Jaganmohan_Palace%2C_Mysuru%2C_Karnataka.jpg/1600px-A_side_wide_angle_view_of_Jaganmohan_Palace%2C_Mysuru%2C_Karnataka.jpg",
+    imageAlt: "Jaganmohan Palace facade in Mysuru",
     category: "Heritage",
   },
   {
@@ -89,7 +89,7 @@ export const HERO_DESTINATIONS: HeroDestination[] = [
     description:
       "Neo-Gothic twin towers rise over Mysuru — stained glass, quiet aisles, and a skyline beyond palace domes.",
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Beautiful_Exterior_view_of_St._Philomena%E2%80%99s_Cathedral%2C_Mysuru%2C_Karnataka.jpg/1280px-Beautiful_Exterior_view_of_St._Philomena%E2%80%99s_Cathedral%2C_Mysuru%2C_Karnataka.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Beautiful_Exterior_view_of_St._Philomena%E2%80%99s_Cathedral%2C_Mysuru%2C_Karnataka.jpg/1600px-Beautiful_Exterior_view_of_St._Philomena%E2%80%99s_Cathedral%2C_Mysuru%2C_Karnataka.jpg",
     imageAlt: "St. Philomena's Cathedral twin towers in Mysuru",
     category: "Architecture",
   },
@@ -104,7 +104,7 @@ export const HERO_DESTINATIONS: HeroDestination[] = [
     description:
       "White neoclassical grandeur on the edge of the city — a royal guest palace that still feels cinematic.",
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Lalitha_Mahal_Palace_%2C_Mysore_-_Host_to_many_events.jpg/1920px-Lalitha_Mahal_Palace_%2C_Mysore_-_Host_to_many_events.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Lalitha_Mahal_Palace_%2C_Mysore_-_Host_to_many_events.jpg/1600px-Lalitha_Mahal_Palace_%2C_Mysore_-_Host_to_many_events.jpg",
     imageAlt: "Lalitha Mahal Palace white facade",
     category: "Royal",
   },
@@ -119,8 +119,8 @@ export const HERO_DESTINATIONS: HeroDestination[] = [
     description:
       "Still water, birds and green edges — a quieter Mysuru morning beside the walkway and gardens.",
     image:
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2000&q=85&auto=format&fit=crop",
-    imageAlt: "Calm lake water reflecting morning sky",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/North_View_Karanji_Lake_Mysore_Nov23_A7C_08174.jpg/1600px-North_View_Karanji_Lake_Mysore_Nov23_A7C_08174.jpg",
+    imageAlt: "Karanji Lake north view in Mysuru",
     category: "Nature",
   },
   {
@@ -134,8 +134,8 @@ export const HERO_DESTINATIONS: HeroDestination[] = [
     description:
       "Terraced gardens below the Krishnarajasagara dam — musical fountains and evening light.",
     image:
-      "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=2000&q=85&auto=format&fit=crop",
-    imageAlt: "Formal illuminated gardens and fountains",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Brindavan_Gardens.JPG/1600px-Brindavan_Gardens.JPG",
+    imageAlt: "Brindavan Gardens near Mysuru",
     category: "Culture",
   },
   {
@@ -149,8 +149,8 @@ export const HERO_DESTINATIONS: HeroDestination[] = [
     description:
       "A beloved walking lake — birds, circular paths, and Mysuru's evening breath.",
     image:
-      "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=2000&q=85&auto=format&fit=crop",
-    imageAlt: "Lake edge glowing at sunset",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Sunset-Mysore-Kukkarahalli.jpg/1600px-Sunset-Mysore-Kukkarahalli.jpg",
+    imageAlt: "Sunset over Kukkarahalli Lake in Mysuru",
     category: "Nature",
   },
   {
@@ -164,8 +164,8 @@ export const HERO_DESTINATIONS: HeroDestination[] = [
     description:
       "A river island of Tipu Sultan's era — temples, Gumbaz, and layered fort history beyond the palace city.",
     image:
-      "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=2000&q=85&auto=format&fit=crop",
-    imageAlt: "Historic fort and temple landscape near Mysuru",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Ranganathaswamy_Temple%2C_Srirangapatna_-_Wide_Shot.jpg/1600px-Ranganathaswamy_Temple%2C_Srirangapatna_-_Wide_Shot.jpg",
+    imageAlt: "Ranganathaswamy Temple at Srirangapatna",
     category: "History",
   },
 ];

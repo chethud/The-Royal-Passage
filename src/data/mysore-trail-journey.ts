@@ -91,7 +91,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Where Mysuru begins above the clouds.",
     cityLabel: "Mysuru",
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Chamunda_Devi_Temple,_Chamundi_Hill,_Mysore.jpg/1280px-Chamunda_Devi_Temple,_Chamundi_Hill,_Mysore.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Chamunda_Devi_Temple,_Chamundi_Hill,_Mysore.jpg/1600px-Chamunda_Devi_Temple,_Chamundi_Hill,_Mysore.jpg",
     imageAlt: "Chamundeshwari Temple on Chamundi Hill",
     coordinates: { lat: 12.2724, lng: 76.6701 },
     categories: ["spiritual", "heritage", "photography", "nature"],
@@ -120,7 +120,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "The crown jewel of the City of Palaces.",
     cityLabel: "Mysuru",
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Mysore_Palace_-_Front_view.jpg/1280px-Mysore_Palace_-_Front_view.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Mysore_Palace_-_Front_view.jpg/1600px-Mysore_Palace_-_Front_view.jpg",
     imageAlt: "Mysuru Palace facade in morning light",
     coordinates: { lat: 12.3052, lng: 76.6552 },
     categories: ["heritage", "architecture", "photography", "culture", "luxury"],
@@ -148,7 +148,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Royal Mysuru lives in its markets too.",
     cityLabel: "Mysuru",
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Devaraja_Market_1.jpg/1280px-Devaraja_Market_1.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Devaraja_Market_1.jpg/1600px-Devaraja_Market_1.jpg",
     imageAlt: "Devaraja Market street façade in Mysuru",
     coordinates: { lat: 12.311, lng: 76.658 },
     categories: ["culture", "shopping", "food", "photography", "hidden"],
@@ -175,8 +175,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "A Mysuru meal, unhurried.",
     cityLabel: "Mysuru",
     image:
-      "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=1800&q=85&auto=format&fit=crop",
-    imageAlt: "South Indian dosa meal on a banana leaf",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Masala_Dosa.jpg/1600px-Masala_Dosa.jpg",
+    imageAlt: "South Indian masala dosa meal",
     coordinates: { lat: 12.309, lng: 76.655 },
     categories: ["food", "culture", "family"],
     description:
@@ -201,8 +201,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Where Mysuru paints its memory.",
     cityLabel: "Mysuru",
     image:
-      "https://images.unsplash.com/photo-1548013146-72479768bada?w=1800&q=85&auto=format&fit=crop",
-    imageAlt: "Heritage art gallery interior with warm light",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/A_side_wide_angle_view_of_Jaganmohan_Palace%2C_Mysuru%2C_Karnataka.jpg/1600px-A_side_wide_angle_view_of_Jaganmohan_Palace%2C_Mysuru%2C_Karnataka.jpg",
+    imageAlt: "Jaganmohan Palace facade in Mysuru",
     coordinates: { lat: 12.3085, lng: 76.6498 },
     categories: ["heritage", "culture", "architecture", "photography"],
     description:
@@ -228,7 +228,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Gothic towers over a southern sky.",
     cityLabel: "Mysuru",
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Beautiful_Exterior_view_of_St._Philomena%E2%80%99s_Cathedral%2C_Mysuru%2C_Karnataka.jpg/960px-Beautiful_Exterior_view_of_St._Philomena%E2%80%99s_Cathedral%2C_Mysuru%2C_Karnataka.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Beautiful_Exterior_view_of_St._Philomena%E2%80%99s_Cathedral%2C_Mysuru%2C_Karnataka.jpg/1600px-Beautiful_Exterior_view_of_St._Philomena%E2%80%99s_Cathedral%2C_Mysuru%2C_Karnataka.jpg",
     imageAlt: "St. Philomena’s Cathedral twin towers in Mysuru",
     coordinates: { lat: 12.321, lng: 76.6584 },
     categories: ["architecture", "spiritual", "photography", "heritage"],
@@ -255,8 +255,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "When the city softens into gold.",
     cityLabel: "Mysuru",
     image:
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1800&q=85&auto=format&fit=crop",
-    imageAlt: "Palace lights and evening sky over Mysuru",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Mysuru_Palace_-_Night_View.jpg/1600px-Mysuru_Palace_-_Night_View.jpg",
+    imageAlt: "Mysuru Palace illuminated at night",
     coordinates: { lat: 12.3052, lng: 76.6552 },
     categories: ["heritage", "luxury", "culture", "photography"],
     description:
@@ -281,8 +281,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Morning Mysuru by the water.",
     cityLabel: "Mysuru",
     image:
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1800&q=85&auto=format&fit=crop",
-    imageAlt: "Calm lake water reflecting morning sky",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/North_View_Karanji_Lake_Mysore_Nov23_A7C_08174.jpg/1600px-North_View_Karanji_Lake_Mysore_Nov23_A7C_08174.jpg",
+    imageAlt: "Karanji Lake north view in Mysuru",
     coordinates: { lat: 12.3028, lng: 76.6795 },
     categories: ["nature", "photography", "family", "hidden"],
     description:
@@ -308,8 +308,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "One of India’s oldest zoological gardens.",
     cityLabel: "Mysuru",
     image:
-      "https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=1800&q=85&auto=format&fit=crop",
-    imageAlt: "Wildlife among green trees",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Sri_Chamarajendra_Zoological_Gardens.jpg/1600px-Sri_Chamarajendra_Zoological_Gardens.jpg",
+    imageAlt: "Sri Chamarajendra Zoological Gardens in Mysuru",
     coordinates: { lat: 12.301, lng: 76.666 },
     categories: ["family", "nature", "culture"],
     description:
@@ -335,7 +335,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Luxury on the hillside.",
     cityLabel: "Mysuru",
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Lalitha_Mahal_Palace_%2C_Mysore_-_Host_to_many_events.jpg/1280px-Lalitha_Mahal_Palace_%2C_Mysore_-_Host_to_many_events.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Lalitha_Mahal_Palace_%2C_Mysore_-_Host_to_many_events.jpg/1600px-Lalitha_Mahal_Palace_%2C_Mysore_-_Host_to_many_events.jpg",
     imageAlt: "Lalitha Mahal Palace white facade",
     coordinates: { lat: 12.292, lng: 76.685 },
     categories: ["luxury", "heritage", "architecture", "photography"],
@@ -362,8 +362,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Sunset for walkers and birds.",
     cityLabel: "Mysuru",
     image:
-      "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1800&q=85&auto=format&fit=crop",
-    imageAlt: "Lake edge glowing at sunset",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Sunset-Mysore-Kukkarahalli.jpg/1600px-Sunset-Mysore-Kukkarahalli.jpg",
+    imageAlt: "Sunset over Kukkarahalli Lake in Mysuru",
     coordinates: { lat: 12.3115, lng: 76.623 },
     categories: ["nature", "photography", "family", "hidden"],
     description:
@@ -388,8 +388,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Silk, sandalwood, and Mysuru Pak.",
     cityLabel: "Mysuru",
     image:
-      "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=1800&q=85&auto=format&fit=crop",
-    imageAlt: "Colourful silk and textile folds",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Mysore_Silk_Saree.jpg/1600px-Mysore_Silk_Saree.jpg",
+    imageAlt: "Mysore silk saree with golden zari",
     coordinates: { lat: 12.31, lng: 76.65 },
     categories: ["shopping", "food", "culture"],
     description:
@@ -414,8 +414,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Island of Tipu’s history.",
     cityLabel: "Near Mysuru",
     image:
-      "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1800&q=85&auto=format&fit=crop",
-    imageAlt: "Historic fort and temple landscape near Mysuru",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Ranganathaswamy_Temple%2C_Srirangapatna_-_Wide_Shot.jpg/1600px-Ranganathaswamy_Temple%2C_Srirangapatna_-_Wide_Shot.jpg",
+    imageAlt: "Ranganathaswamy Temple at Srirangapatna",
     coordinates: { lat: 12.4237, lng: 76.6947 },
     categories: ["heritage", "architecture", "culture", "photography"],
     description:
@@ -440,8 +440,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Boats among the islands.",
     cityLabel: "Near Mysuru",
     image:
-      "https://images.unsplash.com/photo-1484406566174-9da000fda645?w=1800&q=85&auto=format&fit=crop",
-    imageAlt: "Water birds among greenery",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Islands_River_Ranganathittu_Srirangapatna_Jan24_A7C_09120.jpg/1600px-Islands_River_Ranganathittu_Srirangapatna_Jan24_A7C_09120.jpg",
+    imageAlt: "Bird islands at Ranganathittu Bird Sanctuary",
     coordinates: { lat: 12.424, lng: 76.656 },
     categories: ["nature", "photography", "family"],
     description:
@@ -467,8 +467,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Terraces, fountains, evening light.",
     cityLabel: "Near Mysuru",
     image:
-      "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1800&q=85&auto=format&fit=crop",
-    imageAlt: "Formal illuminated gardens and fountains",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Brindavan_Gardens.JPG/1600px-Brindavan_Gardens.JPG",
+    imageAlt: "Brindavan Gardens near Mysuru",
     coordinates: { lat: 12.4244, lng: 76.572 },
     categories: ["family", "photography", "culture", "nature"],
     description:
@@ -494,8 +494,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Your Mysuru story doesn’t end here.",
     cityLabel: "Mysuru",
     image:
-      "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1800&q=85&auto=format&fit=crop",
-    imageAlt: "Quiet night sky over the city lights",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Mysuru_Palace_-_Night_View.jpg/1600px-Mysuru_Palace_-_Night_View.jpg",
+    imageAlt: "Mysuru Palace lights at the end of the day",
     coordinates: { lat: 12.295, lng: 76.639 },
     categories: ["luxury", "culture", "heritage"],
     description:
@@ -774,5 +774,17 @@ export const DEFAULT_PREFERENCES: TripPreferences = {
 };
 
 export function getPlace(placeId: string): TrailPlace {
-  return TRAIL_PLACES[placeId] ?? TRAIL_PLACES["mysuru-palace"]!;
+  const places = trailPlaceCatalog ?? TRAIL_PLACES;
+  return places[placeId] ?? places["mysuru-palace"] ?? TRAIL_PLACES["mysuru-palace"]!;
+}
+
+/** Apply published CMS place catalog for this request/render tree. */
+let trailPlaceCatalog: Record<string, TrailPlace> | null = null;
+
+export function setTrailPlaceCatalog(places: Record<string, TrailPlace> | null) {
+  trailPlaceCatalog = places;
+}
+
+export function getTrailPlaceCatalog(): Record<string, TrailPlace> {
+  return trailPlaceCatalog ?? TRAIL_PLACES;
 }

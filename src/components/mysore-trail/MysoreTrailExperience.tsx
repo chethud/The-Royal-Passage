@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { ItineraryStopCard } from "@/components/mysore-trail/ItineraryStopCard";
 import { TrailHeroDiscovery } from "@/components/mysore-trail/TrailHeroDiscovery";
 import { TripConfigurator } from "@/components/mysore-trail/TripConfigurator";
+import type { HeroDestination } from "@/data/mysore-trail-hero-destinations";
 import {
   DEFAULT_PREFERENCES,
   getPlace,
@@ -19,7 +20,7 @@ import {
 } from "@/lib/mysore-trail-personalize";
 
 const FINALE_IMAGE =
-  "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=2000&q=85&auto=format&fit=crop";
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Mysuru_Palace_-_Night_View.jpg/1600px-Mysuru_Palace_-_Night_View.jpg";
 
 const CATEGORY_FILTERS = [
   "All",
@@ -35,11 +36,13 @@ const CATEGORY_FILTERS = [
 type MysoreTrailExperienceProps = {
   canEdit?: boolean;
   initialPlaceId?: string;
+  heroDestinations?: HeroDestination[];
 };
 
 export function MysoreTrailExperience({
   canEdit = false,
   initialPlaceId,
+  heroDestinations,
 }: MysoreTrailExperienceProps) {
   const defaults = useMemo(() => getDefaultTrail(), []);
   const [prefs, setPrefs] = useState<TripPreferences>(DEFAULT_PREFERENCES);
@@ -90,7 +93,7 @@ export function MysoreTrailExperience({
     if (!planning || !scrollPlannerIntoView.current) return;
     scrollPlannerIntoView.current = false;
     const id = window.setTimeout(() => {
-      document.getElementById("trail-config")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("trail-journey")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 50);
     return () => window.clearTimeout(id);
   }, [planning]);
@@ -258,7 +261,11 @@ export function MysoreTrailExperience({
 
   return (
     <div className="mt-page">
-      <TrailHeroDiscovery onExploreTrail={() => setPlanning(false)} />
+      <TrailHeroDiscovery
+        destinations={heroDestinations}
+        onExploreTrail={() => setPlanning(false)}
+        onPlanTrip={startPlanning}
+      />
 
       {/* Planner — only in Plan my journey mode */}
       <TripConfigurator
@@ -389,44 +396,6 @@ export function MysoreTrailExperience({
           </div>
         </div>
       </section>
-
-      {/* Route map — plan mode only */}
-      {planning ? (
-        <section className="mt-route" id="trail-route">
-          <div className="mt-wrap">
-            <header className="mt-section-head">
-              <p className="mt-eyebrow">Your journey route</p>
-              <h2 className="mt-h2">A stylised path through Mysuru</h2>
-            </header>
-            <div className="mt-route-board">
-              <ol className="mt-route-list">
-                {stops.map((stop, i) => {
-                  const place = getPlace(stop.placeId);
-                  return (
-                    <li key={stop.id}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveStopId(stop.id);
-                          document.getElementById(place.id)?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "center",
-                          });
-                        }}
-                      >
-                        <span className="mt-route-marker">{String(i + 1).padStart(2, "0")}</span>
-                        <span className="mt-route-name">{place.shortName}</span>
-                        <span className="mt-route-time">Day {stop.day}</span>
-                      </button>
-                      {i < stops.length - 1 ? <span className="mt-route-dash" aria-hidden /> : null}
-                    </li>
-                  );
-                })}
-              </ol>
-            </div>
-          </div>
-        </section>
-      ) : null}
 
       {/* Featured journey */}
       <section className="mt-featured">
