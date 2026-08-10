@@ -100,11 +100,15 @@ export function MysoreTrailCatalogEditor({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-2xl border border-ink/10 bg-white/70 p-5 shadow-sm sm:p-6">
-        <p className="max-w-3xl text-sm text-muted-foreground">
+    <div className="space-y-6 text-[rgb(42_0_0)]">
+      <div className="rounded-2xl border border-[rgb(74_0_0/0.12)] bg-white/80 p-5 shadow-sm sm:p-6">
+        <p className="max-w-3xl text-sm leading-relaxed text-[rgb(58_0_0/0.72)]">
           Edit the places and hero destinations shown on the public{" "}
-          <Link to="/mysore-trail" search={{ place: undefined }} className="text-ink underline">
+          <Link
+            to="/mysore-trail"
+            search={{ place: undefined }}
+            className="font-medium text-[rgb(42_0_0)] underline"
+          >
             Mysore Trail
           </Link>{" "}
           page — names, short lines, images, and categories. Publish to update the live page for
@@ -154,7 +158,7 @@ export function MysoreTrailCatalogEditor({
 
       {tab === "places" && selectedPlace ? (
         <div className="grid gap-5 lg:grid-cols-[16rem_minmax(0,1fr)]">
-          <aside className="max-h-[70vh] space-y-1 overflow-y-auto rounded-2xl border border-ink/10 bg-white/60 p-3">
+          <aside className="max-h-[70vh] space-y-1 overflow-y-auto rounded-2xl border border-[rgb(74_0_0/0.12)] bg-white/80 p-3">
             {catalog.places.map((place) => (
               <button
                 key={place.id}
@@ -162,8 +166,8 @@ export function MysoreTrailCatalogEditor({
                 onClick={() => setSelectedPlaceId(place.id)}
                 className={`block w-full rounded-xl px-3 py-2 text-left text-sm transition ${
                   place.id === selectedPlace.id
-                    ? "bg-ink text-ivory"
-                    : "text-ink hover:bg-ink/5"
+                    ? "bg-[rgb(42_0_0)] text-[#F7F1E8]"
+                    : "text-[rgb(42_0_0)] hover:bg-[rgb(74_0_0/0.06)]"
                 }`}
               >
                 <span className="block font-medium">{place.shortName}</span>
@@ -172,8 +176,8 @@ export function MysoreTrailCatalogEditor({
             ))}
           </aside>
 
-          <section className="space-y-4 rounded-2xl border border-ink/10 bg-white/70 p-5 sm:p-6">
-            <div className="overflow-hidden rounded-xl border border-ink/10">
+          <section className="space-y-4 rounded-2xl border border-[rgb(74_0_0/0.12)] bg-white/80 p-5 sm:p-6">
+            <div className="overflow-hidden rounded-xl border border-[rgb(74_0_0/0.12)]">
               <img
                 src={selectedPlace.image}
                 alt={selectedPlace.imageAlt}
@@ -187,28 +191,28 @@ export function MysoreTrailCatalogEditor({
                 <input
                   value={selectedPlace.name}
                   onChange={(e) => updatePlace(selectedPlace.id, { name: e.target.value })}
-                  className="admin-input"
+                  className="luxury-input mt-1.5"
                 />
               </Field>
               <Field label="Short name">
                 <input
                   value={selectedPlace.shortName}
                   onChange={(e) => updatePlace(selectedPlace.id, { shortName: e.target.value })}
-                  className="admin-input"
+                  className="luxury-input mt-1.5"
                 />
               </Field>
               <Field label="City label">
                 <input
                   value={selectedPlace.cityLabel}
                   onChange={(e) => updatePlace(selectedPlace.id, { cityLabel: e.target.value })}
-                  className="admin-input"
+                  className="luxury-input mt-1.5"
                 />
               </Field>
               <Field label="Image alt text">
                 <input
                   value={selectedPlace.imageAlt}
                   onChange={(e) => updatePlace(selectedPlace.id, { imageAlt: e.target.value })}
-                  className="admin-input"
+                  className="luxury-input mt-1.5"
                 />
               </Field>
             </div>
@@ -217,7 +221,7 @@ export function MysoreTrailCatalogEditor({
               <input
                 value={selectedPlace.tagline}
                 onChange={(e) => updatePlace(selectedPlace.id, { tagline: e.target.value })}
-                className="admin-input"
+                className="luxury-input mt-1.5"
               />
             </Field>
 
@@ -225,7 +229,7 @@ export function MysoreTrailCatalogEditor({
               <input
                 value={selectedPlace.image}
                 onChange={(e) => updatePlace(selectedPlace.id, { image: e.target.value })}
-                className="admin-input font-mono text-xs sm:text-sm"
+                className="luxury-input mt-1.5 font-mono text-xs sm:text-sm"
               />
             </Field>
 
@@ -234,12 +238,12 @@ export function MysoreTrailCatalogEditor({
                 value={selectedPlace.description}
                 onChange={(e) => updatePlace(selectedPlace.id, { description: e.target.value })}
                 rows={4}
-                className="admin-input resize-y"
+                className="luxury-input mt-1.5 resize-y"
               />
             </Field>
 
             <div>
-              <p className="eyebrow mb-2 text-muted-foreground">Categories</p>
+              <p className="eyebrow mb-2 !text-[#3a0000]">Categories</p>
               <div className="flex flex-wrap gap-2">
                 {TRAIL_CATEGORIES.map((category) => {
                   const on = selectedPlace.categories.includes(category);
@@ -250,8 +254,8 @@ export function MysoreTrailCatalogEditor({
                       onClick={() => toggleCategory(selectedPlace.id, category)}
                       className={`rounded-full border px-3 py-1 text-xs uppercase tracking-wide ${
                         on
-                          ? "border-ink bg-ink text-ivory"
-                          : "border-ink/20 text-ink hover:border-ink/40"
+                          ? "border-[rgb(42_0_0)] bg-[rgb(42_0_0)] text-[#F7F1E8]"
+                          : "border-[rgb(74_0_0/0.22)] text-[rgb(42_0_0)] hover:border-[rgb(74_0_0/0.45)]"
                       }`}
                     >
                       {category}
@@ -266,14 +270,16 @@ export function MysoreTrailCatalogEditor({
 
       {tab === "heroes" && selectedHero ? (
         <div className="grid gap-5 lg:grid-cols-[16rem_minmax(0,1fr)]">
-          <aside className="max-h-[70vh] space-y-1 overflow-y-auto rounded-2xl border border-ink/10 bg-white/60 p-3">
+          <aside className="max-h-[70vh] space-y-1 overflow-y-auto rounded-2xl border border-[rgb(74_0_0/0.12)] bg-white/80 p-3">
             {catalog.heroes.map((hero) => (
               <button
                 key={hero.id}
                 type="button"
                 onClick={() => setSelectedHeroId(hero.id)}
                 className={`block w-full rounded-xl px-3 py-2 text-left text-sm transition ${
-                  hero.id === selectedHero.id ? "bg-ink text-ivory" : "text-ink hover:bg-ink/5"
+                  hero.id === selectedHero.id
+                    ? "bg-[rgb(42_0_0)] text-[#F7F1E8]"
+                    : "text-[rgb(42_0_0)] hover:bg-[rgb(74_0_0/0.06)]"
                 }`}
               >
                 <span className="block font-medium">{hero.name}</span>
@@ -282,8 +288,8 @@ export function MysoreTrailCatalogEditor({
             ))}
           </aside>
 
-          <section className="space-y-4 rounded-2xl border border-ink/10 bg-white/70 p-5 sm:p-6">
-            <div className="overflow-hidden rounded-xl border border-ink/10">
+          <section className="space-y-4 rounded-2xl border border-[rgb(74_0_0/0.12)] bg-white/80 p-5 sm:p-6">
+            <div className="overflow-hidden rounded-xl border border-[rgb(74_0_0/0.12)]">
               <img
                 src={selectedHero.image}
                 alt={selectedHero.imageAlt}
@@ -297,28 +303,28 @@ export function MysoreTrailCatalogEditor({
                 <input
                   value={selectedHero.name}
                   onChange={(e) => updateHero(selectedHero.id, { name: e.target.value })}
-                  className="admin-input"
+                  className="luxury-input mt-1.5"
                 />
               </Field>
               <Field label="Eyebrow">
                 <input
                   value={selectedHero.eyebrow}
                   onChange={(e) => updateHero(selectedHero.id, { eyebrow: e.target.value })}
-                  className="admin-input"
+                  className="luxury-input mt-1.5"
                 />
               </Field>
               <Field label="Location">
                 <input
                   value={selectedHero.location}
                   onChange={(e) => updateHero(selectedHero.id, { location: e.target.value })}
-                  className="admin-input"
+                  className="luxury-input mt-1.5"
                 />
               </Field>
               <Field label="Category label">
                 <input
                   value={selectedHero.category}
                   onChange={(e) => updateHero(selectedHero.id, { category: e.target.value })}
-                  className="admin-input"
+                  className="luxury-input mt-1.5"
                 />
               </Field>
             </div>
@@ -339,7 +345,7 @@ export function MysoreTrailCatalogEditor({
                   })
                 }
                 rows={3}
-                className="admin-input resize-y"
+                className="luxury-input mt-1.5 resize-y"
               />
             </Field>
 
@@ -359,7 +365,7 @@ export function MysoreTrailCatalogEditor({
                   })
                 }
                 rows={2}
-                className="admin-input resize-y"
+                className="luxury-input mt-1.5 resize-y"
               />
             </Field>
 
@@ -368,7 +374,7 @@ export function MysoreTrailCatalogEditor({
                 value={selectedHero.description}
                 onChange={(e) => updateHero(selectedHero.id, { description: e.target.value })}
                 rows={3}
-                className="admin-input resize-y"
+                className="luxury-input mt-1.5 resize-y"
               />
             </Field>
 
@@ -376,7 +382,7 @@ export function MysoreTrailCatalogEditor({
               <input
                 value={selectedHero.image}
                 onChange={(e) => updateHero(selectedHero.id, { image: e.target.value })}
-                className="admin-input font-mono text-xs sm:text-sm"
+                className="luxury-input mt-1.5 font-mono text-xs sm:text-sm"
               />
             </Field>
 
@@ -384,28 +390,12 @@ export function MysoreTrailCatalogEditor({
               <input
                 value={selectedHero.imageAlt}
                 onChange={(e) => updateHero(selectedHero.id, { imageAlt: e.target.value })}
-                className="admin-input"
+                className="luxury-input mt-1.5"
               />
             </Field>
           </section>
         </div>
       ) : null}
-
-      <style>{`
-        .admin-input {
-          width: 100%;
-          margin-top: 0.35rem;
-          border-radius: 0.75rem;
-          border: 1px solid color-mix(in oklab, var(--ink, #1a1210) 14%, transparent);
-          background: #fff;
-          padding: 0.65rem 0.8rem;
-          color: inherit;
-          outline: none;
-        }
-        .admin-input:focus {
-          border-color: color-mix(in oklab, var(--ink, #1a1210) 45%, transparent);
-        }
-      `}</style>
     </div>
   );
 }
@@ -413,7 +403,7 @@ export function MysoreTrailCatalogEditor({
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="eyebrow text-muted-foreground">{label}</span>
+      <span className="eyebrow !text-[#3a0000]">{label}</span>
       {children}
     </label>
   );
