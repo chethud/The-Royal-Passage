@@ -1,11 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import type { WheelDestination } from "@/components/mysore-trail/ImageWheel3D";
+import { TrailCircularPanel } from "@/components/mysore-trail/TrailCircularPanel";
 import { ItineraryStopCard } from "@/components/mysore-trail/ItineraryStopCard";
-import { StickyImagePanel } from "@/components/mysore-trail/StickyImagePanel";
-import {
-  TripConfigurator,
-} from "@/components/mysore-trail/TripConfigurator";
+import { TripConfigurator } from "@/components/mysore-trail/TripConfigurator";
 import {
   DEFAULT_PREFERENCES,
   getPlace,
@@ -38,13 +37,15 @@ export function MysoreTrailExperience({
   const [days, setDays] = useState<TrailDay[]>(defaults.days);
   const [stops, setStops] = useState<TrailStop[]>(defaults.stops);
   const [activeStopId, setActiveStopId] = useState(defaults.stops[0]?.id ?? "");
-  const [imageDirection, setImageDirection] = useState<1 | -1>(1);
   const [planning, setPlanning] = useState(false);
   const [customized, setCustomized] = useState(false);
+  const [journeyLocked, setJourneyLocked] = useState(false);
   const activeStopIdRef = useRef(activeStopId);
   const stopsRef = useRef(stops);
+  const journeyLockedRef = useRef(false);
   activeStopIdRef.current = activeStopId;
   stopsRef.current = stops;
+  journeyLockedRef.current = journeyLocked;
 
   const applyPrefs = useCallback((next: TripPreferences) => {
     const built = buildPersonalizedTrail(next);
@@ -104,7 +105,6 @@ export function MysoreTrailExperience({
 
   const activeStop = stops.find((s) => s.id === activeStopId) ?? stops[0];
   const activePlace = getPlace(activeStop?.placeId ?? "mysuru-palace");
-  const activeDay = days.find((d) => d.day === activeStop?.day);
   const dayStops = stops.filter((s) => s.day === activeStop?.day);
   const activeIndexInAll = Math.max(0, stops.findIndex((s) => s.id === activeStop?.id));
   const dayProgress = dayStops.length
@@ -125,15 +125,112 @@ export function MysoreTrailExperience({
 
   const summary = useMemo(() => summarizeTrail(stops), [stops]);
 
-  const onVisible = useCallback((stopId: string) => {
-    if (stopId === activeStopIdRef.current) return;
-    const prevIdx = stopsRef.current.findIndex((s) => s.id === activeStopIdRef.current);
-    const nextIdx = stopsRef.current.findIndex((s) => s.id === stopId);
-    if (nextIdx >= 0 && prevIdx >= 0) {
-      setImageDirection(nextIdx >= prevIdx ? 1 : -1);
-    }
-    setActiveStopId(stopId);
+  const wheelItems: WheelDestination[] = useMemo(() => {
+    return stops.map((stop) => {
+      const place = getPlace(stop.placeId);
+      const dayMeta = days.find((d) => d.day === stop.day);
+      return {
+        id: `${stop.id}-${place.id}`,
+        stopId: stop.id,
+        image: place.image,
+        imageAlt: place.imageAlt,
+        name: place.name,
+        shortName: place.shortName,
+        cityLabel: place.cityLabel,
+        day: stop.day,
+        dayTitle: dayMeta?.title ?? "Royal Mysuru",
+      };
+    });
+  }, [stops, days]);
+
+  /**
+   * Soft-lock the hero visually once the journey docks — never clamp scroll.
+   */
+  useEffect(() => {
+    const journey = document.getElementById("trail-journey");
+    if (!journey) return;
+
+    const headerH = () => {
+      const raw = getComputedStyle(document.documentElement).getPropertyValue("--header-height");
+      const n = Number.parseFloat(raw);
+      return Number.isFinite(n) ? n : 80;
+    };
+
+    const onScroll = () => {
+      const h = headerH();
+      const jTop = journey.getBoundingClientRect().top;
+      if (jTop <= h + 10) {
+        if (!journeyLockedRef.current) setJourneyLocked(true);
+      } else if (jTop > h + 120) {
+        if (journeyLockedRef.current) setJourneyLocked(false);
+      }
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
+
+  /**
+   * Scroll-spy: stop whose center is nearest the viewport middle
+   * (matches centered text + centered photo).
+   */
+  useEffect(() => {
+    const pickActiveFromScroll = () => {
+      const list = stopsRef.current;
+      if (list.length === 0) return;
+
+      const headerRaw = getComputedStyle(document.documentElement).getPropertyValue(
+        "--header-height",
+      );
+      const headerH = Number.parseFloat(headerRaw) || 80;
+      const focusY = headerH + (window.innerHeight - headerH) * 0.5;
+
+      let bestId: string | null = null;
+      let bestDist = Number.POSITIVE_INFINITY;
+
+      for (const stop of list) {
+        const article = document.querySelector<HTMLElement>(`[data-stop-id="${stop.id}"]`);
+        if (!article) continue;
+        const rect = article.getBoundingClientRect();
+        const mid = rect.top + rect.height * 0.5;
+        const dist = Math.abs(mid - focusY);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestId = stop.id;
+        }
+      }
+
+      const nextId = bestId ?? list[0]?.id ?? null;
+      if (nextId && nextId !== activeStopIdRef.current) {
+        setActiveStopId(nextId);
+      }
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        pickActiveFromScroll();
+      });
+    };
+
+    pickActiveFromScroll();
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    document.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll, true);
+      document.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [stops]);
 
   const addToTrail = (placeId: string) => {
     if (stops.some((s) => s.placeId === placeId)) {
@@ -186,10 +283,13 @@ export function MysoreTrailExperience({
     }
   };
 
+  let globalStopIndex = 0;
+
   return (
-    <div className="trail-page">
-      {/* Hero */}
-      <section className="trail-hero">
+    <div
+      className={`trail-page${journeyLocked ? " trail-page--journey-locked" : ""}${planning ? " trail-page--planning" : ""}`}
+    >
+      <section className={`trail-hero${journeyLocked ? " is-locked" : ""}`} aria-hidden={journeyLocked || undefined}>
         <img
           src={MYSORE_STREET_HERO}
           alt="Devaraja Market street, Mysuru"
@@ -212,11 +312,7 @@ export function MysoreTrailExperience({
             <a href="#trail-journey" className="trail-btn-primary">
               Explore the trail
             </a>
-            <button
-              type="button"
-              className="trail-btn-ghost"
-              onClick={() => setPlanning(true)}
-            >
+            <button type="button" className="trail-btn-ghost" onClick={() => setPlanning(true)}>
               Plan my trip
             </button>
             {canEdit ? (
@@ -240,7 +336,6 @@ export function MysoreTrailExperience({
         onSelectStop={selectPlannedStop}
       />
 
-      {/* Day nav — only on trip plan */}
       {planning ? (
         <nav className="trail-day-nav" aria-label="Days">
           <div className="trail-container trail-day-nav-inner">
@@ -253,7 +348,15 @@ export function MysoreTrailExperience({
         </nav>
       ) : null}
 
-      {/* Journey split */}
+      <div className="trail-collage-mobile lg:hidden">
+        <TrailCircularPanel
+          items={wheelItems}
+          activeIndex={activeIndexInAll}
+          totalDays={days.length}
+          showTripDetails={planning}
+        />
+      </div>
+
       <section className="trail-journey" id="trail-journey">
         <div className="trail-journey-left">
           {planning ? (
@@ -272,37 +375,56 @@ export function MysoreTrailExperience({
             const list = day.stopIds
               .map((id) => stops.find((s) => s.id === id))
               .filter(Boolean) as TrailStop[];
+            const isActiveDay = day.day === activeStop?.day;
             return (
-              <div key={day.day} id={`day-${day.day}`} className="trail-day-block">
-                <header className="trail-day-head">
-                  {planning ? (
-                    <p className="eyebrow text-[#C9A45C]">Day {String(day.day).padStart(2, "0")}</p>
-                  ) : (
-                    <p className="eyebrow text-[#C9A45C]">Along the trail</p>
-                  )}
-                  <h2>{day.title}</h2>
-                  <p>{day.theme}</p>
-                </header>
-                {list.map((stop, i) => (
-                  <ItineraryStopCard
-                    key={stop.id}
-                    stop={stop}
-                    indexInDay={i}
-                    dayStopCount={list.length}
-                    active={stop.id === activeStopId}
-                    nextStop={list[i + 1]}
-                    showTripDetails={planning}
-                    onVisible={onVisible}
-                  />
-                ))}
+              <div
+                key={day.day}
+                id={`day-${day.day}`}
+                className={`trail-day-block${isActiveDay ? " is-active-day" : " is-other-day"}`}
+              >
+                {planning && isActiveDay ? (
+                  <header className="trail-day-head">
+                    <p className="eyebrow text-[#C9A45C]">
+                      Day {String(day.day).padStart(2, "0")}
+                    </p>
+                    <h2>{day.title}</h2>
+                    <p>{day.theme}</p>
+                  </header>
+                ) : null}
+                {list.map((stop, i) => {
+                  const gIdx = globalStopIndex;
+                  globalStopIndex += 1;
+                  const focus =
+                    gIdx === activeIndexInAll
+                      ? "active"
+                      : gIdx === activeIndexInAll - 1
+                        ? "prev"
+                        : gIdx === activeIndexInAll + 1
+                          ? "next"
+                          : "far";
+                  return (
+                    <ItineraryStopCard
+                      key={stop.id}
+                      stop={stop}
+                      indexInDay={i}
+                      dayStopCount={list.length}
+                      globalIndex={gIdx}
+                      active={stop.id === activeStopId}
+                      focus={focus}
+                      nextStop={list[i + 1]}
+                      showTripDetails={planning}
+                    />
+                  );
+                })}
               </div>
             );
           })}
 
-          {/* Recommendations */}
           <aside className="trail-recs">
             <p className="eyebrow text-[#C9A45C]">You may also like</p>
-            <h3 className="font-display text-2xl text-[#F4EBDD]">While you are at {activePlace.shortName}</h3>
+            <h3 className="font-display text-2xl text-[#F4EBDD]">
+              While you are at {activePlace.shortName}
+            </h3>
             <div className="trail-recs-grid">
               {recommendations.map((rec) => (
                 <article key={rec.placeId} className="trail-rec-card">
@@ -333,18 +455,15 @@ export function MysoreTrailExperience({
         </div>
 
         <aside className="trail-journey-right">
-          <StickyImagePanel
-            place={activePlace}
-            index={activeIndexInAll}
-            total={stops.length}
-            dayLabel={activeDay ? `Day ${String(activeDay.day).padStart(2, "0")}` : "—"}
+          <TrailCircularPanel
+            items={wheelItems}
+            activeIndex={activeIndexInAll}
+            totalDays={days.length}
             showTripDetails={planning}
-            direction={imageDirection}
           />
         </aside>
       </section>
 
-      {/* Summary + share — trip plan page only */}
       {planning ? (
         <section className="trail-summary">
           <p className="eyebrow text-[#C9A45C]">Your Royal Trail</p>
@@ -397,7 +516,6 @@ export function MysoreTrailExperience({
         </section>
       ) : null}
 
-      {/* Finale */}
       <section className="trail-finale">
         <img
           src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=2000&q=85&auto=format&fit=crop"
@@ -414,11 +532,7 @@ export function MysoreTrailExperience({
             <a href="#trail-journey" className="trail-btn-primary">
               Start your Royal Trail
             </a>
-            <button
-              type="button"
-              className="trail-btn-ghost"
-              onClick={() => setPlanning(true)}
-            >
+            <button type="button" className="trail-btn-ghost" onClick={() => setPlanning(true)}>
               Plan my trip
             </button>
             <Link to="/experiences" className="trail-btn-ghost">

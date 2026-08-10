@@ -66,7 +66,7 @@ function AdminMysoreTrailPage() {
       showRoleDescription={false}
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Link to="/mysore-trail" className="dashboard-chrome-link">
+        <Link to="/mysore-trail" search={{ place: undefined }} className="dashboard-chrome-link">
           ← View public page
         </Link>
         <Link to="/admin/homepage-edit" className="dashboard-chrome-link">

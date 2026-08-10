@@ -1,51 +1,50 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import type { TrailStop } from "@/data/mysore-trail-journey";
 import { getPlace } from "@/data/mysore-trail-journey";
+
+export type StopFocus = "active" | "prev" | "next" | "far";
 
 type ItineraryStopCardProps = {
   stop: TrailStop;
   indexInDay: number;
   dayStopCount: number;
+  globalIndex: number;
   active: boolean;
+  focus?: StopFocus;
   nextStop?: TrailStop;
-  /** Trip schedule (times, travel) — only after Plan my trip */
   showTripDetails?: boolean;
-  onVisible: (stopId: string) => void;
 };
 
 export function ItineraryStopCard({
   stop,
   indexInDay,
   dayStopCount,
+  globalIndex,
   active,
+  focus = "active",
   nextStop,
   showTripDetails = false,
-  onVisible,
 }: ItineraryStopCardProps) {
-  const ref = useRef<HTMLElement>(null);
+  const articleRef = useRef<HTMLElement>(null);
   const place = getPlace(stop.placeId);
   const nextPlace = nextStop ? getPlace(nextStop.placeId) : null;
 
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) onVisible(stop.id);
-      },
-      { root: null, rootMargin: "-32% 0px -48% 0px", threshold: 0 },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [onVisible, stop.id]);
+  const mode: StopFocus | "idle" = showTripDetails
+    ? active
+      ? "active"
+      : "idle"
+    : focus;
 
   return (
     <article
-      ref={ref}
+      ref={articleRef}
       id={place.id}
       data-stop-id={stop.id}
-      className={`trail-stop${active ? " is-active" : ""}`}
+      data-stop-index={globalIndex}
+      className={`trail-stop is-${mode}${active ? " is-active" : ""}`}
     >
+      <span className="trail-stop-spy" aria-hidden />
+
       <div className="trail-stop-rail" aria-hidden>
         <span className="trail-stop-dot" />
         {indexInDay < dayStopCount - 1 ? <span className="trail-stop-line" /> : null}
@@ -56,16 +55,13 @@ export function ItineraryStopCard({
           <header className="trail-stop-head">
             <p className="trail-stop-time">{stop.timeLabel}</p>
             <p className="trail-stop-index">
-              {String(indexInDay + 1).padStart(2, "0")}
+              {String(globalIndex + 1).padStart(2, "0")}
               {active ? <span className="trail-stop-live"> Active</span> : null}
             </p>
           </header>
         ) : (
           <header className="trail-stop-head">
-            <p className="trail-stop-index">
-              {String(indexInDay + 1).padStart(2, "0")}
-              {active ? <span className="trail-stop-live"> Active</span> : null}
-            </p>
+            <p className="trail-stop-index">{String(globalIndex + 1).padStart(2, "0")}</p>
           </header>
         )}
 
@@ -79,27 +75,31 @@ export function ItineraryStopCard({
           </p>
         ) : null}
 
-        <div className="trail-stop-mobile-media lg:hidden">
-          <img
-            src={place.image}
-            alt={place.imageAlt}
-            loading="lazy"
-            decoding="async"
-            referrerPolicy="no-referrer"
-          />
-        </div>
-
         <p className="trail-stop-desc">{place.description}</p>
 
-        {place.whatToSee.length > 0 ? (
-          <ul className="trail-stop-highlights">
-            {place.whatToSee.slice(0, 3).map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+        {showTripDetails && place.whatToSee.length > 0 ? (
+          <div className="trail-stop-block">
+            <p className="trail-stop-block-label">See</p>
+            <ul className="trail-stop-highlights">
+              {place.whatToSee.slice(0, 4).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
         ) : null}
 
-        {place.localTip ? (
+        {showTripDetails && place.whatToDo.length > 0 ? (
+          <div className="trail-stop-block">
+            <p className="trail-stop-block-label">Do</p>
+            <ul className="trail-stop-highlights">
+              {place.whatToDo.slice(0, 3).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {showTripDetails && place.localTip ? (
           <p className="trail-stop-tip">
             <span>Local tip</span> {place.localTip}
           </p>
@@ -108,7 +108,7 @@ export function ItineraryStopCard({
         {showTripDetails ? (
           <>
             <p className="trail-stop-facts-inline">
-              {place.durationLabel} · {place.bestTime}
+              {place.durationLabel} · Best {place.bestTime}
             </p>
             {nextPlace ? (
               <p className="trail-stop-next">
