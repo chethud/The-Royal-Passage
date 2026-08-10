@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { ImagePlus, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   defaultMysoreTrailCatalog,
   TRAIL_CATEGORIES,
@@ -8,6 +9,7 @@ import {
   type MysoreTrailPlaceDraft,
 } from "@/data/mysore-trail-cms";
 import type { TrailCategory } from "@/data/mysore-trail-journey";
+import { uploadExperiencePhoto } from "@/lib/experience-photo-upload";
 import { saveMysoreTrailCatalog } from "@/lib/mysore-trail-fns";
 
 type MysoreTrailCatalogEditorProps = {
@@ -225,13 +227,10 @@ export function MysoreTrailCatalogEditor({
               />
             </Field>
 
-            <Field label="Image URL">
-              <input
-                value={selectedPlace.image}
-                onChange={(e) => updatePlace(selectedPlace.id, { image: e.target.value })}
-                className="luxury-input mt-1.5 font-mono text-xs sm:text-sm"
-              />
-            </Field>
+            <ImageUploadField
+              value={selectedPlace.image}
+              onChange={(image) => updatePlace(selectedPlace.id, { image })}
+            />
 
             <Field label="Description">
               <textarea
@@ -378,13 +377,10 @@ export function MysoreTrailCatalogEditor({
               />
             </Field>
 
-            <Field label="Image URL">
-              <input
-                value={selectedHero.image}
-                onChange={(e) => updateHero(selectedHero.id, { image: e.target.value })}
-                className="luxury-input mt-1.5 font-mono text-xs sm:text-sm"
-              />
-            </Field>
+            <ImageUploadField
+              value={selectedHero.image}
+              onChange={(image) => updateHero(selectedHero.id, { image })}
+            />
 
             <Field label="Image alt text">
               <input
@@ -406,5 +402,81 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
       <span className="eyebrow !text-[#3a0000]">{label}</span>
       {children}
     </label>
+  );
+}
+
+function ImageUploadField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (url: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [showUrl, setShowUrl] = useState(false);
+
+  const onFile = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const url = await uploadExperiencePhoto(file);
+      onChange(url);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="eyebrow !text-[#3a0000]">Image</span>
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="inline-flex items-center gap-1.5 rounded-sm border border-[rgb(74_0_0/0.28)] bg-white/80 px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#2A0000] hover:bg-[rgb(200_162_90/0.14)] disabled:opacity-50"
+        >
+          {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImagePlus className="h-3.5 w-3.5" />}
+          {uploading ? "Uploading…" : "Upload from computer"}
+        </button>
+      </div>
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="hidden"
+        onChange={(event) => void onFile(event.target.files?.[0])}
+      />
+
+      <p className="text-xs text-[rgb(58_0_0/0.65)]">
+        Choose a JPEG, PNG, WebP, or GIF under 5 MB. Then publish the trail to make it live.
+      </p>
+
+      {uploadError ? <p className="text-sm text-red-700">{uploadError}</p> : null}
+
+      <button
+        type="button"
+        className="text-xs font-medium text-[rgb(42_0_0)] underline underline-offset-2"
+        onClick={() => setShowUrl((open) => !open)}
+      >
+        {showUrl ? "Hide image URL" : "Or paste an image URL"}
+      </button>
+
+      {showUrl ? (
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="luxury-input font-mono text-xs sm:text-sm"
+          placeholder="https://…"
+        />
+      ) : null}
+    </div>
   );
 }
