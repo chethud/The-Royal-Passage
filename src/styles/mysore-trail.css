@@ -299,8 +299,8 @@
 }
 @media (min-width: 1024px) {
   .trail-journey {
-    grid-template-columns: minmax(0, 38%) minmax(0, 62%);
-    column-gap: 1.5rem;
+    grid-template-columns: minmax(0, 32%) minmax(0, 68%);
+    column-gap: 1.25rem;
     row-gap: 0;
   }
 }

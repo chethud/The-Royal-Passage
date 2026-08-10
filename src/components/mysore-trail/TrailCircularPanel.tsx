@@ -46,7 +46,7 @@ export function TrailCircularPanel({
         <CircularGallery
           items={galleryItems}
           activeIndex={activeIndex}
-          bend={-0.85}
+          bend={-0.45}
           borderRadius={0.035}
           scrollEase={0.04}
           scrollSpeed={1}
