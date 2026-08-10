@@ -1252,8 +1252,8 @@
 
 @media (max-width: 767px) {
   .mt-disco {
-    height: 100dvh;
-    max-height: 100dvh;
+    height: min(85dvh, 640px);
+    max-height: min(85dvh, 640px);
   }
   .mt-disco-stage {
     height: 100%;
