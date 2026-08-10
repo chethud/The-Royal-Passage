@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import type {
   TrailCategory,
-  TrailStop,
   TravellerType,
   TripPace,
   TripPreferences,
 } from "@/data/mysore-trail-journey";
-import { getPlace } from "@/data/mysore-trail-journey";
 
 const DAY_OPTIONS = [1, 2, 3, 4, 5] as const;
 
@@ -15,23 +13,16 @@ const TRAVELLER_OPTIONS: { id: TravellerType; label: string }[] = [
   { id: "couple", label: "Couple" },
   { id: "family", label: "Family" },
   { id: "friends", label: "Friends" },
-  { id: "luxury", label: "Luxury" },
-  { id: "heritage", label: "Heritage" },
-  { id: "photography", label: "Photography" },
-  { id: "food", label: "Food lover" },
 ];
 
-const INTEREST_OPTIONS: { id: TrailCategory; label: string }[] = [
-  { id: "heritage", label: "Royal Heritage" },
-  { id: "architecture", label: "Architecture" },
+const STYLE_OPTIONS: { id: TrailCategory; label: string }[] = [
+  { id: "heritage", label: "Heritage" },
+  { id: "luxury", label: "Royal" },
   { id: "food", label: "Food" },
-  { id: "culture", label: "Culture" },
   { id: "nature", label: "Nature" },
+  { id: "culture", label: "Culture" },
   { id: "photography", label: "Photography" },
-  { id: "shopping", label: "Shopping" },
   { id: "spiritual", label: "Spiritual" },
-  { id: "hidden", label: "Hidden Gems" },
-  { id: "family", label: "Family" },
 ];
 
 const PACE_OPTIONS: { id: TripPace; label: string }[] = [
@@ -40,236 +31,137 @@ const PACE_OPTIONS: { id: TripPace; label: string }[] = [
   { id: "explorer", label: "Explorer" },
 ];
 
-type TripPlannerFieldsProps = {
-  value: TripPreferences;
-  onChange: (next: TripPreferences) => void;
-};
-
-function TripPlannerFields({ value, onChange }: TripPlannerFieldsProps) {
-  const interestSet = useMemo(() => new Set(value.interests), [value.interests]);
-
-  const toggleInterest = (id: TrailCategory) => {
-    const next = interestSet.has(id)
-      ? value.interests.filter((i) => i !== id)
-      : [...value.interests, id];
-    onChange({ ...value, interests: next.length ? next : value.interests });
-  };
-
-  return (
-    <>
-      <div className="trail-config-block">
-        <h3>Trip length</h3>
-        <div className="trail-chip-row">
-          {DAY_OPTIONS.map((d) => (
-            <button
-              key={d}
-              type="button"
-              className={`trail-chip${value.days === d ? " is-on" : ""}`}
-              onClick={() => onChange({ ...value, days: d })}
-            >
-              {d} Day{d > 1 ? "s" : ""}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="trail-config-block">
-        <h3>Traveller type</h3>
-        <div className="trail-chip-row">
-          {TRAVELLER_OPTIONS.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              className={`trail-chip${value.traveller === opt.id ? " is-on" : ""}`}
-              onClick={() => onChange({ ...value, traveller: opt.id })}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="trail-config-block">
-        <h3>Interests</h3>
-        <div className="trail-chip-row">
-          {INTEREST_OPTIONS.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              className={`trail-chip${interestSet.has(opt.id) ? " is-on" : ""}`}
-              onClick={() => toggleInterest(opt.id)}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="trail-config-block">
-        <h3>Pace</h3>
-        <div className="trail-chip-row">
-          {PACE_OPTIONS.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              className={`trail-chip${value.pace === opt.id ? " is-on" : ""}`}
-              onClick={() => onChange({ ...value, pace: opt.id })}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-}
-
-type TripRouteListProps = {
-  stops: TrailStop[];
-  onSelectStop: (stopId: string, placeId: string) => void;
-};
-
-function TripRouteList({ stops, onSelectStop }: TripRouteListProps) {
-  return (
-    <section className="trail-map trail-map--in-plan" id="trail-map">
-      <p className="eyebrow text-[#C9A45C]">Your trip plan</p>
-      <h3 className="font-display text-2xl text-[#F4EBDD] sm:text-3xl">Route through Mysuru</h3>
-      <ol className="trail-map-list">
-        {stops.map((stop, i) => {
-          const place = getPlace(stop.placeId);
-          return (
-            <li key={stop.id}>
-              <button type="button" onClick={() => onSelectStop(stop.id, place.id)}>
-                <span>{String(i + 1).padStart(2, "0")}</span>
-                <span>{place.name}</span>
-                <span>{stop.timeLabel}</span>
-              </button>
-              {i < stops.length - 1 ? (
-                <span className="trail-map-arrow" aria-hidden>
-                  ↓
-                </span>
-              ) : null}
-            </li>
-          );
-        })}
-      </ol>
-    </section>
-  );
-}
-
 type TripConfiguratorProps = {
   value: TripPreferences;
   planning: boolean;
+  onApply: (next: TripPreferences) => void;
+  onReset: () => void;
+  onCancel: () => void;
   customized: boolean;
-  stops: TrailStop[];
-  onCancelPlanning: () => void;
-  onApplyPlan: (next: TripPreferences) => void;
-  onResetDefault: () => void;
-  onSelectStop: (stopId: string, placeId: string) => void;
 };
 
-/** Plan my trip page only — itinerary uses hero CTAs. */
 export function TripConfigurator({
   value,
   planning,
+  onApply,
+  onReset,
+  onCancel,
   customized,
-  stops,
-  onCancelPlanning,
-  onApplyPlan,
-  onResetDefault,
-  onSelectStop,
 }: TripConfiguratorProps) {
   const [draft, setDraft] = useState(value);
+  const interestSet = useMemo(() => new Set(draft.interests), [draft.interests]);
 
   useEffect(() => {
     if (planning) setDraft(value);
   }, [planning, value]);
 
+  const toggleStyle = (id: TrailCategory) => {
+    const next = interestSet.has(id)
+      ? draft.interests.filter((i) => i !== id)
+      : [...draft.interests, id];
+    setDraft({ ...draft, interests: next.length ? next : draft.interests });
+  };
+
   if (!planning) return null;
 
   return (
-    <section className="trail-config trail-config--planning" id="trail-config">
-      <div className="trail-config-intro">
-        <p className="eyebrow text-[#C9A45C]">Plan your trip</p>
-        <h2 className="font-display text-3xl text-[#F4EBDD] sm:text-4xl">
-          {customized ? "Your trip plan" : "Build your passage"}
-        </h2>
-        <p className="mt-3 max-w-xl text-sm text-[#F4EBDD]/70">
-          {customized
-            ? "Your route, times, and days — adjust preferences below anytime, or return to the itinerary."
-            : "Choose length, traveller style, and interests — then generate a trail shaped around what you love."}
-        </p>
-      </div>
+    <section className="mt-planner" id="trail-config">
+      <div className="mt-wrap">
+        <header className="mt-section-head">
+          <p className="mt-eyebrow">Plan your journey</p>
+          <h2 className="mt-h2">Shape a trail around how you travel</h2>
+          <p className="mt-lead">
+            Choose length, company, and style — then generate a paced Mysuru itinerary.
+          </p>
+        </header>
 
-      <TripPlannerFields value={draft} onChange={setDraft} />
+        <div className="mt-planner-grid">
+          <fieldset className="mt-field">
+            <legend>Trip length</legend>
+            <div className="mt-pills" role="radiogroup" aria-label="Trip length">
+              {DAY_OPTIONS.map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  role="radio"
+                  aria-checked={draft.days === d}
+                  className={`mt-pill${draft.days === d ? " is-on" : ""}`}
+                  onClick={() => setDraft({ ...draft, days: d })}
+                >
+                  {d} Day{d > 1 ? "s" : ""}
+                </button>
+              ))}
+            </div>
+          </fieldset>
 
-      <div className="mt-6 flex flex-wrap gap-3">
-        <button type="button" className="trail-btn-primary" onClick={() => onApplyPlan(draft)}>
-          {customized ? "Update my trail" : "Generate my trail"}
-        </button>
-        <button type="button" className="trail-btn-ghost" onClick={onCancelPlanning}>
-          {customized ? "Back to itinerary" : "Cancel"}
-        </button>
-        {customized ? (
-          <button type="button" className="trail-config-cta" onClick={onResetDefault}>
-            Reset to curated trail
+          <fieldset className="mt-field">
+            <legend>Traveller type</legend>
+            <div className="mt-pills" role="radiogroup" aria-label="Traveller type">
+              {TRAVELLER_OPTIONS.map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={draft.traveller === opt.id}
+                  className={`mt-pill${draft.traveller === opt.id ? " is-on" : ""}`}
+                  onClick={() => setDraft({ ...draft, traveller: opt.id })}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="mt-field mt-field--wide">
+            <legend>Travel style</legend>
+            <div className="mt-pills" role="group" aria-label="Travel style">
+              {STYLE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  aria-pressed={interestSet.has(opt.id)}
+                  className={`mt-pill${interestSet.has(opt.id) ? " is-on" : ""}`}
+                  onClick={() => toggleStyle(opt.id)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="mt-field">
+            <legend>Pace</legend>
+            <div className="mt-pills" role="radiogroup" aria-label="Pace">
+              {PACE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={draft.pace === opt.id}
+                  className={`mt-pill${draft.pace === opt.id ? " is-on" : ""}`}
+                  onClick={() => setDraft({ ...draft, pace: opt.id })}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+
+        <div className="mt-planner-actions">
+          <button type="button" className="mt-btn-primary" onClick={() => onApply(draft)}>
+            {customized ? "Update my trail" : "Generate my trail"}
           </button>
-        ) : null}
+          <button type="button" className="mt-btn-ghost" onClick={onCancel}>
+            {customized ? "Back to itinerary" : "Cancel"}
+          </button>
+          {customized ? (
+            <button type="button" className="mt-btn-ghost" onClick={onReset}>
+              Reset curated trail
+            </button>
+          ) : null}
+        </div>
       </div>
-
-      {customized ? <TripRouteList stops={stops} onSelectStop={onSelectStop} /> : null}
     </section>
-  );
-}
-
-type PersonalizeModalProps = {
-  open: boolean;
-  value: TripPreferences;
-  onClose: () => void;
-  onApply: (next: TripPreferences) => void;
-};
-
-export function PersonalizeModal({ open, value, onClose, onApply }: PersonalizeModalProps) {
-  const [draft, setDraft] = useState(value);
-
-  useEffect(() => {
-    if (open) setDraft(value);
-  }, [open, value]);
-
-  if (!open) return null;
-
-  return (
-    <div className="trail-modal" role="dialog" aria-modal="true" aria-labelledby="trail-modal-title">
-      <button type="button" className="trail-modal-backdrop" aria-label="Close" onClick={onClose} />
-      <div className="trail-modal-panel">
-        <p className="eyebrow text-[#C9A45C]">Royal Passage</p>
-        <h2 id="trail-modal-title" className="font-display text-3xl text-[#F4EBDD]">
-          Plan your trip
-        </h2>
-        <p className="mt-2 text-sm text-[#F4EBDD]/70">
-          How many days? What kind of traveller are you? What do you love?
-        </p>
-
-        <div className="trail-config trail-config--modal">
-          <TripPlannerFields value={draft} onChange={setDraft} />
-        </div>
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            className="trail-btn-primary"
-            onClick={() => {
-              onApply(draft);
-              onClose();
-            }}
-          >
-            Generate my Royal Mysuru Trail
-          </button>
-          <button type="button" className="trail-btn-ghost" onClick={onClose}>
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }

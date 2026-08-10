@@ -223,11 +223,11 @@ class Media {
     if (viewport) this.viewport = viewport;
 
     this.scale = this.screen.height / 1500;
-    // Extra-wide landscape photo
-    this.plane.scale.y = (this.viewport.height * (1000 * this.scale)) / this.screen.height;
-    this.plane.scale.x = (this.viewport.width * (2100 * this.scale)) / this.screen.width;
+    // Extra-wide landscape photo — fill the large sticky stage
+    this.plane.scale.y = (this.viewport.height * (1180 * this.scale)) / this.screen.height;
+    this.plane.scale.x = (this.viewport.width * (2480 * this.scale)) / this.screen.width;
     this.program.uniforms.uPlaneSizes.value = [this.plane.scale.x, this.plane.scale.y];
-    this.padding = Math.max(this.plane.scale.y * 0.65, 2.6);
+    this.padding = Math.max(this.plane.scale.y * 0.55, 2.2);
     this.height = this.plane.scale.y + this.padding;
     this.heightTotal = this.height * this.length;
     // Text reads top → bottom; photos stack the opposite way (next below)

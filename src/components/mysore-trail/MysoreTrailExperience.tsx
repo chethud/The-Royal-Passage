@@ -1,9 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import type { WheelDestination } from "@/components/mysore-trail/ImageWheel3D";
-import { TrailCircularPanel } from "@/components/mysore-trail/TrailCircularPanel";
 import { ItineraryStopCard } from "@/components/mysore-trail/ItineraryStopCard";
+import { TrailHeroDiscovery } from "@/components/mysore-trail/TrailHeroDiscovery";
 import { TripConfigurator } from "@/components/mysore-trail/TripConfigurator";
 import {
   DEFAULT_PREFERENCES,
@@ -19,9 +18,19 @@ import {
   summarizeTrail,
 } from "@/lib/mysore-trail-personalize";
 
-/** Mysuru street — Devaraja Market heritage façade */
-const MYSORE_STREET_HERO =
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Devaraja_Market_1.jpg/1280px-Devaraja_Market_1.jpg";
+const FINALE_IMAGE =
+  "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=2000&q=85&auto=format&fit=crop";
+
+const CATEGORY_FILTERS = [
+  "All",
+  "Heritage",
+  "Culture",
+  "Food",
+  "Nature",
+  "History",
+  "Shopping",
+  "Hidden",
+] as const;
 
 type MysoreTrailExperienceProps = {
   canEdit?: boolean;
@@ -39,13 +48,15 @@ export function MysoreTrailExperience({
   const [activeStopId, setActiveStopId] = useState(defaults.stops[0]?.id ?? "");
   const [planning, setPlanning] = useState(false);
   const [customized, setCustomized] = useState(false);
-  const [journeyLocked, setJourneyLocked] = useState(false);
+  const [discoverFilter, setDiscoverFilter] = useState<(typeof CATEGORY_FILTERS)[number]>("All");
+  const scrollPlannerIntoView = useRef(false);
   const activeStopIdRef = useRef(activeStopId);
-  const stopsRef = useRef(stops);
-  const journeyLockedRef = useRef(false);
   activeStopIdRef.current = activeStopId;
-  stopsRef.current = stops;
-  journeyLockedRef.current = journeyLocked;
+
+  const startPlanning = useCallback(() => {
+    scrollPlannerIntoView.current = true;
+    setPlanning(true);
+  }, []);
 
   const applyPrefs = useCallback((next: TripPreferences) => {
     const built = buildPersonalizedTrail(next);
@@ -54,12 +65,13 @@ export function MysoreTrailExperience({
     setStops(built.stops);
     setActiveStopId(built.stops[0]?.id ?? "");
     setCustomized(true);
+    scrollPlannerIntoView.current = false;
     setPlanning(true);
-    toast.message("Your Royal Trail is ready", {
-      description: `${next.days}-day passage shaped around your interests.`,
+    toast.message("Your Mysore Trail is ready", {
+      description: `${next.days}-day journey shaped around your interests.`,
     });
     requestAnimationFrame(() => {
-      document.getElementById("trail-map")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("trail-journey")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }, []);
 
@@ -74,15 +86,68 @@ export function MysoreTrailExperience({
     toast.message("Curated Mysore Trail restored");
   }, []);
 
-  const selectPlannedStop = useCallback((stopId: string, placeId: string) => {
-    setActiveStopId(stopId);
-    requestAnimationFrame(() => {
-      document.getElementById(placeId)?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
+  useEffect(() => {
+    if (!planning || !scrollPlannerIntoView.current) return;
+    scrollPlannerIntoView.current = false;
+    const id = window.setTimeout(() => {
+      document.getElementById("trail-config")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+    return () => window.clearTimeout(id);
+  }, [planning]);
+
+  /** Pick the stop whose center is nearest the sticky focus line — keeps image in sync */
+  useEffect(() => {
+    const pickActive = () => {
+      const list = stops;
+      if (list.length === 0) return;
+
+      const headerRaw = getComputedStyle(document.documentElement).getPropertyValue(
+        "--header-height",
+      );
+      const headerH = Number.parseFloat(headerRaw) || 80;
+      const dayNav = document.querySelector(".mt-day-nav");
+      const dayNavH = dayNav?.getBoundingClientRect().height ?? 0;
+      const focusY = headerH + dayNavH + (window.innerHeight - headerH - dayNavH) * 0.38;
+
+      let bestId: string | null = null;
+      let bestDist = Number.POSITIVE_INFINITY;
+
+      for (const stop of list) {
+        const article = document.querySelector<HTMLElement>(`[data-stop-id="${stop.id}"]`);
+        if (!article) continue;
+        const rect = article.getBoundingClientRect();
+        if (rect.height === 0) continue;
+        const mid = rect.top + rect.height * 0.35;
+        const dist = Math.abs(mid - focusY);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestId = stop.id;
+        }
+      }
+
+      if (bestId && bestId !== activeStopIdRef.current) {
+        setActiveStopId(bestId);
+      }
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        pickActive();
       });
-    });
-  }, []);
+    };
+
+    pickActive();
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [stops]);
 
   useEffect(() => {
     if (!initialPlaceId) return;
@@ -95,23 +160,8 @@ export function MysoreTrailExperience({
     }
   }, [initialPlaceId, stops]);
 
-  useEffect(() => {
-    if (!planning) return;
-    const id = window.setTimeout(() => {
-      document.getElementById("trail-config")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 50);
-    return () => window.clearTimeout(id);
-  }, [planning]);
-
   const activeStop = stops.find((s) => s.id === activeStopId) ?? stops[0];
   const activePlace = getPlace(activeStop?.placeId ?? "mysuru-palace");
-  const dayStops = stops.filter((s) => s.day === activeStop?.day);
-  const activeIndexInAll = Math.max(0, stops.findIndex((s) => s.id === activeStop?.id));
-  const dayProgress = dayStops.length
-    ? Math.round(
-        ((dayStops.findIndex((s) => s.id === activeStop?.id) + 1) / dayStops.length) * 100,
-      )
-    : 0;
 
   const visited = useMemo(() => {
     const idx = stops.findIndex((s) => s.id === activeStopId);
@@ -125,112 +175,19 @@ export function MysoreTrailExperience({
 
   const summary = useMemo(() => summarizeTrail(stops), [stops]);
 
-  const wheelItems: WheelDestination[] = useMemo(() => {
-    return stops.map((stop) => {
-      const place = getPlace(stop.placeId);
-      const dayMeta = days.find((d) => d.day === stop.day);
-      return {
-        id: `${stop.id}-${place.id}`,
-        stopId: stop.id,
-        image: place.image,
-        imageAlt: place.imageAlt,
-        name: place.name,
-        shortName: place.shortName,
-        cityLabel: place.cityLabel,
-        day: stop.day,
-        dayTitle: dayMeta?.title ?? "Royal Mysuru",
-      };
-    });
-  }, [stops, days]);
-
-  /**
-   * Soft-lock the hero visually once the journey docks — never clamp scroll.
-   */
-  useEffect(() => {
-    const journey = document.getElementById("trail-journey");
-    if (!journey) return;
-
-    const headerH = () => {
-      const raw = getComputedStyle(document.documentElement).getPropertyValue("--header-height");
-      const n = Number.parseFloat(raw);
-      return Number.isFinite(n) ? n : 80;
+  const categoryKey = useMemo(() => {
+    if (discoverFilter === "All") return null;
+    const map: Record<string, string> = {
+      heritage: "heritage",
+      culture: "culture",
+      food: "food",
+      nature: "nature",
+      history: "heritage",
+      shopping: "shopping",
+      hidden: "hidden",
     };
-
-    const onScroll = () => {
-      const h = headerH();
-      const jTop = journey.getBoundingClientRect().top;
-      if (jTop <= h + 10) {
-        if (!journeyLockedRef.current) setJourneyLocked(true);
-      } else if (jTop > h + 120) {
-        if (journeyLockedRef.current) setJourneyLocked(false);
-      }
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll, true);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, []);
-
-  /**
-   * Scroll-spy: stop whose center is nearest the viewport middle
-   * (matches centered text + centered photo).
-   */
-  useEffect(() => {
-    const pickActiveFromScroll = () => {
-      const list = stopsRef.current;
-      if (list.length === 0) return;
-
-      const headerRaw = getComputedStyle(document.documentElement).getPropertyValue(
-        "--header-height",
-      );
-      const headerH = Number.parseFloat(headerRaw) || 80;
-      const focusY = headerH + (window.innerHeight - headerH) * 0.5;
-
-      let bestId: string | null = null;
-      let bestDist = Number.POSITIVE_INFINITY;
-
-      for (const stop of list) {
-        const article = document.querySelector<HTMLElement>(`[data-stop-id="${stop.id}"]`);
-        if (!article) continue;
-        const rect = article.getBoundingClientRect();
-        const mid = rect.top + rect.height * 0.5;
-        const dist = Math.abs(mid - focusY);
-        if (dist < bestDist) {
-          bestDist = dist;
-          bestId = stop.id;
-        }
-      }
-
-      const nextId = bestId ?? list[0]?.id ?? null;
-      if (nextId && nextId !== activeStopIdRef.current) {
-        setActiveStopId(nextId);
-      }
-    };
-
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        ticking = false;
-        pickActiveFromScroll();
-      });
-    };
-
-    pickActiveFromScroll();
-    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
-    document.addEventListener("scroll", onScroll, { passive: true, capture: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll, true);
-      document.removeEventListener("scroll", onScroll, true);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [stops]);
+    return map[discoverFilter.toLowerCase()] ?? null;
+  }, [discoverFilter]);
 
   const addToTrail = (placeId: string) => {
     if (stops.some((s) => s.placeId === placeId)) {
@@ -254,11 +211,9 @@ export function MysoreTrailExperience({
     };
     setStops((prev) => [...prev, newStop]);
     setDays((prev) =>
-      prev.map((d) =>
-        d.day === day ? { ...d, stopIds: [...d.stopIds, newStop.id] } : d,
-      ),
+      prev.map((d) => (d.day === day ? { ...d, stopIds: [...d.stopIds, newStop.id] } : d)),
     );
-    toast.success("Added to your Royal Trail.");
+    toast.success("Added to your trail");
   };
 
   const copyLink = async () => {
@@ -283,259 +238,294 @@ export function MysoreTrailExperience({
     }
   };
 
+  const downloadItinerary = () => {
+    const lines = stops.map((s, i) => {
+      const p = getPlace(s.placeId);
+      return `${i + 1}. Day ${s.day} · ${s.timeLabel} · ${p.name}`;
+    });
+    const blob = new Blob(
+      [`Mysore Trail — The Royal Passage\n\n${lines.join("\n")}\n`],
+      { type: "text/plain" },
+    );
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "mysore-trail-itinerary.txt";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
   let globalStopIndex = 0;
 
   return (
-    <div
-      className={`trail-page${journeyLocked ? " trail-page--journey-locked" : ""}${planning ? " trail-page--planning" : ""}`}
-    >
-      <section className={`trail-hero${journeyLocked ? " is-locked" : ""}`} aria-hidden={journeyLocked || undefined}>
-        <img
-          src={MYSORE_STREET_HERO}
-          alt="Devaraja Market street, Mysuru"
-          className="trail-hero-bg"
-          decoding="async"
-          referrerPolicy="no-referrer"
-        />
-        <div className="trail-hero-veil" />
-        <div className="trail-hero-inner trail-container">
-          <p className="eyebrow text-[#C9A45C]">The Royal Passage</p>
-          <h1 className="trail-hero-title">
-            Mysore <em>Trail</em>
-          </h1>
-          <p className="trail-hero-sub">A Royal Journey Through Mysuru</p>
-          <p className="trail-hero-desc">
-            Follow the stories, palaces, markets, temples and hidden corners that make Mysuru one of
-            India’s most captivating heritage cities.
-          </p>
-          <div className="trail-hero-actions">
-            <a href="#trail-journey" className="trail-btn-primary">
-              Explore the trail
-            </a>
-            <button type="button" className="trail-btn-ghost" onClick={() => setPlanning(true)}>
-              Plan my trip
-            </button>
-            {canEdit ? (
-              <Link to="/admin/mysore-trail" className="trail-btn-ghost">
-                Edit trail
-              </Link>
-            ) : null}
-          </div>
-          <p className="trail-hero-scroll">↓ Scroll to begin</p>
-        </div>
-      </section>
+    <div className="mt-page">
+      <TrailHeroDiscovery onExploreTrail={() => setPlanning(false)} />
 
+      {/* Planner — only in Plan my journey mode */}
       <TripConfigurator
         value={prefs}
         planning={planning}
+        onApply={applyPrefs}
+        onReset={resetDefault}
+        onCancel={() => setPlanning(false)}
         customized={customized}
-        stops={stops}
-        onCancelPlanning={() => setPlanning(false)}
-        onApplyPlan={applyPrefs}
-        onResetDefault={resetDefault}
-        onSelectStop={selectPlannedStop}
       />
 
-      {planning ? (
-        <nav className="trail-day-nav" aria-label="Days">
-          <div className="trail-container trail-day-nav-inner">
-            {days.map((d) => (
-              <a key={d.day} href={`#day-${d.day}`} className="trail-day-pill">
-                Day {String(d.day).padStart(2, "0")}
-              </a>
+      {/* Itinerary — each stop is a photo card with text overlaid on the image */}
+      <section className="mt-itinerary" id="trail-journey">
+        <div className="mt-wrap">
+          <header className="mt-section-head">
+            <p className="mt-eyebrow">
+              {planning ? "Your journey itinerary" : "The curated trail"}
+            </p>
+            <h2 className="mt-h2">
+              {planning
+                ? "A carefully paced route through the best of Mysuru"
+                : "Discover Mysuru, one place at a time"}
+            </h2>
+            {canEdit ? (
+              <p className="mt-lead mt-intro-edit">
+                <Link to="/admin/mysore-trail" className="mt-text-link">
+                  Edit trail
+                </Link>
+              </p>
+            ) : null}
+          </header>
+
+          <div className="mt-pills mt-discover-filters" role="toolbar" aria-label="Filter by interest">
+            {CATEGORY_FILTERS.map((f) => (
+              <button
+                key={f}
+                type="button"
+                className={`mt-pill${discoverFilter === f ? " is-on" : ""}`}
+                onClick={() => setDiscoverFilter(f)}
+              >
+                {f}
+              </button>
             ))}
           </div>
-        </nav>
-      ) : null}
 
-      <div className="trail-collage-mobile lg:hidden">
-        <TrailCircularPanel
-          items={wheelItems}
-          activeIndex={activeIndexInAll}
-          totalDays={days.length}
-          showTripDetails={planning}
-        />
-      </div>
-
-      <section className="trail-journey" id="trail-journey">
-        <div className="trail-journey-left">
-          {planning ? (
-            <div className="trail-progress-card">
-              <p>
-                {dayStops.findIndex((s) => s.id === activeStop?.id) + 1} / {dayStops.length} stops
-              </p>
-              <p>{dayProgress}% of day completed</p>
-              <div className="trail-progress-bar">
-                <span style={{ width: `${dayProgress}%` }} />
-              </div>
-            </div>
-          ) : null}
-
-          {days.map((day) => {
-            const list = day.stopIds
-              .map((id) => stops.find((s) => s.id === id))
-              .filter(Boolean) as TrailStop[];
-            const isActiveDay = day.day === activeStop?.day;
-            return (
-              <div
-                key={day.day}
-                id={`day-${day.day}`}
-                className={`trail-day-block${isActiveDay ? " is-active-day" : " is-other-day"}`}
-              >
-                {planning && isActiveDay ? (
-                  <header className="trail-day-head">
-                    <p className="eyebrow text-[#C9A45C]">
-                      Day {String(day.day).padStart(2, "0")}
-                    </p>
-                    <h2>{day.title}</h2>
-                    <p>{day.theme}</p>
-                  </header>
-                ) : null}
-                {list.map((stop, i) => {
-                  const gIdx = globalStopIndex;
-                  globalStopIndex += 1;
-                  const focus =
-                    gIdx === activeIndexInAll
-                      ? "active"
-                      : gIdx === activeIndexInAll - 1
-                        ? "prev"
-                        : gIdx === activeIndexInAll + 1
-                          ? "next"
-                          : "far";
-                  return (
-                    <ItineraryStopCard
-                      key={stop.id}
-                      stop={stop}
-                      indexInDay={i}
-                      dayStopCount={list.length}
-                      globalIndex={gIdx}
-                      active={stop.id === activeStopId}
-                      focus={focus}
-                      nextStop={list[i + 1]}
-                      showTripDetails={planning}
-                    />
-                  );
-                })}
-              </div>
-            );
-          })}
-
-          <aside className="trail-recs">
-            <p className="eyebrow text-[#C9A45C]">You may also like</p>
-            <h3 className="font-display text-2xl text-[#F4EBDD]">
-              While you are at {activePlace.shortName}
-            </h3>
-            <div className="trail-recs-grid">
-              {recommendations.map((rec) => (
-                <article key={rec.placeId} className="trail-rec-card">
-                  <img
-                    src={rec.place.image}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div>
-                    <p className="trail-rec-cat">{rec.category}</p>
-                    <h4>{rec.place.name}</h4>
-                    <p>{rec.reason}</p>
-                    {planning ? (
-                      <p className="trail-rec-meta">{rec.place.distanceFromCentreKm} km from centre</p>
-                    ) : null}
-                    {planning ? (
-                      <button type="button" onClick={() => addToTrail(rec.placeId)}>
-                        Add to my trail
-                      </button>
-                    ) : null}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </aside>
+          <div className="mt-itinerary-stack">
+            {days.map((day) => {
+              const list = (
+                day.stopIds
+                  .map((id) => stops.find((s) => s.id === id))
+                  .filter(Boolean) as TrailStop[]
+              ).filter((stop) => {
+                if (!categoryKey) return true;
+                const place = getPlace(stop.placeId);
+                return place.categories.includes(categoryKey as never);
+              });
+              if (list.length === 0) return null;
+              return (
+                <div key={day.day} id={`day-${day.day}`} className="mt-day-block">
+                  {planning ? (
+                    <header className="mt-day-head">
+                      <p className="mt-eyebrow">Day {String(day.day).padStart(2, "0")}</p>
+                      <h3 className="mt-day-title">{day.title}</h3>
+                      <p className="mt-day-theme">{day.theme}</p>
+                    </header>
+                  ) : (
+                    <header className="mt-day-head">
+                      <h3 className="mt-day-title">{day.title}</h3>
+                      <p className="mt-day-theme">{day.theme}</p>
+                    </header>
+                  )}
+                  {list.map((stop, i) => {
+                    const gIdx = globalStopIndex;
+                    globalStopIndex += 1;
+                    return (
+                      <ItineraryStopCard
+                        key={stop.id}
+                        stop={stop}
+                        indexInDay={i}
+                        dayStopCount={list.length}
+                        globalIndex={gIdx}
+                        active={stop.id === activeStopId}
+                        nextStop={list[i + 1]}
+                        showTripDetails={planning}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
         </div>
-
-        <aside className="trail-journey-right">
-          <TrailCircularPanel
-            items={wheelItems}
-            activeIndex={activeIndexInAll}
-            totalDays={days.length}
-            showTripDetails={planning}
-          />
-        </aside>
       </section>
 
+      {/* Suggestions */}
+      <section className="mt-recs">
+        <div className="mt-wrap">
+          <header className="mt-section-head">
+            <p className="mt-eyebrow">You may also like</p>
+            <h2 className="mt-h2">While you are at {activePlace.shortName}</h2>
+          </header>
+          <div className="mt-recs-grid">
+            {recommendations.map((rec) => (
+              <article key={rec.placeId} className="mt-rec-card">
+                <img
+                  src={rec.place.image}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="mt-rec-body">
+                  <p className="mt-rec-cat">{rec.category}</p>
+                  <h3>{rec.place.name}</h3>
+                  <p>{rec.reason}</p>
+                  <p className="mt-rec-meta">{rec.place.distanceFromCentreKm} km from centre</p>
+                  <div className="mt-rec-actions">
+                    <a href={`#${rec.placeId}`} className="mt-text-link">
+                      View details →
+                    </a>
+                    <button type="button" className="mt-text-link" onClick={() => addToTrail(rec.placeId)}>
+                      Add to trail
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Route map — plan mode only */}
       {planning ? (
-        <section className="trail-summary">
-          <p className="eyebrow text-[#C9A45C]">Your Royal Trail</p>
-          <h2 className="font-display text-3xl text-[#F4EBDD] sm:text-5xl">
-            {summary.days} days · {summary.experiences}+ experiences
-          </h2>
-          <dl className="trail-summary-stats">
-            <div>
-              <dt>Distance</dt>
-              <dd>{summary.km} km</dd>
-            </div>
-            <div>
-              <dt>Experience hours</dt>
-              <dd>~{summary.hours} hrs</dd>
-            </div>
-            <div>
-              <dt>Best for</dt>
-              <dd>{summary.bestFor.join(" · ")}</dd>
-            </div>
-          </dl>
-          <div className="trail-share-card">
-            <p className="eyebrow text-[#C9A45C]">The Royal Passage</p>
-            <h3 className="font-display text-2xl">Mysore Trail</h3>
-            <p>A {summary.days}-Day Journey Through the City of Palaces</p>
-            <div className="trail-share-actions">
-              <button type="button" className="trail-btn-primary" onClick={saveTrail}>
-                Save my trail
-              </button>
-              <button type="button" className="trail-btn-ghost" onClick={() => void copyLink()}>
-                Copy link
-              </button>
-              <button
-                type="button"
-                className="trail-btn-ghost"
-                onClick={() => {
-                  if (navigator.share) {
-                    void navigator.share({
-                      title: "Mysore Trail — The Royal Passage",
-                      url: window.location.href,
-                    });
-                  } else {
-                    void copyLink();
-                  }
-                }}
-              >
-                Share trail
-              </button>
+        <section className="mt-route" id="trail-route">
+          <div className="mt-wrap">
+            <header className="mt-section-head">
+              <p className="mt-eyebrow">Your journey route</p>
+              <h2 className="mt-h2">A stylised path through Mysuru</h2>
+            </header>
+            <div className="mt-route-board">
+              <ol className="mt-route-list">
+                {stops.map((stop, i) => {
+                  const place = getPlace(stop.placeId);
+                  return (
+                    <li key={stop.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveStopId(stop.id);
+                          document.getElementById(place.id)?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center",
+                          });
+                        }}
+                      >
+                        <span className="mt-route-marker">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="mt-route-name">{place.shortName}</span>
+                        <span className="mt-route-time">Day {stop.day}</span>
+                      </button>
+                      {i < stops.length - 1 ? <span className="mt-route-dash" aria-hidden /> : null}
+                    </li>
+                  );
+                })}
+              </ol>
             </div>
           </div>
         </section>
       ) : null}
 
-      <section className="trail-finale">
-        <img
-          src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=2000&q=85&auto=format&fit=crop"
-          alt=""
-          className="trail-finale-bg"
-          decoding="async"
-          referrerPolicy="no-referrer"
-        />
-        <div className="trail-finale-veil" />
-        <div className="trail-finale-inner">
-          <h2 className="font-display text-4xl sm:text-6xl">Your royal journey awaits</h2>
-          <p>Some cities are visited. Mysuru is experienced.</p>
-          <div className="trail-hero-actions">
-            <a href="#trail-journey" className="trail-btn-primary">
-              Start your Royal Trail
+      {/* Featured journey */}
+      <section className="mt-featured">
+        <div className="mt-wrap">
+          <article className="mt-featured-card">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Mysore_Palace_-_Front_view.jpg/1280px-Mysore_Palace_-_Front_view.jpg"
+              alt="Mysuru Palace"
+              decoding="async"
+              referrerPolicy="no-referrer"
+            />
+            <div className="mt-featured-body">
+              <p className="mt-eyebrow">Featured journey</p>
+              <h2 className="mt-h2">The Royal Weekend</h2>
+              <p className="mt-featured-meta">3 Days / 2 Nights · Palaces · Food · Culture · Nature</p>
+              <p className="mt-lead">
+                A perfectly paced introduction to Mysuru for travellers who want to experience the
+                city&apos;s royal character without rushing.
+              </p>
+              <a href="#trail-journey" className="mt-btn-primary">
+                View journey →
+              </a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      {/* Trust */}
+      <section className="mt-trust">
+        <div className="mt-wrap mt-trust-inner">
+          <div>
+            <p className="mt-eyebrow">Trusted by travellers</p>
+            <p className="mt-trust-stars" aria-label="4.9 out of 5">
+              ★★★★★
+            </p>
+            <p className="mt-trust-score">
+              4.9 <span>320+ reviews</span>
+            </p>
+          </div>
+          <blockquote className="mt-trust-quote">
+            “Every detail made exploring Mysuru feel effortless.”
+            <cite>— Traveller on The Royal Passage</cite>
+          </blockquote>
+        </div>
+      </section>
+
+      {/* Summary — plan mode only */}
+      {planning ? (
+        <section className="mt-summary">
+          <div className="mt-wrap">
+            <div className="mt-summary-card">
+              <p className="mt-eyebrow">Your Mysore Trail</p>
+              <h2 className="mt-h2">
+                {summary.days} days · {summary.experiences} stops · {summary.hours}+ hours
+              </h2>
+              <p className="mt-summary-tags">
+                {summary.bestFor.map((c) => c.toUpperCase()).join(" · ")}
+              </p>
+              <div className="mt-summary-actions">
+                <button type="button" className="mt-btn-primary" onClick={saveTrail}>
+                  Save my trail
+                </button>
+                <button type="button" className="mt-btn-ghost" onClick={() => void copyLink()}>
+                  Share trail
+                </button>
+                <button type="button" className="mt-btn-ghost" onClick={downloadItinerary}>
+                  Download itinerary
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* Finale */}
+      <section className="mt-finale">
+        <img src={FINALE_IMAGE} alt="" className="mt-finale-bg" decoding="async" referrerPolicy="no-referrer" />
+        <div className="mt-finale-veil" />
+        <div className="mt-finale-inner">
+          <h2 className="mt-finale-title">
+            Some places
+            <br />
+            stay with you
+            <br />
+            forever.
+          </h2>
+          <p>Your Mysuru story starts here.</p>
+          <div className="mt-hero-actions">
+            <a
+              href="#trail-journey"
+              className="mt-btn-primary"
+              onClick={() => setPlanning(false)}
+            >
+              Start your journey →
             </a>
-            <button type="button" className="trail-btn-ghost" onClick={() => setPlanning(true)}>
-              Plan my trip
+            <button type="button" className="mt-btn-ghost-light" onClick={startPlanning}>
+              Plan my journey
             </button>
-            <Link to="/experiences" className="trail-btn-ghost">
+            <Link to="/experiences" className="mt-btn-ghost-light">
               Explore experiences
             </Link>
           </div>

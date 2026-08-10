@@ -1,1106 +1,1298 @@
-/* Mysore Trail — immersive royal itinerary */
+/* Mysore Trail — Royal Passage site theme (maroon / gold / cream) */
 
-/* clip (not hidden) so sticky image panel can pin while scrolling */
+.trail-page-shell,
+.mt-page {
+  --mt-ivory: var(--background);
+  --mt-sand: var(--burgundy);
+  --mt-card: oklch(0.26 0.09 24 / 0.42);
+  --mt-ink: var(--ink);
+  --mt-muted: var(--muted-foreground);
+  --mt-teal: var(--gold);
+  --mt-gold: var(--gold);
+  --mt-line: var(--border);
+  --mt-on-accent: var(--primary-foreground);
+  --mt-radius: 22px;
+  --mt-serif: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+  --mt-sans: "DM Sans", "Manrope", Inter, system-ui, sans-serif;
+}
+
 .trail-page-shell {
+  background: var(--mt-ivory);
+  color: var(--mt-ink);
+}
+
+/* Constant Royal Passage maroon header on Mysore Trail — no scroll color change */
+.trail-page-shell .site-header,
+.trail-page-shell .site-header[data-elevated="true"],
+.trail-page-shell .site-header[data-elevated="false"] {
+  background-color: var(--burgundy-deep) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: 1px solid color-mix(in oklab, var(--gold) 45%, transparent) !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+.trail-page-shell .site-header .header-nav-link {
+  color: color-mix(in oklab, var(--ink) 82%, transparent);
+}
+.trail-page-shell .site-header .header-nav-link:hover,
+.trail-page-shell .site-header .header-nav-link--active,
+.trail-page-shell .site-header .header-nav-link.text-ember {
+  color: var(--gold);
+}
+.trail-page-shell .site-header img {
+  filter: none !important;
+}
+.trail-page-shell .site-header button,
+.trail-page-shell .site-header [aria-label="Open menu"] {
+  color: var(--ink);
+}
+
+.mt-page {
+  background: var(--mt-ivory);
+  color: var(--mt-ink);
+  font-family: var(--mt-sans);
   overflow-x: clip;
 }
 
-.trail-page {
-  --trail-maroon: #2a080a;
-  --trail-gold: #c9a45c;
-  --trail-ivory: #f4ebdd;
-  --trail-ink: #15100f;
-  --trail-bronze: #8d6b3f;
-  --trail-day-nav-h: 3.25rem;
-  /* Fixed screen band for every stop’s title — never jumps up/down */
-  --trail-text-sticky-top: calc(
-    var(--header-height, 5rem) + (100vh - var(--header-height, 5rem)) * 0.5 - 6.5rem
-  );
-  background: var(--trail-maroon);
-  color: var(--trail-ivory);
-}
-
-.trail-container {
+.mt-wrap {
   width: 100%;
-  max-width: 1280px;
+  max-width: 1180px;
   margin-inline: auto;
-  padding-inline: 1rem;
-}
-@media (min-width: 640px) {
-  .trail-container {
-    padding-inline: 1.5rem;
-  }
+  padding-inline: 1.25rem;
 }
 @media (min-width: 768px) {
-  .trail-container {
-    padding-inline: 2.5rem;
+  .mt-wrap {
+    padding-inline: 2rem;
   }
 }
 
-.trail-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 2px;
-  background: var(--trail-gold);
-  color: var(--trail-ink);
-  padding: 0.75rem 1.25rem;
+.mt-eyebrow {
+  margin: 0;
   font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  transition: opacity 0.2s ease;
+  color: var(--mt-teal);
+  font-weight: 500;
 }
-.trail-btn-primary:hover {
-  opacity: 0.9;
+.mt-eyebrow--light {
+  color: color-mix(in oklab, #f4efe5 88%, white);
 }
 
-.trail-btn-ghost {
+.mt-h1 {
+  margin: 0.6rem 0 0;
+  font-family: var(--mt-serif);
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  color: var(--mt-ink);
+}
+
+.mt-h2 {
+  margin: 0.45rem 0 0;
+  font-family: var(--mt-serif);
+  font-size: clamp(1.85rem, 3.4vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--mt-ink);
+}
+
+.mt-lead {
+  margin: 0.85rem 0 0;
+  max-width: 34rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--mt-muted);
+}
+
+.mt-section-head {
+  margin-bottom: 2rem;
+  max-width: 40rem;
+}
+
+.mt-btn-primary,
+.mt-btn-ghost,
+.mt-btn-ghost-light {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 2px;
-  border: 1px solid color-mix(in oklab, var(--trail-gold) 45%, transparent);
-  color: var(--trail-ivory);
-  padding: 0.75rem 1.25rem;
-  font-size: 0.68rem;
+  border-radius: 999px;
+  padding: 0.8rem 1.35rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   transition:
-    border-color 0.2s ease,
-    color 0.2s ease;
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
 }
-.trail-btn-ghost:hover {
-  border-color: var(--trail-gold);
-  color: var(--trail-gold);
+.mt-btn-primary {
+  border: 1px solid var(--mt-teal);
+  background: var(--mt-teal);
+  color: var(--mt-on-accent);
+}
+.mt-btn-primary:hover {
+  background: color-mix(in oklab, var(--mt-teal) 88%, white);
+}
+.mt-btn-ghost {
+  border: 1px solid var(--mt-line);
+  background: transparent;
+  color: var(--mt-ink);
+}
+.mt-btn-ghost:hover {
+  border-color: var(--mt-teal);
+  color: var(--mt-teal);
+}
+.mt-btn-ghost-light {
+  border: 1px solid color-mix(in oklab, #fff 55%, transparent);
+  background: color-mix(in oklab, #fff 12%, transparent);
+  color: #f7f3ea;
+}
+.mt-btn-ghost-light:hover {
+  background: color-mix(in oklab, #fff 22%, transparent);
+}
+.mt-btn-sm {
+  padding: 0.6rem 1rem;
+  font-size: 0.65rem;
+}
+.mt-text-link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--mt-teal);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.mt-text-link:hover {
+  color: var(--mt-ink);
 }
 
-.trail-hero {
+/* ——— Hero ——— */
+.mt-hero {
+  padding: 1.25rem 0 2.5rem;
+}
+.mt-hero-media {
   position: relative;
-  min-height: calc(100dvh - var(--header-height, 5rem));
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
   overflow: hidden;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+  border-radius: 28px;
+  min-height: min(78vh, 720px);
+  background: var(--mt-sand);
 }
-.trail-hero.is-locked {
-  pointer-events: none;
-}
-.trail-hero.is-locked .trail-hero-bg,
-.trail-hero.is-locked .trail-hero-veil,
-.trail-hero.is-locked .trail-hero-inner {
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.35s ease,
-    visibility 0.35s ease;
-}
-.trail-page--journey-locked #trail-journey {
-  scroll-snap-align: start;
-}
-.trail-hero-bg {
+.mt-hero-media > img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 40%;
 }
-.trail-hero-veil {
+.mt-hero-veil {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, #2a080acc 0%, #2a080a88 40%, #2a080af2 100%),
-    radial-gradient(ellipse 70% 50% at 50% 20%, #c9a45c22 0%, transparent 70%);
+  background: linear-gradient(
+    115deg,
+    color-mix(in oklab, var(--burgundy-deep) 78%, transparent) 0%,
+    color-mix(in oklab, var(--burgundy-deep) 42%, transparent) 48%,
+    color-mix(in oklab, var(--burgundy-deep) 14%, transparent) 100%
+  );
 }
-.trail-hero-inner {
+.mt-hero-copy {
   position: relative;
   z-index: 1;
-  width: 100%;
-  padding-top: 6rem;
-  padding-bottom: 4rem;
-}
-.trail-hero-title {
-  margin-top: 0.75rem;
-  font-family: var(--font-display);
-  font-size: clamp(2.6rem, 7vw, 5.25rem);
-  line-height: 0.98;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.trail-hero-title em {
-  font-style: italic;
-  color: var(--trail-gold);
-  text-transform: none;
-}
-.trail-hero-sub {
-  margin-top: 1rem;
-  font-size: clamp(0.85rem, 1.6vw, 1.05rem);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--trail-ivory) 80%, transparent);
-}
-.trail-hero-desc {
-  margin-top: 1.25rem;
   max-width: 36rem;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: color-mix(in oklab, var(--trail-ivory) 72%, transparent);
+  padding: clamp(2rem, 6vw, 4.5rem);
+  color: #f7f3ea;
 }
-.trail-hero-actions {
-  margin-top: 2rem;
+.mt-hero-title {
+  margin: 0.55rem 0 0;
+  font-family: var(--mt-serif);
+  font-size: clamp(3rem, 7vw, 5.2rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+.mt-hero-kicker {
+  margin: 1rem 0 0;
+  font-family: var(--mt-serif);
+  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+  line-height: 1.25;
+  font-weight: 400;
+  color: color-mix(in oklab, #f7f3ea 92%, transparent);
+}
+.mt-hero-desc {
+  margin: 1rem 0 0;
+  max-width: 28rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: color-mix(in oklab, #f7f3ea 78%, transparent);
+}
+.mt-hero-actions {
+  margin-top: 1.6rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.7rem;
 }
-.trail-hero-scroll {
-  margin-top: 3rem;
-  font-size: 0.65rem;
-  letter-spacing: 0.22em;
+.mt-hero-meta {
+  margin: 1.5rem 0 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--trail-gold);
+  color: color-mix(in oklab, #f7f3ea 70%, transparent);
 }
 
-.trail-intro {
-  max-width: 42rem;
-  margin: 0 auto;
-  padding: 5rem 1.25rem 3rem;
-  text-align: center;
+/* ——— Intro ——— */
+.mt-intro {
+  padding: 3.5rem 0 2rem;
 }
-.trail-intro h2 {
-  margin-top: 1.25rem;
+.mt-intro-grid {
+  display: grid;
+  gap: 2rem;
 }
-.trail-intro p {
-  margin-top: 1.25rem;
-  font-size: 1rem;
-  line-height: 1.8;
-  color: color-mix(in oklab, var(--trail-ivory) 72%, transparent);
-}
-
-.trail-config {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem 1rem 3rem;
-  border-top: 1px solid color-mix(in oklab, var(--trail-gold) 18%, transparent);
-}
-@media (min-width: 640px) {
-  .trail-config {
-    padding-inline: 1.5rem;
+@media (min-width: 900px) {
+  .mt-intro-grid {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 4rem;
+    align-items: end;
   }
+}
+.mt-stats {
+  margin: 2rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.mt-stats dt {
+  font-family: var(--mt-serif);
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  color: var(--mt-teal);
+  line-height: 1;
+}
+.mt-stats dd {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  color: var(--mt-muted);
+}
+
+/* ——— Planner ——— */
+.mt-planner {
+  padding: 2.5rem 0 3.5rem;
+  background: color-mix(in oklab, var(--mt-sand) 55%, var(--mt-ivory));
+  border-block: 1px solid var(--mt-line);
+}
+.mt-planner-grid {
+  display: grid;
+  gap: 1.5rem;
 }
 @media (min-width: 768px) {
-  .trail-config {
-    padding-inline: 2.5rem;
+  .mt-planner-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem 2rem;
+  }
+  .mt-field--wide {
+    grid-column: 1 / -1;
   }
 }
-.trail-config-intro {
-  margin-bottom: 2rem;
+.mt-field {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
 }
-.trail-config-block {
-  margin-top: 1.5rem;
-}
-.trail-config-block h3 {
+.mt-field legend {
+  padding: 0;
   margin-bottom: 0.75rem;
-  font-size: 0.65rem;
-  letter-spacing: 0.18em;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: color-mix(in oklab, var(--trail-ivory) 55%, transparent);
+  color: var(--mt-muted);
 }
-.trail-chip-row {
+.mt-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
-.trail-chip {
+.mt-pill {
   border-radius: 999px;
-  border: 1px solid color-mix(in oklab, var(--trail-gold) 28%, transparent);
-  background: transparent;
-  color: color-mix(in oklab, var(--trail-ivory) 78%, transparent);
-  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--mt-line);
+  background: var(--mt-card);
+  color: var(--mt-muted);
+  padding: 0.55rem 0.95rem;
   font-size: 0.72rem;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
   transition:
     background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease;
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
-.trail-chip.is-on,
-.trail-chip:hover {
-  border-color: var(--trail-gold);
-  background: color-mix(in oklab, var(--trail-gold) 16%, transparent);
-  color: var(--trail-ivory);
+.mt-pill:hover {
+  border-color: color-mix(in oklab, var(--mt-teal) 45%, var(--mt-line));
+  color: var(--mt-ink);
 }
-.trail-config-cta {
-  margin-top: 2rem;
-  border-bottom: 1px solid var(--trail-gold);
-  color: var(--trail-gold);
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  padding-bottom: 0.2rem;
+.mt-pill.is-on {
+  border-color: var(--mt-teal);
+  background: var(--mt-teal);
+  color: var(--mt-on-accent);
+}
+.mt-planner-actions {
+  margin-top: 1.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
-.trail-day-nav {
-  position: sticky;
-  top: var(--header-height);
-  z-index: 30;
-  background: color-mix(in oklab, var(--trail-maroon) 94%, transparent);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid color-mix(in oklab, var(--trail-gold) 16%, transparent);
+/* ——— Day nav ——— */
+.mt-day-nav {
+  position: relative;
+  z-index: 1;
+  background: color-mix(in oklab, var(--burgundy-deep) 88%, transparent);
+  border-bottom: 1px solid var(--mt-line);
 }
-.trail-day-nav-inner {
+.mt-day-nav-inner {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
-  padding-block: 0.75rem;
+  padding-block: 0.85rem;
   scrollbar-width: none;
 }
-.trail-day-nav-inner::-webkit-scrollbar {
+.mt-day-nav-inner::-webkit-scrollbar {
   display: none;
 }
-.trail-day-pill {
+.mt-day-chip {
   flex: 0 0 auto;
-  border: 1px solid color-mix(in oklab, var(--trail-gold) 30%, transparent);
   border-radius: 999px;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.65rem;
-  letter-spacing: 0.14em;
+  border: 1px solid var(--mt-line);
+  background: var(--mt-card);
+  padding: 0.45rem 0.9rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--trail-ivory);
+  color: var(--mt-muted);
   white-space: nowrap;
 }
-.trail-day-pill:hover {
-  border-color: var(--trail-gold);
-  color: var(--trail-gold);
+.mt-day-chip.is-on,
+.mt-day-chip:hover {
+  border-color: var(--mt-teal);
+  color: var(--mt-teal);
+}
+.mt-day-chip--plan {
+  margin-left: auto;
+  background: transparent;
+  border-color: transparent;
+  color: var(--mt-teal);
+  text-decoration: underline;
+  text-underline-offset: 0.22rem;
+  cursor: pointer;
+  font: inherit;
 }
 
-.trail-journey {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem 1rem 4rem;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 2rem;
-  align-items: start;
+/* ——— Itinerary ——— */
+.mt-itinerary {
+  padding: 3.25rem 0 4rem;
 }
-@media (min-width: 640px) {
-  .trail-journey {
-    padding-inline: 1.5rem;
+.mt-itinerary-stack {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 920px;
+}
+@media (min-width: 900px) {
+  .mt-itinerary-stack {
+    max-width: none;
+    gap: 1.5rem;
   }
+}
+.mt-day-block {
+  margin-bottom: 2rem;
+  display: grid;
+  gap: 1.25rem;
+}
+.mt-day-head {
+  margin-bottom: 0.25rem;
+}
+.mt-day-title {
+  margin: 0.35rem 0 0;
+  font-family: var(--mt-serif);
+  font-size: clamp(1.6rem, 2.5vw, 2.1rem);
+  font-weight: 500;
+}
+.mt-day-theme {
+  margin: 0.35rem 0 0;
+  color: var(--mt-muted);
+  font-size: 0.92rem;
+}
+
+/* One stop = one photo card; text lives ON the photograph */
+.mt-stop-photo {
+  margin: 0;
+  scroll-margin-top: calc(var(--header-height) + 4.5rem);
+}
+.mt-stop-photo-card {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: min(32vh, 240px);
+  border-radius: 24px;
+  background: var(--mt-sand);
+  box-shadow: 0 18px 40px -28px color-mix(in oklab, var(--mt-ink) 35%, transparent);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 @media (min-width: 768px) {
-  .trail-journey {
-    padding-inline: 2.5rem;
+  .mt-stop-photo-card {
+    height: min(72vh, 540px);
   }
 }
-@media (min-width: 1024px) {
-  .trail-journey {
-    grid-template-columns: minmax(0, 32%) minmax(0, 68%);
-    column-gap: 1.25rem;
-    row-gap: 0;
-  }
+.mt-stop-photo.is-active .mt-stop-photo-card {
+  box-shadow: 0 22px 48px -24px color-mix(in oklab, var(--mt-ink) 42%, transparent);
 }
-
-.trail-journey-left {
-  min-width: 0;
-}
-
-.trail-progress-card {
-  margin-bottom: 1.5rem;
-  padding: 0.85rem 0 1rem;
-  border-bottom: 1px solid color-mix(in oklab, var(--trail-gold) 18%, transparent);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--trail-ivory) 65%, transparent);
-  display: grid;
-  gap: 0.35rem;
-}
-.trail-progress-bar {
-  margin-top: 0.65rem;
-  height: 2px;
-  width: 100%;
-  background: color-mix(in oklab, var(--trail-gold) 18%, transparent);
-  overflow: hidden;
-}
-.trail-progress-bar span {
-  display: block;
-  height: 100%;
-  background: var(--trail-gold);
-  transition: width 0.4s ease;
-}
-
-.trail-day-head {
-  margin: 0.75rem 0 1.25rem;
-  animation: trail-day-head-in 0.7s ease;
-}
-.trail-day-block.is-active-day .trail-day-head {
-  margin-top: 0.5rem;
-}
-@keyframes trail-day-head-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.trail-day-head h2 {
-  margin-top: 0.35rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
-  line-height: 1.1;
-}
-.trail-day-head p {
-  margin-top: 0.4rem;
-  font-size: 0.9rem;
-  color: color-mix(in oklab, var(--trail-ivory) 60%, transparent);
-}
-
-.trail-stop {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1rem minmax(0, 1fr);
-  column-gap: 0.85rem;
-  /* One viewport per stop — text sticks to the same screen line */
-  min-height: calc(100vh - var(--header-height, 5rem));
-  padding: 0;
-  margin: 0;
-  scroll-margin-top: var(--header-height, 5rem);
-  scroll-snap-align: center;
-  scroll-snap-stop: always;
-  align-content: start;
-  align-items: start;
-  opacity: 1;
-}
-.trail-stop-spy {
+.mt-stop-photo-img {
   position: absolute;
-  top: 50%;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  pointer-events: none;
-}
-.trail-stop-body,
-.trail-stop-rail {
-  transition: opacity 0.85s ease, visibility 0.85s ease;
-}
-/* Only the active stop’s text is visible */
-.trail-stop:not(.is-active) .trail-stop-body,
-.trail-stop:not(.is-active) .trail-stop-rail {
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-.trail-stop:not(.is-active) {
-  pointer-events: none;
-}
-.trail-stop.is-active {
-  opacity: 1;
-}
-.trail-stop.is-active .trail-stop-body,
-.trail-stop.is-active .trail-stop-rail {
-  visibility: visible;
-  opacity: 1;
-  position: sticky;
-  top: var(--trail-text-sticky-top);
-  align-self: start;
-}
-.trail-stop.is-active .trail-stop-body {
-  /* Same text block height so short/long copy stay on the same line */
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  min-height: 12rem;
-  max-height: min(40vh, 20rem);
-}
-.trail-stop.is-active .trail-stop-title {
-  font-size: clamp(1.55rem, 2.6vw, 2.35rem);
-  letter-spacing: 0.03em;
-  line-height: 1.15;
-}
-.trail-stop.is-active .trail-stop-tagline {
-  margin-top: 0.45rem;
-  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
-}
-.trail-stop.is-active .trail-stop-desc {
-  margin-top: 0.85rem;
-  font-size: clamp(0.95rem, 1.25vw, 1.08rem);
-  line-height: 1.65;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 5;
-}
-.trail-stop.is-active .trail-stop-index {
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  color: var(--trail-gold);
-}
-/* Snap stops while the journey is locked */
-html:has(.trail-page--journey-locked) {
-  scroll-snap-type: y proximity;
-}
-/* Plan mode: show the full list again */
-.trail-page--planning .trail-stop {
-  min-height: 0;
-  align-content: start;
-  padding: 0.85rem 0 1.75rem;
-  opacity: 0.5;
-  scroll-snap-align: none;
-}
-.trail-page--planning .trail-stop:not(.is-active) .trail-stop-body,
-.trail-page--planning .trail-stop:not(.is-active) .trail-stop-rail {
-  visibility: visible;
-  opacity: 1;
-  pointer-events: auto;
-  position: static;
-}
-.trail-page--planning .trail-stop:not(.is-active) {
-  pointer-events: auto;
-}
-.trail-page--planning .trail-stop.is-active {
-  opacity: 1;
-}
-.trail-page--planning .trail-stop.is-active .trail-stop-body,
-.trail-page--planning .trail-stop.is-active .trail-stop-rail {
-  position: static;
-  max-height: none;
-  min-height: 0;
-}
-.trail-page--planning .trail-stop.is-idle {
-  opacity: 0.5;
-}
-.trail-stop-rail {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.trail-stop-dot {
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
-  width: 0.5rem;
-  height: 0.5rem;
-  margin-top: 0.3rem;
-  flex-shrink: 0;
-  border-radius: 999px;
-  border: 1.5px solid color-mix(in oklab, var(--trail-gold) 50%, transparent);
-  background: transparent;
 }
-.trail-stop.is-active .trail-stop-dot {
-  background: var(--trail-gold);
-  border-color: var(--trail-gold);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--trail-gold) 22%, transparent);
-}
-.trail-stop-line {
-  flex: 1;
-  width: 1px;
-  min-height: 1.25rem;
-  margin-top: 0.35rem;
+.mt-stop-photo-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--trail-gold) 45%, transparent),
-    transparent
+    to top,
+    rgba(0, 0, 0, 0.78) 0%,
+    rgba(0, 0, 0, 0.45) 28%,
+    rgba(0, 0, 0, 0.12) 55%,
+    rgba(0, 0, 0, 0) 75%
   );
 }
-.trail-stop-body {
-  min-width: 0;
-  transition: opacity 0.65s ease;
-}
-.trail-stop-time {
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--trail-gold);
-}
-.trail-stop-head {
+.mt-stop-photo-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 1rem 1.1rem 1rem;
+  color: #f4efe5;
   display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  align-items: baseline;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  pointer-events: none;
 }
-.trail-stop-index {
-  flex-shrink: 0;
-  font-size: 0.58rem;
-  letter-spacing: 0.12em;
+@media (min-width: 768px) {
+  .mt-stop-photo-overlay {
+    padding: 2.25rem 2rem 2rem;
+    max-width: 36rem;
+    gap: 0.25rem;
+  }
+}
+.mt-stop-photo-time {
+  margin: 0 0 0.15rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: color-mix(in oklab, var(--trail-ivory) 45%, transparent);
+  color: color-mix(in oklab, #f4efe5 80%, transparent);
 }
-.trail-stop-live {
-  color: var(--trail-gold);
+.mt-stop-photo-title {
+  margin: 0;
+  font-family: var(--mt-serif);
+  font-size: clamp(1.35rem, 5.5vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: #f4efe5;
 }
-.trail-stop-title {
-  margin-top: 0.2rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
-  letter-spacing: 0.03em;
-  line-height: 1.2;
+@media (min-width: 768px) {
+  .mt-stop-photo-title {
+    font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+  }
 }
-.trail-stop-tagline {
-  margin-top: 0.2rem;
-  font-size: 0.82rem;
+.mt-stop-photo-tagline {
+  margin: 0.35rem 0 0;
+  font-family: var(--mt-serif);
   font-style: italic;
-  line-height: 1.35;
-  color: color-mix(in oklab, var(--trail-ivory) 68%, transparent);
+  font-size: 0.9rem;
+  line-height: 1.3;
+  color: color-mix(in oklab, #f4efe5 88%, transparent);
 }
-.trail-stop-travel {
-  margin-top: 0.45rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--trail-bronze);
+@media (min-width: 768px) {
+  .mt-stop-photo-tagline {
+    margin: 0.45rem 0 0;
+    font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+    line-height: 1.35;
+  }
 }
-.trail-stop-mobile-media {
-  display: none;
-}
-.trail-stop-block {
-  margin-top: 0.55rem;
-}
-.trail-stop-block-label {
-  margin: 0 0 0.2rem;
-  font-size: 0.52rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--trail-gold);
-}
-.trail-stop-desc {
-  margin-top: 0.45rem;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  color: color-mix(in oklab, var(--trail-ivory) 78%, transparent);
-}
-.trail-stop-facts {
-  margin-top: 0.65rem;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem 1rem;
-}
-.trail-stop-facts dt {
-  font-size: 0.52rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--trail-ivory) 45%, transparent);
-}
-.trail-stop-facts dd {
-  margin-top: 0.15rem;
-  font-size: 0.78rem;
-  color: var(--trail-ivory);
-}
-.trail-stop-highlights {
-  margin: 0.45rem 0 0;
+.mt-stop-photo-tags {
+  margin: 0.5rem 0 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 0.55rem;
-}
-.trail-stop-highlights li {
-  font-size: 0.68rem;
-  letter-spacing: 0.02em;
-  color: color-mix(in oklab, var(--trail-ivory) 82%, transparent);
-}
-.trail-stop-highlights li::before {
-  content: "· ";
-  color: var(--trail-gold);
-}
-.trail-stop-tip {
-  margin-top: 0.55rem;
-  font-size: 0.75rem;
-  line-height: 1.45;
-  color: color-mix(in oklab, var(--trail-ivory) 72%, transparent);
-}
-.trail-stop-tip span {
-  display: inline-block;
-  margin-right: 0.35rem;
-  font-size: 0.55rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--trail-gold);
-}
-.trail-stop-next {
-  margin-top: 0.65rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--trail-ivory) 45%, transparent);
-}
-
-.trail-journey-right {
-  display: none;
-  min-width: 0;
-}
-@media (min-width: 1024px) {
-  .trail-journey-right {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    position: sticky;
-    top: var(--header-height);
-    align-self: start;
-    min-height: calc(100vh - var(--header-height));
-    height: calc(100vh - var(--header-height));
-    max-height: calc(100vh - var(--header-height));
-  }
-}
-
-.trail-orbit-mobile,
-.trail-collage-mobile {
-  padding: 1.25rem 1rem 0.5rem;
-  max-width: 1280px;
-  margin-inline: auto;
-}
-@media (min-width: 1024px) {
-  .trail-orbit-mobile,
-  .trail-collage-mobile {
-    display: none;
-  }
-}
-
-.trail-circular-panel {
-  position: relative;
-  width: 100%;
-  max-width: none;
-  margin-left: auto;
-  margin-right: 0;
-  outline: none;
-  user-select: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.85rem;
-}
-.trail-circular-stage {
-  position: relative;
-  width: 100%;
-  max-width: none;
-  /* Large focal photo */
-  height: min(78vh, 680px);
-  margin: 0;
-  transition: opacity 0.85s ease;
-  flex-shrink: 0;
-}
-.trail-circular-panel .trail-collage-head {
-  position: static;
-  transform: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  text-align: center;
-  pointer-events: none;
-  z-index: 2;
-}
-.trail-circular-panel .trail-collage-caption {
-  width: 100%;
-  margin-top: 0;
-  text-align: center;
-  padding-right: 0;
-}
-.trail-collage {
-  width: 100%;
-  max-width: none;
-  margin-left: auto;
-  margin-right: 0;
-  outline: none;
-  user-select: none;
-}
-.trail-collage-head {
-  text-align: center;
-  margin-bottom: 0;
-  padding-right: 0;
-  position: relative;
-  z-index: 2;
-}
-.trail-collage-eyebrow {
-  font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--trail-gold);
-}
-.trail-collage-chapter {
-  margin-top: 0;
-  font-family: var(--font-display);
-  font-size: clamp(0.95rem, 1.5vw, 1.2rem);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--trail-ivory) 82%, transparent);
-}
-.trail-collage-stage {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: min(100%, 560px);
-  aspect-ratio: 3 / 4;
-  max-height: min(62vh, 560px);
-  margin-left: auto;
-  margin-right: 0;
-  cursor: grab;
-  overflow: hidden;
-}
-.trail-collage-stage:active {
-  cursor: grabbing;
-}
-.trail-orbit {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-.trail-orbit-card {
-  position: absolute;
-  width: min(68%, 280px);
-  aspect-ratio: 3 / 4;
-  padding: 0;
-  border: none;
-  background: #15100f;
-  border-radius: 6px;
-  overflow: hidden;
-  outline: 1px solid color-mix(in oklab, var(--trail-gold) 35%, transparent);
-  box-shadow: 0 18px 36px #00000088;
-  will-change: left, top, transform, opacity;
-  backface-visibility: hidden;
-}
-.trail-orbit-card img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
-  pointer-events: none;
-  user-select: none;
-}
-.trail-orbit-card.is-active {
-  width: min(74%, 300px);
-  outline-color: color-mix(in oklab, var(--trail-gold) 75%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--trail-gold) 45%, transparent),
-    0 22px 44px #000000aa;
-}
-.trail-orbit-card:focus-visible {
-  outline: 2px solid var(--trail-gold);
-  outline-offset: 3px;
-}
-.trail-collage-nav:disabled {
-  opacity: 0.35;
-  pointer-events: none;
-}
-.trail-collage-caption {
-  margin-top: 0.75rem;
-  text-align: center;
-  padding-right: 0;
-  transition: opacity 0.85s ease;
-}
-.trail-collage-caption-num {
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--trail-gold);
-}
-.trail-collage-caption-num span {
-  opacity: 0.55;
-}
-.trail-collage-caption-name {
-  margin-top: 0.3rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.2vw, 1.95rem);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  line-height: 1.15;
-  color: var(--trail-ivory);
-}
-.trail-collage-caption-city {
-  margin-top: 0.25rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--trail-ivory) 65%, transparent);
-}
-.trail-collage-controls {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: flex-end;
-  gap: 1.25rem;
-  padding-right: 0.25rem;
-}
-.trail-collage-nav {
-  font-size: 0.65rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--trail-ivory) 70%, transparent);
-  border-bottom: 1px solid color-mix(in oklab, var(--trail-gold) 35%, transparent);
-  padding-bottom: 0.15rem;
-  transition: color 0.2s ease;
-}
-.trail-collage-nav:hover,
-.trail-collage-nav:focus-visible {
-  color: var(--trail-gold);
-  outline: none;
-}
-.trail-collage--reduced .trail-collage-reduced-frame {
-  margin: 0.75rem auto 0;
-  width: min(100%, 360px);
-  aspect-ratio: 3 / 4;
-  border-radius: 18px;
-  overflow: hidden;
-  outline: 1px solid color-mix(in oklab, var(--trail-gold) 55%, transparent);
-}
-.trail-collage--reduced .trail-collage-reduced-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .trail-orbit-card {
-    transition: none !important;
-  }
-}
-
-/* legacy orbit styles removed — collage only */
-
-.trail-recs {
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid color-mix(in oklab, var(--trail-gold) 18%, transparent);
-}
-.trail-recs-grid {
-  margin-top: 1.25rem;
-  display: grid;
-  gap: 1rem;
-}
-.trail-rec-card {
-  display: grid;
-  grid-template-columns: 5.5rem minmax(0, 1fr);
-  gap: 0.9rem;
-  align-items: start;
-  padding: 0.75rem;
-  border: 1px solid color-mix(in oklab, var(--trail-gold) 16%, transparent);
-  border-radius: 4px;
-  background: color-mix(in oklab, #000 16%, transparent);
-}
-.trail-rec-card img {
-  width: 5.5rem;
-  height: 5.5rem;
-  object-fit: cover;
-  border-radius: 3px;
-}
-.trail-rec-cat {
-  font-size: 0.58rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--trail-gold);
-}
-.trail-rec-card h4 {
-  margin-top: 0.2rem;
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  line-height: 1.2;
-}
-.trail-rec-card p {
-  margin-top: 0.25rem;
-  font-size: 0.8rem;
-  line-height: 1.45;
-  color: color-mix(in oklab, var(--trail-ivory) 65%, transparent);
-}
-.trail-rec-meta {
-  font-size: 0.7rem !important;
-  color: var(--trail-bronze) !important;
-}
-.trail-rec-card button {
-  margin-top: 0.55rem;
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--trail-gold);
-  border-bottom: 1px solid color-mix(in oklab, var(--trail-gold) 50%, transparent);
-}
-
-.trail-map,
-.trail-summary {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 3rem 1rem;
-  border-top: 1px solid color-mix(in oklab, var(--trail-gold) 16%, transparent);
-}
-@media (min-width: 640px) {
-  .trail-map,
-  .trail-summary {
-    padding-inline: 1.5rem;
-  }
+  gap: 0.4rem;
 }
 @media (min-width: 768px) {
-  .trail-map,
-  .trail-summary {
-    padding-inline: 2.5rem;
+  .mt-stop-photo-tags {
+    margin: 0.75rem 0 0;
   }
 }
-.trail-map--in-plan {
-  margin-top: 2.5rem;
-  padding-top: 2rem;
-  border-top: 1px solid color-mix(in oklab, var(--trail-gold) 22%, transparent);
-}
-.trail-map--in-plan h3 {
-  margin-top: 0.35rem;
-  margin-bottom: 1.25rem;
-}
-.trail-map-list {
-  margin-top: 1.75rem;
-  display: grid;
-  gap: 0.15rem;
-  padding: 0;
-  list-style: none;
-}
-.trail-map-list > li {
-  display: grid;
-  gap: 0.15rem;
-}
-.trail-map-list button {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
-  gap: 0.75rem;
-  align-items: center;
-  text-align: left;
-  padding: 0.85rem 0.25rem;
-  border-bottom: 1px solid color-mix(in oklab, var(--trail-gold) 12%, transparent);
-  color: var(--trail-ivory);
-}
-.trail-map-list button span:first-child {
-  color: var(--trail-gold);
+.mt-stop-photo-tags li {
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, #f4efe5 35%, transparent);
+  padding: 0.28rem 0.65rem;
+  font-size: 0.6rem;
   letter-spacing: 0.1em;
-  font-variant-numeric: tabular-nums;
-}
-.trail-map-list button:hover {
-  color: var(--trail-gold);
-}
-.trail-map-arrow {
-  display: block;
-  padding-left: 2.75rem;
-  color: color-mix(in oklab, var(--trail-gold) 45%, transparent);
-  font-size: 0.75rem;
-  line-height: 1;
+  text-transform: uppercase;
+  color: color-mix(in oklab, #f4efe5 88%, transparent);
 }
 
-.trail-summary-stats {
-  margin-top: 1.5rem;
+/* ——— Recs ——— */
+.mt-recs {
+  padding: 1rem 0 4rem;
+}
+.mt-recs-grid {
   display: grid;
   gap: 1rem;
 }
-@media (min-width: 640px) {
-  .trail-summary-stats {
+@media (min-width: 700px) {
+  .mt-recs-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .mt-recs-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.mt-rec-card {
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid var(--mt-line);
+  background: var(--mt-card);
+}
+.mt-rec-card img {
+  width: 100%;
+  height: 10rem;
+  object-fit: cover;
+}
+.mt-rec-body {
+  padding: 1rem 1.05rem 1.15rem;
+}
+.mt-rec-cat {
+  margin: 0;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mt-teal);
+}
+.mt-rec-body h3,
+.mt-exp-body h3 {
+  margin: 0.35rem 0 0;
+  font-family: var(--mt-serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+.mt-rec-body p {
+  margin: 0.4rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--mt-muted);
+}
+.mt-rec-meta {
+  font-size: 0.72rem !important;
+}
+.mt-rec-actions {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+/* ——— Route ——— */
+.mt-route {
+  padding: 2rem 0 4rem;
+  background: color-mix(in oklab, var(--mt-sand) 60%, var(--mt-ivory));
+}
+.mt-route-board {
+  border: 1px solid var(--mt-line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 20% 20%, color-mix(in oklab, var(--mt-gold) 12%, transparent), transparent 40%),
+    linear-gradient(180deg, color-mix(in oklab, var(--burgundy) 88%, black), var(--mt-sand));
+  padding: 1.75rem 1.25rem;
+}
+@media (min-width: 768px) {
+  .mt-route-board {
+    padding: 2.25rem 2rem;
+  }
+}
+.mt-route-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0;
+}
+.mt-route-list > li {
+  display: grid;
+  gap: 0;
+}
+.mt-route-list button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
+  text-align: left;
+  padding: 0.85rem 0.35rem;
+  border: 0;
+  background: transparent;
+  color: var(--mt-ink);
+}
+.mt-route-list button:hover .mt-route-name {
+  color: var(--mt-teal);
+}
+.mt-route-marker {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px dashed color-mix(in oklab, var(--mt-teal) 45%, var(--mt-line));
+  display: grid;
+  place-items: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--mt-teal);
+  background: var(--mt-card);
+}
+.mt-route-name {
+  font-family: var(--mt-serif);
+  font-size: 1.15rem;
+  transition: color 0.2s ease;
+}
+.mt-route-time {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mt-muted);
+}
+.mt-route-dash {
+  display: block;
+  width: 1px;
+  height: 0.85rem;
+  margin-left: 1.35rem;
+  border-left: 1px dashed color-mix(in oklab, var(--mt-teal) 35%, transparent);
+}
+
+/* ——— Discover filters (itinerary) ——— */
+.mt-discover-filters {
+  margin: 0 0 1.75rem;
+}
+
+/* ——— Experiences ——— */
+.mt-experiences {
+  padding: 1rem 0 4rem;
+  background: color-mix(in oklab, var(--mt-sand) 45%, var(--mt-ivory));
+}
+.mt-exp-grid {
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 700px) {
+  .mt-exp-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .mt-exp-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-.trail-summary-stats dt {
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--trail-ivory) 45%, transparent);
-}
-.trail-summary-stats dd {
-  margin-top: 0.35rem;
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  text-transform: capitalize;
-  line-height: 1.25;
-}
-.trail-share-card {
-  margin-top: 2rem;
-  padding: 1.75rem;
-  border: 1px solid color-mix(in oklab, var(--trail-gold) 28%, transparent);
-  border-radius: 6px;
-  background:
-    linear-gradient(135deg, color-mix(in oklab, var(--trail-gold) 8%, transparent), transparent),
-    color-mix(in oklab, #000 22%, transparent);
-}
-.trail-share-actions {
-  margin-top: 1.25rem;
+.mt-exp-card {
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid var(--mt-line);
+  background: var(--mt-card);
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  flex-direction: column;
+}
+.mt-exp-card img {
+  width: 100%;
+  height: 11.5rem;
+  object-fit: cover;
+}
+.mt-exp-body {
+  padding: 1.1rem 1.15rem 1.25rem;
+  display: grid;
+  gap: 0.65rem;
+  flex: 1;
+}
+.mt-exp-meta {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--mt-muted);
 }
 
-.trail-finale {
+/* ——— Featured ——— */
+.mt-featured {
+  padding: 3rem 0;
+}
+.mt-featured-card {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid var(--mt-line);
+  background: var(--mt-card);
+}
+@media (min-width: 900px) {
+  .mt-featured-card {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+}
+.mt-featured-card img {
+  width: 100%;
+  height: 100%;
+  min-height: 16rem;
+  object-fit: cover;
+}
+.mt-featured-body {
+  padding: 1.75rem 1.5rem 2rem;
+  display: grid;
+  align-content: center;
+  gap: 0.35rem;
+}
+.mt-featured-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mt-muted);
+}
+.mt-featured-body .mt-btn-primary {
+  justify-self: start;
+  margin-top: 1rem;
+}
+
+/* ——— Trust ——— */
+.mt-trust {
+  padding: 2rem 0 3.5rem;
+}
+.mt-trust-inner {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem 1.5rem;
+  border-radius: 24px;
+  border: 1px solid var(--mt-line);
+  background: var(--mt-card);
+}
+@media (min-width: 800px) {
+  .mt-trust-inner {
+    grid-template-columns: 0.7fr 1.3fr;
+    align-items: center;
+    padding: 2.5rem 2.25rem;
+  }
+}
+.mt-trust-stars {
+  margin: 0.75rem 0 0;
+  color: var(--mt-gold);
+  letter-spacing: 0.12em;
+  font-size: 1.1rem;
+}
+.mt-trust-score {
+  margin: 0.4rem 0 0;
+  font-family: var(--mt-serif);
+  font-size: 2.4rem;
+  color: var(--mt-ink);
+}
+.mt-trust-score span {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--mt-sans);
+  font-size: 0.85rem;
+  color: var(--mt-muted);
+}
+.mt-trust-quote {
+  margin: 0;
+  font-family: var(--mt-serif);
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+  line-height: 1.35;
+  font-style: italic;
+  color: var(--mt-ink);
+}
+.mt-trust-quote cite {
+  display: block;
+  margin-top: 0.85rem;
+  font-family: var(--mt-sans);
+  font-size: 0.78rem;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mt-muted);
+}
+
+/* ——— Summary ——— */
+.mt-summary {
+  padding: 1rem 0 3.5rem;
+}
+.mt-summary-card {
+  border-radius: 28px;
+  border: 1px solid var(--mt-line);
+  background: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--burgundy) 70%, black),
+    var(--mt-sand)
+  );
+  padding: 2rem 1.5rem;
+}
+@media (min-width: 768px) {
+  .mt-summary-card {
+    padding: 2.5rem 2.25rem;
+  }
+}
+.mt-summary-tags {
+  margin: 0.85rem 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mt-muted);
+}
+.mt-summary-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+/* ——— Finale ——— */
+.mt-finale {
   position: relative;
-  min-height: 80vh;
+  min-height: min(72vh, 640px);
   display: grid;
   place-items: center;
   overflow: hidden;
-  text-align: center;
 }
-.trail-finale-bg {
+.mt-finale-bg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.trail-finale-veil {
+.mt-finale-veil {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #2a080add 0%, #2a080a99 50%, #2a080aee 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--burgundy-deep) 45%, transparent),
+    color-mix(in oklab, var(--burgundy-deep) 78%, transparent)
+  );
 }
-.trail-finale-inner {
+.mt-finale-inner {
   position: relative;
   z-index: 1;
+  text-align: center;
+  color: #f7f3ea;
+  padding: 3rem 1.25rem;
   max-width: 40rem;
-  width: 100%;
-  padding: 4rem 1.25rem;
 }
-.trail-finale-inner p {
-  margin-top: 1rem;
-  font-style: italic;
-  color: color-mix(in oklab, var(--trail-ivory) 75%, transparent);
+.mt-finale-title {
+  margin: 0;
+  font-family: var(--mt-serif);
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+  font-weight: 500;
+  line-height: 1.05;
 }
-.trail-finale-inner .trail-hero-actions {
+.mt-finale-inner p {
+  margin: 1rem 0 0;
+  font-size: 1.05rem;
+  color: color-mix(in oklab, #f7f3ea 80%, transparent);
+}
+.mt-finale-inner .mt-hero-actions {
   justify-content: center;
 }
 
-.trail-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  display: grid;
-  place-items: center;
-  padding: 1rem;
-}
-.trail-modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background: #000000b8;
-  border: 0;
-}
-.trail-modal-panel {
-  position: relative;
-  z-index: 1;
-  width: min(40rem, 100%);
-  max-height: min(90vh, 900px);
-  overflow: auto;
-  border-radius: 8px;
-  border: 1px solid color-mix(in oklab, var(--trail-gold) 30%, transparent);
-  background: var(--trail-maroon);
-  padding: 1.5rem;
-}
-.trail-config--itinerary .trail-config-intro {
-  margin-bottom: 0;
-}
-.trail-config--modal {
-  padding-inline: 0;
-  border-top: 0;
-  margin-top: 1rem;
-}
-.trail-config--planning {
-  scroll-margin-top: calc(var(--header-height) + 1rem);
+@media (prefers-reduced-motion: reduce) {
+  .mt-stop-photo-card,
+  .mt-pill,
+  .mt-btn-primary {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .trail-stop,
-  .trail-progress-bar span {
-    transition: none;
+/* ——— Cinematic destination discovery hero ——— */
+.mt-disco {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  color: #f7f3ea;
+  background: #1a1210;
+}
+.mt-disco-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+.mt-disco-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  pointer-events: none;
+}
+.mt-disco-expand {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  transform-origin: 0 0;
+  pointer-events: none;
+  will-change: transform;
+  backface-visibility: hidden;
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.45);
+}
+.mt-disco-expand-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+.mt-disco-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.65) 0%,
+      rgba(0, 0, 0, 0.3) 50%,
+      rgba(0, 0, 0, 0.05) 100%
+    ),
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.75) 0%,
+      transparent 45%
+    );
+}
+
+.mt-disco-stage {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  height: 100%;
+  padding:
+    calc(var(--header-height) + 0.65rem)
+    clamp(1.1rem, 4vw, 3.5rem)
+    0.85rem;
+  max-width: 1440px;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+.mt-disco-copy-slot {
+  position: relative;
+  align-self: end;
+  max-width: min(34rem, 92vw);
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+  margin-left: clamp(0rem, 2vw, 1.5rem);
+  min-height: 0;
+}
+.mt-disco-copy {
+  width: 100%;
+}
+
+.mt-disco-eyebrow {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, #f4efe5 78%, #b99a62);
+  font-weight: 500;
+}
+.mt-disco-location {
+  margin: 0.4rem 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, #f7f3ea 72%, transparent);
+}
+.mt-disco-title {
+  margin: 0.45rem 0 0;
+  font-family: var(--mt-serif);
+  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  font-weight: 500;
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  color: #f7f3ea;
+}
+.mt-disco-title-line {
+  display: block;
+}
+.mt-disco-desc {
+  margin: 0.75rem 0 0;
+  max-width: 28rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: color-mix(in oklab, #f7f3ea 82%, transparent);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.mt-disco-actions {
+  margin-top: 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+.mt-disco-cta {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--gold) 70%, transparent);
+  background: var(--gold);
+  color: var(--primary-foreground);
+  padding: 0.78rem 1.35rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+.mt-disco-cta:hover {
+  transform: translateY(-1px);
+  background: color-mix(in oklab, var(--gold) 88%, white);
+}
+.mt-disco-cta--ghost {
+  background: transparent;
+  color: #f7f3ea;
+  border-color: color-mix(in oklab, #f7f3ea 42%, transparent);
+}
+.mt-disco-cta--ghost:hover {
+  background: color-mix(in oklab, #fff 12%, transparent);
+  color: #fff;
+}
+.mt-disco-cta:focus-visible,
+.mt-disco-arrow:focus-visible,
+.mt-disco-card:focus-visible {
+  outline: 2px solid #b99a62;
+  outline-offset: 3px;
+}
+
+.mt-disco-lower {
+  display: grid;
+  gap: 0.65rem;
+  align-items: end;
+  margin-top: 0.35rem;
+  justify-items: end;
+}
+@media (min-width: 900px) {
+  .mt-disco-lower {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mt-disco-rail-wrap {
+  min-width: 0;
+  display: grid;
+  gap: 0.65rem;
+  justify-items: end;
+  overflow: hidden;
+}
+.mt-disco-rail-controls {
+  display: flex;
+  gap: 0.45rem;
+  justify-self: end;
+}
+.mt-disco-arrow {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, #f7f3ea 35%, transparent);
+  background: color-mix(in oklab, #000 28%, transparent);
+  color: #f7f3ea;
+  font-size: 0.95rem;
+  line-height: 1;
+  backdrop-filter: blur(8px);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+.mt-disco-arrow:hover:not(:disabled) {
+  background: color-mix(in oklab, #000 45%, transparent);
+  border-color: color-mix(in oklab, #b99a62 55%, transparent);
+}
+.mt-disco-arrow:disabled,
+.mt-disco-card:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.mt-disco-rail {
+  display: flex;
+  gap: 0.75rem;
+  overflow: hidden;
+  padding: 0.55rem 0.15rem 0.65rem;
+  max-width: min(100%, 56rem);
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+}
+.mt-disco-rail:active {
+  cursor: grabbing;
+}
+
+.mt-disco-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(9rem, 12.5vw, 11.5rem);
+  height: clamp(6.25rem, 8.5vw, 7.75rem);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, #f7f3ea 18%, transparent);
+  padding: 0;
+  background: #2a1c18;
+  box-shadow: 0 14px 28px -16px rgba(0, 0, 0, 0.55);
+  transform-origin: center center;
+}
+.mt-disco-card.is-next {
+  border-color: color-mix(in oklab, #f4efe5 45%, #b99a62);
+  box-shadow:
+    0 16px 30px -14px rgba(0, 0, 0, 0.6),
+    0 0 0 1px color-mix(in oklab, #b99a62 40%, transparent);
+  z-index: 2;
+}
+.mt-disco-card-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  pointer-events: none;
+}
+.mt-disco-card img:not(.mt-disco-card-photo) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+.mt-disco-card-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.2) 42%,
+    transparent 70%
+  );
+}
+.mt-disco-card-meta {
+  position: absolute;
+  left: 0.7rem;
+  right: 0.55rem;
+  bottom: 0.65rem;
+  z-index: 2;
+  display: grid;
+  gap: 0.2rem;
+  text-align: left;
+  color: #f7f3ea;
+  pointer-events: none;
+}
+.mt-disco-card-num {
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  opacity: 0.8;
+}
+.mt-disco-card-name {
+  display: grid;
+  font-family: var(--mt-serif);
+  font-size: 0.8rem;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.mt-disco-card-name span {
+  display: block;
+}
+
+.mt-intro--bridge {
+  padding-top: 4.5rem;
+  background: var(--mt-ivory);
+  border-bottom: 1px solid var(--mt-line);
+}
+.mt-intro-edit {
+  margin-top: 1rem;
+}
+
+@media (max-width: 767px) {
+  .mt-disco {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+  .mt-disco-stage {
+    height: 100%;
+    padding-inline: 1.1rem;
+    padding-bottom: 0.75rem;
+  }
+  .mt-disco-copy-slot {
+    align-self: end;
+    margin-top: auto;
+    margin-bottom: 0.35rem;
+    margin-left: 0;
+    min-height: 0;
+  }
+  .mt-disco-title {
+    font-size: clamp(2.1rem, 9vw, 2.85rem);
+  }
+  .mt-disco-desc {
+    font-size: 0.86rem;
+    -webkit-line-clamp: 2;
+  }
+  .mt-disco-lower {
+    margin-top: 0.35rem;
+  }
+  .mt-disco-rail-wrap {
+    justify-items: stretch;
+  }
+  .mt-disco-rail-controls {
+    display: none;
+  }
+  .mt-disco-rail {
+    max-width: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .mt-disco-rail::-webkit-scrollbar {
+    display: none;
+  }
+  .mt-disco-card {
+    width: 7.5rem;
+    height: 5.75rem;
   }
 }

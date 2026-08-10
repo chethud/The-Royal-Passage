@@ -34,32 +34,18 @@ export function TrailCircularPanel({
           <p className="trail-collage-eyebrow">
             DAY {String(active.day).padStart(2, "0")} / {String(totalDays).padStart(2, "0")}
           </p>
-          <p className="trail-collage-chapter">The Royal Mysuru Journey</p>
         </div>
-      ) : (
-        <div className="trail-collage-head">
-          <p className="trail-collage-chapter">The Royal Mysuru Journey</p>
-        </div>
-      )}
+      ) : null}
 
       <div className="trail-circular-stage">
         <CircularGallery
           items={galleryItems}
           activeIndex={activeIndex}
-          bend={-0.45}
-          borderRadius={0.035}
+          bend={-0.28}
+          borderRadius={0.02}
           scrollEase={0.04}
           scrollSpeed={1}
         />
-      </div>
-
-      <div className="trail-collage-caption">
-        <p className="trail-collage-caption-num">
-          {String(activeIndex + 1).padStart(2, "0")}
-          <span> / {String(items.length).padStart(2, "0")} destinations</span>
-        </p>
-        <p className="trail-collage-caption-name">{active.shortName}</p>
-        <p className="trail-collage-caption-city">{active.cityLabel}</p>
       </div>
     </div>
   );
