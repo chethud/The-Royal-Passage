@@ -680,8 +680,8 @@ html:has(.trail-page--journey-locked) {
   position: relative;
   width: 100%;
   max-width: none;
-  /* Big, wide focal photo */
-  height: min(64vh, 580px);
+  /* Large focal photo */
+  height: min(78vh, 680px);
   margin: 0;
   transition: opacity 0.85s ease;
   flex-shrink: 0;
