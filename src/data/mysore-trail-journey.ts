@@ -276,8 +276,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Karanji Lake",
     tagline: "Morning Mysuru by the water.",
     cityLabel: "Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/North_View_Karanji_Lake_Mysore_Nov23_A7C_08174.jpg/1600px-North_View_Karanji_Lake_Mysore_Nov23_A7C_08174.jpg",
+    image: "/mysore-trail/karanji-lake.png",
     imageAlt: "Karanji Lake north view in Mysuru",
     coordinates: { lat: 12.3028, lng: 76.6795 },
     categories: ["nature", "photography", "family", "hidden"],
@@ -303,8 +302,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Mysuru Zoo",
     tagline: "One of India’s oldest zoological gardens.",
     cityLabel: "Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Sri_Chamarajendra_Zoological_Gardens.jpg/1600px-Sri_Chamarajendra_Zoological_Gardens.jpg",
+    image: "/mysore-trail/mysuru-zoo.png",
     imageAlt: "Sri Chamarajendra Zoological Gardens in Mysuru",
     coordinates: { lat: 12.301, lng: 76.666 },
     categories: ["family", "nature", "culture"],
@@ -330,8 +328,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Lalitha Mahal",
     tagline: "Luxury on the hillside.",
     cityLabel: "Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Lalitha_Mahal_Palace_%2C_Mysore_-_Host_to_many_events.jpg/1600px-Lalitha_Mahal_Palace_%2C_Mysore_-_Host_to_many_events.jpg",
+    image: "/mysore-trail/lalitha-mahal.jpg",
     imageAlt: "Lalitha Mahal Palace white facade",
     coordinates: { lat: 12.292, lng: 76.685 },
     categories: ["luxury", "heritage", "architecture", "photography"],
