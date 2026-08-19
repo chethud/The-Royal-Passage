@@ -875,12 +875,7 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  background:
-    linear-gradient(
-      160deg,
-      color-mix(in oklab, var(--mt-ink) 82%, var(--mt-gold) 18%) 0%,
-      color-mix(in oklab, var(--mt-ink) 92%, black) 100%
-    );
+  background: var(--burgundy-deep);
 }
 .mt-finale-bg {
   position: absolute;
@@ -894,8 +889,8 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--burgundy-deep) 45%, transparent),
-    color-mix(in oklab, var(--burgundy-deep) 78%, transparent)
+    var(--burgundy) 0%,
+    var(--burgundy-deep) 100%
   );
 }
 .mt-finale-inner {
