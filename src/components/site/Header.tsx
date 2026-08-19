@@ -144,11 +144,7 @@ export function Header() {
   const isVipSection = isVipPublicSection(pathname);
   const isMarketplaceSection = isHomestaySection || isVipSection;
   const logoPath =
-    user && workspaceRole && workspaceRole !== "guest"
-      ? dashboardPath
-      : isMarketplaceSection
-        ? marketplaceHomePath(pathname)
-        : "/";
+    user && workspaceRole && workspaceRole !== "guest" ? dashboardPath : "/";
   const isGuest = isGuestAccount(primaryRole, roles);
   const isAdmin = isAdminRole(primaryRole) || roles.includes("admin");
   const isHost = primaryRole === "host" || roles.includes("host");
@@ -212,13 +208,7 @@ export function Header() {
           to={logoPath}
           className="flex min-h-11 min-w-0 shrink items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember/60"
           aria-label={
-            isVipSection && (!user || isGuest)
-              ? "The Royal Passage — VIP home"
-              : isHomestaySection && (!user || isGuest)
-                ? "The Royal Passage — Homestays home"
-                : user && !isGuest
-                  ? "Go to dashboard"
-                  : "The Royal Passage — Home"
+            user && !isGuest ? "Go to dashboard" : "The Royal Passage — Home"
           }
         >
           <img
