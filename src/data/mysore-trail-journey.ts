@@ -91,7 +91,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     tagline: "Where Mysuru begins above the clouds.",
     cityLabel: "Mysuru",
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Chamunda_Devi_Temple,_Chamundi_Hill,_Mysore.jpg/1600px-Chamunda_Devi_Temple,_Chamundi_Hill,_Mysore.jpg",
+      "https://sqecqtcmgbfrwwgnbdsx.supabase.co/storage/v1/object/public/experience-photos/737ab068-af8b-49d3-8615-a7b32ccbe804/1786515307394-78d3a06e.png",
     imageAlt: "Chamundeshwari Temple on Chamundi Hill",
     coordinates: { lat: 12.2724, lng: 76.6701 },
     categories: ["spiritual", "heritage", "photography", "nature"],
@@ -354,8 +354,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Kukkarahalli Lake",
     tagline: "Sunset for walkers and birds.",
     cityLabel: "Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Sunset-Mysore-Kukkarahalli.jpg/1600px-Sunset-Mysore-Kukkarahalli.jpg",
+    image: "/mysore-trail/kukkarahalli-lake.png",
     imageAlt: "Sunset over Kukkarahalli Lake in Mysuru",
     coordinates: { lat: 12.3115, lng: 76.623 },
     categories: ["nature", "photography", "family", "hidden"],
@@ -405,8 +404,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Srirangapatna",
     tagline: "Island of Tipu’s history.",
     cityLabel: "Near Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Ranganathaswamy_Temple%2C_Srirangapatna_-_Wide_Shot.jpg/1600px-Ranganathaswamy_Temple%2C_Srirangapatna_-_Wide_Shot.jpg",
+    image: "/mysore-trail/srirangapatna.png",
     imageAlt: "Ranganathaswamy Temple at Srirangapatna",
     coordinates: { lat: 12.4237, lng: 76.6947 },
     categories: ["heritage", "architecture", "culture", "photography"],
@@ -431,8 +429,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Ranganathittu",
     tagline: "Boats among the islands.",
     cityLabel: "Near Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Islands_River_Ranganathittu_Srirangapatna_Jan24_A7C_09120.jpg/1600px-Islands_River_Ranganathittu_Srirangapatna_Jan24_A7C_09120.jpg",
+    image: "/mysore-trail/ranganathittu.png",
     imageAlt: "Bird islands at Ranganathittu Bird Sanctuary",
     coordinates: { lat: 12.424, lng: 76.656 },
     categories: ["nature", "photography", "family"],
@@ -458,8 +455,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Brindavan Gardens",
     tagline: "Terraces, fountains, evening light.",
     cityLabel: "Near Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Brindavan_Gardens.JPG/1600px-Brindavan_Gardens.JPG",
+    image: "/mysore-trail/brindavan-gardens.png",
     imageAlt: "Brindavan Gardens near Mysuru",
     coordinates: { lat: 12.4244, lng: 76.572 },
     categories: ["family", "photography", "culture", "nature"],

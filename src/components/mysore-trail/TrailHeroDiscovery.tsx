@@ -13,8 +13,9 @@ import {
 } from "@/data/mysore-trail-hero-destinations";
 import { getPlace } from "@/data/mysore-trail-journey";
 
-const AUTOPLAY_MS = 4000;
+const AUTOPLAY_MS = 3000;
 const TRANSITION_MS = 1250;
+const PRELOAD_WAIT_MS = 180;
 const EASE = [0.16, 1, 0.3, 1] as const;
 const VISIBLE_CARDS = 3;
 
@@ -39,12 +40,19 @@ function padIndex(n: number) {
   return String(n).padStart(2, "0");
 }
 
-function preloadImage(src: string) {
-  if (typeof window === "undefined") return Promise.resolve();
+function preloadImage(src: string, timeoutMs = 0) {
+  if (typeof window === "undefined" || !src) return Promise.resolve();
   const img = new Image();
   img.decoding = "async";
   img.src = src;
-  return img.decode?.().catch(() => undefined) ?? Promise.resolve();
+  const decoded = img.decode?.().catch(() => undefined) ?? Promise.resolve();
+  if (!timeoutMs) return decoded;
+  return Promise.race([
+    decoded,
+    new Promise<void>((resolve) => {
+      window.setTimeout(resolve, timeoutMs);
+    }),
+  ]);
 }
 
 function HeroCopy({
@@ -105,10 +113,18 @@ function flightFromCard(
   };
 }
 
+function isWikimediaPhoto(url: string) {
+  return url.includes("upload.wikimedia.org");
+}
+
 function withItineraryPhoto(dest: HeroDestination): HeroDestination {
   if (!dest.placeId) return dest;
   const place = getPlace(dest.placeId);
   if (place.id !== dest.placeId || !place.image) return dest;
+  // Keep an uploaded homepage/itinerary photo instead of a Wikimedia fallback.
+  if (isWikimediaPhoto(place.image) && dest.image && !isWikimediaPhoto(dest.image)) {
+    return dest;
+  }
   return { ...dest, image: place.image, imageAlt: place.imageAlt || dest.imageAlt };
 }
 
@@ -201,7 +217,7 @@ export function TrailHeroDiscovery({
       setIsTransitioning(true);
       setCopyIndex(wrapped);
 
-      void preloadImage(dest.image).then(() => {
+      void preloadImage(dest.image, PRELOAD_WAIT_MS).then(() => {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             // Start expand and advance rail together — next photo fills the slot
@@ -242,6 +258,12 @@ export function TrailHeroDiscovery({
     void preloadImage(active.image);
     for (const d of upcoming) void preloadImage(d.image);
   }, [active.image, upcoming]);
+
+  useEffect(() => {
+    for (const dest of destinations.slice(0, VISIBLE_CARDS + 1)) {
+      void preloadImage(dest.image);
+    }
+  }, [destinations]);
 
   useEffect(() => {
     if (paused || reduceMotion || isTransitioning) return;
@@ -335,7 +357,8 @@ export function TrailHeroDiscovery({
           className="mt-disco-bg-img"
           src={active.image}
           alt=""
-          decoding="async"
+          decoding={activeIndex === 0 ? "sync" : "async"}
+          fetchPriority={activeIndex === 0 ? "high" : "auto"}
           referrerPolicy="no-referrer"
         />
       </div>
