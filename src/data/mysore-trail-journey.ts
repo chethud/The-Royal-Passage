@@ -174,9 +174,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Royal Lunch",
     tagline: "A Mysuru meal, unhurried.",
     cityLabel: "Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Masala_Dosa.jpg/1600px-Masala_Dosa.jpg",
-    imageAlt: "South Indian masala dosa meal",
+    image: "",
+    imageAlt: "",
     coordinates: { lat: 12.309, lng: 76.655 },
     categories: ["food", "culture", "family"],
     description:
@@ -200,8 +199,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Jaganmohan Palace",
     tagline: "Where Mysuru paints its memory.",
     cityLabel: "Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/A_side_wide_angle_view_of_Jaganmohan_Palace%2C_Mysuru%2C_Karnataka.jpg/1600px-A_side_wide_angle_view_of_Jaganmohan_Palace%2C_Mysuru%2C_Karnataka.jpg",
+    image: "/mysore-trail/jaganmohan-palace.png",
     imageAlt: "Jaganmohan Palace facade in Mysuru",
     coordinates: { lat: 12.3085, lng: 76.6498 },
     categories: ["heritage", "culture", "architecture", "photography"],
@@ -227,8 +225,7 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "St. Philomena's",
     tagline: "Gothic towers over a southern sky.",
     cityLabel: "Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Beautiful_Exterior_view_of_St._Philomena%E2%80%99s_Cathedral%2C_Mysuru%2C_Karnataka.jpg/1600px-Beautiful_Exterior_view_of_St._Philomena%E2%80%99s_Cathedral%2C_Mysuru%2C_Karnataka.jpg",
+    image: "/mysore-trail/st-philomena.png",
     imageAlt: "St. Philomena’s Cathedral twin towers in Mysuru",
     coordinates: { lat: 12.321, lng: 76.6584 },
     categories: ["architecture", "spiritual", "photography", "heritage"],
@@ -254,9 +251,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Royal Evening",
     tagline: "When the city softens into gold.",
     cityLabel: "Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Mysuru_Palace_-_Night_View.jpg/1600px-Mysuru_Palace_-_Night_View.jpg",
-    imageAlt: "Mysuru Palace illuminated at night",
+    image: "",
+    imageAlt: "",
     coordinates: { lat: 12.3052, lng: 76.6552 },
     categories: ["heritage", "luxury", "culture", "photography"],
     description:
@@ -387,9 +383,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Food & Shopping",
     tagline: "Silk, sandalwood, and Mysuru Pak.",
     cityLabel: "Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Mysore_Silk_Saree.jpg/1600px-Mysore_Silk_Saree.jpg",
-    imageAlt: "Mysore silk saree with golden zari",
+    image: "",
+    imageAlt: "",
     coordinates: { lat: 12.31, lng: 76.65 },
     categories: ["shopping", "food", "culture"],
     description:
@@ -493,9 +488,8 @@ export const TRAIL_PLACES: Record<string, TrailPlace> = {
     shortName: "Final Evening",
     tagline: "Your Mysuru story doesn’t end here.",
     cityLabel: "Mysuru",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Mysuru_Palace_-_Night_View.jpg/1600px-Mysuru_Palace_-_Night_View.jpg",
-    imageAlt: "Mysuru Palace lights at the end of the day",
+    image: "",
+    imageAlt: "",
     coordinates: { lat: 12.295, lng: 76.639 },
     categories: ["luxury", "culture", "heritage"],
     description:

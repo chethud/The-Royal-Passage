@@ -186,19 +186,32 @@ export function normalizeMysoreTrailCatalog(raw: unknown): MysoreTrailCatalog {
   };
 }
 
+function isWikimediaPhoto(url: string): boolean {
+  return url.includes("upload.wikimedia.org");
+}
+
+/** Prefer the code catalog over leftover Wikimedia files still stored in CMS. */
+function catalogPhoto(codeImage: string, cmsImage: string): string {
+  const cms = cmsImage.trim();
+  const code = codeImage.trim();
+  if (isWikimediaPhoto(cms)) return code;
+  return cms || code;
+}
+
 export function applyCatalogToPlaces(catalog: MysoreTrailCatalog): Record<string, TrailPlace> {
   const next: Record<string, TrailPlace> = { ...TRAIL_PLACES };
   for (const draft of catalog.places) {
     const base = next[draft.id];
     if (!base) continue;
+    const image = catalogPhoto(base.image, draft.image);
     next[draft.id] = {
       ...base,
       name: draft.name,
       shortName: draft.shortName,
       tagline: draft.tagline,
       cityLabel: draft.cityLabel,
-      image: draft.image,
-      imageAlt: draft.imageAlt,
+      image,
+      imageAlt: image ? draft.imageAlt || base.imageAlt : "",
       description: draft.description,
       categories: draft.categories.length ? draft.categories : base.categories,
     };
@@ -207,21 +220,28 @@ export function applyCatalogToPlaces(catalog: MysoreTrailCatalog): Record<string
 }
 
 export function applyCatalogToHeroes(catalog: MysoreTrailCatalog): HeroDestination[] {
+  const places = applyCatalogToPlaces(catalog);
   const byId = new Map(catalog.heroes.map((hero) => [hero.id, hero]));
   return HERO_DESTINATIONS.map((hero) => {
     const draft = byId.get(hero.id);
-    if (!draft) return hero;
+    const placeId = draft?.placeId ?? hero.placeId;
+    const place = placeId ? places[placeId] : undefined;
+    if (!draft) {
+      if (!place?.image) return hero;
+      return { ...hero, image: place.image, imageAlt: place.imageAlt || hero.imageAlt };
+    }
+    const image = place?.image || catalogPhoto(hero.image, draft.image);
     return {
       ...hero,
-      placeId: draft.placeId ?? hero.placeId,
+      placeId,
       name: draft.name,
       titleLines: draft.titleLines,
       cardLines: draft.cardLines,
       location: draft.location,
       eyebrow: draft.eyebrow,
       description: draft.description,
-      image: draft.image,
-      imageAlt: draft.imageAlt,
+      image,
+      imageAlt: image ? place?.imageAlt || draft.imageAlt || hero.imageAlt : "",
       category: draft.category,
     };
   });

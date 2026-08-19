@@ -19,9 +19,6 @@ import {
   summarizeTrail,
 } from "@/lib/mysore-trail-personalize";
 
-const FINALE_IMAGE =
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Mysuru_Palace_-_Night_View.jpg/1600px-Mysuru_Palace_-_Night_View.jpg";
-
 const CATEGORY_FILTERS = [
   "All",
   "Heritage",
@@ -370,13 +367,15 @@ export function MysoreTrailExperience({
           <div className="mt-recs-grid">
             {recommendations.map((rec) => (
               <article key={rec.placeId} className="mt-rec-card">
-                <img
-                  src={rec.place.image}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  referrerPolicy="no-referrer"
-                />
+                {rec.place.image ? (
+                  <img
+                    src={rec.place.image}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : null}
                 <div className="mt-rec-body">
                   <p className="mt-rec-cat">{rec.category}</p>
                   <h3>{rec.place.name}</h3>
@@ -472,7 +471,6 @@ export function MysoreTrailExperience({
 
       {/* Finale */}
       <section className="mt-finale">
-        <img src={FINALE_IMAGE} alt="" className="mt-finale-bg" decoding="async" referrerPolicy="no-referrer" />
         <div className="mt-finale-veil" />
         <div className="mt-finale-inner">
           <h2 className="mt-finale-title">

@@ -11,6 +11,7 @@ import {
   HERO_DESTINATIONS,
   type HeroDestination,
 } from "@/data/mysore-trail-hero-destinations";
+import { getPlace } from "@/data/mysore-trail-journey";
 
 const AUTOPLAY_MS = 4000;
 const TRANSITION_MS = 1250;
@@ -104,12 +105,22 @@ function flightFromCard(
   };
 }
 
+function withItineraryPhoto(dest: HeroDestination): HeroDestination {
+  if (!dest.placeId) return dest;
+  const place = getPlace(dest.placeId);
+  if (place.id !== dest.placeId || !place.image) return dest;
+  return { ...dest, image: place.image, imageAlt: place.imageAlt || dest.imageAlt };
+}
+
 export function TrailHeroDiscovery({
   destinations: destinationsProp,
   onExploreTrail,
   onPlanTrip,
 }: TrailHeroDiscoveryProps) {
-  const destinations = destinationsProp?.length ? destinationsProp : HERO_DESTINATIONS;
+  const destinations = useMemo(() => {
+    const list = destinationsProp?.length ? destinationsProp : HERO_DESTINATIONS;
+    return list.map(withItineraryPhoto);
+  }, [destinationsProp]);
   const total = destinations.length;
   const reduceMotion = useReducedMotion();
 

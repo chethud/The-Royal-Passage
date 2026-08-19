@@ -37,6 +37,8 @@ export function ItineraryStopCard({
   const place = getPlace(stop.placeId);
   const tags = place.categories.slice(0, 3).map((c) => CATEGORY_LABEL[c] ?? c);
 
+  if (!place.image) return null;
+
   return (
     <article
       id={place.id}
