@@ -4,9 +4,7 @@ import {
 } from "@/components/editor/EditableHomepageFields";
 import {
   CornerFiligree,
-  HeritageCompass,
   MaharajaEmblem,
-  PalaceArchFrame,
 } from "@/components/site/RoyalHeritageDecor";
 import { DEFAULT_HOMEPAGE_JOURNEYS, type HomepageJourneySlide } from "@/lib/homepage-content";
 import { normalizeYoutubeVideoInput } from "@/lib/youtube-video-id";
@@ -66,24 +64,15 @@ function SlideContent({ slide, visible }: SlideContentProps) {
       className={`royal-slide-content relative order-2 flex flex-col justify-start px-6 py-8 text-left sm:px-10 sm:py-10 md:order-1 md:px-12 md:pb-14 md:pt-10 ${visible ? "is-visible" : ""}`}
     >
       <div className="relative z-10 w-full max-w-xl self-start">
-        <PalaceArchFrame className="pointer-events-none absolute -top-1 left-0 z-10 h-7 w-[min(100%,19rem)] opacity-70 sm:-top-2 sm:h-8 sm:w-[min(100%,22rem)]" />
-
-        <div className="pointer-events-none absolute top-1 left-0 z-0 opacity-30 sm:top-2">
-          {slide.theme === "manuscript" ? (
-            <HeritageCompass className="h-11 w-11 text-[#D4AF37]/40 sm:h-14 sm:w-14" />
-          ) : (
-            <MaharajaEmblem className="h-11 w-11 text-[#D4AF37]/35 sm:h-14 sm:w-14" />
-          )}
+        <div className="relative z-10 mb-4 inline-flex max-w-full flex-col items-stretch sm:mb-5">
+          <p className="royal-slide-eyebrow mb-3 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-[#C9A227] sm:mb-3.5 sm:text-[0.68rem]">
+            {slide.subtitle}
+          </p>
+          <div
+            className="royal-slide-line royal-slide-line--top h-px w-full bg-[#D4AF37]"
+            aria-hidden
+          />
         </div>
-
-        <p className="royal-slide-eyebrow relative z-10 mb-3 pt-6 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-[#C9A227] sm:mb-3.5 sm:pt-7 sm:text-[0.68rem]">
-          {slide.subtitle}
-        </p>
-
-        <div
-          className="royal-slide-line royal-slide-line--top relative z-10 mb-4 h-px w-28 bg-gradient-to-r from-[#D4AF37] via-[#C9A227] to-transparent sm:mb-5"
-          aria-hidden
-        />
 
         <h2 className="royal-slide-title font-display text-[1.45rem] leading-[1.12] tracking-[0.06em] text-balance sm:text-4xl md:text-[2.65rem]">
           {slide.title}

@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   CornerFiligree,
   MaharajaEmblem,
-  PalaceArchFrame,
 } from "@/components/site/RoyalHeritageDecor";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import {
@@ -39,20 +38,15 @@ function SlideContent({ slide, visible }: { slide: HomestayHighlightSlide; visib
       className={`royal-slide-content relative order-2 flex flex-col justify-center px-6 py-8 text-left sm:px-10 sm:py-14 md:order-none md:px-12 md:py-16 ${visible ? "is-visible" : ""}`}
     >
       <div className="relative z-10 w-full max-w-xl self-start">
-        <PalaceArchFrame className="pointer-events-none absolute -top-1 left-0 z-10 h-7 w-[min(100%,19rem)] opacity-70 sm:-top-2 sm:h-8 sm:w-[min(100%,22rem)]" />
-
-        <div className="pointer-events-none absolute top-1 left-0 z-0 opacity-30 sm:top-2">
-          <MaharajaEmblem className="h-11 w-11 text-[#D4AF37]/35 sm:h-14 sm:w-14" />
+        <div className="relative z-10 mb-5 inline-flex max-w-full flex-col items-stretch">
+          <p className="royal-slide-eyebrow mb-4 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-[#C9A227] sm:text-[0.68rem]">
+            {slide.subtitle}
+          </p>
+          <div
+            className="royal-slide-line royal-slide-line--top h-px w-full bg-[#D4AF37]"
+            aria-hidden
+          />
         </div>
-
-        <p className="royal-slide-eyebrow relative z-10 mb-4 pt-7 text-[0.62rem] font-medium uppercase tracking-[0.38em] text-[#C9A227] sm:pt-8 sm:text-[0.68rem]">
-          {slide.subtitle}
-        </p>
-
-        <div
-          className="royal-slide-line royal-slide-line--top relative z-10 mb-5 h-px w-28 bg-gradient-to-r from-[#D4AF37] via-[#C9A227] to-transparent"
-          aria-hidden
-        />
 
         <h2 className="royal-slide-title font-display text-[1.65rem] leading-[1.12] tracking-[0.06em] text-balance sm:text-4xl md:text-[2.65rem]">
           {slide.title}
