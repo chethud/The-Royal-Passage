@@ -15,7 +15,7 @@ export function SlotWeekOverview({ days, selectedIso, onSelectDay }: SlotWeekOve
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="eyebrow text-[#D4AF6A]/90">Upcoming schedule</p>
+          <p className="eyebrow text-[#D4AF37]/90">Upcoming schedule</p>
           <p className="mt-1 text-sm text-muted-foreground">
             <span className="font-medium text-ink">{filled}</span> day{filled === 1 ? "" : "s"}{" "}
             with sessions ·{" "}

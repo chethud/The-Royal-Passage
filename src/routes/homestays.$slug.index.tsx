@@ -152,12 +152,12 @@ function HomestayDetailPage() {
                   </DetailStatItem>
                   <DetailStatItem label="Beds">
                     <span className="inline-flex items-center gap-1.5">
-                      <BedDouble className="h-5 w-5 shrink-0 text-[#D4AF6A]" aria-hidden />
+                      <BedDouble className="h-5 w-5 shrink-0 text-[#D4AF37]" aria-hidden />
                       {stay.bedrooms}
                     </span>
                   </DetailStatItem>
                   <DetailStatItem label="Rating">
-                    <span className="inline-flex items-center gap-1 text-[#D4AF6A]">
+                    <span className="inline-flex items-center gap-1 text-[#D4AF37]">
                       <Star className="h-4 w-4 shrink-0 fill-current" aria-hidden />
                       {stay.rating}
                     </span>
@@ -191,7 +191,7 @@ function HomestayDetailPage() {
               ) : null}
 
               <div className="flex items-center gap-2 text-sm text-[#D6C8B5]/85">
-                <Users className="h-4 w-4 text-[#D4AF6A]" aria-hidden />
+                <Users className="h-4 w-4 text-[#D4AF37]" aria-hidden />
                 Up to {stay.maxGuests} guests · {stay.bathrooms} bath
               </div>
             </>

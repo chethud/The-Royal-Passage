@@ -52,7 +52,7 @@ export function OwnerHomestayBookingTable({
 
   return (
     <DashboardTableSection>
-      <DashboardTableFilters>
+      <DashboardTableFilters orientation="vertical">
         {(["all", "pending", "confirmed", "completed", "cancelled"] as const).map((status) => (
           <button
             key={status}

@@ -23,7 +23,7 @@ export function VipCard({ pkg, search }: { pkg: VipPackage; search?: VipBrowseSe
       title={pkg.title}
       ctaLabel="View package"
       topLeft={
-        <span className="inline-flex items-center gap-1 rounded-full border border-[rgb(200_162_90/0.55)] bg-black/45 px-2.5 py-1 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A] backdrop-blur-sm">
+        <span className="inline-flex items-center gap-1 rounded-full border border-[rgb(200_162_90/0.55)] bg-black/45 px-2.5 py-1 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF37] backdrop-blur-sm">
           <Crown className="h-3 w-3" aria-hidden />
           {pkg.packageType}
         </span>
@@ -31,15 +31,15 @@ export function VipCard({ pkg, search }: { pkg: VipPackage; search?: VipBrowseSe
       meta={
         <>
           <span className="inline-flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]" strokeWidth={1.75} />
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" strokeWidth={1.75} />
             {pkg.city}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <CalendarDays className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]" strokeWidth={1.75} />
+            <CalendarDays className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" strokeWidth={1.75} />
             {pkg.durationDays} day{pkg.durationDays === 1 ? "" : "s"}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Users className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]" strokeWidth={1.75} />
+            <Users className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" strokeWidth={1.75} />
             Up to {pkg.maxGuests}
           </span>
         </>
@@ -53,7 +53,7 @@ export function VipCard({ pkg, search }: { pkg: VipPackage; search?: VipBrowseSe
               / package
             </span>
           </span>
-          <span className="inline-flex items-center gap-1 text-[0.62rem] text-[#D4AF6A]">
+          <span className="inline-flex items-center gap-1 text-[0.62rem] text-[#D4AF37]">
             <Star className="h-3.5 w-3.5 fill-current" aria-hidden />
             {pkg.rating}
           </span>

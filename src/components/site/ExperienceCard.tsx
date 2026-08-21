@@ -24,7 +24,7 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
       ctaLabel="View details"
       topLeft={
         <span
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-[#D4AF6A] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-[#D4AF37] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
           aria-label={exp.category}
           title={exp.category}
         >
@@ -40,11 +40,11 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
       meta={
         <>
           <span className="inline-flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]" strokeWidth={1.75} />
+            <Clock className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" strokeWidth={1.75} />
             {exp.durationHours}h
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]" strokeWidth={1.75} />
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" strokeWidth={1.75} />
             {exp.city}
           </span>
         </>

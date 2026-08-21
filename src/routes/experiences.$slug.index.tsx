@@ -132,11 +132,11 @@ function ExperienceDetail() {
                     <>
                       <AddToCartButton
                         exp={exp}
-                        className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
+                        className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF37]"
                       />
                       <WishlistButton
                         experienceId={exp.id}
-                        className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF6A]"
+                        className="border-[rgb(200_162_90/0.45)] bg-[rgb(0_0_0/0.25)] text-[#F7F1E8] hover:border-[#D4AF37]"
                       />
                     </>
                   }
@@ -158,7 +158,7 @@ function ExperienceDetail() {
                     />
                   </DetailStatItem>
                   <DetailStatItem label="Rating">
-                    <span className="text-[#D4AF6A]">
+                    <span className="text-[#D4AF37]">
                       ★ {exp.rating}
                       <span className="ml-1 text-xs text-[#D6C8B5]/75">({exp.reviewsCount})</span>
                     </span>

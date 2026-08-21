@@ -32,7 +32,7 @@ export function HomestayCard({
       title={stay.title}
       ctaLabel="View stay"
       topLeft={
-        <span className="inline-flex rounded-full border border-[rgb(200_162_90/0.45)] bg-black/40 px-2.5 py-1 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A] backdrop-blur-sm">
+        <span className="inline-flex rounded-full border border-[rgb(200_162_90/0.45)] bg-black/40 px-2.5 py-1 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF37] backdrop-blur-sm">
           {stay.propertyType}
         </span>
       }
@@ -42,15 +42,15 @@ export function HomestayCard({
       meta={
         <>
           <span className="inline-flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]" strokeWidth={1.75} />
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" strokeWidth={1.75} />
             {stay.city}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <BedDouble className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]" strokeWidth={1.75} />
+            <BedDouble className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" strokeWidth={1.75} />
             {stay.bedrooms} bed
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Users className="h-3.5 w-3.5 shrink-0 text-[#D4AF6A]" strokeWidth={1.75} />
+            <Users className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" strokeWidth={1.75} />
             {stay.maxGuests}
           </span>
         </>
@@ -67,7 +67,7 @@ export function HomestayCard({
             showPercent
             priceClassName="font-display text-base font-normal text-[#F7F1E8]"
           />
-          <span className="inline-flex shrink-0 items-center gap-1 text-[0.62rem] text-[#D4AF6A]">
+          <span className="inline-flex shrink-0 items-center gap-1 text-[0.62rem] text-[#D4AF37]">
             <Star className="h-3.5 w-3.5 fill-current" aria-hidden />
             {stay.rating}
           </span>

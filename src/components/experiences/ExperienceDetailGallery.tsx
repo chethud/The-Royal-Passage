@@ -90,7 +90,7 @@ export function ExperienceDetailGallery({
                 className={cn(
                   "relative h-16 w-20 shrink-0 overflow-hidden rounded-sm border transition-colors sm:h-20 sm:w-24",
                   index === activeIndex
-                    ? "border-[#D4AF6A] ring-1 ring-[#D4AF6A]/60"
+                    ? "border-[#D4AF37] ring-1 ring-[#D4AF37]/60"
                     : "border-[rgb(200_162_90/0.25)] opacity-80 hover:opacity-100",
                 )}
               >
@@ -151,7 +151,7 @@ export function ExperienceDetailGallery({
 
         <div className="pointer-events-none absolute left-3.5 top-3.5 z-10">
           <span
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/35 text-[#D4AF6A] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/35 text-[#D4AF37] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
             aria-label={exp.category}
             title={exp.category}
           >

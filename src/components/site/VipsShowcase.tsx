@@ -21,7 +21,7 @@ export function VipsShowcase({ vips = [] }: VipsShowcaseProps) {
       <div className="container-page">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
           <div>
-            <p className="eyebrow mb-3 inline-flex items-center gap-2 text-[#D4AF6A]/95">
+            <p className="eyebrow mb-3 inline-flex items-center gap-2 text-[#D4AF37]/95">
               <Crown className="h-3.5 w-3.5" aria-hidden />
               Royal VIP
             </p>

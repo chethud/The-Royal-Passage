@@ -27,7 +27,7 @@ export function ReviewForm({ onSubmit, submitting = false, surface = "dark" }: R
   return (
     <form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
       <div>
-        <div className={`eyebrow ${isLight ? "luxury-panel-label" : "text-[#D4AF6A]/90"}`}>
+        <div className={`eyebrow ${isLight ? "luxury-panel-label" : "text-[#D4AF37]/90"}`}>
           Your rating
         </div>
         <div className="mt-2">
@@ -35,7 +35,7 @@ export function ReviewForm({ onSubmit, submitting = false, surface = "dark" }: R
         </div>
       </div>
       <label className="block text-sm">
-        <span className={`eyebrow ${isLight ? "luxury-panel-label" : "text-[#D4AF6A]/90"}`}>
+        <span className={`eyebrow ${isLight ? "luxury-panel-label" : "text-[#D4AF37]/90"}`}>
           Your review
         </span>
         <textarea

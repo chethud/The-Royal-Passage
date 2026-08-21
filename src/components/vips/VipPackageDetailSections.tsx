@@ -19,8 +19,8 @@ export function VipPackageDetailSections({ pkg }: VipPackageDetailSectionsProps)
         <DetailDarkSection label="Day-by-day itinerary">
           <ol className="space-y-5">
             {pkg.itinerary.map((day) => (
-              <li key={day.day} className="border-l border-[#D4AF6A]/35 pl-4">
-                <p className="eyebrow text-[0.58rem] text-[#D4AF6A]/90">
+              <li key={day.day} className="border-l border-[#D4AF37]/35 pl-4">
+                <p className="eyebrow text-[0.58rem] text-[#D4AF37]/90">
                   Day {day.day}
                 </p>
                 <p className="mt-1 font-display text-lg text-[#F7F1E8]">{day.title}</p>
@@ -39,7 +39,7 @@ export function VipPackageDetailSections({ pkg }: VipPackageDetailSectionsProps)
                 key={item}
                 className="flex items-start gap-2.5 text-sm leading-relaxed text-[#D6C8B5]/90"
               >
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF6A]" aria-hidden />
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF37]" aria-hidden />
                 {item}
               </li>
             ))}
@@ -59,7 +59,7 @@ export function VipPackageDetailSections({ pkg }: VipPackageDetailSectionsProps)
 
       {pkg.conciergeNote ? (
         <DetailDarkSection label="From your concierge">
-          <p className="rounded-sm border border-[#D4AF6A]/25 bg-[#D4AF6A]/8 px-4 py-3 text-sm leading-relaxed text-[#E8DCC8]/90">
+          <p className="rounded-sm border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-4 py-3 text-sm leading-relaxed text-[#E8DCC8]/90">
             {pkg.conciergeNote}
           </p>
         </DetailDarkSection>
@@ -67,7 +67,7 @@ export function VipPackageDetailSections({ pkg }: VipPackageDetailSectionsProps)
 
       <DetailDarkSection label="Where this package runs">
         <p className="inline-flex items-center gap-2 font-display text-xl text-[#F7F1E8]">
-          <MapPin className="h-5 w-5 text-[#D4AF6A]" aria-hidden />
+          <MapPin className="h-5 w-5 text-[#D4AF37]" aria-hidden />
           {locationLine}
         </p>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#D6C8B5]/80">

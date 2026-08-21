@@ -72,13 +72,13 @@ function panelTone(surface: "light" | "dark") {
   }
 
   return {
-    eyebrow: "text-[#D4AF6A]/90",
+    eyebrow: "text-[#D4AF37]/90",
     muted: "text-muted-foreground/90",
-    slotActive: "border-[#D4AF6A] text-foreground",
+    slotActive: "border-[#D4AF37] text-foreground",
     slotIdle: "border-transparent text-foreground/75 hover:border-[#C8A25A]/35 hover:text-foreground",
-    slotHover: "group-hover:text-[#D4AF6A]",
-    seats: "text-[#D4AF6A]",
-    guestBtn: "text-[#D4AF6A] hover:text-[#F7F1E8]",
+    slotHover: "group-hover:text-[#D4AF37]",
+    seats: "text-[#D4AF37]",
+    guestBtn: "text-[#D4AF37] hover:text-[#F7F1E8]",
     guestCount: "text-foreground",
     total: "text-[#F7F1E8]",
     textarea:
@@ -140,7 +140,7 @@ function DateSlotPicker({
   const slotRowActive =
     surface === "light"
       ? "luxury-slot-row luxury-slot-row--selected"
-      : "border border-[#D4AF6A]/55 bg-[#2a1212] text-foreground shadow-[0_6px_18px_-12px_rgb(0_0_0/0.55)]";
+      : "border border-[#D4AF37]/55 bg-[#2a1212] text-foreground shadow-[0_6px_18px_-12px_rgb(0_0_0/0.55)]";
 
   return (
     <div className="space-y-2.5 sm:space-y-3">
@@ -169,7 +169,7 @@ function DateSlotPicker({
                   hasSelected || open
                     ? surface === "light"
                       ? "luxury-slot-date__rail--active"
-                      : "bg-[#D4AF6A]"
+                      : "bg-[#D4AF37]"
                     : surface === "light"
                       ? "luxury-slot-date__rail"
                       : "bg-[#C8A25A]/25"
@@ -193,7 +193,7 @@ function DateSlotPicker({
                 <ChevronDown
                   className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 sm:h-4 sm:w-4 ${
                     open ? "rotate-180" : ""
-                  } ${surface === "light" ? "text-[#8B6914]/85" : "text-[#D4AF6A]/90"}`}
+                  } ${surface === "light" ? "text-[#8B6914]/85" : "text-[#D4AF37]/90"}`}
                   strokeWidth={1.75}
                 />
               ) : null}
@@ -229,7 +229,7 @@ function DateSlotPicker({
                       {active ? (
                         <span
                           className={`absolute bottom-2 left-1.5 top-2 w-1 rounded-full sm:bottom-2.5 sm:left-2 sm:top-2.5 ${
-                            surface === "light" ? "luxury-slot-row__rail" : "bg-[#D4AF6A]"
+                            surface === "light" ? "luxury-slot-row__rail" : "bg-[#D4AF37]"
                           }`}
                           aria-hidden
                         />
@@ -243,7 +243,7 @@ function DateSlotPicker({
                             active
                               ? surface === "light"
                                 ? "luxury-slot-row__selected-label"
-                                : "font-semibold text-[#D4AF6A]"
+                                : "font-semibold text-[#D4AF37]"
                               : tone.muted
                           }`}
                         >

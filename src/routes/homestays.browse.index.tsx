@@ -111,7 +111,7 @@ function HomestaysBrowsePage() {
 
         {filtered.length === 0 ? (
           <div className="luxury-empty">
-            <Home className="mb-4 h-8 w-8 text-[#D4AF6A]/80" strokeWidth={1.5} aria-hidden />
+            <Home className="mb-4 h-8 w-8 text-[#D4AF37]/80" strokeWidth={1.5} aria-hidden />
             <h2 className="font-display text-xl text-ink">No homestays match your search</h2>
             <p className="mt-2 max-w-md text-sm text-muted-foreground">
               Try different dates, fewer guests, or another city — new stays are added weekly.

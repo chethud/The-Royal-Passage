@@ -22,7 +22,7 @@ export function HomestayCashPaymentSelector({
         active
           ? isLight
             ? "border-[#4A0000] text-[#4A0000]"
-            : "border-[#D4AF6A] text-foreground"
+            : "border-[#D4AF37] text-foreground"
           : isLight
             ? "border-transparent text-[#4A0000]/75"
             : "border-transparent text-foreground/75"

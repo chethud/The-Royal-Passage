@@ -140,7 +140,7 @@ function BookingReviewPage() {
         <Link
           to="/bookings/$bookingId"
           params={{ bookingId }}
-          className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
+          className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF37] transition-colors hover:text-[#F7F1E8]"
         >
           ← Back to booking
         </Link>

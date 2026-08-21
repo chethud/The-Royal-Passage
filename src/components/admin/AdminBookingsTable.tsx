@@ -133,7 +133,7 @@ export function AdminBookingsTable({
         ))}
       </DashboardTableFilters>
 
-      <DashboardTableFilters>
+      <DashboardTableFilters orientation="vertical">
         {statusButtons.map((value) => (
           <button
             key={value}

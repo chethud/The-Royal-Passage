@@ -35,7 +35,7 @@ export function PaymentMethodSelector({
               active
                 ? isLight
                   ? "border-[#4A0000] text-[#4A0000]"
-                  : "border-[#D4AF6A] text-foreground"
+                  : "border-[#D4AF37] text-foreground"
                 : isLight
                   ? "border-transparent text-[#4A0000]/75 hover:border-[#4A0000]/50 hover:text-[#4A0000]"
                   : "border-transparent text-foreground/75 hover:border-[#C8A25A]/35 hover:text-foreground"
@@ -49,14 +49,14 @@ export function PaymentMethodSelector({
                     : "bg-[#C8A25A]"
                   : isLight
                     ? "bg-[#4A0000]/20 group-hover:bg-[#4A0000]/45"
-                    : "bg-muted-foreground/30 group-hover:bg-[#D4AF6A]/60"
+                    : "bg-muted-foreground/30 group-hover:bg-[#D4AF37]/60"
               }`}
               aria-hidden
             />
             <span>
               <span
                 className={`block font-display text-lg tracking-wide transition-colors ${
-                  isLight ? "group-hover:text-[#4A0000]" : "group-hover:text-[#D4AF6A]"
+                  isLight ? "group-hover:text-[#4A0000]" : "group-hover:text-[#D4AF37]"
                 }`}
               >
                 {option.title}

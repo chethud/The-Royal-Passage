@@ -71,16 +71,16 @@ export function ExperiencesFilterSidebar({
             type="button"
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((open) => !open)}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-sm border border-[rgb(200_162_90/0.35)] bg-[rgb(0_0_0/0.2)] px-3 py-2.5 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#F7F1E8] transition-colors hover:border-[#D4AF6A]"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-sm border border-[rgb(200_162_90/0.35)] bg-[rgb(0_0_0/0.2)] px-3 py-2.5 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#F7F1E8] transition-colors hover:border-[#D4AF37]"
           >
             {mobileOpen ? (
-              <X className="h-3.5 w-3.5 text-[#D4AF6A]" aria-hidden />
+              <X className="h-3.5 w-3.5 text-[#D4AF37]" aria-hidden />
             ) : (
-              <SlidersHorizontal className="h-3.5 w-3.5 text-[#D4AF6A]" aria-hidden />
+              <SlidersHorizontal className="h-3.5 w-3.5 text-[#D4AF37]" aria-hidden />
             )}
             {mobileOpen ? "Hide filters" : "Refine"}
             {activeCount > 0 ? (
-              <span className="rounded-full bg-[#D4AF6A]/20 px-1.5 py-0.5 text-[0.6rem] text-[#D4AF6A]">
+              <span className="rounded-full bg-[#D4AF37]/20 px-1.5 py-0.5 text-[0.6rem] text-[#D4AF37]">
                 {activeCount}
               </span>
             ) : null}
@@ -89,7 +89,7 @@ export function ExperiencesFilterSidebar({
             <button
               type="button"
               onClick={onReset}
-              className="shrink-0 px-2 py-2.5 text-[0.65rem] uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
+              className="shrink-0 px-2 py-2.5 text-[0.65rem] uppercase tracking-[0.14em] text-[#D4AF37]/85 transition-colors hover:text-[#F7F1E8]"
             >
               Reset
             </button>
@@ -110,7 +110,7 @@ export function ExperiencesFilterSidebar({
           <button
             type="button"
             onClick={onReset}
-            className="text-[0.65rem] uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8]"
+            className="text-[0.65rem] uppercase tracking-[0.14em] text-[#D4AF37]/85 transition-colors hover:text-[#F7F1E8]"
           >
             Reset
           </button>
@@ -278,7 +278,7 @@ function HorizontalRangeFilter({
 
   return (
     <div>
-      <h3 className="eyebrow mb-3 text-[0.62rem] tracking-[0.2em] text-[#D4AF6A]/90">{title}</h3>
+      <h3 className="eyebrow mb-3 text-[0.62rem] tracking-[0.2em] text-[#D4AF37]/90">{title}</h3>
 
       <div
         ref={railRef}
@@ -341,7 +341,7 @@ function HorizontalRangeFilter({
               <Icon
                 strokeWidth={1.5}
                 className={`h-3.5 w-3.5 shrink-0 ${
-                  active ? "text-[#D4AF6A]" : "text-[#D4AF6A]/65"
+                  active ? "text-[#D4AF37]" : "text-[#D4AF37]/65"
                 }`}
               />
               <span className="experiences-filter-range-h__label-text">{option.shortLabel}</span>
@@ -405,7 +405,7 @@ function FilterSection({
 
   return (
     <div>
-      <h3 className="eyebrow mb-3 text-[0.62rem] tracking-[0.2em] text-[#D4AF6A]/90">{title}</h3>
+      <h3 className="eyebrow mb-3 text-[0.62rem] tracking-[0.2em] text-[#D4AF37]/90">{title}</h3>
       <div className="experiences-filter-rail relative pl-3">
         <div className="experiences-filter-rail__track" aria-hidden />
         {indicator ? (
@@ -457,7 +457,7 @@ function FilterOption({
       <Icon
         strokeWidth={1.5}
         className={`h-4 w-4 shrink-0 transition-colors ${
-          active ? "text-[#D4AF6A]" : "text-[#D4AF6A]/70 group-hover:text-[#D4AF6A]"
+          active ? "text-[#D4AF37]" : "text-[#D4AF37]/70 group-hover:text-[#D4AF37]"
         }`}
       />
       <span className="min-w-0 text-[0.72rem] font-medium leading-snug tracking-[0.04em]">{text}</span>

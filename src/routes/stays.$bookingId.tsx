@@ -95,7 +95,7 @@ function StayBookingDetailPage() {
         <div className="mx-auto max-w-2xl">
           <Link
             to="/dashboard/history"
-            className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 hover:text-[#F7F1E8]"
+            className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF37]/85 hover:text-[#F7F1E8]"
           >
             ← Booking history
           </Link>

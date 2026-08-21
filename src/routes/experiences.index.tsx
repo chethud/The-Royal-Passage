@@ -125,7 +125,7 @@ function ExperiencesPage() {
       <section id="experiences-grid" className="container-page pb-16 pt-8">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="eyebrow text-[0.65rem] text-[#D4AF6A]">Curated collection</p>
+            <p className="eyebrow text-[0.65rem] text-[#D4AF37]">Curated collection</p>
             <h2 className="mt-1 font-display text-2xl tracking-tight text-[#F7F1E8] md:text-3xl">
               {filtered.length} experience{filtered.length === 1 ? "" : "s"}
             </h2>
@@ -168,7 +168,7 @@ function ExperiencesPage() {
                   type="button"
                   disabled={page <= 1 || pending}
                   onClick={() => updateSearch({ page: Math.max(1, page - 1) })}
-                  className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
+                  className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF37]/85 transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
                 >
                   Previous
                 </button>
@@ -179,7 +179,7 @@ function ExperiencesPage() {
                   type="button"
                   disabled={page >= pages || pending}
                   onClick={() => updateSearch({ page: Math.min(pages, page + 1) })}
-                  className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
+                  className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF37]/85 transition-colors hover:text-[#F7F1E8] disabled:cursor-default disabled:opacity-35"
                 >
                   Next
                 </button>

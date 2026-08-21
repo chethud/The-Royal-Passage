@@ -27,7 +27,7 @@ export function VipsHomeHero() {
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-2xl"
         >
-          <p className="eyebrow inline-flex items-center gap-2 text-[#D4AF6A]">
+          <p className="eyebrow inline-flex items-center gap-2 text-[#D4AF37]">
             <Crown className="h-4 w-4" aria-hidden />
             Royal VIP
           </p>

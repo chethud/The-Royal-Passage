@@ -36,7 +36,7 @@ export function HomestaysBrowseHero({ search, onSearchChange, onSubmit }: Homest
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="w-full"
         >
-          <p className="eyebrow text-[#D4AF6A]">Browse stays</p>
+          <p className="eyebrow text-[#D4AF37]">Browse stays</p>
           <div className="mt-2 max-w-2xl">
             <h1 className="font-display text-3xl leading-tight tracking-tight text-[#F7F1E8] sm:text-4xl md:text-[2.75rem]">
               Mysuru homestays

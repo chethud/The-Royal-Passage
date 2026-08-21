@@ -5,13 +5,13 @@ import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
 
 export const detailBackLinkClass =
-  "inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]";
+  "inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF37] transition-colors hover:text-[#F7F1E8]";
 
 export const detailSectionLabelClass =
-  "text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]/85 sm:text-[0.58rem] sm:tracking-[0.16em]";
+  "text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF37]/85 sm:text-[0.58rem] sm:tracking-[0.16em]";
 
 export const detailEyebrowClass =
-  "text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A]";
+  "text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF37]";
 
 type DetailPageShellProps = {
   children: ReactNode;
@@ -117,7 +117,7 @@ export function DetailLocationBlock({ locationLine, address, mapLink }: DetailLo
 
   return (
     <div className="flex items-start gap-1.5 text-[0.78rem] text-[#D6C8B5]/90 sm:gap-2 sm:text-sm">
-      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D4AF6A] sm:h-4 sm:w-4" aria-hidden />
+      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D4AF37] sm:h-4 sm:w-4" aria-hidden />
       <div className="min-w-0">
         {mapLink ? (
           <a
@@ -127,7 +127,7 @@ export function DetailLocationBlock({ locationLine, address, mapLink }: DetailLo
             className="block transition-colors hover:text-[#F7F1E8]"
           >
             {body}
-            <span className="mt-1.5 inline-flex items-center gap-1 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8] sm:mt-2 sm:gap-1.5 sm:text-[0.65rem] sm:tracking-[0.16em]">
+            <span className="mt-1.5 inline-flex items-center gap-1 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-[#D4AF37] transition-colors hover:text-[#F7F1E8] sm:mt-2 sm:gap-1.5 sm:text-[0.65rem] sm:tracking-[0.16em]">
               <Navigation className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden />
               Get directions
             </span>

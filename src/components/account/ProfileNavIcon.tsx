@@ -11,7 +11,7 @@ export function ProfileNavIcon({ size = 40, className = "" }: ProfileNavIconProp
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-full border border-[#C8A25A]/55 text-[#D4AF6A] transition-colors group-hover:border-[#D4AF6A]/80 group-hover:text-[#E8C878] ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-full border border-[#C8A25A]/55 text-[#D4AF37] transition-colors group-hover:border-[#D4AF37]/80 group-hover:text-[#E8C878] ${className}`}
       style={{ width: size, height: size }}
       aria-hidden
     >

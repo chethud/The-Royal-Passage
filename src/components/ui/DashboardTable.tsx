@@ -11,8 +11,24 @@ const tableMinWidth: Record<DashboardTableWidth, string> = {
   "2xl": "min-w-[1100px]",
 };
 
-export function dashboardFilterBtnClass(active: boolean) {
-  return active ? "luxury-btn-sm luxury-btn-primary" : "luxury-btn-sm luxury-btn-panel-outline";
+export function dashboardRoyalFilterBtnClass(active: boolean) {
+  return active ? "luxury-btn-sm luxury-btn-primary" : "luxury-btn-sm dashboard-chrome-btn";
+}
+
+export function hostBookingsFilterBtnClass(active: boolean) {
+  return `host-bookings-filter-btn ${active ? "is-active" : ""}`;
+}
+
+export function DashboardFilterCountBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <span
+      className="pointer-events-none absolute -right-1.5 -top-1.5 z-[1] inline-flex min-h-[1.15rem] min-w-[1.15rem] items-center justify-center rounded-full bg-[#c45c26] px-1 text-[0.58rem] font-bold leading-none text-[#fff8ef] shadow-[0_4px_12px_-4px_rgb(0_0_0/0.45)]"
+      aria-label={`${count} guests`}
+    >
+      {count > 99 ? "99+" : count}
+    </span>
+  );
 }
 
 export function DashboardTableSection({
@@ -25,8 +41,61 @@ export function DashboardTableSection({
   return <section className={`space-y-2.5 sm:space-y-3 ${className}`.trim()}>{children}</section>;
 }
 
-export function DashboardTableFilters({ children }: { children: ReactNode }) {
-  return <div className="flex flex-wrap gap-1.5 sm:gap-2">{children}</div>;
+export function DashboardTableFilters({
+  children,
+  orientation = "horizontal",
+}: {
+  children: ReactNode;
+  orientation?: "horizontal" | "vertical";
+}) {
+  return (
+    <div
+      className={
+        orientation === "vertical"
+          ? "flex w-full flex-col items-stretch gap-1.5 sm:gap-2 [&>button]:relative [&>button]:w-full [&>button]:justify-center"
+          : "flex flex-wrap gap-1.5 sm:gap-2 [&>button]:relative"
+      }
+    >
+      {children}
+    </div>
+  );
+}
+
+export function DashboardInsetPanel({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`rounded-[var(--radius-md)] border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.42)] p-3 sm:p-4 ${className}`.trim()}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function RoyalSplitChamber({
+  children,
+  title,
+  className = "",
+  tone = "burgundy",
+}: {
+  children: ReactNode;
+  title?: string;
+  className?: string;
+  tone?: "burgundy" | "cream";
+}) {
+  return (
+    <div
+      className={`royal-split-chamber ${tone === "cream" ? "royal-split-chamber--cream" : ""} p-4 sm:p-5 ${className}`.trim()}
+    >
+      {title ? <h2 className="royal-split-chamber__title">{title}</h2> : null}
+      {children}
+    </div>
+  );
 }
 
 export function DashboardTableEmpty({ children }: { children: ReactNode }) {
@@ -161,14 +230,14 @@ export function DashboardTableLinkCell({
   className = "",
 }: DashboardTableLinkCellProps) {
   return (
-    <DashboardTableCell className={className}>
+    <DashboardTableCell className={`min-w-0 overflow-hidden ${className}`.trim()}>
       <Link
         to={to}
         params={params}
-        className="luxury-panel-link block hover:underline"
+        className="luxury-panel-link block min-w-0 hover:underline"
       >
-        <div className="luxury-panel-heading">{title}</div>
-        {subtitle ? <div className="luxury-panel-body text-xs">{subtitle}</div> : null}
+        <div className="luxury-panel-heading truncate">{title}</div>
+        {subtitle ? <div className="luxury-panel-body truncate text-xs">{subtitle}</div> : null}
       </Link>
     </DashboardTableCell>
   );

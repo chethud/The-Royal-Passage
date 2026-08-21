@@ -29,7 +29,7 @@ export function ExperiencesHero({ searchValue, onSearchChange }: ExperiencesHero
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="w-full"
         >
-          <p className="eyebrow text-[#D4AF6A]">The Royal Collection</p>
+          <p className="eyebrow text-[#D4AF37]">The Royal Collection</p>
 
           <div className="mt-2 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
             <h1 className="min-w-0 font-display text-3xl leading-tight tracking-tight text-[#F7F1E8] sm:text-4xl md:text-[2.75rem]">

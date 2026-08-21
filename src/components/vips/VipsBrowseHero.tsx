@@ -37,7 +37,7 @@ export function VipsBrowseHero({ search, onSearchChange, onSubmit }: VipsBrowseH
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="w-full"
         >
-          <p className="eyebrow text-[#D4AF6A]">Royal VIP</p>
+          <p className="eyebrow text-[#D4AF37]">Royal VIP</p>
           <h1 className="mt-2 font-display text-3xl leading-tight tracking-tight text-[#F7F1E8] sm:text-4xl">
             Packages in {VIP_CITY}
           </h1>

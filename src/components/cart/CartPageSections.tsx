@@ -26,7 +26,7 @@ export function CartItemsSection({
     return (
       <div className="py-14 text-center">
         <ShoppingCart
-          className={`mx-auto h-7 w-7 ${isLight ? "text-[#C8A25A]/70" : "text-[#D4AF6A]/45"}`}
+          className={`mx-auto h-7 w-7 ${isLight ? "text-[#C8A25A]/70" : "text-[#D4AF37]/45"}`}
           strokeWidth={1.5}
         />
         <p className={`mt-4 font-display text-lg tracking-wide ${isLight ? "luxury-panel-heading" : "text-foreground"}`}>
@@ -189,7 +189,7 @@ export function WishlistCartSection({
     return (
       <div className="py-14 text-center">
         <Heart
-          className={`mx-auto h-7 w-7 ${isLight ? "text-[#C8A25A]/70" : "text-[#D4AF6A]/45"}`}
+          className={`mx-auto h-7 w-7 ${isLight ? "text-[#C8A25A]/70" : "text-[#D4AF37]/45"}`}
           strokeWidth={1.5}
         />
         <p className={`mt-4 font-display text-lg tracking-wide ${isLight ? "luxury-panel-heading" : "text-foreground"}`}>
@@ -223,7 +223,7 @@ export function WishlistCartSection({
               removeLabel="Remove from wishlist"
               removeIcon={
                 <Heart
-                  className={`h-4 w-4 fill-current ${isLight ? "text-[#9A7228]" : "text-[#D4AF6A]"}`}
+                  className={`h-4 w-4 fill-current ${isLight ? "text-[#9A7228]" : "text-[#D4AF37]"}`}
                   strokeWidth={1.5}
                 />
               }
@@ -235,7 +235,7 @@ export function WishlistCartSection({
                   className={`text-[0.65rem] font-semibold uppercase tracking-[0.14em] transition-colors disabled:cursor-default disabled:opacity-45 ${
                     isLight
                       ? "luxury-panel-link hover:text-[#4A0000]"
-                      : "text-[#D4AF6A]/85 hover:text-[#F7F1E8]"
+                      : "text-[#D4AF37]/85 hover:text-[#F7F1E8]"
                   }`}
                 >
                   {inCart ? "In cart" : "Add to cart"}
@@ -304,7 +304,7 @@ function CartRow({
 
         <div className="flex min-w-0 flex-1 flex-col justify-between gap-4">
           <div className="min-w-0">
-            <div className={`eyebrow text-[0.62rem] ${isLight ? "luxury-panel-label" : "text-[#D4AF6A]/85"}`}>
+            <div className={`eyebrow text-[0.62rem] ${isLight ? "luxury-panel-label" : "text-[#D4AF37]/85"}`}>
               {kindLabel} · {city}
             </div>
             <Link
@@ -313,7 +313,7 @@ function CartRow({
               className={`mt-1 block font-display text-base uppercase leading-snug tracking-[0.05em] transition-colors sm:text-lg ${
                 isLight
                   ? "luxury-panel-heading hover:text-[#9A7228]"
-                  : "text-[#F7F1E8] hover:text-[#D4AF6A]"
+                  : "text-[#F7F1E8] hover:text-[#D4AF37]"
               }`}
             >
               {title}
@@ -342,7 +342,7 @@ function CartRow({
                 className={`inline-flex items-center justify-center transition-colors disabled:opacity-40 ${
                   isLight
                     ? "luxury-panel-body hover:text-[#9A7228]"
-                    : "text-muted-foreground/70 hover:text-[#D4AF6A]"
+                    : "text-muted-foreground/70 hover:text-[#D4AF37]"
                 }`}
                 aria-label={removeLabel}
               >

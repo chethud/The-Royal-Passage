@@ -54,7 +54,7 @@ export function DetailExpandableCopy({ label, children, className = "" }: Detail
       {overflows || expanded ? (
         <button
           type="button"
-          className="mt-1.5 self-start text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-colors hover:text-[#F7F1E8]"
+          className="mt-1.5 self-start text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#D4AF37] transition-colors hover:text-[#F7F1E8]"
           aria-expanded={expanded}
           aria-controls={textId}
           onClick={() => setExpanded((value) => !value)}

@@ -108,11 +108,11 @@ function HostBookingsPage() {
       showRoleDescription={false}
     >
       {pageLoading ? (
-        <LuxuryCheckoutPanel>
+        <LuxuryCheckoutPanel ornate>
           <p className="luxury-panel-body py-8 text-sm">Loading bookings…</p>
         </LuxuryCheckoutPanel>
       ) : (
-        <LuxuryCheckoutPanel>
+        <>
           {pageError ? (
             <p className="mb-4 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {pageError}
@@ -121,7 +121,7 @@ function HostBookingsPage() {
           <HostBookingTable
             bookings={bookings}
             busyId={busyId}
-            initialStatus={status ?? "all"}
+            initialStatus={status ?? (dateView || payment ? "all" : "today")}
             initialPayment={payment ?? "all"}
             initialDateView={dateView ?? "week"}
             onConfirm={(id, decision) => runDecision(id, decision, confirmHostBooking)}
@@ -131,7 +131,7 @@ function HostBookingsPage() {
             onPause={(id) => void runAction(id, pauseHostBooking)}
             onResume={(id) => void runAction(id, resumeHostBooking)}
           />
-        </LuxuryCheckoutPanel>
+        </>
       )}
     </HostDashboardShell>
   );

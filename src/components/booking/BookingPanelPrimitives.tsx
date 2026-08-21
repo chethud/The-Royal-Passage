@@ -32,10 +32,10 @@ function stepperTone(surface: BookingSurface) {
   }
 
   return {
-    label: "eyebrow text-[#D4AF6A]/90",
+    label: "eyebrow text-[#D4AF37]/90",
     hint: "mt-0.5 text-[0.66rem] leading-snug text-muted-foreground sm:mt-1 sm:text-xs",
     button:
-      "inline-flex h-7 w-7 items-center justify-center text-[#D4AF6A] transition-colors hover:text-[#F7F1E8] disabled:opacity-35 sm:h-9 sm:w-9",
+      "inline-flex h-7 w-7 items-center justify-center text-[#D4AF37] transition-colors hover:text-[#F7F1E8] disabled:opacity-35 sm:h-9 sm:w-9",
     value: "w-7 text-center font-display text-xl text-foreground sm:w-8 sm:text-2xl",
   };
 }
@@ -174,7 +174,7 @@ export function BookingNotesField({
 
   return (
     <div>
-      <h2 className="eyebrow mb-3 text-[#D4AF6A]/90">{label}</h2>
+      <h2 className="eyebrow mb-3 text-[#D4AF37]/90">{label}</h2>
       <textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}

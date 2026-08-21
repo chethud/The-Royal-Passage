@@ -43,7 +43,7 @@ export function ExperienceReviewsSection({
                 {review.isVerified ? (
                   <span
                     className={`ml-2 text-[0.6rem] font-semibold uppercase tracking-[0.12em] ${
-                      isLight ? "text-[#8B6914]" : "text-[#D4AF6A]"
+                      isLight ? "text-[#8B6914]" : "text-[#D4AF37]"
                     }`}
                   >
                     Verified visit
@@ -72,11 +72,11 @@ export function ExperienceReviewsSection({
               className={`mt-4 border-l-2 pl-4 text-sm ${
                 isLight
                   ? "border-[#4A0000]/25 text-[#4A0000]/85"
-                  : "border-[#D4AF6A]/45 text-[#E8DCC8]/90"
+                  : "border-[#D4AF37]/45 text-[#E8DCC8]/90"
               }`}
             >
               <div
-                className={`eyebrow ${isLight ? "luxury-panel-label" : "text-[#D4AF6A]/90"}`}
+                className={`eyebrow ${isLight ? "luxury-panel-label" : "text-[#D4AF37]/90"}`}
               >
                 Host reply
               </div>

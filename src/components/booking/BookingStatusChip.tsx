@@ -3,6 +3,7 @@ type BookingStatusChipProps = {
   paymentStatus?: string;
   isPaused?: boolean;
   surface?: "light" | "dark";
+  compact?: boolean;
   /** Shown when confirmed and payment pending (default: Pay at venue). */
   pendingPaymentLabel?: string;
 };
@@ -19,6 +20,7 @@ export function BookingStatusChip({
   paymentStatus,
   isPaused = false,
   surface = "dark",
+  compact = false,
   pendingPaymentLabel = "Pay at venue",
 }: BookingStatusChipProps) {
   const label = isPaused && bookingStatus === "confirmed" ? "Paused" : (BOOKING_LABELS[bookingStatus] ?? bookingStatus);
@@ -55,11 +57,17 @@ export function BookingStatusChip({
             ? "border-destructive/40 bg-destructive/10 text-destructive"
             : "border-[oklch(0.88_0.08_86_/_0.35)] bg-background/30 text-foreground/80";
 
+  const chipClass = compact
+    ? `inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 text-[0.55rem] font-semibold uppercase tracking-[0.08em] ${tone}`
+    : `inline-flex items-center gap-2 rounded-sm border px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${tone}`;
+
   return (
-    <span className={`inline-flex items-center gap-2 rounded-sm border px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${tone}`}>
+    <span className={chipClass}>
       {label}
       {!isPaused && bookingStatus === "confirmed" && paymentStatus === "pending" ? (
-        <span className="normal-case tracking-normal text-[0.65rem] opacity-80">· {pendingPaymentLabel}</span>
+        <span className={`normal-case tracking-normal opacity-80 ${compact ? "text-[0.5rem]" : "text-[0.65rem]"}`}>
+          · {pendingPaymentLabel}
+        </span>
       ) : null}
     </span>
   );

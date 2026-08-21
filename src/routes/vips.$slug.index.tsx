@@ -75,7 +75,7 @@ function VipDetailPage() {
           <DetailTagline>{pkg.tagline}</DetailTagline>
           <DetailStatGrid>
             <DetailStatItem label="Rating">
-              <span className="text-[#D4AF6A]">
+              <span className="text-[#D4AF37]">
                 <Star className="mr-1 inline h-4 w-4 fill-current" aria-hidden />
                 {pkg.rating}
               </span>
@@ -84,7 +84,7 @@ function VipDetailPage() {
               {pkg.durationDays} day{pkg.durationDays === 1 ? "" : "s"}
             </DetailStatItem>
             <DetailStatItem label="Max guests">
-              <Users className="mx-auto h-5 w-5 text-[#D4AF6A] sm:mx-0" aria-hidden />
+              <Users className="mx-auto h-5 w-5 text-[#D4AF37] sm:mx-0" aria-hidden />
               {pkg.maxGuests}
             </DetailStatItem>
           </DetailStatGrid>

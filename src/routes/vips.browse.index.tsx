@@ -161,7 +161,7 @@ function VipsBrowsePage() {
 
         {!criteriaReady ? (
           <div className="luxury-empty">
-            <Crown className="mb-4 h-8 w-8 text-[#D4AF6A]/80" strokeWidth={1.5} aria-hidden />
+            <Crown className="mb-4 h-8 w-8 text-[#D4AF37]/80" strokeWidth={1.5} aria-hidden />
             <h2 className="font-display text-xl text-ink">
               {browseBlock === "too_soon" ? "Book a little earlier" : "Tell us about your trip"}
             </h2>
@@ -223,7 +223,7 @@ function VipsBrowsePage() {
 
               <div className="luxury-empty">
 
-                <Crown className="mb-4 h-8 w-8 text-[#D4AF6A]/80" strokeWidth={1.5} aria-hidden />
+                <Crown className="mb-4 h-8 w-8 text-[#D4AF37]/80" strokeWidth={1.5} aria-hidden />
 
                 <h2 className="font-display text-xl text-ink">No packages match your search</h2>
 

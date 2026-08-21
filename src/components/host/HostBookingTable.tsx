@@ -1,30 +1,41 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
+  Banknote,
+  BarChart3,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  CircleDot,
+  ClipboardList,
+  Clock3,
+  Download,
+  XCircle,
+} from "lucide-react";
+import {
   BookingDecisionDialog,
   type BookingDecisionPayload,
 } from "@/components/booking/BookingDecisionDialog";
-import { BookingStatusChip } from "@/components/booking/BookingStatusChip";
 import { HostBookingActions } from "@/components/host/HostBookingActions";
+import { CornerFiligree } from "@/components/site/RoyalHeritageDecor";
 import {
   DashboardTable,
   DashboardTableBody,
   DashboardTableCell,
   DashboardTableEmpty,
+  DashboardFilterCountBadge,
   DashboardTableFilters,
   DashboardTableHead,
   DashboardTableHeadCell,
   DashboardTableHeadRow,
-  DashboardTableLinkCell,
   DashboardTableRow,
   DashboardTableScroll,
-  DashboardTableSection,
-  dashboardFilterBtnClass,
+  hostBookingsFilterBtnClass,
 } from "@/components/ui/DashboardTable";
 import type { BookingSummary } from "@/lib/api/bookings";
 import type { BookingListStatus, BookingPaymentFilter, BookingDateView } from "@/lib/dashboard-booking-filters";
 import { bookingMatchesDateView } from "@/lib/booking-window";
-import { formatDateLong } from "@/lib/date-format";
+import { formatDateWeekdayShort } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 
 type HostBookingTableProps = {
@@ -75,10 +86,100 @@ function filterBookings(
   });
 }
 
+const PAGE_SIZE = 10;
+
+function FilterStripCorners() {
+  return (
+    <>
+      <CornerFiligree className="host-bookings-strip__corner host-bookings-strip__corner--tl" />
+      <CornerFiligree className="host-bookings-strip__corner host-bookings-strip__corner--tr" />
+      <CornerFiligree className="host-bookings-strip__corner host-bookings-strip__corner--bl" />
+      <CornerFiligree className="host-bookings-strip__corner host-bookings-strip__corner--br" />
+    </>
+  );
+}
+
+function SummaryOrnament() {
+  return (
+    <svg className="host-bookings-summary__ornament" viewBox="0 0 180 42" fill="none" aria-hidden>
+      <path d="M12 38 L18 22 Q 28 8, 46 14 L 54 6 L 62 14 Q 80 6, 90 16 Q 100 6, 118 14 L 126 6 L 134 14 Q 152 8, 162 22 L 168 38" stroke="#C9A227" strokeWidth="0.7" />
+      <path d="M46 38 V20 M90 38 V18 M134 38 V20" stroke="#C9A227" strokeWidth="0.45" />
+      <path d="M28 38 H152" stroke="#C9A227" strokeWidth="0.5" />
+    </svg>
+  );
+}
+
+function guestInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const first = parts[0]?.[0] ?? "G";
+  const second = parts[1]?.[0] ?? "";
+  return `${first}${second}`.toUpperCase();
+}
+
+function exportLedger(rows: BookingSummary[]) {
+  const header = ["Guest", "Email", "Experience", "Date", "Time", "Pax", "Total", "Status", "Reason"];
+  const lines = rows.map((booking) =>
+    [
+      booking.guestName ?? "Guest",
+      booking.guestEmail ?? "",
+      booking.experience.title,
+      booking.slot.date,
+      booking.slot.start,
+      String(booking.participantCount),
+      String(booking.totalAmount),
+      booking.bookingStatus,
+      booking.rejectionReason ?? "",
+    ]
+      .map((value) => `"${String(value).replaceAll('"', '""')}"`)
+      .join(","),
+  );
+  const blob = new Blob([[header.join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "host-bookings.csv";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function HostLedgerStatus({ booking }: { booking: BookingSummary }) {
+  const tone = booking.isPaused
+    ? "paused"
+    : booking.bookingStatus === "pending"
+      ? "pending"
+      : booking.bookingStatus === "completed"
+        ? "completed"
+        : booking.bookingStatus === "cancelled"
+          ? "cancelled"
+          : "confirmed";
+  const label = booking.isPaused
+    ? "Paused"
+    : booking.bookingStatus === "pending"
+      ? "Pending"
+      : booking.bookingStatus === "completed"
+        ? "Completed"
+        : booking.bookingStatus === "cancelled"
+          ? "Cancelled"
+          : "Confirmed";
+  const hint =
+    !booking.isPaused && booking.bookingStatus === "confirmed" && booking.paymentStatus !== "paid"
+      ? "COD"
+      : booking.isPaused
+        ? "On hold"
+        : null;
+
+  return (
+    <span className={`host-bookings-status host-bookings-status--${tone}`}>
+      {label}
+      {hint ? <span className="host-bookings-status__hint">{hint}</span> : null}
+    </span>
+  );
+}
+
 export function HostBookingTable({
   bookings,
   busyId,
-  initialStatus = "all",
+  initialStatus = "today",
   initialPayment = "all",
   initialDateView = "week",
   onConfirm,
@@ -92,6 +193,7 @@ export function HostBookingTable({
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialStatus);
   const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>(initialPayment);
   const [dateView, setDateView] = useState<BookingDateView>(initialDateView);
+  const [page, setPage] = useState(1);
   const [decision, setDecision] = useState<{
     booking: BookingSummary;
     mode: "accept" | "reject";
@@ -116,7 +218,7 @@ export function HostBookingTable({
   }) => {
     void navigate({
       search: {
-        status: next.status === "all" ? undefined : next.status,
+        status: next.status === "today" ? undefined : next.status,
         payment: next.payment === "all" ? undefined : next.payment,
         dateView: next.dateView === "week" ? undefined : next.dateView,
       },
@@ -129,146 +231,293 @@ export function HostBookingTable({
     [bookings, dateView, paymentFilter, statusFilter],
   );
 
+  useEffect(() => {
+    setPage(1);
+  }, [filtered]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const bookingCounts = useMemo(() => {
+    const countFor = (status: StatusFilter, payment: PaymentFilter = "all") =>
+      filterBookings(bookings, status, payment, dateView).length;
+    return {
+      all: countFor("all"),
+      today: countFor("today"),
+      pending: countFor("pending"),
+      confirmed: countFor("confirmed"),
+      completed: countFor("completed"),
+      cancelled: countFor("cancelled"),
+      "cod-pending": countFor("confirmed", "cod-pending"),
+    };
+  }, [bookings, dateView]);
+
   const dateViewButtons: { value: BookingDateView; label: string }[] = [
     { value: "all", label: "All dates" },
     { value: "week", label: "Next 7 days" },
     { value: "history", label: "History" },
   ];
 
-  const statusButtons: StatusFilter[] = [
-    "all",
-    "today",
-    "pending",
-    "confirmed",
-    "completed",
-    "cancelled",
+  const todaySelected = statusFilter === "today";
+
+  const applyStatus = (status: StatusFilter, payment: PaymentFilter = "all") => {
+    setStatusFilter(status);
+    setPaymentFilter(payment);
+    syncSearch({ status, payment, dateView });
+  };
+
+  const summaryRows: {
+    label: string;
+    count: number;
+    active: boolean;
+    onClick: () => void;
+    icon: typeof ClipboardList;
+  }[] = [
+    {
+      label: "Total bookings",
+      count: bookingCounts.all,
+      active: statusFilter === "all" && paymentFilter === "all" && !todaySelected,
+      onClick: () => applyStatus("all"),
+      icon: ClipboardList,
+    },
+    {
+      label: "Pending",
+      count: bookingCounts.pending,
+      active: statusFilter === "pending" && paymentFilter === "all",
+      onClick: () => applyStatus("pending"),
+      icon: Clock3,
+    },
+    {
+      label: "Confirmed",
+      count: bookingCounts.confirmed,
+      active: statusFilter === "confirmed" && paymentFilter === "all",
+      onClick: () => applyStatus("confirmed"),
+      icon: CircleDot,
+    },
+    {
+      label: "Completed",
+      count: bookingCounts.completed,
+      active: statusFilter === "completed",
+      onClick: () => applyStatus("completed"),
+      icon: CheckCircle2,
+    },
+    {
+      label: "Cancelled",
+      count: bookingCounts.cancelled,
+      active: statusFilter === "cancelled",
+      onClick: () => applyStatus("cancelled"),
+      icon: XCircle,
+    },
+    {
+      label: "COD pending",
+      count: bookingCounts["cod-pending"],
+      active: paymentFilter === "cod-pending",
+      onClick: () => applyStatus("confirmed", "cod-pending"),
+      icon: Banknote,
+    },
   ];
 
   return (
-    <DashboardTableSection>
-      <DashboardTableFilters>
-        {dateViewButtons.map(({ value, label }) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => {
-              setDateView(value);
-              syncSearch({ status: statusFilter, payment: paymentFilter, dateView: value });
-            }}
-            className={dashboardFilterBtnClass(dateView === value)}
-          >
-            {label}
+    <div className="host-bookings-deck">
+      <div className="host-bookings-strip">
+        <FilterStripCorners />
+        <div className="host-bookings-strip__bar">
+          <DashboardTableFilters>
+            {dateViewButtons.map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => {
+                  const nextStatus = statusFilter === "today" ? "all" : statusFilter;
+                  setDateView(value);
+                  if (statusFilter === "today") setStatusFilter("all");
+                  syncSearch({ status: nextStatus, payment: paymentFilter, dateView: value });
+                }}
+                className={hostBookingsFilterBtnClass(!todaySelected && dateView === value)}
+              >
+                {label}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => applyStatus("today")}
+              className={hostBookingsFilterBtnClass(todaySelected)}
+            >
+              Today
+              <DashboardFilterCountBadge count={bookingCounts.today} />
+            </button>
+          </DashboardTableFilters>
+          <button type="button" className="host-bookings-export" onClick={() => exportLedger(filtered)}>
+            <Download size={13} strokeWidth={1.7} />
+            Export
           </button>
-        ))}
-      </DashboardTableFilters>
+        </div>
+      </div>
 
-      <DashboardTableFilters>
-        {statusButtons.map((value) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => {
-              const nextPayment = value !== "confirmed" ? "all" : paymentFilter;
-              setStatusFilter(value);
-              if (value !== "confirmed") setPaymentFilter("all");
-              syncSearch({ status: value, payment: nextPayment, dateView });
-            }}
-            className={dashboardFilterBtnClass(statusFilter === value && paymentFilter === "all")}
-          >
-            {value}
-          </button>
-        ))}
-        <button
-          type="button"
-          onClick={() => {
-            setStatusFilter("confirmed");
-            setPaymentFilter("cod-pending");
-            syncSearch({ status: "confirmed", payment: "cod-pending", dateView });
-          }}
-          className={dashboardFilterBtnClass(paymentFilter === "cod-pending")}
-        >
-          COD pending
-        </button>
-      </DashboardTableFilters>
+      <div className="host-bookings-workspace">
+        <aside className="host-bookings-summary">
+          <h2 className="host-bookings-summary__title">Quick summary</h2>
+          <ul className="host-bookings-summary__list">
+            {summaryRows.map((row) => {
+              const Icon = row.icon;
+              return (
+                <li key={row.label}>
+                  <button
+                    type="button"
+                    onClick={row.onClick}
+                    className={`host-bookings-summary__row ${row.active ? "is-active" : ""}`}
+                  >
+                    <span className="host-bookings-summary__icon">
+                      <Icon size={14} strokeWidth={1.5} />
+                    </span>
+                    <span className="host-bookings-summary__label">{row.label}</span>
+                    <span className="host-bookings-summary__count">{row.count}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <Link to="/host/revenue" className="host-bookings-summary__cta">
+            <BarChart3 size={13} strokeWidth={1.6} />
+            View revenue report
+          </Link>
+          <SummaryOrnament />
+        </aside>
 
-      {filtered.length === 0 ? (
-        <DashboardTableEmpty>No bookings in this view.</DashboardTableEmpty>
-      ) : (
-        <DashboardTableScroll>
-          <DashboardTable minWidth="xl">
-            <DashboardTableHead>
-              <DashboardTableHeadRow>
-                <DashboardTableHeadCell>Guest</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Experience</DashboardTableHeadCell>
-                <DashboardTableHeadCell>When</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Guests</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Total</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Status</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Reason</DashboardTableHeadCell>
-                <DashboardTableHeadCell>Actions</DashboardTableHeadCell>
-              </DashboardTableHeadRow>
-            </DashboardTableHead>
-            <DashboardTableBody>
-              {filtered.map((booking) => (
-                <DashboardTableRow key={booking.id}>
-                  <DashboardTableLinkCell
-                    to="/host/bookings/$bookingId"
-                    params={{ bookingId: booking.id }}
-                    title={booking.guestName ?? "Guest"}
-                    subtitle={booking.guestEmail}
-                  />
-                  <DashboardTableCell>
-                    <Link
-                      to="/host/bookings/$bookingId"
-                      params={{ bookingId: booking.id }}
-                      className="luxury-panel-link hover:underline"
-                    >
-                      {booking.experience.title}
-                    </Link>
-                  </DashboardTableCell>
-                  <DashboardTableCell>
-                    {formatDateLong(booking.slot.date)}
-                    <br />
-                    <span className="text-xs">{booking.slot.start}</span>
-                  </DashboardTableCell>
-                  <DashboardTableCell>{booking.participantCount}</DashboardTableCell>
-                  <DashboardTableCell variant="money">
-                    {formatMoney(booking.totalAmount, booking.currencySymbol)}
-                  </DashboardTableCell>
-                  <DashboardTableCell>
-                    <BookingStatusChip
-                      bookingStatus={booking.bookingStatus}
-                      paymentStatus={booking.paymentStatus}
-                      isPaused={booking.isPaused}
-                      surface="light"
-                    />
-                  </DashboardTableCell>
-                  <DashboardTableCell>
-                    {booking.rejectionReason ? (
-                      <span className="text-xs leading-snug">{booking.rejectionReason}</span>
-                    ) : (
-                      <span className="text-xs opacity-50">—</span>
-                    )}
-                  </DashboardTableCell>
-                  <DashboardTableCell>
-                    <HostBookingActions
-                      booking={booking}
-                      busy={busyId === booking.id}
-                      surface="light"
-                      onConfirm={() => setDecision({ booking, mode: "accept" })}
-                      onReject={() => setDecision({ booking, mode: "reject" })}
-                      onMarkPaid={onMarkPaid}
-                      onComplete={onComplete}
-                      onPause={onPause}
-                      onResume={onResume}
-                    />
-                  </DashboardTableCell>
-                </DashboardTableRow>
-              ))}
-            </DashboardTableBody>
-          </DashboardTable>
-        </DashboardTableScroll>
-      )}
+        <div className="host-bookings-ledger">
+          {filtered.length === 0 ? (
+            <DashboardTableEmpty>No bookings in this view.</DashboardTableEmpty>
+          ) : (
+            <>
+              <DashboardTableScroll>
+                <DashboardTable minWidth="lg" layout="fixed" className="host-bookings-table">
+                  <colgroup>
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                  </colgroup>
+                  <DashboardTableHead>
+                    <DashboardTableHeadRow>
+                      <DashboardTableHeadCell>Guest</DashboardTableHeadCell>
+                      <DashboardTableHeadCell>Experience</DashboardTableHeadCell>
+                      <DashboardTableHeadCell>When</DashboardTableHeadCell>
+                      <DashboardTableHeadCell>Pax</DashboardTableHeadCell>
+                      <DashboardTableHeadCell>Total</DashboardTableHeadCell>
+                      <DashboardTableHeadCell>Status</DashboardTableHeadCell>
+                      <DashboardTableHeadCell>Reason</DashboardTableHeadCell>
+                      <DashboardTableHeadCell>Actions</DashboardTableHeadCell>
+                    </DashboardTableHeadRow>
+                  </DashboardTableHead>
+                  <DashboardTableBody>
+                    {paged.map((booking) => {
+                      const name = booking.guestName ?? "Guest";
+                      return (
+                      <DashboardTableRow key={booking.id}>
+                        <DashboardTableCell>
+                          <Link
+                            to="/host/bookings/$bookingId"
+                            params={{ bookingId: booking.id }}
+                            className="host-bookings-guest luxury-panel-link"
+                          >
+                            <span className="host-bookings-guest__avatar">{guestInitials(name)}</span>
+                            <span className="host-bookings-guest__copy">
+                              <span className="luxury-panel-heading">{name}</span>
+                              {booking.guestEmail ? (
+                                <span className="luxury-panel-body">{booking.guestEmail}</span>
+                              ) : null}
+                            </span>
+                          </Link>
+                        </DashboardTableCell>
+                        <DashboardTableCell>
+                          <Link
+                            to="/host/bookings/$bookingId"
+                            params={{ bookingId: booking.id }}
+                            className="luxury-panel-link line-clamp-2 hover:underline"
+                          >
+                            {booking.experience.title}
+                          </Link>
+                        </DashboardTableCell>
+                        <DashboardTableCell>
+                          {formatDateWeekdayShort(booking.slot.date)}
+                          <br />
+                          <span className="text-[0.58rem] opacity-80">{booking.slot.start}</span>
+                        </DashboardTableCell>
+                        <DashboardTableCell className="text-center">
+                          {booking.participantCount}
+                        </DashboardTableCell>
+                        <DashboardTableCell variant="heading" className="whitespace-nowrap">
+                          {formatMoney(booking.totalAmount, booking.currencySymbol)}
+                        </DashboardTableCell>
+                        <DashboardTableCell>
+                          <HostLedgerStatus booking={booking} />
+                        </DashboardTableCell>
+                        <DashboardTableCell>
+                          {booking.rejectionReason ? (
+                            <span className="line-clamp-2 text-[0.58rem] leading-snug">
+                              {booking.rejectionReason}
+                            </span>
+                          ) : (
+                            <span className="opacity-50">—</span>
+                          )}
+                        </DashboardTableCell>
+                        <DashboardTableCell>
+                          <HostBookingActions
+                            booking={booking}
+                            busy={busyId === booking.id}
+                            surface="light"
+                            presentation="menu"
+                            onConfirm={() => setDecision({ booking, mode: "accept" })}
+                            onReject={() => setDecision({ booking, mode: "reject" })}
+                            onMarkPaid={onMarkPaid}
+                            onComplete={onComplete}
+                            onPause={onPause}
+                            onResume={onResume}
+                          />
+                        </DashboardTableCell>
+                      </DashboardTableRow>
+                      );
+                    })}
+                  </DashboardTableBody>
+                </DashboardTable>
+              </DashboardTableScroll>
+              {filtered.length > 0 ? (
+                <div className="host-bookings-pager">
+                  <span className="host-bookings-pager__flourish" aria-hidden />
+                  <button type="button" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>
+                    <ChevronLeft size={14} />
+                  </button>
+                  {Array.from({ length: pageCount }, (_, index) => {
+                    const n = index + 1;
+                    return (
+                      <button
+                        key={n}
+                        type="button"
+                        className={page === n ? "is-active" : ""}
+                        onClick={() => setPage(n)}
+                      >
+                        {n}
+                      </button>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    disabled={page >= pageCount}
+                    onClick={() => setPage((value) => Math.min(pageCount, value + 1))}
+                  >
+                    <ChevronRight size={14} />
+                  </button>
+                  <span className="host-bookings-pager__flourish" aria-hidden />
+                </div>
+              ) : null}
+            </>
+          )}
+        </div>
+      </div>
 
       <BookingDecisionDialog
         open={Boolean(decision)}
@@ -292,6 +541,6 @@ export function HostBookingTable({
           }
         }}
       />
-    </DashboardTableSection>
+    </div>
   );
 }

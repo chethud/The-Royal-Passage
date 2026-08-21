@@ -78,7 +78,7 @@ function MarketplaceCardContent({
           }`}
         >
           <h3
-            className={`line-clamp-2 font-display uppercase leading-snug tracking-[0.06em] text-[#F7F1E8] drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] transition-colors group-hover:text-[#D4AF6A] ${
+            className={`line-clamp-2 font-display uppercase leading-snug tracking-[0.06em] text-[#F7F1E8] drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] transition-colors group-hover:text-[#D4AF37] ${
               large
                 ? "text-lg sm:text-xl lg:text-2xl"
                 : "text-base sm:text-lg"
@@ -95,7 +95,7 @@ function MarketplaceCardContent({
           </div>
           {footer ? <div className="mt-1.5 sm:mt-2">{footer}</div> : null}
           <span
-            className={`mt-1.5 inline-flex items-center gap-1.5 font-semibold uppercase tracking-[0.16em] text-[#D4AF6A] transition-all duration-300 group-hover:gap-2.5 sm:mt-2 ${
+            className={`mt-1.5 inline-flex items-center gap-1.5 font-semibold uppercase tracking-[0.16em] text-[#D4AF37] transition-all duration-300 group-hover:gap-2.5 sm:mt-2 ${
               large ? "text-[0.62rem] sm:text-[0.68rem]" : "text-[0.58rem] sm:text-[0.62rem]"
             }`}
           >
