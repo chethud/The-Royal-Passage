@@ -139,6 +139,24 @@ export function HomeHero({
 
   const heading = activeHeading ?? headings[0];
 
+  const renderReadableCopy = (item: HomepageHeroHeading) => (
+    <div className="home-hero-copy__text">
+      {item.eyebrow ? (
+        <p className="eyebrow mb-5 text-ember/95">{item.eyebrow}</p>
+      ) : null}
+      <h1 className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-[1.02] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]">
+        {item.line1 ? <span className="block">{item.line1}</span> : null}
+        {item.line2 ? <span className="block text-ember">{item.line2}</span> : null}
+        {item.line3 ? <span className="block">{item.line3}</span> : null}
+      </h1>
+      {item.body ? (
+        <p className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg [text-shadow:0_1px_12px_oklch(0.05_0.04_18_/_0.55)]">
+          {item.body}
+        </p>
+      ) : null}
+    </div>
+  );
+
   return (
     <section
       id="hero"
@@ -168,11 +186,7 @@ export function HomeHero({
           className="absolute inset-0 h-full w-full"
         />
         <div
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(95deg,oklch(0.12_0.06_22_/_0.82)_0%,oklch(0.12_0.06_22_/_0.55)_45%,oklch(0.12_0.06_22_/_0.25)_75%,oklch(0.12_0.06_22_/_0.6)_100%)]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent"
           aria-hidden
         />
       </motion.div>
@@ -201,33 +215,7 @@ export function HomeHero({
                     ))}
                   </div>
                   {headings[editHeadingIndex] ? (
-                    <div className="max-w-xl text-left">
-                      {headings[editHeadingIndex]!.eyebrow ? (
-                        <p className="eyebrow mb-4 text-ember/95">
-                          {headings[editHeadingIndex]!.eyebrow}
-                        </p>
-                      ) : null}
-                      <h1 className="font-display text-[clamp(2.2rem,5vw,4.25rem)] font-semibold leading-[1.02] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]">
-                        <span>{headings[editHeadingIndex]!.line1}</span>
-                        {headings[editHeadingIndex]!.line1 && headings[editHeadingIndex]!.line2
-                          ? " "
-                          : null}
-                        <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-                          {headings[editHeadingIndex]!.line2}
-                        </span>
-                        {headings[editHeadingIndex]!.line3 ? (
-                          <>
-                            <br />
-                            {headings[editHeadingIndex]!.line3}
-                          </>
-                        ) : null}
-                      </h1>
-                      {headings[editHeadingIndex]!.body ? (
-                        <p className="mt-5 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:text-[1.05rem]">
-                          {headings[editHeadingIndex]!.body}
-                        </p>
-                      ) : null}
-                    </div>
+                    <div className="home-hero-copy">{renderReadableCopy(headings[editHeadingIndex]!)}</div>
                   ) : null}
                 </div>
 
@@ -289,47 +277,22 @@ export function HomeHero({
               {copyVisible && heading ? (
                 <motion.div
                   key={heading.id}
-                  className="max-w-2xl text-left"
+                  className="home-hero-copy"
                   variants={reduceMotion ? undefined : revealParent}
                   initial={reduceMotion || !cinematic ? false : "hidden"}
                   animate="show"
                   exit={reduceMotion || !cinematic ? undefined : "exit"}
                 >
-                  <motion.div
-                    variants={reduceMotion ? undefined : revealItem}
-                    className="eyebrow mb-5 text-ember/95"
-                  >
-                    {heading.eyebrow}
+                  <motion.div variants={reduceMotion ? undefined : revealItem}>
+                    {renderReadableCopy(heading)}
                   </motion.div>
-                  <motion.h1
-                    variants={reduceMotion ? undefined : revealItem}
-                    className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-[1.02] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]"
-                  >
-                    <span>{heading.line1}</span>
-                    {heading.line1 && heading.line2 ? " " : null}
-                    <span className="text-ember [text-shadow:0_0_1.1em_oklch(0.55_0.14_78_/_0.45)]">
-                      {heading.line2}
-                    </span>
-                    {heading.line3 ? (
-                      <>
-                        <br />
-                        {heading.line3}
-                      </>
-                    ) : null}
-                  </motion.h1>
-                  <motion.p
-                    variants={reduceMotion ? undefined : revealItem}
-                    className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg"
-                  >
-                    {heading.body}
-                  </motion.p>
                   <motion.div
                     variants={reduceMotion ? undefined : revealItem}
-                    className="mt-7 flex flex-wrap items-center justify-start gap-3 sm:mt-9 sm:gap-4"
+                    className="home-hero-copy__actions"
                   >
                     <Link
                       to="/experiences"
-                      className="group inline-flex items-center gap-2 rounded-sm bg-ember px-6 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary-foreground shadow-[var(--shadow-gold)] transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-8 sm:py-4 sm:text-xs"
+                      className="home-hero-copy__cta-primary group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       Explore Experiences
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -337,7 +300,7 @@ export function HomeHero({
                     {!user ? (
                       <Link
                         to="/sign-in"
-                        className="inline-flex items-center rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-transparent px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-ink/85 backdrop-blur-md transition-colors hover:border-ember/55 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-7 sm:py-4 sm:text-xs"
+                        className="home-hero-copy__cta-ghost focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Sign in
                       </Link>

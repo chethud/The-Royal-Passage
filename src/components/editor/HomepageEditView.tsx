@@ -3,9 +3,11 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { HomeHero } from "@/components/site/HomeHero";
 import { ExperiencesShowcase } from "@/components/site/ExperiencesShowcase";
+import { FeaturedStaysShowcase } from "@/components/site/FeaturedStaysShowcase";
 import { JourneysSplit } from "@/components/site/JourneysSplit";
 import { PillarsRow } from "@/components/site/PillarsRow";
 import { JournalPreview } from "@/components/site/JournalPreview";
+import { ScrollMotionProvider } from "@/components/site/ScrollReveal";
 import { HomepageEditorBar } from "@/components/editor/HomepageEditorBar";
 import { useAuthUser } from "@/lib/auth-user";
 import { normalizeHomepageContent, type HomepageContent } from "@/lib/homepage-content";
@@ -20,6 +22,7 @@ import {
   type UserRole,
 } from "@/lib/roles";
 import type { ShowcaseExperienceOption } from "@/lib/showcase-from-experience";
+import type { Homestay } from "@/data/homestays";
 
 type HomepageEditViewProps = {
   homepage: HomepageContent;
@@ -27,6 +30,7 @@ type HomepageEditViewProps = {
   /** When set, limits which sections are editable (defaults from role). */
   editorRole?: Extract<UserRole, "editor" | "admin">;
   experiences?: ShowcaseExperienceOption[];
+  featuredStays?: Homestay[];
 };
 
 export function HomepageEditView({
@@ -34,6 +38,7 @@ export function HomepageEditView({
   onRefresh,
   editorRole,
   experiences = [],
+  featuredStays = [],
 }: HomepageEditViewProps) {
   const { role, roles, accessToken } = useAuthUser();
   const resolvedRole: Extract<UserRole, "editor" | "admin"> =
@@ -166,36 +171,40 @@ export function HomepageEditView({
         }
       />
 
-      <ExperiencesShowcase
-        items={editContent.showcase}
-        imageVersion={displayVersion}
-        editable={canEditAdminSections}
-        experiences={experiences}
-        onItemsChange={(showcase) => setDraft((prev) => ({ ...prev, showcase }))}
-        uploadPhoto={
-          canEditAdminSections
-            ? (section, itemIndex) => createPhotoUploader(section, itemIndex)
-            : undefined
-        }
-      />
+      <ScrollMotionProvider enabled={false}>
+        <ExperiencesShowcase
+          items={editContent.showcase}
+          imageVersion={displayVersion}
+          editable={canEditAdminSections}
+          experiences={experiences}
+          onItemsChange={(showcase) => setDraft((prev) => ({ ...prev, showcase }))}
+          uploadPhoto={
+            canEditAdminSections
+              ? (section, itemIndex) => createPhotoUploader(section, itemIndex)
+              : undefined
+          }
+        />
 
-      <JourneysSplit
-        slides={editContent.journeys}
-        editable={canEditJourneys}
-        onSlidesChange={(journeys) => setDraft((prev) => ({ ...prev, journeys }))}
-      />
+        <FeaturedStaysShowcase stays={featuredStays} />
 
-      <PillarsRow />
+        <JourneysSplit
+          slides={editContent.journeys}
+          editable={canEditJourneys}
+          onSlidesChange={(journeys) => setDraft((prev) => ({ ...prev, journeys }))}
+        />
 
-      <JournalPreview
-        items={editContent.journal}
-        imageVersion={displayVersion}
-        editable={canEditJournal}
-        onItemsChange={(journal) => setDraft((prev) => ({ ...prev, journal }))}
-        uploadPhoto={
-          canEditJournal ? (section, itemIndex) => createPhotoUploader(section, itemIndex) : undefined
-        }
-      />
+        <PillarsRow />
+
+        <JournalPreview
+          items={editContent.journal}
+          imageVersion={displayVersion}
+          editable={canEditJournal}
+          onItemsChange={(journal) => setDraft((prev) => ({ ...prev, journal }))}
+          uploadPhoto={
+            canEditJournal ? (section, itemIndex) => createPhotoUploader(section, itemIndex) : undefined
+          }
+        />
+      </ScrollMotionProvider>
     </>
   );
 }
@@ -205,6 +214,7 @@ type HomepageEditPageShellProps = {
   onRefresh: () => void;
   editorRole?: Extract<UserRole, "editor" | "admin">;
   experiences?: ShowcaseExperienceOption[];
+  featuredStays?: Homestay[];
 };
 
 export function HomepageEditPageShell({
@@ -212,6 +222,7 @@ export function HomepageEditPageShell({
   onRefresh,
   editorRole,
   experiences = [],
+  featuredStays = [],
 }: HomepageEditPageShellProps) {
   return (
     <div className="overflow-x-hidden bg-background text-foreground">
@@ -221,6 +232,7 @@ export function HomepageEditPageShell({
         onRefresh={onRefresh}
         editorRole={editorRole}
         experiences={experiences}
+        featuredStays={featuredStays}
       />
       <Footer />
     </div>

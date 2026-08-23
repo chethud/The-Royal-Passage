@@ -4,25 +4,37 @@ import { Footer } from "@/components/site/Footer";
 import { HomeHero } from "@/components/site/HomeHero";
 import { HomeBrandSplash, HomeIntroProvider } from "@/components/site/home-intro";
 import { ExperiencesShowcase } from "@/components/site/ExperiencesShowcase";
+import { FeaturedStaysShowcase } from "@/components/site/FeaturedStaysShowcase";
 import { JourneysSplit } from "@/components/site/JourneysSplit";
 import { PillarsRow } from "@/components/site/PillarsRow";
 import { JournalPreview } from "@/components/site/JournalPreview";
 import { getCatalogForUi, getCatalogFallback } from "@/lib/marketplace-fns";
 import { getHomepageContent } from "@/lib/homepage-content-fns";
+import { getHomestaysForUi } from "@/lib/homestay-fns";
+import { fetchFeaturedHomestaySlugs } from "@/lib/homestay-featured-fns";
+import { resolveFeaturedHomestays } from "@/lib/homestay-featured";
+import { homestays as staticHomestays } from "@/data/homestays";
 import { withHomepageCacheBust, normalizeHomepageContent } from "@/lib/homepage-content";
 import { buildHomeJsonLd, SITE_URL } from "@/lib/seo";
-import { ScrollParallaxSection } from "@/components/site/ScrollReveal";
+import { ScrollMotionProvider } from "@/components/site/ScrollReveal";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [catalog, homepage] = await Promise.all([
+    const [catalog, homepage, homestayCatalog, featuredStaySlugs] = await Promise.all([
       getCatalogForUi().catch(() => getCatalogFallback()),
       getHomepageContent().catch(() => normalizeHomepageContent({})),
+      getHomestaysForUi().catch(() => ({ homestays: staticHomestays })),
+      fetchFeaturedHomestaySlugs().catch(() => [] as string[]),
     ]);
+    const homestays =
+      (homestayCatalog.homestays?.length ?? 0) > 0
+        ? homestayCatalog.homestays
+        : staticHomestays;
     return {
       ...catalog,
       experiences: catalog.experiences ?? [],
       homepage: normalizeHomepageContent(homepage ?? {}),
+      featuredStays: resolveFeaturedHomestays(homestays, featuredStaySlugs),
     };
   },
   staleTime: 0,
@@ -68,8 +80,13 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { experiences: loaderExperiences, homepage: loaderHomepage } = Route.useLoaderData();
+  const {
+    experiences: loaderExperiences,
+    homepage: loaderHomepage,
+    featuredStays: loaderFeaturedStays,
+  } = Route.useLoaderData();
   const experiences = loaderExperiences ?? [];
+  const featuredStays = loaderFeaturedStays ?? [];
   const publicContent = normalizeHomepageContent(loaderHomepage ?? {});
   const ldJson = buildHomeJsonLd(experiences);
 
@@ -90,18 +107,13 @@ function Index() {
           headings={publicContent.heroHeadings}
           imageVersion={publicContent.version}
         />
-        <ScrollParallaxSection>
+        <ScrollMotionProvider enabled={false}>
           <ExperiencesShowcase items={publicContent.showcase} imageVersion={publicContent.version} />
-        </ScrollParallaxSection>
-        <ScrollParallaxSection intensity="subtle">
+          <FeaturedStaysShowcase stays={featuredStays} />
           <JourneysSplit slides={publicContent.journeys} />
-        </ScrollParallaxSection>
-        <ScrollParallaxSection intensity="subtle">
           <PillarsRow />
-        </ScrollParallaxSection>
-        <ScrollParallaxSection>
           <JournalPreview items={publicContent.journal} imageVersion={publicContent.version} />
-        </ScrollParallaxSection>
+        </ScrollMotionProvider>
         <Footer />
       </div>
     </HomeIntroProvider>

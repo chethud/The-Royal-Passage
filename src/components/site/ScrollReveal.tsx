@@ -8,8 +8,26 @@ import {
   type Transition,
   type Variants,
 } from "motion/react";
-import { useRef, type ElementType, type ReactNode } from "react";
+import { useRef, createContext, useContext, type ElementType, type ReactNode } from "react";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+
+const ScrollMotionContext = createContext(true);
+
+export function ScrollMotionProvider({
+  enabled = true,
+  children,
+}: {
+  enabled?: boolean;
+  children: ReactNode;
+}) {
+  return <ScrollMotionContext.Provider value={enabled}>{children}</ScrollMotionContext.Provider>;
+}
+
+function useScrollMotionEnabled() {
+  const enabled = useContext(ScrollMotionContext);
+  const reduceMotion = usePrefersReducedMotion();
+  return enabled && !reduceMotion;
+}
 
 export const scrollRevealEase = [0.22, 1, 0.36, 1] as const;
 
@@ -86,8 +104,17 @@ export function ScrollReveal({
   style,
   ...props
 }: ScrollRevealProps) {
-  const reduceMotion = usePrefersReducedMotion();
+  const motionEnabled = useScrollMotionEnabled();
   const Component = motionTags[as] as ElementType;
+
+  if (!motionEnabled) {
+    const StaticTag = as;
+    return (
+      <StaticTag className={props.className} style={style}>
+        {children}
+      </StaticTag>
+    );
+  }
 
   const initial = depth3d
     ? { opacity: 0, y: offsetY + 12, rotateX: 10, scale: 0.96, filter: "blur(4px)" }
@@ -101,7 +128,7 @@ export function ScrollReveal({
 
   return (
     <Component
-      initial={reduceMotion ? false : initial}
+      initial={initial}
       whileInView={animate}
       viewport={viewport}
       transition={{
@@ -135,7 +162,7 @@ export function ScrollParallaxSection({
   id,
   intensity = "medium",
 }: ScrollParallaxSectionProps) {
-  const reduceMotion = usePrefersReducedMotion();
+  const motionEnabled = useScrollMotionEnabled();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -168,7 +195,7 @@ export function ScrollParallaxSection({
     [0.82, 0.94, 1, 1, 0.96, 0.9],
   );
 
-  if (reduceMotion) {
+  if (!motionEnabled) {
     return (
       <div id={id} className={className}>
         {children}
@@ -227,13 +254,17 @@ type ScrollRevealGroupProps = {
 };
 
 export function ScrollRevealGroup({ children, className, depth3d = false }: ScrollRevealGroupProps) {
-  const reduceMotion = usePrefersReducedMotion();
+  const motionEnabled = useScrollMotionEnabled();
+
+  if (!motionEnabled) {
+    return <div className={className}>{children}</div>;
+  }
 
   return (
     <motion.div
       className={className}
       variants={scrollRevealStaggerParent}
-      initial={reduceMotion ? false : "hidden"}
+      initial="hidden"
       whileInView="show"
       viewport={scrollRevealViewport}
       style={{
@@ -255,6 +286,12 @@ export function ScrollRevealItem({
   className?: string;
   depth3d?: boolean;
 }) {
+  const motionEnabled = useScrollMotionEnabled();
+
+  if (!motionEnabled) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       className={className}

@@ -292,6 +292,83 @@
   justify-content: flex-start;
 }
 
+.home-hero-copy {
+  width: min(100%, 38rem);
+  text-align: left;
+}
+
+.home-hero-copy__text {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.home-hero-copy__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 0.9rem;
+  margin-top: 1.85rem;
+}
+
+.home-hero-copy__cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 2px;
+  background: #c9a227;
+  padding: 0.85rem 1.55rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #2a0b08;
+  box-shadow: 0 8px 22px rgb(8 2 0 / 0.28);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease, background-color 0.35s ease;
+}
+
+.home-hero-copy__cta-primary:hover {
+  background: #d4ad32;
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.home-hero-copy__cta-ghost {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 2px;
+  border: 1px solid rgb(201 162 39 / 0.42);
+  background: rgb(12 4 2 / 0.32);
+  padding: 0.85rem 1.4rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #f3ead6;
+  transition: border-color 0.3s ease, color 0.3s ease, background-color 0.3s ease;
+}
+
+.home-hero-copy__cta-ghost:hover {
+  border-color: rgb(201 162 39 / 0.72);
+  background: rgb(12 4 2 / 0.42);
+  color: #c9a227;
+}
+
+@media (min-width: 640px) {
+  .home-hero-copy__body {
+    margin-top: 1.55rem;
+    font-size: 1.05rem;
+  }
+
+  .home-hero-copy__cta-primary,
+  .home-hero-copy__cta-ghost {
+    padding: 1rem 1.85rem;
+    font-size: 0.72rem;
+  }
+}
+
 /* Home cinematic intro — logo splash + chrome reveal */
 .home-brand-splash {
   position: fixed;
@@ -1665,7 +1742,7 @@ a.dashboard-stat-card:hover .dashboard-stat-card__cta {
   border-radius: 999px;
   border: 1px solid transparent;
   font-size: 0.55rem;
-  font-weight: 650;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }

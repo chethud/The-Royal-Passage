@@ -49,7 +49,7 @@ export const Route = createFileRoute("/homestays/")({
 });
 
 function HomestaysHomePage() {
-  const { featured, homepage } = Route.useLoaderData();
+  const { featured, homepage, homestays } = Route.useLoaderData();
   const content = normalizeHomepageContent(homepage ?? {});
 
   return (
@@ -57,7 +57,7 @@ function HomestaysHomePage() {
       <Header />
 
       <HomestaysHomeHero slides={content.homestayHero} imageVersion={content.version} />
-      <HomestaysShowcase featured={featured} />
+      <HomestaysShowcase featured={featured} homestays={homestays} />
       <HomestayPillarsRow />
       <Footer />
     </div>

@@ -6,6 +6,10 @@ import { useAuthUser } from "@/lib/auth-user";
 import { getHomepageContent } from "@/lib/homepage-content-fns";
 import { normalizeHomepageContent } from "@/lib/homepage-content";
 import { getCatalogForUi, getCatalogFallback } from "@/lib/marketplace-fns";
+import { getHomestaysForUi } from "@/lib/homestay-fns";
+import { fetchFeaturedHomestaySlugs } from "@/lib/homestay-featured-fns";
+import { resolveFeaturedHomestays } from "@/lib/homestay-featured";
+import { homestays as staticHomestays } from "@/data/homestays";
 import {
   dashboardPathForRoles,
   hasAdminAccess,
@@ -19,13 +23,21 @@ export const Route = createFileRoute("/admin/homepage-edit")({
     meta: [{ title: "Edit homepage — The Royal Passage" }, ...NOINDEX_META],
   }),
   loader: async () => {
-    const [homepage, catalog] = await Promise.all([
+    const [homepage, catalog, homestayCatalog, featuredStaySlugs] = await Promise.all([
       getHomepageContent().catch(() => normalizeHomepageContent({})),
       getCatalogForUi().catch(() => getCatalogFallback()),
+      getHomestaysForUi().catch(() => ({ homestays: staticHomestays })),
+      fetchFeaturedHomestaySlugs().catch(() => [] as string[]),
     ]);
     return {
       homepage: normalizeHomepageContent(homepage ?? {}),
       experiences: (catalog.experiences ?? []).map(toShowcaseExperienceOption),
+      featuredStays: resolveFeaturedHomestays(
+        (homestayCatalog.homestays?.length ?? 0) > 0
+          ? homestayCatalog.homestays
+          : staticHomestays,
+        featuredStaySlugs,
+      ),
     };
   },
   component: AdminHomepageEditPage,
@@ -35,7 +47,7 @@ function AdminHomepageEditPage() {
   const navigate = useNavigate();
   const router = useRouter();
   const { user, role, roles, loading, accessToken } = useAuthUser();
-  const { homepage, experiences } = Route.useLoaderData();
+  const { homepage, experiences, featuredStays } = Route.useLoaderData();
   const canEdit = hasEditorAccess(roles, role);
   const editorRole = hasAdminAccess(roles, role) ? "admin" : "editor";
 
@@ -75,6 +87,7 @@ function AdminHomepageEditPage() {
       onRefresh={refreshHomepage}
       editorRole={editorRole}
       experiences={experiences}
+      featuredStays={featuredStays}
     />
   );
 }
