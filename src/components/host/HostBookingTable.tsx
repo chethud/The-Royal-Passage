@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Banknote,
   BarChart3,
+  CalendarDays,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -17,19 +18,23 @@ import {
   type BookingDecisionPayload,
 } from "@/components/booking/BookingDecisionDialog";
 import { HostBookingActions } from "@/components/host/HostBookingActions";
-import { CornerFiligree } from "@/components/site/RoyalHeritageDecor";
+import {
+  CornerFiligree,
+  MaharajaEmblem,
+  OrnamentalDivider,
+  PalaceSilhouette,
+} from "@/components/site/RoyalHeritageDecor";
 import {
   DashboardTable,
   DashboardTableBody,
   DashboardTableCell,
-  DashboardTableEmpty,
-  DashboardFilterCountBadge,
   DashboardTableFilters,
   DashboardTableHead,
   DashboardTableHeadCell,
   DashboardTableHeadRow,
   DashboardTableRow,
   DashboardTableScroll,
+  DashboardFilterCountBadge,
   hostBookingsFilterBtnClass,
 } from "@/components/ui/DashboardTable";
 import type { BookingSummary } from "@/lib/api/bookings";
@@ -88,6 +93,17 @@ function filterBookings(
 
 const PAGE_SIZE = 10;
 
+function DeckCorners() {
+  return (
+    <>
+      <CornerFiligree className="host-bookings-deck__corner host-bookings-deck__corner--tl" />
+      <CornerFiligree className="host-bookings-deck__corner host-bookings-deck__corner--tr" />
+      <CornerFiligree className="host-bookings-deck__corner host-bookings-deck__corner--bl" />
+      <CornerFiligree className="host-bookings-deck__corner host-bookings-deck__corner--br" />
+    </>
+  );
+}
+
 function FilterStripCorners() {
   return (
     <>
@@ -106,6 +122,43 @@ function SummaryOrnament() {
       <path d="M46 38 V20 M90 38 V18 M134 38 V20" stroke="#C9A227" strokeWidth="0.45" />
       <path d="M28 38 H152" stroke="#C9A227" strokeWidth="0.5" />
     </svg>
+  );
+}
+
+function HostBookingsEmptyState({
+  onViewAll,
+  onClearFilters,
+}: {
+  onViewAll: () => void;
+  onClearFilters: () => void;
+}) {
+  return (
+    <div className="host-bookings-empty">
+      <PalaceSilhouette className="host-bookings-empty__palace" />
+      <div className="host-bookings-empty__content">
+        <span className="host-bookings-empty__medallion" aria-hidden>
+          <CalendarDays className="host-bookings-empty__medallion-icon" />
+        </span>
+        <OrnamentalDivider className="host-bookings-empty__divider" />
+        <h3 className="host-bookings-empty__title">No bookings in this view</h3>
+        <p className="host-bookings-empty__body">
+          Try changing the date range or booking status
+          <br />
+          to view reservations.
+        </p>
+        <button type="button" className="host-bookings-empty__primary" onClick={onViewAll}>
+          View all bookings
+        </button>
+        <span className="host-bookings-empty__or" aria-hidden>
+          <span className="host-bookings-empty__or-line" />
+          <span className="host-bookings-empty__or-text">Or</span>
+          <span className="host-bookings-empty__or-line" />
+        </span>
+        <button type="button" className="host-bookings-empty__secondary" onClick={onClearFilters}>
+          Clear filters
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -266,6 +319,20 @@ export function HostBookingTable({
     syncSearch({ status, payment, dateView });
   };
 
+  const viewAllBookings = () => {
+    setStatusFilter("all");
+    setPaymentFilter("all");
+    setDateView("all");
+    syncSearch({ status: "all", payment: "all", dateView: "all" });
+  };
+
+  const clearFilters = () => {
+    setStatusFilter("today");
+    setPaymentFilter("all");
+    setDateView("week");
+    syncSearch({ status: "today", payment: "all", dateView: "week" });
+  };
+
   const summaryRows: {
     label: string;
     count: number;
@@ -319,6 +386,7 @@ export function HostBookingTable({
 
   return (
     <div className="host-bookings-deck">
+      <DeckCorners />
       <div className="host-bookings-strip">
         <FilterStripCorners />
         <div className="host-bookings-strip__bar">
@@ -356,7 +424,10 @@ export function HostBookingTable({
 
       <div className="host-bookings-workspace">
         <aside className="host-bookings-summary">
-          <h2 className="host-bookings-summary__title">Quick summary</h2>
+          <h2 className="host-bookings-summary__title">
+            <MaharajaEmblem className="host-bookings-summary__emblem" />
+            Quick summary
+          </h2>
           <ul className="host-bookings-summary__list">
             {summaryRows.map((row) => {
               const Icon = row.icon;
@@ -384,9 +455,9 @@ export function HostBookingTable({
           <SummaryOrnament />
         </aside>
 
-        <div className="host-bookings-ledger">
+        <div className={`host-bookings-ledger${filtered.length > 0 ? " host-bookings-ledger--filled" : ""}`}>
           {filtered.length === 0 ? (
-            <DashboardTableEmpty>No bookings in this view.</DashboardTableEmpty>
+            <HostBookingsEmptyState onViewAll={viewAllBookings} onClearFilters={clearFilters} />
           ) : (
             <>
               <DashboardTableScroll>

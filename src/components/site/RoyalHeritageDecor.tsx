@@ -96,6 +96,71 @@ export function HeritageCompass({ className }: { className?: string }) {
   );
 }
 
+/** Extremely subtle Mysuru-style palace line art for host overview surfaces. */
+export function PalaceSilhouette({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 420 220"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <path
+        d="M28 200 H392 M48 200 V132 L78 112 L108 132 V200 M108 132 L148 88 L188 132 V200 M188 132 L210 108 L232 132 V200 M232 132 L272 88 L312 132 V200 M312 132 L342 112 L372 132 V200"
+        stroke={AGED_GOLD}
+        strokeWidth="1.1"
+        strokeOpacity="0.55"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M148 88 L168 58 L188 88 M272 88 L292 58 L312 88 M210 108 L210 72 L220 58 L210 48 L200 58 L210 72"
+        stroke={GOLD}
+        strokeWidth="0.9"
+        strokeOpacity="0.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M78 112 V96 M108 132 V118 M312 132 V118 M342 112 V96 M168 58 V46 M292 58 V46"
+        stroke={AGED_GOLD}
+        strokeWidth="0.8"
+        strokeOpacity="0.4"
+      />
+      <circle cx="210" cy="42" r="3.5" stroke={GOLD} strokeWidth="0.7" strokeOpacity="0.45" />
+      <path
+        d="M60 200 H380"
+        stroke={GOLD}
+        strokeWidth="0.6"
+        strokeOpacity="0.3"
+      />
+    </svg>
+  );
+}
+
+export function OrnamentalDivider({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 280 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <path d="M8 9 H118" stroke={AGED_GOLD} strokeWidth="0.7" strokeOpacity="0.7" />
+      <path d="M162 9 H272" stroke={AGED_GOLD} strokeWidth="0.7" strokeOpacity="0.7" />
+      <path
+        d="M128 9 L140 4 L152 9 L140 14 Z"
+        stroke={GOLD}
+        strokeWidth="0.7"
+        strokeOpacity="0.75"
+        fill={GOLD}
+        fillOpacity="0.12"
+      />
+      <circle cx="140" cy="9" r="1.6" fill={GOLD} fillOpacity="0.7" />
+    </svg>
+  );
+}
+
 export function PalaceDoorPanel({ side }: { side: "left" | "right" }) {
   return (
     <div

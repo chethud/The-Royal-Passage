@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { HomestayOwnerDashboardShell } from "@/components/homestay-owner/HomestayOwnerDashboardShell";
 import { OwnerHomestayBookingTable } from "@/components/homestay-owner/OwnerHomestayBookingTable";
 import {
@@ -96,17 +95,18 @@ function OwnerHomestayBookingsPage() {
       title="Bookings"
       subtitle="Accept or reject stay requests, mark pay-at-property payments, and complete stays."
       showRoleDescription={false}
+      variant="bookings"
     >
       {pageLoading ? (
-        <LuxuryCheckoutPanel>
-          <p className="luxury-panel-body py-8 text-sm">Loading bookings…</p>
-        </LuxuryCheckoutPanel>
+        <div className="host-overview-panel host-overview-loading">
+          <p className="host-overview-loading__text">Loading bookings…</p>
+        </div>
       ) : (
-        <LuxuryCheckoutPanel>
+        <>
           {pageError ? (
-            <p className="mb-4 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {pageError}
-            </p>
+            <div className="host-overview-panel host-overview-warning mb-4">
+              <p>{pageError}</p>
+            </div>
           ) : null}
           <OwnerHomestayBookingTable
             bookings={bookings}
@@ -116,7 +116,7 @@ function OwnerHomestayBookingsPage() {
             onMarkPaid={(id) => void runAction(id, markOwnerHomestayBookingPaid)}
             onComplete={(id) => void runAction(id, completeOwnerHomestayBooking)}
           />
-        </LuxuryCheckoutPanel>
+        </>
       )}
     </HomestayOwnerDashboardShell>
   );

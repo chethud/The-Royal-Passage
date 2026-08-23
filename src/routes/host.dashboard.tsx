@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { CreateExperienceCta } from "@/components/host/CreateExperienceCta";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
+import { HostOverviewActionPanel } from "@/components/host/HostOverviewActionPanel";
 import { HostStatsGrid } from "@/components/host/HostStatsGrid";
 import { HostTodayBookings } from "@/components/host/HostTodayBookings";
 import type { BookingSummary } from "@/lib/api/bookings";
@@ -88,72 +88,49 @@ function HostOverviewPage() {
       title="Overview"
       subtitle="Today's sessions, pending confirmations, and your week ahead."
       showRoleDescription={false}
+      variant="overview"
     >
       {pageLoading ? (
-        <LuxuryCheckoutPanel>
-          <p className="luxury-panel-body py-8 text-sm">Loading overview…</p>
-        </LuxuryCheckoutPanel>
+        <div className="host-overview-panel host-overview-loading">
+          <p className="host-overview-loading__text">Loading overview…</p>
+        </div>
       ) : (
-        <div className="space-y-8">
+        <div className="host-overview-stack">
           {pageWarning ? (
-            <LuxuryCheckoutPanel>
-              <p className="rounded-sm border border-amber-700/30 bg-amber-50/80 px-4 py-3 text-sm text-amber-950">
-                {pageWarning}
-              </p>
-            </LuxuryCheckoutPanel>
+            <div className="host-overview-panel host-overview-warning">
+              <p>{pageWarning}</p>
+            </div>
           ) : null}
 
-          <LuxuryCheckoutPanel>
-            <HostStatsGrid stats={stats} />
-          </LuxuryCheckoutPanel>
+          <HostStatsGrid stats={stats} />
 
           {stats.publishedExperiences === 0 ? <CreateExperienceCta /> : null}
 
-          <LuxuryCheckoutPanel>
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h2 className="luxury-panel-heading font-display text-2xl">Today&apos;s sessions</h2>
-                <p className="luxury-panel-body mt-1 text-sm">
-                  Confirmed and pending bookings happening today.
-                </p>
-              </div>
-              <Link
-                to="/host/bookings"
-                search={{ status: "today" }}
-                className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
-              >
-                View all bookings
-              </Link>
-            </div>
-            <div className="mt-6">
-              <HostTodayBookings bookings={todayBookings} />
-            </div>
-          </LuxuryCheckoutPanel>
+          <HostOverviewActionPanel
+            title="Today's sessions"
+            subtitle="Confirmed and pending bookings happening today."
+            emptyMessage="No sessions scheduled for today."
+            ctaLabel="View all bookings →"
+            ctaTo="/host/bookings"
+            ctaSearch={{ status: "today" }}
+            icon="calendar"
+            isEmpty={todayBookings.length === 0}
+          >
+            <HostTodayBookings bookings={todayBookings} />
+          </HostOverviewActionPanel>
 
-          <LuxuryCheckoutPanel>
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h2 className="luxury-panel-heading font-display text-2xl">Pending confirmations</h2>
-                <p className="luxury-panel-body mt-1 text-sm">
-                  Guest requests waiting for your response.
-                </p>
-              </div>
-              <Link
-                to="/host/bookings"
-                search={{ status: "pending" }}
-                className="luxury-btn-sm luxury-btn-panel-outline inline-flex items-center no-underline"
-              >
-                Manage bookings
-              </Link>
-            </div>
-            <div className="mt-6">
-              {pendingBookings.length === 0 ? (
-                <p className="luxury-panel-body text-sm">No pending requests right now.</p>
-              ) : (
-                <HostTodayBookings bookings={pendingBookings.slice(0, 5)} />
-              )}
-            </div>
-          </LuxuryCheckoutPanel>
+          <HostOverviewActionPanel
+            title="Pending confirmations"
+            subtitle="Guest requests waiting for your response."
+            emptyMessage="No pending requests right now."
+            ctaLabel="Manage bookings →"
+            ctaTo="/host/bookings"
+            ctaSearch={{ status: "pending" }}
+            icon="hourglass"
+            isEmpty={pendingBookings.length === 0}
+          >
+            <HostTodayBookings bookings={pendingBookings.slice(0, 5)} />
+          </HostOverviewActionPanel>
         </div>
       )}
     </HostDashboardShell>

@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
-import { OwnerHomestayStatsGrid } from "@/components/homestay-owner/OwnerHomestayStatsGrid";
+import { HostOverviewActionPanel } from "@/components/host/HostOverviewActionPanel";
 import { HomestayOwnerDashboardShell } from "@/components/homestay-owner/HomestayOwnerDashboardShell";
 import { OwnerHomestayBookingTable } from "@/components/homestay-owner/OwnerHomestayBookingTable";
+import { OwnerHomestayStatsGrid } from "@/components/homestay-owner/OwnerHomestayStatsGrid";
 import {
   confirmOwnerHomestayBooking,
   EMPTY_OWNER_DASHBOARD_STATS,
@@ -31,27 +31,7 @@ function HomestayOwnerOverviewPage() {
   const [todayBookings, setTodayBookings] = useState<HomestayBookingSummary[]>([]);
   const [pageWarning, setPageWarning] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
-
   const [busyId, setBusyId] = useState<string | null>(null);
-
-  const runAction = async (
-    bookingId: string,
-    action: (token: string, id: string) => Promise<HomestayBookingSummary>,
-  ) => {
-    if (!accessToken) return;
-    setBusyId(bookingId);
-    setPageWarning(null);
-    try {
-      const updated = await action(accessToken, bookingId);
-      setPendingBookings((rows) => rows.map((row) => (row.id === bookingId ? updated : row)));
-      setTodayBookings((rows) => rows.map((row) => (row.id === bookingId ? updated : row)));
-    } catch (err) {
-      setPageWarning(toErrorMessage(err, "Action failed."));
-      throw err;
-    } finally {
-      setBusyId(null);
-    }
-  };
 
   const runDecision = async (
     bookingId: string,
@@ -128,96 +108,79 @@ function HomestayOwnerOverviewPage() {
       title="Overview"
       subtitle="Pending stay requests, today's check-ins, and your published properties."
       showRoleDescription={false}
+      variant="overview"
     >
       {pageLoading ? (
-        <LuxuryCheckoutPanel>
-          <p className="luxury-panel-body py-8 text-sm">Loading overview…</p>
-        </LuxuryCheckoutPanel>
+        <div className="host-overview-panel host-overview-loading">
+          <p className="host-overview-loading__text">Loading overview…</p>
+        </div>
       ) : (
-        <div className="space-y-8">
+        <div className="host-overview-stack">
           {pageWarning ? (
-            <LuxuryCheckoutPanel>
-              <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                {pageWarning}
-              </p>
-            </LuxuryCheckoutPanel>
+            <div className="host-overview-panel host-overview-warning">
+              <p>{pageWarning}</p>
+            </div>
           ) : null}
 
-          <LuxuryCheckoutPanel>
-            <OwnerHomestayStatsGrid stats={stats} />
-          </LuxuryCheckoutPanel>
+          <OwnerHomestayStatsGrid stats={stats} />
 
           {stats.publishedHomestays === 0 ? (
-            <LuxuryCheckoutPanel>
-              <p className="luxury-panel-body text-sm">Add your first property to start accepting stay requests.</p>
-              <Link
-                to="/homestay/properties/new"
-                className="luxury-btn-sm luxury-btn-primary mt-4 inline-flex no-underline"
-              >
-                Add property
-              </Link>
-            </LuxuryCheckoutPanel>
+            <div className="host-overview-panel host-overview-action">
+              <div className="host-overview-action__layout">
+                <div className="host-overview-action__copy">
+                  <h2 className="host-overview-action__title">Add your first property</h2>
+                  <p className="host-overview-action__subtitle">
+                    Publish a homestay listing to start accepting stay requests.
+                  </p>
+                </div>
+                <div className="host-overview-action__cta-wrap">
+                  <Link to="/homestay/properties/new" className="host-overview-action__cta">
+                    Add property →
+                  </Link>
+                </div>
+              </div>
+            </div>
           ) : null}
 
-          <LuxuryCheckoutPanel>
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h2 className="luxury-panel-heading font-display text-2xl">Today&apos;s check-ins</h2>
-                <p className="luxury-panel-body mt-1 text-sm">Confirmed and pending arrivals today.</p>
-              </div>
-              <Link
-                to="/homestay/bookings"
-                search={{ status: "today" }}
-                className="luxury-btn-sm luxury-btn-panel-outline inline-flex no-underline"
-              >
-                View all bookings
-              </Link>
-            </div>
-            <div className="mt-6">
-              {todayBookings.length === 0 ? (
-                <p className="luxury-panel-body text-sm">No check-ins scheduled for today.</p>
-              ) : (
-                <OwnerHomestayBookingTable
-                  bookings={todayBookings}
-                  busyId={null}
-                  onConfirm={async () => undefined}
-                  onReject={async () => undefined}
-                  onMarkPaid={() => undefined}
-                  onComplete={() => undefined}
-                />
-              )}
-            </div>
-          </LuxuryCheckoutPanel>
+          <HostOverviewActionPanel
+            title="Today's check-ins"
+            subtitle="Confirmed and pending arrivals happening today."
+            emptyMessage="No check-ins scheduled for today."
+            ctaLabel="View all bookings →"
+            ctaTo="/homestay/bookings"
+            ctaSearch={{ status: "today" }}
+            icon="calendar"
+            isEmpty={todayBookings.length === 0}
+          >
+            <OwnerHomestayBookingTable
+              bookings={todayBookings}
+              busyId={null}
+              onConfirm={async () => undefined}
+              onReject={async () => undefined}
+              onMarkPaid={() => undefined}
+              onComplete={() => undefined}
+            />
+          </HostOverviewActionPanel>
 
-          <LuxuryCheckoutPanel>
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h2 className="luxury-panel-heading font-display text-2xl">Pending confirmations</h2>
-                <p className="luxury-panel-body mt-1 text-sm">Guest stay requests waiting for your response.</p>
-              </div>
-              <Link
-                to="/homestay/bookings"
-                search={{ status: "pending" }}
-                className="luxury-btn-sm luxury-btn-panel-outline inline-flex no-underline"
-              >
-                Manage bookings
-              </Link>
-            </div>
-            <div className="mt-6">
-              {pendingBookings.length === 0 ? (
-                <p className="luxury-panel-body text-sm">No pending requests right now.</p>
-              ) : (
-                <OwnerHomestayBookingTable
-                  bookings={pendingBookings.slice(0, 5)}
-                  busyId={busyId}
-                  onConfirm={(id, decision) => runDecision(id, decision, confirmOwnerHomestayBooking)}
-                  onReject={(id, decision) => runDecision(id, decision, rejectOwnerHomestayBooking)}
-                  onMarkPaid={() => undefined}
-                  onComplete={() => undefined}
-                />
-              )}
-            </div>
-          </LuxuryCheckoutPanel>
+          <HostOverviewActionPanel
+            title="Pending confirmations"
+            subtitle="Guest stay requests waiting for your response."
+            emptyMessage="No pending requests right now."
+            ctaLabel="Manage bookings →"
+            ctaTo="/homestay/bookings"
+            ctaSearch={{ status: "pending" }}
+            icon="hourglass"
+            isEmpty={pendingBookings.length === 0}
+          >
+            <OwnerHomestayBookingTable
+              bookings={pendingBookings.slice(0, 5)}
+              busyId={busyId}
+              onConfirm={(id, decision) => runDecision(id, decision, confirmOwnerHomestayBooking)}
+              onReject={(id, decision) => runDecision(id, decision, rejectOwnerHomestayBooking)}
+              onMarkPaid={() => undefined}
+              onComplete={() => undefined}
+            />
+          </HostOverviewActionPanel>
         </div>
       )}
     </HomestayOwnerDashboardShell>

@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import type { BookingDecisionPayload } from "@/components/booking/BookingDecisionDialog";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { HostBookingTable } from "@/components/host/HostBookingTable";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import type { BookingSummary } from "@/lib/api/bookings";
@@ -106,11 +105,12 @@ function HostBookingsPage() {
       title="Bookings"
       subtitle="Accept or reject requests, pause when needed, mark pay-at-venue payments, and complete sessions."
       showRoleDescription={false}
+      variant="bookings"
     >
       {pageLoading ? (
-        <LuxuryCheckoutPanel ornate>
-          <p className="luxury-panel-body py-8 text-sm">Loading bookings…</p>
-        </LuxuryCheckoutPanel>
+        <div className="host-overview-panel host-overview-loading">
+          <p className="host-overview-loading__text">Loading bookings…</p>
+        </div>
       ) : (
         <>
           {pageError ? (

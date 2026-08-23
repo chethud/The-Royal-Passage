@@ -1,11 +1,32 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Home } from "lucide-react";
+import { ArrowRight, Building2, Landmark, Mountain, Trees, type LucideIcon } from "lucide-react";
 import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/site/ScrollReveal";
 import type { Homestay } from "@/data/homestays";
 
 type FeaturedStaysShowcaseProps = {
   stays: Homestay[];
 };
+
+function stayShowcaseIcon(stay: Homestay): LucideIcon {
+  const haystack = `${stay.title} ${stay.slug} ${stay.tagline}`.toLowerCase();
+
+  if (/haveli|heritage|palace|fort|courtyard/.test(haystack)) return Landmark;
+  if (/hill|mountain|foothill/.test(haystack)) return Mountain;
+  if (/villa|garden|resort/.test(haystack) || stay.propertyType === "Resort") return Trees;
+  if (/guest|hotel|boutique|room/.test(haystack) || stay.propertyType === "Hotel") return Building2;
+  if (stay.propertyType === "Home Stay") return Landmark;
+
+  switch (stay.propertyType) {
+    case "Home Stay":
+      return Landmark;
+    case "Resort":
+      return Trees;
+    case "Hotel":
+      return Building2;
+    default:
+      return Building2;
+  }
+}
 
 export function FeaturedStaysShowcase({ stays }: FeaturedStaysShowcaseProps) {
   if (stays.length === 0) return null;
@@ -37,7 +58,10 @@ export function FeaturedStaysShowcase({ stays }: FeaturedStaysShowcaseProps) {
         </ScrollRevealGroup>
 
         <div className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2 md:grid-cols-3 md:gap-7">
-          {stays.map((stay, index) => (
+          {stays.map((stay, index) => {
+            const StayIcon = stayShowcaseIcon(stay);
+
+            return (
             <ScrollReveal
               key={stay.id}
               as="article"
@@ -67,7 +91,7 @@ export function FeaturedStaysShowcase({ stays }: FeaturedStaysShowcaseProps) {
                   className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent"
                 />
                 <div className="absolute left-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-[oklch(0.78_0.1_78_/_0.55)] bg-[oklch(0.14_0.05_22_/_0.72)] text-ember shadow-[inset_0_1px_0_oklch(0.9_0.06_82_/_0.2),0_0_18px_oklch(0.7_0.12_78_/_0.25)] backdrop-blur-md">
-                  <Home className="h-5 w-5" aria-hidden />
+                  <StayIcon className="h-5 w-5" aria-hidden />
                 </div>
                 <div className="absolute inset-x-0 bottom-0 p-6">
                   <p className="mb-2 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-ink/80">
@@ -79,7 +103,8 @@ export function FeaturedStaysShowcase({ stays }: FeaturedStaysShowcaseProps) {
                 </div>
               </Link>
             </ScrollReveal>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
