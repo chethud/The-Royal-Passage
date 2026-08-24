@@ -1,9 +1,16 @@
 import { useState } from "react";
+import { ExperiencePartyPricingFields } from "@/components/experience/ExperiencePartyPricingFields";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
-import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import type { CategoryOption, HostExperienceDetail } from "@/lib/api/host-experiences";
 import type { CitySummary } from "@/lib/cities";
 import { HOST_CITY_SLUG } from "@/lib/host-form-data";
+import {
+  groupTotalMajorFromPerPersonMinor,
+  inferExperiencePartyKind,
+  perPersonMinorFromGroupTotal,
+  resolveExperiencePartyPricing,
+  type ExperiencePartyKind,
+} from "@/lib/experience-party-pricing";
 
 type HostExperienceFormProps = {
   categories: CategoryOption[];
@@ -67,15 +74,27 @@ export function HostExperienceForm({
   const [address, setAddress] = useState(initial?.address ?? "");
   const [mapLink, setMapLink] = useState(initial?.mapLink ?? "");
   const [durationMinutes, setDurationMinutes] = useState(initial?.durationMinutes ?? 120);
+  const initialPartyKind = initial
+    ? inferExperiencePartyKind(
+        initial.minGuestsPerBooking ?? 1,
+        initial.maxGuestsPerBooking ?? 10,
+      )
+    : null;
+  const [partyKind, setPartyKind] = useState<ExperiencePartyKind | null>(initialPartyKind);
   const [priceMajor, setPriceMajor] = useState(
     initial ? Math.round(initial.pricePerPersonMinor / 100) : 0,
   );
-  const [compareAtMajor, setCompareAtMajor] = useState(
-    initial?.compareAtPricePerPersonMinor
-      ? Math.round(initial.compareAtPricePerPersonMinor / 100)
-      : 0,
-  );
-  const [photoUrls, setPhotoUrls] = useState<string[]>(() => {
+  const [compareAtMajor, setCompareAtMajor] = useState(() => {
+    if (!initial?.compareAtPricePerPersonMinor) return 0;
+    if (initialPartyKind === "group") {
+      return groupTotalMajorFromPerPersonMinor(
+        initial.compareAtPricePerPersonMinor,
+        initial.minGuestsPerBooking,
+      );
+    }
+    return Math.round(initial.compareAtPricePerPersonMinor / 100);
+  });
+  const [photoUrls, setPhotoUrls] = useState(() => {
     const existing = initial?.galleryUrls?.length
       ? initial.galleryUrls
       : initial?.heroImageUrl
@@ -83,12 +102,25 @@ export function HostExperienceForm({
         : [];
     return existing;
   });
+  const [groupMembers, setGroupMembers] = useState(
+    initialPartyKind === "group" ? (initial?.minGuestsPerBooking ?? 2) : 2,
+  );
+  const [groupTotalMajor, setGroupTotalMajor] = useState(
+    initialPartyKind === "group" && initial
+      ? groupTotalMajorFromPerPersonMinor(
+          initial.pricePerPersonMinor,
+          initial.minGuestsPerBooking,
+        )
+      : 0,
+  );
   const [inclusions, setInclusions] = useState(joinLines(initial?.inclusions ?? []));
   const [exclusions, setExclusions] = useState(joinLines(initial?.exclusions ?? []));
   const [requirements, setRequirements] = useState(joinLines(initial?.requirements ?? []));
-  const [minGuests, setMinGuests] = useState(initial?.minGuestsPerBooking ?? 1);
-  const [maxGuests, setMaxGuests] = useState(initial?.maxGuestsPerBooking ?? 10);
+  const [maxGuests, setMaxGuests] = useState(
+    initialPartyKind === "group" ? 10 : (initial?.maxGuestsPerBooking ?? 10),
+  );
   const [submitForReview, setSubmitForReview] = useState(false);
+  const [pricingError, setPricingError] = useState<string | null>(null);
 
   const status = initial?.status ?? "draft";
   const canSubmitForReview = status === "draft" || status === "rejected";
@@ -112,6 +144,24 @@ export function HostExperienceForm({
       return;
     }
     const galleryUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
+    const pricing = resolveExperiencePartyPricing({
+      partyKind,
+      priceMajor,
+      maxGuests,
+      groupMembers,
+      groupTotalMajor,
+    });
+    if (!pricing.ok) {
+      setPricingError(pricing.error);
+      return;
+    }
+    setPricingError(null);
+    const compareAtPricePerPersonMinor =
+      compareAtMajor > 0
+        ? partyKind === "group"
+          ? perPersonMinorFromGroupTotal(compareAtMajor, groupMembers)
+          : compareAtMajor * 100
+        : null;
     onSubmit({
       title: title.trim(),
       slug: slug.trim() || undefined,
@@ -123,15 +173,15 @@ export function HostExperienceForm({
       address: address.trim() || undefined,
       mapLink: mapLink.trim() || undefined,
       durationMinutes,
-      pricePerPersonMinor: priceMajor * 100,
-      compareAtPricePerPersonMinor: compareAtMajor > 0 ? compareAtMajor * 100 : null,
+      pricePerPersonMinor: pricing.pricePerPersonMinor,
+      compareAtPricePerPersonMinor,
       heroImageUrl: galleryUrls[0],
       galleryUrls,
       inclusions: splitLines(inclusions),
       exclusions: splitLines(exclusions),
       requirements: splitLines(requirements),
-      minGuestsPerBooking: minGuests,
-      maxGuestsPerBooking: maxGuests,
+      minGuestsPerBooking: pricing.minGuests,
+      maxGuestsPerBooking: pricing.maxGuests,
       submitForReview,
     });
   };
@@ -255,51 +305,28 @@ export function HostExperienceForm({
               className={numberInputClass}
             />
           </label>
-          <label className="text-sm">
-            <span className="eyebrow text-muted-foreground">Price per person (₹)</span>
-            <RupeeAmountInput
-              disabled={readOnly}
-              value={priceMajor}
-              onChange={setPriceMajor}
-              className={inputClass}
-            />
-          </label>
-          <label className="text-sm">
-            <span className="eyebrow text-muted-foreground">Original price / was (₹)</span>
-            <RupeeAmountInput
-              disabled={readOnly}
-              value={compareAtMajor}
-              onChange={setCompareAtMajor}
-              className={inputClass}
-            />
-            <span className="mt-1 block text-xs text-muted-foreground">
-              Optional. Leave blank for no offer. Must be higher than the selling price.
-            </span>
-          </label>
-          <label className="text-sm">
-            <span className="eyebrow text-muted-foreground">Min guests / booking</span>
-            <input
-              type="number"
-              min={1}
-              max={50}
-              disabled={readOnly}
-              value={minGuests}
-              onChange={(e) => setMinGuests(Number(e.target.value))}
-              className={numberInputClass}
-            />
-          </label>
-          <label className="text-sm">
-            <span className="eyebrow text-muted-foreground">Max guests / booking</span>
-            <input
-              type="number"
-              min={1}
-              max={50}
-              disabled={readOnly}
-              value={maxGuests}
-              onChange={(e) => setMaxGuests(Number(e.target.value))}
-              className={numberInputClass}
-            />
-          </label>
+          <ExperiencePartyPricingFields
+            partyKind={partyKind}
+            onPartyKindChange={setPartyKind}
+            priceMajor={priceMajor}
+            onPriceMajorChange={setPriceMajor}
+            maxGuests={maxGuests}
+            onMaxGuestsChange={setMaxGuests}
+            groupMembers={groupMembers}
+            onGroupMembersChange={setGroupMembers}
+            groupTotalMajor={groupTotalMajor}
+            onGroupTotalMajorChange={setGroupTotalMajor}
+            compareAtMajor={compareAtMajor}
+            onCompareAtMajorChange={setCompareAtMajor}
+            showCompareAt
+            disabled={readOnly}
+            labelClass="text-muted-foreground"
+            inputClass={inputClass}
+            numberInputClass={numberInputClass}
+            hintClass="mt-1 block text-xs text-muted-foreground"
+            optionClass="border-[oklch(0.88_0.08_86_/_0.35)] bg-background/50 text-foreground"
+            optionActiveClass="border-ember bg-ember/10 text-foreground"
+          />
         </div>
       </div>
 
@@ -353,6 +380,9 @@ export function HostExperienceForm({
 
       {!readOnly ? (
         <div className="flex flex-wrap items-center gap-4">
+          {pricingError ? (
+            <p className="w-full text-sm text-destructive">{pricingError}</p>
+          ) : null}
           {canSubmitForReview ? (
             <div className="w-full space-y-2 sm:w-auto sm:flex-1">
               <label

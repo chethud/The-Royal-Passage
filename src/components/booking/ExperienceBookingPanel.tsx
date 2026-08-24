@@ -20,6 +20,7 @@ import { bookExperiencePath, guestBookingLimits } from "@/lib/booking-url";
 import { formatDateLong } from "@/lib/date-format";
 import { OfferPrice } from "@/components/pricing/OfferPrice";
 import { formatMoney } from "@/lib/money";
+import { isFixedGroupBooking } from "@/lib/experience-party-pricing";
 import { isGuestAccount, isStaffRole } from "@/lib/roles";
 import { useBookingClock } from "@/hooks/use-today-iso-date";
 import { formatTime12h } from "@/lib/weekday-slots";
@@ -328,6 +329,7 @@ export function ExperienceBookingPanel({
     ? guestBookingLimits(exp, selectedSlot.available)
     : { min: exp.minGuestsPerBooking ?? 1, max: exp.maxGuestsPerBooking ?? 10 };
   const totalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
+  const groupBooking = isFixedGroupBooking(limits.min, limits.max);
 
   const bookSearch = selectedSlot ? { slotId: selectedSlot.id, guests } : undefined;
   const bookPath = bookExperiencePath(exp.slug, bookSearch);
@@ -373,14 +375,18 @@ export function ExperienceBookingPanel({
           <div className="hairline" />
 
           <BookingStepper
-            label="Guests"
-            hint={`${limits.min}–${limits.max} per booking`}
+            label={groupBooking ? "Group members" : "Guests"}
+            hint={
+              groupBooking
+                ? `This experience is booked as a group of ${limits.min}`
+                : `${limits.min}–${limits.max} per booking`
+            }
             value={guests}
             min={limits.min}
             max={limits.max}
             onChange={onGuestsChange}
             surface={surface}
-            disabled={!selectedSlot}
+            disabled={!selectedSlot || groupBooking}
           />
 
           {variant === "checkout" && onNotesChange ? (
@@ -399,14 +405,20 @@ export function ExperienceBookingPanel({
             breakdown={
               <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
                 <OfferPrice
-                  price={exp.pricePerPerson}
-                  compareAt={exp.compareAtPricePerPerson}
+                  price={groupBooking ? exp.pricePerPerson * guests : exp.pricePerPerson}
+                  compareAt={
+                    groupBooking && exp.compareAtPricePerPerson
+                      ? exp.compareAtPricePerPerson * guests
+                      : exp.compareAtPricePerPerson
+                  }
                   currencySymbol={sym}
                   tone={surface === "dark" ? "dark" : "light"}
                   showPercent={false}
                 />
                 <span>
-                  × {guests} guest{guests > 1 ? "s" : ""}
+                  {groupBooking
+                    ? `for ${guests} member${guests === 1 ? "" : "s"}`
+                    : `× ${guests} guest${guests > 1 ? "s" : ""}`}
                 </span>
               </span>
             }

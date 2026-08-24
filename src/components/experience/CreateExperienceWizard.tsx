@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
+import { ExperiencePartyPricingFields } from "@/components/experience/ExperiencePartyPricingFields";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
 import { WeekdaySlotBuilder } from "@/components/experience/WeekdaySlotBuilder";
-import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import type { CategoryOption, CreateHostSlotPayload } from "@/lib/api/host-experiences";
 import type { CitySummary } from "@/lib/cities";
 import { isPublicImageUrl } from "@/lib/experience-photo-upload";
@@ -9,6 +9,11 @@ import { HOST_CITY_SLUG } from "@/lib/host-form-data";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 import { toErrorMessage } from "@/lib/api/client";
+import {
+  perPersonMinorFromGroupTotal,
+  resolveExperiencePartyPricing,
+  type ExperiencePartyKind,
+} from "@/lib/experience-party-pricing";
 import { mergeUniqueSlots, formatTime12h } from "@/lib/weekday-slots";
 
 type CreateExperienceWizardProps = {
@@ -96,13 +101,15 @@ export function CreateExperienceWizard({
   const [address, setAddress] = useState("");
   const [mapLink, setMapLink] = useState("");
   const [durationMinutes, setDurationMinutes] = useState(120);
+  const [partyKind, setPartyKind] = useState<ExperiencePartyKind | null>(null);
   const [priceMajor, setPriceMajor] = useState(0);
   const [compareAtMajor, setCompareAtMajor] = useState(0);
+  const [groupMembers, setGroupMembers] = useState(2);
+  const [groupTotalMajor, setGroupTotalMajor] = useState(0);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [inclusions, setInclusions] = useState("");
   const [exclusions, setExclusions] = useState("");
   const [requirements, setRequirements] = useState("");
-  const [minGuests, setMinGuests] = useState(1);
   const [maxGuests, setMaxGuests] = useState(10);
   const [submitForReview, setSubmitForReview] = useState(false);
 
@@ -159,12 +166,14 @@ export function CreateExperienceWizard({
       if (durationMinutes < 30 || !Number.isFinite(durationMinutes)) {
         return "Duration must be at least 30 minutes.";
       }
-      if (priceMajor < 0 || !Number.isFinite(priceMajor)) return "Price cannot be negative.";
-      if (minGuests < 1 || !Number.isFinite(minGuests)) return "Minimum guests must be at least 1.";
-      if (maxGuests < minGuests || !Number.isFinite(maxGuests)) {
-        return "Max guests must be at least the minimum.";
-      }
-      return null;
+      const pricing = resolveExperiencePartyPricing({
+        partyKind,
+        priceMajor,
+        maxGuests,
+        groupMembers,
+        groupTotalMajor,
+      });
+      return pricing.ok ? null : pricing.error;
     }
     if (current === 3) {
       for (const url of validPhotoUrls) {
@@ -245,6 +254,23 @@ export function CreateExperienceWizard({
       showError("Add at least one bookable slot before submitting for review.");
       return;
     }
+    const pricing = resolveExperiencePartyPricing({
+      partyKind,
+      priceMajor,
+      maxGuests,
+      groupMembers,
+      groupTotalMajor,
+    });
+    if (!pricing.ok) {
+      showError(pricing.error);
+      return;
+    }
+    const compareAtPricePerPersonMinor =
+      compareAtMajor > 0
+        ? partyKind === "group"
+          ? perPersonMinorFromGroupTotal(compareAtMajor, groupMembers)
+          : compareAtMajor * 100
+        : null;
     setStepError(null);
     const galleryUrls = validPhotoUrls.filter(isPublicImageUrl);
     try {
@@ -260,15 +286,15 @@ export function CreateExperienceWizard({
           address: address.trim() || undefined,
           mapLink: mapLink.trim() || undefined,
           durationMinutes,
-          pricePerPersonMinor: priceMajor * 100,
-          compareAtPricePerPersonMinor: compareAtMajor > 0 ? compareAtMajor * 100 : null,
+          pricePerPersonMinor: pricing.pricePerPersonMinor,
+          compareAtPricePerPersonMinor,
           heroImageUrl: galleryUrls[0],
           galleryUrls,
           inclusions: splitLines(inclusions),
           exclusions: splitLines(exclusions),
           requirements: splitLines(requirements),
-          minGuestsPerBooking: minGuests,
-          maxGuestsPerBooking: maxGuests,
+          minGuestsPerBooking: pricing.minGuests,
+          maxGuestsPerBooking: pricing.maxGuests,
           submitForReview,
         },
         slots: draftSlots.map(({ slotDate: d, startTime: s, endTime: e, capacity }) => ({
@@ -424,47 +450,25 @@ export function CreateExperienceWizard({
                 className={numberInputClass}
               />
             </label>
-            <label className="text-sm">
-              <span className="eyebrow luxury-panel-label">Price per person (₹)</span>
-              <RupeeAmountInput
-                value={priceMajor}
-                onChange={setPriceMajor}
-                className={inputClass}
-              />
-            </label>
-            <label className="text-sm">
-              <span className="eyebrow luxury-panel-label">Original price / was (₹)</span>
-              <RupeeAmountInput
-                value={compareAtMajor}
-                onChange={setCompareAtMajor}
-                className={inputClass}
-              />
-              <span className={hintClass}>
-                Optional. Leave blank for no offer. Must be higher than the selling price.
-              </span>
-            </label>
-            <label className="text-sm">
-              <span className="eyebrow luxury-panel-label">Min guests / booking</span>
-              <input
-                type="number"
-                min={1}
-                max={50}
-                value={minGuests}
-                onChange={(e) => setMinGuests(Number(e.target.value))}
-                className={numberInputClass}
-              />
-            </label>
-            <label className="text-sm">
-              <span className="eyebrow luxury-panel-label">Max guests / booking</span>
-              <input
-                type="number"
-                min={1}
-                max={50}
-                value={maxGuests}
-                onChange={(e) => setMaxGuests(Number(e.target.value))}
-                className={numberInputClass}
-              />
-            </label>
+            <ExperiencePartyPricingFields
+              partyKind={partyKind}
+              onPartyKindChange={setPartyKind}
+              priceMajor={priceMajor}
+              onPriceMajorChange={setPriceMajor}
+              maxGuests={maxGuests}
+              onMaxGuestsChange={setMaxGuests}
+              groupMembers={groupMembers}
+              onGroupMembersChange={setGroupMembers}
+              groupTotalMajor={groupTotalMajor}
+              onGroupTotalMajorChange={setGroupTotalMajor}
+              compareAtMajor={compareAtMajor}
+              onCompareAtMajorChange={setCompareAtMajor}
+              showCompareAt
+              labelClass="luxury-panel-label"
+              inputClass={inputClass}
+              numberInputClass={numberInputClass}
+              hintClass={hintClass}
+            />
           </div>
         </div>
       ) : null}
@@ -603,7 +607,11 @@ export function CreateExperienceWizard({
             </div>
             <div>
               <dt className="eyebrow luxury-panel-label">Price</dt>
-              <dd className="mt-1">{formatMoney(priceMajor * 100)} per person</dd>
+              <dd className="mt-1">
+                {partyKind === "group"
+                  ? `${formatMoney(groupTotalMajor * 100)} for ${groupMembers} members`
+                  : `${formatMoney(priceMajor * 100)} per person`}
+              </dd>
             </div>
             <div>
               <dt className="eyebrow luxury-panel-label">Duration</dt>
@@ -612,7 +620,7 @@ export function CreateExperienceWizard({
             <div>
               <dt className="eyebrow luxury-panel-label">Guests per booking</dt>
               <dd className="mt-1">
-                {minGuests}–{maxGuests}
+                {partyKind === "group" ? `Group of ${groupMembers}` : `1–${maxGuests}`}
               </dd>
             </div>
             <div className="sm:col-span-2">

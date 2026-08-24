@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
+import { ExperiencePartyPricingFields } from "@/components/experience/ExperiencePartyPricingFields";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
-import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import { toErrorMessage } from "@/lib/api/client";
 import { FALLBACK_CATEGORIES } from "@/lib/experience-categories";
 import { validateExperiencePhotoFile } from "@/lib/experience-photo-upload";
@@ -10,6 +10,10 @@ import {
   submitPartnerExperienceApplication,
   uploadPartnerExperiencePhoto,
 } from "@/lib/partner-experience-fns";
+import {
+  resolveExperiencePartyPricing,
+  type ExperiencePartyKind,
+} from "@/lib/experience-party-pricing";
 import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput, TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
 
 const inputClass =
@@ -80,9 +84,11 @@ export function PartnerExperienceApplicationForm() {
   const [address, setAddress] = useState("");
   const [mapLink, setMapLink] = useState("");
   const [durationMinutes, setDurationMinutes] = useState(120);
+  const [partyKind, setPartyKind] = useState<ExperiencePartyKind | null>(null);
   const [priceMajor, setPriceMajor] = useState(0);
-  const [minGuests, setMinGuests] = useState(1);
   const [maxGuests, setMaxGuests] = useState(10);
+  const [groupMembers, setGroupMembers] = useState(2);
+  const [groupTotalMajor, setGroupTotalMajor] = useState(0);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [inclusions, setInclusions] = useState("");
   const [exclusions, setExclusions] = useState("");
@@ -129,12 +135,16 @@ export function PartnerExperienceApplicationForm() {
     event.preventDefault();
     setError(null);
 
-    if (priceMajor <= 0) {
-      setError("Please enter a price per person.");
-      return;
-    }
-    if (maxGuests < minGuests) {
-      setError("Maximum guests must be at least the minimum.");
+    const pricing = resolveExperiencePartyPricing({
+      partyKind,
+      priceMajor,
+      maxGuests,
+      groupMembers,
+      groupTotalMajor,
+      requirePositivePrice: true,
+    });
+    if (!pricing.ok) {
+      setError(pricing.error);
       return;
     }
     if (!passportPhotoUrl.trim()) {
@@ -170,9 +180,9 @@ export function PartnerExperienceApplicationForm() {
           address: address.trim(),
           mapLink: mapLink.trim() || undefined,
           durationMinutes,
-          pricePerPersonMinor: priceMajor * 100,
-          minGuests,
-          maxGuests,
+          pricePerPersonMinor: pricing.pricePerPersonMinor,
+          minGuests: pricing.minGuests,
+          maxGuests: pricing.maxGuests,
           heroImageUrl: galleryUrls[0],
           galleryUrls,
           inclusions: splitLines(inclusions),
@@ -453,38 +463,22 @@ export function PartnerExperienceApplicationForm() {
                 className={numberInputClass}
               />
             </label>
-            <label className="text-sm">
-              <span className="eyebrow luxury-panel-label">Price per person (₹)</span>
-              <RupeeAmountInput
-                value={priceMajor}
-                onChange={setPriceMajor}
-                className={inputClass}
-              />
-            </label>
-            <label className="text-sm">
-              <span className="eyebrow luxury-panel-label">Min guests / booking</span>
-              <input
-                required
-                type="number"
-                min={1}
-                max={50}
-                value={minGuests}
-                onChange={(e) => setMinGuests(Number(e.target.value))}
-                className={numberInputClass}
-              />
-            </label>
-            <label className="text-sm">
-              <span className="eyebrow luxury-panel-label">Max guests / booking</span>
-              <input
-                required
-                type="number"
-                min={1}
-                max={50}
-                value={maxGuests}
-                onChange={(e) => setMaxGuests(Number(e.target.value))}
-                className={numberInputClass}
-              />
-            </label>
+            <ExperiencePartyPricingFields
+              partyKind={partyKind}
+              onPartyKindChange={setPartyKind}
+              priceMajor={priceMajor}
+              onPriceMajorChange={setPriceMajor}
+              maxGuests={maxGuests}
+              onMaxGuestsChange={setMaxGuests}
+              groupMembers={groupMembers}
+              onGroupMembersChange={setGroupMembers}
+              groupTotalMajor={groupTotalMajor}
+              onGroupTotalMajorChange={setGroupTotalMajor}
+              labelClass="luxury-panel-label"
+              inputClass={inputClass}
+              numberInputClass={numberInputClass}
+              hintClass="mt-1 block text-xs luxury-panel-body opacity-80"
+            />
           </div>
         </section>
 

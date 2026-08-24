@@ -26,6 +26,7 @@ import type { Slot } from "@/data/experiences";
 import { useAuthUser } from "@/lib/auth-user";
 import { guestBookingLimits } from "@/lib/booking-url";
 import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
+import { isFixedGroupBooking } from "@/lib/experience-party-pricing";
 import { useBookingClock } from "@/hooks/use-today-iso-date";
 import { getExperienceForDetail } from "@/lib/marketplace-fns";
 import { getExperienceReviews } from "@/lib/review-fns";
@@ -112,6 +113,14 @@ function ExperienceDetail() {
   const ldJson = buildExperienceJsonLd(exp, reviews);
   const locationLine = [exp.region, exp.city].filter(Boolean).join(" · ");
   const canBook = bookableSlots.some((slot) => slot.available > 0);
+  const minGuests = exp.minGuestsPerBooking ?? 1;
+  const maxGuests = exp.maxGuestsPerBooking ?? 10;
+  const groupListing = isFixedGroupBooking(minGuests, maxGuests);
+  const listedPrice = groupListing ? exp.pricePerPerson * minGuests : exp.pricePerPerson;
+  const listedCompare =
+    groupListing && exp.compareAtPricePerPerson
+      ? exp.compareAtPricePerPerson * minGuests
+      : exp.compareAtPricePerPerson;
 
   return (
     <DetailPageShell jsonLd={ldJson}>
@@ -148,14 +157,19 @@ function ExperienceDetail() {
 
                 <DetailStatGrid>
                   <DetailStatItem label="Duration">{exp.durationHours}h</DetailStatItem>
-                  <DetailStatItem label="From">
-                    <OfferPrice
-                      price={exp.pricePerPerson}
-                      compareAt={exp.compareAtPricePerPerson}
-                      currencySymbol={sym}
-                      tone="dark"
-                      priceClassName="font-display text-[0.95rem] uppercase tracking-[0.02em] sm:text-lg md:text-xl text-[#F7F1E8]"
-                    />
+                  <DetailStatItem label={groupListing ? "Group from" : "From"}>
+                    <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+                      <OfferPrice
+                        price={listedPrice}
+                        compareAt={listedCompare}
+                        currencySymbol={sym}
+                        tone="dark"
+                        priceClassName="font-display text-[0.95rem] uppercase tracking-[0.02em] sm:text-lg md:text-xl text-[#F7F1E8]"
+                      />
+                      <span className="text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#D6C8B5]/75">
+                        {groupListing ? `for ${minGuests}` : "per person"}
+                      </span>
+                    </span>
                   </DetailStatItem>
                   <DetailStatItem label="Rating">
                     <span className="text-[#D4AF37]">

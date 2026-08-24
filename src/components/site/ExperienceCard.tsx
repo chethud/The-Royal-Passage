@@ -3,12 +3,21 @@ import type { Experience } from "@/data/experiences";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { OfferPrice } from "@/components/pricing/OfferPrice";
+import { isFixedGroupBooking } from "@/lib/experience-party-pricing";
 import { categoryIconForLabel } from "@/lib/experience-category-icons";
 import { MarketplaceCard, marketplaceCardActionClass } from "@/components/site/MarketplaceCard";
 
 export function ExperienceCard({ exp }: { exp: Experience }) {
   const CategoryIcon = categoryIconForLabel(exp.category);
   const sym = exp.currencySymbol ?? "₹";
+  const minGuests = exp.minGuestsPerBooking ?? 1;
+  const maxGuests = exp.maxGuestsPerBooking ?? 10;
+  const groupListing = isFixedGroupBooking(minGuests, maxGuests);
+  const listedPrice = groupListing ? exp.pricePerPerson * minGuests : exp.pricePerPerson;
+  const listedCompare =
+    groupListing && exp.compareAtPricePerPerson
+      ? exp.compareAtPricePerPerson * minGuests
+      : exp.compareAtPricePerPerson;
 
   return (
     <MarketplaceCard
@@ -50,14 +59,19 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
         </>
       }
       footer={
-        <OfferPrice
-          price={exp.pricePerPerson}
-          compareAt={exp.compareAtPricePerPerson}
-          currencySymbol={sym}
-          tone="dark"
-          showPercent
-          priceClassName="font-display text-base font-normal text-[color:var(--royal-ivory)]"
-        />
+        <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+          <OfferPrice
+            price={listedPrice}
+            compareAt={listedCompare}
+            currencySymbol={sym}
+            tone="dark"
+            showPercent
+            priceClassName="font-display text-base font-normal text-[color:var(--royal-ivory)]"
+          />
+          <span className="text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#D6C8B5]/75">
+            {groupListing ? `for ${minGuests}` : "per person"}
+          </span>
+        </span>
       }
     />
   );
