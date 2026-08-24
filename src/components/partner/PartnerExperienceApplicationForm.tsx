@@ -89,6 +89,8 @@ export function PartnerExperienceApplicationForm() {
   const [maxGuests, setMaxGuests] = useState(10);
   const [groupMembers, setGroupMembers] = useState(2);
   const [groupTotalMajor, setGroupTotalMajor] = useState(0);
+  const [gstPercent, setGstPercent] = useState(0);
+  const [gstNumber, setGstNumber] = useState("");
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [inclusions, setInclusions] = useState("");
   const [exclusions, setExclusions] = useState("");
@@ -97,6 +99,7 @@ export function PartnerExperienceApplicationForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const chargesGst = gstPercent > 0;
 
   const uploadOne = async (file: File) => {
     const [url] = await uploadPartnerPhotos([file]);
@@ -147,6 +150,17 @@ export function PartnerExperienceApplicationForm() {
       setError(pricing.error);
       return;
     }
+    if (gstPercent < 0 || gstPercent > 100 || !Number.isFinite(gstPercent)) {
+      setError("GST must be between 0% and 100% of the total price.");
+      return;
+    }
+    if (chargesGst) {
+      const gstin = gstNumber.trim().toUpperCase();
+      if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gstin)) {
+        setError("Enter a valid 15-character GST number when GST is greater than 0%.");
+        return;
+      }
+    }
     if (!passportPhotoUrl.trim()) {
       setError("Upload a passport-size photo.");
       return;
@@ -181,6 +195,8 @@ export function PartnerExperienceApplicationForm() {
           mapLink: mapLink.trim() || undefined,
           durationMinutes,
           pricePerPersonMinor: pricing.pricePerPersonMinor,
+          gstPercent,
+          gstNumber: chargesGst ? gstNumber.trim().toUpperCase() : undefined,
           minGuests: pricing.minGuests,
           maxGuests: pricing.maxGuests,
           heroImageUrl: galleryUrls[0],
@@ -479,6 +495,36 @@ export function PartnerExperienceApplicationForm() {
               numberInputClass={numberInputClass}
               hintClass="mt-1 block text-xs luxury-panel-body opacity-80"
             />
+            <label className="text-sm">
+              <span className="eyebrow luxury-panel-label">GST (%)</span>
+              <input
+                type="number"
+                min={0}
+                max={100}
+                step={0.01}
+                value={gstPercent}
+                onChange={(e) => setGstPercent(Number(e.target.value))}
+                className={numberInputClass}
+              />
+              <span className="mt-1 block text-xs luxury-panel-body opacity-80">
+                Percent of the total price. Enter 0 if you do not charge GST. If GST is above 0%, a
+                GST number is required.
+              </span>
+            </label>
+            {chargesGst ? (
+              <label className="text-sm">
+                <span className="eyebrow luxury-panel-label">GST number</span>
+                <input
+                  required
+                  value={gstNumber}
+                  onChange={(e) => setGstNumber(e.target.value.toUpperCase())}
+                  className={inputClass}
+                  placeholder="22AAAAA0000A1Z5"
+                  maxLength={15}
+                  autoComplete="off"
+                />
+              </label>
+            ) : null}
           </div>
         </section>
 

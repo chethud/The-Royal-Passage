@@ -16,7 +16,10 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 const lineListSchema = z.array(z.string().trim().min(1)).max(40);
 const urlListSchema = z.array(z.string().url().max(2000)).max(20);
 
-const submitSchema = z.object({
+const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+
+const submitSchema = z
+  .object({
   fullName: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(200),
   phone: z.string().trim().min(7).max(40),
@@ -42,6 +45,8 @@ const submitSchema = z.object({
   mapLink: z.string().trim().url().max(1000).optional(),
   durationMinutes: z.number().int().min(30).max(480),
   pricePerPersonMinor: z.number().int().positive().max(50_000_000),
+  gstPercent: z.number().min(0).max(100).default(0),
+  gstNumber: z.string().trim().toUpperCase().max(20).optional(),
   minGuests: z.number().int().min(1).max(50),
   maxGuests: z.number().int().min(1).max(50),
   heroImageUrl: z.string().url().max(2000).optional(),
@@ -49,7 +54,19 @@ const submitSchema = z.object({
   inclusions: lineListSchema.default([]),
   exclusions: lineListSchema.default([]),
   requirements: lineListSchema.default([]),
-});
+})
+  .superRefine((data, ctx) => {
+    if (data.gstPercent > 0) {
+      const gst = data.gstNumber?.trim() ?? "";
+      if (!GSTIN_REGEX.test(gst)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["gstNumber"],
+          message: "Enter a valid GST number when GST is greater than 0%.",
+        });
+      }
+    }
+  });
 
 const adminTokenSchema = z.object({
   accessToken: z.string().min(1),
@@ -98,6 +115,8 @@ export type PartnerExperienceApplication = {
   mapLink: string | null;
   durationMinutes: number;
   pricePerPersonMinor: number;
+  gstPercent: number;
+  gstNumber: string | null;
   minGuests: number;
   maxGuests: number;
   heroImageUrl: string | null;
@@ -134,6 +153,8 @@ function mapRow(row: Record<string, unknown>): PartnerExperienceApplication {
     mapLink: row.map_link == null ? null : String(row.map_link),
     durationMinutes: Number(row.duration_minutes ?? 0),
     pricePerPersonMinor: Number(row.price_per_person_minor ?? 0),
+    gstPercent: Number(row.gst_percent ?? 0),
+    gstNumber: row.gst_number == null ? null : String(row.gst_number),
     minGuests: Number(row.min_guests ?? 1),
     maxGuests: Number(row.max_guests ?? 1),
     heroImageUrl: row.hero_image_url == null ? null : String(row.hero_image_url),
@@ -266,6 +287,9 @@ export const submitPartnerExperienceApplication = createServerFn({ method: "POST
         map_link: mapLink,
         duration_minutes: data.durationMinutes,
         price_per_person_minor: data.pricePerPersonMinor,
+        gst_percent: data.gstPercent,
+        gst_number:
+          data.gstPercent > 0 ? data.gstNumber?.trim().toUpperCase() || null : null,
         min_guests: data.minGuests,
         max_guests: data.maxGuests,
         hero_image_url: heroImageUrl,

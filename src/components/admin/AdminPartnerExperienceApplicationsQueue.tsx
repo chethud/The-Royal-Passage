@@ -357,6 +357,16 @@ export function AdminPartnerExperienceApplicationsQueue({
                         {formatMoney(row.pricePerPersonMinor)}
                       </p>
                       <p>
+                        <span className="eyebrow luxury-panel-label mb-1 block">GST</span>
+                        {row.gstPercent > 0 ? `${row.gstPercent}% of total` : "0% (not charged)"}
+                      </p>
+                      <p>
+                        <span className="eyebrow luxury-panel-label mb-1 block">GST number</span>
+                        {row.gstPercent > 0
+                          ? row.gstNumber || "—"
+                          : "Not required (GST is 0%)"}
+                      </p>
+                      <p>
                         <span className="eyebrow luxury-panel-label mb-1 block">Min guests</span>
                         {row.minGuests}
                       </p>
