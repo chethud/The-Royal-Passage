@@ -148,6 +148,16 @@ async function ensureAuthUser({ email, password, fullName, role, meta = {} }) {
     ...meta,
   });
   if (profileError) throw profileError;
+
+  // Keep user_roles in sync — frontend prefers this table, and a leftover
+  // "guest" row would otherwise hide the staff role on the profile.
+  await supabase.from("user_roles").delete().eq("user_id", userId);
+  const { error: roleError } = await supabase.from("user_roles").insert({
+    user_id: userId,
+    role,
+  });
+  if (roleError) throw roleError;
+
   return userId;
 }
 

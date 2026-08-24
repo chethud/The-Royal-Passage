@@ -1,8 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Info, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { HomestayOwnerDashboardShell } from "@/components/homestay-owner/HomestayOwnerDashboardShell";
 import { OwnerHomestayTable } from "@/components/homestay-owner/OwnerHomestayTable";
+import {
+  CornerFiligree,
+  OrnamentalDivider,
+  PalaceSilhouette,
+} from "@/components/site/RoyalHeritageDecor";
 import { fetchOwnerHomestays, type OwnerHomestaySummary } from "@/lib/api/owner-homestays";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { useHomestayOwnerAccess } from "@/lib/use-homestay-owner-access";
@@ -14,6 +19,17 @@ export const Route = createFileRoute("/homestay/properties/")({
   }),
   component: OwnerHomestaysPage,
 });
+
+function PanelCorners() {
+  return (
+    <>
+      <CornerFiligree className="host-catalog-ledger__corner host-catalog-ledger__corner--tl" />
+      <CornerFiligree className="host-catalog-ledger__corner host-catalog-ledger__corner--tr" />
+      <CornerFiligree className="host-catalog-ledger__corner host-catalog-ledger__corner--bl" />
+      <CornerFiligree className="host-catalog-ledger__corner host-catalog-ledger__corner--br" />
+    </>
+  );
+}
 
 function OwnerHomestaysPage() {
   const { accessToken, ready, loading } = useHomestayOwnerAccess();
@@ -51,36 +67,45 @@ function OwnerHomestaysPage() {
       title="My properties"
       subtitle="Create listings, block dates, and submit for admin review."
       showRoleDescription={false}
+      variant="experiences"
     >
-      <LuxuryCheckoutPanel>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="luxury-panel-body text-sm">Draft properties, finish details, and submit for Royal Passage review.</p>
-          <Link to="/homestay/properties/new" className="luxury-btn-sm luxury-btn-primary inline-flex no-underline">
+      <section className="host-catalog-ledger">
+        <PanelCorners />
+        <PalaceSilhouette className="host-catalog-ledger__palace" aria-hidden />
+
+        <div className="host-catalog-toolbar">
+          <p className="host-catalog-info">
+            <Info className="host-catalog-info__icon" aria-hidden />
+            <span>Draft properties, finish details, and submit for Royal Passage review.</span>
+          </p>
+          <Link to="/homestay/properties/new" className="host-catalog-cta">
+            <Plus className="host-catalog-cta__icon" aria-hidden />
             Add property
           </Link>
         </div>
-        <div className="mt-6">
-          {pageLoading ? (
-            <p className="luxury-panel-body py-8 text-sm">Loading properties…</p>
-          ) : pageError ? (
-            <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {pageError}
-            </p>
-          ) : homestays.length === 0 ? (
-            <div className="py-4 text-center">
-              <p className="luxury-panel-body text-sm">No properties yet.</p>
-              <Link
-                to="/homestay/properties/new"
-                className="luxury-btn-sm luxury-btn-primary mt-4 inline-flex no-underline"
-              >
-                Add your first property
-              </Link>
-            </div>
-          ) : (
+
+        {pageLoading ? (
+          <p className="host-catalog-state">Loading properties…</p>
+        ) : pageError ? (
+          <p className="host-catalog-error">{pageError}</p>
+        ) : homestays.length === 0 ? (
+          <div className="host-catalog-empty">
+            <span className="host-catalog-empty__medallion" aria-hidden>
+              <Plus className="host-catalog-empty__icon" />
+            </span>
+            <p className="host-catalog-empty__text">No properties yet.</p>
+            <Link to="/homestay/properties/new" className="host-catalog-cta">
+              <Plus className="host-catalog-cta__icon" aria-hidden />
+              Add your first property
+            </Link>
+          </div>
+        ) : (
+          <>
             <OwnerHomestayTable homestays={homestays} />
-          )}
-        </div>
-      </LuxuryCheckoutPanel>
+            <OrnamentalDivider className="host-catalog-ledger__footer" />
+          </>
+        )}
+      </section>
     </HomestayOwnerDashboardShell>
   );
 }

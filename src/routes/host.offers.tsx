@@ -1,20 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Info, MapPin, Pencil, Settings2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { ExperienceStatusBadge } from "@/components/experience/ExperienceStatusBadge";
 import { HostDashboardShell } from "@/components/host/HostDashboardShell";
 import { OfferPrice } from "@/components/pricing/OfferPrice";
 import { SetOfferDialog } from "@/components/pricing/SetOfferDialog";
-import {
-  DashboardTable,
-  DashboardTableBody,
-  DashboardTableCell,
-  DashboardTableHead,
-  DashboardTableHeadCell,
-  DashboardTableHeadRow,
-  DashboardTableRow,
-  DashboardTableScroll,
-} from "@/components/ui/DashboardTable";
+import { CornerFiligree, OrnamentalDivider } from "@/components/site/RoyalHeritageDecor";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -37,6 +28,32 @@ export const Route = createFileRoute("/host/offers")({
   }),
   component: HostOffersPage,
 });
+
+function PanelCorners() {
+  return (
+    <>
+      <CornerFiligree className="host-offers-ledger__corner host-offers-ledger__corner--tl" />
+      <CornerFiligree className="host-offers-ledger__corner host-offers-ledger__corner--tr" />
+      <CornerFiligree className="host-offers-ledger__corner host-offers-ledger__corner--bl" />
+      <CornerFiligree className="host-offers-ledger__corner host-offers-ledger__corner--br" />
+    </>
+  );
+}
+
+function ExperienceMedallion({ title, image }: { title: string; image: string | null }) {
+  if (image) {
+    return (
+      <span className="host-offers-medallion host-offers-medallion--photo" aria-hidden>
+        <img src={image} alt="" />
+      </span>
+    );
+  }
+  return (
+    <span className="host-offers-medallion" aria-hidden>
+      {title.trim().charAt(0).toUpperCase() || "E"}
+    </span>
+  );
+}
 
 function HostOffersPage() {
   const { accessToken, ready, loading } = useHostAccess();
@@ -134,56 +151,67 @@ function HostOffersPage() {
       title="Offers"
       subtitle="Set an original (was) price higher than your selling price. Guests see the discount; they still pay the selling price."
       showRoleDescription={false}
+      variant="offers"
     >
-      <LuxuryCheckoutPanel>
-        <p className="luxury-panel-body text-sm">
-          Use Set offer to configure prices, then turn each experience&apos;s offer on or off with the
-          toggle below.
+      <section className="host-offers-ledger">
+        <PanelCorners />
+
+        <p className="host-offers-info">
+          <Info className="host-offers-info__icon" aria-hidden />
+          <span>
+            Use Set offer to configure prices, then turn each experience&apos;s offer on or off with the
+            toggle below.
+          </span>
         </p>
 
-        <div className="mt-6">
-          {pageLoading ? (
-            <p className="luxury-panel-body py-8 text-sm">Loading offers…</p>
-          ) : pageError ? (
-            <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {pageError}
-            </p>
-          ) : experiences.length === 0 ? (
-            <div className="py-4 text-center">
-              <p className="luxury-panel-body text-sm">No experiences yet.</p>
-              <Link
-                to="/host/experiences/new"
-                className="luxury-btn-sm luxury-btn-primary mt-4 inline-flex no-underline"
-              >
-                Add experience
-              </Link>
-            </div>
-          ) : (
-            <DashboardTableScroll>
-              <DashboardTable minWidth="md">
-                <DashboardTableHead>
-                  <DashboardTableHeadRow>
-                    <DashboardTableHeadCell>Experience</DashboardTableHeadCell>
-                    <DashboardTableHeadCell>Guest price</DashboardTableHeadCell>
-                    <DashboardTableHeadCell>Offer</DashboardTableHeadCell>
-                    <DashboardTableHeadCell>Status</DashboardTableHeadCell>
-                    <DashboardTableHeadCell>Edit</DashboardTableHeadCell>
-                    <DashboardTableHeadCell>Offer on/off</DashboardTableHeadCell>
-                  </DashboardTableHeadRow>
-                </DashboardTableHead>
-                <DashboardTableBody>
+        {pageLoading ? (
+          <p className="host-offers-state">Loading offers…</p>
+        ) : pageError ? (
+          <p className="host-offers-error">{pageError}</p>
+        ) : experiences.length === 0 ? (
+          <div className="host-offers-empty">
+            <p className="host-offers-state">No experiences yet.</p>
+            <Link to="/host/experiences/new" className="host-offers-empty__cta">
+              Add experience
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="host-offers-table-wrap" role="region" aria-label="Offers">
+              <table className="host-offers-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Experience</th>
+                    <th scope="col">Guest price</th>
+                    <th scope="col">Offer</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Edit</th>
+                    <th scope="col">Offer on/off</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {experiences.map((exp) => {
                     const hasOffer =
                       exp.compareAtPricePerPersonMinor != null &&
                       exp.compareAtPricePerPersonMinor > exp.pricePerPersonMinor;
                     const isToggling = togglingOfferId === exp.id;
                     return (
-                      <DashboardTableRow key={exp.id}>
-                        <DashboardTableCell variant="heading">
-                          <div className="font-display text-lg">{exp.title}</div>
-                          <div className="luxury-panel-body text-xs">{exp.city}</div>
-                        </DashboardTableCell>
-                        <DashboardTableCell>
+                      <tr key={exp.id}>
+                        <td>
+                          <div className="host-offers-experience">
+                            <ExperienceMedallion title={exp.title} image={exp.image} />
+                            <div className="host-offers-experience__copy">
+                              <span className="host-offers-experience__title">{exp.title}</span>
+                              {exp.city ? (
+                                <span className="host-offers-experience__city">
+                                  <MapPin className="host-offers-experience__pin" aria-hidden />
+                                  {exp.city}
+                                </span>
+                              ) : null}
+                            </div>
+                          </div>
+                        </td>
+                        <td>
                           <OfferPrice
                             price={exp.pricePerPersonMinor}
                             compareAt={exp.compareAtPricePerPersonMinor}
@@ -191,50 +219,141 @@ function HostOffersPage() {
                             asMinor
                             tone="light"
                             showPercent={false}
+                            className="host-offers-price"
+                            priceClassName="host-offers-price__sell"
+                            compareClassName="host-offers-price__was"
                           />
-                        </DashboardTableCell>
-                        <DashboardTableCell>
+                        </td>
+                        <td>
                           {hasOffer ? (
-                            <span className="text-sm font-medium text-[#8B1E1E]">Active</span>
+                            <span className="host-offers-flag host-offers-flag--active">Active</span>
                           ) : (
-                            <span className="luxury-panel-body text-sm">None</span>
+                            <span className="host-offers-flag">None</span>
                           )}
-                        </DashboardTableCell>
-                        <DashboardTableCell>
+                        </td>
+                        <td>
                           <ExperienceStatusBadge status={exp.status} surface="light" />
-                        </DashboardTableCell>
-                        <DashboardTableCell>
+                        </td>
+                        <td>
                           <button
                             type="button"
-                            className="luxury-btn-sm luxury-btn-primary inline-flex h-7 items-center px-2.5 py-1 text-[0.58rem] leading-none"
+                            className="host-offers-btn"
                             onClick={() => setOfferTarget(exp)}
                           >
+                            {hasOffer ? (
+                              <Pencil className="host-offers-btn__icon" aria-hidden />
+                            ) : (
+                              <Settings2 className="host-offers-btn__icon" aria-hidden />
+                            )}
                             {hasOffer ? "Edit offer" : "Set offer"}
                           </button>
-                        </DashboardTableCell>
-                        <DashboardTableCell>
-                          <div className="flex items-center gap-2">
+                        </td>
+                        <td>
+                          <div className="host-offers-toggle">
                             <Switch
                               checked={hasOffer}
                               disabled={isToggling || offerSaving}
                               onCheckedChange={(checked) => void handleOfferToggle(exp, checked)}
                               aria-label={`${hasOffer ? "Turn off" : "Turn on"} offer for ${exp.title}`}
-                              className="data-[state=checked]:bg-[#8B1E1E] data-[state=unchecked]:bg-[rgb(74_0_0/0.18)]"
+                              className="host-offers-switch"
                             />
-                            <span className="luxury-panel-body text-xs font-medium uppercase tracking-[0.08em]">
+                            <span className="host-offers-toggle__label">
                               {isToggling ? "Saving…" : hasOffer ? "On" : "Off"}
                             </span>
                           </div>
-                        </DashboardTableCell>
-                      </DashboardTableRow>
+                        </td>
+                      </tr>
                     );
                   })}
-                </DashboardTableBody>
-              </DashboardTable>
-            </DashboardTableScroll>
-          )}
-        </div>
-      </LuxuryCheckoutPanel>
+                </tbody>
+              </table>
+            </div>
+
+            <ul className="host-offers-cards">
+              {experiences.map((exp) => {
+                const hasOffer =
+                  exp.compareAtPricePerPersonMinor != null &&
+                  exp.compareAtPricePerPersonMinor > exp.pricePerPersonMinor;
+                const isToggling = togglingOfferId === exp.id;
+                return (
+                  <li key={exp.id} className="host-offers-card">
+                    <div className="host-offers-experience">
+                      <ExperienceMedallion title={exp.title} image={exp.image} />
+                      <div className="host-offers-experience__copy">
+                        <span className="host-offers-experience__title">{exp.title}</span>
+                        {exp.city ? (
+                          <span className="host-offers-experience__city">
+                            <MapPin className="host-offers-experience__pin" aria-hidden />
+                            {exp.city}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    <div className="host-offers-card__row">
+                      <span className="host-offers-card__label">Guest price</span>
+                      <OfferPrice
+                        price={exp.pricePerPersonMinor}
+                        compareAt={exp.compareAtPricePerPersonMinor}
+                        currencySymbol={exp.currencySymbol}
+                        asMinor
+                        tone="light"
+                        showPercent={false}
+                        className="host-offers-price"
+                        priceClassName="host-offers-price__sell"
+                        compareClassName="host-offers-price__was"
+                      />
+                    </div>
+
+                    <div className="host-offers-card__row">
+                      <span className="host-offers-card__label">Offer</span>
+                      {hasOffer ? (
+                        <span className="host-offers-flag host-offers-flag--active">Active</span>
+                      ) : (
+                        <span className="host-offers-flag">None</span>
+                      )}
+                    </div>
+
+                    <div className="host-offers-card__row">
+                      <span className="host-offers-card__label">Status</span>
+                      <ExperienceStatusBadge status={exp.status} surface="light" />
+                    </div>
+
+                    <div className="host-offers-card__actions">
+                      <button
+                        type="button"
+                        className="host-offers-btn"
+                        onClick={() => setOfferTarget(exp)}
+                      >
+                        {hasOffer ? (
+                          <Pencil className="host-offers-btn__icon" aria-hidden />
+                        ) : (
+                          <Settings2 className="host-offers-btn__icon" aria-hidden />
+                        )}
+                        {hasOffer ? "Edit offer" : "Set offer"}
+                      </button>
+                      <div className="host-offers-toggle">
+                        <Switch
+                          checked={hasOffer}
+                          disabled={isToggling || offerSaving}
+                          onCheckedChange={(checked) => void handleOfferToggle(exp, checked)}
+                          aria-label={`${hasOffer ? "Turn off" : "Turn on"} offer for ${exp.title}`}
+                          className="host-offers-switch"
+                        />
+                        <span className="host-offers-toggle__label">
+                          {isToggling ? "Saving…" : hasOffer ? "On" : "Off"}
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <OrnamentalDivider className="host-offers-ledger__footer" />
+          </>
+        )}
+      </section>
 
       <SetOfferDialog
         open={offerTarget != null}

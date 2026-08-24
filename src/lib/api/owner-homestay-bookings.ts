@@ -165,3 +165,21 @@ export const markOwnerHomestayBookingPaid = (token: string, id: string) =>
   ownerBookingAction(token, id, "markPaid");
 export const completeOwnerHomestayBooking = (token: string, id: string) =>
   ownerBookingAction(token, id, "complete");
+
+export type OwnerHomestayReviewSummary = {
+  id: string;
+  homestayId: string;
+  homestayTitle: string;
+  rating: number;
+  comment: string | null;
+  reviewerDisplayName: string | null;
+  hostReply: string | null;
+  isVerified: boolean;
+  createdAt: string;
+};
+
+export function fetchOwnerHomestayReviews(accessToken: string) {
+  return apiFetch<OwnerHomestayReviewSummary[]>("/api/v1/owner/homestay/reviews", {
+    accessToken,
+  });
+}

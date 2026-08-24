@@ -17,7 +17,7 @@ const STATUS_STYLES_DARK: Record<string, string> = {
 const STATUS_STYLES_LIGHT: Record<string, string> = {
   draft: "border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.45)] text-[rgb(58_0_0/0.65)]",
   pending_review: "border-[#8B6914]/45 bg-[#F5E6C0]/80 text-[#5C4508]",
-  published: "border-emerald-800/35 bg-emerald-50 text-emerald-900",
+  published: "border-[#3f5a45]/40 bg-[#e8efe9] text-[#3f5a45]",
   rejected: "border-destructive/40 bg-destructive/10 text-destructive",
   archived: "border-[rgb(74_0_0/0.2)] text-[rgb(58_0_0/0.55)]",
 };

@@ -1,26 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { HostDashboardShell } from "@/components/host/HostDashboardShell";
+import { HomestayOwnerDashboardShell } from "@/components/homestay-owner/HomestayOwnerDashboardShell";
 import { HostReviewsList, type RoyalReviewItem } from "@/components/host/HostReviewsList";
-import { fetchHostReviews, type HostReviewSummary } from "@/lib/api/host";
+import {
+  fetchOwnerHomestayReviews,
+  type OwnerHomestayReviewSummary,
+} from "@/lib/api/owner-homestay-bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
-import { useHostAccess } from "@/lib/use-host-access";
+import { useHomestayOwnerAccess } from "@/lib/use-homestay-owner-access";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
 
-export const Route = createFileRoute("/host/reviews")({
+export const Route = createFileRoute("/homestay/reviews")({
   head: () => ({
     meta: [
-      { title: "Host reviews — The Royal Passage" },
-      { name: "description", content: "Recent guest ratings for your experiences." },
+      { title: "Homestay reviews — The Royal Passage" },
+      { name: "description", content: "Recent guest ratings for your properties." },
     ],
   }),
-  component: HostReviewsPage,
+  component: HomestayOwnerReviewsPage,
 });
 
-function mapHostReview(review: HostReviewSummary): RoyalReviewItem {
+function mapHomestayReview(review: OwnerHomestayReviewSummary): RoyalReviewItem {
   return {
     id: review.id,
-    listingTitle: review.experienceTitle,
+    listingTitle: review.homestayTitle,
     rating: review.rating,
     comment: review.comment,
     reviewerDisplayName: review.reviewerDisplayName,
@@ -30,8 +33,8 @@ function mapHostReview(review: HostReviewSummary): RoyalReviewItem {
   };
 }
 
-function HostReviewsPage() {
-  const { accessToken, ready, loading } = useHostAccess();
+function HomestayOwnerReviewsPage() {
+  const { accessToken, ready, loading } = useHomestayOwnerAccess();
   const [reviews, setReviews] = useState<RoyalReviewItem[]>([]);
   const [pageError, setPageError] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
@@ -44,8 +47,8 @@ function HostReviewsPage() {
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
-      const rows = await fetchHostReviews(accessToken);
-      setReviews(rows.map(mapHostReview));
+      const rows = await fetchOwnerHomestayReviews(accessToken);
+      setReviews(rows.map(mapHomestayReview));
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to load reviews."));
     } finally {
@@ -63,9 +66,9 @@ function HostReviewsPage() {
   }
 
   return (
-    <HostDashboardShell
+    <HomestayOwnerDashboardShell
       title="Reviews"
-      subtitle="Recent guest ratings and comments across your experiences."
+      subtitle="Recent guest ratings and comments across your properties."
       variant="reviews"
     >
       {pageLoading ? (
@@ -76,9 +79,10 @@ function HostReviewsPage() {
         <HostReviewsList
           reviews={reviews}
           accessToken={accessToken!}
-          onUpdated={() => void loadPage()}
+          canReply={false}
+          emptyMessage="No reviews yet. They will appear here after guests complete stays."
         />
       )}
-    </HostDashboardShell>
+    </HomestayOwnerDashboardShell>
   );
 }

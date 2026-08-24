@@ -5,4 +5,5 @@ export const HOMESTAY_OWNER_NAV_ITEMS = [
   { to: "/homestay/properties", label: "My properties" },
   { to: "/homestay/offers", label: "Offers" },
   { to: "/homestay/revenue", label: "Revenue" },
+  { to: "/homestay/reviews", label: "Reviews" },
 ] as const;

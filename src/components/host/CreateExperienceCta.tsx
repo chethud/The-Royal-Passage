@@ -1,16 +1,22 @@
 import { Link } from "@tanstack/react-router";
+import { Plus } from "lucide-react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 
 type CreateExperienceCtaProps = {
   variant?: "card" | "inline";
+  tone?: "default" | "royal";
 };
 
-export function CreateExperienceCta({ variant = "card" }: CreateExperienceCtaProps) {
-  const buttonClass = "luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline";
+export function CreateExperienceCta({ variant = "card", tone = "default" }: CreateExperienceCtaProps) {
+  const buttonClass =
+    tone === "royal"
+      ? "host-catalog-cta inline-flex items-center gap-2 no-underline"
+      : "luxury-btn-sm luxury-btn-primary inline-flex items-center no-underline";
 
   if (variant === "inline") {
     return (
       <Link to="/host/experiences/new" resetScroll className={buttonClass}>
+        {tone === "royal" ? <Plus className="host-catalog-cta__icon" aria-hidden /> : null}
         Add experience
       </Link>
     );

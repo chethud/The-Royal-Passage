@@ -11,8 +11,13 @@ const tableMinWidth: Record<DashboardTableWidth, string> = {
   "2xl": "min-w-[1100px]",
 };
 
-export function dashboardRoyalFilterBtnClass(active: boolean) {
+export function dashboardFilterBtnClass(active: boolean) {
   return active ? "luxury-btn-sm luxury-btn-primary" : "luxury-btn-sm dashboard-chrome-btn";
+}
+
+/** @deprecated Prefer dashboardFilterBtnClass — kept for older call sites. */
+export function dashboardRoyalFilterBtnClass(active: boolean) {
+  return dashboardFilterBtnClass(active);
 }
 
 export function hostBookingsFilterBtnClass(active: boolean) {

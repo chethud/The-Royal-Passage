@@ -1,4 +1,6 @@
+import { Calculator } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { PalaceSilhouette } from "@/components/site/RoyalHeritageDecor";
 import type { HostRevenueDay, HostRevenueGrain } from "@/lib/api/host";
 import { formatMoney, minorToMajor } from "@/lib/money";
 
@@ -16,8 +18,8 @@ type RevenueChartProps = {
 };
 
 const COLORS = {
-  collected: "#E0B86A",
-  pending: "#F0E2C4",
+  collected: "#B88A2A",
+  pending: "#8FA58E",
 } as const;
 
 function formatAxisMoney(value: number, currencySymbol: string) {
@@ -74,26 +76,20 @@ function RevenueTooltip({
   if (!point) return null;
 
   return (
-    <div className="rounded-md border border-[rgb(200_162_90/0.45)] bg-[#FEF9E7] px-3 py-2 text-xs text-[#2A0000] shadow-md">
-      <p className="mb-1.5 font-medium">{point.fullLabel}</p>
-      <div className="space-y-1">
-        <p className="flex justify-between gap-6">
+    <div className="host-revenue-tooltip">
+      <p className="host-revenue-tooltip__title">{point.fullLabel}</p>
+      <div className="host-revenue-tooltip__rows">
+        <p className="host-revenue-tooltip__row">
           <span>Collected</span>
-          <span className="tabular-nums font-medium">
-            {formatMoney(point.collectedMinor ?? 0, currencySymbol)}
-          </span>
+          <span>{formatMoney(point.collectedMinor ?? 0, currencySymbol)}</span>
         </p>
-        <p className="flex justify-between gap-6">
+        <p className="host-revenue-tooltip__row">
           <span>Pending COD</span>
-          <span className="tabular-nums font-medium">
-            {formatMoney(point.pendingMinor ?? 0, currencySymbol)}
-          </span>
+          <span>{formatMoney(point.pendingMinor ?? 0, currencySymbol)}</span>
         </p>
-        <p className="flex justify-between gap-6">
+        <p className="host-revenue-tooltip__row">
           <span>Estimated</span>
-          <span className="tabular-nums font-medium">
-            {formatMoney(point.estimatedMinor ?? 0, currencySymbol)}
-          </span>
+          <span>{formatMoney(point.estimatedMinor ?? 0, currencySymbol)}</span>
         </p>
       </div>
     </div>
@@ -113,26 +109,32 @@ export function RevenueChart({ series, currencySymbol, grain }: RevenueChartProp
 
   if (!hasActivity) {
     return (
-      <div className="rounded-md border border-[rgb(200_162_90/0.28)] bg-[rgb(254_249_231/0.08)] px-5 py-10 text-center text-sm text-[#E8DCC8]/80">
-        No revenue in this period yet.
+      <div className="host-revenue-empty">
+        <PalaceSilhouette className="host-revenue-empty__palace" />
+        <div className="host-revenue-empty__content">
+          <span className="host-revenue-empty__medallion" aria-hidden>
+            <Calculator className="host-revenue-empty__icon" />
+          </span>
+          <p className="host-revenue-empty__text">No revenue in this period yet.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="h-[340px] w-full rounded-md border border-[rgb(200_162_90/0.28)] bg-[rgb(254_249_231/0.06)] p-3 sm:p-4">
+    <div className="host-revenue-chart">
+      <div className="host-revenue-chart__surface">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 12, right: 8, left: 4, bottom: 4 }} barCategoryGap="16%">
-            <CartesianGrid vertical={false} stroke="rgb(200 162 90 / 0.28)" />
+          <BarChart data={data} margin={{ top: 14, right: 10, left: 4, bottom: 6 }} barCategoryGap="22%">
+            <CartesianGrid vertical={false} stroke="rgb(184 138 42 / 0.18)" strokeDasharray="3 6" />
             <XAxis
               dataKey="label"
               tickLine={false}
-              axisLine={false}
-              tickMargin={10}
+              axisLine={{ stroke: "rgb(184 138 42 / 0.45)", strokeWidth: 1 }}
+              tickMargin={12}
               interval="preserveStartEnd"
               minTickGap={grain === "day" ? 18 : 8}
-              tick={{ fill: "#E8DCC8", fontSize: 11 }}
+              tick={{ fill: "#4A1113", fontSize: 11, fontFamily: "var(--font-display)" }}
             />
             <YAxis
               tickLine={false}
@@ -140,10 +142,10 @@ export function RevenueChart({ series, currencySymbol, grain }: RevenueChartProp
               width={58}
               tickMargin={6}
               tickFormatter={(value) => formatAxisMoney(Number(value), currencySymbol)}
-              tick={{ fill: "#E8DCC8", fontSize: 11 }}
+              tick={{ fill: "rgb(74 17 19 / 0.62)", fontSize: 11 }}
             />
             <Tooltip
-              cursor={{ fill: "rgb(200 162 90 / 0.12)" }}
+              cursor={{ fill: "rgb(184 138 42 / 0.08)" }}
               content={<RevenueTooltip currencySymbol={currencySymbol} />}
             />
             <Bar
@@ -152,27 +154,27 @@ export function RevenueChart({ series, currencySymbol, grain }: RevenueChartProp
               stackId="revenue"
               fill={COLORS.collected}
               radius={[0, 0, 0, 0]}
-              maxBarSize={42}
+              maxBarSize={38}
             />
             <Bar
               dataKey="pendingMinor"
               name="Pending COD"
               stackId="revenue"
               fill={COLORS.pending}
-              radius={[4, 4, 0, 0]}
-              maxBarSize={42}
+              radius={[5, 5, 0, 0]}
+              maxBarSize={38}
             />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 text-xs text-[#E8DCC8]/85">
-        <span className="inline-flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-sm" style={{ background: COLORS.collected }} />
+      <div className="host-revenue-chart__legend">
+        <span className="host-revenue-chart__legend-item">
+          <span className="host-revenue-chart__swatch" style={{ background: COLORS.collected }} />
           Collected
         </span>
-        <span className="inline-flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-sm" style={{ background: COLORS.pending }} />
+        <span className="host-revenue-chart__legend-item">
+          <span className="host-revenue-chart__swatch" style={{ background: COLORS.pending }} />
           Pending COD
         </span>
       </div>

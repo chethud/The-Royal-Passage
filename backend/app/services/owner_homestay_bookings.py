@@ -498,3 +498,72 @@ def complete_owner_homestay_booking(booking_id: str, auth: dict) -> HomestayBook
             {"bookingId": booking_id, "bookingType": "homestay"},
         )
     return updated
+
+
+def _homestay_review_comment(row: dict) -> str | None:
+    title = (row.get("title") or "").strip()
+    body = (row.get("body") or "").strip()
+    if title and body:
+        return f"{title} — {body}"
+    if title:
+        return title
+    if body:
+        return body
+    return None
+
+
+def list_owner_homestay_reviews(auth: dict, limit: int = 20):
+    from app.models.schemas import OwnerHomestayReviewSummary
+
+    supabase = get_supabase_admin()
+    owner_id = _resolve_owner_id(auth)
+    homestay_ids = _owner_homestay_ids(supabase, owner_id)
+
+    if not homestay_ids:
+        return []
+
+    result = (
+        supabase.table("homestay_reviews")
+        .select(
+            "id, homestay_id, rating, title, body, guest_id, booking_id, status, created_at, homestays ( title )"
+        )
+        .in_("homestay_id", homestay_ids)
+        .eq("status", "published")
+        .order("created_at", desc=True)
+        .limit(limit)
+        .execute()
+    )
+
+    rows = result.data or []
+    guest_ids = list({row["guest_id"] for row in rows if row.get("guest_id")})
+    name_by_guest: dict[str, str] = {}
+    if guest_ids:
+        profiles = (
+            supabase.table("profiles")
+            .select("id, full_name")
+            .in_("id", guest_ids)
+            .execute()
+        )
+        for profile in profiles.data or []:
+            if profile.get("full_name"):
+                name_by_guest[profile["id"]] = profile["full_name"]
+
+    reviews: list[OwnerHomestayReviewSummary] = []
+    for row in rows:
+        homestay = row.get("homestays") or {}
+        if isinstance(homestay, list):
+            homestay = homestay[0] if homestay else {}
+        reviews.append(
+            OwnerHomestayReviewSummary(
+                id=row["id"],
+                homestayId=row["homestay_id"],
+                homestayTitle=homestay.get("title") or "Property",
+                rating=row["rating"],
+                comment=_homestay_review_comment(row),
+                reviewerDisplayName=name_by_guest.get(row.get("guest_id", "")),
+                hostReply=None,
+                isVerified=bool(row.get("booking_id")),
+                createdAt=row.get("created_at", ""),
+            )
+        )
+    return reviews

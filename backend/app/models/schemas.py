@@ -777,6 +777,18 @@ class HostReviewSummary(BaseModel):
     createdAt: str
 
 
+class OwnerHomestayReviewSummary(BaseModel):
+    id: str
+    homestayId: str
+    homestayTitle: str
+    rating: int
+    comment: str | None
+    reviewerDisplayName: str | None
+    hostReply: str | None = None
+    isVerified: bool = False
+    createdAt: str
+
+
 class ManagedUser(BaseModel):
     id: str
     email: str | None

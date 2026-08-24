@@ -87,8 +87,12 @@ export function resolveUserRoles(
   primaryRole: UserRole | null | undefined,
 ): UserRole[] {
   const resolved = [...(roles ?? [])].filter(isUserRole);
+  // Always include profiles.role so a stale guest row in user_roles cannot
+  // hide a staff role that was written on the profile (common after demo seed).
+  if (primaryRole && isUserRole(primaryRole) && !resolved.includes(primaryRole)) {
+    resolved.push(primaryRole);
+  }
   if (resolved.length > 0) return [...new Set(resolved)];
-  if (primaryRole && isUserRole(primaryRole)) return [primaryRole];
   return [];
 }
 

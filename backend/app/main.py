@@ -65,7 +65,7 @@ from app.http_notifications import (
     notifications_list,
     notifications_mark_all_read,
 )
-from app.http_owner_homestay import owner_homestay_revenue
+from app.http_owner_homestay import owner_homestay_revenue, owner_homestay_reviews
 from app.rpc.servicer import RoyalPassageServiceImpl
 from royalpassage.v1.service_connect import RoyalPassageServiceASGIApplication
 
@@ -167,6 +167,7 @@ core_app = Starlette(
         ),
         Route("/api/v1/host/revenue", host_revenue, methods=["GET"]),
         Route("/api/v1/owner/homestay/revenue", owner_homestay_revenue, methods=["GET"]),
+        Route("/api/v1/owner/homestay/reviews", owner_homestay_reviews, methods=["GET"]),
         Route("/api/v1/host/reviews", host_reviews, methods=["GET"]),
         Route("/api/v1/host/categories", host_categories, methods=["GET"]),
         Route("/api/v1/host/experiences", host_experiences_list, methods=["GET"]),

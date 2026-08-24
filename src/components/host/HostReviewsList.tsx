@@ -1,17 +1,53 @@
+import { ArrowRight, ShieldCheck, Star } from "lucide-react";
 import { useState } from "react";
 import { StarRating } from "@/components/reviews/StarRating";
-import type { HostReviewSummary } from "@/lib/api/host";
+import {
+  CornerFiligree,
+  MaharajaEmblem,
+  OrnamentalDivider,
+  PalaceSilhouette,
+} from "@/components/site/RoyalHeritageDecor";
 import { toErrorMessage } from "@/lib/api/client";
 import { formatDateLong } from "@/lib/date-format";
 import { replyToReview } from "@/lib/review-fns";
 
-type HostReviewsListProps = {
-  reviews: HostReviewSummary[];
-  accessToken: string;
-  onUpdated?: () => void;
+export type RoyalReviewItem = {
+  id: string;
+  listingTitle: string;
+  rating: number;
+  comment: string | null;
+  reviewerDisplayName: string | null;
+  hostReply: string | null;
+  isVerified: boolean;
+  createdAt: string;
 };
 
-export function HostReviewsList({ reviews, accessToken, onUpdated }: HostReviewsListProps) {
+type HostReviewsListProps = {
+  reviews: RoyalReviewItem[];
+  accessToken: string;
+  onUpdated?: () => void;
+  canReply?: boolean;
+  emptyMessage?: string;
+};
+
+function ReviewCorners() {
+  return (
+    <>
+      <CornerFiligree className="host-reviews-entry__corner host-reviews-entry__corner--tl" />
+      <CornerFiligree className="host-reviews-entry__corner host-reviews-entry__corner--tr" />
+      <CornerFiligree className="host-reviews-entry__corner host-reviews-entry__corner--bl" />
+      <CornerFiligree className="host-reviews-entry__corner host-reviews-entry__corner--br" />
+    </>
+  );
+}
+
+export function HostReviewsList({
+  reviews,
+  accessToken,
+  onUpdated,
+  canReply = true,
+  emptyMessage = "No reviews yet. They will appear here after guests complete experiences.",
+}: HostReviewsListProps) {
   const [replyingId, setReplyingId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -41,91 +77,117 @@ export function HostReviewsList({ reviews, accessToken, onUpdated }: HostReviews
 
   if (reviews.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">
-        No reviews yet. They will appear here after guests complete experiences.
-      </p>
+      <div className="host-reviews-empty">
+        <PalaceSilhouette className="host-reviews-empty__palace" />
+        <div className="host-reviews-empty__content">
+          <span className="host-reviews-empty__medallion" aria-hidden>
+            <Star className="host-reviews-empty__icon" />
+          </span>
+          <p className="host-reviews-empty__text">{emptyMessage}</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {error ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
-      <ul className="space-y-4">
-        {reviews.map((review) => (
-          <li
-            key={review.id}
-            className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-5"
-          >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <div className="font-display text-lg">{review.experienceTitle}</div>
-                <div className="mt-1 text-sm text-muted-foreground">
-                  {review.reviewerDisplayName ?? "Guest"} ·{" "}
-                  {formatDateLong(review.createdAt.slice(0, 10))}
-                  {review.isVerified ? (
-                    <span className="ml-2 text-xs text-ember">Verified visit</span>
+    <div className="host-reviews-stack">
+      {error ? <p className="host-reviews-error">{error}</p> : null}
+
+      <ul className="host-reviews-list">
+        {reviews.map((review, index) => (
+          <li key={review.id}>
+            <article className="host-reviews-entry">
+              <ReviewCorners />
+
+              <div className="host-reviews-entry__layout">
+                <div className="host-reviews-entry__main">
+                  <div className="host-reviews-entry__title">{review.listingTitle}</div>
+                  <div className="host-reviews-entry__meta">
+                    <span>{review.reviewerDisplayName ?? "Guest"}</span>
+                    <span className="host-reviews-entry__dot" aria-hidden>
+                      ·
+                    </span>
+                    <span>{formatDateLong(review.createdAt.slice(0, 10))}</span>
+                    {review.isVerified ? (
+                      <span className="host-reviews-verified">
+                        <ShieldCheck className="host-reviews-verified__icon" aria-hidden />
+                        Verified visit
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {review.comment ? (
+                    <p className="host-reviews-entry__comment">{review.comment}</p>
+                  ) : null}
+
+                  {review.hostReply ? (
+                    <div className="host-reviews-reply">
+                      <div className="host-reviews-reply__label">Your reply</div>
+                      <p className="host-reviews-reply__body">{review.hostReply}</p>
+                    </div>
+                  ) : canReply && replyingId === review.id ? (
+                    <div className="host-reviews-compose">
+                      <textarea
+                        rows={3}
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        placeholder="Thank your guest and share any follow-up…"
+                        className="host-reviews-compose__input"
+                      />
+                      <div className="host-reviews-compose__actions">
+                        <button
+                          type="button"
+                          disabled={busyId === review.id}
+                          onClick={() => void handleReply(review.id)}
+                          className="host-reviews-compose__submit"
+                        >
+                          {busyId === review.id ? "Posting…" : "Post reply"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReplyingId(null);
+                            setReplyText("");
+                          }}
+                          className="host-reviews-compose__cancel"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : canReply ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReplyingId(review.id);
+                        setReplyText("");
+                      }}
+                      className="host-reviews-reply-action"
+                    >
+                      Reply to guest
+                      <ArrowRight className="host-reviews-reply-action__icon" aria-hidden />
+                    </button>
                   ) : null}
                 </div>
-              </div>
-              <StarRating value={review.rating} size="sm" />
-            </div>
-            {review.comment ? (
-              <p className="mt-3 text-sm leading-relaxed text-foreground/90">{review.comment}</p>
-            ) : null}
-            {review.hostReply ? (
-              <div className="mt-4 border-l-2 border-ember/40 pl-4 text-sm">
-                <div className="eyebrow text-muted-foreground">Your reply</div>
-                <p className="mt-1">{review.hostReply}</p>
-              </div>
-            ) : replyingId === review.id ? (
-              <div className="mt-4 space-y-3">
-                <textarea
-                  rows={3}
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  placeholder="Thank your guest and share any follow-up…"
-                  className="w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/50 px-3 py-2 text-sm"
-                />
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    disabled={busyId === review.id}
-                    onClick={() => void handleReply(review.id)}
-                    className="rounded-sm bg-ember px-3 py-1.5 text-xs text-primary-foreground disabled:opacity-50"
-                  >
-                    {busyId === review.id ? "Posting…" : "Post reply"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setReplyingId(null);
-                      setReplyText("");
-                    }}
-                    className="rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-3 py-1.5 text-xs"
-                  >
-                    Cancel
-                  </button>
+
+                <div className="host-reviews-entry__rating" aria-label={`${review.rating} out of 5 stars`}>
+                  <StarRating value={review.rating} size="md" tone="royal" />
                 </div>
               </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setReplyingId(review.id);
-                  setReplyText("");
-                }}
-                className="mt-4 text-xs text-ember hover:underline"
-              >
-                Reply to guest
-              </button>
-            )}
+            </article>
+
+            {index < reviews.length - 1 ? (
+              <OrnamentalDivider className="host-reviews-separator" />
+            ) : null}
           </li>
         ))}
       </ul>
+
+      <div className="host-reviews-footer">
+        <span className="host-reviews-footer__line" aria-hidden />
+        <MaharajaEmblem className="host-reviews-footer__emblem" />
+        <span className="host-reviews-footer__line" aria-hidden />
+      </div>
     </div>
   );
 }

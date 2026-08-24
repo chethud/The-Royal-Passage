@@ -44,6 +44,7 @@ import { Route as HostExperiencesRouteImport } from './routes/host.experiences'
 import { Route as HostDashboardRouteImport } from './routes/host.dashboard'
 import { Route as HostBookingsRouteImport } from './routes/host.bookings'
 import { Route as HomestaysSlugRouteImport } from './routes/homestays.$slug'
+import { Route as HomestayReviewsRouteImport } from './routes/homestay.reviews'
 import { Route as HomestayRevenueRouteImport } from './routes/homestay.revenue'
 import { Route as HomestayPropertiesRouteImport } from './routes/homestay.properties'
 import { Route as HomestayOffersRouteImport } from './routes/homestay.offers'
@@ -299,6 +300,11 @@ const HostBookingsRoute = HostBookingsRouteImport.update({
 const HomestaysSlugRoute = HomestaysSlugRouteImport.update({
   id: '/homestays/$slug',
   path: '/homestays/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomestayReviewsRoute = HomestayReviewsRouteImport.update({
+  id: '/homestay/reviews',
+  path: '/homestay/reviews',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomestayRevenueRoute = HomestayRevenueRouteImport.update({
@@ -756,6 +762,7 @@ export interface FileRoutesByFullPath {
   '/homestay/offers': typeof HomestayOffersRoute
   '/homestay/properties': typeof HomestayPropertiesRouteWithChildren
   '/homestay/revenue': typeof HomestayRevenueRoute
+  '/homestay/reviews': typeof HomestayReviewsRoute
   '/homestays/$slug': typeof HomestaysSlugRouteWithChildren
   '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
@@ -865,6 +872,7 @@ export interface FileRoutesByTo {
   '/homestay/dashboard': typeof HomestayDashboardRoute
   '/homestay/offers': typeof HomestayOffersRoute
   '/homestay/revenue': typeof HomestayRevenueRoute
+  '/homestay/reviews': typeof HomestayReviewsRoute
   '/host/dashboard': typeof HostDashboardRoute
   '/host/offers': typeof HostOffersRoute
   '/host/profile': typeof HostProfileRoute
@@ -978,6 +986,7 @@ export interface FileRoutesById {
   '/homestay/offers': typeof HomestayOffersRoute
   '/homestay/properties': typeof HomestayPropertiesRouteWithChildren
   '/homestay/revenue': typeof HomestayRevenueRoute
+  '/homestay/reviews': typeof HomestayReviewsRoute
   '/homestays/$slug': typeof HomestaysSlugRouteWithChildren
   '/host/bookings': typeof HostBookingsRouteWithChildren
   '/host/dashboard': typeof HostDashboardRoute
@@ -1098,6 +1107,7 @@ export interface FileRouteTypes {
     | '/homestay/offers'
     | '/homestay/properties'
     | '/homestay/revenue'
+    | '/homestay/reviews'
     | '/homestays/$slug'
     | '/host/bookings'
     | '/host/dashboard'
@@ -1207,6 +1217,7 @@ export interface FileRouteTypes {
     | '/homestay/dashboard'
     | '/homestay/offers'
     | '/homestay/revenue'
+    | '/homestay/reviews'
     | '/host/dashboard'
     | '/host/offers'
     | '/host/profile'
@@ -1319,6 +1330,7 @@ export interface FileRouteTypes {
     | '/homestay/offers'
     | '/homestay/properties'
     | '/homestay/revenue'
+    | '/homestay/reviews'
     | '/homestays/$slug'
     | '/host/bookings'
     | '/host/dashboard'
@@ -1425,6 +1437,7 @@ export interface RootRouteChildren {
   HomestayOffersRoute: typeof HomestayOffersRoute
   HomestayPropertiesRoute: typeof HomestayPropertiesRouteWithChildren
   HomestayRevenueRoute: typeof HomestayRevenueRoute
+  HomestayReviewsRoute: typeof HomestayReviewsRoute
   HomestaysSlugRoute: typeof HomestaysSlugRouteWithChildren
   HostBookingsRoute: typeof HostBookingsRouteWithChildren
   HostDashboardRoute: typeof HostDashboardRoute
@@ -1699,6 +1712,13 @@ declare module '@tanstack/react-router' {
       path: '/homestays/$slug'
       fullPath: '/homestays/$slug'
       preLoaderRoute: typeof HomestaysSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/homestay/reviews': {
+      id: '/homestay/reviews'
+      path: '/homestay/reviews'
+      fullPath: '/homestay/reviews'
+      preLoaderRoute: typeof HomestayReviewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/homestay/revenue': {
@@ -2582,6 +2602,7 @@ const rootRouteChildren: RootRouteChildren = {
   HomestayOffersRoute: HomestayOffersRoute,
   HomestayPropertiesRoute: HomestayPropertiesRouteWithChildren,
   HomestayRevenueRoute: HomestayRevenueRoute,
+  HomestayReviewsRoute: HomestayReviewsRoute,
   HomestaysSlugRoute: HomestaysSlugRouteWithChildren,
   HostBookingsRoute: HostBookingsRouteWithChildren,
   HostDashboardRoute: HostDashboardRoute,

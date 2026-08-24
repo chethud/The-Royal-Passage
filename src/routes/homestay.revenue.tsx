@@ -1,7 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+  type ComponentType,
+  type SVGProps,
+} from "react";
+import { Calculator, Coins, Wallet } from "lucide-react";
 import { HomestayOwnerDashboardShell } from "@/components/homestay-owner/HomestayOwnerDashboardShell";
 import { RevenueChart } from "@/components/host/RevenueChart";
+import { CornerFiligree, OrnamentalDivider } from "@/components/site/RoyalHeritageDecor";
 import {
   fetchOwnerHomestayRevenue,
   type OwnerRevenuePeriod,
@@ -11,7 +21,6 @@ import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { formatMoney } from "@/lib/money";
 import { useHomestayOwnerAccess } from "@/lib/use-homestay-owner-access";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
-import { dashboardFilterBtnClass } from "@/components/ui/DashboardTable";
 
 const PERIODS = ["month", "monthwise", "months_6", "year"] as const;
 
@@ -82,6 +91,41 @@ function changeLabel(current: number, previous: number) {
   return `${rounded > 0 ? "+" : ""}${rounded}% vs prior period`;
 }
 
+function PanelCorners() {
+  return (
+    <>
+      <CornerFiligree className="host-revenue-panel__corner host-revenue-panel__corner--tl" />
+      <CornerFiligree className="host-revenue-panel__corner host-revenue-panel__corner--tr" />
+      <CornerFiligree className="host-revenue-panel__corner host-revenue-panel__corner--bl" />
+      <CornerFiligree className="host-revenue-panel__corner host-revenue-panel__corner--br" />
+    </>
+  );
+}
+
+function RevenueMetric({
+  label,
+  value,
+  hint,
+  Icon,
+}: {
+  label: string;
+  value: string;
+  hint: string;
+  Icon: ComponentType<SVGProps<SVGSVGElement>>;
+}) {
+  return (
+    <article className="host-revenue-metric">
+      <span className="host-revenue-metric__medallion" aria-hidden>
+        <Icon className="host-revenue-metric__icon" />
+      </span>
+      <p className="host-revenue-metric__label">{label}</p>
+      <p className="host-revenue-metric__value">{value}</p>
+      <span className="host-revenue-metric__rule" aria-hidden />
+      <p className="host-revenue-metric__hint">{hint}</p>
+    </article>
+  );
+}
+
 function HomestayOwnerRevenuePage() {
   const { period } = Route.useSearch();
   const navigate = Route.useNavigate();
@@ -142,91 +186,92 @@ function HomestayOwnerRevenuePage() {
     <HomestayOwnerDashboardShell
       title="Revenue"
       subtitle="Compare pay-at-property collections and outstanding COD across time."
+      variant="revenue"
       showRoleDescription={false}
     >
-      <div className="mb-6 flex flex-wrap gap-2">
-        {PERIOD_OPTIONS.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => selectPeriod(option.value)}
-            aria-pressed={period === option.value}
-            disabled={refreshing && period === option.value}
-            className={dashboardFilterBtnClass(period === option.value)}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-
-      {initialLoading && !revenue ? (
-        <p className="text-sm text-muted-foreground">Loading revenue…</p>
-      ) : pageError && !revenue ? (
-        <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {pageError}
-        </p>
-      ) : revenue ? (
-        <div
-          className={`space-y-8 transition-opacity duration-200 ${refreshing ? "pointer-events-none opacity-55" : "opacity-100"}`}
-          aria-busy={refreshing}
-        >
-          {pageError ? (
-            <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {pageError}
-            </p>
-          ) : null}
-          {refreshing ? (
-            <p className="text-sm text-muted-foreground">Updating {activePeriod.label.toLowerCase()}…</p>
-          ) : null}
-          <div className="grid gap-4 sm:grid-cols-3">
-            <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-5">
-              <div className="eyebrow text-muted-foreground">Collected</div>
-              <div className="mt-2 font-display text-3xl text-ember">
-                {formatMoney(revenue.collectedMinor, revenue.currencySymbol)}
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {changeLabel(revenue.collectedMinor, revenue.previousCollectedMinor)} ·{" "}
-                {formatMoney(revenue.previousCollectedMinor, revenue.currencySymbol)} prior
-              </p>
-            </article>
-            <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-5">
-              <div className="eyebrow text-muted-foreground">COD pending</div>
-              <div className="mt-2 font-display text-3xl text-ember">
-                {formatMoney(revenue.pendingMinor, revenue.currencySymbol)}
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {changeLabel(revenue.pendingMinor, revenue.previousPendingMinor)} ·{" "}
-                {formatMoney(revenue.previousPendingMinor, revenue.currencySymbol)} prior
-              </p>
-            </article>
-            <article className="glass-strong rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-5">
-              <div className="eyebrow text-muted-foreground">Estimated</div>
-              <div className="mt-2 font-display text-3xl text-ember">
-                {formatMoney(revenue.estimatedMinor, revenue.currencySymbol)}
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {changeLabel(revenue.estimatedMinor, revenue.previousEstimatedMinor)} ·{" "}
-                {formatMoney(revenue.previousEstimatedMinor, revenue.currencySymbol)} prior
-              </p>
-            </article>
-          </div>
-
-          <section>
-            <h2 className="font-display text-2xl">Revenue breakdown</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {activePeriod.summary} ({activePeriod.previous}).
-            </p>
-            <div className="mt-6">
-              <RevenueChart
-                key={`${period}-${revenue.grain}-${revenue.week.length}`}
-                series={revenue.week}
-                currencySymbol={revenue.currencySymbol}
-                grain={revenue.grain}
-              />
-            </div>
-          </section>
+      <div className="host-revenue-stack">
+        <div className="host-revenue-filters" role="group" aria-label="Revenue period">
+          {PERIOD_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => selectPeriod(option.value)}
+              aria-pressed={period === option.value}
+              disabled={refreshing && period === option.value}
+              className={`host-revenue-filter${period === option.value ? " is-active" : ""}`}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
-      ) : null}
+
+        {initialLoading && !revenue ? (
+          <div className="host-revenue-panel host-revenue-loading">
+            <p>Loading revenue…</p>
+          </div>
+        ) : pageError && !revenue ? (
+          <div className="host-revenue-panel host-revenue-warning">
+            <p>{pageError}</p>
+          </div>
+        ) : revenue ? (
+          <div
+            className={`host-revenue-content transition-opacity duration-200 ${refreshing ? "pointer-events-none opacity-55" : "opacity-100"}`}
+            aria-busy={refreshing}
+          >
+            {pageError ? (
+              <div className="host-revenue-panel host-revenue-warning">
+                <p>{pageError}</p>
+              </div>
+            ) : null}
+            {refreshing ? (
+              <p className="host-revenue-updating">Updating {activePeriod.label.toLowerCase()}…</p>
+            ) : null}
+
+            <div className="host-revenue-panel host-revenue-summary">
+              <PanelCorners />
+              <div className="host-revenue-summary__grid">
+                <RevenueMetric
+                  label="Collected"
+                  value={formatMoney(revenue.collectedMinor, revenue.currencySymbol)}
+                  hint={`${changeLabel(revenue.collectedMinor, revenue.previousCollectedMinor)} · ${formatMoney(revenue.previousCollectedMinor, revenue.currencySymbol)} prior`}
+                  Icon={Coins}
+                />
+                <RevenueMetric
+                  label="COD pending"
+                  value={formatMoney(revenue.pendingMinor, revenue.currencySymbol)}
+                  hint={`${changeLabel(revenue.pendingMinor, revenue.previousPendingMinor)} · ${formatMoney(revenue.previousPendingMinor, revenue.currencySymbol)} prior`}
+                  Icon={Wallet}
+                />
+                <RevenueMetric
+                  label="Estimated"
+                  value={formatMoney(revenue.estimatedMinor, revenue.currencySymbol)}
+                  hint={`${changeLabel(revenue.estimatedMinor, revenue.previousEstimatedMinor)} · ${formatMoney(revenue.previousEstimatedMinor, revenue.currencySymbol)} prior`}
+                  Icon={Calculator}
+                />
+              </div>
+            </div>
+
+            <section className="host-revenue-panel host-revenue-breakdown">
+              <PanelCorners />
+              <div className="host-revenue-breakdown__header">
+                <h2 className="host-revenue-breakdown__title">Revenue breakdown</h2>
+                <OrnamentalDivider className="host-revenue-breakdown__divider" />
+                <p className="host-revenue-breakdown__summary">
+                  {activePeriod.summary} ({activePeriod.previous}).
+                </p>
+              </div>
+              <div className="host-revenue-breakdown__chart">
+                <RevenueChart
+                  key={`${period}-${revenue.grain}-${revenue.week.length}`}
+                  series={revenue.week}
+                  currencySymbol={revenue.currencySymbol}
+                  grain={revenue.grain}
+                />
+              </div>
+            </section>
+          </div>
+        ) : null}
+      </div>
     </HomestayOwnerDashboardShell>
   );
 }
