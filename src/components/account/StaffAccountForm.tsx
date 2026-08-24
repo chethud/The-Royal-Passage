@@ -5,6 +5,7 @@ import { updateAccountProfile } from "@/lib/profile-browser";
 import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 import { toErrorMessage } from "@/lib/api/client";
 import { ROLE_LABELS, isUserRole } from "@/lib/roles";
+import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput, TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
 
 const inputClass =
   "w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
@@ -16,7 +17,7 @@ type StaffAccountFormProps = {
 
 export function StaffAccountForm({ profile, onUpdated }: StaffAccountFormProps) {
   const [fullName, setFullName] = useState(profile.fullName ?? "");
-  const [phone, setPhone] = useState(profile.phone ?? "");
+  const [phone, setPhone] = useState(() => sanitizeTenDigitPhoneInput(profile.phone ?? ""));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -32,9 +33,12 @@ export function StaffAccountForm({ profile, onUpdated }: StaffAccountFormProps) 
       if (!isSupabaseBrowserConfigured()) {
         throw new Error("Supabase is not configured for this deployment.");
       }
+      if (phone.trim() && !normalizeTenDigitPhone(phone)) {
+        throw new Error("Enter a valid 10-digit mobile number.");
+      }
       const updated = await updateAccountProfile({
         fullName: fullName.trim() || undefined,
-        phone: phone.trim() || undefined,
+        phone: normalizeTenDigitPhone(phone) ?? undefined,
       });
       onUpdated(updated);
       setSaved(true);
@@ -87,10 +91,9 @@ export function StaffAccountForm({ profile, onUpdated }: StaffAccountFormProps) 
             </label>
             <input
               id="staff-phone"
-              type="tel"
+              {...TEN_DIGIT_PHONE_INPUT_PROPS}
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+91 98XXXXXXX"
+              onChange={(e) => setPhone(sanitizeTenDigitPhoneInput(e.target.value))}
               className={inputClass}
             />
           </div>

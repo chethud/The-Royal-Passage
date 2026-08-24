@@ -21,6 +21,7 @@ import {
   uploadVipProfessionalCardPhoto,
 } from "@/lib/vip-membership-photo-upload";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
+import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput, TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
 
 const STEPS = [
   { id: 1, label: "Contact" },
@@ -104,7 +105,7 @@ export function VipMembershipApplyForm() {
   const [stepError, setStepError] = useState<string | null>(null);
   const [fullName, setFullName] = useState(displayName ?? profile?.fullName ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
-  const [phone, setPhone] = useState(profile?.phone ?? "");
+  const [phone, setPhone] = useState(() => sanitizeTenDigitPhoneInput(profile?.phone ?? ""));
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
   const [aadhaarNumber, setAadhaarNumber] = useState("");
@@ -120,6 +121,9 @@ export function VipMembershipApplyForm() {
     if (currentStep === 1) {
       if (fullName.trim().length < 2) return "Enter your full name.";
       if (!email.trim()) return "Enter your email address.";
+      if (phone.trim() && !normalizeTenDigitPhone(phone)) {
+        return "Enter a valid 10-digit mobile number.";
+      }
       if (description.trim().length < 20) return "About you must be at least 20 characters.";
       return null;
     }
@@ -198,7 +202,7 @@ export function VipMembershipApplyForm() {
       await submitVipMembershipApplication(accessToken, {
         fullName: fullName.trim(),
         email: email.trim(),
-        phone: phone.trim() || undefined,
+        phone: normalizeTenDigitPhone(phone) ?? undefined,
         address: address.trim() || undefined,
         idDocumentNumber: aadhaarNumber.replace(/\s/g, ""),
         idDocumentPhotoUrl: aadhaarPhotoUrl,
@@ -286,9 +290,9 @@ export function VipMembershipApplyForm() {
                 </label>
                 <input
                   id="vip-phone"
-                  type="tel"
+                  {...TEN_DIGIT_PHONE_INPUT_PROPS}
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(sanitizeTenDigitPhoneInput(e.target.value))}
                   className={inputClass}
                 />
               </div>

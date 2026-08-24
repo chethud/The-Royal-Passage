@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { createVipOwner } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
+import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput, TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
 
 const inputClass =
   "w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
@@ -31,11 +32,14 @@ export function CreateVipOwnerForm({ accessToken, onCreated }: CreateVipOwnerFor
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
+      if (phone.trim() && !normalizeTenDigitPhone(phone)) {
+        throw new Error("Enter a valid 10-digit mobile number.");
+      }
       await createVipOwner(accessToken, {
         fullName: fullName.trim(),
         email: email.trim(),
         password,
-        phone: phone.trim() || undefined,
+        phone: normalizeTenDigitPhone(phone) ?? undefined,
         address: address.trim() || undefined,
       });
       setNotice(`VIP owner login created for ${email.trim()}. Share these credentials securely.`);
@@ -111,10 +115,9 @@ export function CreateVipOwnerForm({ accessToken, onCreated }: CreateVipOwnerFor
             </label>
             <input
               id="vip-owner-phone"
-              type="tel"
+              {...TEN_DIGIT_PHONE_INPUT_PROPS}
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+91 98XXXXXXX"
+              onChange={(e) => setPhone(sanitizeTenDigitPhoneInput(e.target.value))}
               className={inputClass}
             />
           </div>

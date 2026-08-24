@@ -2,6 +2,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { createPlatformUser } from "@/lib/api/admin";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
+import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput, TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
 import type { UserRole } from "@/lib/roles";
 
 const inputClass =
@@ -147,12 +148,15 @@ export function CreatePlatformUserForm({
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
+      if (phone.trim() && !normalizeTenDigitPhone(phone)) {
+        throw new Error("Enter a valid 10-digit mobile number.");
+      }
       await createPlatformUser(accessToken, {
         roles,
         fullName: fullName.trim(),
         email: email.trim(),
         password,
-        phone: phone.trim() || undefined,
+        phone: normalizeTenDigitPhone(phone) ?? undefined,
         bio: showBio ? bio.trim() || undefined : undefined,
         address: showAddress ? address.trim() || undefined : undefined,
       });
@@ -269,10 +273,9 @@ export function CreatePlatformUserForm({
             </label>
             <input
               id={`${fieldPrefix}-phone`}
-              type="tel"
+              {...TEN_DIGIT_PHONE_INPUT_PROPS}
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+91 98XXXXXXX"
+              onChange={(e) => setPhone(sanitizeTenDigitPhoneInput(e.target.value))}
               className={inputClass}
             />
           </div>

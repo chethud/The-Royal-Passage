@@ -13,6 +13,7 @@ import {
 import { dashboardPathForRole, isGuestAccount } from "@/lib/roles";
 import { NOINDEX_META } from "@/lib/seo-helpers";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
+import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput, TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
 
 const inputClass =
   "w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-4 py-3 text-sm luxury-panel-body focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
@@ -32,7 +33,7 @@ function MemberVipCustomRequestPage() {
   const [travelEnd, setTravelEnd] = useState(minDate);
   const [guestCount, setGuestCount] = useState(2);
   const [preferences, setPreferences] = useState("");
-  const [guestPhone, setGuestPhone] = useState(profile?.phone ?? "");
+  const [guestPhone, setGuestPhone] = useState(() => sanitizeTenDigitPhoneInput(profile?.phone ?? ""));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -62,13 +63,16 @@ function MemberVipCustomRequestPage() {
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
+      if (guestPhone.trim() && !normalizeTenDigitPhone(guestPhone)) {
+        throw new Error("Enter a valid 10-digit mobile number.");
+      }
       const dates = normalizeVipTravelDates(travelStart, travelEnd);
       await submitVipCustomPackageRequest(accessToken, {
         travelStart: dates.start,
         travelEnd: dates.end,
         guestCount,
         preferences: preferences.trim() || undefined,
-        guestPhone: guestPhone.trim() || undefined,
+        guestPhone: normalizeTenDigitPhone(guestPhone) ?? undefined,
       });
       setNotice("Your custom package request has been sent to the Royal VIP concierge.");
       setPreferences("");
@@ -144,9 +148,9 @@ function MemberVipCustomRequestPage() {
               </label>
               <input
                 id="guest-phone"
-                type="tel"
+                {...TEN_DIGIT_PHONE_INPUT_PROPS}
                 value={guestPhone}
-                onChange={(e) => setGuestPhone(e.target.value)}
+                onChange={(e) => setGuestPhone(sanitizeTenDigitPhoneInput(e.target.value))}
                 className={inputClass}
               />
             </div>

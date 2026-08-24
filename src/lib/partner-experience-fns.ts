@@ -28,8 +28,11 @@ const submitSchema = z.object({
     .toUpperCase()
     .regex(/^[A-Z]{5}[0-9]{4}[A-Z]$/, "Enter a valid PAN (e.g. ABCDE1234F)."),
   passportPhotoUrl: z.string().url().max(2000),
-  tradeLicenseUrl: z.string().url().max(2000),
-  tradeLicenseExpiresOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter trade licence expiry date."),
+  tradeLicenseUrl: z.string().url().max(2000).optional(),
+  tradeLicenseExpiresOn: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Enter trade licence expiry date.")
+    .optional(),
   title: z.string().trim().min(3).max(200),
   tagline: z.string().trim().max(280).optional(),
   description: z.string().trim().min(20).max(8000),
@@ -252,8 +255,8 @@ export const submitPartnerExperienceApplication = createServerFn({ method: "POST
         city: data.city,
         pan_number: data.panNumber.trim().toUpperCase(),
         passport_photo_url: data.passportPhotoUrl,
-        trade_license_url: data.tradeLicenseUrl,
-        trade_license_expires_on: data.tradeLicenseExpiresOn,
+        trade_license_url: data.tradeLicenseUrl?.trim() || null,
+        trade_license_expires_on: data.tradeLicenseExpiresOn?.trim() || null,
         title: data.title,
         tagline: data.tagline?.trim() || null,
         description: data.description,

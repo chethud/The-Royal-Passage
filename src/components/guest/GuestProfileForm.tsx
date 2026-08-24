@@ -9,6 +9,7 @@ import { resolveRegistrationNumber } from "@/lib/registration-number";
 import { RoyalPassportBook } from "@/components/passport/RoyalPassportBook";
 import { useFaceDetection } from "@/hooks/useFaceDetection";
 import { useAuthUser } from "@/lib/auth-user";
+import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput } from "@/lib/phone";
 
 type GuestProfileFormProps = {
   profile: GuestProfile;
@@ -23,7 +24,7 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
   const vipMembershipRejectedAt = authVipRejectedAt;
 
   const [fullName, setFullName] = useState(profile.fullName ?? "");
-  const [phone, setPhone] = useState(profile.phone ?? "");
+  const [phone, setPhone] = useState(() => sanitizeTenDigitPhoneInput(profile.phone ?? ""));
   const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl ?? "");
   const [previewUrl, setPreviewUrl] = useState<string | null>(profile.avatarUrl ?? null);
   const [dateOfBirth, setDateOfBirth] = useState(profile.dateOfBirth ?? "");
@@ -74,9 +75,12 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
       if (!isSupabaseBrowserConfigured()) {
         throw new Error("Supabase is not configured for this deployment.");
       }
+      if (phone.trim() && !normalizeTenDigitPhone(phone)) {
+        throw new Error("Enter a valid 10-digit mobile number.");
+      }
       const updated = await updateAccountProfile({
         fullName: fullName.trim() || undefined,
-        phone: phone.trim() || undefined,
+        phone: normalizeTenDigitPhone(phone) ?? undefined,
         avatarUrl,
         dateOfBirth,
       });
@@ -113,7 +117,7 @@ export function GuestProfileForm({ profile, onUpdated }: GuestProfileFormProps) 
         photoProcessing={uploadingPhoto}
         onFullNameChange={setFullName}
         onDateOfBirthChange={setDateOfBirth}
-        onPhoneChange={setPhone}
+        onPhoneChange={(value) => setPhone(sanitizeTenDigitPhoneInput(value))}
         onPhotoSelected={(file) => void handlePhotoSelected(file)}
       />
 

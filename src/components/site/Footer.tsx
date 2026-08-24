@@ -147,7 +147,7 @@ function FooterColumn({
 }) {
   return (
     <section className={className}>
-      <h2 className="eyebrow mb-3 text-ember/95">{title}</h2>
+      <h2 className="eyebrow m-0 mb-2 text-ember/95 leading-none">{title}</h2>
       {children}
     </section>
   );
@@ -156,16 +156,16 @@ function FooterColumn({
 function FooterFull() {
   return (
     <footer className="relative overflow-hidden border-t border-[color:rgba(198,161,91,0.18)] bg-[color:var(--royal-burgundy)]">
-      <div className="container-page relative z-10 py-7 sm:py-12 lg:py-14">
-        <div className="flex flex-col items-start gap-8 lg:flex-row lg:flex-nowrap lg:items-start lg:justify-between lg:gap-4 xl:gap-6">
+      <div className="container-page relative z-10 py-5 sm:py-8 lg:py-10">
+        <div className="flex flex-col items-start gap-6 lg:flex-row lg:flex-nowrap lg:items-start lg:justify-between lg:gap-4 xl:gap-5">
           <div className="w-full shrink-0 lg:w-auto lg:max-w-[14rem] xl:max-w-[18rem]">
-            <FooterBrandBlock logoClassName="h-28 w-auto max-w-full sm:h-32 lg:h-40 xl:h-44" />
+            <FooterBrandBlock logoClassName="h-22 w-auto max-w-full sm:h-24 lg:h-30 xl:h-32" />
           </div>
 
           <section className="min-w-0 w-full lg:w-auto lg:flex-1 lg:basis-0">
-            <div className="flex flex-col items-start gap-6 sm:gap-7">
+            <div className="flex flex-col items-start gap-5 sm:gap-6">
               <div>
-                <h2 className="eyebrow mb-3 text-ember/95">Experience Host</h2>
+                <h2 className="eyebrow m-0 mb-2 text-ember/95 leading-none">Experience Host</h2>
                 <ul className="space-y-2 text-sm">
                   <li>
                     <Link
@@ -178,7 +178,7 @@ function FooterFull() {
                 </ul>
               </div>
               <div>
-                <h2 className="eyebrow mb-3 text-ember/95">Homestay Host</h2>
+                <h2 className="eyebrow m-0 mb-2 text-ember/95 leading-none">Homestay Host</h2>
                 <ul className="space-y-2 text-sm">
                   <li>
                     <Link

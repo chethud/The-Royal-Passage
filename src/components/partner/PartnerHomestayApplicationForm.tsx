@@ -8,6 +8,7 @@ import { toErrorMessage } from "@/lib/api/client";
 import { validateExperiencePhotoFile } from "@/lib/experience-photo-upload";
 import { uploadPartnerExperiencePhoto } from "@/lib/partner-experience-fns";
 import { submitPartnerHomestayApplication } from "@/lib/partner-homestay-fns";
+import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput, TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
 
 const inputClass =
   "mt-1 w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-3 py-2 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
@@ -152,6 +153,11 @@ export function PartnerHomestayApplicationForm() {
       setError("GST number is required when price per room per day is above ₹8,000.");
       return;
     }
+    const normalizedPhone = normalizeTenDigitPhone(phone);
+    if (!normalizedPhone) {
+      setError("Enter a valid 10-digit mobile number.");
+      return;
+    }
 
     const galleryUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
 
@@ -161,7 +167,7 @@ export function PartnerHomestayApplicationForm() {
         data: {
           fullName: fullName.trim(),
           email: email.trim(),
-          phone: phone.trim(),
+          phone: normalizedPhone,
           bio: bio.trim() || undefined,
           city: applicantCity.trim(),
           fssaiId: fssaiId.trim(),
@@ -262,11 +268,10 @@ export function PartnerHomestayApplicationForm() {
               <span className="eyebrow luxury-panel-label">Phone</span>
               <input
                 required
-                type="tel"
+                {...TEN_DIGIT_PHONE_INPUT_PROPS}
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(sanitizeTenDigitPhoneInput(e.target.value))}
                 className={inputClass}
-                autoComplete="tel"
               />
             </label>
             <label className="text-sm">

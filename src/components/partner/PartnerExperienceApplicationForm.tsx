@@ -10,6 +10,7 @@ import {
   submitPartnerExperienceApplication,
   uploadPartnerExperiencePhoto,
 } from "@/lib/partner-experience-fns";
+import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput, TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
 
 const inputClass =
   "mt-1 w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-3 py-2 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
@@ -140,12 +141,9 @@ export function PartnerExperienceApplicationForm() {
       setError("Upload a passport-size photo.");
       return;
     }
-    if (!tradeLicenseUrl.trim()) {
-      setError("Upload your trade licence.");
-      return;
-    }
-    if (!tradeLicenseExpiresOn.trim()) {
-      setError("Enter the trade licence expiry date.");
+    const normalizedPhone = normalizeTenDigitPhone(phone);
+    if (!normalizedPhone) {
+      setError("Enter a valid 10-digit mobile number.");
       return;
     }
 
@@ -157,13 +155,13 @@ export function PartnerExperienceApplicationForm() {
         data: {
           fullName: fullName.trim(),
           email: email.trim(),
-          phone: phone.trim(),
+          phone: normalizedPhone,
           bio: bio.trim() || undefined,
           city: applicantCity.trim(),
           panNumber: panNumber.trim().toUpperCase(),
           passportPhotoUrl: passportPhotoUrl.trim(),
-          tradeLicenseUrl: tradeLicenseUrl.trim(),
-          tradeLicenseExpiresOn: tradeLicenseExpiresOn.trim(),
+          tradeLicenseUrl: tradeLicenseUrl.trim() || undefined,
+          tradeLicenseExpiresOn: tradeLicenseExpiresOn.trim() || undefined,
           title: title.trim(),
           tagline: tagline.trim() || undefined,
           description: description.trim(),
@@ -249,11 +247,10 @@ export function PartnerExperienceApplicationForm() {
               <span className="eyebrow luxury-panel-label">Phone</span>
               <input
                 required
-                type="tel"
+                {...TEN_DIGIT_PHONE_INPUT_PROPS}
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(sanitizeTenDigitPhoneInput(e.target.value))}
                 className={inputClass}
-                autoComplete="tel"
               />
             </label>
             <label className="text-sm">
@@ -327,14 +324,13 @@ export function PartnerExperienceApplicationForm() {
                     <p className="luxury-panel-body mt-2 text-xs">Trade licence uploaded.</p>
                   ) : (
                     <p className="luxury-panel-body mt-2 text-xs">
-                      Required — your trade licence document.
+                      Optional — upload your trade licence document if you have one.
                     </p>
                   )}
                 </div>
                 <label className="text-sm">
                   <span className="eyebrow luxury-panel-label">Expiry date</span>
                   <input
-                    required
                     type="date"
                     value={tradeLicenseExpiresOn}
                     onChange={(e) => setTradeLicenseExpiresOn(e.target.value)}

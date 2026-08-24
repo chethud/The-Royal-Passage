@@ -24,6 +24,7 @@ import {
 } from "@/lib/auth-redirect";
 import { getSupabaseBrowser, isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 import { formatAuthError } from "@/lib/format-auth-error";
+import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput, TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
 import { markVipSignupPromptPending } from "@/lib/vip-membership-prompt-storage";
 
 const inputClass =
@@ -74,7 +75,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
     if (!user) return;
     const meta = user.user_metadata ?? {};
     setFullName((meta.full_name as string | undefined) ?? (meta.name as string | undefined) ?? "");
-    setPhone((meta.phone as string | undefined) ?? user.phone ?? "");
+    setPhone(sanitizeTenDigitPhoneInput((meta.phone as string | undefined) ?? user.phone ?? ""));
   }, [user]);
 
   useEffect(() => {
@@ -228,6 +229,10 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       setError("Supabase browser auth is not configured.");
       return;
     }
+    if (phone.trim() && !normalizeTenDigitPhone(phone)) {
+      setError("Enter a valid 10-digit mobile number.");
+      return;
+    }
     try {
       setBusy(true);
       const { data, error: signUpError } = await supabase.auth.signUp({
@@ -235,7 +240,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
         password,
         options: {
           emailRedirectTo: buildAuthRedirect(redirect),
-          data: { full_name: fullName.trim(), phone: phone.trim() || null },
+          data: { full_name: fullName.trim(), phone: normalizeTenDigitPhone(phone) },
         },
       });
       if (signUpError) throw signUpError;
@@ -270,10 +275,14 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
       setError("You must be signed in to update profile.");
       return;
     }
+    if (phone.trim() && !normalizeTenDigitPhone(phone)) {
+      setError("Enter a valid 10-digit mobile number.");
+      return;
+    }
     try {
       setSavingProfile(true);
       const { error: upErr } = await supabase.auth.updateUser({
-        data: { full_name: fullName.trim(), phone: phone.trim() },
+        data: { full_name: fullName.trim(), phone: normalizeTenDigitPhone(phone) },
       });
       if (upErr) throw upErr;
       setNotice("Profile updated.");
@@ -357,11 +366,9 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                 <input
                   id="profile-phone"
                   name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  placeholder="+91 98XXXXXXX"
+                  {...TEN_DIGIT_PHONE_INPUT_PROPS}
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(sanitizeTenDigitPhoneInput(e.target.value))}
                   className={inputClass}
                 />
               </div>
@@ -606,11 +613,9 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                 <input
                   id="signup-phone"
                   name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  placeholder="+91 98XXXXXXX"
+                  {...TEN_DIGIT_PHONE_INPUT_PROPS}
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(sanitizeTenDigitPhoneInput(e.target.value))}
                   className={inputClass}
                 />
               </div>

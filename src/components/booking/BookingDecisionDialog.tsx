@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput } from "@/lib/phone";
 
 export type BookingDecisionPayload = {
   decisionName: string;
@@ -31,21 +32,8 @@ function normalizeName(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
-/** Digits only; strip leading 91 when pasted as +91XXXXXXXXXX. */
-function normalizeTenDigitPhone(value: string): string | null {
-  let digits = value.replace(/\D/g, "");
-  if (digits.startsWith("91") && digits.length === 12) {
-    digits = digits.slice(2);
-  }
-  return digits.length === 10 ? digits : null;
-}
-
 function sanitizeNameInput(value: string) {
   return value.replace(/[^A-Za-z ]/g, "");
-}
-
-function sanitizePhoneInput(value: string) {
-  return value.replace(/\D/g, "").slice(0, 10);
 }
 
 export function BookingDecisionDialog({
@@ -163,7 +151,7 @@ export function BookingDecisionDialog({
               </span>
               <input
                 value={decisionPhone}
-                onChange={(e) => setDecisionPhone(sanitizePhoneInput(e.target.value))}
+                onChange={(e) => setDecisionPhone(sanitizeTenDigitPhoneInput(e.target.value))}
                 className="w-full bg-transparent px-3 py-2 text-sm text-[#2A0000] placeholder:text-[rgb(58_0_0/0.4)] focus:outline-none"
                 placeholder="10-digit number"
                 disabled={busy}

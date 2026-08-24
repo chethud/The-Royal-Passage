@@ -11,6 +11,7 @@ import {
   formatVipReapplyDate,
   isApprovedVipMember,
 } from "@/lib/api/vip-membership";
+import { TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
 
 type VipStepState = "upcoming" | "current" | "done";
 
@@ -262,11 +263,10 @@ export function RoyalPassportBook({
               </label>
               <input
                 id="passport-phone"
+                {...TEN_DIGIT_PHONE_INPUT_PROPS}
                 value={phone}
                 onChange={(event) => onPhoneChange(event.target.value)}
                 className="royal-passport-book__input"
-                placeholder="Phone number"
-                autoComplete="tel"
               />
             </div>
           </div>

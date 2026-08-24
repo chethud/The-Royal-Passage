@@ -6,6 +6,7 @@ import {
   type EscalationRoleScope,
 } from "@/lib/profile-browser";
 import { toErrorMessage } from "@/lib/api/client";
+import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput, TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
 
 type EscalationMemberDraft = {
   memberName: string;
@@ -67,7 +68,7 @@ export function EscalationDetailsForm({ roleScope }: { roleScope: EscalationRole
             ? contacts.map((contact) => ({
                 memberName: contact.memberName,
                 memberEmail: contact.memberEmail,
-                memberMobile: contact.memberMobile,
+                memberMobile: sanitizeTenDigitPhoneInput(contact.memberMobile),
                 designation: contact.designation,
               }))
             : [EMPTY_MEMBER(), EMPTY_MEMBER()],
@@ -105,7 +106,7 @@ export function EscalationDetailsForm({ roleScope }: { roleScope: EscalationRole
       const trimmed = members.map((member) => ({
         memberName: member.memberName.trim(),
         memberEmail: member.memberEmail.trim().toLowerCase(),
-        memberMobile: member.memberMobile.trim(),
+        memberMobile: sanitizeTenDigitPhoneInput(member.memberMobile),
         designation: member.designation.trim(),
       }));
 
@@ -119,8 +120,8 @@ export function EscalationDetailsForm({ roleScope }: { roleScope: EscalationRole
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(member.memberEmail)) {
           throw new Error(`Enter a valid email for member ${index + 1}.`);
         }
-        if (member.memberMobile.replace(/\D/g, "").length < 10) {
-          throw new Error(`Enter a valid mobile number for member ${index + 1}.`);
+        if (!normalizeTenDigitPhone(member.memberMobile)) {
+          throw new Error(`Enter a valid 10-digit mobile number for member ${index + 1}.`);
         }
       }
 
@@ -129,7 +130,7 @@ export function EscalationDetailsForm({ roleScope }: { roleScope: EscalationRole
         savedContacts.map((contact) => ({
           memberName: contact.memberName,
           memberEmail: contact.memberEmail,
-          memberMobile: contact.memberMobile,
+          memberMobile: sanitizeTenDigitPhoneInput(contact.memberMobile),
           designation: contact.designation,
         })),
       );
@@ -196,11 +197,12 @@ export function EscalationDetailsForm({ roleScope }: { roleScope: EscalationRole
                   <div>
                     <label className="eyebrow luxury-panel-label mb-2 block">Mobile number</label>
                     <input
-                      type="tel"
+                      {...TEN_DIGIT_PHONE_INPUT_PROPS}
                       value={member.memberMobile}
-                      onChange={(e) => updateMember(index, { memberMobile: e.target.value })}
+                      onChange={(e) =>
+                        updateMember(index, { memberMobile: sanitizeTenDigitPhoneInput(e.target.value) })
+                      }
                       className={inputClass}
-                      placeholder="+91 98XXXXXXX"
                     />
                   </div>
                   <div>
