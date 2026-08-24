@@ -4,6 +4,7 @@ import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DashboardShell } from "@/components/auth/DashboardShell";
 import { useAuthUser } from "@/lib/auth-user";
 import { fetchAdminVipPackageApprovals } from "@/lib/api/admin-vip-packages";
+import { fetchVipMembershipApplications } from "@/lib/api/vip-membership";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
 import { dashboardPathForRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/admin/vip/")({
   head: () => ({
     meta: [
       { title: "VIP admin — The Royal Passage" },
-      { name: "description", content: "VIP package approvals, owners, and catalog management." },
+      { name: "description", content: "VIP membership applications, package approvals, and catalog management." },
       ...NOINDEX_META,
     ],
   }),
@@ -25,7 +26,8 @@ function AdminVipOverviewPage() {
   const navigate = useNavigate();
   const { user, role, loading } = useAuthUser();
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [pendingCount, setPendingCount] = useState(0);
+  const [pendingPackages, setPendingPackages] = useState(0);
+  const [pendingMemberships, setPendingMemberships] = useState(0);
   const [pageError, setPageError] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -57,8 +59,12 @@ function AdminVipOverviewPage() {
       if (!isApiConfigured()) {
         throw new Error("VITE_API_BASE_URL is not configured for this deployment.");
       }
-      const rows = await fetchAdminVipPackageApprovals(accessToken);
-      setPendingCount(rows.length);
+      const [packages, memberships] = await Promise.all([
+        fetchAdminVipPackageApprovals(accessToken),
+        fetchVipMembershipApplications(accessToken),
+      ]);
+      setPendingPackages(packages.length);
+      setPendingMemberships(memberships.length);
     } catch (err) {
       setPageError(toErrorMessage(err, "Failed to load VIP summary."));
     } finally {
@@ -79,7 +85,7 @@ function AdminVipOverviewPage() {
     <DashboardShell
       role="admin"
       title="VIP control"
-      subtitle="Manage package approvals, concierge owner accounts, and the live VIP catalog."
+      subtitle="Manage membership applications, package approvals, concierge owners, and the live VIP catalog."
       showRoleDescription={false}
     >
       <div className="space-y-8">
@@ -93,11 +99,15 @@ function AdminVipOverviewPage() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <SummaryCard
-                label="Pending approvals"
-                value={String(pendingCount)}
-                hint="Packages awaiting review"
+                label="Pending memberships"
+                value={String(pendingMemberships)}
+                hint="Guest VIP applications awaiting review"
               />
-              <SummaryCard label="Module" value="VIP" hint="Curated packages & custom enquiries" />
+              <SummaryCard
+                label="Pending packages"
+                value={String(pendingPackages)}
+                hint="Host packages awaiting approval"
+              />
               <SummaryCard label="City" value="Mysuru" hint="VIP packages are Mysuru-only" />
             </div>
           )}
@@ -107,10 +117,19 @@ function AdminVipOverviewPage() {
           <h2 className="luxury-panel-heading font-display text-xl tracking-wide">Quick links</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <QuickLink
+              to="/admin/vip/memberships"
+              label="Membership requests"
+              detail={
+                pendingMemberships
+                  ? `${pendingMemberships} guest application${pendingMemberships === 1 ? "" : "s"} awaiting review`
+                  : "No pending membership applications"
+              }
+            />
+            <QuickLink
               to="/admin/vip-packages"
               label="Approve packages"
               detail={
-                pendingCount ? `${pendingCount} awaiting approval` : "No pending submissions"
+                pendingPackages ? `${pendingPackages} awaiting approval` : "No pending submissions"
               }
             />
             <QuickLink

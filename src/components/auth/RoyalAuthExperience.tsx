@@ -31,6 +31,15 @@ const inputClass =
   "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 text-sm normal-case tracking-normal text-ink placeholder:text-ink/45 backdrop-blur-sm [font-family:Georgia,'Times_New_Roman',serif] focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
 const labelClass =
   "mb-2 block text-sm font-medium normal-case tracking-normal text-ink/90 [font-family:Georgia,'Times_New_Roman',serif]";
+const mutedTextClass = "text-ink/70";
+const linkMutedClass = "text-ink/70 underline-offset-4 hover:text-ink hover:underline";
+const dividerLabelClass = "text-xs uppercase tracking-[0.14em] text-ink/55";
+const outlineBtnClass =
+  "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-sm font-medium text-ink transition-colors hover:border-ember/50 hover:text-ember disabled:cursor-not-allowed disabled:opacity-70";
+const noticeClass =
+  "mt-4 rounded-sm border border-ember/25 bg-ember/10 px-4 py-3 text-sm text-ink";
+const toggleBtnClass =
+  "absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink/60 hover:text-ink";
 
 type RoyalAuthExperienceProps = {
   initialMode: "signin" | "signup" | "forgot";
@@ -313,16 +322,14 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
             "Enter your email and we will send you a secure link to choose a new password.",
         }
       : mode === "signin"
-      ? {
-          title: "Sign in",
-          subtitle:
-            "Sign in with Google or your email and password. Your role is assigned automatically.",
-        }
-      : {
-          title: "Create account",
-          subtitle:
-            "Create a guest account to book experiences. Host, editor, and admin logins are created by the platform team.",
-        };
+        ? {
+            title: "Sign in",
+            subtitle: undefined as string | undefined,
+          }
+        : {
+            title: "Create account",
+            subtitle: undefined as string | undefined,
+          };
 
   return (
     <AuthPageLayout title={pageMeta.title} subtitle={pageMeta.subtitle}>
@@ -392,7 +399,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
               <button
                 type="button"
                 onClick={() => void signOut()}
-                className="text-ink/70 underline-offset-4 hover:text-ink hover:underline"
+                className={linkMutedClass}
               >
                 Sign out
               </button>
@@ -428,7 +435,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                 {sendingPasswordReset ? "Sending…" : "Send reset link"}
               </button>
             </form>
-            <p className="mt-6 text-center text-sm text-ink/70">
+            <p className={`mt-6 text-center text-sm ${mutedTextClass}`}>
               Remember your password?{" "}
               <Link
                 to="/sign-in"
@@ -455,7 +462,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
               />
               <div className="flex items-center gap-3">
                 <div className="hairline flex-1" />
-                <span className="text-xs uppercase tracking-[0.14em] text-ink/55">or email</span>
+                <span className={dividerLabelClass}>or email</span>
                 <div className="hairline flex-1" />
               </div>
             </div>
@@ -499,7 +506,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink/60 hover:text-ink"
+                    className={toggleBtnClass}
                   >
                     {showPassword ? "Hide" : "Show"}
                   </button>
@@ -531,14 +538,14 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                   type="button"
                   onClick={() => void resendConfirmation()}
                   disabled={resendingConfirmation || !email.trim()}
-                  className="w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] px-4 py-3 text-sm font-medium text-ink transition-colors hover:border-ember/50 hover:text-ember disabled:cursor-not-allowed disabled:opacity-70"
+                  className={outlineBtnClass}
                 >
                   {resendingConfirmation ? "Sending…" : "Resend confirmation email"}
                 </button>
               ) : null}
             </form>
 
-            <p className="mt-6 text-center text-sm text-ink/70">
+            <p className={`mt-6 text-center text-sm ${mutedTextClass}`}>
               New guest?{" "}
               <Link
                 to="/sign-up"
@@ -565,7 +572,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
               />
               <div className="flex items-center gap-3">
                 <div className="hairline flex-1" />
-                <span className="text-xs uppercase tracking-[0.14em] text-ink/55">or email</span>
+                <span className={dividerLabelClass}>or email</span>
                 <div className="hairline flex-1" />
               </div>
             </div>
@@ -639,7 +646,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink/60 hover:text-ink"
+                    className={toggleBtnClass}
                   >
                     {showPassword ? "Hide" : "Show"}
                   </button>
@@ -659,7 +666,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
               </button>
             </form>
 
-            <p className="mt-6 text-center text-sm text-ink/70">
+            <p className={`mt-6 text-center text-sm ${mutedTextClass}`}>
               Already have an account?{" "}
               <Link
                 to="/sign-in"
@@ -689,7 +696,7 @@ export function RoyalAuthExperience({ initialMode }: RoyalAuthExperienceProps) {
         ) : null}
         {notice ? (
           <p
-            className="mt-4 rounded-sm border border-ember/25 bg-ember/10 px-4 py-3 text-sm text-ink"
+            className={noticeClass}
             role="status"
           >
             {notice}

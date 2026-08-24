@@ -17,6 +17,7 @@ export const ADMIN_HOMESTAY_NAV_ITEMS = [
 
 export const ADMIN_VIP_NAV_ITEMS = [
   { to: "/admin/vip", label: "Overview" },
+  { to: "/admin/vip/memberships", label: "Membership requests" },
   { to: "/admin/vip-packages", label: "Approve packages" },
   { to: "/admin/vip-owners", label: "VIP owners" },
   { to: "/vips", label: "Live catalog" },
@@ -133,6 +134,9 @@ export function isAdminNavItemActive(pathname: string, to: string): boolean {
   }
   if (target === "/admin/vip") {
     return path === "/admin/vip";
+  }
+  if (target === "/admin/vip/memberships") {
+    return path === "/admin/vip/memberships" || path.startsWith("/admin/vip/memberships/");
   }
   if (target === "/admin/profile") {
     return path === "/admin/profile" || path.startsWith("/admin/profile/");

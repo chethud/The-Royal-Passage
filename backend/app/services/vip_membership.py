@@ -12,6 +12,7 @@ from app.models.schemas import (
     VipMembershipApplicationSummary,
 )
 from app.services.guest_profile import get_guest_profile
+from app.services.user_roles import profile_has_role
 
 VALID_ID_TYPE = "aadhaar"
 VALID_PROFESSIONAL_CARD_TYPES = {"business", "visitor"}
@@ -71,7 +72,7 @@ def _refresh_profile(auth: dict) -> dict:
 
 
 def skip_vip_membership_interest(auth: dict) -> GuestProfile:
-    if auth["profile"].get("role") != "guest":
+    if not profile_has_role(auth["profile"], "guest", get_supabase_admin()):
         raise ValueError("Only guest accounts can update VIP membership interest.")
     status = _membership_status(auth["profile"])
     if status == "approved":
@@ -124,7 +125,7 @@ def _summary_from_row(row: dict) -> VipMembershipApplicationSummary:
 def submit_vip_membership_application(
     auth: dict, payload: SubmitVipMembershipApplicationRequest
 ) -> GuestProfile:
-    if auth["profile"].get("role") != "guest":
+    if not profile_has_role(auth["profile"], "guest", get_supabase_admin()):
         raise ValueError("Only guest accounts can apply for VIP membership.")
     status = _membership_status(auth["profile"])
     if status == "approved":
@@ -168,10 +169,11 @@ def submit_vip_membership_application(
         supabase.table("vip_membership_applications")
         .select("id, status, reviewed_at")
         .eq("guest_user_id", user_id)
-        .maybe_single()
+        .limit(1)
         .execute()
     )
-    existing_row = existing.data if existing else None
+    existing_rows = existing.data or []
+    existing_row = existing_rows[0] if existing_rows else None
     if existing_row:
         if existing_row.get("status") == "pending":
             raise ValueError("Your VIP membership application is already under review.")
@@ -313,7 +315,7 @@ def reject_vip_membership(application_id: str, reviewer_user_id: str) -> VipMemb
 
 
 def _require_approved_vip_member(auth: dict) -> None:
-    if auth["profile"].get("role") != "guest":
+    if not profile_has_role(auth["profile"], "guest", get_supabase_admin()):
         raise ValueError("Only guest accounts can request custom VIP packages.")
     if _membership_status(auth["profile"]) != "approved":
         raise ValueError("VIP membership approval is required for custom package requests.")

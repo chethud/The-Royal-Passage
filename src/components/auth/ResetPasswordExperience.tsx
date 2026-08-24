@@ -9,6 +9,11 @@ const inputClass =
   "w-full rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/40 px-4 py-3 text-sm normal-case tracking-normal text-ink placeholder:text-ink/45 backdrop-blur-sm [font-family:Georgia,'Times_New_Roman',serif] focus:border-ember/50 focus:outline-none focus:ring-1 focus:ring-ember/30";
 const labelClass =
   "block text-sm font-medium leading-normal normal-case tracking-normal text-ink/90 [font-family:Georgia,'Times_New_Roman',serif]";
+const mutedTextClass = "text-ink/70";
+const toggleBtnClass =
+  "absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink/60 hover:text-ink";
+const noticeClass =
+  "mt-4 rounded-sm border border-ember/25 bg-ember/10 px-4 py-3 text-sm text-ink";
 
 export function ResetPasswordExperience() {
   const navigate = useNavigate();
@@ -120,7 +125,7 @@ export function ResetPasswordExperience() {
           Missing browser auth env vars. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
         </p>
       ) : !ready && !error ? (
-        <p className="text-center text-sm text-ink/75">Verifying your reset link…</p>
+        <p className={`text-center text-sm ${mutedTextClass}`}>Verifying your reset link…</p>
       ) : ready ? (
         <form className="mt-1 flex flex-col gap-5" onSubmit={submitNewPassword}>
           <div className="flex flex-col gap-2.5">
@@ -143,7 +148,7 @@ export function ResetPasswordExperience() {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink/60 hover:text-ink"
+                className={toggleBtnClass}
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -182,20 +187,23 @@ export function ResetPasswordExperience() {
         </p>
       ) : null}
       {notice ? (
-        <p
-          className="mt-4 rounded-sm border border-ember/25 bg-ember/10 px-4 py-3 text-sm text-ink"
-          role="status"
-        >
+        <p className={noticeClass} role="status">
           {notice}
         </p>
       ) : null}
 
-      <p className="mt-6 text-center text-sm text-ink/70">
-        <Link to="/sign-in" className="text-ember underline-offset-4 hover:underline">
+      <p className={`mt-6 text-center text-sm ${mutedTextClass}`}>
+        <Link
+          to="/sign-in"
+          className="text-ember underline-offset-4 hover:underline"
+        >
           Back to sign in
         </Link>
         {" · "}
-        <Link to="/forgot-password" className="text-ember underline-offset-4 hover:underline">
+        <Link
+          to="/forgot-password"
+          className="text-ember underline-offset-4 hover:underline"
+        >
           Request a new link
         </Link>
       </p>

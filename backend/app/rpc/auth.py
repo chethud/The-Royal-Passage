@@ -79,3 +79,17 @@ def require_vip_owner(ctx: RequestContext) -> dict:
     if not profile_has_role(auth["profile"], "vip_owner", get_supabase_admin()):
         raise ConnectError(Code.PERMISSION_DENIED, "VIP owner access required.")
     return auth
+
+
+def require_admin_or_vip_owner(ctx: RequestContext) -> dict:
+    """Admins and VIP hosts share membership / custom-request review queues."""
+    auth = resolve_current_user(ctx)
+    supabase = get_supabase_admin()
+    try:
+        is_admin = profile_has_role(auth["profile"], "admin", supabase)
+        is_vip_owner = profile_has_role(auth["profile"], "vip_owner", supabase)
+    except Exception as exc:
+        raise ConnectError(Code.INTERNAL, f"Failed to verify VIP review access: {exc}") from exc
+    if not is_admin and not is_vip_owner:
+        raise ConnectError(Code.PERMISSION_DENIED, "Admin or VIP owner access required.")
+    return auth

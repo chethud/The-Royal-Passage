@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Building2, Landmark, Mountain, Trees, type LucideIcon } from "lucide-react";
 import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/site/ScrollReveal";
+import { HOMESTAY_FEATURED_SLOT_COUNT } from "@/lib/homestay-featured-keys";
 import type { Homestay } from "@/data/homestays";
 
 type FeaturedStaysShowcaseProps = {
@@ -29,11 +30,12 @@ function stayShowcaseIcon(stay: Homestay): LucideIcon {
 }
 
 export function FeaturedStaysShowcase({ stays }: FeaturedStaysShowcaseProps) {
-  if (stays.length === 0) return null;
+  const topStays = stays.slice(0, HOMESTAY_FEATURED_SLOT_COUNT);
+  if (topStays.length === 0) return null;
 
   return (
     <section
-      id="stays"
+      id="homestays"
       className="relative border-y border-[oklch(0.88_0.08_86_/_0.1)] bg-[oklch(0.14_0.06_22)] pt-16 pb-8 sm:pt-20 sm:pb-10 md:pt-24 md:pb-12"
     >
       <div className="container-page">
@@ -58,7 +60,7 @@ export function FeaturedStaysShowcase({ stays }: FeaturedStaysShowcaseProps) {
         </ScrollRevealGroup>
 
         <div className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2 md:grid-cols-3 md:gap-7">
-          {stays.map((stay, index) => {
+          {topStays.map((stay, index) => {
             const StayIcon = stayShowcaseIcon(stay);
 
             return (

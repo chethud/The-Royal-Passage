@@ -14,7 +14,7 @@ export function AuthPageLayout({ title, subtitle, children }: AuthPageLayoutProp
     <div className="min-h-dvh bg-[color:var(--royal-burgundy)] text-foreground">
       <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-5 sm:px-6">
         <main className="flex flex-1 flex-col justify-center py-4 sm:py-6">
-          <div className="glass-strong w-full rounded-[var(--radius-xl)] border border-[color:rgba(198,161,91,0.22)] bg-[color:rgba(252,249,243,0.96)] px-6 pb-8 pt-0 text-[color:var(--royal-charcoal)] shadow-[var(--shadow-lift)] sm:px-8 sm:pb-10 sm:pt-1">
+          <div className="auth-page-card glass-strong w-full rounded-[var(--radius-xl)] border border-[color:rgba(198,161,91,0.28)] px-6 pb-8 pt-0 text-[color:var(--royal-ivory)] shadow-[var(--shadow-lift)] sm:px-8 sm:pb-10 sm:pt-1">
             <div className="mb-5 pt-1 text-center sm:mb-6 sm:pt-2">
               <Link
                 to="/"
@@ -32,11 +32,13 @@ export function AuthPageLayout({ title, subtitle, children }: AuthPageLayoutProp
                   />
                 </span>
               </Link>
-              <h1 className="mt-1 font-display text-[1.75rem] tracking-tight text-[color:var(--royal-burgundy)] md:text-[2.1rem]">
+              <h1 className="mt-1 font-display text-[1.75rem] font-semibold tracking-tight text-[color:var(--royal-ivory)] md:text-[2.1rem]">
                 {title}
               </h1>
               {subtitle ? (
-                <p className="mt-1.5 text-sm leading-snug normal-case text-muted-foreground">{subtitle}</p>
+                <p className="mt-1.5 text-sm leading-snug normal-case text-[color:rgba(245,239,227,0.78)]">
+                  {subtitle}
+                </p>
               ) : null}
             </div>
             {children}

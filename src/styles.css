@@ -244,11 +244,14 @@
   --muted: rgba(58, 8, 15, 0.08);
 }
 
-/* Auth layout card — pearl white background */
-.auth-page-card,
-.glass-strong {
-  --muted-foreground: #665b54;
-  --muted: rgba(58, 8, 15, 0.08);
+/* Auth layout card — original dark glass panel; ivory text for contrast */
+.auth-page-card {
+  --muted-foreground: rgba(245, 239, 227, 0.78);
+  --muted: rgba(245, 239, 227, 0.12);
+  --foreground: var(--royal-ivory);
+  --ink: var(--pearl-white);
+  --ink-soft: #d7cdbf;
+  color: var(--royal-ivory);
 }
 
 @utility container-page {

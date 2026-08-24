@@ -111,6 +111,7 @@ import { Route as ExperiencesSlugBookRouteImport } from './routes/experiences.$s
 import { Route as BookingsBookingIdReviewRouteImport } from './routes/bookings.$bookingId.review'
 import { Route as AdminVipRequestsRouteImport } from './routes/admin.vip.requests'
 import { Route as AdminVipPendingBookingsRouteImport } from './routes/admin.vip.pending-bookings'
+import { Route as AdminVipMembershipsRouteImport } from './routes/admin.vip.memberships'
 import { Route as AdminVipPackagesPackageIdRouteImport } from './routes/admin.vip-packages.$packageId'
 import { Route as AdminProfileUsersRouteImport } from './routes/admin.profile.users'
 import { Route as AdminProfileMyTeamRouteImport } from './routes/admin.profile.my-team'
@@ -640,6 +641,11 @@ const AdminVipPendingBookingsRoute = AdminVipPendingBookingsRouteImport.update({
   path: '/vip/pending-bookings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminVipMembershipsRoute = AdminVipMembershipsRouteImport.update({
+  id: '/vip/memberships',
+  path: '/vip/memberships',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminVipPackagesPackageIdRoute =
   AdminVipPackagesPackageIdRouteImport.update({
     id: '/vip-packages/$packageId',
@@ -798,6 +804,7 @@ export interface FileRoutesByFullPath {
   '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
+  '/admin/vip/memberships': typeof AdminVipMembershipsRoute
   '/admin/vip/pending-bookings': typeof AdminVipPendingBookingsRoute
   '/admin/vip/requests': typeof AdminVipRequestsRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
@@ -902,6 +909,7 @@ export interface FileRoutesByTo {
   '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
+  '/admin/vip/memberships': typeof AdminVipMembershipsRoute
   '/admin/vip/pending-bookings': typeof AdminVipPendingBookingsRoute
   '/admin/vip/requests': typeof AdminVipRequestsRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
@@ -1022,6 +1030,7 @@ export interface FileRoutesById {
   '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
+  '/admin/vip/memberships': typeof AdminVipMembershipsRoute
   '/admin/vip/pending-bookings': typeof AdminVipPendingBookingsRoute
   '/admin/vip/requests': typeof AdminVipRequestsRoute
   '/bookings/$bookingId/review': typeof BookingsBookingIdReviewRoute
@@ -1143,6 +1152,7 @@ export interface FileRouteTypes {
     | '/admin/profile/my-team'
     | '/admin/profile/users'
     | '/admin/vip-packages/$packageId'
+    | '/admin/vip/memberships'
     | '/admin/vip/pending-bookings'
     | '/admin/vip/requests'
     | '/bookings/$bookingId/review'
@@ -1247,6 +1257,7 @@ export interface FileRouteTypes {
     | '/admin/profile/my-team'
     | '/admin/profile/users'
     | '/admin/vip-packages/$packageId'
+    | '/admin/vip/memberships'
     | '/admin/vip/pending-bookings'
     | '/admin/vip/requests'
     | '/bookings/$bookingId/review'
@@ -1366,6 +1377,7 @@ export interface FileRouteTypes {
     | '/admin/profile/my-team'
     | '/admin/profile/users'
     | '/admin/vip-packages/$packageId'
+    | '/admin/vip/memberships'
     | '/admin/vip/pending-bookings'
     | '/admin/vip/requests'
     | '/bookings/$bookingId/review'
@@ -2183,6 +2195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminVipPendingBookingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/vip/memberships': {
+      id: '/admin/vip/memberships'
+      path: '/vip/memberships'
+      fullPath: '/admin/vip/memberships'
+      preLoaderRoute: typeof AdminVipMembershipsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/vip-packages/$packageId': {
       id: '/admin/vip-packages/$packageId'
       path: '/vip-packages/$packageId'
@@ -2326,6 +2345,7 @@ interface AdminRouteChildren {
   AdminHomestayRequestsRoute: typeof AdminHomestayRequestsRoute
   AdminHomestaysHomestayIdRoute: typeof AdminHomestaysHomestayIdRoute
   AdminVipPackagesPackageIdRoute: typeof AdminVipPackagesPackageIdRoute
+  AdminVipMembershipsRoute: typeof AdminVipMembershipsRoute
   AdminVipPendingBookingsRoute: typeof AdminVipPendingBookingsRoute
   AdminVipRequestsRoute: typeof AdminVipRequestsRoute
   AdminActivityIndexRoute: typeof AdminActivityIndexRoute
@@ -2359,6 +2379,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHomestayRequestsRoute: AdminHomestayRequestsRoute,
   AdminHomestaysHomestayIdRoute: AdminHomestaysHomestayIdRoute,
   AdminVipPackagesPackageIdRoute: AdminVipPackagesPackageIdRoute,
+  AdminVipMembershipsRoute: AdminVipMembershipsRoute,
   AdminVipPendingBookingsRoute: AdminVipPendingBookingsRoute,
   AdminVipRequestsRoute: AdminVipRequestsRoute,
   AdminActivityIndexRoute: AdminActivityIndexRoute,

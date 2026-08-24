@@ -43,7 +43,7 @@ export function GoogleSignInButton({
       onClick={onClick}
       className={
         className ||
-        "flex w-full items-center justify-center gap-3 rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/60 px-4 py-3.5 text-sm font-medium text-foreground transition-colors hover:border-ember/45 hover:bg-background/80 disabled:cursor-not-allowed disabled:opacity-70"
+        "flex w-full items-center justify-center gap-3 rounded-sm border border-[oklch(0.88_0.08_86_/_0.35)] bg-background/60 px-4 py-3.5 text-sm font-medium text-ink transition-colors hover:border-ember/45 hover:bg-background/80 disabled:cursor-not-allowed disabled:opacity-70"
       }
     >
       <GoogleIcon />

@@ -13,7 +13,15 @@ from royalpassage.v1.service_connect import RoyalPassageService
 
 from app.config import settings
 from app.models import schemas as s
-from app.rpc.auth import require_admin, require_guest, require_host, require_homestay_owner, require_vip_owner, resolve_current_user
+from app.rpc.auth import (
+    require_admin,
+    require_admin_or_vip_owner,
+    require_guest,
+    require_host,
+    require_homestay_owner,
+    require_vip_owner,
+    resolve_current_user,
+)
 from app.rpc.converters import proto_to_pydantic, pydantic_to_proto
 from app.services.admin_analytics import get_admin_stats, list_admin_activity, list_admin_bookings
 from app.services.admin_homestays import (
@@ -553,7 +561,7 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         self, _request: empty_pb2.Empty, ctx: RequestContext
     ) -> types_pb2.ListVipMembershipApplicationsResponse:
         _ensure_supabase()
-        require_vip_owner(ctx)
+        require_admin_or_vip_owner(ctx)
         result = list_vip_membership_applications()
         return types_pb2.ListVipMembershipApplicationsResponse(
             applications=[
@@ -567,7 +575,7 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         self, request: types_pb2.VipMembershipActionRequest, ctx: RequestContext
     ) -> types_pb2.VipMembershipApplicationSummary:
         _ensure_supabase()
-        auth = require_vip_owner(ctx)
+        auth = require_admin_or_vip_owner(ctx)
         result = approve_vip_membership(request.application_id, auth["user"].id)
         return pydantic_to_proto(result, types_pb2.VipMembershipApplicationSummary)
 
@@ -576,7 +584,7 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         self, request: types_pb2.VipMembershipActionRequest, ctx: RequestContext
     ) -> types_pb2.VipMembershipApplicationSummary:
         _ensure_supabase()
-        auth = require_vip_owner(ctx)
+        auth = require_admin_or_vip_owner(ctx)
         result = reject_vip_membership(request.application_id, auth["user"].id)
         return pydantic_to_proto(result, types_pb2.VipMembershipApplicationSummary)
 
@@ -585,7 +593,7 @@ class RoyalPassageServiceImpl(RoyalPassageService):
         self, _request: empty_pb2.Empty, ctx: RequestContext
     ) -> types_pb2.ListVipCustomPackageRequestsResponse:
         _ensure_supabase()
-        require_vip_owner(ctx)
+        require_admin_or_vip_owner(ctx)
         result = list_vip_custom_package_requests()
         return types_pb2.ListVipCustomPackageRequestsResponse(
             requests=[
