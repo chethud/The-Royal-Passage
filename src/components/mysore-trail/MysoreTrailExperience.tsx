@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ItineraryStopCard } from "@/components/mysore-trail/ItineraryStopCard";
@@ -12,6 +12,7 @@ import {
   type TrailStop,
   type TripPreferences,
 } from "@/data/mysore-trail-journey";
+import { useAuthUser } from "@/lib/auth-user";
 import {
   buildPersonalizedTrail,
   getDefaultTrail,
@@ -41,6 +42,8 @@ export function MysoreTrailExperience({
   initialPlaceId,
   heroDestinations,
 }: MysoreTrailExperienceProps) {
+  const navigate = useNavigate();
+  const { user } = useAuthUser();
   const defaults = useMemo(() => getDefaultTrail(), []);
   const [prefs, setPrefs] = useState<TripPreferences>(DEFAULT_PREFERENCES);
   const [days, setDays] = useState<TrailDay[]>(defaults.days);
@@ -216,7 +219,20 @@ export function MysoreTrailExperience({
     toast.success("Added to your trail");
   };
 
+  const requireSignIn = useCallback(() => {
+    if (user) return false;
+    toast.message("Sign in to continue", {
+      description: "Save, share, and download your Mysore Trail after signing in.",
+    });
+    void navigate({
+      to: "/sign-in",
+      search: { redirect: "/mysore-trail" },
+    });
+    return true;
+  }, [navigate, user]);
+
   const copyLink = async () => {
+    if (requireSignIn()) return;
     const url = `${window.location.origin}/mysore-trail?place=${activePlace.id}`;
     try {
       await navigator.clipboard.writeText(url);
@@ -227,6 +243,7 @@ export function MysoreTrailExperience({
   };
 
   const saveTrail = () => {
+    if (requireSignIn()) return;
     try {
       localStorage.setItem(
         "trp.mysore-trail.journey.v2",
@@ -239,6 +256,7 @@ export function MysoreTrailExperience({
   };
 
   const downloadItinerary = () => {
+    if (requireSignIn()) return;
     const lines = stops.map((s, i) => {
       const p = getPlace(s.placeId);
       return `${i + 1}. Day ${s.day} · ${s.timeLabel} · ${p.name}`;
