@@ -3203,13 +3203,13 @@ a.dashboard-stat-card:hover .dashboard-stat-card__cta {
 }
 
 .host-offers-switch[data-state="checked"] > span {
-  background: linear-gradient(145deg, #f0e0b0, #d4af37) !important;
-  box-shadow: 0 0 0 1px rgb(184 148 70 / 0.35);
+  background: var(--royal-ivory) !important;
+  box-shadow: 0 0 0 1px rgb(184 148 70 / 0.25);
 }
 
 .host-offers-switch[data-state="unchecked"] > span {
-  background: #5c1015 !important;
-  box-shadow: 0 0 0 1px rgb(184 148 70 / 0.55);
+  background: var(--royal-ivory) !important;
+  box-shadow: 0 0 0 1px rgb(184 148 70 / 0.35);
 }
 
 .host-offers-cards {
