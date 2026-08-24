@@ -11,9 +11,9 @@
   --font-royal: "Cinzel Decorative", "Cinzel", ui-serif, Georgia, serif;
   --font-body: "Cinzel", ui-serif, Georgia, serif;
 
-  --radius-sm: 2px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-xl: 16px;
 
   --color-background: var(--background);
@@ -44,74 +44,83 @@
   --color-gold-dim: var(--gold-dim);
   --color-burgundy: var(--burgundy);
 
-  --shadow-soft: 0 1px 0 oklch(0.78 0.09 78 / 0.14), 0 10px 36px -8px oklch(0.08 0.04 22 / 0.65);
-  --shadow-lift:
-    0 1px 0 oklch(0.82 0.1 78 / 0.18), 0 22px 48px -14px oklch(0.06 0.03 22 / 0.55),
-    0 0 48px -16px oklch(0.72 0.12 78 / 0.22);
-  --shadow-gold:
-    0 0 42px -10px oklch(0.72 0.14 78 / 0.55), inset 0 1px 0 oklch(0.92 0.06 82 / 0.25);
+  --shadow-soft: 0 8px 30px rgba(36, 16, 23, 0.08);
+  --shadow-lift: 0 12px 40px rgba(36, 16, 23, 0.16);
+  --shadow-gold: 0 10px 28px rgba(58, 8, 15, 0.18), inset 0 1px 0 rgba(252, 249, 243, 0.35);
 }
 
 :root {
-  --radius: 6px;
+  --radius: 8px;
   /* Header is shorter on mobile so the fixed bar doesn't eat the viewport. */
   --header-height: 5rem;
 
-  --burgundy: oklch(0.21 0.1 22);
-  --burgundy-deep: oklch(0.15 0.08 20);
+  --royal-burgundy: #3a080f;
+  --royal-plum: #241017;
+  --antique-gold: #c6a15b;
+  --soft-champagne: #e2c98b;
+  --old-gold: #9c7a3c;
+  --royal-ivory: #f5efe3;
+  --pearl-white: #fcf9f3;
+  --royal-charcoal: #191719;
+  --success-green: #2f6b4f;
+  --error-red: #8c3030;
 
-  --background: oklch(0.19 0.09 22);
-  --foreground: oklch(0.96 0.012 85);
-  --ink: oklch(0.97 0.01 88);
-  --ink-soft: oklch(0.74 0.04 78);
+  --burgundy: var(--royal-burgundy);
+  --burgundy-deep: var(--royal-plum);
 
-  --gold: oklch(0.62 0.12 78);
-  --gold-dim: oklch(0.48 0.1 74);
-  --ember: var(--gold);
-  --ember-soft: oklch(0.38 0.08 74 / 0.35);
-  --cream: oklch(0.52 0.09 78 / 0.12);
+  --background: var(--royal-burgundy);
+  --foreground: var(--royal-ivory);
+  --ink: var(--pearl-white);
+  --ink-soft: #d7cdbf;
 
-  --card: oklch(0.26 0.09 24 / 0.42);
-  --card-foreground: var(--ink);
-  --popover: oklch(0.17 0.07 22 / 0.94);
-  --popover-foreground: var(--ink);
+  --gold: var(--antique-gold);
+  --gold-dim: var(--old-gold);
+  --ember: var(--antique-gold);
+  --ember-soft: rgba(198, 161, 91, 0.2);
+  --cream: rgba(245, 239, 227, 0.14);
 
-  --primary: oklch(0.62 0.12 78);
-  --primary-foreground: oklch(0.14 0.06 22);
-  --secondary: oklch(0.28 0.08 24 / 0.55);
-  --secondary-foreground: var(--ink);
-  --muted: oklch(0.3 0.07 24 / 0.45);
-  --muted-foreground: oklch(0.68 0.04 78);
-  --accent: oklch(0.62 0.12 82);
-  --accent-foreground: oklch(0.14 0.06 22);
-  --destructive: oklch(0.52 0.18 25);
-  --destructive-foreground: oklch(0.98 0.01 90);
+  --card: rgba(252, 249, 243, 0.96);
+  --card-foreground: var(--royal-charcoal);
+  --popover: var(--pearl-white);
+  --popover-foreground: var(--royal-charcoal);
 
-  --border: oklch(0.72 0.1 78 / 0.28);
-  --input: oklch(0.72 0.09 78 / 0.22);
-  --ring: oklch(0.62 0.12 78);
+  --primary: var(--royal-burgundy);
+  --primary-foreground: var(--royal-ivory);
+  --secondary: rgba(36, 16, 23, 0.92);
+  --secondary-foreground: var(--royal-ivory);
+  /* muted-foreground must read on dark burgundy backgrounds (footer, dark cards, dropdowns) */
+  --muted: rgba(245, 239, 227, 0.12);
+  --muted-foreground: rgba(225, 210, 185, 0.78);
+  --accent: var(--antique-gold);
+  --accent-foreground: var(--royal-plum);
+  --destructive: var(--error-red);
+  --destructive-foreground: var(--pearl-white);
 
-  --sidebar: oklch(0.17 0.08 22);
+  --border: rgba(198, 161, 91, 0.28);
+  --input: rgba(58, 8, 15, 0.12);
+  --ring: var(--antique-gold);
+
+  --sidebar: var(--royal-burgundy);
   --sidebar-foreground: var(--foreground);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: var(--accent);
-  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-primary: var(--antique-gold);
+  --sidebar-primary-foreground: var(--royal-plum);
+  --sidebar-accent: rgba(198, 161, 91, 0.14);
+  --sidebar-accent-foreground: var(--royal-ivory);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
 
-  --chart-1: oklch(0.62 0.12 78);
-  --chart-2: oklch(0.62 0.08 72);
-  --chart-3: oklch(0.55 0.06 220);
-  --chart-4: oklch(0.7 0.1 80);
-  --chart-5: oklch(0.45 0.04 300);
+  --chart-1: var(--antique-gold);
+  --chart-2: var(--soft-champagne);
+  --chart-3: var(--old-gold);
+  --chart-4: #7d5b4f;
+  --chart-5: #b7a48a;
 
   /* Cream-white surfaces (checkout, cart) — warm ivory like #FEF9E7 */
-  --cream-white: #fef9e7;
-  --cream-surface: #fef6df;
-  --cream-warm: #fdf3d8;
-  --cream-border: rgb(210 180 120 / 0.32);
-  --cream-shadow: rgb(26 0 0 / 0.36);
+  --cream-white: var(--pearl-white);
+  --cream-surface: var(--royal-ivory);
+  --cream-warm: #efe3cf;
+  --cream-border: rgba(198, 161, 91, 0.32);
+  --cream-shadow: rgba(36, 16, 23, 0.18);
 }
 
 @media (min-width: 640px) {
@@ -164,10 +173,10 @@
     color: var(--color-foreground);
     background-color: var(--color-background);
     background-image:
-      radial-gradient(ellipse 90% 55% at 50% -18%, oklch(0.42 0.12 78 / 0.22), transparent 58%),
-      radial-gradient(ellipse 55% 45% at 100% 15%, oklch(0.35 0.1 75 / 0.14), transparent 52%),
-      radial-gradient(ellipse 45% 40% at 0% 85%, oklch(0.28 0.12 22 / 0.35), transparent 48%),
-      linear-gradient(180deg, oklch(0.2 0.09 22) 0%, oklch(0.14 0.07 20) 100%);
+      radial-gradient(ellipse 90% 55% at 50% -18%, rgba(198, 161, 91, 0.16), transparent 58%),
+      radial-gradient(ellipse 55% 45% at 100% 15%, rgba(226, 201, 139, 0.08), transparent 52%),
+      radial-gradient(ellipse 45% 40% at 0% 85%, rgba(36, 16, 23, 0.3), transparent 48%),
+      linear-gradient(180deg, #3a080f 0%, #241017 100%);
     background-attachment: fixed;
   }
   @media (max-width: 639px) {
@@ -182,28 +191,64 @@
   optgroup {
     font-family: inherit;
   }
+  /* Form fields sit on cream surfaces — placeholder must be dark */
+  input::placeholder,
+  textarea::placeholder {
+    color: #999088;
+    opacity: 1;
+  }
   button,
   [role="button"] {
     font-family: var(--font-sans);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
   }
   h1,
   h2,
   h3,
   h4 {
-    font-family: var(--font-royal);
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
   label,
   legend {
     font-family: var(--font-sans);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
   }
   ::selection {
-    background-color: oklch(0.62 0.1 78 / 0.45);
+    background-color: rgba(198, 161, 91, 0.35);
     color: var(--color-foreground);
   }
+}
+
+/*
+ * Light-surface context: restore dark muted-foreground so placeholder / helper
+ * text stays readable on ivory/cream/pearl-white backgrounds (inputs, selects,
+ * popovers, dialogs, cards, cream panels).
+ */
+[data-radix-popper-content-wrapper] [role="dialog"],
+[data-radix-popper-content-wrapper] [role="listbox"],
+[data-radix-popper-content-wrapper],
+.bg-popover,
+.bg-card,
+.luxury-checkout-panel,
+.luxury-panel,
+.glass-strong.bg-card {
+  --muted-foreground: #665b54;
+  --muted: rgba(58, 8, 15, 0.08);
+}
+
+/* Scoped to Radix portal roots (dialog, sheet, popover, select, dropdown) */
+[data-radix-portal] {
+  --muted-foreground: #665b54;
+  --muted: rgba(58, 8, 15, 0.08);
+}
+
+/* Auth layout card — pearl white background */
+.auth-page-card,
+.glass-strong {
+  --muted-foreground: #665b54;
+  --muted: rgba(58, 8, 15, 0.08);
 }
 
 @utility container-page {
@@ -669,6 +714,7 @@
   border-radius: 6px;
   padding: 0.55rem 0.55rem;
   outline: none;
+  color: oklch(0.94 0.02 86);
   transition:
     background-color 150ms ease,
     color 150ms ease;
@@ -829,58 +875,57 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  border: 1px solid #a67c28;
-  background: linear-gradient(160deg, #8a6a1c 0%, #6e5414 50%, #5a4510 100%);
-  padding: 0.85rem 1.6rem;
-  font-family: var(--font-display);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--antique-gold);
+  background: var(--royal-burgundy);
+  padding: 0.85rem 1.45rem;
+  font-family: var(--font-sans);
   font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #f4ead0;
-  box-shadow: 0 0 28px -12px rgb(90 69 16 / 0.75);
+  color: var(--royal-ivory);
+  box-shadow: var(--shadow-soft);
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease,
-    filter 0.3s ease;
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
 .luxury-btn-primary:hover {
   transform: translateY(-1px);
-  filter: brightness(1.08);
-  box-shadow: 0 0 32px -10px rgb(166 124 40 / 0.4);
+  background: var(--antique-gold);
+  color: var(--royal-plum);
+  box-shadow: var(--shadow-lift);
 }
 
 /* Cream panels: high-contrast CTAs (gold Cinzel was unreadable on ivory). */
 .luxury-checkout-panel .luxury-btn-primary,
 .luxury-checkout-panel a.luxury-btn-primary {
-  color: #fff8ef !important;
-  border-color: #3a0000;
-  background: linear-gradient(160deg, #5c1010 0%, #3a0000 55%, #2a0000 100%);
-  font-family: var(--font-body), Georgia, serif;
-  font-weight: 700;
+  color: var(--royal-ivory) !important;
+  border-color: var(--antique-gold);
+  background: var(--royal-burgundy);
+  font-family: var(--font-sans);
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-shadow: none;
-  box-shadow:
-    inset 0 1px 0 rgb(255 248 239 / 0.12),
-    0 8px 22px -12px rgb(42 0 0 / 0.45);
+  box-shadow: var(--shadow-soft);
 }
 
 .luxury-checkout-panel .luxury-btn-primary:hover:not(:disabled),
 .luxury-checkout-panel a.luxury-btn-primary:hover {
   filter: none;
-  background: linear-gradient(160deg, #7a1a1a 0%, #4a0808 55%, #3a0000 100%);
-  color: #fff8ef !important;
-  border-color: #2a0000;
-  box-shadow:
-    inset 0 1px 0 rgb(255 248 239 / 0.18),
-    0 10px 26px -12px rgb(42 0 0 / 0.5);
+  background: var(--antique-gold);
+  color: var(--royal-plum) !important;
+  border-color: var(--antique-gold);
+  box-shadow: var(--shadow-lift);
 }
 
 .luxury-checkout-panel .luxury-btn-primary:disabled {
-  color: rgb(255 248 239 / 0.88) !important;
-  border-color: rgb(58 0 0 / 0.45);
-  background: linear-gradient(160deg, #7a4a2a 0%, #5c3018 100%);
+  color: rgba(245, 239, 227, 0.88) !important;
+  border-color: rgba(198, 161, 91, 0.35);
+  background: rgba(58, 8, 15, 0.72);
   opacity: 1;
   box-shadow: none;
   cursor: not-allowed;
@@ -890,26 +935,27 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  border: 1px solid #c8a25a55;
-  background: #4a000066;
-  padding: 0.85rem 1.6rem;
-  font-family: var(--font-display);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(198, 161, 91, 0.5);
+  background: transparent;
+  padding: 0.85rem 1.45rem;
+  font-family: var(--font-sans);
   font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #f7f1e8;
-  backdrop-filter: blur(8px);
+  color: var(--antique-gold);
   transition:
     border-color 0.3s ease,
     box-shadow 0.3s ease,
+    background-color 0.3s ease,
     color 0.3s ease;
 }
 .luxury-btn-secondary:hover {
-  border-color: #c8a25a;
-  color: #d4af37;
-  box-shadow: 0 0 24px -10px #c8a25a66;
+  border-color: var(--antique-gold);
+  background: var(--antique-gold);
+  color: var(--royal-plum);
+  box-shadow: var(--shadow-soft);
 }
 
 .luxury-btn-sm {
@@ -932,7 +978,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid rgb(185 28 28 / 0.42);
   background: rgb(255 255 255 / 0.2);
   padding: 0.5rem 1rem;
@@ -962,15 +1008,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  border: 1px solid rgb(74 0 0 / 0.32);
-  background: rgb(255 255 255 / 0.25);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(58, 8, 15, 0.22);
+  background: rgba(252, 249, 243, 0.68);
   padding: 0.5rem 1rem;
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #4a0000;
+  color: var(--royal-burgundy);
   text-decoration: none;
   transition:
     border-color 0.25s ease,
@@ -979,9 +1025,9 @@
 }
 
 .luxury-btn-panel-outline:hover {
-  border-color: #4a0000;
-  background: rgb(74 0 0 / 0.05);
-  color: #2d0000;
+  border-color: var(--antique-gold);
+  background: rgba(198, 161, 91, 0.08);
+  color: var(--royal-plum);
 }
 
 /* Pill buttons and links on dark dashboard backgrounds (outside ivory panels) */
@@ -989,15 +1035,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  border: 1px solid oklch(0.76 0.1 78 / 0.48);
-  background: oklch(0.18 0.06 22 / 0.65);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(198, 161, 91, 0.42);
+  background: rgba(36, 16, 23, 0.82);
   padding: 0.5rem 1rem;
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #d4af37;
+  color: var(--antique-gold);
   text-decoration: none;
   transition:
     border-color 0.25s ease,
@@ -1006,21 +1052,21 @@
 }
 
 .dashboard-chrome-btn:hover {
-  border-color: #c8a25a;
-  background: oklch(0.22 0.07 22 / 0.85);
-  color: #f7f1e8;
+  border-color: var(--soft-champagne);
+  background: rgba(58, 8, 15, 0.92);
+  color: var(--royal-ivory);
 }
 
 .dashboard-chrome-link {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #d4af37;
+  color: var(--antique-gold);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .dashboard-chrome-link:hover {
-  color: #f7f1e8;
+  color: var(--royal-ivory);
   text-decoration: underline;
 }
 

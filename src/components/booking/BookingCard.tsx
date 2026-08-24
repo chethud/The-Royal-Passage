@@ -47,7 +47,7 @@ export function BookingCard({
       className={
         isLight
           ? bookingCardRowClass
-          : "glass-strong overflow-hidden rounded-md border border-[oklch(0.88_0.08_86_/_0.15)]"
+          : "glass-strong overflow-hidden rounded-[var(--radius-lg)] border border-[color:rgba(198,161,91,0.15)]"
       }
     >
       <div className={isLight ? bookingCardLayoutClass : "grid gap-0 sm:grid-cols-[96px_1fr]"}>
@@ -78,7 +78,7 @@ export function BookingCard({
                   <Link
                     to="/experiences/$slug"
                     params={{ slug: experienceSlug }}
-                    className="transition-colors hover:text-ember"
+                    className="transition-colors hover:text-[color:var(--soft-champagne)]"
                   >
                     {booking.experience.title}
                   </Link>

@@ -86,12 +86,12 @@ function navItemsForWorkspace(
 }
 
 const navLinkClass =
-  "header-nav-link rounded-sm px-1 py-1 text-ink/80 transition-colors hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60";
+  "header-nav-link rounded-[var(--radius-sm)] px-1 py-1 text-ink/82 transition-colors hover:text-[color:var(--soft-champagne)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/80";
 
 function NavCountBadge({ count }: { count?: number }) {
   if (!count || count <= 0) return null;
   return (
-    <span className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-ember px-1 text-[0.55rem] font-bold leading-none text-primary-foreground">
+    <span className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[color:var(--antique-gold)] px-1 text-[0.55rem] font-bold leading-none text-[color:var(--royal-plum)]">
       {count > 9 ? "9+" : count}
     </span>
   );
@@ -206,7 +206,7 @@ export function Header() {
       <div className="mx-auto flex h-[var(--header-height)] max-w-[1280px] items-center justify-between gap-2 pl-3 pr-3 sm:gap-4 sm:pl-2 sm:pr-4 md:gap-6 md:pl-3 md:pr-10">
         <Link
           to={logoPath}
-          className="flex min-h-11 min-w-0 shrink items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember/60"
+          className="flex min-h-11 min-w-0 shrink items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--soft-champagne)]"
           aria-label={
             user && !isGuest ? "Go to dashboard" : "The Royal Passage — Home"
           }
@@ -219,13 +219,13 @@ export function Header() {
             decoding="sync"
             loading="eager"
             fetchPriority="high"
-            className="h-15 w-auto max-h-[calc(var(--header-height)-0.35rem)] max-w-[min(62vw,13.5rem)] object-contain object-left drop-shadow-[0_0_24px_oklch(0.75_0.12_86_/_0.45)] sm:h-16 sm:max-w-[min(50vw,14rem)] md:h-[6.75rem] md:max-w-none lg:h-[7.35rem]"
+            className="h-15 w-auto max-h-[calc(var(--header-height)-0.35rem)] max-w-[min(62vw,13.5rem)] object-contain object-left sm:h-16 sm:max-w-[min(50vw,14rem)] md:h-[6.4rem] md:max-w-none lg:h-[6.9rem]"
           />
         </Link>
 
         <nav
           key={adminModule ?? workspaceRole ?? "public"}
-          className="hidden items-center gap-5 text-[0.72rem] font-medium uppercase tracking-[0.14em] md:flex lg:gap-7 lg:text-[0.76rem] lg:tracking-[0.16em]"
+          className="hidden items-center gap-5 text-[0.72rem] font-medium uppercase tracking-[0.12em] md:flex lg:gap-7 lg:text-[0.76rem] lg:tracking-[0.14em]"
           aria-label={adminModule ? `${adminModule} admin` : "Main"}
         >
           {navItems.map((item) => {
@@ -251,7 +251,7 @@ export function Header() {
             >
               <CartIcon size={46} />
               {cartCount > 0 ? (
-                <span className="rounded-full bg-ember px-1.5 py-0.5 text-[0.6rem] font-semibold text-primary-foreground">
+                <span className="rounded-full bg-[color:var(--antique-gold)] px-1.5 py-0.5 text-[0.6rem] font-semibold text-[color:var(--royal-plum)]">
                   {cartCount}
                 </span>
               ) : null}
@@ -292,7 +292,7 @@ export function Header() {
             >
               <CartIcon size={40} />
               {cartCount > 0 ? (
-                <span className="absolute right-1 top-1 rounded-full bg-ember px-1.5 py-0.5 text-[0.55rem] font-semibold leading-none text-primary-foreground">
+                <span className="absolute right-1 top-1 rounded-full bg-[color:var(--antique-gold)] px-1.5 py-0.5 text-[0.55rem] font-semibold leading-none text-[color:var(--royal-plum)]">
                   {cartCount > 9 ? "9+" : cartCount}
                 </span>
               ) : null}
@@ -307,7 +307,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="right" className={headerMobileSheetClass}>
               <SheetHeader className="shrink-0 space-y-1 text-left">
-                <SheetTitle className="font-display text-xl tracking-wide">The Royal Passage</SheetTitle>
+                <SheetTitle className="font-display text-[1.7rem] tracking-[0.03em]">The Royal Passage</SheetTitle>
                 {displayName ? (
                   <p className="text-sm text-muted-foreground">{displayName}</p>
                 ) : null}

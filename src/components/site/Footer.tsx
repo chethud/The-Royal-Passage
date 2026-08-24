@@ -130,7 +130,7 @@ function FooterBar({
 
 function FooterSimple() {
   return (
-    <footer className="border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
+    <footer className="border-t border-[color:rgba(198,161,91,0.18)] bg-[color:var(--royal-burgundy)]">
       <FooterBar />
     </footer>
   );
@@ -155,7 +155,7 @@ function FooterColumn({
 
 function FooterFull() {
   return (
-    <footer className="relative overflow-hidden border-t border-[oklch(0.88_0.08_86_/_0.18)] bg-[oklch(0.13_0.06_22)]">
+    <footer className="relative overflow-hidden border-t border-[color:rgba(198,161,91,0.18)] bg-[color:var(--royal-burgundy)]">
       <div className="container-page relative z-10 py-7 sm:py-12 lg:py-14">
         <div className="flex flex-col items-start gap-8 lg:flex-row lg:flex-nowrap lg:items-start lg:justify-between lg:gap-4 xl:gap-6">
           <div className="w-full shrink-0 lg:w-auto lg:max-w-[14rem] xl:max-w-[18rem]">
@@ -262,7 +262,7 @@ function FooterFull() {
         </div>
       </div>
 
-      <div className="relative z-10 border-t border-[oklch(0.88_0.08_86_/_0.12)]">
+      <div className="relative z-10 border-t border-[color:rgba(198,161,91,0.12)]">
         <FooterBar showLogo={false} />
       </div>
 
@@ -276,15 +276,15 @@ function FooterFull() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,oklch(0.13_0.06_22)_0%,oklch(0.13_0.06_22_/_0.94)_28%,oklch(0.13_0.06_22_/_0.78)_52%,oklch(0.13_0.06_22_/_0.5)_78%,oklch(0.13_0.06_22_/_0.28)_100%)] lg:block"
+        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,var(--royal-burgundy)_0%,rgba(58,8,15,0.94)_28%,rgba(58,8,15,0.78)_52%,rgba(58,8,15,0.5)_78%,rgba(58,8,15,0.28)_100%)] lg:block"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_bottom,oklch(0.13_0.06_22)_0%,transparent_18%,transparent_82%,oklch(0.13_0.06_22)_100%)] lg:block"
+        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_bottom,var(--royal-burgundy)_0%,transparent_18%,transparent_82%,var(--royal-burgundy)_100%)] lg:block"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[35%] bg-[radial-gradient(ellipse_at_right,oklch(0.55_0.14_78_/_0.05)_0%,transparent_70%)] lg:block"
+        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[35%] bg-[radial-gradient(ellipse_at_right,rgba(198,161,91,0.05)_0%,transparent_70%)] lg:block"
       />
     </footer>
   );
@@ -297,7 +297,7 @@ function FooterLegalLinks({ className = "" }: { className?: string }) {
     >
       <Link
         to={EXPERIENCE_TERMS_LINK.to}
-        className="text-ember/85 underline-offset-4 transition-colors hover:text-ember hover:underline"
+        className="text-ember/85 underline-offset-4 transition-colors hover:text-[color:var(--soft-champagne)] hover:underline"
       >
         {EXPERIENCE_TERMS_LINK.label}
       </Link>
@@ -306,7 +306,7 @@ function FooterLegalLinks({ className = "" }: { className?: string }) {
       </span>
       <Link
         to={PAYMENT_POLICY_LINK.to}
-        className="text-ember/85 underline-offset-4 transition-colors hover:text-ember hover:underline"
+        className="text-ember/85 underline-offset-4 transition-colors hover:text-[color:var(--soft-champagne)] hover:underline"
       >
         {PAYMENT_POLICY_LINK.label}
       </Link>
@@ -315,7 +315,7 @@ function FooterLegalLinks({ className = "" }: { className?: string }) {
       </span>
       <Link
         to={PRIVACY_POLICY_LINK.to}
-        className="text-ember/85 underline-offset-4 transition-colors hover:text-ember hover:underline"
+        className="text-ember/85 underline-offset-4 transition-colors hover:text-[color:var(--soft-champagne)] hover:underline"
       >
         {PRIVACY_POLICY_LINK.label}
       </Link>
@@ -340,7 +340,7 @@ function SocialIcon({
       target="_blank"
       rel="noreferrer"
       aria-label={label}
-      className={`flex items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.32)] text-ink/80 transition-all hover:border-ember/60 hover:text-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+      className={`flex items-center justify-center rounded-full border border-[color:rgba(198,161,91,0.32)] text-ink/80 transition-all hover:border-[color:var(--soft-champagne)] hover:text-[color:var(--soft-champagne)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
         compact ? "h-8 w-8" : "h-9 w-9"
       }`}
     >

@@ -9,7 +9,7 @@ export const headerMobileActionClass =
   "header-mobile-action header-nav-link inline-flex text-ink/85 md:hidden";
 
 export const headerMobileSheetClass =
-  "header-mobile-sheet w-[min(100vw-1rem,22rem)] border-[oklch(0.72_0.09_78_/_0.22)] bg-[oklch(0.14_0.05_22)] text-foreground sm:max-w-sm [&>button]:right-3 [&>button]:top-3 [&>button]:inline-flex [&>button]:h-11 [&>button]:w-11 [&>button]:items-center [&>button]:justify-center";
+  "header-mobile-sheet w-[min(100vw-1rem,22rem)] border-[color:rgba(198,161,91,0.22)] bg-[color:var(--royal-plum)] text-foreground sm:max-w-sm [&>button]:right-3 [&>button]:top-3 [&>button]:inline-flex [&>button]:h-11 [&>button]:w-11 [&>button]:items-center [&>button]:justify-center";
 
 export const headerMobileNavLinkClass = "header-mobile-nav-link";
 

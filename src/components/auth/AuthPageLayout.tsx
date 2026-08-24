@@ -11,10 +11,10 @@ type AuthPageLayoutProps = {
 /** Standalone sign-in / sign-up page — not the homepage hero. */
 export function AuthPageLayout({ title, subtitle, children }: AuthPageLayoutProps) {
   return (
-    <div className="min-h-dvh bg-[oklch(0.13_0.06_22)] text-foreground">
+    <div className="min-h-dvh bg-[color:var(--royal-burgundy)] text-foreground">
       <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-5 sm:px-6">
         <main className="flex flex-1 flex-col justify-center py-4 sm:py-6">
-          <div className="glass-strong w-full rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] px-6 pb-8 pt-0 [font-family:Georgia,'Times_New_Roman',serif] sm:px-8 sm:pb-10 sm:pt-1">
+          <div className="glass-strong w-full rounded-[var(--radius-xl)] border border-[color:rgba(198,161,91,0.22)] bg-[color:rgba(252,249,243,0.96)] px-6 pb-8 pt-0 text-[color:var(--royal-charcoal)] shadow-[var(--shadow-lift)] sm:px-8 sm:pb-10 sm:pt-1">
             <div className="mb-5 pt-1 text-center sm:mb-6 sm:pt-2">
               <Link
                 to="/"
@@ -32,11 +32,11 @@ export function AuthPageLayout({ title, subtitle, children }: AuthPageLayoutProp
                   />
                 </span>
               </Link>
-              <h1 className="mt-1 font-display text-[1.45rem] tracking-tight text-ink md:text-[1.78rem]">
+              <h1 className="mt-1 font-display text-[1.75rem] tracking-tight text-[color:var(--royal-burgundy)] md:text-[2.1rem]">
                 {title}
               </h1>
               {subtitle ? (
-                <p className="mt-1.5 text-sm leading-snug normal-case text-ink/75">{subtitle}</p>
+                <p className="mt-1.5 text-sm leading-snug normal-case text-muted-foreground">{subtitle}</p>
               ) : null}
             </div>
             {children}
@@ -46,7 +46,7 @@ export function AuthPageLayout({ title, subtitle, children }: AuthPageLayoutProp
         <footer className="py-6 text-center">
           <Link
             to="/experiences"
-            className="text-sm text-ink/70 underline-offset-4 transition-colors hover:text-ember hover:underline"
+            className="text-sm text-[color:var(--royal-ivory)]/78 underline-offset-4 transition-colors hover:text-[color:var(--soft-champagne)] hover:underline"
           >
             Browse experiences
           </Link>

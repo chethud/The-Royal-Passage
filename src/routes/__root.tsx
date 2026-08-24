@@ -12,8 +12,8 @@ const GOOGLE_FONTS_HREF =
 
 /** Above-the-fold paint without waiting on the full stylesheet. */
 const CRITICAL_CSS = `
-html{background:#2a0808;color:#f7f1e8}
-body{margin:0;min-height:100%;background:#2a0808;color:#f7f1e8;font-family:"Cinzel",Georgia,"Times New Roman",serif}
+html{background:#3A080F;color:#F5EFE3}
+body{margin:0;min-height:100%;background:#3A080F;color:#F5EFE3;font-family:"Cinzel",Georgia,"Times New Roman",serif}
 `.replace(/\s+/g, " ").trim();
 
 function NotFoundComponent() {
@@ -50,7 +50,7 @@ export const Route = createRootRoute({
         content:
           "Curated premium experiences in Mysuru & beyond — gold-standard hosting, glass-clear booking.",
       },
-      { name: "theme-color", content: "#4a0404" },
+      { name: "theme-color", content: "#3A080F" },
       { property: "og:title", content: "The Royal Passage — Mysuru" },
       {
         property: "og:description",

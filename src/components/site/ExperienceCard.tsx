@@ -24,7 +24,7 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
       ctaLabel="View details"
       topLeft={
         <span
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-[#D4AF37] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color:rgba(198,161,91,0.28)] bg-[color:rgba(36,16,23,0.42)] text-[color:var(--antique-gold)] backdrop-blur-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.55)]"
           aria-label={exp.category}
           title={exp.category}
         >
@@ -40,11 +40,11 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
       meta={
         <>
           <span className="inline-flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" strokeWidth={1.75} />
+            <Clock className="h-3.5 w-3.5 shrink-0 text-[color:var(--antique-gold)]" strokeWidth={1.75} />
             {exp.durationHours}h
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" strokeWidth={1.75} />
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[color:var(--antique-gold)]" strokeWidth={1.75} />
             {exp.city}
           </span>
         </>
@@ -56,7 +56,7 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
           currencySymbol={sym}
           tone="dark"
           showPercent
-          priceClassName="font-display text-base font-normal text-[#F7F1E8]"
+          priceClassName="font-display text-base font-normal text-[color:var(--royal-ivory)]"
         />
       }
     />

@@ -142,15 +142,15 @@ export function HomeHero({
   const renderReadableCopy = (item: HomepageHeroHeading) => (
     <div className="home-hero-copy__text">
       {item.eyebrow ? (
-        <p className="eyebrow mb-5 text-ember/95">{item.eyebrow}</p>
+        <p className="eyebrow mb-5 text-[color:var(--soft-champagne)]">{item.eyebrow}</p>
       ) : null}
-      <h1 className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-[1.02] tracking-tight text-ink text-balance [text-shadow:0_0.06em_0.4em_oklch(0.05_0.04_18_/_0.85)]">
+      <h1 className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-[1.02] tracking-[0.01em] text-ink text-balance [text-shadow:0_0.06em_0.4em_rgba(25,23,25,0.85)]">
         {item.line1 ? <span className="block">{item.line1}</span> : null}
-        {item.line2 ? <span className="block text-ember">{item.line2}</span> : null}
+        {item.line2 ? <span className="block text-[color:var(--soft-champagne)]">{item.line2}</span> : null}
         {item.line3 ? <span className="block">{item.line3}</span> : null}
       </h1>
       {item.body ? (
-        <p className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/85 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg [text-shadow:0_1px_12px_oklch(0.05_0.04_18_/_0.55)]">
+        <p className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/88 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg [text-shadow:0_1px_12px_rgba(25,23,25,0.55)]">
           {item.body}
         </p>
       ) : null}
@@ -160,7 +160,7 @@ export function HomeHero({
   return (
     <section
       id="hero"
-      className="relative min-h-[max(640px,100dvh)] w-full overflow-hidden border-b border-[oklch(0.72_0.09_78_/_0.18)]"
+      className="relative min-h-[max(640px,100dvh)] w-full overflow-hidden border-b border-[color:rgba(198,161,91,0.18)]"
     >
       <motion.div
         className="absolute inset-0 z-0 origin-center"
@@ -206,8 +206,8 @@ export function HomeHero({
                         onClick={() => setEditHeadingIndex(index)}
                         className={`rounded-sm border px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] shadow-[0_2px_10px_rgb(0_0_0/0.35)] transition-colors ${
                           editHeadingIndex === index
-                            ? "border-ember bg-[oklch(0.14_0.06_22)] text-ember"
-                            : "border-[oklch(0.88_0.08_86_/_0.35)] bg-[oklch(0.12_0.06_22_/_0.88)] text-ink/90 hover:border-ember/60 hover:text-ember"
+                            ? "border-[color:var(--antique-gold)] bg-[color:var(--royal-plum)] text-[color:var(--soft-champagne)]"
+                            : "border-[color:rgba(198,161,91,0.35)] bg-[color:rgba(36,16,23,0.88)] text-ink/90 hover:border-[color:var(--soft-champagne)] hover:text-[color:var(--soft-champagne)]"
                         }`}
                       >
                         {index === 0 ? "Priority" : `Heading ${index + 1}`}
@@ -222,8 +222,8 @@ export function HomeHero({
                 {/* Edit controls: copy + slide photo in one panel */}
                 <div className="min-w-0 space-y-3">
                   {headings[editHeadingIndex] ? (
-                    <div className="rounded-sm border border-ember/35 bg-black/55 p-3.5 backdrop-blur-md sm:p-4">
-                      <p className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-ember">
+                    <div className="rounded-[var(--radius-md)] border border-[color:rgba(198,161,91,0.24)] bg-[color:rgba(36,16,23,0.7)] p-3.5 backdrop-blur-md sm:p-4">
+                      <p className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--soft-champagne)]">
                         Edit hero copy
                       </p>
                       <div className="grid grid-cols-2 gap-2">
@@ -292,7 +292,7 @@ export function HomeHero({
                   >
                     <Link
                       to="/experiences"
-                      className="home-hero-copy__cta-primary group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      className="home-hero-copy__cta-primary group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--antique-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       Explore Experiences
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -300,7 +300,7 @@ export function HomeHero({
                     {!user ? (
                       <Link
                         to="/sign-in"
-                        className="home-hero-copy__cta-ghost focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                        className="home-hero-copy__cta-ghost focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--antique-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Sign in
                       </Link>
@@ -319,7 +319,7 @@ export function HomeHero({
               aria-label="Scroll to experiences"
               className="pointer-events-auto absolute inset-x-0 bottom-[4.75rem] z-20 flex justify-center"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] bg-[oklch(0.12_0.06_22_/_0.45)] text-ink/80 backdrop-blur-md">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:rgba(198,161,91,0.35)] bg-[color:rgba(36,16,23,0.45)] text-ink/80 backdrop-blur-md">
                 <ChevronDown className="h-5 w-5" strokeWidth={1.5} />
               </span>
             </a>
@@ -333,7 +333,7 @@ export function HomeHero({
               transition={{ duration: 0.3, delay: 0.12, ease: softEase }}
             >
               <motion.span
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.88_0.08_86_/_0.35)] bg-[oklch(0.12_0.06_22_/_0.45)] text-ink/80 backdrop-blur-md"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:rgba(198,161,91,0.35)] bg-[color:rgba(36,16,23,0.45)] text-ink/80 backdrop-blur-md"
                 animate={{ y: [0, 6, 0] }}
                 transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
               >

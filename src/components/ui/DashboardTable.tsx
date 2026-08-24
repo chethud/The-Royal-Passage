@@ -9,6 +9,7 @@ const tableMinWidth: Record<DashboardTableWidth, string> = {
   lg: "min-w-[800px]",
   xl: "min-w-[900px]",
   "2xl": "min-w-[1100px]",
+  none: "",
 };
 
 export function dashboardFilterBtnClass(active: boolean) {
@@ -28,7 +29,7 @@ export function DashboardFilterCountBadge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
     <span
-      className="pointer-events-none absolute -right-1.5 -top-1.5 z-[1] inline-flex min-h-[1.15rem] min-w-[1.15rem] items-center justify-center rounded-full bg-[#c45c26] px-1 text-[0.58rem] font-bold leading-none text-[#fff8ef] shadow-[0_4px_12px_-4px_rgb(0_0_0/0.45)]"
+      className="pointer-events-none absolute -right-1.5 -top-1.5 z-[1] inline-flex min-h-[1.15rem] min-w-[1.15rem] items-center justify-center rounded-full bg-[color:var(--antique-gold)] px-1 text-[0.58rem] font-bold leading-none text-[color:var(--royal-plum)] shadow-[var(--shadow-soft)]"
       aria-label={`${count} guests`}
     >
       {count > 99 ? "99+" : count}
@@ -75,7 +76,7 @@ export function DashboardInsetPanel({
 }) {
   return (
     <div
-      className={`rounded-[var(--radius-md)] border border-[rgb(74_0_0/0.14)] bg-[rgb(255_255_255/0.42)] p-3 sm:p-4 ${className}`.trim()}
+      className={`rounded-[var(--radius-md)] border border-[color:rgba(58,8,15,0.12)] bg-[color:rgba(252,249,243,0.72)] p-3 sm:p-4 ${className}`.trim()}
     >
       {children}
     </div>
@@ -139,7 +140,7 @@ export function DashboardTable({
   const layoutClass = layout === "fixed" ? "table-fixed" : "";
   return (
     <table
-      className={`w-full ${minWidthClass} ${layoutClass} text-left text-sm ${className}`.trim()}
+      className={`w-full ${minWidthClass} ${layoutClass} text-left text-sm text-[color:var(--royal-charcoal)] ${className}`.trim()}
     >
       {children}
     </table>
@@ -159,7 +160,7 @@ export function DashboardTableHeadRow({
 }) {
   return (
     <tr
-      className={`border-b text-xs uppercase tracking-[0.14em] luxury-panel-divider luxury-panel-label ${className}`.trim()}
+      className={`border-b border-[color:rgba(198,161,91,0.28)] text-xs uppercase tracking-[0.12em] luxury-panel-divider luxury-panel-label ${className}`.trim()}
     >
       {children}
     </tr>
@@ -173,7 +174,11 @@ export function DashboardTableHeadCell({
   children: ReactNode;
   className?: string;
 }) {
-  return <th className={`px-2.5 py-1.5 font-normal ${className}`.trim()}>{children}</th>;
+  return (
+    <th className={`px-2.5 py-2 font-sans font-semibold text-[color:var(--royal-burgundy)] ${className}`.trim()}>
+      {children}
+    </th>
+  );
 }
 
 export function DashboardTableBody({ children }: { children: ReactNode }) {
@@ -188,7 +193,7 @@ export function DashboardTableRow({
   className?: string;
 }) {
   return (
-    <tr className={`border-b border-[rgb(74_0_0/0.12)] last:border-0 ${className}`.trim()}>
+    <tr className={`border-b border-[color:rgba(58,8,15,0.1)] last:border-0 ${className}`.trim()}>
       {children}
     </tr>
   );
@@ -213,7 +218,7 @@ export function DashboardTableCell({
   className?: string;
 }) {
   return (
-    <td className={`px-2.5 py-2 align-top ${cellVariantClass[variant]} ${className}`.trim()}>
+    <td className={`px-2.5 py-2.5 align-top ${cellVariantClass[variant]} ${className}`.trim()}>
       {children}
     </td>
   );

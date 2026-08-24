@@ -30,10 +30,10 @@ export function ClickableStatCard({
   ) : (
     <>
       <div className="eyebrow text-muted-foreground">{label}</div>
-      <div className="mt-2 font-display text-3xl text-ember">{value}</div>
+      <div className="mt-2 font-display text-3xl text-[color:var(--soft-champagne)]">{value}</div>
       {hint ? <p className="mt-2 text-xs text-muted-foreground">{hint}</p> : null}
       {to ? (
-        <p className="mt-3 text-xs font-medium uppercase tracking-[0.14em] text-ember/80">
+        <p className="mt-3 text-xs font-medium uppercase tracking-[0.14em] text-[color:var(--antique-gold)]/85">
           View details →
         </p>
       ) : null}
@@ -42,7 +42,7 @@ export function ClickableStatCard({
 
   const className = isLight
     ? "dashboard-panel-card dashboard-stat-card"
-    : "glass-strong block rounded-md border border-[oklch(0.88_0.08_86_/_0.15)] p-5 transition-colors hover:border-ember/40 hover:bg-[oklch(0.88_0.08_86_/_0.04)]";
+    : "glass-strong block rounded-[var(--radius-lg)] border border-[color:rgba(198,161,91,0.15)] p-5 transition-colors hover:border-[color:rgba(198,161,91,0.4)] hover:bg-[color:rgba(198,161,91,0.04)]";
 
   if (to) {
     return (
@@ -70,7 +70,7 @@ export function StatCardSection({
 
   return (
     <section>
-      <h2 className={`font-display text-2xl tracking-wide ${isLight ? "luxury-panel-heading" : ""}`}>
+      <h2 className={`font-display text-2xl tracking-[0.02em] ${isLight ? "luxury-panel-heading" : ""}`}>
         {title}
       </h2>
       {description ? (

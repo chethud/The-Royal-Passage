@@ -9,13 +9,13 @@ export const bookingCardLayoutClass = "flex gap-3 sm:gap-7";
 export const bookingCardContentClass = "flex min-w-0 flex-1 flex-col gap-2.5 sm:gap-4";
 
 export const bookingCardThumbClass =
-  "h-16 w-[3.35rem] shrink-0 rounded-sm border border-[rgb(200_162_90/0.28)] object-cover sm:h-28 sm:w-[6.5rem]";
+  "h-16 w-[3.35rem] shrink-0 rounded-[var(--radius-sm)] border border-[color:rgba(198,161,91,0.28)] object-cover sm:h-28 sm:w-[6.5rem]";
 
 export const bookingCardThumbPlaceholderClass =
-  "h-16 w-[3.35rem] shrink-0 rounded-sm border border-[rgb(200_162_90/0.28)] bg-[rgb(74_0_0/0.06)] sm:h-28 sm:w-[6.5rem]";
+  "h-16 w-[3.35rem] shrink-0 rounded-[var(--radius-sm)] border border-[color:rgba(198,161,91,0.28)] bg-[color:rgba(58,8,15,0.06)] sm:h-28 sm:w-[6.5rem]";
 
 export function bookingCardTitleClass(surface: BookingCardSurface) {
-  return `font-display leading-snug uppercase tracking-[0.05em] ${
+  return `font-display leading-snug tracking-[0.03em] ${
     surface === "light" ? "luxury-panel-heading text-[0.82rem] sm:text-lg" : "text-base sm:text-lg"
   }`;
 }
@@ -46,13 +46,13 @@ export function bookingCardMetaValueClass(surface: BookingCardSurface, emphasis 
 export function bookingCardPrimaryActionClass(surface: BookingCardSurface) {
   return surface === "light"
     ? "luxury-btn-sm luxury-btn-primary inline-flex min-h-0 flex-1 items-center justify-center px-2.5 py-1.5 text-[0.58rem] tracking-[0.08em] no-underline sm:flex-none sm:px-4 sm:py-2 sm:text-[0.65rem] sm:tracking-[0.1em]"
-    : "text-sm text-ember underline-offset-4 hover:underline";
+    : "text-sm text-[color:var(--antique-gold)] underline-offset-4 hover:text-[color:var(--soft-champagne)] hover:underline";
 }
 
 export function bookingCardSecondaryActionClass(surface: BookingCardSurface) {
   return surface === "light"
     ? "luxury-btn-sm dashboard-chrome-btn inline-flex min-h-0 flex-1 items-center justify-center px-2.5 py-1.5 text-[0.58rem] tracking-[0.08em] no-underline sm:flex-none sm:px-4 sm:py-2 sm:text-[0.65rem] sm:tracking-[0.1em]"
-    : "text-sm text-ember underline-offset-4 hover:underline";
+    : "text-sm text-[color:var(--antique-gold)] underline-offset-4 hover:text-[color:var(--soft-champagne)] hover:underline";
 }
 
 export function bookingCardDangerActionClass(surface: BookingCardSurface) {

@@ -5,18 +5,18 @@ import type { ReactNode } from "react";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 export const marketplaceCardActionClass =
-  "scale-90 border-0 bg-black/35 p-2 text-[#F7F1E8] shadow-none backdrop-blur-sm hover:border-0 hover:bg-black/50";
+  "scale-90 rounded-[var(--radius-md)] border border-[color:rgba(198,161,91,0.3)] bg-[color:rgba(36,16,23,0.52)] p-2 text-[color:var(--royal-ivory)] shadow-none backdrop-blur-sm hover:border-[color:var(--soft-champagne)] hover:bg-[color:rgba(36,16,23,0.68)]";
 
 export const marketplaceCardFrameClass =
-  "relative aspect-[16/11] w-full overflow-hidden rounded-md sm:aspect-[4/5]";
+  "relative aspect-[16/11] w-full overflow-hidden rounded-[var(--radius-lg)] sm:aspect-[4/5]";
 
 /** Larger frames for the experiences catalog (fits 3 across) — shorter than full-portrait. */
 export const marketplaceCardFrameLargeClass =
-  "relative aspect-[16/10] w-full overflow-hidden rounded-md sm:aspect-[4/5] sm:min-h-[16rem] lg:min-h-[18rem] xl:min-h-[20rem]";
+  "relative aspect-[16/10] w-full overflow-hidden rounded-[var(--radius-lg)] sm:aspect-[4/5] sm:min-h-[16rem] lg:min-h-[18rem] xl:min-h-[20rem]";
 
-export const marketplaceCardShellClass = `${marketplaceCardFrameClass} shadow-[0_20px_50px_-28px_rgba(0,0,0,0.72)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_28px_56px_-24px_rgba(200,162,90,0.3)]`;
+export const marketplaceCardShellClass = `${marketplaceCardFrameClass} border border-[color:rgba(198,161,91,0.18)] bg-[color:var(--royal-plum)] shadow-[var(--shadow-soft)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]`;
 
-export const marketplaceCardShellLargeClass = `${marketplaceCardFrameLargeClass} shadow-[0_20px_50px_-28px_rgba(0,0,0,0.72)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_28px_56px_-24px_rgba(200,162,90,0.3)]`;
+export const marketplaceCardShellLargeClass = `${marketplaceCardFrameLargeClass} border border-[color:rgba(198,161,91,0.18)] bg-[color:var(--royal-plum)] shadow-[var(--shadow-soft)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]`;
 
 type MarketplaceCardLinkProps = {
   to: string;
@@ -59,7 +59,7 @@ function MarketplaceCardContent({
         params={link.params}
         search={link.search ?? {}}
         aria-label={link.ariaLabel}
-        className="absolute inset-0 z-10 block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8A25A] focus-visible:ring-inset"
+        className="absolute inset-0 z-10 block focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--antique-gold)] focus-visible:ring-inset"
       >
         <img
           src={image}
@@ -67,7 +67,7 @@ function MarketplaceCardContent({
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#120000]/95 via-[#4A0000]/40 to-[#4A0000]/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(36,16,23,0.96)] via-[rgba(58,8,15,0.42)] to-[rgba(58,8,15,0.08)]" />
         <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent" />
 
         <div className="absolute left-2.5 top-2.5 z-20 sm:left-3.5 sm:top-3.5">{topLeft}</div>
@@ -78,7 +78,7 @@ function MarketplaceCardContent({
           }`}
         >
           <h3
-            className={`line-clamp-2 font-display uppercase leading-snug tracking-[0.06em] text-[#F7F1E8] drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] transition-colors group-hover:text-[#D4AF37] ${
+            className={`line-clamp-2 font-display leading-[1.02] tracking-[0.03em] text-[color:var(--royal-ivory)] drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] transition-colors group-hover:text-[color:var(--soft-champagne)] ${
               large
                 ? "text-lg sm:text-xl lg:text-2xl"
                 : "text-base sm:text-lg"
@@ -87,7 +87,7 @@ function MarketplaceCardContent({
             {title}
           </h3>
           <div
-            className={`mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[#E8DCC8]/90 sm:mt-1.5 sm:gap-x-3 ${
+            className={`mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[color:rgba(245,239,227,0.88)] sm:mt-1.5 sm:gap-x-3 ${
               large ? "text-[0.68rem] sm:text-[0.75rem]" : "text-[0.62rem] sm:text-[0.68rem]"
             }`}
           >
@@ -95,7 +95,7 @@ function MarketplaceCardContent({
           </div>
           {footer ? <div className="mt-1.5 sm:mt-2">{footer}</div> : null}
           <span
-            className={`mt-1.5 inline-flex items-center gap-1.5 font-semibold uppercase tracking-[0.16em] text-[#D4AF37] transition-all duration-300 group-hover:gap-2.5 sm:mt-2 ${
+            className={`mt-1.5 inline-flex items-center gap-1.5 font-sans font-semibold uppercase tracking-[0.14em] text-[color:var(--antique-gold)] transition-all duration-300 group-hover:gap-2.5 group-hover:text-[color:var(--soft-champagne)] sm:mt-2 ${
               large ? "text-[0.62rem] sm:text-[0.68rem]" : "text-[0.58rem] sm:text-[0.62rem]"
             }`}
           >
