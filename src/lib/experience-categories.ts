@@ -10,4 +10,5 @@ export const FALLBACK_CATEGORIES: CategoryOption[] = [
   { slug: "rural_farm", label: "Rural & Farm" },
   { slug: "cultural_heritage", label: "Cultural & Heritage" },
   { slug: "premium_luxury", label: "Premium / Luxury" },
+  { slug: "tours_sightseeing", label: "Tours & Sightseeing" },
 ];

@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Landmark,
   Leaf,
+  MapPinned,
   Moon,
   Mountain,
   Palette,
@@ -25,6 +26,7 @@ export function categoryIconForLabel(label: string): LucideIcon {
   }
   if (key.includes("wellness") || key.includes("healing")) return Leaf;
   if (key.includes("outdoor") || key.includes("nature") || key.includes("voyage")) return Trees;
+  if (key.includes("tour") || key.includes("sightseeing")) return MapPinned;
   if (key.includes("heritage") || key.includes("cultural")) return Landmark;
   if (key.includes("rural") || key.includes("farm")) return Wheat;
   if (key.includes("luxury") || key.includes("premium") || key.includes("drive")) return Sparkles;
