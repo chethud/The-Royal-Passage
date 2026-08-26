@@ -14,6 +14,12 @@ import {
   type ExperienceSearch,
   PAGE_SIZE,
 } from "@/lib/experience-filters";
+import {
+  orderExperiencesWithShowcaseFirst,
+  showcaseExperienceSlugs,
+} from "@/lib/experience-showcase-order";
+import { normalizeHomepageContent } from "@/lib/homepage-content";
+import { getHomepageContent } from "@/lib/homepage-content-fns";
 import { getCatalogForUi } from "@/lib/marketplace-fns";
 import { canonicalLink } from "@/lib/seo-helpers";
 import { SITE_URL } from "@/lib/seo";
@@ -44,9 +50,20 @@ function parseSearch(s: Record<string, unknown>): ExperienceSearch {
 
 export const Route = createFileRoute("/experiences/")({
   loader: async () => {
-    const [catalog, cities] = await Promise.all([getCatalogForUi(), listCities()]);
-    return { ...catalog, cityOptions: cities };
+    const [catalog, cities, homepage] = await Promise.all([
+      getCatalogForUi(),
+      listCities(),
+      getHomepageContent().catch(() => normalizeHomepageContent({})),
+    ]);
+    const content = normalizeHomepageContent(homepage ?? {});
+    const showcaseSlugs = showcaseExperienceSlugs(content.showcase);
+    return {
+      ...catalog,
+      experiences: orderExperiencesWithShowcaseFirst(catalog.experiences, showcaseSlugs),
+      cityOptions: cities,
+    };
   },
+  staleTime: 0,
   validateSearch: parseSearch,
   head: ({ search }) => {
     const citySlug = search?.city;
