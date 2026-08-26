@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
+import { PercentAmountInput } from "@/components/host/PercentAmountInput";
 import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import { HOMESTAY_PROPERTY_TYPES } from "@/lib/api/owner-homestays";
 import { toErrorMessage } from "@/lib/api/client";
@@ -68,6 +69,7 @@ export function PartnerHomestayApplicationForm() {
   const [fssaiId, setFssaiId] = useState("");
   const [panNumber, setPanNumber] = useState("");
   const [passportPhotoUrl, setPassportPhotoUrl] = useState("");
+  const [gstPercent, setGstPercent] = useState(0);
   const [gstNumber, setGstNumber] = useState("");
   const [uploadingPassport, setUploadingPassport] = useState(false);
 
@@ -100,8 +102,7 @@ export function PartnerHomestayApplicationForm() {
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  const effectiveWeekend = weekendPriceMajor || priceMajor;
-  const needsGst = priceMajor > 8000 || effectiveWeekend > 8000;
+  const chargesGst = gstPercent > 0;
 
   const handleLicenseSelect = async (file: File | null) => {
     if (!file) return;
@@ -149,9 +150,16 @@ export function PartnerHomestayApplicationForm() {
       setError("Upload a passport-size photo.");
       return;
     }
-    if (needsGst && !gstNumber.trim()) {
-      setError("GST number is required when price per room per day is above ₹8,000.");
+    if (gstPercent < 0 || gstPercent > 100 || !Number.isFinite(gstPercent)) {
+      setError("GST must be between 0% and 100% of the stay total.");
       return;
+    }
+    if (chargesGst) {
+      const gstin = gstNumber.trim().toUpperCase();
+      if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gstin)) {
+        setError("Enter a valid 15-character GST number when GST is greater than 0%.");
+        return;
+      }
     }
     const normalizedPhone = normalizeTenDigitPhone(phone);
     if (!normalizedPhone) {
@@ -160,6 +168,7 @@ export function PartnerHomestayApplicationForm() {
     }
 
     const galleryUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
+    const effectiveWeekend = weekendPriceMajor || priceMajor;
 
     setSubmitting(true);
     try {
@@ -173,7 +182,8 @@ export function PartnerHomestayApplicationForm() {
           fssaiId: fssaiId.trim(),
           panNumber: panNumber.trim().toUpperCase(),
           passportPhotoUrl: passportPhotoUrl.trim(),
-          gstNumber: needsGst ? gstNumber.trim().toUpperCase() : undefined,
+          gstPercent,
+          gstNumber: chargesGst ? gstNumber.trim().toUpperCase() : undefined,
           title: title.trim(),
           tagline: tagline.trim() || undefined,
           description: description.trim(),
@@ -599,26 +609,38 @@ export function PartnerHomestayApplicationForm() {
           </label>
         </section>
 
-        {needsGst ? (
-          <section className={sectionClass}>
-            <h2 className="font-display text-xl luxury-panel-heading">GST</h2>
-            <p className="luxury-panel-body text-sm">
-              Price per room per day is above ₹8,000 — a GST number is required.
-            </p>
-            <label className="block text-sm">
-              <span className="eyebrow luxury-panel-label">GST number</span>
-              <input
-                required
-                value={gstNumber}
-                onChange={(e) => setGstNumber(e.target.value.toUpperCase())}
+        <section className={sectionClass}>
+          <h2 className="font-display text-xl luxury-panel-heading">GST</h2>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <label className="text-sm">
+              <span className="eyebrow luxury-panel-label">GST (%)</span>
+              <PercentAmountInput
+                value={gstPercent}
+                onChange={setGstPercent}
                 className={inputClass}
-                placeholder="22AAAAA0000A1Z5"
-                maxLength={15}
-                autoComplete="off"
+                placeholder="0"
               />
+              <span className="mt-1 block text-xs luxury-panel-body opacity-80">
+                Percent of the stay total added at checkout (e.g. 5 means +5%). Enter 0 if you do
+                not charge GST. If GST is above 0%, a GST number is required.
+              </span>
             </label>
-          </section>
-        ) : null}
+            {chargesGst ? (
+              <label className="text-sm">
+                <span className="eyebrow luxury-panel-label">GST number</span>
+                <input
+                  required
+                  value={gstNumber}
+                  onChange={(e) => setGstNumber(e.target.value.toUpperCase())}
+                  className={inputClass}
+                  placeholder="22AAAAA0000A1Z5"
+                  maxLength={15}
+                  autoComplete="off"
+                />
+              </label>
+            ) : null}
+          </div>
+        </section>
 
         {error ? (
           <p className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">

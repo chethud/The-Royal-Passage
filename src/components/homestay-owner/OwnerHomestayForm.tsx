@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
+import { PercentAmountInput } from "@/components/host/PercentAmountInput";
 import { RupeeAmountInput } from "@/components/host/RupeeAmountInput";
 import type { CitySummary } from "@/lib/cities";
 import {
@@ -8,6 +9,7 @@ import {
   type OwnerHomestayDetail,
   type UpdateOwnerHomestayPayload,
 } from "@/lib/api/owner-homestays";
+import { majorToMinor, minorToMajor } from "@/lib/money";
 import { uploadHomestayLicenseCertificate } from "@/lib/homestay-license-upload";
 import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
 
@@ -53,17 +55,20 @@ export function OwnerHomestayForm({
   const [region, setRegion] = useState(initial?.region ?? "");
   const [address, setAddress] = useState(initial?.address ?? "");
   const [priceMajor, setPriceMajor] = useState(
-    Math.round((initial?.pricePerNightMinor ?? 0) / 100) || 0,
+    Math.round(minorToMajor(initial?.pricePerNightMinor ?? 0)) || 0,
   );
   const [weekendPriceMajor, setWeekendPriceMajor] = useState(
-    Math.round((initial?.weekendPricePerNightMinor ?? initial?.pricePerNightMinor ?? 0) / 100) || 0,
+    Math.round(minorToMajor(initial?.weekendPricePerNightMinor ?? initial?.pricePerNightMinor ?? 0)) ||
+      0,
   );
   const [compareAtWeekdayMajor, setCompareAtWeekdayMajor] = useState(
-    Math.round((initial?.compareAtPricePerNightMinor ?? 0) / 100) || 0,
+    Math.round(minorToMajor(initial?.compareAtPricePerNightMinor ?? 0)) || 0,
   );
   const [compareAtWeekendMajor, setCompareAtWeekendMajor] = useState(
-    Math.round((initial?.compareAtWeekendPricePerNightMinor ?? 0) / 100) || 0,
+    Math.round(minorToMajor(initial?.compareAtWeekendPricePerNightMinor ?? 0)) || 0,
   );
+  const [gstPercent, setGstPercent] = useState(Number(initial?.gstPercent ?? 0));
+  const [gstNumber, setGstNumber] = useState(initial?.gstNumber ?? "");
   const [photoUrls, setPhotoUrls] = useState<string[]>(() => {
     const existing = initial?.galleryUrls?.length
       ? initial.galleryUrls
@@ -81,11 +86,13 @@ export function OwnerHomestayForm({
   const [checkOutTime, setCheckOutTime] = useState(initial?.checkOutTime ?? "11:00");
   const [extraBedAvailable, setExtraBedAvailable] = useState(initial?.extraBedAvailable ?? false);
   const [extraBedPriceMajor, setExtraBedPriceMajor] = useState(
-    Math.round((initial?.extraBedPricePerNightMinor ?? 0) / 100) || 0,
+    Math.round(minorToMajor(initial?.extraBedPricePerNightMinor ?? 0)) || 0,
   );
   const [extraBedWeekendPriceMajor, setExtraBedWeekendPriceMajor] = useState(
     Math.round(
-      (initial?.extraBedWeekendPricePerNightMinor ?? initial?.extraBedPricePerNightMinor ?? 0) / 100,
+      minorToMajor(
+        initial?.extraBedWeekendPricePerNightMinor ?? initial?.extraBedPricePerNightMinor ?? 0,
+      ),
     ) || 0,
   );
   const [extraBedsPerRoom, setExtraBedsPerRoom] = useState<1 | 2>(
@@ -96,6 +103,7 @@ export function OwnerHomestayForm({
   );
   const [uploadingLicense, setUploadingLicense] = useState(false);
   const [licenseError, setLicenseError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [submitForReview, setSubmitForReview] = useState(false);
   const licenseInputRef = useRef<HTMLInputElement>(null);
   const bedroomCount = Number.parseInt(bedrooms, 10) || 1;
@@ -117,9 +125,21 @@ export function OwnerHomestayForm({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setFormError(null);
     if (!licenseCertificateUrl.trim()) {
       setLicenseError("Upload a certificate or license for this property.");
       return;
+    }
+    if (gstPercent < 0 || gstPercent > 100 || !Number.isFinite(gstPercent)) {
+      setFormError("GST must be between 0% and 100%.");
+      return;
+    }
+    if (gstPercent > 0) {
+      const gstin = gstNumber.trim().toUpperCase();
+      if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gstin)) {
+        setFormError("Enter a valid 15-character GST number when GST is greater than 0%.");
+        return;
+      }
     }
     const galleryUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
     const payload = {
@@ -130,11 +150,13 @@ export function OwnerHomestayForm({
       citySlug,
       region: region.trim() || undefined,
       address: address.trim() || undefined,
-      pricePerNightMinor: priceMajor * 100,
-      weekendPricePerNightMinor: weekendPriceMajor * 100,
-      compareAtPricePerNightMinor: compareAtWeekdayMajor > 0 ? compareAtWeekdayMajor * 100 : null,
+      pricePerNightMinor: majorToMinor(priceMajor),
+      weekendPricePerNightMinor: majorToMinor(weekendPriceMajor),
+      compareAtPricePerNightMinor: compareAtWeekdayMajor > 0 ? majorToMinor(compareAtWeekdayMajor) : null,
       compareAtWeekendPricePerNightMinor:
-        compareAtWeekendMajor > 0 ? compareAtWeekendMajor * 100 : null,
+        compareAtWeekendMajor > 0 ? majorToMinor(compareAtWeekendMajor) : null,
+      gstPercent,
+      gstNumber: gstPercent > 0 ? gstNumber.trim().toUpperCase() : null,
       heroImageUrl: galleryUrls[0],
       galleryUrls,
       amenities: splitLines(amenitiesText),
@@ -145,8 +167,10 @@ export function OwnerHomestayForm({
       checkInTime,
       checkOutTime,
       extraBedAvailable,
-      extraBedPricePerNightMinor: extraBedAvailable ? extraBedPriceMajor * 100 : 0,
-      extraBedWeekendPricePerNightMinor: extraBedAvailable ? extraBedWeekendPriceMajor * 100 : 0,
+      extraBedPricePerNightMinor: extraBedAvailable ? majorToMinor(extraBedPriceMajor) : 0,
+      extraBedWeekendPricePerNightMinor: extraBedAvailable
+        ? majorToMinor(extraBedWeekendPriceMajor)
+        : 0,
       extraBedsPerRoom: extraBedAvailable ? extraBedsPerRoom : 1,
       licenseCertificateUrl: licenseCertificateUrl.trim(),
       submitForReview: canSubmitForReview && submitForReview,
@@ -280,6 +304,32 @@ export function OwnerHomestayForm({
               disabled={disabled || saving}
             />
           </label>
+          <label className="block">
+            <span className={labelClass}>GST (%)</span>
+            <p className="luxury-panel-body mb-2 text-xs">
+              Added on top of the stay total at checkout. Enter 0 if you do not charge GST.
+            </p>
+            <PercentAmountInput
+              className={inputClass}
+              value={gstPercent}
+              onChange={setGstPercent}
+              disabled={disabled || saving}
+            />
+          </label>
+          {gstPercent > 0 ? (
+            <label className="block">
+              <span className={labelClass}>GST number</span>
+              <input
+                className={inputClass}
+                value={gstNumber}
+                onChange={(e) => setGstNumber(e.target.value.toUpperCase())}
+                placeholder="22AAAAA0000A1Z5"
+                maxLength={15}
+                autoComplete="off"
+                disabled={disabled || saving}
+              />
+            </label>
+          ) : null}
         </div>
 
         <label className="block">
@@ -492,6 +542,7 @@ export function OwnerHomestayForm({
             </p>
           ) : null}
           {licenseError ? <p className="mt-2 text-xs text-destructive">{licenseError}</p> : null}
+          {formError ? <p className="mt-2 text-sm text-destructive">{formError}</p> : null}
         </div>
       </section>
 

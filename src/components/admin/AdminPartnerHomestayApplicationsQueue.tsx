@@ -264,8 +264,14 @@ export function AdminPartnerHomestayApplicationsQueue({
                         {row.panNumber || "—"}
                       </p>
                       <p>
+                        <span className="eyebrow luxury-panel-label mb-1 block">GST</span>
+                        {row.gstPercent > 0 ? `${row.gstPercent}% of total` : "0% (not charged)"}
+                      </p>
+                      <p>
                         <span className="eyebrow luxury-panel-label mb-1 block">GST number</span>
-                        {row.gstNumber || "Not provided (price ≤ ₹8,000)"}
+                        {row.gstPercent > 0
+                          ? row.gstNumber || "—"
+                          : "Not required (GST is 0%)"}
                       </p>
                       <p>
                         <span className="eyebrow luxury-panel-label mb-1 block">Homestay license</span>

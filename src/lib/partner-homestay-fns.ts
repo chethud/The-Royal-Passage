@@ -12,7 +12,7 @@ const urlListSchema = z.array(z.string().url().max(2000)).max(20);
 
 const propertyTypeSchema = z.enum(["Home Stay", "Resort", "Hotel"]);
 
-const GST_PRICE_THRESHOLD_MAJOR = 8000;
+const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
 
 const submitSchema = z
   .object({
@@ -28,6 +28,7 @@ const submitSchema = z
       .toUpperCase()
       .regex(/^[A-Z]{5}[0-9]{4}[A-Z]$/, "Enter a valid PAN (e.g. ABCDE1234F)."),
     passportPhotoUrl: z.string().url().max(2000),
+    gstPercent: z.number().min(0).max(100).default(0),
     gstNumber: z.string().trim().toUpperCase().max(20).optional(),
     title: z.string().trim().min(3).max(200),
     tagline: z.string().trim().max(280).optional(),
@@ -54,19 +55,13 @@ const submitSchema = z
     licenseCertificateUrl: z.string().url().max(2000),
   })
   .superRefine((data, ctx) => {
-    const weekdayMajor = Math.round(data.pricePerNightMinor / 100);
-    const weekendMajor = Math.round(
-      (data.weekendPricePerNightMinor ?? data.pricePerNightMinor) / 100,
-    );
-    const needsGst =
-      weekdayMajor > GST_PRICE_THRESHOLD_MAJOR || weekendMajor > GST_PRICE_THRESHOLD_MAJOR;
-    if (needsGst) {
+    if (data.gstPercent > 0) {
       const gst = data.gstNumber?.trim() ?? "";
-      if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gst)) {
+      if (!GSTIN_REGEX.test(gst)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["gstNumber"],
-          message: "GST number is required when price per room per day is above ₹8,000.",
+          message: "Enter a valid GST number when GST is greater than 0%.",
         });
       }
     }
@@ -105,6 +100,7 @@ export type PartnerHomestayApplication = {
   fssaiId: string | null;
   panNumber: string | null;
   passportPhotoUrl: string | null;
+  gstPercent: number;
   gstNumber: string | null;
   title: string;
   tagline: string | null;
@@ -147,6 +143,7 @@ function mapRow(row: Record<string, unknown>): PartnerHomestayApplication {
     fssaiId: row.fssai_id == null ? null : String(row.fssai_id),
     panNumber: row.pan_number == null ? null : String(row.pan_number),
     passportPhotoUrl: row.passport_photo_url == null ? null : String(row.passport_photo_url),
+    gstPercent: Number(row.gst_percent ?? 0),
     gstNumber: row.gst_number == null ? null : String(row.gst_number),
     title: String(row.title ?? ""),
     tagline: row.tagline == null ? null : String(row.tagline),
@@ -246,7 +243,9 @@ export const submitPartnerHomestayApplication = createServerFn({ method: "POST" 
         fssai_id: data.fssaiId.trim(),
         pan_number: data.panNumber.trim().toUpperCase(),
         passport_photo_url: data.passportPhotoUrl,
-        gst_number: data.gstNumber?.trim().toUpperCase() || null,
+        gst_percent: data.gstPercent,
+        gst_number:
+          data.gstPercent > 0 ? data.gstNumber?.trim().toUpperCase() || null : null,
         title: data.title,
         tagline: data.tagline?.trim() || null,
         description: data.description,
@@ -438,6 +437,13 @@ export const reviewPartnerHomestayApplication = createServerFn({ method: "POST" 
       ),
       extra_beds_per_room: Number(application.extra_beds_per_room ?? 1),
       license_certificate_url: licenseUrl,
+      gst_percent: Number(application.gst_percent ?? 0),
+      gst_number:
+        Number(application.gst_percent ?? 0) > 0
+          ? application.gst_number == null
+            ? null
+            : String(application.gst_number)
+          : null,
     };
     if (application.map_link) {
       insertRow.map_link = String(application.map_link);

@@ -105,6 +105,7 @@ class Homestay(BaseModel):
     weekendPricePerNight: int | None = None
     compareAtPricePerNight: int | None = None
     compareAtWeekendPricePerNight: int | None = None
+    gstPercent: float = 0
     rating: float
     reviewsCount: int
     image: str
@@ -232,6 +233,8 @@ class OwnerHomestayDetail(BaseModel):
     weekendPricePerNightMinor: int | None = None
     compareAtPricePerNightMinor: int | None = None
     compareAtWeekendPricePerNightMinor: int | None = None
+    gstPercent: float = 0
+    gstNumber: str | None = None
     status: str
     heroImageUrl: str | None = None
     galleryUrls: list[str] = Field(default_factory=list)
@@ -270,6 +273,8 @@ class CreateOwnerHomestayRequest(BaseModel):
     weekendPricePerNightMinor: int | None = Field(default=None, ge=0)
     compareAtPricePerNightMinor: int | None = Field(default=None, ge=0)
     compareAtWeekendPricePerNightMinor: int | None = Field(default=None, ge=0)
+    gstPercent: float = Field(default=0, ge=0, le=100)
+    gstNumber: str | None = Field(default=None, max_length=20)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] = Field(default_factory=list)
     amenities: list[str] = Field(default_factory=list)
@@ -302,6 +307,8 @@ class UpdateOwnerHomestayRequest(BaseModel):
     weekendPricePerNightMinor: int | None = Field(default=None, ge=0)
     compareAtPricePerNightMinor: int | None = Field(default=None, ge=0)
     compareAtWeekendPricePerNightMinor: int | None = Field(default=None, ge=0)
+    gstPercent: float | None = Field(default=None, ge=0, le=100)
+    gstNumber: str | None = Field(default=None, max_length=20)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] | None = None
     amenities: list[str] | None = None

@@ -140,6 +140,10 @@ export function useHomestayCheckout(
     [homestay, roomId, roomCount, extraBedCount, checkIn, checkOut, rooms.length],
   );
   const sym = homestay.currencySymbol ?? "₹";
+  const gstPercent = Number(homestay.gstPercent ?? 0);
+  const subtotalMinor = pricing.totalMinor;
+  const gstMinor = gstPercent > 0 ? Math.round((subtotalMinor * gstPercent) / 100) : 0;
+  const totalMinor = subtotalMinor + gstMinor;
 
   const goNext = useCallback(() => {
     setError(null);
@@ -238,8 +242,11 @@ export function useHomestayCheckout(
     paymentMethod,
     setPaymentMethod,
     nights,
-    totalMinor: pricing.totalMinor,
-    totalLabel: formatMoney(pricing.totalMinor, sym),
+    subtotalMinor,
+    gstPercent,
+    gstMinor,
+    totalMinor,
+    totalLabel: formatMoney(totalMinor, sym),
     nightlyLabel: formatWeekdayWeekendRates(
       sym,
       weekdayPriceMajor(homestay, selectedRoom),

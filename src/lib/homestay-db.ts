@@ -34,6 +34,7 @@ export function mapProtoHomestay(stay: ProtoHomestay): Homestay {
     mapLink: stay.mapLink,
     pricePerNight: stay.pricePerNight,
     weekendPricePerNight: stay.weekendPricePerNight,
+    gstPercent: stay.gstPercent ?? 0,
     currencySymbol: stay.currencySymbol || "₹",
     rating: stay.rating,
     reviewsCount: stay.reviewsCount,

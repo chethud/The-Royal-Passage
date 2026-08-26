@@ -267,6 +267,8 @@ def _map_owner_homestay(row: dict, rooms: list[dict], availability: list[dict]) 
         weekendPricePerNightMinor=row.get("weekend_price_per_night_minor"),
         compareAtPricePerNightMinor=row.get("compare_at_price_per_night_minor"),
         compareAtWeekendPricePerNightMinor=row.get("compare_at_weekend_price_per_night_minor"),
+        gstPercent=float(row.get("gst_percent") or 0),
+        gstNumber=row.get("gst_number"),
         status=row.get("status") or "draft",
         heroImageUrl=row.get("hero_image_url"),
         galleryUrls=row.get("gallery_urls") or [],
@@ -404,6 +406,12 @@ def create_owner_homestay(auth: dict, payload: CreateOwnerHomestayRequest) -> Ow
             else payload.pricePerNightMinor,
             label="Weekend original (was) price",
         ),
+        "gst_percent": float(payload.gstPercent or 0),
+        "gst_number": (
+            ((payload.gstNumber or "").strip().upper() or None)
+            if float(payload.gstPercent or 0) > 0
+            else None
+        ),
         "hero_image_url": hero_image_url,
         "gallery_urls": gallery_urls,
         "amenities": payload.amenities,
@@ -483,6 +491,16 @@ def update_owner_homestay(
         updates["price_per_night_minor"] = payload.pricePerNightMinor
     if payload.weekendPricePerNightMinor is not None:
         updates["weekend_price_per_night_minor"] = payload.weekendPricePerNightMinor
+    if "gstPercent" in payload.model_fields_set:
+        gst_percent = float(payload.gstPercent or 0)
+        updates["gst_percent"] = gst_percent
+        if gst_percent > 0:
+            if "gstNumber" in payload.model_fields_set:
+                updates["gst_number"] = (payload.gstNumber or "").strip().upper() or None
+        else:
+            updates["gst_number"] = None
+    elif "gstNumber" in payload.model_fields_set:
+        updates["gst_number"] = (payload.gstNumber or "").strip().upper() or None
 
     unset = payload.model_fields_set
     if (

@@ -83,6 +83,8 @@ export type OwnerHomestayDetail = {
   weekendPricePerNightMinor?: number | null;
   compareAtPricePerNightMinor?: number | null;
   compareAtWeekendPricePerNightMinor?: number | null;
+  gstPercent?: number;
+  gstNumber?: string | null;
   status: string;
   heroImageUrl: string | null;
   galleryUrls: string[];
@@ -121,6 +123,8 @@ export type CreateOwnerHomestayPayload = {
   weekendPricePerNightMinor?: number;
   compareAtPricePerNightMinor?: number | null;
   compareAtWeekendPricePerNightMinor?: number | null;
+  gstPercent?: number;
+  gstNumber?: string | null;
   heroImageUrl?: string;
   galleryUrls?: string[];
   amenities?: string[];

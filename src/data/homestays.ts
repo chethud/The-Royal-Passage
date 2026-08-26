@@ -58,6 +58,8 @@ export type Homestay = {
   weekendPricePerNight?: number;
   compareAtPricePerNight?: number | null;
   compareAtWeekendPricePerNight?: number | null;
+  /** Owner GST % added on top of the stay subtotal at checkout. */
+  gstPercent?: number;
   currencySymbol?: string;
   rating: number;
   reviewsCount: number;

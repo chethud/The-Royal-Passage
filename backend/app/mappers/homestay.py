@@ -93,6 +93,7 @@ def map_row_to_homestay(row: dict, rooms: list[dict]) -> Homestay:
             if row.get("compare_at_weekend_price_per_night_minor")
             else None
         ),
+        gstPercent=float(row.get("gst_percent") or 0),
         rating=float(row.get("rating_avg") or 0),
         reviewsCount=int(row.get("reviews_count") or 0),
         image=hero,

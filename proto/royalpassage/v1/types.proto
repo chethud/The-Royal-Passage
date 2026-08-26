@@ -52,6 +52,7 @@ message Experience {
   optional string region = 27;
   optional string map_link = 28;
   optional int32 compare_at_price_per_person = 29;
+  double gst_percent = 30;
 }
 
 message CatalogResponse {
@@ -614,6 +615,7 @@ message Homestay {
   optional int32 weekend_price_per_night = 30;
   repeated HomestayDatePrice date_prices = 31;
   optional int32 weekend_extra_bed_price_per_night = 32;
+  double gst_percent = 33;
 }
 
 message HomestayDatePrice {
@@ -765,6 +767,8 @@ message OwnerHomestayDetail {
   optional int32 weekend_extra_bed_price_per_night_minor = 34;
   optional int32 compare_at_price_per_night_minor = 35;
   optional int32 compare_at_weekend_price_per_night_minor = 36;
+  double gst_percent = 37;
+  optional string gst_number = 38;
 }
 
 message ListOwnerHomestaysResponse {
@@ -801,6 +805,8 @@ message CreateOwnerHomestayRequest {
   optional int32 weekend_extra_bed_price_per_night_minor = 27;
   optional int32 compare_at_price_per_night_minor = 28;
   optional int32 compare_at_weekend_price_per_night_minor = 29;
+  double gst_percent = 30;
+  optional string gst_number = 31;
 }
 
 message UpdateOwnerHomestayRequest {
@@ -833,6 +839,8 @@ message UpdateOwnerHomestayRequest {
   optional int32 weekend_extra_bed_price_per_night_minor = 27;
   optional int32 compare_at_price_per_night_minor = 28;
   optional int32 compare_at_weekend_price_per_night_minor = 29;
+  optional double gst_percent = 30;
+  optional string gst_number = 31;
 }
 
 message CreateOwnerHomestayRoomRequest {

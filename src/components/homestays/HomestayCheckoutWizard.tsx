@@ -226,6 +226,16 @@ export function HomestayCheckoutWizard({
                 </>
               ) : null}
               <CheckoutWizardConfirmRow
+                label="Stay subtotal"
+                value={formatMoney(checkout.subtotalMinor, sym)}
+              />
+              {checkout.gstPercent > 0 ? (
+                <CheckoutWizardConfirmRow
+                  label={`GST (${checkout.gstPercent}%)`}
+                  value={formatMoney(checkout.gstMinor, sym)}
+                />
+              ) : null}
+              <CheckoutWizardConfirmRow
                 label="Total (cash at check-in)"
                 value={formatMoney(checkout.totalMinor, sym)}
                 emphasis
@@ -275,6 +285,16 @@ export function HomestayCheckoutWizard({
             <CheckoutWizardSummaryRow label="Guests" value={String(checkout.guests)} align="left" />
             {checkout.selectedRoom ? (
               <CheckoutWizardSummaryRow label="Room" value={roomSummary} />
+            ) : null}
+            <CheckoutWizardSummaryRow
+              label="Stay"
+              value={checkout.nights > 0 ? formatMoney(checkout.subtotalMinor, sym) : "—"}
+            />
+            {checkout.gstPercent > 0 ? (
+              <CheckoutWizardSummaryRow
+                label={`GST (${checkout.gstPercent}%)`}
+                value={checkout.nights > 0 ? formatMoney(checkout.gstMinor, sym) : "—"}
+              />
             ) : null}
             <CheckoutWizardSummaryRow
               label="Payment"

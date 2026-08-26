@@ -254,6 +254,12 @@ def create_homestay_booking(
         extra_bed_overrides,
     )
     commission_percent = _commission_percent(supabase)
+    try:
+        gst_percent = float(stay.get("gst_percent") or 0)
+    except (TypeError, ValueError):
+        gst_percent = 0.0
+    gst_minor = round((subtotal_minor * gst_percent) / 100) if gst_percent > 0 else 0
+    total_minor = subtotal_minor + gst_minor
     platform_fee_minor = round((subtotal_minor * commission_percent) / 100)
     host_payout_minor = subtotal_minor - platform_fee_minor
 
@@ -267,7 +273,7 @@ def create_homestay_booking(
         "room_count": room_count,
         "extra_bed_count": extra_bed_count,
         "subtotal_minor": subtotal_minor,
-        "total_amount": subtotal_minor,
+        "total_amount": total_minor,
         "platform_fee_minor": platform_fee_minor,
         "host_payout_minor": host_payout_minor,
         "currency_code": stay.get("currency_code") or "INR",
@@ -293,7 +299,7 @@ def create_homestay_booking(
                 check_in=check_in.isoformat(),
                 check_out=check_out.isoformat(),
                 nights=nights,
-                total_minor=subtotal_minor,
+                total_minor=total_minor,
                 currency_code=stay.get("currency_code") or "INR",
                 booking_id=booking_id,
             ):
@@ -320,7 +326,7 @@ def create_homestay_booking(
             check_out=check_out.isoformat(),
             nights=nights,
             guest_count=payload.guestCount,
-            total_minor=subtotal_minor,
+            total_minor=total_minor,
             currency_code=stay.get("currency_code") or "INR",
             booking_id=booking_id,
         ):

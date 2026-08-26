@@ -133,6 +133,7 @@ async function loadHomestaysFromDb(citySlug = "mysuru"): Promise<Homestay[]> {
       mapLink: (row.map_link as string | null) ?? undefined,
       pricePerNight: baseNight,
       weekendPricePerNight: weekendNight,
+      gstPercent: Number(row.gst_percent ?? 0),
       currencySymbol: "₹",
       rating: Number(row.rating_avg ?? 0),
       reviewsCount: Number(row.reviews_count ?? 0),
