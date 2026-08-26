@@ -219,7 +219,7 @@ export function Header() {
             decoding="sync"
             loading="eager"
             fetchPriority="high"
-            className="h-15 w-auto max-h-[calc(var(--header-height)-0.35rem)] max-w-[min(62vw,13.5rem)] object-contain object-left sm:h-16 sm:max-w-[min(50vw,14rem)] md:h-[6.4rem] md:max-w-none lg:h-[6.9rem]"
+            className="h-12 w-auto max-h-[calc(var(--header-height)-0.35rem)] max-w-[min(62vw,11.5rem)] object-contain object-left sm:h-14 sm:max-w-[min(50vw,12.5rem)] md:h-[4.55rem] md:max-w-none lg:h-[5rem]"
           />
         </Link>
 

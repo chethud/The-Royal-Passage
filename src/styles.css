@@ -53,7 +53,7 @@
 :root {
   --radius: 8px;
   /* Header is shorter on mobile so the fixed bar doesn't eat the viewport. */
-  --header-height: 5rem;
+  --header-height: 4.25rem;
 
   --royal-burgundy: #3a080f;
   --royal-plum: #241017;
@@ -126,19 +126,19 @@
 
 @media (min-width: 640px) {
   :root {
-    --header-height: 5.25rem;
+    --header-height: 4.5rem;
   }
 }
 
 @media (min-width: 768px) {
   :root {
-    --header-height: 6.75rem;
+    --header-height: 5.25rem;
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --header-height: 7.5rem;
+    --header-height: 5.75rem;
   }
 }
 
