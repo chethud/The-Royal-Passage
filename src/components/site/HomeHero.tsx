@@ -150,7 +150,7 @@ export function HomeHero({
         {item.line3 ? <span className="block">{item.line3}</span> : null}
       </h1>
       {item.body ? (
-        <p className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-ink/88 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg [text-shadow:0_1px_12px_rgba(25,23,25,0.55)]">
+        <p className="mt-6 max-w-md font-baskerville text-[0.95rem] leading-relaxed text-ink/88 text-balance sm:mt-7 sm:text-[1.05rem] md:max-w-lg [text-shadow:0_1px_12px_rgba(25,23,25,0.55)]">
           {item.body}
         </p>
       ) : null}

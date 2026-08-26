@@ -36,7 +36,7 @@ export function FeaturedStaysShowcase({ stays }: FeaturedStaysShowcaseProps) {
   return (
     <section
       id="homestays"
-      className="relative border-y border-[oklch(0.88_0.08_86_/_0.1)] bg-[oklch(0.14_0.06_22)] pt-16 pb-8 sm:pt-20 sm:pb-10 md:pt-24 md:pb-12"
+      className="relative border-y border-[oklch(0.88_0.08_86_/_0.1)] bg-[oklch(0.14_0.06_22)] pt-8 pb-8 sm:pt-10 sm:pb-10 md:pt-12 md:pb-12"
     >
       <div className="container-page">
         <ScrollRevealGroup

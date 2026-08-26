@@ -77,7 +77,7 @@ function HeroCopy({
           </span>
         ))}
       </h1>
-      <p className="mt-disco-desc">{description}</p>
+      <p className="mt-disco-desc font-baskerville">{description}</p>
     </>
   );
 }

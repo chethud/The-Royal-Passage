@@ -12,8 +12,8 @@
   --mt-line: var(--border);
   --mt-on-accent: var(--primary-foreground);
   --mt-radius: 22px;
-  --mt-serif: "Cormorant Garamond", "Playfair Display", Georgia, serif;
-  --mt-sans: "DM Sans", "Manrope", Inter, system-ui, sans-serif;
+  --mt-serif: var(--font-display);
+  --mt-sans: var(--font-sans);
 }
 
 .trail-page-shell {
@@ -1022,6 +1022,7 @@
 .mt-disco-desc {
   margin: 0.75rem 0 0;
   max-width: 28rem;
+  font-family: var(--font-baskerville);
   font-size: 0.92rem;
   line-height: 1.55;
   color: color-mix(in oklab, #f7f3ea 82%, transparent);

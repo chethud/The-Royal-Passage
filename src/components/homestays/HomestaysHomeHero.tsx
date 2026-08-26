@@ -99,7 +99,7 @@ export function HomestaysHomeHero({ slides, imageVersion = 0 }: HomestaysHomeHer
                 <br />
                 Royally
               </motion.h1>
-              <motion.p variants={revealItem} className="homestays-home-hero__body mt-5 sm:mt-7">
+              <motion.p variants={revealItem} className="homestays-home-hero__body mt-5 font-baskerville sm:mt-7">
                 Heritage havelis, villas, and guest houses in Mysuru — each vetted for warmth, location, and
                 Royal Passage hospitality.
               </motion.p>

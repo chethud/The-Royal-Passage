@@ -184,7 +184,7 @@ function ExperienceDetail() {
                     href="#book"
                     className="luxury-btn-sm luxury-btn-primary mt-5 inline-flex w-fit items-center no-underline sm:mt-6"
                   >
-                    Buy now
+                    Book now
                   </a>
                 ) : null}
 

@@ -10,6 +10,7 @@
   --font-sans: "Cinzel", ui-serif, Georgia, serif;
   --font-royal: "Cinzel Decorative", "Cinzel", ui-serif, Georgia, serif;
   --font-body: "Cinzel", ui-serif, Georgia, serif;
+  --font-baskerville: "Libre Baskerville", ui-serif, Georgia, serif;
 
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -324,6 +325,7 @@
 
 .homestays-home-hero__body {
   max-width: 28rem;
+  font-family: var(--font-baskerville);
   font-size: 0.9rem;
   line-height: 1.6;
   color: color-mix(in oklch, var(--color-ink, oklch(0.97 0.01 88)) 85%, transparent);
