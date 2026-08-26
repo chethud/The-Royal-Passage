@@ -1,4 +1,6 @@
+import { createClient } from "@supabase/supabase-js";
 import { PRODUCTION_SITE_ORIGIN } from "@/lib/auth-redirect";
+import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/env.server";
 import { isResendConfigured, sendResendEmailDetailed } from "@/lib/resend.server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { UserRole } from "@/lib/roles";
@@ -99,49 +101,104 @@ function escapeHtml(value: string) {
     .replaceAll('"', "&quot;");
 }
 
+/**
+ * Same delivery path as “Forgot password” (Supabase Auth SMTP).
+ * Used when Resend API cannot send the temporary-password email.
+ */
+async function sendSupabasePasswordSetupLink(input: {
+  email: string;
+  role: ProviderInviteRole;
+}): Promise<{ sent: boolean; error: string | null }> {
+  const url = getSupabaseUrl();
+  const anonKey = getSupabaseAnonKey();
+  if (!url || !anonKey) {
+    return {
+      sent: false,
+      error: "Supabase URL / anon key missing — cannot send password setup link.",
+    };
+  }
+
+  const origin = getServerSiteOrigin();
+  const dashboardPath = input.role === "host" ? "/host/dashboard" : "/homestay/dashboard";
+  const redirectTo = `${origin}/reset-password?redirect=${encodeURIComponent(dashboardPath)}`;
+
+  const client = createClient(url, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { error } = await client.auth.resetPasswordForEmail(input.email.trim().toLowerCase(), {
+    redirectTo,
+  });
+  if (error) {
+    return { sent: false, error: error.message };
+  }
+  return { sent: true, error: null };
+}
+
 export async function sendTemporaryPasswordEmail(input: {
   email: string;
   fullName: string;
   role: ProviderInviteRole;
   temporaryPassword: string;
 }): Promise<{ sent: boolean; warning: string | null }> {
-  if (!isResendConfigured()) {
-    return {
-      sent: false,
-      warning:
-        "Account created, but RESEND_API_KEY / RESEND_FROM_EMAIL is not configured — password email was not sent.",
-    };
-  }
-
   const origin = getServerSiteOrigin();
   const dashboardPath = input.role === "host" ? "/host/dashboard" : "/homestay/dashboard";
   const signInUrl = `${origin}/sign-in?redirect=${encodeURIComponent(dashboardPath)}`;
   const dashboardUrl = `${origin}${dashboardPath}`;
 
-  const result = await sendResendEmailDetailed({
-    to: input.email,
-    subject:
-      input.role === "host"
-        ? "Your host login — The Royal Passage"
-        : "Your property owner login — The Royal Passage",
-    html: temporaryPasswordEmailHtml({
-      fullName: input.fullName,
-      role: input.role,
-      email: input.email.trim().toLowerCase(),
-      temporaryPassword: input.temporaryPassword,
-      signInUrl,
-      dashboardUrl,
-    }),
-  });
+  if (isResendConfigured()) {
+    const result = await sendResendEmailDetailed({
+      to: input.email,
+      subject:
+        input.role === "host"
+          ? "Your host login — The Royal Passage"
+          : "Your property owner login — The Royal Passage",
+      html: temporaryPasswordEmailHtml({
+        fullName: input.fullName,
+        role: input.role,
+        email: input.email.trim().toLowerCase(),
+        temporaryPassword: input.temporaryPassword,
+        signInUrl,
+        dashboardUrl,
+      }),
+    });
 
-  if (!result.ok) {
+    if (result.ok) {
+      return { sent: true, warning: null };
+    }
+
+    const fallback = await sendSupabasePasswordSetupLink({
+      email: input.email,
+      role: input.role,
+    });
+    if (fallback.sent) {
+      return {
+        sent: true,
+        warning: `Temporary-password email failed (${result.error}). Sent a password setup link instead (same as Forgot password).`,
+      };
+    }
+
     return {
       sent: false,
-      warning: `Account created, but the login email failed to send: ${result.error}`,
+      warning: `Account created, but no login email was sent. Resend: ${result.error}. Setup link: ${fallback.error ?? "failed"}.`,
     };
   }
 
-  return { sent: true, warning: null };
+  const fallback = await sendSupabasePasswordSetupLink({
+    email: input.email,
+    role: input.role,
+  });
+  if (fallback.sent) {
+    return {
+      sent: true,
+      warning:
+        "RESEND_API_KEY is not configured — sent a password setup link via Supabase (same as Forgot password) instead of a temporary password email.",
+    };
+  }
+
+  return {
+    sent: false,
+    warning: `Account created, but the login email was not sent: ${fallback.error ?? "unknown error"}`,
+  };
 }
 
 /** Resets password and emails the temporary credentials. */

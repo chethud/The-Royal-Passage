@@ -120,7 +120,7 @@ export function AdminPartnerHomestayApplicationsQueue({
 
     const ok = window.confirm(
       action === "approve"
-        ? "Approve this application? An owner login will be created, a password setup email will be sent, and the homestay will go live with the rooms you entered."
+        ? "Approve this application? An owner login will be created, a temporary password will be emailed, and the homestay will go live with the rooms you entered."
         : "Reject this partner application?",
     );
     if (!ok) return;
@@ -149,8 +149,11 @@ export function AdminPartnerHomestayApplicationsQueue({
               : undefined,
         },
       });
-      if (result.passwordEmailWarning) {
+      if (action === "approve" && result.passwordEmailWarning) {
         setWarning(result.passwordEmailWarning);
+        window.alert(
+          `Homestay published.\n\nEmail note:\n${result.passwordEmailWarning}`,
+        );
       }
       await load();
       setExpandedId(null);
@@ -559,8 +562,9 @@ export function AdminPartnerHomestayApplicationsQueue({
                   </label>
 
                   <p className="luxury-panel-body text-xs leading-relaxed">
-                    Approving creates an owner login for {row.email}, emails a password setup link,
-                    and publishes this homestay with your rooms.
+                    Approving creates an owner login for {row.email}, emails a temporary password
+                    (or a password setup link if Resend fails), and publishes this homestay with your
+                    rooms.
                   </p>
 
                   <div className="flex flex-wrap gap-3">

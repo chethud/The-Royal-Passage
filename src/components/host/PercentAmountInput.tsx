@@ -1,7 +1,7 @@
-import { parseRupeeMajorInput } from "@/lib/money";
+import { parsePercentInput } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
-type RupeeAmountInputProps = {
+type PercentAmountInputProps = {
   value: number;
   onChange: (value: number) => void;
   disabled?: boolean;
@@ -12,8 +12,8 @@ type RupeeAmountInputProps = {
   name?: string;
 };
 
-/** Text input for rupee amounts — no number spinners or leading-zero quirks. */
-export function RupeeAmountInput({
+/** Text input for percentages — matches RupeeAmountInput styling (no number spinners). */
+export function PercentAmountInput({
   value,
   onChange,
   disabled = false,
@@ -22,23 +22,22 @@ export function RupeeAmountInput({
   className,
   id,
   name,
-}: RupeeAmountInputProps) {
-  const whole = Math.round(Number(value));
-  const displayValue = Number.isFinite(whole) && whole > 0 ? String(whole) : "";
+}: PercentAmountInputProps) {
+  const displayValue = value > 0 ? String(value) : "";
 
   return (
     <input
       id={id}
       name={name}
       type="text"
-      inputMode="numeric"
+      inputMode="decimal"
       autoComplete="off"
       spellCheck={false}
       disabled={disabled}
       readOnly={readOnly}
       placeholder={placeholder}
       value={displayValue}
-      onChange={(event) => onChange(parseRupeeMajorInput(event.target.value))}
+      onChange={(event) => onChange(parsePercentInput(event.target.value))}
       className={cn(className)}
     />
   );

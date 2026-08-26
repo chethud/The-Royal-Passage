@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { ExperiencePartyPricingFields } from "@/components/experience/ExperiencePartyPricingFields";
+import { PercentAmountInput } from "@/components/host/PercentAmountInput";
+import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
 import { toErrorMessage } from "@/lib/api/client";
 import { FALLBACK_CATEGORIES } from "@/lib/experience-categories";
@@ -497,18 +498,15 @@ export function PartnerExperienceApplicationForm() {
             />
             <label className="text-sm">
               <span className="eyebrow luxury-panel-label">GST (%)</span>
-              <input
-                type="number"
-                min={0}
-                max={100}
-                step={0.01}
+              <PercentAmountInput
                 value={gstPercent}
-                onChange={(e) => setGstPercent(Number(e.target.value))}
-                className={numberInputClass}
+                onChange={setGstPercent}
+                className={inputClass}
+                placeholder="0"
               />
               <span className="mt-1 block text-xs luxury-panel-body opacity-80">
-                Percent of the total price. Enter 0 if you do not charge GST. If GST is above 0%, a
-                GST number is required.
+                Percent of the experience total added at checkout (e.g. 5 means +5%). Enter 0 if you
+                do not charge GST. If GST is above 0%, a GST number is required.
               </span>
             </label>
             {chargesGst ? (

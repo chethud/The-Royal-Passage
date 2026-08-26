@@ -42,6 +42,8 @@ export type HostExperienceDetail = {
   durationMinutes: number;
   pricePerPersonMinor: number;
   compareAtPricePerPersonMinor?: number | null;
+  gstPercent?: number;
+  gstNumber?: string | null;
   status: string;
   heroImageUrl: string | null;
   galleryUrls: string[];
@@ -72,6 +74,8 @@ export type CreateHostExperiencePayload = {
   durationMinutes: number;
   pricePerPersonMinor: number;
   compareAtPricePerPersonMinor?: number | null;
+  gstPercent?: number;
+  gstNumber?: string | null;
   heroImageUrl?: string;
   galleryUrls?: string[];
   inclusions?: string[];

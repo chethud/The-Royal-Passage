@@ -328,7 +328,10 @@ export function ExperienceBookingPanel({
   const limits = selectedSlot
     ? guestBookingLimits(exp, selectedSlot.available)
     : { min: exp.minGuestsPerBooking ?? 1, max: exp.maxGuestsPerBooking ?? 10 };
-  const totalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
+  const gstPercent = Number(exp.gstPercent ?? 0);
+  const subtotalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
+  const gstMinor = gstPercent > 0 ? Math.round((subtotalMinor * gstPercent) / 100) : 0;
+  const totalMinor = subtotalMinor + gstMinor;
   const groupBooking = isFixedGroupBooking(limits.min, limits.max);
 
   const bookSearch = selectedSlot ? { slotId: selectedSlot.id, guests } : undefined;

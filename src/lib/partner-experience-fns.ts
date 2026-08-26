@@ -427,6 +427,13 @@ export const reviewPartnerExperienceApplication = createServerFn({ method: "POST
       address: String(application.address),
       duration_minutes: Number(application.duration_minutes),
       price_per_person_minor: Number(application.price_per_person_minor),
+      gst_percent: Number(application.gst_percent ?? 0),
+      gst_number:
+        Number(application.gst_percent ?? 0) > 0
+          ? application.gst_number == null
+            ? null
+            : String(application.gst_number)
+          : null,
       hero_image_url: heroImageUrl,
       gallery_urls: galleryUrls,
       inclusions: Array.isArray(application.inclusions) ? application.inclusions : [],

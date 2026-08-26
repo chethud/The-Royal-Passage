@@ -1,4 +1,5 @@
 import { getExperienceCoverImage } from "@/lib/experience-cover-image";
+import { minorToMajor } from "@/lib/money";
 
 type HostEmbed = {
   display_name: string;
@@ -27,6 +28,8 @@ export type ExperienceRow = {
   duration_minutes: number;
   price_per_person_minor: number;
   compare_at_price_per_person_minor?: number | null;
+  gst_percent?: number | null;
+  gst_number?: string | null;
   hero_image_url: string | null;
   inclusions: string[];
   exclusions: string[];
@@ -83,9 +86,9 @@ export function mapRowToExperience(exp: ExperienceRow, slots: SlotRow[]): Experi
     available: s.is_blocked ? 0 : Math.max(0, s.capacity - s.seats_sold),
   }));
 
-  const rupees = Math.round(exp.price_per_person_minor / 100);
+  const rupees = Math.round(minorToMajor(exp.price_per_person_minor));
   const compareAtRupees = exp.compare_at_price_per_person_minor
-    ? Math.round(exp.compare_at_price_per_person_minor / 100)
+    ? Math.round(minorToMajor(exp.compare_at_price_per_person_minor))
     : null;
   const galleryUrls = exp.gallery_urls?.length
     ? exp.gallery_urls
@@ -115,6 +118,7 @@ export function mapRowToExperience(exp: ExperienceRow, slots: SlotRow[]): Experi
     pricePerPerson: rupees,
     compareAtPricePerPerson:
       compareAtRupees != null && compareAtRupees > rupees ? compareAtRupees : null,
+    gstPercent: Number(exp.gst_percent ?? 0),
     rating: Number(exp.average_rating),
     reviewsCount: exp.review_count,
     image,

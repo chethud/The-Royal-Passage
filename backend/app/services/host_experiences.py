@@ -156,6 +156,8 @@ def _map_host_experience(row: dict, slots: list[dict]) -> HostExperienceDetail:
         durationMinutes=int(row.get("duration_minutes") or 60),
         pricePerPersonMinor=int(row.get("price_per_person_minor") or 0),
         compareAtPricePerPersonMinor=row.get("compare_at_price_per_person_minor"),
+        gstPercent=float(row.get("gst_percent") or 0),
+        gstNumber=row.get("gst_number"),
         status=row.get("status") or "draft",
         heroImageUrl=row.get("hero_image_url"),
         galleryUrls=row.get("gallery_urls") or [],
@@ -299,6 +301,12 @@ def create_host_experience(auth: dict, payload: CreateHostExperienceRequest) -> 
             payload.compareAtPricePerPersonMinor,
             payload.pricePerPersonMinor,
         ),
+        "gst_percent": float(payload.gstPercent or 0),
+        "gst_number": (
+            ((payload.gstNumber or "").strip().upper() or None)
+            if float(payload.gstPercent or 0) > 0
+            else None
+        ),
         "hero_image_url": hero_image_url,
         "gallery_urls": gallery_urls,
         "inclusions": payload.inclusions,
@@ -366,6 +374,16 @@ def update_host_experience(
         updates["duration_minutes"] = payload.durationMinutes
     if payload.pricePerPersonMinor is not None:
         updates["price_per_person_minor"] = payload.pricePerPersonMinor
+    if "gstPercent" in payload.model_fields_set:
+        gst_percent = float(payload.gstPercent or 0)
+        updates["gst_percent"] = gst_percent
+        if gst_percent > 0:
+            if "gstNumber" in payload.model_fields_set:
+                updates["gst_number"] = (payload.gstNumber or "").strip().upper() or None
+        else:
+            updates["gst_number"] = None
+    elif "gstNumber" in payload.model_fields_set:
+        updates["gst_number"] = (payload.gstNumber or "").strip().upper() or None
 
     unset = payload.model_fields_set
     if "pricePerPersonMinor" in unset or "compareAtPricePerPersonMinor" in unset:

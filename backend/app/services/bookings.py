@@ -106,7 +106,7 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
     slot_result = (
         supabase.table("experience_slots")
         .select(
-            "*, experiences ( id, title, host_id, price_per_person_minor, currency_code, status, "
+            "*, experiences ( id, title, host_id, price_per_person_minor, gst_percent, currency_code, status, "
             "min_guests_per_booking, max_guests_per_booking, hero_image_url, description, "
             "duration_minutes, address, city, map_link, tagline )"
         )
@@ -150,7 +150,13 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
     except (TypeError, ValueError):
         commission_percent = 10.0
 
-    subtotal_minor = experience["price_per_person_minor"] * payload.guestCount
+    subtotal_minor = int(experience["price_per_person_minor"]) * payload.guestCount
+    try:
+        gst_percent = float(experience.get("gst_percent") or 0)
+    except (TypeError, ValueError):
+        gst_percent = 0.0
+    gst_minor = round((subtotal_minor * gst_percent) / 100) if gst_percent > 0 else 0
+    total_minor = subtotal_minor + gst_minor
     platform_fee_minor = round((subtotal_minor * commission_percent) / 100)
     host_payout_minor = subtotal_minor - platform_fee_minor
 
@@ -165,7 +171,7 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         "guest_count": payload.guestCount,
         "participant_count": payload.guestCount,
         "subtotal_minor": subtotal_minor,
-        "total_amount": subtotal_minor,
+        "total_amount": total_minor,
         "platform_fee_minor": platform_fee_minor,
         "host_payout_minor": host_payout_minor,
         "currency_code": experience["currency_code"],
@@ -215,7 +221,7 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
                 slot_start=slot.get("start_time", ""),
                 slot_end=slot.get("end_time", ""),
                 guest_count=payload.guestCount,
-                total_minor=subtotal_minor,
+                total_minor=total_minor,
                 currency_code=experience["currency_code"],
                 booking_id=booking_id,
                 experience_description=(experience.get("description") or experience.get("tagline") or ""),
@@ -246,7 +252,7 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
             slot_start=slot.get("start_time", ""),
             slot_end=slot.get("end_time", ""),
             guest_count=payload.guestCount,
-            total_minor=subtotal_minor,
+            total_minor=total_minor,
             currency_code=experience["currency_code"],
             booking_id=booking_id,
         ):

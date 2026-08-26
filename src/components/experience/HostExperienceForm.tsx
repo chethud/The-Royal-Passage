@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ExperiencePartyPricingFields } from "@/components/experience/ExperiencePartyPricingFields";
 import { ExperiencePhotoGallery } from "@/components/experience/ExperiencePhotoGallery";
+import { PercentAmountInput } from "@/components/host/PercentAmountInput";
 import type { CategoryOption, HostExperienceDetail } from "@/lib/api/host-experiences";
 import type { CitySummary } from "@/lib/cities";
 import { HOST_CITY_SLUG } from "@/lib/host-form-data";
@@ -11,6 +12,7 @@ import {
   resolveExperiencePartyPricing,
   type ExperiencePartyKind,
 } from "@/lib/experience-party-pricing";
+import { majorToMinor, minorToMajor } from "@/lib/money";
 
 type HostExperienceFormProps = {
   categories: CategoryOption[];
@@ -33,6 +35,8 @@ type HostExperienceFormProps = {
     durationMinutes: number;
     pricePerPersonMinor: number;
     compareAtPricePerPersonMinor?: number | null;
+    gstPercent?: number;
+    gstNumber?: string | null;
     heroImageUrl?: string;
     galleryUrls?: string[];
     inclusions: string[];
@@ -82,7 +86,7 @@ export function HostExperienceForm({
     : null;
   const [partyKind, setPartyKind] = useState<ExperiencePartyKind | null>(initialPartyKind);
   const [priceMajor, setPriceMajor] = useState(
-    initial ? Math.round(initial.pricePerPersonMinor / 100) : 0,
+    initial ? Math.round(minorToMajor(initial.pricePerPersonMinor)) : 0,
   );
   const [compareAtMajor, setCompareAtMajor] = useState(() => {
     if (!initial?.compareAtPricePerPersonMinor) return 0;
@@ -92,8 +96,10 @@ export function HostExperienceForm({
         initial.minGuestsPerBooking,
       );
     }
-    return Math.round(initial.compareAtPricePerPersonMinor / 100);
+    return Math.round(minorToMajor(initial.compareAtPricePerPersonMinor));
   });
+  const [gstPercent, setGstPercent] = useState(Number(initial?.gstPercent ?? 0));
+  const [gstNumber, setGstNumber] = useState(initial?.gstNumber ?? "");
   const [photoUrls, setPhotoUrls] = useState(() => {
     const existing = initial?.galleryUrls?.length
       ? initial.galleryUrls
@@ -160,8 +166,19 @@ export function HostExperienceForm({
       compareAtMajor > 0
         ? partyKind === "group"
           ? perPersonMinorFromGroupTotal(compareAtMajor, groupMembers)
-          : compareAtMajor * 100
+          : majorToMinor(compareAtMajor)
         : null;
+    if (gstPercent < 0 || gstPercent > 100 || !Number.isFinite(gstPercent)) {
+      setPricingError("GST must be between 0% and 100%.");
+      return;
+    }
+    if (gstPercent > 0) {
+      const gstin = gstNumber.trim().toUpperCase();
+      if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gstin)) {
+        setPricingError("Enter a valid 15-character GST number when GST is greater than 0%.");
+        return;
+      }
+    }
     onSubmit({
       title: title.trim(),
       slug: slug.trim() || undefined,
@@ -175,6 +192,8 @@ export function HostExperienceForm({
       durationMinutes,
       pricePerPersonMinor: pricing.pricePerPersonMinor,
       compareAtPricePerPersonMinor,
+      gstPercent,
+      gstNumber: gstPercent > 0 ? gstNumber.trim().toUpperCase() : null,
       heroImageUrl: galleryUrls[0],
       galleryUrls,
       inclusions: splitLines(inclusions),
@@ -327,6 +346,32 @@ export function HostExperienceForm({
             optionClass="border-[oklch(0.88_0.08_86_/_0.35)] bg-background/50 text-foreground"
             optionActiveClass="border-ember bg-ember/10 text-foreground"
           />
+          <label className="text-sm">
+            <span className="eyebrow text-muted-foreground">GST (%)</span>
+            <PercentAmountInput
+              disabled={readOnly}
+              value={gstPercent}
+              onChange={setGstPercent}
+              className={inputClass}
+            />
+            <span className="mt-1 block text-xs text-muted-foreground">
+              Added on top of the experience total at checkout. Enter 0 if you do not charge GST.
+            </span>
+          </label>
+          {gstPercent > 0 ? (
+            <label className="text-sm">
+              <span className="eyebrow text-muted-foreground">GST number</span>
+              <input
+                disabled={readOnly}
+                value={gstNumber}
+                onChange={(e) => setGstNumber(e.target.value.toUpperCase())}
+                className={inputClass}
+                placeholder="22AAAAA0000A1Z5"
+                maxLength={15}
+                autoComplete="off"
+              />
+            </label>
+          ) : null}
         </div>
       </div>
 

@@ -52,7 +52,11 @@ export function useCheckoutBooking({
 
   const isLiveExperience = source === "live";
   const sym = exp.currencySymbol ?? "₹";
-  const totalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
+  const gstPercent = Number(exp.gstPercent ?? 0);
+  const subtotalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
+  const gstMinor =
+    selectedSlot && gstPercent > 0 ? Math.round((subtotalMinor * gstPercent) / 100) : 0;
+  const totalMinor = subtotalMinor + gstMinor;
 
   useEffect(() => {
     if (!selectedSlot) return;
@@ -153,6 +157,9 @@ export function useCheckoutBooking({
     bookableSlots,
     isLiveExperience,
     sym,
+    subtotalMinor,
+    gstPercent,
+    gstMinor,
     totalMinor,
     submit,
   };

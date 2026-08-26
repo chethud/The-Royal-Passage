@@ -33,6 +33,8 @@ export type Experience = {
   pricePerPerson: number;
   /** Optional original / "was" price (majors). */
   compareAtPricePerPerson?: number | null;
+  /** Host GST % added on top of the experience subtotal at checkout. */
+  gstPercent?: number;
   rating: number;
   reviewsCount: number;
   image: string;

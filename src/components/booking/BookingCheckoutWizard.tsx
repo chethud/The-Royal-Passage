@@ -72,6 +72,10 @@ export function BookingCheckoutWizard({
     submit,
   } = checkout;
 
+  const gstPercent = Number(exp.gstPercent ?? 0);
+  const subtotalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
+  const gstMinor = gstPercent > 0 ? Math.round((subtotalMinor * gstPercent) / 100) : 0;
+
   const handleSubmit = async () => {
     const bookingId = await submit();
     if (bookingId) onSuccess(bookingId);
@@ -193,6 +197,16 @@ export function BookingCheckoutWizard({
               }
             />
             <CheckoutWizardSummaryRow label="Guests" value={String(guests)} align="left" />
+            <CheckoutWizardSummaryRow
+              label="Experience"
+              value={selectedSlot ? formatMoney(subtotalMinor, sym) : "—"}
+            />
+            {gstPercent > 0 ? (
+              <CheckoutWizardSummaryRow
+                label={`GST (${gstPercent}%)`}
+                value={selectedSlot ? formatMoney(gstMinor, sym) : "—"}
+              />
+            ) : null}
             <CheckoutWizardSummaryRow label="Payment" value={step >= 2 ? "Pay at venue" : "—"} />
           </>
         }

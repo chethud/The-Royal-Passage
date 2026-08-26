@@ -59,6 +59,7 @@ def map_row_to_experience(row: dict, slots: list[dict]) -> Experience:
             if row.get("compare_at_price_per_person_minor")
             else None
         ),
+        gstPercent=float(row.get("gst_percent") or 0),
         rating=float(row.get("average_rating") or 0),
         reviewsCount=int(row.get("review_count") or 0),
         image=hero,

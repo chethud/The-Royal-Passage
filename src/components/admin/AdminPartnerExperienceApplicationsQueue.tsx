@@ -121,7 +121,7 @@ export function AdminPartnerExperienceApplicationsQueue({
 
     const ok = window.confirm(
       action === "approve"
-        ? "Approve this application? A host login will be created, a password setup email will be sent, and the experience will go live with the sessions you entered."
+        ? "Approve this application? A host login will be created, a temporary password will be emailed, and the experience will go live with the sessions you entered."
         : "Reject this partner application?",
     );
     if (!ok) return;
@@ -139,8 +139,11 @@ export function AdminPartnerExperienceApplicationsQueue({
           slots: action === "approve" ? slotsFor(applicationId) : undefined,
         },
       });
-      if (result.passwordEmailWarning) {
+      if (action === "approve" && result.passwordEmailWarning) {
         setWarning(result.passwordEmailWarning);
+        window.alert(
+          `Experience published.\n\nEmail note:\n${result.passwordEmailWarning}`,
+        );
       }
       await load();
       setExpandedId(null);
@@ -512,8 +515,9 @@ export function AdminPartnerExperienceApplicationsQueue({
                   </label>
 
                   <p className="luxury-panel-body text-xs leading-relaxed">
-                    Approving creates a host login for {row.email}, emails a password setup link,
-                    publishes this experience with your sessions, and marks the host as approved.
+                    Approving creates a host login for {row.email}, emails a temporary password
+                    (or a password setup link if Resend fails), publishes this experience with your
+                    sessions, and marks the host as approved.
                   </p>
 
                   <div className="flex flex-wrap gap-3">

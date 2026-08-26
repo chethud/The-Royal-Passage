@@ -1,3 +1,5 @@
+import { majorToMinor, minorToMajor } from "@/lib/money";
+
 export type ExperiencePartyKind = "solo" | "group";
 
 export function isFixedGroupBooking(minGuests: number, maxGuests: number) {
@@ -10,11 +12,12 @@ export function inferExperiencePartyKind(minGuests: number, maxGuests: number): 
 
 export function perPersonMinorFromGroupTotal(totalMajor: number, members: number) {
   if (members < 1) return 0;
-  return Math.round((totalMajor * 100) / members);
+  const totalMinor = majorToMinor(totalMajor);
+  return Math.round(totalMinor / members);
 }
 
 export function groupTotalMajorFromPerPersonMinor(perPersonMinor: number, members: number) {
-  return Math.round((perPersonMinor * members) / 100);
+  return Math.round(minorToMajor(perPersonMinor * members));
 }
 
 type ResolvePartyPricingInput = {
@@ -55,7 +58,7 @@ export function resolveExperiencePartyPricing(
     }
     return {
       ok: true,
-      pricePerPersonMinor: Math.round(input.priceMajor * 100),
+      pricePerPersonMinor: majorToMinor(input.priceMajor),
       minGuests: 1,
       maxGuests,
     };

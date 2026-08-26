@@ -37,6 +37,7 @@ class Experience(BaseModel):
     verifiedHost: bool
     pricePerPerson: int
     compareAtPricePerPerson: int | None = None
+    gstPercent: float = 0
     rating: float
     reviewsCount: int
     image: str
@@ -1017,6 +1018,8 @@ class HostExperienceDetail(BaseModel):
     durationMinutes: int
     pricePerPersonMinor: int
     compareAtPricePerPersonMinor: int | None = None
+    gstPercent: float = 0
+    gstNumber: str | None = None
     status: str
     heroImageUrl: str | None
     galleryUrls: list[str] = Field(default_factory=list)
@@ -1047,6 +1050,8 @@ class CreateHostExperienceRequest(BaseModel):
     durationMinutes: int = Field(ge=30, le=480)
     pricePerPersonMinor: int = Field(ge=0)
     compareAtPricePerPersonMinor: int | None = Field(default=None, ge=0)
+    gstPercent: float = Field(default=0, ge=0, le=100)
+    gstNumber: str | None = Field(default=None, max_length=20)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] = Field(default_factory=list)
     inclusions: list[str] = Field(default_factory=list)
@@ -1072,6 +1077,8 @@ class UpdateHostExperienceRequest(BaseModel):
     durationMinutes: int | None = Field(default=None, ge=30, le=480)
     pricePerPersonMinor: int | None = Field(default=None, ge=0)
     compareAtPricePerPersonMinor: int | None = Field(default=None, ge=0)
+    gstPercent: float | None = Field(default=None, ge=0, le=100)
+    gstNumber: str | None = Field(default=None, max_length=20)
     heroImageUrl: str | None = Field(default=None, max_length=500)
     galleryUrls: list[str] | None = None
     inclusions: list[str] | None = None
