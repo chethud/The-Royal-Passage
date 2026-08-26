@@ -39,7 +39,11 @@ def get_guest_profile(auth: dict) -> GuestProfile:
     try:
         maybe_send_welcome_email(auth)
     except Exception:
-        pass
+        import logging
+
+        logging.getLogger(__name__).exception(
+            "Welcome email hook failed for user %s", getattr(auth.get("user"), "id", "?")
+        )
 
     profile = auth["profile"]
     user = auth["user"]

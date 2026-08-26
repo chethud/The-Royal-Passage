@@ -1,5 +1,5 @@
 import { PRODUCTION_SITE_ORIGIN } from "@/lib/auth-redirect";
-import { isResendConfigured, sendResendEmail } from "@/lib/resend.server";
+import { isResendConfigured, sendResendEmailDetailed } from "@/lib/resend.server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { UserRole } from "@/lib/roles";
 
@@ -52,14 +52,15 @@ async function syncRoles(userId: string, roles: string[]) {
   if (error) throw new Error(error.message);
 }
 
-function passwordSetupEmailHtml(input: {
+function temporaryPasswordEmailHtml(input: {
   fullName: string;
   role: ProviderInviteRole;
-  setupUrl: string;
+  email: string;
+  temporaryPassword: string;
+  signInUrl: string;
+  dashboardUrl: string;
 }): string {
   const roleLabel = input.role === "host" ? "experience host" : "homestay owner";
-  const dashboardPath = input.role === "host" ? "/host/dashboard" : "/homestay/dashboard";
-  const origin = getServerSiteOrigin();
 
   return `
   <div style="font-family: Georgia, 'Times New Roman', serif; background:#2A0000; color:#F7E7C2; padding:32px;">
@@ -67,17 +68,24 @@ function passwordSetupEmailHtml(input: {
       <p style="letter-spacing:0.18em;text-transform:uppercase;font-size:11px;color:#D4A84B;margin:0 0 12px;">The Royal Passage</p>
       <h1 style="font-size:28px;margin:0 0 16px;color:#F7E7C2;">Welcome, ${escapeHtml(input.fullName)}</h1>
       <p style="font-size:15px;line-height:1.6;color:rgba(247,231,194,0.9);">
-        Your ${roleLabel} account is ready. Set your password to open your dashboard and manage your listing.
+        Your ${roleLabel} application was approved. Use the temporary password below to sign in, then change it from your profile.
       </p>
+      <div style="margin:24px 0;padding:16px 18px;background:rgba(0,0,0,0.28);border:1px solid rgba(247,231,194,0.18);">
+        <p style="margin:0 0 10px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#D4A84B;">Sign-in email</p>
+        <p style="margin:0 0 16px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;color:#F7E7C2;">${escapeHtml(input.email)}</p>
+        <p style="margin:0 0 10px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#D4A84B;">Temporary password</p>
+        <p style="margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;color:#F7E7C2;">${escapeHtml(input.temporaryPassword)}</p>
+      </div>
       <p style="margin:28px 0;">
-        <a href="${escapeHtml(input.setupUrl)}"
+        <a href="${escapeHtml(input.signInUrl)}"
            style="display:inline-block;background:#D4A84B;color:#2A0000;text-decoration:none;padding:12px 22px;font-size:14px;font-weight:600;">
-          Set your password
+          Sign in
         </a>
       </p>
       <p style="font-size:13px;line-height:1.5;color:rgba(247,231,194,0.7);">
-        After setting your password, sign in and visit
-        <a href="${escapeHtml(`${origin}${dashboardPath}`)}" style="color:#D4A84B;">your dashboard</a>.
+        After signing in, open
+        <a href="${escapeHtml(input.dashboardUrl)}" style="color:#D4A84B;">your dashboard</a>
+        to manage your listing.
       </p>
     </div>
   </div>`;
@@ -91,35 +99,12 @@ function escapeHtml(value: string) {
     .replaceAll('"', "&quot;");
 }
 
-export async function sendPasswordSetupEmail(input: {
+export async function sendTemporaryPasswordEmail(input: {
   email: string;
   fullName: string;
   role: ProviderInviteRole;
+  temporaryPassword: string;
 }): Promise<{ sent: boolean; warning: string | null }> {
-  const supabase = getSupabaseAdmin();
-  const redirectTo = `${getServerSiteOrigin()}/reset-password?redirect=${encodeURIComponent(
-    input.role === "host" ? "/host/dashboard" : "/homestay/dashboard",
-  )}`;
-
-  const { data, error } = await supabase.auth.admin.generateLink({
-    type: "recovery",
-    email: input.email.trim().toLowerCase(),
-    options: { redirectTo },
-  });
-
-  if (error) {
-    return { sent: false, warning: `Password setup link could not be created: ${error.message}` };
-  }
-
-  const setupUrl =
-    data.properties?.action_link ||
-    (data as { action_link?: string }).action_link ||
-    null;
-
-  if (!setupUrl) {
-    return { sent: false, warning: "Password setup link was empty — ask admin to resend from Users." };
-  }
-
   if (!isResendConfigured()) {
     return {
       sent: false,
@@ -128,31 +113,66 @@ export async function sendPasswordSetupEmail(input: {
     };
   }
 
-  const sent = await sendResendEmail({
+  const origin = getServerSiteOrigin();
+  const dashboardPath = input.role === "host" ? "/host/dashboard" : "/homestay/dashboard";
+  const signInUrl = `${origin}/sign-in?redirect=${encodeURIComponent(dashboardPath)}`;
+  const dashboardUrl = `${origin}${dashboardPath}`;
+
+  const result = await sendResendEmailDetailed({
     to: input.email,
     subject:
       input.role === "host"
-        ? "Set your host password — The Royal Passage"
-        : "Set your property owner password — The Royal Passage",
-    html: passwordSetupEmailHtml({
+        ? "Your host login — The Royal Passage"
+        : "Your property owner login — The Royal Passage",
+    html: temporaryPasswordEmailHtml({
       fullName: input.fullName,
       role: input.role,
-      setupUrl,
+      email: input.email.trim().toLowerCase(),
+      temporaryPassword: input.temporaryPassword,
+      signInUrl,
+      dashboardUrl,
     }),
   });
 
-  if (!sent) {
+  if (!result.ok) {
     return {
       sent: false,
-      warning: "Account created, but the password setup email failed to send via Resend.",
+      warning: `Account created, but the login email failed to send: ${result.error}`,
     };
   }
 
   return { sent: true, warning: null };
 }
 
+/** Resets password and emails the temporary credentials. */
+export async function sendPasswordSetupEmail(input: {
+  email: string;
+  fullName: string;
+  role: ProviderInviteRole;
+}): Promise<{ sent: boolean; warning: string | null }> {
+  const supabase = getSupabaseAdmin();
+  const temporaryPassword = randomPassword();
+  const userId = await findAuthUserIdByEmail(input.email);
+  if (!userId) {
+    return { sent: false, warning: "Could not find the user login to set a temporary password." };
+  }
+  const { error } = await supabase.auth.admin.updateUserById(userId, {
+    password: temporaryPassword,
+    email_confirm: true,
+  });
+  if (error) {
+    return { sent: false, warning: `Could not set temporary password: ${error.message}` };
+  }
+  return sendTemporaryPasswordEmail({
+    email: input.email,
+    fullName: input.fullName,
+    role: input.role,
+    temporaryPassword,
+  });
+}
+
 /**
- * Create or reuse auth user + host/homestay_owner row, then send password setup email.
+ * Create or reuse auth user + host/homestay_owner row, then email a temporary password.
  * Host/owner rows are approved + verified for partner-publish flow.
  */
 export async function createProviderLogin(input: {
@@ -168,6 +188,7 @@ export async function createProviderLogin(input: {
   const fullName = input.fullName.trim();
   const phone = input.phone?.trim() || null;
   const bio = input.bio?.trim() || null;
+  const temporaryPassword = randomPassword();
 
   let userId = await findAuthUserIdByEmail(email);
   let createdNewUser = false;
@@ -175,7 +196,7 @@ export async function createProviderLogin(input: {
   if (!userId) {
     const { data: created, error } = await supabase.auth.admin.createUser({
       email,
-      password: randomPassword(),
+      password: temporaryPassword,
       email_confirm: true,
       user_metadata: {
         full_name: fullName,
@@ -183,14 +204,32 @@ export async function createProviderLogin(input: {
       },
     });
     if (error || !created.user) {
-      // Race: user may have been created concurrently
       userId = await findAuthUserIdByEmail(email);
       if (!userId) {
         throw new Error(error?.message ?? "Failed to create user login.");
       }
+      const { error: resetError } = await supabase.auth.admin.updateUserById(userId, {
+        password: temporaryPassword,
+        email_confirm: true,
+      });
+      if (resetError) {
+        throw new Error(resetError.message);
+      }
     } else {
       userId = created.user.id;
       createdNewUser = true;
+    }
+  } else {
+    const { error: resetError } = await supabase.auth.admin.updateUserById(userId, {
+      password: temporaryPassword,
+      email_confirm: true,
+      user_metadata: {
+        full_name: fullName,
+        phone,
+      },
+    });
+    if (resetError) {
+      throw new Error(resetError.message);
     }
   }
 
@@ -218,23 +257,45 @@ export async function createProviderLogin(input: {
         })
         .eq("id", hostId);
     } else {
-      const { data: hostRow, error: hostError } = await supabase
+      const { data: orphanHost } = await supabase
         .from("hosts")
-        .insert({
-          auth_user_id: userId,
-          display_name: fullName,
-          email,
-          phone,
-          bio,
-          verified: true,
-          approval_status: "approved",
-        })
         .select("id")
-        .single();
-      if (hostError || !hostRow) {
-        throw new Error(hostError?.message ?? "Failed to create host profile.");
+        .eq("email", email)
+        .is("auth_user_id", null)
+        .maybeSingle();
+
+      if (orphanHost?.id) {
+        hostId = String(orphanHost.id);
+        await supabase
+          .from("hosts")
+          .update({
+            auth_user_id: userId,
+            display_name: fullName,
+            phone,
+            bio,
+            verified: true,
+            approval_status: "approved",
+          })
+          .eq("id", hostId);
+      } else {
+        const { data: hostRow, error: hostError } = await supabase
+          .from("hosts")
+          .insert({
+            auth_user_id: userId,
+            display_name: fullName,
+            email,
+            phone,
+            bio,
+            verified: true,
+            approval_status: "approved",
+          })
+          .select("id")
+          .single();
+        if (hostError || !hostRow) {
+          throw new Error(hostError?.message ?? "Failed to create host profile.");
+        }
+        hostId = String(hostRow.id);
       }
-      hostId = String(hostRow.id);
     }
   }
 
@@ -302,14 +363,12 @@ export async function createProviderLogin(input: {
     })
     .eq("id", userId);
 
-  // Preserve multi-role if guest/etc already present — ensure provider role is included.
   const { data: existingRoles } = await supabase
     .from("user_roles")
     .select("role")
     .eq("user_id", userId);
   const roles = new Set((existingRoles ?? []).map((r) => String(r.role)));
   roles.add(input.role);
-  // Primary provider role; drop guest if promoting
   if (roles.has("guest") && (input.role === "host" || input.role === "homestay_owner")) {
     roles.delete("guest");
   }
@@ -326,10 +385,11 @@ export async function createProviderLogin(input: {
     // Non-fatal
   }
 
-  const emailResult = await sendPasswordSetupEmail({
+  const emailResult = await sendTemporaryPasswordEmail({
     email,
     fullName,
     role: input.role,
+    temporaryPassword,
   });
 
   return {

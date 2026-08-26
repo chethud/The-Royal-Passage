@@ -119,6 +119,7 @@ def maybe_send_welcome_email(auth: dict) -> None:
         + royal_paragraph(royal_link(_site_link("/"), "Explore experiences")),
     )
     if not send_email(to=user.email, subject=subject, html=html):
+        logger.error("Welcome email was not sent to %s", user.email)
         return
 
     from app.services.notifications import create_notification
@@ -132,7 +133,7 @@ def maybe_send_welcome_email(auth: dict) -> None:
             {},
         )
     except Exception:
-        pass
+        logger.exception("Failed to record account_welcome notification for %s", user.id)
 
 
 def send_experience_booking_requested_email(
