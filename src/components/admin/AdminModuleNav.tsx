@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Compass, Crown, Home } from "lucide-react";
+import { Compass, Crown, Home, Briefcase } from "lucide-react";
 import {
   adminModuleHome,
   adminModuleHostRequestsPath,
@@ -35,6 +35,12 @@ const modules: {
     label: "VIP",
     description: "Packages, owners & approvals",
     icon: Crown,
+  },
+  {
+    id: "travel_agent",
+    label: "Travel agent",
+    description: "Agent applications & bookings",
+    icon: Briefcase,
   },
 ];
 

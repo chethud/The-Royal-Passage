@@ -4,7 +4,7 @@ import type { WishlistItem } from "@/lib/api/wishlist";
 import { guestBookingLimits } from "@/lib/booking-url";
 import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
 import type { HomestayBrowseSearch } from "@/lib/homestay-filters";
-import { weekdayPriceMajor } from "@/lib/homestay-day-pricing";
+import { startingNightPriceMajor, weekdayPriceMajor, weekendPriceMajor } from "@/lib/homestay-day-pricing";
 
 export type ExperienceCartItem = {
   kind: "experience";
@@ -210,7 +210,7 @@ export function cartItemFromHomestay(
     tagline: stay.tagline,
     city: stay.city,
     image: stay.image,
-    pricePerNight: weekdayPriceMajor(stay),
+    pricePerNight: startingNightPriceMajor(weekdayPriceMajor(stay), weekendPriceMajor(stay)),
     currencySymbol: stay.currencySymbol ?? "₹",
     checkIn: search?.checkIn,
     checkOut: search?.checkOut,

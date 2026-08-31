@@ -9,6 +9,12 @@ export type CreateHomestayBookingPayload = {
   roomCount?: number;
   extraBedCount?: number;
   notes?: string;
+  guestName?: string;
+  guestEmail?: string;
+  guestPhone?: string;
+  agentMarkupMinor?: number;
+  clientSendConfirmation?: boolean;
+  clientEmailIncludePrice?: boolean;
 };
 
 export type CreateHomestayBookingResult = {

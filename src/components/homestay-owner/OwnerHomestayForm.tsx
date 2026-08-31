@@ -12,6 +12,11 @@ import {
 import { majorToMinor, minorToMajor } from "@/lib/money";
 import { uploadHomestayLicenseCertificate } from "@/lib/homestay-license-upload";
 import { isSupabaseBrowserConfigured } from "@/lib/supabase/browser";
+import {
+  countWords,
+  HOMESTAY_DESCRIPTION_MAX_WORDS,
+  limitWordsOnInput,
+} from "@/lib/word-limit";
 
 type OwnerHomestayFormProps = {
   cities: CitySummary[];
@@ -141,6 +146,10 @@ export function OwnerHomestayForm({
         return;
       }
     }
+    if (countWords(description) > HOMESTAY_DESCRIPTION_MAX_WORDS) {
+      setFormError(`Description must be ${HOMESTAY_DESCRIPTION_MAX_WORDS} words or fewer.`);
+      return;
+    }
     const galleryUrls = photoUrls.map((url) => url.trim()).filter(Boolean);
     const payload = {
       title: title.trim(),
@@ -225,10 +234,15 @@ export function OwnerHomestayForm({
           <textarea
             className={`${inputClass} min-h-32`}
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) =>
+              setDescription(limitWordsOnInput(e.target.value, HOMESTAY_DESCRIPTION_MAX_WORDS))
+            }
             required
             disabled={disabled || saving}
           />
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            {countWords(description)} / {HOMESTAY_DESCRIPTION_MAX_WORDS} words
+          </p>
         </label>
       </section>
 

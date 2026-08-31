@@ -1,6 +1,12 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
+import { GuestContactFields } from "@/components/booking/GuestContactFields";
+import {
+  DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS,
+  TravelAgentBookingExtras,
+  travelAgentOptionsToPayload,
+} from "@/components/travel-agent/TravelAgentBookingExtras";
 import {
   CheckoutWizardConfirmRow,
   CheckoutWizardStepBody,
@@ -15,9 +21,13 @@ import { HomestayCashPaymentSelector } from "@/components/homestays/HomestayCash
 import { PayAtHomestayBadge } from "@/components/homestays/PayAtHomestayBadge";
 import type { Homestay } from "@/data/homestays";
 import { useHomestayCheckout } from "@/hooks/use-homestay-checkout";
+import { useGuestContactDetails } from "@/hooks/use-guest-contact-details";
 import { formatDateLong } from "@/lib/date-format";
 import { buildHomestayBookSearch } from "@/lib/homestay-booking-url";
 import { formatMoney } from "@/lib/money";
+import { fetchTravelAgentProfile } from "@/lib/partner-travel-agent-fns";
+import { isTravelAgentRole, type UserRole } from "@/lib/roles";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 type HomestayCheckoutWizardProps = {
   stay: Homestay;
@@ -29,6 +39,7 @@ type HomestayCheckoutWizardProps = {
   initialRoomCount?: number;
   initialExtraBeds?: number;
   onSuccess: (bookingId: string) => void;
+  userRole?: string | null;
   backLink: {
     to: "/homestays/$slug";
     params: { slug: string };
@@ -52,9 +63,42 @@ export function HomestayCheckoutWizard({
   initialRoomCount,
   initialExtraBeds,
   onSuccess,
+  userRole = null,
   backLink,
 }: HomestayCheckoutWizardProps) {
   const navigate = useNavigate();
+  const contactDetails = useGuestContactDetails();
+  const isTravelAgent = isTravelAgentRole(userRole as UserRole | null);
+  const [markupMajor, setMarkupMajor] = useState(0);
+  const [clientSendConfirmation, setClientSendConfirmation] = useState(
+    DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS.clientSendConfirmation,
+  );
+  const [clientEmailIncludePrice, setClientEmailIncludePrice] = useState(
+    DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS.clientEmailIncludePrice,
+  );
+  const [discountPercent, setDiscountPercent] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!isTravelAgent) return;
+    void getSupabaseBrowser()
+      .auth.getSession()
+      .then(({ data }) => {
+        const token = data.session?.access_token;
+        if (!token) return;
+        return fetchTravelAgentProfile({ data: { accessToken: token } });
+      })
+      .then((profile) => {
+        if (profile) setDiscountPercent(profile.discountPercent);
+      })
+      .catch(() => undefined);
+  }, [isTravelAgent]);
+
+  const agentOptions = travelAgentOptionsToPayload(
+    markupMajor,
+    clientSendConfirmation,
+    clientEmailIncludePrice,
+  );
+
   const checkout = useHomestayCheckout(stay, {
     initialCheckIn,
     initialCheckOut,
@@ -62,6 +106,10 @@ export function HomestayCheckoutWizard({
     initialRoomId,
     initialRoomCount,
     initialExtraBeds,
+    contact: contactDetails.contact,
+    syncContact: contactDetails.syncToProfile,
+    isTravelAgent,
+    agentOptions,
   });
   const bookable = source === "live" && !stay.id.startsWith("stay-");
   const sym = stay.currencySymbol ?? "₹";
@@ -94,8 +142,14 @@ export function HomestayCheckoutWizard({
   ]);
 
   const handleSubmit = async () => {
-    const bookingId = await checkout.submit();
-    if (bookingId) onSuccess(bookingId);
+    contactDetails.setShowErrors(true);
+    if (!contactDetails.isValid) return;
+    try {
+      const bookingId = await checkout.submit();
+      if (bookingId) onSuccess(bookingId);
+    } catch {
+      // Error message is set inside the checkout hook.
+    }
   };
 
   const roomSummary = checkout.selectedRoom
@@ -203,7 +257,30 @@ export function HomestayCheckoutWizard({
             description="Review your details, then submit your stay request to the host."
           />
           <CheckoutWizardStepBody>
-            <dl className="luxury-panel-body space-y-0 text-sm">
+            <GuestContactFields
+              value={contactDetails.contact}
+              onChange={contactDetails.setContact}
+              showErrors={contactDetails.showErrors}
+              surface="light"
+              heading={isTravelAgent ? "Customer contact" : undefined}
+              description={
+                isTravelAgent
+                  ? "Enter the guest's details for this stay. Confirmation emails can be sent to them separately."
+                  : undefined
+              }
+            />
+            {isTravelAgent ? (
+              <TravelAgentBookingExtras
+                markupMajor={markupMajor}
+                onMarkupMajorChange={setMarkupMajor}
+                clientSendConfirmation={clientSendConfirmation}
+                onClientSendConfirmationChange={setClientSendConfirmation}
+                clientEmailIncludePrice={clientEmailIncludePrice}
+                onClientEmailIncludePriceChange={setClientEmailIncludePrice}
+                discountPercent={discountPercent}
+              />
+            ) : null}
+            <dl className="luxury-panel-body mt-6 space-y-0 text-sm sm:mt-8">
               <CheckoutWizardConfirmRow label="Property" value={stay.title} />
               <CheckoutWizardConfirmRow
                 label="Dates"
@@ -255,7 +332,7 @@ export function HomestayCheckoutWizard({
             primary={{
               label: checkout.busy ? "Submitting…" : "Request stay",
               onClick: () => void handleSubmit(),
-              disabled: checkout.busy,
+              disabled: checkout.busy || !contactDetails.isValid,
               showArrow: false,
             }}
           />

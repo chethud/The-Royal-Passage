@@ -163,6 +163,12 @@ class CreateHomestayBookingRequest(BaseModel):
     notes: str | None = Field(default=None, max_length=500)
     roomCount: int = Field(default=1, ge=1, le=20)
     extraBedCount: int = Field(default=0, ge=0, le=20)
+    guestName: str | None = Field(default=None, max_length=120)
+    guestEmail: str | None = Field(default=None, max_length=200)
+    guestPhone: str | None = Field(default=None, max_length=40)
+    agentMarkupMinor: int = Field(default=0, ge=0, le=50_000_000)
+    clientSendConfirmation: bool = False
+    clientEmailIncludePrice: bool = True
 
 
 class CreateHomestayBookingResponse(BaseModel):
@@ -258,6 +264,21 @@ class OwnerHomestayDetail(BaseModel):
     licenseCertificateUrl: str | None = None
 
 
+HOMESTAY_DESCRIPTION_MAX_WORDS = 70
+
+
+def _word_count(value: str) -> int:
+    return len(value.split())
+
+
+def _validate_homestay_description_words(value: str) -> str:
+    if _word_count(value) > HOMESTAY_DESCRIPTION_MAX_WORDS:
+        raise ValueError(
+            f"Description must be {HOMESTAY_DESCRIPTION_MAX_WORDS} words or fewer."
+        )
+    return value
+
+
 class CreateOwnerHomestayRequest(BaseModel):
     title: str = Field(min_length=5, max_length=120)
     slug: str | None = Field(default=None, max_length=120, pattern=r"^[a-z0-9-]+$")
@@ -290,6 +311,11 @@ class CreateOwnerHomestayRequest(BaseModel):
     extraBedWeekendPricePerNightMinor: int = Field(default=0, ge=0)
     extraBedsPerRoom: int = Field(default=1, ge=1, le=2)
     licenseCertificateUrl: str = Field(min_length=10, max_length=2048)
+
+    @field_validator("description")
+    @classmethod
+    def validate_description_words(cls, value: str) -> str:
+        return _validate_homestay_description_words(value)
 
 
 class UpdateOwnerHomestayRequest(BaseModel):
@@ -324,6 +350,13 @@ class UpdateOwnerHomestayRequest(BaseModel):
     extraBedWeekendPricePerNightMinor: int | None = Field(default=None, ge=0)
     extraBedsPerRoom: int | None = Field(default=None, ge=1, le=2)
     licenseCertificateUrl: str | None = Field(default=None, min_length=10, max_length=2048)
+
+    @field_validator("description")
+    @classmethod
+    def validate_description_words(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        return _validate_homestay_description_words(value)
 
 
 class CreateOwnerHomestayRoomRequest(BaseModel):
@@ -680,6 +713,12 @@ class CreateBookingRequest(BaseModel):
     slotId: str
     guestCount: int = Field(ge=1, le=50)
     notes: str | None = Field(default=None, max_length=500)
+    guestName: str | None = Field(default=None, max_length=120)
+    guestEmail: str | None = Field(default=None, max_length=200)
+    guestPhone: str | None = Field(default=None, max_length=40)
+    agentMarkupMinor: int = Field(default=0, ge=0, le=50_000_000)
+    clientSendConfirmation: bool = False
+    clientEmailIncludePrice: bool = True
 
 
 class CreateBookingResponse(BaseModel):
@@ -1306,3 +1345,34 @@ class AdminBookingRow(BaseModel):
     hostPayoutMinor: int = 0
     hostName: str | None = None
     isPaused: bool = False
+
+
+class TravelAgentBookingSummary(BaseModel):
+    id: str
+    kind: str  # experience | homestay
+    title: str
+    slug: str | None = None
+    clientName: str | None = None
+    clientEmail: str | None = None
+    clientPhone: str | None = None
+    bookingStatus: str
+    paymentStatus: str
+    totalAmount: int
+    agentMarkupMinor: int = 0
+    agentDiscountPercent: float | None = None
+    currencyCode: str = "INR"
+    currencySymbol: str = "₹"
+    createdAt: str = ""
+    slotDate: str | None = None
+    slotStart: str | None = None
+    slotEnd: str | None = None
+    guestCount: int | None = None
+    checkIn: str | None = None
+    checkOut: str | None = None
+    nights: int | None = None
+
+
+class AdminTravelAgentBookingSummary(TravelAgentBookingSummary):
+    agentCompanyName: str | None = None
+    agentContactName: str | None = None
+    agentEmail: str | None = None

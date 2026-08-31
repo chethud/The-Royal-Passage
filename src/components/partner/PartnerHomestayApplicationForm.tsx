@@ -10,6 +10,11 @@ import { validateExperiencePhotoFile } from "@/lib/experience-photo-upload";
 import { uploadPartnerExperiencePhoto } from "@/lib/partner-experience-fns";
 import { submitPartnerHomestayApplication } from "@/lib/partner-homestay-fns";
 import { normalizeTenDigitPhone, sanitizeTenDigitPhoneInput, TEN_DIGIT_PHONE_INPUT_PROPS } from "@/lib/phone";
+import {
+  countWords,
+  HOMESTAY_DESCRIPTION_MAX_WORDS,
+  limitWordsOnInput,
+} from "@/lib/word-limit";
 
 const inputClass =
   "mt-1 w-full rounded-sm border border-[rgb(74_0_0/0.2)] bg-[rgb(255_255_255/0.55)] px-3 py-2 text-sm luxury-panel-body placeholder:text-[rgb(58_0_0/0.4)] focus:border-[#4A0000]/50 focus:outline-none focus:ring-1 focus:ring-[#4A0000]/25";
@@ -164,6 +169,10 @@ export function PartnerHomestayApplicationForm() {
     const normalizedPhone = normalizeTenDigitPhone(phone);
     if (!normalizedPhone) {
       setError("Enter a valid 10-digit mobile number.");
+      return;
+    }
+    if (countWords(description) > HOMESTAY_DESCRIPTION_MAX_WORDS) {
+      setError(`Description must be ${HOMESTAY_DESCRIPTION_MAX_WORDS} words or fewer.`);
       return;
     }
 
@@ -420,9 +429,14 @@ export function PartnerHomestayApplicationForm() {
                 required
                 rows={6}
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) =>
+                  setDescription(limitWordsOnInput(e.target.value, HOMESTAY_DESCRIPTION_MAX_WORDS))
+                }
                 className={inputClass}
               />
+              <p className="mt-1.5 text-xs luxury-panel-body opacity-75">
+                {countWords(description)} / {HOMESTAY_DESCRIPTION_MAX_WORDS} words
+              </p>
             </label>
           </div>
         </section>

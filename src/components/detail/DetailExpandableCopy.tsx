@@ -1,15 +1,23 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { detailSectionLabelClass } from "@/components/detail/DetailPageLayout";
+import { truncateToWordLimit } from "@/lib/word-limit";
 import { cn } from "@/lib/utils";
 
 type DetailExpandableCopyProps = {
   label: string;
   children: string;
   className?: string;
+  maxWords?: number;
 };
 
 /** Long stay/description copy with Read more when the text overflows. */
-export function DetailExpandableCopy({ label, children, className = "" }: DetailExpandableCopyProps) {
+export function DetailExpandableCopy({
+  label,
+  children,
+  className = "",
+  maxWords,
+}: DetailExpandableCopyProps) {
+  const copy = maxWords ? truncateToWordLimit(children, maxWords) : children;
   const textId = useId();
   const copyRef = useRef<HTMLParagraphElement>(null);
   const [expanded, setExpanded] = useState(false);
@@ -31,7 +39,7 @@ export function DetailExpandableCopy({ label, children, className = "" }: Detail
     const observer = new ResizeObserver(measure);
     observer.observe(el);
     return () => observer.disconnect();
-  }, [children, expanded]);
+  }, [copy, expanded]);
 
   return (
     <div className={cn("flex flex-col", className)}>
@@ -48,7 +56,7 @@ export function DetailExpandableCopy({ label, children, className = "" }: Detail
               "[mask-image:linear-gradient(180deg,#000_78%,transparent)]",
           )}
         >
-          {children}
+          {copy}
         </p>
       </div>
       {overflows || expanded ? (

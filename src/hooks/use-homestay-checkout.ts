@@ -13,12 +13,13 @@ import {
   usesPropertyLevelExtraBeds,
 } from "@/lib/homestay-room-pricing";
 import {
-  formatWeekdayWeekendRates,
+  formatStartingNightRate,
   weekdayPriceMajor,
   weekendPriceMajor,
 } from "@/lib/homestay-day-pricing";
 import { formatMoney } from "@/lib/money";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
+import type { TravelAgentBookingOptions } from "@/components/travel-agent/TravelAgentBookingExtras";
 
 function addDays(iso: string, days: number) {
   const date = new Date(`${iso}T12:00:00`);
@@ -41,6 +42,10 @@ export function useHomestayCheckout(
     initialRoomId?: string;
     initialRoomCount?: number;
     initialExtraBeds?: number;
+    contact?: GuestContactDetails;
+    syncContact?: () => Promise<void>;
+    isTravelAgent?: boolean;
+    agentOptions?: TravelAgentBookingOptions;
   } = {},
 ) {
   const rooms = getActiveRooms(homestay);
@@ -185,6 +190,9 @@ export function useHomestayCheckout(
     setBusy(true);
     setError(null);
     try {
+      if (options.syncContact && !options.isTravelAgent) {
+        await options.syncContact();
+      }
       const result = await createHomestayBooking(token, {
         homestayId: homestay.id,
         roomId: roomId ?? (rooms.length === 1 ? rooms[0]?.id : undefined),
@@ -194,6 +202,16 @@ export function useHomestayCheckout(
         roomCount: rooms.length ? roomCount : undefined,
         extraBedCount: rooms.length ? extraBedCount : undefined,
         notes: notes.trim() || undefined,
+        ...(options.isTravelAgent && options.contact
+          ? {
+              guestName: options.contact.fullName.trim(),
+              guestEmail: options.contact.email.trim(),
+              guestPhone: options.contact.phone.trim(),
+              agentMarkupMinor: options.agentOptions?.agentMarkupMinor ?? 0,
+              clientSendConfirmation: options.agentOptions?.clientSendConfirmation ?? false,
+              clientEmailIncludePrice: options.agentOptions?.clientEmailIncludePrice ?? true,
+            }
+          : {}),
       });
       return result.bookingId;
     } catch (err) {
@@ -211,6 +229,10 @@ export function useHomestayCheckout(
     homestay.id,
     nights,
     notes,
+    options.agentOptions,
+    options.contact,
+    options.isTravelAgent,
+    options.syncContact,
     paymentMethod,
     roomCount,
     roomId,
@@ -247,7 +269,7 @@ export function useHomestayCheckout(
     gstMinor,
     totalMinor,
     totalLabel: formatMoney(totalMinor, sym),
-    nightlyLabel: formatWeekdayWeekendRates(
+    nightlyLabel: formatStartingNightRate(
       sym,
       weekdayPriceMajor(homestay, selectedRoom),
       weekendPriceMajor(homestay, selectedRoom),

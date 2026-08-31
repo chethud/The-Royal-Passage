@@ -91,6 +91,7 @@ function BookHomestayPage() {
           <HomestayCheckoutWizard
             stay={stay}
             source={source}
+            userRole={role}
             initialCheckIn={bookSearch.checkIn}
             initialCheckOut={bookSearch.checkOut}
             initialGuests={bookSearch.guests}

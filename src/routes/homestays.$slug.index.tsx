@@ -30,6 +30,7 @@ import {
   weekdayPriceMajor,
   weekendPriceMajor,
 } from "@/lib/homestay-day-pricing";
+import { HOMESTAY_DESCRIPTION_MAX_WORDS } from "@/lib/word-limit";
 import { HomestayOfferRates } from "@/components/pricing/OfferPrice";
 import { getHomestayForDetail } from "@/lib/homestay-fns";
 import { SITE_URL } from "@/lib/seo";
@@ -166,15 +167,6 @@ function HomestayDetailPage() {
                 <DetailDivider className="!my-0" />
               </div>
 
-              <div className="space-y-2">
-                <DetailExpandableCopy label="About this stay">{stay.description}</DetailExpandableCopy>
-                <DetailLocationBlock
-                  locationLine={locationLine}
-                  address={stay.address}
-                  mapLink={stay.mapLink}
-                />
-              </div>
-
               {stay.amenities.length > 0 ? (
                 <DetailDarkSection label="Amenities" className="!mt-0">
                   <div className="flex flex-wrap gap-2">
@@ -189,6 +181,17 @@ function HomestayDetailPage() {
                   </div>
                 </DetailDarkSection>
               ) : null}
+
+              <div className="space-y-2">
+                <DetailExpandableCopy label="About this stay" maxWords={HOMESTAY_DESCRIPTION_MAX_WORDS}>
+                  {stay.description}
+                </DetailExpandableCopy>
+                <DetailLocationBlock
+                  locationLine={locationLine}
+                  address={stay.address}
+                  mapLink={stay.mapLink}
+                />
+              </div>
 
               <div className="flex items-center gap-2 text-sm text-[#D6C8B5]/85">
                 <Users className="h-4 w-4 text-[#D4AF37]" aria-hidden />

@@ -1,6 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import {
+  countWords,
+  HOMESTAY_DESCRIPTION_MAX_WORDS,
+} from "@/lib/word-limit";
+import {
   createProviderLogin,
   ensureUniqueSlug,
   slugifyTitle,
@@ -32,7 +36,10 @@ const submitSchema = z
     gstNumber: z.string().trim().toUpperCase().max(20).optional(),
     title: z.string().trim().min(3).max(200),
     tagline: z.string().trim().max(280).optional(),
-    description: z.string().trim().min(20).max(8000),
+    description: z.string().trim().min(20).refine(
+      (value) => countWords(value) <= HOMESTAY_DESCRIPTION_MAX_WORDS,
+      `Description must be ${HOMESTAY_DESCRIPTION_MAX_WORDS} words or fewer.`,
+    ),
     propertyType: propertyTypeSchema,
     region: z.string().trim().max(120).optional(),
     address: z.string().trim().min(5).max(500),

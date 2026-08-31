@@ -5,12 +5,13 @@ import { isResendConfigured, sendResendEmailDetailed } from "@/lib/resend.server
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { UserRole } from "@/lib/roles";
 
-export type ProviderInviteRole = Extract<UserRole, "host" | "homestay_owner">;
+export type ProviderInviteRole = Extract<UserRole, "host" | "homestay_owner" | "travel_agent">;
 
 export type CreatedProviderLogin = {
   userId: string;
   hostId: string | null;
   homestayOwnerId: string | null;
+  travelAgentId: string | null;
   createdNewUser: boolean;
   passwordEmailSent: boolean;
   passwordEmailWarning: string | null;
@@ -54,6 +55,18 @@ async function syncRoles(userId: string, roles: string[]) {
   if (error) throw new Error(error.message);
 }
 
+function providerDashboardPath(role: ProviderInviteRole): string {
+  if (role === "host") return "/host/dashboard";
+  if (role === "travel_agent") return "/travel-agent/dashboard";
+  return "/homestay/dashboard";
+}
+
+function providerRoleLabel(role: ProviderInviteRole): string {
+  if (role === "host") return "experience host";
+  if (role === "travel_agent") return "travel agent";
+  return "homestay owner";
+}
+
 function temporaryPasswordEmailHtml(input: {
   fullName: string;
   role: ProviderInviteRole;
@@ -62,7 +75,11 @@ function temporaryPasswordEmailHtml(input: {
   signInUrl: string;
   dashboardUrl: string;
 }): string {
-  const roleLabel = input.role === "host" ? "experience host" : "homestay owner";
+  const roleLabel = providerRoleLabel(input.role);
+  const dashboardHint =
+    input.role === "travel_agent"
+      ? "to book experiences and homestays for your clients."
+      : "to manage your listing.";
 
   return `
   <div style="font-family: Georgia, 'Times New Roman', serif; background:#2A0000; color:#F7E7C2; padding:32px;">
@@ -87,7 +104,7 @@ function temporaryPasswordEmailHtml(input: {
       <p style="font-size:13px;line-height:1.5;color:rgba(247,231,194,0.7);">
         After signing in, open
         <a href="${escapeHtml(input.dashboardUrl)}" style="color:#D4A84B;">your dashboard</a>
-        to manage your listing.
+        ${dashboardHint}
       </p>
     </div>
   </div>`;
@@ -119,7 +136,7 @@ async function sendSupabasePasswordSetupLink(input: {
   }
 
   const origin = getServerSiteOrigin();
-  const dashboardPath = input.role === "host" ? "/host/dashboard" : "/homestay/dashboard";
+  const dashboardPath = providerDashboardPath(input.role);
   const redirectTo = `${origin}/reset-password?redirect=${encodeURIComponent(dashboardPath)}`;
 
   const client = createClient(url, anonKey, {
@@ -141,7 +158,7 @@ export async function sendTemporaryPasswordEmail(input: {
   temporaryPassword: string;
 }): Promise<{ sent: boolean; warning: string | null }> {
   const origin = getServerSiteOrigin();
-  const dashboardPath = input.role === "host" ? "/host/dashboard" : "/homestay/dashboard";
+  const dashboardPath = providerDashboardPath(input.role);
   const signInUrl = `${origin}/sign-in?redirect=${encodeURIComponent(dashboardPath)}`;
   const dashboardUrl = `${origin}${dashboardPath}`;
 
@@ -151,7 +168,9 @@ export async function sendTemporaryPasswordEmail(input: {
       subject:
         input.role === "host"
           ? "Your host login — The Royal Passage"
-          : "Your property owner login — The Royal Passage",
+          : input.role === "travel_agent"
+            ? "Your travel agent login — The Royal Passage"
+            : "Your property owner login — The Royal Passage",
       html: temporaryPasswordEmailHtml({
         fullName: input.fullName,
         role: input.role,
@@ -239,6 +258,14 @@ export async function createProviderLogin(input: {
   bio?: string | null;
   role: ProviderInviteRole;
   address?: string | null;
+  companyName?: string | null;
+  city?: string | null;
+  gstNumber?: string | null;
+  panNumber?: string | null;
+  gstCertificateUrl?: string | null;
+  companyRegistrationUrl?: string | null;
+  passportPhotoUrl?: string | null;
+  discountPercent?: number | null;
 }): Promise<CreatedProviderLogin> {
   const supabase = getSupabaseAdmin();
   const email = input.email.trim().toLowerCase();
@@ -292,6 +319,7 @@ export async function createProviderLogin(input: {
 
   let hostId: string | null = null;
   let homestayOwnerId: string | null = null;
+  let travelAgentId: string | null = null;
 
   if (input.role === "host") {
     const { data: existingHost } = await supabase
@@ -397,6 +425,50 @@ export async function createProviderLogin(input: {
     }
   }
 
+  if (input.role === "travel_agent") {
+    const companyName = input.companyName?.trim() || fullName;
+    const { data: existingAgent } = await supabase
+      .from("travel_agents")
+      .select("id")
+      .eq("auth_user_id", userId)
+      .maybeSingle();
+
+    const agentPatch = {
+      company_name: companyName,
+      contact_name: fullName,
+      email,
+      phone,
+      city: input.city?.trim() || null,
+      address: input.address?.trim() || null,
+      gst_number: input.gstNumber?.trim().toUpperCase() || null,
+      pan_number: input.panNumber?.trim().toUpperCase() || null,
+      gst_certificate_url: input.gstCertificateUrl?.trim() || null,
+      company_registration_url: input.companyRegistrationUrl?.trim() || null,
+      passport_photo_url: input.passportPhotoUrl?.trim() || null,
+      discount_percent: input.discountPercent ?? 0,
+      verified: true,
+      approval_status: "approved",
+    };
+
+    if (existingAgent?.id) {
+      travelAgentId = String(existingAgent.id);
+      await supabase.from("travel_agents").update(agentPatch).eq("id", travelAgentId);
+    } else {
+      const { data: agentRow, error: agentError } = await supabase
+        .from("travel_agents")
+        .insert({
+          auth_user_id: userId,
+          ...agentPatch,
+        })
+        .select("id")
+        .single();
+      if (agentError || !agentRow) {
+        throw new Error(agentError?.message ?? "Failed to create travel agent profile.");
+      }
+      travelAgentId = String(agentRow.id);
+    }
+  }
+
   const profilePatch: Record<string, unknown> = {
     id: userId,
     full_name: fullName,
@@ -405,6 +477,7 @@ export async function createProviderLogin(input: {
   };
   if (hostId) profilePatch.host_id = hostId;
   if (homestayOwnerId) profilePatch.homestay_owner_id = homestayOwnerId;
+  if (travelAgentId) profilePatch.travel_agent_id = travelAgentId;
 
   const { error: profileError } = await supabase.from("profiles").upsert(profilePatch);
   if (profileError) throw new Error(profileError.message);
@@ -417,6 +490,7 @@ export async function createProviderLogin(input: {
       phone,
       ...(hostId ? { host_id: hostId } : {}),
       ...(homestayOwnerId ? { homestay_owner_id: homestayOwnerId } : {}),
+      ...(travelAgentId ? { travel_agent_id: travelAgentId } : {}),
     })
     .eq("id", userId);
 
@@ -426,7 +500,7 @@ export async function createProviderLogin(input: {
     .eq("user_id", userId);
   const roles = new Set((existingRoles ?? []).map((r) => String(r.role)));
   roles.add(input.role);
-  if (roles.has("guest") && (input.role === "host" || input.role === "homestay_owner")) {
+  if (roles.has("guest") && (input.role === "host" || input.role === "homestay_owner" || input.role === "travel_agent")) {
     roles.delete("guest");
   }
   await syncRoles(userId, [...roles]);
@@ -453,6 +527,7 @@ export async function createProviderLogin(input: {
     userId,
     hostId,
     homestayOwnerId,
+    travelAgentId,
     createdNewUser,
     passwordEmailSent: emailResult.sent,
     passwordEmailWarning: emailResult.warning,

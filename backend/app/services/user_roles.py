@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 ADMIN_CREATABLE_ROLES = frozenset(
-    {"host", "homestay_owner", "vip_owner", "admin", "editor"},
+    {"host", "homestay_owner", "vip_owner", "travel_agent", "admin", "editor"},
 )
 
 ALLOWED_ROLES = frozenset(
-    {"guest", "host", "homestay_owner", "vip_owner", "admin", "editor"},
+    {"guest", "host", "homestay_owner", "vip_owner", "travel_agent", "admin", "editor"},
 )
 
 ROLE_PRIORITY = (
@@ -13,6 +13,7 @@ ROLE_PRIORITY = (
     "host",
     "homestay_owner",
     "vip_owner",
+    "travel_agent",
     "editor",
     "guest",
 )

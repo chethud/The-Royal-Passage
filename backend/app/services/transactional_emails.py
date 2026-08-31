@@ -154,8 +154,9 @@ def send_experience_booking_requested_email(
     map_link: str = "",
     host_name: str = "",
     duration_minutes: int | None = None,
+    hide_price: bool = False,
 ) -> bool:
-    amount = _format_amount(total_minor, currency_code)
+    amount = "Price on request" if hide_price else _format_amount(total_minor, currency_code)
     ctx = RoyalBookingRequestContext(
         guest_name=guest_name or "Guest",
         experience_name=experience_title,
@@ -229,8 +230,9 @@ def send_homestay_booking_requested_email(
     total_minor: int,
     currency_code: str,
     booking_id: str,
+    hide_price: bool = False,
 ) -> bool:
-    amount = _format_amount(total_minor, currency_code)
+    amount = "Price on request" if hide_price else _format_amount(total_minor, currency_code)
     stay_path = _site_link(f"/stays/{booking_id}")
     html = _wrap_html(
         "Stay Request Received",

@@ -48,6 +48,8 @@ type ExperienceBookingPanelProps = {
   onConfirm?: () => void;
   busy?: boolean;
   error?: string | null;
+  /** Disable the confirm button (e.g. incomplete contact details). */
+  confirmDisabled?: boolean;
   /** Hide sign-in / continue / confirm buttons (used inside multi-step checkout). */
   hideActions?: boolean;
   /** Cream checkout panel vs dark experience detail page. */
@@ -294,6 +296,7 @@ export function ExperienceBookingPanel({
   onConfirm,
   busy = false,
   error = null,
+  confirmDisabled = false,
   hideActions = false,
   surface = "dark",
 }: ExperienceBookingPanelProps) {
@@ -485,7 +488,7 @@ export function ExperienceBookingPanel({
               ) : null}
               <button
                 type="button"
-                disabled={!selectedSlot || busy}
+                disabled={!selectedSlot || busy || confirmDisabled}
                 onClick={() => onConfirm?.()}
                 className="luxury-btn-sm luxury-btn-primary w-full disabled:opacity-50"
               >

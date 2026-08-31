@@ -30,7 +30,11 @@ import { Route as VipsSlugRouteImport } from './routes/vips.$slug'
 import { Route as VipListingsRouteImport } from './routes/vip.listings'
 import { Route as VipDashboardRouteImport } from './routes/vip.dashboard'
 import { Route as VipBookingsRouteImport } from './routes/vip.bookings'
+import { Route as TravelAgentDashboardRouteImport } from './routes/travel-agent.dashboard'
+import { Route as TravelAgentCatalogRouteImport } from './routes/travel-agent.catalog'
+import { Route as TravelAgentBookingsRouteImport } from './routes/travel-agent.bookings'
 import { Route as StaysBookingIdRouteImport } from './routes/stays.$bookingId'
+import { Route as PartnerTravelAgentRouteImport } from './routes/partner.travel-agent'
 import { Route as PartnerHomestayHostRouteImport } from './routes/partner.homestay-host'
 import { Route as PartnerExperienceHostRouteImport } from './routes/partner.experience-host'
 import { Route as LegalPrivacyPolicyRouteImport } from './routes/legal.privacy-policy'
@@ -88,6 +92,7 @@ import { Route as AdminVipIndexRouteImport } from './routes/admin.vip.index'
 import { Route as AdminVipPackagesIndexRouteImport } from './routes/admin.vip-packages.index'
 import { Route as AdminVipOwnersIndexRouteImport } from './routes/admin.vip-owners.index'
 import { Route as AdminTrustIndexRouteImport } from './routes/admin.trust.index'
+import { Route as AdminTravelAgentIndexRouteImport } from './routes/admin.travel-agent.index'
 import { Route as AdminReviewsIndexRouteImport } from './routes/admin.reviews.index'
 import { Route as AdminProfileIndexRouteImport } from './routes/admin.profile.index'
 import { Route as AdminHostsIndexRouteImport } from './routes/admin.hosts.index'
@@ -113,6 +118,8 @@ import { Route as AdminVipRequestsRouteImport } from './routes/admin.vip.request
 import { Route as AdminVipPendingBookingsRouteImport } from './routes/admin.vip.pending-bookings'
 import { Route as AdminVipMembershipsRouteImport } from './routes/admin.vip.memberships'
 import { Route as AdminVipPackagesPackageIdRouteImport } from './routes/admin.vip-packages.$packageId'
+import { Route as AdminTravelAgentRequestsRouteImport } from './routes/admin.travel-agent.requests'
+import { Route as AdminTravelAgentBookingsRouteImport } from './routes/admin.travel-agent.bookings'
 import { Route as AdminProfileUsersRouteImport } from './routes/admin.profile.users'
 import { Route as AdminProfileMyTeamRouteImport } from './routes/admin.profile.my-team'
 import { Route as AdminProfileHomepagePhotosRouteImport } from './routes/admin.profile.homepage-photos'
@@ -233,9 +240,29 @@ const VipBookingsRoute = VipBookingsRouteImport.update({
   path: '/vip/bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TravelAgentDashboardRoute = TravelAgentDashboardRouteImport.update({
+  id: '/travel-agent/dashboard',
+  path: '/travel-agent/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TravelAgentCatalogRoute = TravelAgentCatalogRouteImport.update({
+  id: '/travel-agent/catalog',
+  path: '/travel-agent/catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TravelAgentBookingsRoute = TravelAgentBookingsRouteImport.update({
+  id: '/travel-agent/bookings',
+  path: '/travel-agent/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StaysBookingIdRoute = StaysBookingIdRouteImport.update({
   id: '/stays/$bookingId',
   path: '/stays/$bookingId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerTravelAgentRoute = PartnerTravelAgentRouteImport.update({
+  id: '/partner/travel-agent',
+  path: '/partner/travel-agent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerHomestayHostRoute = PartnerHomestayHostRouteImport.update({
@@ -523,6 +550,11 @@ const AdminTrustIndexRoute = AdminTrustIndexRouteImport.update({
   path: '/trust/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTravelAgentIndexRoute = AdminTravelAgentIndexRouteImport.update({
+  id: '/travel-agent/',
+  path: '/travel-agent/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReviewsIndexRoute = AdminReviewsIndexRouteImport.update({
   id: '/reviews/',
   path: '/reviews/',
@@ -650,6 +682,18 @@ const AdminVipPackagesPackageIdRoute =
   AdminVipPackagesPackageIdRouteImport.update({
     id: '/vip-packages/$packageId',
     path: '/vip-packages/$packageId',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminTravelAgentRequestsRoute =
+  AdminTravelAgentRequestsRouteImport.update({
+    id: '/travel-agent/requests',
+    path: '/travel-agent/requests',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminTravelAgentBookingsRoute =
+  AdminTravelAgentBookingsRouteImport.update({
+    id: '/travel-agent/bookings',
+    path: '/travel-agent/bookings',
     getParentRoute: () => AdminRoute,
   } as any)
 const AdminProfileUsersRoute = AdminProfileUsersRouteImport.update({
@@ -782,7 +826,11 @@ export interface FileRoutesByFullPath {
   '/legal/privacy-policy': typeof LegalPrivacyPolicyRoute
   '/partner/experience-host': typeof PartnerExperienceHostRoute
   '/partner/homestay-host': typeof PartnerHomestayHostRoute
+  '/partner/travel-agent': typeof PartnerTravelAgentRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
+  '/travel-agent/bookings': typeof TravelAgentBookingsRoute
+  '/travel-agent/catalog': typeof TravelAgentCatalogRoute
+  '/travel-agent/dashboard': typeof TravelAgentDashboardRoute
   '/vip/bookings': typeof VipBookingsRouteWithChildren
   '/vip/dashboard': typeof VipDashboardRoute
   '/vip/listings': typeof VipListingsRouteWithChildren
@@ -803,6 +851,8 @@ export interface FileRoutesByFullPath {
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
   '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
+  '/admin/travel-agent/bookings': typeof AdminTravelAgentBookingsRoute
+  '/admin/travel-agent/requests': typeof AdminTravelAgentRequestsRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
   '/admin/vip/memberships': typeof AdminVipMembershipsRoute
   '/admin/vip/pending-bookings': typeof AdminVipPendingBookingsRoute
@@ -828,6 +878,7 @@ export interface FileRoutesByFullPath {
   '/admin/hosts/': typeof AdminHostsIndexRoute
   '/admin/profile/': typeof AdminProfileIndexRoute
   '/admin/reviews/': typeof AdminReviewsIndexRoute
+  '/admin/travel-agent/': typeof AdminTravelAgentIndexRoute
   '/admin/trust/': typeof AdminTrustIndexRoute
   '/admin/vip-owners/': typeof AdminVipOwnersIndexRoute
   '/admin/vip-packages/': typeof AdminVipPackagesIndexRoute
@@ -890,7 +941,11 @@ export interface FileRoutesByTo {
   '/legal/privacy-policy': typeof LegalPrivacyPolicyRoute
   '/partner/experience-host': typeof PartnerExperienceHostRoute
   '/partner/homestay-host': typeof PartnerHomestayHostRoute
+  '/partner/travel-agent': typeof PartnerTravelAgentRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
+  '/travel-agent/bookings': typeof TravelAgentBookingsRoute
+  '/travel-agent/catalog': typeof TravelAgentCatalogRoute
+  '/travel-agent/dashboard': typeof TravelAgentDashboardRoute
   '/vip/dashboard': typeof VipDashboardRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -908,6 +963,8 @@ export interface FileRoutesByTo {
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
   '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
+  '/admin/travel-agent/bookings': typeof AdminTravelAgentBookingsRoute
+  '/admin/travel-agent/requests': typeof AdminTravelAgentRequestsRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
   '/admin/vip/memberships': typeof AdminVipMembershipsRoute
   '/admin/vip/pending-bookings': typeof AdminVipPendingBookingsRoute
@@ -933,6 +990,7 @@ export interface FileRoutesByTo {
   '/admin/hosts': typeof AdminHostsIndexRoute
   '/admin/profile': typeof AdminProfileIndexRoute
   '/admin/reviews': typeof AdminReviewsIndexRoute
+  '/admin/travel-agent': typeof AdminTravelAgentIndexRoute
   '/admin/trust': typeof AdminTrustIndexRoute
   '/admin/vip-owners': typeof AdminVipOwnersIndexRoute
   '/admin/vip-packages': typeof AdminVipPackagesIndexRoute
@@ -1008,7 +1066,11 @@ export interface FileRoutesById {
   '/legal/privacy-policy': typeof LegalPrivacyPolicyRoute
   '/partner/experience-host': typeof PartnerExperienceHostRoute
   '/partner/homestay-host': typeof PartnerHomestayHostRoute
+  '/partner/travel-agent': typeof PartnerTravelAgentRoute
   '/stays/$bookingId': typeof StaysBookingIdRoute
+  '/travel-agent/bookings': typeof TravelAgentBookingsRoute
+  '/travel-agent/catalog': typeof TravelAgentCatalogRoute
+  '/travel-agent/dashboard': typeof TravelAgentDashboardRoute
   '/vip/bookings': typeof VipBookingsRouteWithChildren
   '/vip/dashboard': typeof VipDashboardRoute
   '/vip/listings': typeof VipListingsRouteWithChildren
@@ -1029,6 +1091,8 @@ export interface FileRoutesById {
   '/admin/profile/homepage-photos': typeof AdminProfileHomepagePhotosRoute
   '/admin/profile/my-team': typeof AdminProfileMyTeamRoute
   '/admin/profile/users': typeof AdminProfileUsersRoute
+  '/admin/travel-agent/bookings': typeof AdminTravelAgentBookingsRoute
+  '/admin/travel-agent/requests': typeof AdminTravelAgentRequestsRoute
   '/admin/vip-packages/$packageId': typeof AdminVipPackagesPackageIdRoute
   '/admin/vip/memberships': typeof AdminVipMembershipsRoute
   '/admin/vip/pending-bookings': typeof AdminVipPendingBookingsRoute
@@ -1054,6 +1118,7 @@ export interface FileRoutesById {
   '/admin/hosts/': typeof AdminHostsIndexRoute
   '/admin/profile/': typeof AdminProfileIndexRoute
   '/admin/reviews/': typeof AdminReviewsIndexRoute
+  '/admin/travel-agent/': typeof AdminTravelAgentIndexRoute
   '/admin/trust/': typeof AdminTrustIndexRoute
   '/admin/vip-owners/': typeof AdminVipOwnersIndexRoute
   '/admin/vip-packages/': typeof AdminVipPackagesIndexRoute
@@ -1130,7 +1195,11 @@ export interface FileRouteTypes {
     | '/legal/privacy-policy'
     | '/partner/experience-host'
     | '/partner/homestay-host'
+    | '/partner/travel-agent'
     | '/stays/$bookingId'
+    | '/travel-agent/bookings'
+    | '/travel-agent/catalog'
+    | '/travel-agent/dashboard'
     | '/vip/bookings'
     | '/vip/dashboard'
     | '/vip/listings'
@@ -1151,6 +1220,8 @@ export interface FileRouteTypes {
     | '/admin/profile/homepage-photos'
     | '/admin/profile/my-team'
     | '/admin/profile/users'
+    | '/admin/travel-agent/bookings'
+    | '/admin/travel-agent/requests'
     | '/admin/vip-packages/$packageId'
     | '/admin/vip/memberships'
     | '/admin/vip/pending-bookings'
@@ -1176,6 +1247,7 @@ export interface FileRouteTypes {
     | '/admin/hosts/'
     | '/admin/profile/'
     | '/admin/reviews/'
+    | '/admin/travel-agent/'
     | '/admin/trust/'
     | '/admin/vip-owners/'
     | '/admin/vip-packages/'
@@ -1238,7 +1310,11 @@ export interface FileRouteTypes {
     | '/legal/privacy-policy'
     | '/partner/experience-host'
     | '/partner/homestay-host'
+    | '/partner/travel-agent'
     | '/stays/$bookingId'
+    | '/travel-agent/bookings'
+    | '/travel-agent/catalog'
+    | '/travel-agent/dashboard'
     | '/vip/dashboard'
     | '/admin'
     | '/dashboard'
@@ -1256,6 +1332,8 @@ export interface FileRouteTypes {
     | '/admin/profile/homepage-photos'
     | '/admin/profile/my-team'
     | '/admin/profile/users'
+    | '/admin/travel-agent/bookings'
+    | '/admin/travel-agent/requests'
     | '/admin/vip-packages/$packageId'
     | '/admin/vip/memberships'
     | '/admin/vip/pending-bookings'
@@ -1281,6 +1359,7 @@ export interface FileRouteTypes {
     | '/admin/hosts'
     | '/admin/profile'
     | '/admin/reviews'
+    | '/admin/travel-agent'
     | '/admin/trust'
     | '/admin/vip-owners'
     | '/admin/vip-packages'
@@ -1355,7 +1434,11 @@ export interface FileRouteTypes {
     | '/legal/privacy-policy'
     | '/partner/experience-host'
     | '/partner/homestay-host'
+    | '/partner/travel-agent'
     | '/stays/$bookingId'
+    | '/travel-agent/bookings'
+    | '/travel-agent/catalog'
+    | '/travel-agent/dashboard'
     | '/vip/bookings'
     | '/vip/dashboard'
     | '/vip/listings'
@@ -1376,6 +1459,8 @@ export interface FileRouteTypes {
     | '/admin/profile/homepage-photos'
     | '/admin/profile/my-team'
     | '/admin/profile/users'
+    | '/admin/travel-agent/bookings'
+    | '/admin/travel-agent/requests'
     | '/admin/vip-packages/$packageId'
     | '/admin/vip/memberships'
     | '/admin/vip/pending-bookings'
@@ -1401,6 +1486,7 @@ export interface FileRouteTypes {
     | '/admin/hosts/'
     | '/admin/profile/'
     | '/admin/reviews/'
+    | '/admin/travel-agent/'
     | '/admin/trust/'
     | '/admin/vip-owners/'
     | '/admin/vip-packages/'
@@ -1463,7 +1549,11 @@ export interface RootRouteChildren {
   LegalPrivacyPolicyRoute: typeof LegalPrivacyPolicyRoute
   PartnerExperienceHostRoute: typeof PartnerExperienceHostRoute
   PartnerHomestayHostRoute: typeof PartnerHomestayHostRoute
+  PartnerTravelAgentRoute: typeof PartnerTravelAgentRoute
   StaysBookingIdRoute: typeof StaysBookingIdRoute
+  TravelAgentBookingsRoute: typeof TravelAgentBookingsRoute
+  TravelAgentCatalogRoute: typeof TravelAgentCatalogRoute
+  TravelAgentDashboardRoute: typeof TravelAgentDashboardRoute
   VipBookingsRoute: typeof VipBookingsRouteWithChildren
   VipDashboardRoute: typeof VipDashboardRoute
   VipListingsRoute: typeof VipListingsRouteWithChildren
@@ -1628,11 +1718,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VipBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/travel-agent/dashboard': {
+      id: '/travel-agent/dashboard'
+      path: '/travel-agent/dashboard'
+      fullPath: '/travel-agent/dashboard'
+      preLoaderRoute: typeof TravelAgentDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/travel-agent/catalog': {
+      id: '/travel-agent/catalog'
+      path: '/travel-agent/catalog'
+      fullPath: '/travel-agent/catalog'
+      preLoaderRoute: typeof TravelAgentCatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/travel-agent/bookings': {
+      id: '/travel-agent/bookings'
+      path: '/travel-agent/bookings'
+      fullPath: '/travel-agent/bookings'
+      preLoaderRoute: typeof TravelAgentBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stays/$bookingId': {
       id: '/stays/$bookingId'
       path: '/stays/$bookingId'
       fullPath: '/stays/$bookingId'
       preLoaderRoute: typeof StaysBookingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner/travel-agent': {
+      id: '/partner/travel-agent'
+      path: '/partner/travel-agent'
+      fullPath: '/partner/travel-agent'
+      preLoaderRoute: typeof PartnerTravelAgentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner/homestay-host': {
@@ -2034,6 +2152,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTrustIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/travel-agent/': {
+      id: '/admin/travel-agent/'
+      path: '/travel-agent'
+      fullPath: '/admin/travel-agent/'
+      preLoaderRoute: typeof AdminTravelAgentIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reviews/': {
       id: '/admin/reviews/'
       path: '/reviews'
@@ -2209,6 +2334,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminVipPackagesPackageIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/travel-agent/requests': {
+      id: '/admin/travel-agent/requests'
+      path: '/travel-agent/requests'
+      fullPath: '/admin/travel-agent/requests'
+      preLoaderRoute: typeof AdminTravelAgentRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/travel-agent/bookings': {
+      id: '/admin/travel-agent/bookings'
+      path: '/travel-agent/bookings'
+      fullPath: '/admin/travel-agent/bookings'
+      preLoaderRoute: typeof AdminTravelAgentBookingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/profile/users': {
       id: '/admin/profile/users'
       path: '/users'
@@ -2344,6 +2483,8 @@ interface AdminRouteChildren {
   AdminHomestayPendingBookingsRoute: typeof AdminHomestayPendingBookingsRoute
   AdminHomestayRequestsRoute: typeof AdminHomestayRequestsRoute
   AdminHomestaysHomestayIdRoute: typeof AdminHomestaysHomestayIdRoute
+  AdminTravelAgentBookingsRoute: typeof AdminTravelAgentBookingsRoute
+  AdminTravelAgentRequestsRoute: typeof AdminTravelAgentRequestsRoute
   AdminVipPackagesPackageIdRoute: typeof AdminVipPackagesPackageIdRoute
   AdminVipMembershipsRoute: typeof AdminVipMembershipsRoute
   AdminVipPendingBookingsRoute: typeof AdminVipPendingBookingsRoute
@@ -2356,6 +2497,7 @@ interface AdminRouteChildren {
   AdminHomestaysIndexRoute: typeof AdminHomestaysIndexRoute
   AdminHostsIndexRoute: typeof AdminHostsIndexRoute
   AdminReviewsIndexRoute: typeof AdminReviewsIndexRoute
+  AdminTravelAgentIndexRoute: typeof AdminTravelAgentIndexRoute
   AdminTrustIndexRoute: typeof AdminTrustIndexRoute
   AdminVipOwnersIndexRoute: typeof AdminVipOwnersIndexRoute
   AdminVipPackagesIndexRoute: typeof AdminVipPackagesIndexRoute
@@ -2378,6 +2520,8 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHomestayPendingBookingsRoute: AdminHomestayPendingBookingsRoute,
   AdminHomestayRequestsRoute: AdminHomestayRequestsRoute,
   AdminHomestaysHomestayIdRoute: AdminHomestaysHomestayIdRoute,
+  AdminTravelAgentBookingsRoute: AdminTravelAgentBookingsRoute,
+  AdminTravelAgentRequestsRoute: AdminTravelAgentRequestsRoute,
   AdminVipPackagesPackageIdRoute: AdminVipPackagesPackageIdRoute,
   AdminVipMembershipsRoute: AdminVipMembershipsRoute,
   AdminVipPendingBookingsRoute: AdminVipPendingBookingsRoute,
@@ -2390,6 +2534,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHomestaysIndexRoute: AdminHomestaysIndexRoute,
   AdminHostsIndexRoute: AdminHostsIndexRoute,
   AdminReviewsIndexRoute: AdminReviewsIndexRoute,
+  AdminTravelAgentIndexRoute: AdminTravelAgentIndexRoute,
   AdminTrustIndexRoute: AdminTrustIndexRoute,
   AdminVipOwnersIndexRoute: AdminVipOwnersIndexRoute,
   AdminVipPackagesIndexRoute: AdminVipPackagesIndexRoute,
@@ -2637,7 +2782,11 @@ const rootRouteChildren: RootRouteChildren = {
   LegalPrivacyPolicyRoute: LegalPrivacyPolicyRoute,
   PartnerExperienceHostRoute: PartnerExperienceHostRoute,
   PartnerHomestayHostRoute: PartnerHomestayHostRoute,
+  PartnerTravelAgentRoute: PartnerTravelAgentRoute,
   StaysBookingIdRoute: StaysBookingIdRoute,
+  TravelAgentBookingsRoute: TravelAgentBookingsRoute,
+  TravelAgentCatalogRoute: TravelAgentCatalogRoute,
+  TravelAgentDashboardRoute: TravelAgentDashboardRoute,
   VipBookingsRoute: VipBookingsRouteWithChildren,
   VipDashboardRoute: VipDashboardRoute,
   VipListingsRoute: VipListingsRouteWithChildren,

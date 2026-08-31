@@ -66,6 +66,7 @@ from app.http_notifications import (
     notifications_mark_all_read,
 )
 from app.http_owner_homestay import owner_homestay_revenue, owner_homestay_reviews
+from app.http_travel_agent import admin_travel_agent_bookings, travel_agent_bookings
 from app.rpc.servicer import RoyalPassageServiceImpl
 from royalpassage.v1.service_connect import RoyalPassageServiceASGIApplication
 
@@ -94,6 +95,7 @@ core_app = Starlette(
         Route("/api/v1/admin/stats", admin_stats, methods=["GET"]),
         Route("/api/v1/admin/homestay-stats", admin_homestay_stats, methods=["GET"]),
         Route("/api/v1/admin/homestay-bookings", admin_homestay_bookings, methods=["GET"]),
+        Route("/api/v1/admin/travel-agent-bookings", admin_travel_agent_bookings, methods=["GET"]),
         Route("/api/v1/admin/bookings", admin_bookings, methods=["GET"]),
         Route("/api/v1/admin/bookings/{booking_id}", admin_booking_detail, methods=["GET"]),
         Route("/api/v1/admin/activity", admin_activity, methods=["GET"]),
@@ -132,6 +134,7 @@ core_app = Starlette(
         Route("/api/v1/bookings/{booking_id}", guest_booking_detail, methods=["GET"]),
         Route("/api/v1/bookings/{booking_id}/cancel", guest_cancel_booking, methods=["POST"]),
         Route("/api/v1/homestay-bookings", guest_create_homestay_booking, methods=["POST"]),
+        Route("/api/v1/travel-agent/bookings", travel_agent_bookings, methods=["GET"]),
         Route("/api/v1/host/dashboard", host_dashboard, methods=["GET"]),
         Route("/api/v1/host/bookings", host_bookings, methods=["GET"]),
         Route("/api/v1/host/bookings/{booking_id}", host_booking_detail, methods=["GET"]),

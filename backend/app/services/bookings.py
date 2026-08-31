@@ -97,11 +97,33 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
 
     from app.services.guest_booking_freeze import assert_guest_can_create_booking
 
-    assert_guest_can_create_booking(user.id)
+    from app.services.travel_agent_booking import (
+        apply_agent_pricing,
+        assert_client_contact_ready,
+        load_travel_agent_row,
+        profile_is_travel_agent,
+    )
 
-    guest_name = profile.get("full_name") or user.email or "Guest"
-    guest_email = user.email or ""
-    guest_phone = profile.get("phone")
+    agent_row = load_travel_agent_row(supabase, profile) if profile_is_travel_agent(profile) else None
+    is_agent_booking = agent_row is not None
+
+    if not is_agent_booking:
+        assert_guest_can_create_booking(user.id)
+        from app.services.guest_contact import assert_guest_contact_ready
+
+        assert_guest_contact_ready(profile, user)
+        guest_name = profile.get("full_name") or user.email or "Guest"
+        guest_email = user.email or ""
+        guest_phone = profile.get("phone")
+    else:
+        assert_client_contact_ready(
+            full_name=payload.guestName,
+            email=payload.guestEmail,
+            phone=payload.guestPhone,
+        )
+        guest_name = (payload.guestName or "").strip()
+        guest_email = (payload.guestEmail or "").strip()
+        guest_phone = (payload.guestPhone or "").strip()
 
     slot_result = (
         supabase.table("experience_slots")
@@ -155,10 +177,17 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         gst_percent = float(experience.get("gst_percent") or 0)
     except (TypeError, ValueError):
         gst_percent = 0.0
-    gst_minor = round((subtotal_minor * gst_percent) / 100) if gst_percent > 0 else 0
-    total_minor = subtotal_minor + gst_minor
-    platform_fee_minor = round((subtotal_minor * commission_percent) / 100)
-    host_payout_minor = subtotal_minor - platform_fee_minor
+
+    agent_discount = float(agent_row.get("discount_percent") or 0) if agent_row else 0.0
+    agent_markup = int(payload.agentMarkupMinor or 0) if is_agent_booking else 0
+    discounted_subtotal, gst_minor, total_minor = apply_agent_pricing(
+        subtotal_minor,
+        gst_percent,
+        discount_percent=agent_discount,
+        markup_minor=agent_markup,
+    )
+    platform_fee_minor = round((discounted_subtotal * commission_percent) / 100)
+    host_payout_minor = discounted_subtotal - platform_fee_minor
 
     booking_row = {
         "slot_id": payload.slotId,
@@ -170,7 +199,7 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         "guest_phone": guest_phone,
         "guest_count": payload.guestCount,
         "participant_count": payload.guestCount,
-        "subtotal_minor": subtotal_minor,
+        "subtotal_minor": discounted_subtotal,
         "total_amount": total_minor,
         "platform_fee_minor": platform_fee_minor,
         "host_payout_minor": host_payout_minor,
@@ -181,6 +210,16 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
         "status": "pending_payment",
         "notes": payload.notes,
     }
+    if is_agent_booking and agent_row:
+        booking_row.update(
+            {
+                "travel_agent_id": agent_row["id"],
+                "agent_markup_minor": agent_markup,
+                "agent_discount_percent": agent_discount,
+                "client_send_confirmation": bool(payload.clientSendConfirmation),
+                "client_email_include_price": bool(payload.clientEmailIncludePrice),
+            }
+        )
 
     try:
         booking_id = insert_row_returning_id(supabase, "bookings", booking_row)
@@ -211,7 +250,7 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
 
     host_display = host_row.get("display_name") or "Heritage Host"
 
-    if guest_email:
+    if guest_email and (not is_agent_booking or payload.clientSendConfirmation):
         try:
             if not send_experience_booking_requested_email(
                 to=guest_email,
@@ -230,6 +269,7 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
                 map_link=experience.get("map_link") or "",
                 host_name=host_display,
                 duration_minutes=experience.get("duration_minutes"),
+                hide_price=is_agent_booking and not payload.clientEmailIncludePrice,
             ):
                 logger.error(
                     "Guest booking email not sent for %s to %s — configure RESEND_API_KEY on Render",
@@ -238,6 +278,30 @@ def create_cod_booking(payload: CreateBookingRequest, auth: dict) -> CreateBooki
                 )
         except Exception:
             logger.exception("Failed to send guest booking email for %s", booking_id)
+
+    if is_agent_booking and user.email:
+        try:
+            send_experience_booking_requested_email(
+                to=user.email,
+                guest_name=guest_name,
+                experience_title=title,
+                slot_date=slot.get("slot_date", ""),
+                slot_start=slot.get("start_time", ""),
+                slot_end=slot.get("end_time", ""),
+                guest_count=payload.guestCount,
+                total_minor=total_minor,
+                currency_code=experience["currency_code"],
+                booking_id=booking_id,
+                experience_description=(experience.get("description") or experience.get("tagline") or ""),
+                experience_image_url=experience.get("hero_image_url") or "",
+                venue=venue,
+                map_link=experience.get("map_link") or "",
+                host_name=host_display,
+                duration_minutes=experience.get("duration_minutes"),
+                hide_price=False,
+            )
+        except Exception:
+            logger.exception("Failed to send travel agent booking email for %s", booking_id)
 
     try:
         from app.services.host_booking_reminders import resolve_host_email

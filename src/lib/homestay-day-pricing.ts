@@ -57,13 +57,35 @@ export function eachNightBetween(checkIn: string, checkOut: string): string[] {
   return nights;
 }
 
+export function startingNightPriceMajor(weekdayMajor: number, weekendMajor: number): number {
+  return Math.min(weekdayMajor, weekendMajor);
+}
+
+export function startingCompareAtMajor(
+  weekdayMajor: number,
+  weekendMajor: number,
+  compareAtWeekday?: number | null,
+  compareAtWeekend?: number | null,
+): number | null {
+  if (weekdayMajor <= weekendMajor) {
+    return compareAtWeekday ?? null;
+  }
+  return compareAtWeekend ?? compareAtWeekday ?? null;
+}
+
+export function formatStartingNightRate(
+  sym: string,
+  weekdayMajor: number,
+  weekendMajor: number,
+): string {
+  const from = startingNightPriceMajor(weekdayMajor, weekendMajor);
+  return `${sym}${from.toLocaleString("en-IN")}/\u200bnight`;
+}
+
 export function formatWeekdayWeekendRates(
   sym: string,
   weekdayMajor: number,
   weekendMajor: number,
 ): string {
-  if (weekdayMajor === weekendMajor) {
-    return `${sym}${weekdayMajor.toLocaleString("en-IN")}/\u200bnight`;
-  }
-  return `${sym}${weekdayMajor.toLocaleString("en-IN")} weekdays · ${sym}${weekendMajor.toLocaleString("en-IN")} weekends`;
+  return formatStartingNightRate(sym, weekdayMajor, weekendMajor);
 }

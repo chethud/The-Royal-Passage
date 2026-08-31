@@ -1,4 +1,10 @@
 import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPanel";
+import { GuestContactFields } from "@/components/booking/GuestContactFields";
+import {
+  DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS,
+  TravelAgentBookingExtras,
+  travelAgentOptionsToPayload,
+} from "@/components/travel-agent/TravelAgentBookingExtras";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { PaymentMethodSelector } from "@/components/booking/PaymentMethodSelector";
 import {
@@ -11,6 +17,11 @@ import {
 } from "@/components/booking/CheckoutWizardPrimitives";
 import type { Experience } from "@/data/experiences";
 import { useCheckoutBooking } from "@/hooks/use-checkout-booking";
+import { useGuestContactDetails } from "@/hooks/use-guest-contact-details";
+import { fetchTravelAgentProfile } from "@/lib/partner-travel-agent-fns";
+import { isTravelAgentRole, type UserRole } from "@/lib/roles";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
+import { useEffect, useState } from "react";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
 import { formatTime12h } from "@/lib/weekday-slots";
@@ -45,11 +56,47 @@ export function BookingCheckoutWizard({
   onSuccess,
   userRole,
 }: BookingCheckoutWizardProps) {
+  const contactDetails = useGuestContactDetails();
+  const isTravelAgent = isTravelAgentRole(userRole as UserRole | null);
+  const [markupMajor, setMarkupMajor] = useState(0);
+  const [clientSendConfirmation, setClientSendConfirmation] = useState(
+    DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS.clientSendConfirmation,
+  );
+  const [clientEmailIncludePrice, setClientEmailIncludePrice] = useState(
+    DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS.clientEmailIncludePrice,
+  );
+  const [discountPercent, setDiscountPercent] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!isTravelAgent) return;
+    void getSupabaseBrowser()
+      .auth.getSession()
+      .then(({ data }) => {
+        const token = data.session?.access_token;
+        if (!token) return;
+        return fetchTravelAgentProfile({ data: { accessToken: token } });
+      })
+      .then((profile) => {
+        if (profile) setDiscountPercent(profile.discountPercent);
+      })
+      .catch(() => undefined);
+  }, [isTravelAgent]);
+
+  const agentOptions = travelAgentOptionsToPayload(
+    markupMajor,
+    clientSendConfirmation,
+    clientEmailIncludePrice,
+  );
+
   const checkout = useCheckoutBooking({
     exp,
     source,
     initialSlotId,
     initialGuests,
+    syncContact: contactDetails.syncToProfile,
+    isTravelAgent,
+    contact: contactDetails.contact,
+    agentOptions,
   });
 
   const {
@@ -77,6 +124,8 @@ export function BookingCheckoutWizard({
   const gstMinor = gstPercent > 0 ? Math.round((subtotalMinor * gstPercent) / 100) : 0;
 
   const handleSubmit = async () => {
+    contactDetails.setShowErrors(true);
+    if (!contactDetails.isValid) return;
     const bookingId = await submit();
     if (bookingId) onSuccess(bookingId);
   };
@@ -153,22 +202,48 @@ export function BookingCheckoutWizard({
             description="We will notify your host. They can accept or decline. You pay at the venue after they confirm."
           />
           <CheckoutWizardStepBody>
-            <ExperienceBookingPanel
-              exp={exp}
-              selectedSlot={selectedSlot}
-              onSelectSlot={setSelectedSlot}
-              guests={guests}
-              onGuestsChange={setGuests}
-              variant="checkout"
-              signedIn
-              userRole={userRole}
-              notes={notes}
-              onNotesChange={setNotes}
-              onConfirm={() => void handleSubmit()}
-              busy={busy}
-              error={error}
-              surface="light"
-            />
+            <div className="space-y-6 sm:space-y-8">
+              <GuestContactFields
+                value={contactDetails.contact}
+                onChange={contactDetails.setContact}
+                showErrors={contactDetails.showErrors}
+                surface="light"
+                heading={isTravelAgent ? "Customer contact" : undefined}
+                description={
+                  isTravelAgent
+                    ? "Enter the guest's details for this booking. Confirmation emails can be sent to them separately."
+                    : undefined
+                }
+              />
+              {isTravelAgent ? (
+                <TravelAgentBookingExtras
+                  markupMajor={markupMajor}
+                  onMarkupMajorChange={setMarkupMajor}
+                  clientSendConfirmation={clientSendConfirmation}
+                  onClientSendConfirmationChange={setClientSendConfirmation}
+                  clientEmailIncludePrice={clientEmailIncludePrice}
+                  onClientEmailIncludePriceChange={setClientEmailIncludePrice}
+                  discountPercent={discountPercent}
+                />
+              ) : null}
+              <ExperienceBookingPanel
+                exp={exp}
+                selectedSlot={selectedSlot}
+                onSelectSlot={setSelectedSlot}
+                guests={guests}
+                onGuestsChange={setGuests}
+                variant="checkout"
+                signedIn
+                userRole={userRole}
+                notes={notes}
+                onNotesChange={setNotes}
+                onConfirm={() => void handleSubmit()}
+                busy={busy}
+                error={error}
+                confirmDisabled={!contactDetails.isValid}
+                surface="light"
+              />
+            </div>
           </CheckoutWizardStepBody>
           <CheckoutWizardStepFooter back={{ label: "Back", onClick: goBack }} />
         </LuxuryCheckoutPanel>

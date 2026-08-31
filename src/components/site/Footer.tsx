@@ -190,6 +190,19 @@ function FooterFull() {
                   </li>
                 </ul>
               </div>
+              <div>
+                <h2 className="eyebrow m-0 mb-2 text-ember/95 leading-none">Travel Agent</h2>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <Link
+                      to="/partner/travel-agent"
+                      className="text-muted-foreground transition-colors hover:text-ember"
+                    >
+                      Apply as travel agent
+                    </Link>
+                  </li>
+                </ul>
+              </div>
             </div>
           </section>
 

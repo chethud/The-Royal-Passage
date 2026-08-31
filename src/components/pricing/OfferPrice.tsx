@@ -85,7 +85,7 @@ export function OfferPrice({
   );
 }
 
-/** Weekday / weekend rates with optional property-level compare-at. */
+/** Lowest nightly rate with optional property-level compare-at. */
 export function HomestayOfferRates({
   symbol,
   weekday,
@@ -107,71 +107,29 @@ export function HomestayOfferRates({
   className?: string;
   priceClassName?: string;
 }) {
-  const sameRate = weekday === weekend;
-  const sameCompare =
-    (compareAtWeekday ?? null) === (compareAtWeekend ?? null) ||
-    (compareAtWeekend == null && compareAtWeekday != null && sameRate);
-
-  if (sameRate && (sameCompare || compareAtWeekend == null)) {
-    return (
-      <span className={cn("inline-flex flex-wrap items-baseline gap-x-1.5", className)}>
-        <OfferPrice
-          price={weekday}
-          compareAt={compareAtWeekday}
-          currencySymbol={symbol}
-          tone={tone}
-          showPercent={showPercent}
-          priceClassName={priceClassName}
-        />
-        <span
-          className={cn(
-            "text-[0.58rem] font-semibold uppercase tracking-[0.12em]",
-            tone === "dark" ? "text-[#D6C8B5]/75" : "text-[rgb(74_0_0/0.55)]",
-          )}
-        >
-          / night
-        </span>
-      </span>
-    );
-  }
+  const fromPrice = Math.min(weekday, weekend);
+  const compareAt =
+    weekday <= weekend
+      ? compareAtWeekday
+      : compareAtWeekend ?? compareAtWeekday;
 
   return (
-    <span className={cn("flex flex-col gap-1", className)}>
-      <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
-        <OfferPrice
-          price={weekday}
-          compareAt={compareAtWeekday}
-          currencySymbol={symbol}
-          tone={tone}
-          showPercent={showPercent}
-          priceClassName={priceClassName}
-        />
-        <span
-          className={cn(
-            "text-[0.58rem] font-semibold uppercase tracking-[0.12em]",
-            tone === "dark" ? "text-[#D6C8B5]/75" : "text-[rgb(74_0_0/0.55)]",
-          )}
-        >
-          weekdays
-        </span>
-      </span>
-      <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
-        <OfferPrice
-          price={weekend}
-          compareAt={compareAtWeekend ?? (sameRate ? compareAtWeekday : null)}
-          currencySymbol={symbol}
-          tone={tone}
-          showPercent={showPercent}
-          priceClassName={priceClassName}
-        />
-        <span
-          className={cn(
-            "text-[0.58rem] font-semibold uppercase tracking-[0.12em]",
-            tone === "dark" ? "text-[#D6C8B5]/75" : "text-[rgb(74_0_0/0.55)]",
-          )}
-        >
-          weekends
-        </span>
+    <span className={cn("inline-flex flex-wrap items-baseline gap-x-1.5", className)}>
+      <OfferPrice
+        price={fromPrice}
+        compareAt={compareAt}
+        currencySymbol={symbol}
+        tone={tone}
+        showPercent={showPercent}
+        priceClassName={priceClassName}
+      />
+      <span
+        className={cn(
+          "text-[0.58rem] font-semibold uppercase tracking-[0.12em]",
+          tone === "dark" ? "text-[#D6C8B5]/75" : "text-[rgb(74_0_0/0.55)]",
+        )}
+      >
+        / night
       </span>
     </span>
   );

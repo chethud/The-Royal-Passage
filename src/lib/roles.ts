@@ -1,5 +1,5 @@
-/** Platform roles — experience providers are **hosts**; property providers are **homestay owners**; VIP providers are **vip owners**. */
-export const USER_ROLES = ["guest", "host", "homestay_owner", "vip_owner", "admin", "editor"] as const;
+/** Platform roles — experience providers are **hosts**; property providers are **homestay owners**; VIP providers are **vip owners**; travel agents book on behalf of guests. */
+export const USER_ROLES = ["guest", "host", "homestay_owner", "vip_owner", "travel_agent", "admin", "editor"] as const;
 
 export type UserRole = (typeof USER_ROLES)[number];
 
@@ -8,6 +8,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   host: "Host",
   homestay_owner: "Homestay owner",
   vip_owner: "VIP owner",
+  travel_agent: "Travel agent",
   admin: "Admin",
   editor: "Editor",
 };
@@ -17,6 +18,7 @@ export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
   host: "Sign in with login credentials provided by Royal Passage.",
   homestay_owner: "Sign in with homestay owner credentials provided by Royal Passage.",
   vip_owner: "Sign in with VIP owner credentials provided by Royal Passage.",
+  travel_agent: "Sign in with travel agent credentials provided by Royal Passage.",
   admin: "Sign in with your admin credentials — manage bookings, experiences, and homepage hero, showcase, and video sections.",
   editor: "Sign in to edit homepage photos, hero headings, journal stories, the heritage video section, and Mysore Trail.",
 };
@@ -26,6 +28,7 @@ export const ROLE_DASHBOARD_PATH: Record<UserRole, string> = {
   host: "/host/dashboard",
   homestay_owner: "/homestay/dashboard",
   vip_owner: "/vip/dashboard",
+  travel_agent: "/travel-agent/dashboard",
   admin: "/admin",
   editor: "/admin/homepage-edit",
 };
@@ -35,6 +38,7 @@ export const ROLE_PROFILE_PATH: Record<UserRole, string> = {
   host: "/account/profile",
   homestay_owner: "/account/profile",
   vip_owner: "/account/profile",
+  travel_agent: "/account/profile",
   admin: "/admin/profile",
   editor: "/account/profile",
 };
@@ -102,6 +106,7 @@ const ROLE_PRIORITY: UserRole[] = [
   "host",
   "homestay_owner",
   "vip_owner",
+  "travel_agent",
   "editor",
   "guest",
 ];
@@ -167,6 +172,12 @@ export function activeWorkspaceRole(
     return "vip_owner";
   }
   if (
+    (pathname === "/travel-agent" || pathname.startsWith("/travel-agent/")) &&
+    resolved.includes("travel_agent")
+  ) {
+    return "travel_agent";
+  }
+  if (
     (pathname.startsWith("/admin/homepage-edit") ||
       pathname.startsWith("/admin/homepage-photos") ||
       pathname.startsWith("/admin/profile/homepage-photos") ||
@@ -197,6 +208,7 @@ const WORKSPACE_META: Record<
   host: { label: "Host dashboard", description: "Experiences, bookings & revenue" },
   homestay_owner: { label: "Homestay dashboard", description: "Properties & stay bookings" },
   vip_owner: { label: "VIP dashboard", description: "VIP packages & members" },
+  travel_agent: { label: "Travel agent dashboard", description: "Book stays & experiences for clients" },
   editor: { label: "Editor tools", description: "Homepage photos, headings & journal" },
 };
 
@@ -285,5 +297,16 @@ export function isGuestAccount(
   if (hasAnyRole(roles, ["host", "homestay_owner", "vip_owner", "admin", "editor"], role)) {
     return false;
   }
+  if (hasRole(roles, "travel_agent", role)) {
+    return true;
+  }
   return !isStaffRole(role);
+}
+
+/** Travel agents may book experiences and homestays on behalf of customers. */
+export function isTravelAgentRole(
+  role: UserRole | null | undefined,
+  roles?: readonly UserRole[] | null,
+): boolean {
+  return hasRole(roles, "travel_agent", role);
 }

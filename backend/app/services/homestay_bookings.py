@@ -113,10 +113,33 @@ def create_homestay_booking(
 
     from app.services.guest_booking_freeze import assert_guest_can_create_booking
 
-    assert_guest_can_create_booking(user.id)
+    from app.services.travel_agent_booking import (
+        apply_agent_pricing,
+        assert_client_contact_ready,
+        load_travel_agent_row,
+        profile_is_travel_agent,
+    )
 
-    guest_name = profile.get("full_name") or user.email or "Guest"
-    guest_email = user.email or ""
+    agent_row = load_travel_agent_row(supabase, profile) if profile_is_travel_agent(profile) else None
+    is_agent_booking = agent_row is not None
+
+    if not is_agent_booking:
+        assert_guest_can_create_booking(user.id)
+        from app.services.guest_contact import assert_guest_contact_ready
+
+        assert_guest_contact_ready(profile, user)
+        guest_name = profile.get("full_name") or user.email or "Guest"
+        guest_email = user.email or ""
+        guest_phone = profile.get("phone")
+    else:
+        assert_client_contact_ready(
+            full_name=payload.guestName,
+            email=payload.guestEmail,
+            phone=payload.guestPhone,
+        )
+        guest_name = (payload.guestName or "").strip()
+        guest_email = (payload.guestEmail or "").strip()
+        guest_phone = (payload.guestPhone or "").strip()
 
     check_in = _parse_day(payload.checkIn)
     check_out = _parse_day(payload.checkOut)
@@ -258,10 +281,16 @@ def create_homestay_booking(
         gst_percent = float(stay.get("gst_percent") or 0)
     except (TypeError, ValueError):
         gst_percent = 0.0
-    gst_minor = round((subtotal_minor * gst_percent) / 100) if gst_percent > 0 else 0
-    total_minor = subtotal_minor + gst_minor
-    platform_fee_minor = round((subtotal_minor * commission_percent) / 100)
-    host_payout_minor = subtotal_minor - platform_fee_minor
+    agent_discount = float(agent_row.get("discount_percent") or 0) if agent_row else 0.0
+    agent_markup = int(payload.agentMarkupMinor or 0) if is_agent_booking else 0
+    discounted_subtotal, gst_minor, total_minor = apply_agent_pricing(
+        subtotal_minor,
+        gst_percent,
+        discount_percent=agent_discount,
+        markup_minor=agent_markup,
+    )
+    platform_fee_minor = round((discounted_subtotal * commission_percent) / 100)
+    host_payout_minor = discounted_subtotal - platform_fee_minor
 
     booking_row = {
         "homestay_id": stay["id"],
@@ -272,7 +301,7 @@ def create_homestay_booking(
         "guest_count": payload.guestCount,
         "room_count": room_count,
         "extra_bed_count": extra_bed_count,
-        "subtotal_minor": subtotal_minor,
+        "subtotal_minor": discounted_subtotal,
         "total_amount": total_minor,
         "platform_fee_minor": platform_fee_minor,
         "host_payout_minor": host_payout_minor,
@@ -282,6 +311,19 @@ def create_homestay_booking(
         "booking_status": "pending",
         "notes": payload.notes,
     }
+    if is_agent_booking and agent_row:
+        booking_row.update(
+            {
+                "travel_agent_id": agent_row["id"],
+                "agent_markup_minor": agent_markup,
+                "agent_discount_percent": agent_discount,
+                "client_send_confirmation": bool(payload.clientSendConfirmation),
+                "client_email_include_price": bool(payload.clientEmailIncludePrice),
+                "guest_name": guest_name,
+                "guest_email": guest_email,
+                "guest_phone": guest_phone,
+            }
+        )
 
     booking_id = insert_row_returning_id(supabase, "homestay_bookings", booking_row)
 
@@ -290,7 +332,7 @@ def create_homestay_booking(
 
     title = stay.get("title") or "your stay"
 
-    if guest_email:
+    if guest_email and (not is_agent_booking or payload.clientSendConfirmation):
         try:
             if not send_homestay_booking_requested_email(
                 to=guest_email,
@@ -302,6 +344,7 @@ def create_homestay_booking(
                 total_minor=total_minor,
                 currency_code=stay.get("currency_code") or "INR",
                 booking_id=booking_id,
+                hide_price=is_agent_booking and not payload.clientEmailIncludePrice,
             ):
                 logger.error(
                     "Guest homestay booking email not sent for %s to %s — configure RESEND_API_KEY on Render",
@@ -310,6 +353,23 @@ def create_homestay_booking(
                 )
         except Exception:
             logger.exception("Failed to send guest homestay booking email for %s", booking_id)
+
+    if is_agent_booking and user.email:
+        try:
+            send_homestay_booking_requested_email(
+                to=user.email,
+                guest_name=guest_name,
+                stay_title=title,
+                check_in=check_in.isoformat(),
+                check_out=check_out.isoformat(),
+                nights=nights,
+                total_minor=total_minor,
+                currency_code=stay.get("currency_code") or "INR",
+                booking_id=booking_id,
+                hide_price=False,
+            )
+        except Exception:
+            logger.exception("Failed to send travel agent homestay booking email for %s", booking_id)
 
     try:
         from datetime import datetime, timezone

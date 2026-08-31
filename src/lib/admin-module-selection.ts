@@ -6,7 +6,7 @@ export function readAdminModulePreference(): AdminModule | null {
   if (typeof window === "undefined") return null;
   try {
     const value = window.sessionStorage.getItem(STORAGE_KEY);
-    if (value === "experiences" || value === "homestays" || value === "vip") {
+    if (value === "experiences" || value === "homestays" || value === "vip" || value === "travel_agent") {
       return value;
     }
   } catch {

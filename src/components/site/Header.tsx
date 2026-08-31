@@ -13,6 +13,7 @@ import {
 import { writeAdminModulePreference } from "@/lib/admin-module-selection";
 import { HOST_NAV_ITEMS } from "@/components/host/host-nav";
 import { HOMESTAY_OWNER_NAV_ITEMS } from "@/components/homestay-owner/homestay-owner-nav";
+import { TRAVEL_AGENT_NAV_ITEMS } from "@/components/travel-agent/travel-agent-nav";
 import { VIP_OWNER_NAV_ITEMS } from "@/components/vip-owner/vip-owner-nav";
 import { GUEST_SIGNED_IN_NAV_ITEMS } from "@/lib/vip-member-nav";
 import { useExperienceCart } from "@/hooks/use-experience-cart";
@@ -28,6 +29,7 @@ import {
 import { useAuthUser } from "@/lib/auth-user";
 import { isHostNavItemActive } from "@/lib/host-nav-active";
 import { isHomestayOwnerNavItemActive } from "@/lib/homestay-owner-nav-active";
+import { isTravelAgentNavItemActive } from "@/lib/travel-agent-nav-active";
 import { isVipOwnerNavItemActive } from "@/lib/vip-owner-nav-active";
 import { dashboardPathForRole, dashboardPathForRoles, activeWorkspaceRole, isAdminRole, isGuestAccount, pickPrimaryRole, profilePathForRole, workspaceLinksForRoles, type UserRole } from "@/lib/roles";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
@@ -68,6 +70,9 @@ function navItemsForWorkspace(
   if (workspace === "homestay_owner") {
     return HOMESTAY_OWNER_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
+  if (workspace === "travel_agent") {
+    return TRAVEL_AGENT_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
+  }
   if (workspace === "vip_owner") {
     return VIP_OWNER_NAV_ITEMS.map((item) => ({ label: item.label, to: item.to }));
   }
@@ -104,6 +109,7 @@ function isHeaderNavItemActive(
 ): boolean {
   if (workspace === "host") return isHostNavItemActive(pathname, to);
   if (workspace === "homestay_owner") return isHomestayOwnerNavItemActive(pathname, to);
+  if (workspace === "travel_agent") return isTravelAgentNavItemActive(pathname, to);
   if (workspace === "vip_owner") return isVipOwnerNavItemActive(pathname, to);
   if (workspace === "admin") {
     return isAdminNavItemActive(pathname, to);

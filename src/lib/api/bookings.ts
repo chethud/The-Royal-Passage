@@ -6,6 +6,12 @@ export type CreateBookingPayload = {
   slotId: string;
   guestCount: number;
   notes?: string;
+  guestName?: string;
+  guestEmail?: string;
+  guestPhone?: string;
+  agentMarkupMinor?: number;
+  clientSendConfirmation?: boolean;
+  clientEmailIncludePrice?: boolean;
 };
 
 export type CreateBookingResult = {

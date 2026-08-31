@@ -6,6 +6,8 @@ import { isApiConfigured } from "@/lib/api/client";
 import { useAuthUser } from "@/lib/auth-user";
 import { countPendingPartnerExperienceApplications } from "@/lib/partner-experience-fns";
 import { countPendingPartnerHomestayApplications } from "@/lib/partner-homestay-fns";
+import { countPendingPartnerTravelAgentApplications } from "@/lib/partner-travel-agent-fns";
+import { fetchAdminTravelAgentBookings } from "@/lib/api/travel-agent-bookings";
 import { hasRole } from "@/lib/roles";
 import type { AdminModule } from "@/components/admin/admin-nav";
 
@@ -28,6 +30,7 @@ const EMPTY_MAP: AdminModuleNotifyMap = {
   experiences: { ...EMPTY_COUNTS },
   homestays: { ...EMPTY_COUNTS },
   vip: { ...EMPTY_COUNTS },
+  travel_agent: { ...EMPTY_COUNTS },
 };
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
@@ -71,6 +74,8 @@ export function useAdminModuleAlerts(): {
           vipApprovals,
           experiencePendingBookings,
           homestayPendingBookings,
+          partnerTravelAgentAppsCount,
+          travelAgentPendingBookings,
         ] = await Promise.all([
           fetchAdminExperienceApprovals(accessToken, 100).catch(() => []),
           countPendingPartnerExperienceApplications({ data: { accessToken } }).catch(() => 0),
@@ -79,6 +84,8 @@ export function useAdminModuleAlerts(): {
           fetchAdminVipPackageApprovals(accessToken).catch(() => []),
           fetchAdminBookings(accessToken, { status: "pending", limit: 200 }).catch(() => []),
           fetchAdminHomestayBookings(accessToken, "pending").catch(() => []),
+          countPendingPartnerTravelAgentApplications({ data: { accessToken } }).catch(() => 0),
+          fetchAdminTravelAgentBookings(accessToken, { status: "pending", limit: 200 }).catch(() => []),
         ]);
         if (cancelled) return;
 
@@ -106,6 +113,11 @@ export function useAdminModuleAlerts(): {
           vip: {
             hostRequests: pendingVip.length,
             userPending: 0,
+            userOverdue: 0,
+          },
+          travel_agent: {
+            hostRequests: partnerTravelAgentAppsCount,
+            userPending: travelAgentPendingBookings.length,
             userOverdue: 0,
           },
         });

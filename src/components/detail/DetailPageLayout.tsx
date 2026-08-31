@@ -185,7 +185,7 @@ export function DetailDivider({ className = "" }: { className?: string }) {
 
 export function DetailStatGrid({ children }: { children: ReactNode }) {
   return (
-    <dl className="grid grid-cols-3 items-start gap-0 text-left">{children}</dl>
+    <dl className="grid grid-cols-3 items-start gap-0 pt-3 text-left sm:pt-4">{children}</dl>
   );
 }
 

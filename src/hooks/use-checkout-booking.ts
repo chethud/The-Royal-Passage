@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Experience, Slot } from "@/data/experiences";
 import { createBooking } from "@/lib/api/bookings";
 import { isApiConfigured, toErrorMessage } from "@/lib/api/client";
-import { fetchGuestProfile } from "@/lib/api/guest";
 import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
 import { useBookingClock } from "@/hooks/use-today-iso-date";
 import { guestBookingLimits } from "@/lib/booking-url";
@@ -10,11 +9,18 @@ import { removeCartItem } from "@/lib/cart-storage";
 import type { PaymentMethod } from "@/components/booking/PaymentMethodSelector";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
+import type { GuestContactDetails } from "@/lib/guest-contact";
+import type { TravelAgentBookingOptions } from "@/components/travel-agent/TravelAgentBookingExtras";
+
 type UseCheckoutBookingOptions = {
   exp: Experience;
   source: "live" | "static";
   initialSlotId?: string;
   initialGuests?: number;
+  syncContact: () => Promise<void>;
+  isTravelAgent?: boolean;
+  contact?: GuestContactDetails;
+  agentOptions?: TravelAgentBookingOptions;
 };
 
 export function useCheckoutBooking({
@@ -22,6 +28,10 @@ export function useCheckoutBooking({
   source,
   initialSlotId,
   initialGuests,
+  syncContact,
+  isTravelAgent = false,
+  contact,
+  agentOptions,
 }: UseCheckoutBookingOptions) {
   const { today, now } = useBookingClock();
   const bookableSlots = useMemo(
@@ -48,7 +58,6 @@ export function useCheckoutBooking({
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [profileReady, setProfileReady] = useState(false);
 
   const isLiveExperience = source === "live";
   const sym = exp.currencySymbol ?? "₹";
@@ -63,30 +72,6 @@ export function useCheckoutBooking({
     const { min, max } = guestBookingLimits(exp, selectedSlot.available);
     setGuests((current) => Math.min(Math.max(min, current), max));
   }, [exp, selectedSlot]);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      try {
-        if (!isApiConfigured()) {
-          if (!cancelled) setProfileReady(true);
-          return;
-        }
-        const { data: sessionData } = await getSupabaseBrowser().auth.getSession();
-        const token = sessionData.session?.access_token;
-        if (token) {
-          await fetchGuestProfile(token);
-        }
-      } catch {
-        // createBooking will surface clearer errors on submit.
-      } finally {
-        if (!cancelled) setProfileReady(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const goNext = useCallback(() => {
     setError(null);
@@ -120,10 +105,24 @@ export function useCheckoutBooking({
       const token = sessionData.session?.access_token;
       if (!token) throw new Error("Please sign in again to complete your booking.");
 
+      if (!isTravelAgent) {
+        await syncContact();
+      }
+
       const result = await createBooking(token, {
         slotId: selectedSlot.id,
         guestCount: guests,
         notes: notes.trim() || undefined,
+        ...(isTravelAgent && contact
+          ? {
+              guestName: contact.fullName.trim(),
+              guestEmail: contact.email.trim(),
+              guestPhone: contact.phone.trim(),
+              agentMarkupMinor: agentOptions?.agentMarkupMinor ?? 0,
+              clientSendConfirmation: agentOptions?.clientSendConfirmation ?? false,
+              clientEmailIncludePrice: agentOptions?.clientEmailIncludePrice ?? true,
+            }
+          : {}),
       });
 
       removeCartItem(exp.id);
@@ -135,7 +134,18 @@ export function useCheckoutBooking({
     } finally {
       setBusy(false);
     }
-  }, [exp.id, guests, isLiveExperience, notes, paymentMethod, selectedSlot]);
+  }, [
+    agentOptions,
+    contact,
+    exp.id,
+    guests,
+    isLiveExperience,
+    isTravelAgent,
+    notes,
+    paymentMethod,
+    selectedSlot,
+    syncContact,
+  ]);
 
   return {
     step,
@@ -153,7 +163,6 @@ export function useCheckoutBooking({
     busy,
     error,
     setError,
-    profileReady,
     bookableSlots,
     isLiveExperience,
     sym,

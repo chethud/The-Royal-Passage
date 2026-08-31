@@ -1,4 +1,4 @@
-export type AdminModule = "experiences" | "homestays" | "vip";
+export type AdminModule = "experiences" | "homestays" | "vip" | "travel_agent";
 
 export const ADMIN_EXPERIENCE_NAV_ITEMS = [
   { to: "/admin", label: "Overview" },
@@ -21,6 +21,12 @@ export const ADMIN_VIP_NAV_ITEMS = [
   { to: "/admin/vip-packages", label: "Approve packages" },
   { to: "/admin/vip-owners", label: "VIP owners" },
   { to: "/vips", label: "Live catalog" },
+] as const;
+
+export const ADMIN_TRAVEL_AGENT_NAV_ITEMS = [
+  { to: "/admin/travel-agent", label: "Overview" },
+  { to: "/admin/travel-agent/requests", label: "Agent applications" },
+  { to: "/admin/travel-agent/bookings", label: "Agent bookings" },
 ] as const;
 
 /** @deprecated Use adminNavItemsForModule(resolveAdminModule(pathname)) instead. */
@@ -50,6 +56,12 @@ export function resolveAdminModule(pathname: string): AdminModule {
     return "vip";
   }
   if (
+    path === "/admin/travel-agent" ||
+    path.startsWith("/admin/travel-agent/")
+  ) {
+    return "travel_agent";
+  }
+  if (
     path === "/homestays" ||
     path.startsWith("/homestays/") ||
     path === "/admin/homestay" ||
@@ -66,19 +78,26 @@ export function resolveAdminModule(pathname: string): AdminModule {
 export function adminModuleHome(module: AdminModule): string {
   if (module === "homestays") return "/admin/homestay";
   if (module === "vip") return "/admin/vip";
+  if (module === "travel_agent") return "/admin/travel-agent";
   return "/admin";
 }
 
 /** Module switcher (Experiences / Homestays / VIP) only on marketplace overview pages. */
 export function isAdminOverviewPath(pathname: string): boolean {
   const path = normalizeAdminPath(pathname);
-  return path === "/admin" || path === "/admin/homestay" || path === "/admin/vip";
+  return (
+    path === "/admin" ||
+    path === "/admin/homestay" ||
+    path === "/admin/vip" ||
+    path === "/admin/travel-agent"
+  );
 }
 
 /** Pending-approval queue for each admin marketplace module. */
 export function adminModuleQueuePath(module: AdminModule): string {
   if (module === "homestays") return "/admin/homestays";
   if (module === "vip") return "/admin/vip-packages";
+  if (module === "travel_agent") return "/admin/travel-agent/requests";
   return "/admin/experiences";
 }
 
@@ -86,6 +105,7 @@ export function adminModuleQueuePath(module: AdminModule): string {
 export function adminModuleHostRequestsPath(module: AdminModule): string {
   if (module === "homestays") return "/admin/homestay/requests";
   if (module === "vip") return "/admin/vip/requests";
+  if (module === "travel_agent") return "/admin/travel-agent/requests";
   return "/admin/experiences/requests";
 }
 
@@ -93,12 +113,14 @@ export function adminModuleHostRequestsPath(module: AdminModule): string {
 export function adminModulePendingBookingsPath(module: AdminModule): string {
   if (module === "homestays") return "/admin/homestay/pending-bookings";
   if (module === "vip") return "/admin/vip/pending-bookings";
+  if (module === "travel_agent") return "/admin/travel-agent/bookings";
   return "/admin/experiences/pending-bookings";
 }
 
 export function adminModuleLabel(module: AdminModule): string {
   if (module === "homestays") return "Homestays admin";
   if (module === "vip") return "VIP admin";
+  if (module === "travel_agent") return "Travel agent admin";
   return "Experiences admin";
 }
 
@@ -108,7 +130,9 @@ export function adminNavItemsForModule(module: AdminModule) {
       ? ADMIN_HOMESTAY_NAV_ITEMS
       : module === "vip"
         ? ADMIN_VIP_NAV_ITEMS
-        : ADMIN_EXPERIENCE_NAV_ITEMS;
+        : module === "travel_agent"
+          ? ADMIN_TRAVEL_AGENT_NAV_ITEMS
+          : ADMIN_EXPERIENCE_NAV_ITEMS;
   return items.map((item) => ({ label: item.label, to: item.to }));
 }
 
@@ -134,6 +158,15 @@ export function isAdminNavItemActive(pathname: string, to: string): boolean {
   }
   if (target === "/admin/vip") {
     return path === "/admin/vip";
+  }
+  if (target === "/admin/travel-agent") {
+    return path === "/admin/travel-agent";
+  }
+  if (target === "/admin/travel-agent/requests") {
+    return path === "/admin/travel-agent/requests" || path.startsWith("/admin/travel-agent/requests/");
+  }
+  if (target === "/admin/travel-agent/bookings") {
+    return path === "/admin/travel-agent/bookings" || path.startsWith("/admin/travel-agent/bookings/");
   }
   if (target === "/admin/vip/memberships") {
     return path === "/admin/vip/memberships" || path.startsWith("/admin/vip/memberships/");

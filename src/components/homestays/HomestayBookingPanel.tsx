@@ -13,7 +13,7 @@ import {
 import type { Homestay } from "@/data/homestays";
 import { formatDateLong } from "@/lib/date-format";
 import {
-  formatWeekdayWeekendRates,
+  formatStartingNightRate,
   weekdayPriceMajor,
   weekendPriceMajor,
 } from "@/lib/homestay-day-pricing";
@@ -87,14 +87,14 @@ export function HomestayBookingPanel({
   const sym = stay.currencySymbol ?? "₹";
   const rooms = getActiveRooms(stay);
   const selectedRoom = rooms.find((room) => room.id === roomId) ?? (rooms.length === 1 ? rooms[0] : undefined);
-  const rateLabel = formatWeekdayWeekendRates(
+  const rateLabel = formatStartingNightRate(
     sym,
     weekdayPriceMajor(stay, selectedRoom),
     weekendPriceMajor(stay, selectedRoom),
   );
   const extraBedWeekdayPrice = weekdayExtraBedPriceMajor(stay, selectedRoom);
   const extraBedWeekendPrice = weekendExtraBedPriceMajor(stay, selectedRoom);
-  const extraBedRateLabel = formatWeekdayWeekendRates(sym, extraBedWeekdayPrice, extraBedWeekendPrice);
+  const extraBedRateLabel = formatStartingNightRate(sym, extraBedWeekdayPrice, extraBedWeekendPrice);
   const extraBedsPerRoom = extraBedsPerRoomForSelection(stay, selectedRoom);
   const showExtraBeds = maxExtraBeds > 0;
   const extraBedUnit = selectedRoom || getActiveRooms(stay).length > 0 ? "room" : "bedroom";
@@ -165,13 +165,13 @@ export function HomestayBookingPanel({
                   <span className="font-medium">{room.name}</span>
                   <span className="mt-1 block text-xs">
                     {room.capacity} guests · up to {room.totalUnits} room{room.totalUnits === 1 ? "" : "s"} ·{" "}
-                    {formatWeekdayWeekendRates(
+                    {formatStartingNightRate(
                       sym,
                       weekdayPriceMajor(stay, room),
                       weekendPriceMajor(stay, room),
                     )}
                     {room.extraBedAvailable
-                      ? ` · extra bed ${formatWeekdayWeekendRates(
+                      ? ` · extra bed ${formatStartingNightRate(
                           sym,
                           weekdayExtraBedPriceMajor(stay, room),
                           weekendExtraBedPriceMajor(stay, room),

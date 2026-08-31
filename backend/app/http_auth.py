@@ -134,5 +134,9 @@ def require_homestay_owner_request(request: Request) -> dict | JSONResponse:
     return require_role_request(request, "homestay_owner")
 
 
+def require_travel_agent_request(request: Request) -> dict | JSONResponse:
+    return require_role_request(request, "travel_agent")
+
+
 def require_guest_request(request: Request) -> dict | JSONResponse:
     return require_role_request(request, "guest")
