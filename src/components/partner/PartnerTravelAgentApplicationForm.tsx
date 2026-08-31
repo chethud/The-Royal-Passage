@@ -157,7 +157,7 @@ export function PartnerTravelAgentApplicationForm() {
         <h1 className="font-display text-3xl luxury-panel-heading">Application received</h1>
         <p className="mt-3 text-sm luxury-panel-body">
           Thank you. Our team will review your company details and GST documents. If approved, you
-          will receive login credentials by email with your negotiated discount rate.
+          will receive login credentials by email once your application is approved.
         </p>
         <Link to="/" className="luxury-btn mt-6 inline-flex no-underline">
           Back to home

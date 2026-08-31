@@ -3,11 +3,14 @@ import type { Experience } from "@/data/experiences";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { OfferPrice } from "@/components/pricing/OfferPrice";
+import { useTravelAgentDiscount } from "@/hooks/use-travel-agent-discount";
+import { travelAgentListedPrices } from "@/lib/travel-agent-pricing";
 import { isFixedGroupBooking } from "@/lib/experience-party-pricing";
 import { categoryIconForLabel } from "@/lib/experience-category-icons";
 import { MarketplaceCard, marketplaceCardActionClass } from "@/components/site/MarketplaceCard";
 
 export function ExperienceCard({ exp }: { exp: Experience }) {
+  const { discountPercent, isTravelAgent } = useTravelAgentDiscount();
   const CategoryIcon = categoryIconForLabel(exp.category);
   const sym = exp.currencySymbol ?? "₹";
   const minGuests = exp.minGuestsPerBooking ?? 1;
@@ -18,6 +21,12 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
     groupListing && exp.compareAtPricePerPerson
       ? exp.compareAtPricePerPerson * minGuests
       : exp.compareAtPricePerPerson;
+  const agentListed = travelAgentListedPrices(
+    listedPrice,
+    listedCompare,
+    isTravelAgent ? discountPercent : 0,
+  );
+  const hideAgentPercent = isTravelAgent && discountPercent > 0;
 
   return (
     <MarketplaceCard
@@ -61,11 +70,11 @@ export function ExperienceCard({ exp }: { exp: Experience }) {
       footer={
         <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
           <OfferPrice
-            price={listedPrice}
-            compareAt={listedCompare}
+            price={agentListed.price}
+            compareAt={hideAgentPercent ? undefined : agentListed.compareAt}
             currencySymbol={sym}
             tone="dark"
-            showPercent
+            showPercent={!hideAgentPercent}
             priceClassName="font-display text-base font-normal text-[color:var(--royal-ivory)]"
           />
           <span className="text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#D6C8B5]/75">

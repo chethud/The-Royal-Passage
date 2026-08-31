@@ -11,6 +11,8 @@ type TravelAgentDashboardShellProps = {
   subtitle: string;
   children: ReactNode;
   showRoleDescription?: boolean;
+  /** Shown under the title in the royal hero (e.g. agency name). */
+  heroDetail?: string | null;
   variant?: "default" | "overview" | "bookings" | "catalog";
 };
 
@@ -19,6 +21,7 @@ export function TravelAgentDashboardShell({
   subtitle,
   children,
   showRoleDescription = true,
+  heroDetail,
   variant = "default",
 }: TravelAgentDashboardShellProps) {
   const isRoyalHero =
@@ -54,6 +57,11 @@ export function TravelAgentDashboardShell({
               <h1 className="font-display text-4xl tracking-[0.04em] text-[#F7F1E8] sm:text-5xl md:text-6xl">
                 {title}
               </h1>
+              {heroDetail ? (
+                <p className="mt-2 font-display text-lg tracking-[0.03em] text-[rgb(247_241_232/0.88)] sm:text-xl">
+                  {heroDetail}
+                </p>
+              ) : null}
               <OrnamentalDivider className="host-overview-hero__divider" />
               <p className="mt-3 max-w-xl text-[0.72rem] font-medium uppercase tracking-[0.16em] text-[rgb(212_175_55/0.78)] sm:mt-4 sm:text-[0.78rem]">
                 {subtitle}

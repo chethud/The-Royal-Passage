@@ -20,6 +20,7 @@ import {
 import { formatMoney } from "@/lib/money";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import type { TravelAgentBookingOptions } from "@/components/travel-agent/TravelAgentBookingExtras";
+import { applyTravelAgentPricing } from "@/lib/travel-agent-pricing";
 
 function addDays(iso: string, days: number) {
   const date = new Date(`${iso}T12:00:00`);
@@ -45,6 +46,7 @@ export function useHomestayCheckout(
     contact?: GuestContactDetails;
     syncContact?: () => Promise<void>;
     isTravelAgent?: boolean;
+    agentDiscountPercent?: number;
     agentOptions?: TravelAgentBookingOptions;
   } = {},
 ) {
@@ -146,9 +148,17 @@ export function useHomestayCheckout(
   );
   const sym = homestay.currencySymbol ?? "₹";
   const gstPercent = Number(homestay.gstPercent ?? 0);
-  const subtotalMinor = pricing.totalMinor;
-  const gstMinor = gstPercent > 0 ? Math.round((subtotalMinor * gstPercent) / 100) : 0;
-  const totalMinor = subtotalMinor + gstMinor;
+  const listSubtotalMinor = pricing.totalMinor;
+  const agentMarkupMinor = options.isTravelAgent ? options.agentOptions?.agentMarkupMinor ?? 0 : 0;
+  const agentPricing = applyTravelAgentPricing(
+    listSubtotalMinor,
+    gstPercent,
+    options.isTravelAgent ? (options.agentDiscountPercent ?? 0) : 0,
+    agentMarkupMinor,
+  );
+  const subtotalMinor = agentPricing.discountedSubtotalMinor;
+  const gstMinor = agentPricing.gstMinor;
+  const totalMinor = agentPricing.totalMinor;
 
   const goNext = useCallback(() => {
     setError(null);
@@ -268,6 +278,7 @@ export function useHomestayCheckout(
     gstPercent,
     gstMinor,
     totalMinor,
+    agentMarkupMinor,
     totalLabel: formatMoney(totalMinor, sym),
     nightlyLabel: formatStartingNightRate(
       sym,

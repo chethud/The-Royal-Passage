@@ -6,6 +6,12 @@ alter table public.profiles add constraint profiles_role_check
     'guest', 'host', 'admin', 'editor', 'homestay_owner', 'vip_owner', 'travel_agent'
   ));
 
+alter table public.user_roles drop constraint if exists user_roles_role_check;
+alter table public.user_roles add constraint user_roles_role_check
+  check (role in (
+    'guest', 'host', 'admin', 'editor', 'homestay_owner', 'vip_owner', 'travel_agent'
+  ));
+
 alter table public.profiles
   add column if not exists travel_agent_id uuid;
 

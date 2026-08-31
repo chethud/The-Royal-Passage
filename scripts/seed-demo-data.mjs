@@ -2,7 +2,7 @@
  * Seed comprehensive demo data into Supabase for live admin + guest testing.
  *
  * Covers: published catalogs, pending approvals, bookings, reviews,
- * demo auth logins (guest / host / homestay owner / vip owner).
+ * demo auth logins (guest / host / homestay owner / vip owner / travel agent).
  *
  * Usage:
  *   npm run seed:demo
@@ -14,6 +14,7 @@
  *   host@royalpassage.demo
  *   homestay@royalpassage.demo
  *   vip@royalpassage.demo
+ *   agent@royalpassage.demo
  *   Admin@gmail.com / Admin@123  (create via npm run setup:admin)
  */
 
@@ -32,6 +33,13 @@ const supabase = createClient(url, serviceKey, {
 });
 
 const DEMO_PASSWORD = "Demo@12345";
+
+/** Required after travel_agent_module migration — upsert omits DB defaults. */
+const DEFAULT_AGENT_BOOKING_FIELDS = {
+  agent_markup_minor: 0,
+  client_send_confirmation: false,
+  client_email_include_price: true,
+};
 
 const IDS = {
   host1: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -75,6 +83,10 @@ const IDS = {
   vip1: "f1000001-0000-4000-8000-000000000001",
   vip2: "f1000002-0000-4000-8000-000000000002",
   vipPending: "f1000003-0000-4000-8000-000000000003",
+  travelAgent: "e0000008-0000-4000-8000-000000000008",
+  travelAgentAppPending: "e0000009-0000-4000-8000-000000000009",
+  agentBooking1: "70000004-0000-4000-8000-000000000004",
+  agentHsBooking1: "d0000003-0000-4000-8000-000000000003",
 };
 
 const IMG = {
@@ -156,7 +168,16 @@ async function ensureAuthUser({ email, password, fullName, role, meta = {} }) {
     user_id: userId,
     role,
   });
-  if (roleError) throw roleError;
+  if (roleError) {
+    if (role === "travel_agent") {
+      console.warn(`  user_roles skipped for ${email}: ${roleError.message}`);
+      console.warn(
+        "  Run supabase/migrations/20260903_user_roles_travel_agent.sql on your Supabase project.",
+      );
+    } else {
+      throw roleError;
+    }
+  }
 
   return userId;
 }
@@ -828,6 +849,49 @@ async function seedVip() {
   }
 }
 
+async function seedTravelAgents() {
+  console.log("Seeding travel agents…");
+  try {
+    await upsert("travel_agents", [
+      {
+        id: IDS.travelAgent,
+        company_name: "Royal Passage Tours Pvt Ltd",
+        contact_name: "Demo Travel Agent",
+        email: "agent@royalpassage.demo",
+        phone: "+91 9888800004",
+        city: "Mysuru",
+        address: "12 Palace Road, Mysuru, Karnataka 570001",
+        gst_number: "29AABCU9603R1ZX",
+        pan_number: "ABCDE1234F",
+        passport_photo_url: IMG.palace,
+        discount_percent: 10,
+        approval_status: "approved",
+        verified: true,
+      },
+    ]);
+
+    await upsert("partner_travel_agent_applications", [
+      {
+        id: IDS.travelAgentAppPending,
+        full_name: "Pending Travel Agent Applicant",
+        email: "pending-agent@royalpassage.demo",
+        phone: "+91 9888800005",
+        bio: "Demo application waiting for admin review and discount assignment.",
+        city: "Bengaluru",
+        company_name: "Skyline Voyages",
+        company_address: "42 MG Road, Bengaluru, Karnataka 560001",
+        gst_number: "29AABCU9603R1ZX",
+        pan_number: "FGHIJ5678K",
+        passport_photo_url: IMG.palace,
+        status: "pending",
+      },
+    ]);
+  } catch (err) {
+    console.warn(`  Travel agent seed skipped: ${err instanceof Error ? err.message : err}`);
+    console.warn("  Apply supabase/migrations/20260901_travel_agent_module.sql first.");
+  }
+}
+
 async function seedBannersAndSettings() {
   console.log("Seeding homepage settings (clearing banners)…");
   const now = Date.now();
@@ -871,6 +935,25 @@ async function seedUsersAndBookings() {
     fullName: "Demo VIP Owner",
     role: "vip_owner",
   });
+
+  let travelAgentUserId = null;
+  try {
+    travelAgentUserId = await ensureAuthUser({
+      email: "agent@royalpassage.demo",
+      password: DEMO_PASSWORD,
+      fullName: "Demo Travel Agent",
+      role: "travel_agent",
+      meta: { travel_agent_id: IDS.travelAgent },
+    });
+
+    await supabase
+      .from("travel_agents")
+      .update({ auth_user_id: travelAgentUserId })
+      .eq("id", IDS.travelAgent);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : JSON.stringify(err);
+    console.warn(`  Travel agent auth skipped: ${message}`);
+  }
 
   await supabase
     .from("hosts")
@@ -930,6 +1013,7 @@ async function seedUsersAndBookings() {
       host_payout_minor: 432000,
       currency_code: "INR",
       notes: "Demo pending booking for admin + host testing",
+      ...DEFAULT_AGENT_BOOKING_FIELDS,
     },
     {
       id: IDS.booking2,
@@ -953,6 +1037,7 @@ async function seedUsersAndBookings() {
       currency_code: "INR",
       notes: "Demo confirmed booking",
       confirmed_at: isoDateTime(-1),
+      ...DEFAULT_AGENT_BOOKING_FIELDS,
     },
     {
       id: IDS.booking3,
@@ -977,7 +1062,40 @@ async function seedUsersAndBookings() {
       notes: "Demo completed booking",
       confirmed_at: isoDateTime(-10),
       completed_at: isoDateTime(-3),
+      ...DEFAULT_AGENT_BOOKING_FIELDS,
     },
+    ...(travelAgentUserId
+      ? [
+          {
+            id: IDS.agentBooking1,
+            slot_id: IDS.slot2,
+            experience_id: IDS.exp1,
+            guest_id: travelAgentUserId,
+            guest_email: "client.demo@example.com",
+            guest_name: "Rahul Sharma",
+            guest_phone: "+91 9123456780",
+            customer_user_id: travelAgentUserId,
+            guest_count: 2,
+            participant_count: 2,
+            status: "confirmed",
+            booking_status: "confirmed",
+            payment_method: "cod",
+            payment_status: "pending",
+            subtotal_minor: 432000,
+            total_amount: 482000,
+            platform_fee_minor: 43200,
+            host_payout_minor: 388800,
+            currency_code: "INR",
+            notes: "Demo travel agent booking for client (10% discount + ₹500 markup)",
+            travel_agent_id: IDS.travelAgent,
+            agent_markup_minor: 50000,
+            agent_discount_percent: 10,
+            client_send_confirmation: true,
+            client_email_include_price: true,
+            confirmed_at: isoDateTime(-2),
+          },
+        ]
+      : []),
   ]);
 
   await upsert("homestay_bookings", [
@@ -1000,6 +1118,7 @@ async function seedUsersAndBookings() {
       payment_status: "pending",
       payment_method: "cod",
       notes: "Demo pending stay for admin/owner testing",
+      ...DEFAULT_AGENT_BOOKING_FIELDS,
     },
     {
       id: IDS.hsBooking2,
@@ -1020,8 +1139,58 @@ async function seedUsersAndBookings() {
       payment_status: "pending",
       payment_method: "cod",
       notes: "Demo confirmed stay",
+      ...DEFAULT_AGENT_BOOKING_FIELDS,
     },
+    ...(travelAgentUserId
+      ? [
+          {
+            id: IDS.agentHsBooking1,
+            homestay_id: IDS.hs2,
+            room_id: IDS.room2,
+            guest_id: travelAgentUserId,
+            check_in: isoDate(10),
+            check_out: isoDate(12),
+            guest_count: 2,
+            room_count: 1,
+            extra_bed_count: 0,
+            subtotal_minor: 1116000,
+            platform_fee_minor: 111600,
+            host_payout_minor: 1004400,
+            total_amount: 1216000,
+            currency_code: "INR",
+            booking_status: "pending",
+            payment_status: "pending",
+            payment_method: "cod",
+            notes: "Demo travel agent homestay booking (10% discount + ₹1000 markup)",
+            travel_agent_id: IDS.travelAgent,
+            agent_markup_minor: 100000,
+            agent_discount_percent: 10,
+            client_send_confirmation: false,
+            client_email_include_price: true,
+          },
+        ]
+      : []),
   ]);
+
+  if (travelAgentUserId) {
+    const { error: guestContactError } = await supabase
+      .from("homestay_bookings")
+      .update({
+        guest_name: "Priya Nair",
+        guest_email: "priya.demo@example.com",
+        guest_phone: "+91 9123456781",
+      })
+      .eq("id", IDS.agentHsBooking1);
+
+    if (guestContactError) {
+      console.warn(
+        `  Homestay guest contact skipped: ${guestContactError.message}`,
+      );
+      console.warn(
+        "  Apply supabase/migrations/20260902_homestay_booking_guest_contact.sql for client contact on stays.",
+      );
+    }
+  }
 }
 
 async function main() {
@@ -1030,6 +1199,7 @@ async function main() {
   await seedExperiences();
   await seedHomestays();
   await seedVip();
+  await seedTravelAgents();
   await seedBannersAndSettings();
   await seedUsersAndBookings();
 
@@ -1038,8 +1208,11 @@ async function main() {
   console.log("  host@royalpassage.demo");
   console.log("  homestay@royalpassage.demo");
   console.log("  vip@royalpassage.demo");
+  console.log("  agent@royalpassage.demo  (10% negotiated discount)");
   console.log("Admin (if set up): Admin@gmail.com / Admin@123");
-  console.log("\nAdmin queues should show pending experience + homestay (+ VIP) approvals.");
+  console.log(
+    "\nAdmin queues should show pending experience + homestay (+ VIP + travel agent) approvals.",
+  );
 }
 
 main().catch((err) => {

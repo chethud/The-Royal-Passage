@@ -2,7 +2,8 @@ import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPa
 import { GuestContactFields } from "@/components/booking/GuestContactFields";
 import {
   DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS,
-  TravelAgentBookingExtras,
+  TravelAgentClientEmailOptions,
+  TravelAgentMarkupControls,
   travelAgentOptionsToPayload,
 } from "@/components/travel-agent/TravelAgentBookingExtras";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
@@ -18,12 +19,13 @@ import {
 import type { Experience } from "@/data/experiences";
 import { useCheckoutBooking } from "@/hooks/use-checkout-booking";
 import { useGuestContactDetails } from "@/hooks/use-guest-contact-details";
-import { fetchTravelAgentProfile } from "@/lib/partner-travel-agent-fns";
+import { useTravelAgentDiscount } from "@/hooks/use-travel-agent-discount";
+import { useAuthUser } from "@/lib/auth-user";
 import { isTravelAgentRole, type UserRole } from "@/lib/roles";
-import { getSupabaseBrowser } from "@/lib/supabase/browser";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { formatDateLong } from "@/lib/date-format";
 import { formatMoney } from "@/lib/money";
+import { agentCostMinor as computeAgentCostMinor } from "@/lib/travel-agent-pricing";
 import { formatTime12h } from "@/lib/weekday-slots";
 
 type BookingCheckoutWizardProps = {
@@ -56,8 +58,10 @@ export function BookingCheckoutWizard({
   onSuccess,
   userRole,
 }: BookingCheckoutWizardProps) {
-  const contactDetails = useGuestContactDetails();
-  const isTravelAgent = isTravelAgentRole(userRole as UserRole | null);
+  const { roles } = useAuthUser();
+  const isTravelAgent = isTravelAgentRole(userRole as UserRole | null, roles);
+  const contactDetails = useGuestContactDetails({ forCustomerEntry: isTravelAgent });
+  const { discountPercent: agentDiscountPercent } = useTravelAgentDiscount();
   const [markupMajor, setMarkupMajor] = useState(0);
   const [clientSendConfirmation, setClientSendConfirmation] = useState(
     DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS.clientSendConfirmation,
@@ -65,22 +69,6 @@ export function BookingCheckoutWizard({
   const [clientEmailIncludePrice, setClientEmailIncludePrice] = useState(
     DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS.clientEmailIncludePrice,
   );
-  const [discountPercent, setDiscountPercent] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!isTravelAgent) return;
-    void getSupabaseBrowser()
-      .auth.getSession()
-      .then(({ data }) => {
-        const token = data.session?.access_token;
-        if (!token) return;
-        return fetchTravelAgentProfile({ data: { accessToken: token } });
-      })
-      .then((profile) => {
-        if (profile) setDiscountPercent(profile.discountPercent);
-      })
-      .catch(() => undefined);
-  }, [isTravelAgent]);
 
   const agentOptions = travelAgentOptionsToPayload(
     markupMajor,
@@ -95,6 +83,7 @@ export function BookingCheckoutWizard({
     initialGuests,
     syncContact: contactDetails.syncToProfile,
     isTravelAgent,
+    agentDiscountPercent,
     contact: contactDetails.contact,
     agentOptions,
   });
@@ -115,13 +104,15 @@ export function BookingCheckoutWizard({
     error,
     isLiveExperience,
     sym,
+    subtotalMinor,
+    gstPercent,
+    gstMinor,
     totalMinor,
+    agentMarkupMinor,
     submit,
   } = checkout;
 
-  const gstPercent = Number(exp.gstPercent ?? 0);
-  const subtotalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
-  const gstMinor = gstPercent > 0 ? Math.round((subtotalMinor * gstPercent) / 100) : 0;
+  const agentCost = computeAgentCostMinor(subtotalMinor, gstMinor);
 
   const handleSubmit = async () => {
     contactDetails.setShowErrors(true);
@@ -208,22 +199,23 @@ export function BookingCheckoutWizard({
                 onChange={contactDetails.setContact}
                 showErrors={contactDetails.showErrors}
                 surface="light"
+                customerEntry={isTravelAgent}
                 heading={isTravelAgent ? "Customer contact" : undefined}
                 description={
                   isTravelAgent
-                    ? "Enter the guest's details for this booking. Confirmation emails can be sent to them separately."
+                    ? "Enter your customer's name, email, and phone. These fields are required and are not filled from your agent account."
                     : undefined
                 }
               />
               {isTravelAgent ? (
-                <TravelAgentBookingExtras
-                  markupMajor={markupMajor}
-                  onMarkupMajorChange={setMarkupMajor}
+                <TravelAgentClientEmailOptions
                   clientSendConfirmation={clientSendConfirmation}
                   onClientSendConfirmationChange={setClientSendConfirmation}
                   clientEmailIncludePrice={clientEmailIncludePrice}
                   onClientEmailIncludePriceChange={setClientEmailIncludePrice}
-                  discountPercent={discountPercent}
+                  customerTotalMinor={totalMinor}
+                  currencySymbol={sym}
+                  groupName="experience-client-email"
                 />
               ) : null}
               <ExperienceBookingPanel
@@ -242,6 +234,8 @@ export function BookingCheckoutWizard({
                 error={error}
                 confirmDisabled={!contactDetails.isValid}
                 surface="light"
+                agentDiscountPercent={agentDiscountPercent}
+                agentMarkupMinor={agentMarkupMinor}
               />
             </div>
           </CheckoutWizardStepBody>
@@ -256,6 +250,7 @@ export function BookingCheckoutWizard({
             {exp.city} · {exp.hostName}
           </>
         }
+        totalLabel={isTravelAgent ? "Customer price" : "Total"}
         total={selectedSlot ? formatMoney(totalMinor, sym) : "—"}
         rows={
           <>
@@ -273,7 +268,7 @@ export function BookingCheckoutWizard({
             />
             <CheckoutWizardSummaryRow label="Guests" value={String(guests)} align="left" />
             <CheckoutWizardSummaryRow
-              label="Experience"
+              label={isTravelAgent ? "Experience (your rate)" : "Experience"}
               value={selectedSlot ? formatMoney(subtotalMinor, sym) : "—"}
             />
             {gstPercent > 0 ? (
@@ -282,10 +277,33 @@ export function BookingCheckoutWizard({
                 value={selectedSlot ? formatMoney(gstMinor, sym) : "—"}
               />
             ) : null}
+            {isTravelAgent && selectedSlot ? (
+              <>
+                <CheckoutWizardSummaryRow
+                  label="Your agent rate"
+                  value={formatMoney(agentCost, sym)}
+                />
+                <CheckoutWizardSummaryRow
+                  label="Your markup"
+                  value={`+${formatMoney(agentMarkupMinor, sym)}`}
+                />
+              </>
+            ) : null}
             <CheckoutWizardSummaryRow label="Payment" value={step >= 2 ? "Pay at venue" : "—"} />
           </>
         }
         footnote="After you submit, your host receives the request and can approve or decline. You will see the status in your booking history."
+        extras={
+          isTravelAgent ? (
+            <TravelAgentMarkupControls
+              markupMajor={markupMajor}
+              onMarkupMajorChange={setMarkupMajor}
+              agentCostMinor={agentCost}
+              currencySymbol={sym}
+              variant="compact"
+            />
+          ) : null
+        }
       />
     </div>
   );

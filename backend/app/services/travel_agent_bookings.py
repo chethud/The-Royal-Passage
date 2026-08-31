@@ -106,11 +106,6 @@ def _map_experience_agent_booking(row: dict) -> TravelAgentBookingSummary:
         paymentStatus=summary.paymentStatus,
         totalAmount=summary.totalAmount,
         agentMarkupMinor=int(row.get("agent_markup_minor") or 0),
-        agentDiscountPercent=(
-            float(row["agent_discount_percent"])
-            if row.get("agent_discount_percent") is not None
-            else None
-        ),
         currencyCode=summary.currencyCode,
         currencySymbol=summary.currencySymbol,
         createdAt=summary.createdAt,
@@ -141,11 +136,6 @@ def _map_homestay_agent_booking(row: dict) -> TravelAgentBookingSummary:
         paymentStatus=str(row.get("payment_status") or "pending"),
         totalAmount=int(row.get("total_amount") or row.get("subtotal_minor") or 0),
         agentMarkupMinor=int(row.get("agent_markup_minor") or 0),
-        agentDiscountPercent=(
-            float(row["agent_discount_percent"])
-            if row.get("agent_discount_percent") is not None
-            else None
-        ),
         currencyCode=currency,
         currencySymbol=_currency_symbol(currency),
         createdAt=str(row.get("created_at") or ""),
@@ -164,6 +154,11 @@ def _map_admin_homestay_agent_booking(row: dict) -> AdminTravelAgentBookingSumma
         agentCompanyName=agent.get("company_name"),
         agentContactName=agent.get("contact_name"),
         agentEmail=agent.get("email"),
+        agentDiscountPercent=(
+            float(row["agent_discount_percent"])
+            if row.get("agent_discount_percent") is not None
+            else None
+        ),
     )
 
 
@@ -175,6 +170,11 @@ def _map_admin_experience_agent_booking(row: dict) -> AdminTravelAgentBookingSum
         agentCompanyName=agent.get("company_name"),
         agentContactName=agent.get("contact_name"),
         agentEmail=agent.get("email"),
+        agentDiscountPercent=(
+            float(row["agent_discount_percent"])
+            if row.get("agent_discount_percent") is not None
+            else None
+        ),
     )
 
 

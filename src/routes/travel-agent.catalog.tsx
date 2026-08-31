@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
+import { createFileRoute } from "@tanstack/react-router";
+import { HostOverviewActionPanel } from "@/components/host/HostOverviewActionPanel";
 import { TravelAgentDashboardShell } from "@/components/travel-agent/TravelAgentDashboardShell";
 import { useTravelAgentAccess } from "@/lib/use-travel-agent-access";
 import { PageLoadingGate } from "@/components/ui/PageLoadingGate";
@@ -25,25 +25,34 @@ function TravelAgentCatalogPage() {
       showRoleDescription={false}
       variant="catalog"
     >
-      <div className="grid gap-4 md:grid-cols-2">
-        <LuxuryCheckoutPanel>
-          <h2 className="font-display text-xl luxury-panel-heading">Experiences</h2>
-          <p className="mt-2 text-sm luxury-panel-body">
-            Browse curated experiences and book on behalf of your customer with optional markup.
+      <div className="host-overview-stack">
+        <HostOverviewActionPanel
+          title="Experiences"
+          subtitle="Curated sessions, workshops, and heritage walks across Mysuru and beyond."
+          emptyMessage=""
+          ctaLabel="Browse experiences →"
+          ctaTo="/experiences"
+          icon="compass"
+          isEmpty={false}
+        >
+          <p className="host-overview-action__subtitle !mt-0">
+            Book on behalf of your customer with optional markup and separate client confirmation emails.
           </p>
-          <Link to="/experiences" className="luxury-btn-sm mt-4 inline-flex no-underline">
-            Browse experiences →
-          </Link>
-        </LuxuryCheckoutPanel>
-        <LuxuryCheckoutPanel>
-          <h2 className="font-display text-xl luxury-panel-heading">Homestays</h2>
-          <p className="mt-2 text-sm luxury-panel-body">
-            Reserve homestays for clients with customer contact details and email preferences.
+        </HostOverviewActionPanel>
+
+        <HostOverviewActionPanel
+          title="Homestays"
+          subtitle="Heritage havelis, villas, and boutique stays for your travellers."
+          emptyMessage=""
+          ctaLabel="Browse homestays →"
+          ctaTo="/homestays/browse"
+          icon="building"
+          isEmpty={false}
+        >
+          <p className="host-overview-action__subtitle !mt-0">
+            Reserve stays with customer contact details and flexible email pricing options.
           </p>
-          <Link to="/homestays/browse" className="luxury-btn-sm mt-4 inline-flex no-underline">
-            Browse homestays →
-          </Link>
-        </LuxuryCheckoutPanel>
+        </HostOverviewActionPanel>
       </div>
     </TravelAgentDashboardShell>
   );

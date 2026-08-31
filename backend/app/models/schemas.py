@@ -1359,7 +1359,6 @@ class TravelAgentBookingSummary(BaseModel):
     paymentStatus: str
     totalAmount: int
     agentMarkupMinor: int = 0
-    agentDiscountPercent: float | None = None
     currencyCode: str = "INR"
     currencySymbol: str = "₹"
     createdAt: str = ""
@@ -1376,3 +1375,4 @@ class AdminTravelAgentBookingSummary(TravelAgentBookingSummary):
     agentCompanyName: str | None = None
     agentContactName: str | None = None
     agentEmail: str | None = None
+    agentDiscountPercent: float | None = None

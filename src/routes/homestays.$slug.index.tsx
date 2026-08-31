@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { BedDouble, Star, Users } from "lucide-react";
 import { ExperienceDetailGallery } from "@/components/experiences/ExperienceDetailGallery";
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
@@ -31,12 +32,15 @@ import {
   weekendPriceMajor,
 } from "@/lib/homestay-day-pricing";
 import { HOMESTAY_DESCRIPTION_MAX_WORDS } from "@/lib/word-limit";
-import { HomestayOfferRates } from "@/components/pricing/OfferPrice";
+import { HomestayOfferRates, OfferPrice } from "@/components/pricing/OfferPrice";
+import { useTravelAgentDiscount } from "@/hooks/use-travel-agent-discount";
 import { getHomestayForDetail } from "@/lib/homestay-fns";
+import { agentCostMinor as computeAgentCostMinor, travelAgentHomestayRates } from "@/lib/travel-agent-pricing";
+import { travelAgentOptionsToPayload } from "@/components/travel-agent/TravelAgentBookingExtras";
+import { useHomestayCheckout } from "@/hooks/use-homestay-checkout";
+import { isGuestAccount, isTravelAgentRole } from "@/lib/roles";
 import { SITE_URL } from "@/lib/seo";
 import { canonicalLink } from "@/lib/seo-helpers";
-import { isGuestAccount } from "@/lib/roles";
-import { useHomestayCheckout } from "@/hooks/use-homestay-checkout";
 
 export const Route = createFileRoute("/homestays/$slug/")({
   validateSearch: parseHomestayBookSearch,
@@ -69,7 +73,11 @@ function HomestayDetailPage() {
   const { homestay: stay, source } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const { user, role } = useAuthUser();
+  const { user, role, roles } = useAuthUser();
+  const isTravelAgent = isTravelAgentRole(role, roles);
+  const { discountPercent: agentDiscountPercent } = useTravelAgentDiscount();
+  const [markupMajor, setMarkupMajor] = useState(() => search.markup ?? 0);
+  const agentOptions = travelAgentOptionsToPayload(markupMajor, false, true);
   const checkout = useHomestayCheckout(stay, {
     initialCheckIn: search.checkIn,
     initialCheckOut: search.checkOut,
@@ -77,8 +85,23 @@ function HomestayDetailPage() {
     initialRoomId: search.roomId,
     initialRoomCount: search.roomCount,
     initialExtraBeds: search.extraBeds,
+    isTravelAgent,
+    agentDiscountPercent,
+    agentOptions,
   });
+  const agentCost = computeAgentCostMinor(checkout.subtotalMinor, checkout.gstMinor);
   const sym = stay.currencySymbol ?? "₹";
+  const weekday = weekdayPriceMajor(stay);
+  const weekend = weekendPriceMajor(stay);
+  const agentRates = travelAgentHomestayRates(
+    weekday,
+    weekend,
+    stay.compareAtPricePerNight,
+    stay.compareAtWeekendPricePerNight,
+    isTravelAgent ? agentDiscountPercent : 0,
+  );
+  const hideAgentPercent = isTravelAgent && agentDiscountPercent > 0;
+  const agentFrom = Math.min(agentRates.weekday, agentRates.weekend);
   const locationLine = [stay.region, stay.city].filter(Boolean).join(" · ");
   const bookable = source === "live" && !stay.id.startsWith("stay-");
   const galleryExp = {
@@ -96,6 +119,7 @@ function HomestayDetailPage() {
     roomId: checkout.roomId,
     roomCount: checkout.roomCount,
     extraBeds: checkout.extraBedCount,
+    markup: isTravelAgent ? markupMajor : undefined,
   });
   const bookPath = bookHomestayPath(stay.slug, bookSearch);
   const canContinue = bookable && checkout.nights >= 1;
@@ -138,18 +162,34 @@ function HomestayDetailPage() {
                 <DetailDivider className="!my-0" />
                 <DetailStatGrid>
                   <DetailStatItem
-                    label="From"
+                    label={hideAgentPercent ? "Your rate from" : "From"}
                     valueClassName="mt-1 space-y-0.5 text-[#F7F1E8] normal-case tracking-normal"
                   >
-                    <HomestayOfferRates
-                      symbol={sym}
-                      weekday={weekdayPriceMajor(stay)}
-                      weekend={weekendPriceMajor(stay)}
-                      compareAtWeekday={stay.compareAtPricePerNight}
-                      compareAtWeekend={stay.compareAtWeekendPricePerNight}
-                      tone="dark"
-                      priceClassName="font-display text-[0.95rem] uppercase tracking-[0.02em] sm:text-lg md:text-xl text-[#F7F1E8] font-normal"
-                    />
+                    {hideAgentPercent ? (
+                      <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+                        <OfferPrice
+                          price={agentFrom}
+                          currencySymbol={sym}
+                          tone="dark"
+                          showPercent={false}
+                          priceClassName="font-display text-[0.95rem] uppercase tracking-[0.02em] sm:text-lg md:text-xl text-[#F7F1E8] font-normal"
+                        />
+                        <span className="text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#D6C8B5]/75">
+                          / night
+                        </span>
+                      </span>
+                    ) : (
+                      <HomestayOfferRates
+                        symbol={sym}
+                        weekday={agentRates.weekday}
+                        weekend={agentRates.weekend}
+                        compareAtWeekday={agentRates.compareAtWeekday}
+                        compareAtWeekend={agentRates.compareAtWeekend}
+                        tone="dark"
+                        showPercent
+                        priceClassName="font-display text-[0.95rem] uppercase tracking-[0.02em] sm:text-lg md:text-xl text-[#F7F1E8] font-normal"
+                      />
+                    )}
                   </DetailStatItem>
                   <DetailStatItem label="Beds">
                     <span className="inline-flex items-center gap-1.5">
@@ -237,6 +277,10 @@ function HomestayDetailPage() {
               onNotesChange={checkout.setNotes}
               hideActions
               bookable={bookable}
+              showTravelAgentMarkup={isTravelAgent}
+              markupMajor={markupMajor}
+              onMarkupMajorChange={setMarkupMajor}
+              agentCostMinor={agentCost}
             />
 
             {bookable ? (

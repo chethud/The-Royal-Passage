@@ -1,19 +1,34 @@
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode, SVGProps } from "react";
 import { Link } from "@tanstack/react-router";
-import { CalendarDays, Hourglass } from "lucide-react";
+import { Building2, CalendarDays, Compass, Hourglass } from "lucide-react";
 import { CornerFiligree, PalaceSilhouette } from "@/components/site/RoyalHeritageDecor";
 import type { BookingListSearch } from "@/lib/dashboard-booking-filters";
+
+type OverviewActionRoute =
+  | "/host/bookings"
+  | "/homestay/bookings"
+  | "/travel-agent/bookings"
+  | "/travel-agent/catalog"
+  | "/experiences"
+  | "/homestays/browse";
 
 type HostOverviewActionPanelProps = {
   title: string;
   subtitle: string;
   emptyMessage: string;
   ctaLabel: string;
-  ctaTo: "/host/bookings" | "/homestay/bookings";
+  ctaTo: OverviewActionRoute;
   ctaSearch?: BookingListSearch | { status?: string };
-  icon: "calendar" | "hourglass";
+  icon: "calendar" | "hourglass" | "compass" | "building";
   children?: ReactNode;
   isEmpty: boolean;
+};
+
+const ICONS: Record<HostOverviewActionPanelProps["icon"], ComponentType<SVGProps<SVGSVGElement>>> = {
+  calendar: CalendarDays,
+  hourglass: Hourglass,
+  compass: Compass,
+  building: Building2,
 };
 
 function PanelCorners() {
@@ -38,7 +53,7 @@ export function HostOverviewActionPanel({
   children,
   isEmpty,
 }: HostOverviewActionPanelProps) {
-  const Icon = icon === "calendar" ? CalendarDays : Hourglass;
+  const Icon = ICONS[icon];
 
   return (
     <div className="host-overview-panel host-overview-action">

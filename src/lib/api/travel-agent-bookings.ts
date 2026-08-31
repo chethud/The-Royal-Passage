@@ -12,7 +12,6 @@ export type TravelAgentBookingSummary = {
   paymentStatus: string;
   totalAmount: number;
   agentMarkupMinor: number;
-  agentDiscountPercent: number | null;
   currencyCode: string;
   currencySymbol: string;
   createdAt: string;
@@ -29,6 +28,7 @@ export type AdminTravelAgentBookingSummary = TravelAgentBookingSummary & {
   agentCompanyName: string | null;
   agentContactName: string | null;
   agentEmail: string | null;
+  agentDiscountPercent: number | null;
 };
 
 export function fetchTravelAgentBookings(

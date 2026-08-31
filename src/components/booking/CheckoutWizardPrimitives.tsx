@@ -191,6 +191,7 @@ export function CheckoutWizardSummaryPanel({
   totalLabel = "Total",
   total,
   rows,
+  extras,
   footnote,
 }: {
   title?: string;
@@ -199,6 +200,7 @@ export function CheckoutWizardSummaryPanel({
   totalLabel?: string;
   total: ReactNode;
   rows: ReactNode;
+  extras?: ReactNode;
   footnote?: ReactNode;
 }) {
   return (
@@ -218,6 +220,13 @@ export function CheckoutWizardSummaryPanel({
       <div className="luxury-panel-divider-bg my-5 h-px" />
 
       <dl className="grid gap-3 text-sm sm:grid-cols-2">{rows}</dl>
+
+      {extras ? (
+        <>
+          <div className="luxury-panel-divider-bg my-5 h-px" />
+          <div>{extras}</div>
+        </>
+      ) : null}
 
       {footnote ? <p className="luxury-panel-body mt-5 text-xs leading-relaxed">{footnote}</p> : null}
     </LuxuryCheckoutPanel>

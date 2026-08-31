@@ -36,7 +36,7 @@ function BookHomestayPage() {
   const { homestay: stay, source } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const { user, role, loading } = useAuthUser();
+  const { user, role, roles, loading } = useAuthUser();
 
   const bookSearch = buildHomestayBookSearch(search);
   const redirectPath = bookHomestayPath(stay.slug, bookSearch);
@@ -63,7 +63,7 @@ function BookHomestayPage() {
     );
   }
 
-  if (!isGuestAccount(role)) return null;
+  if (!isGuestAccount(role, roles)) return null;
 
   return (
     <div className="pt-[var(--header-height)] text-foreground">
@@ -98,6 +98,7 @@ function BookHomestayPage() {
             initialRoomId={bookSearch.roomId}
             initialRoomCount={bookSearch.roomCount}
             initialExtraBeds={bookSearch.extraBeds}
+            initialMarkupMajor={bookSearch.markup}
             backLink={{
               to: "/homestays/$slug",
               params: { slug: stay.slug },

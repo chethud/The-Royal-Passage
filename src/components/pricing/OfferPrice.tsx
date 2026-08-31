@@ -107,11 +107,9 @@ export function HomestayOfferRates({
   className?: string;
   priceClassName?: string;
 }) {
-  const fromPrice = Math.min(weekday, weekend);
-  const compareAt =
-    weekday <= weekend
-      ? compareAtWeekday
-      : compareAtWeekend ?? compareAtWeekday;
+  const useWeekday = weekday <= weekend;
+  const fromPrice = useWeekday ? weekday : weekend;
+  const compareAt = useWeekday ? compareAtWeekday : compareAtWeekend;
 
   return (
     <span className={cn("inline-flex flex-wrap items-baseline gap-x-1.5", className)}>

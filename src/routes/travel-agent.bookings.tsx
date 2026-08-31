@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { TravelAgentBookingsTable } from "@/components/travel-agent/TravelAgentBookingsTable";
 import { TravelAgentDashboardShell } from "@/components/travel-agent/TravelAgentDashboardShell";
 import {
@@ -59,32 +58,27 @@ function TravelAgentBookingsPage() {
       showRoleDescription={false}
       variant="bookings"
     >
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Link
-          to="/travel-agent/catalog"
-          className="luxury-btn-sm dashboard-chrome-btn inline-flex items-center no-underline"
-        >
+      <div className="mb-5 flex flex-wrap items-center justify-end gap-3">
+        <Link to="/travel-agent/catalog" className="host-overview-action__cta inline-flex no-underline">
           Book for client →
         </Link>
-        <button type="button" className="luxury-btn-sm dashboard-chrome-btn" onClick={() => void loadPage()}>
+        <button type="button" className="host-bookings-export" onClick={() => void loadPage()}>
           Refresh
         </button>
       </div>
 
       {pageLoading ? (
-        <LuxuryCheckoutPanel>
-          <p className="text-sm luxury-panel-body">Loading bookings…</p>
-        </LuxuryCheckoutPanel>
+        <div className="host-overview-panel host-overview-loading">
+          <p className="host-overview-loading__text">Loading bookings…</p>
+        </div>
       ) : (
         <>
           {pageError ? (
-            <LuxuryCheckoutPanel>
-              <p className="text-sm text-red-700">{pageError}</p>
-            </LuxuryCheckoutPanel>
+            <div className="host-overview-panel host-overview-warning mb-4">
+              <p>{pageError}</p>
+            </div>
           ) : null}
-          <LuxuryCheckoutPanel>
-            <TravelAgentBookingsTable bookings={bookings} initialStatus={status ?? "all"} />
-          </LuxuryCheckoutPanel>
+          <TravelAgentBookingsTable bookings={bookings} initialStatus={status ?? "all"} />
         </>
       )}
     </TravelAgentDashboardShell>

@@ -5,6 +5,8 @@ export type HomestayBookSearch = {
   roomId?: string;
   roomCount?: number;
   extraBeds?: number;
+  /** Travel agent markup in major currency units (₹). */
+  markup?: number;
 };
 
 function readDate(value: unknown): string | undefined {
@@ -46,6 +48,7 @@ export function parseHomestayBookSearch(search: Record<string, unknown>): Homest
     roomId: typeof search.roomId === "string" && search.roomId.trim() ? search.roomId.trim() : undefined,
     roomCount: readPositiveInt(search.roomCount),
     extraBeds: readNonNegativeInt(search.extraBeds),
+    markup: readNonNegativeInt(search.markup),
   };
 }
 
@@ -57,6 +60,7 @@ export function buildHomestayBookSearch(input: {
   roomId?: string;
   roomCount?: number;
   extraBeds?: number;
+  markup?: number;
 }): HomestayBookSearch {
   const checkIn = readDate(input.checkIn);
   const checkOut = readDate(input.checkOut);
@@ -65,6 +69,7 @@ export function buildHomestayBookSearch(input: {
     typeof input.roomId === "string" && input.roomId.trim() ? input.roomId.trim() : undefined;
   const roomCount = readPositiveInt(input.roomCount);
   const extraBeds = readNonNegativeInt(input.extraBeds);
+  const markup = readNonNegativeInt(input.markup);
 
   return {
     ...(checkIn ? { checkIn } : {}),
@@ -73,6 +78,7 @@ export function buildHomestayBookSearch(input: {
     ...(roomId ? { roomId } : {}),
     ...(roomCount && roomCount > 1 ? { roomCount } : {}),
     ...(extraBeds && extraBeds > 0 ? { extraBeds } : {}),
+    ...(markup && markup > 0 ? { markup } : {}),
   };
 }
 
@@ -85,6 +91,7 @@ export function bookHomestayPath(slug: string, search?: HomestayBookSearch) {
   if (clean.roomId) params.set("roomId", clean.roomId);
   if (clean.roomCount) params.set("roomCount", String(clean.roomCount));
   if (clean.extraBeds) params.set("extraBeds", String(clean.extraBeds));
+  if (clean.markup) params.set("markup", String(clean.markup));
   const query = params.toString();
   return query ? `/homestays/${slug}/book?${query}` : `/homestays/${slug}/book`;
 }

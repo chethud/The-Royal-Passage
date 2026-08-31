@@ -4,6 +4,7 @@ import { ExperienceBookingPanel } from "@/components/booking/ExperienceBookingPa
 import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { DetailListPanel } from "@/components/detail/DetailListPanel";
 import { OfferPrice } from "@/components/pricing/OfferPrice";
+import { useTravelAgentDiscount } from "@/hooks/use-travel-agent-discount";
 import {
   DetailBookingSection,
   DetailDarkSection,
@@ -27,6 +28,7 @@ import { useAuthUser } from "@/lib/auth-user";
 import { guestBookingLimits } from "@/lib/booking-url";
 import { filterSlotsWithinBookingWindow } from "@/lib/booking-window";
 import { isFixedGroupBooking } from "@/lib/experience-party-pricing";
+import { travelAgentListedPrices } from "@/lib/travel-agent-pricing";
 import { useBookingClock } from "@/hooks/use-today-iso-date";
 import { getExperienceForDetail } from "@/lib/marketplace-fns";
 import { getExperienceReviews } from "@/lib/review-fns";
@@ -90,6 +92,7 @@ export const Route = createFileRoute("/experiences/$slug/")({
 function ExperienceDetail() {
   const { exp, reviews } = Route.useLoaderData();
   const { user, role } = useAuthUser();
+  const { discountPercent, isTravelAgent } = useTravelAgentDiscount();
   const { today, now } = useBookingClock();
   const bookableSlots = useMemo(
     () => filterSlotsWithinBookingWindow(exp.slots, today, now),
@@ -121,6 +124,12 @@ function ExperienceDetail() {
     groupListing && exp.compareAtPricePerPerson
       ? exp.compareAtPricePerPerson * minGuests
       : exp.compareAtPricePerPerson;
+  const agentListed = travelAgentListedPrices(
+    listedPrice,
+    listedCompare,
+    isTravelAgent ? discountPercent : 0,
+  );
+  const hideAgentPercent = isTravelAgent && discountPercent > 0;
 
   return (
     <DetailPageShell jsonLd={ldJson}>
@@ -157,13 +166,14 @@ function ExperienceDetail() {
 
                 <DetailStatGrid>
                   <DetailStatItem label="Duration">{exp.durationHours}h</DetailStatItem>
-                  <DetailStatItem label={groupListing ? "Group from" : "From"}>
+                  <DetailStatItem label={hideAgentPercent ? (groupListing ? "Your group rate" : "Your rate from") : (groupListing ? "Group from" : "From")}>
                     <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
                       <OfferPrice
-                        price={listedPrice}
-                        compareAt={listedCompare}
+                        price={agentListed.price}
+                        compareAt={hideAgentPercent ? undefined : agentListed.compareAt}
                         currencySymbol={sym}
                         tone="dark"
+                        showPercent={!hideAgentPercent}
                         priceClassName="font-display text-[0.95rem] uppercase tracking-[0.02em] sm:text-lg md:text-xl text-[#F7F1E8]"
                       />
                       <span className="text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#D6C8B5]/75">

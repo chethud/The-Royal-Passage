@@ -11,6 +11,7 @@ import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 import type { GuestContactDetails } from "@/lib/guest-contact";
 import type { TravelAgentBookingOptions } from "@/components/travel-agent/TravelAgentBookingExtras";
+import { applyTravelAgentPricing } from "@/lib/travel-agent-pricing";
 
 type UseCheckoutBookingOptions = {
   exp: Experience;
@@ -19,6 +20,7 @@ type UseCheckoutBookingOptions = {
   initialGuests?: number;
   syncContact: () => Promise<void>;
   isTravelAgent?: boolean;
+  agentDiscountPercent?: number;
   contact?: GuestContactDetails;
   agentOptions?: TravelAgentBookingOptions;
 };
@@ -30,6 +32,7 @@ export function useCheckoutBooking({
   initialGuests,
   syncContact,
   isTravelAgent = false,
+  agentDiscountPercent = 0,
   contact,
   agentOptions,
 }: UseCheckoutBookingOptions) {
@@ -62,10 +65,17 @@ export function useCheckoutBooking({
   const isLiveExperience = source === "live";
   const sym = exp.currencySymbol ?? "₹";
   const gstPercent = Number(exp.gstPercent ?? 0);
-  const subtotalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
-  const gstMinor =
-    selectedSlot && gstPercent > 0 ? Math.round((subtotalMinor * gstPercent) / 100) : 0;
-  const totalMinor = subtotalMinor + gstMinor;
+  const listSubtotalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
+  const agentMarkupMinor = isTravelAgent ? agentOptions?.agentMarkupMinor ?? 0 : 0;
+  const agentPricing = applyTravelAgentPricing(
+    listSubtotalMinor,
+    gstPercent,
+    isTravelAgent ? agentDiscountPercent : 0,
+    agentMarkupMinor,
+  );
+  const subtotalMinor = agentPricing.discountedSubtotalMinor;
+  const gstMinor = agentPricing.gstMinor;
+  const totalMinor = agentPricing.totalMinor;
 
   useEffect(() => {
     if (!selectedSlot) return;
@@ -166,10 +176,12 @@ export function useCheckoutBooking({
     bookableSlots,
     isLiveExperience,
     sym,
+    listSubtotalMinor,
     subtotalMinor,
     gstPercent,
     gstMinor,
     totalMinor,
+    agentMarkupMinor,
     submit,
   };
 }

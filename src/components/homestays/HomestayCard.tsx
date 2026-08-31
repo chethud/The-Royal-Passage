@@ -3,7 +3,9 @@ import type { Homestay } from "@/data/homestays";
 import type { HomestayBrowseSearch } from "@/lib/homestay-filters";
 import { weekdayPriceMajor, weekendPriceMajor } from "@/lib/homestay-day-pricing";
 import { AddHomestayToCartButton } from "@/components/cart/AddHomestayToCartButton";
-import { HomestayOfferRates } from "@/components/pricing/OfferPrice";
+import { HomestayOfferRates, OfferPrice } from "@/components/pricing/OfferPrice";
+import { useTravelAgentDiscount } from "@/hooks/use-travel-agent-discount";
+import { travelAgentHomestayRates } from "@/lib/travel-agent-pricing";
 import { MarketplaceCard, marketplaceCardActionClass } from "@/components/site/MarketplaceCard";
 
 export function HomestayCard({
@@ -13,7 +15,19 @@ export function HomestayCard({
   stay: Homestay;
   search?: HomestayBrowseSearch;
 }) {
+  const { discountPercent, isTravelAgent } = useTravelAgentDiscount();
   const sym = stay.currencySymbol ?? "₹";
+  const weekday = weekdayPriceMajor(stay);
+  const weekend = weekendPriceMajor(stay);
+  const agentRates = travelAgentHomestayRates(
+    weekday,
+    weekend,
+    stay.compareAtPricePerNight,
+    stay.compareAtWeekendPricePerNight,
+    isTravelAgent ? discountPercent : 0,
+  );
+  const hideAgentPercent = isTravelAgent && discountPercent > 0;
+  const agentFrom = Math.min(agentRates.weekday, agentRates.weekend);
 
   return (
     <MarketplaceCard
@@ -57,16 +71,31 @@ export function HomestayCard({
       }
       footer={
         <div className="flex items-end justify-between gap-3">
-          <HomestayOfferRates
-            symbol={sym}
-            weekday={weekdayPriceMajor(stay)}
-            weekend={weekendPriceMajor(stay)}
-            compareAtWeekday={stay.compareAtPricePerNight}
-            compareAtWeekend={stay.compareAtWeekendPricePerNight}
-            tone="dark"
-            showPercent
-            priceClassName="font-display text-base font-normal text-[color:var(--royal-ivory)]"
-          />
+          {hideAgentPercent ? (
+            <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+              <OfferPrice
+                price={agentFrom}
+                currencySymbol={sym}
+                tone="dark"
+                showPercent={false}
+                priceClassName="font-display text-base font-normal text-[color:var(--royal-ivory)]"
+              />
+              <span className="text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#D6C8B5]/75">
+                / night
+              </span>
+            </span>
+          ) : (
+            <HomestayOfferRates
+              symbol={sym}
+              weekday={agentRates.weekday}
+              weekend={agentRates.weekend}
+              compareAtWeekday={agentRates.compareAtWeekday}
+              compareAtWeekend={agentRates.compareAtWeekend}
+              tone="dark"
+              showPercent
+              priceClassName="font-display text-base font-normal text-[color:var(--royal-ivory)]"
+            />
+          )}
           <span className="inline-flex shrink-0 items-center gap-1 text-[0.62rem] text-[color:var(--antique-gold)]">
             <Star className="h-3.5 w-3.5 fill-current" aria-hidden />
             {stay.rating}

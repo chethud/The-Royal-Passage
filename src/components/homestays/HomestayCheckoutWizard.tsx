@@ -4,7 +4,8 @@ import { LuxuryCheckoutPanel } from "@/components/booking/LuxuryCheckoutPanel";
 import { GuestContactFields } from "@/components/booking/GuestContactFields";
 import {
   DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS,
-  TravelAgentBookingExtras,
+  TravelAgentClientEmailOptions,
+  TravelAgentMarkupControls,
   travelAgentOptionsToPayload,
 } from "@/components/travel-agent/TravelAgentBookingExtras";
 import {
@@ -22,12 +23,13 @@ import { PayAtHomestayBadge } from "@/components/homestays/PayAtHomestayBadge";
 import type { Homestay } from "@/data/homestays";
 import { useHomestayCheckout } from "@/hooks/use-homestay-checkout";
 import { useGuestContactDetails } from "@/hooks/use-guest-contact-details";
+import { useTravelAgentDiscount } from "@/hooks/use-travel-agent-discount";
+import { useAuthUser } from "@/lib/auth-user";
 import { formatDateLong } from "@/lib/date-format";
 import { buildHomestayBookSearch } from "@/lib/homestay-booking-url";
 import { formatMoney } from "@/lib/money";
-import { fetchTravelAgentProfile } from "@/lib/partner-travel-agent-fns";
+import { agentCostMinor as computeAgentCostMinor } from "@/lib/travel-agent-pricing";
 import { isTravelAgentRole, type UserRole } from "@/lib/roles";
-import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 type HomestayCheckoutWizardProps = {
   stay: Homestay;
@@ -38,6 +40,7 @@ type HomestayCheckoutWizardProps = {
   initialRoomId?: string;
   initialRoomCount?: number;
   initialExtraBeds?: number;
+  initialMarkupMajor?: number;
   onSuccess: (bookingId: string) => void;
   userRole?: string | null;
   backLink: {
@@ -62,36 +65,23 @@ export function HomestayCheckoutWizard({
   initialRoomId,
   initialRoomCount,
   initialExtraBeds,
+  initialMarkupMajor,
   onSuccess,
   userRole = null,
   backLink,
 }: HomestayCheckoutWizardProps) {
   const navigate = useNavigate();
-  const contactDetails = useGuestContactDetails();
-  const isTravelAgent = isTravelAgentRole(userRole as UserRole | null);
-  const [markupMajor, setMarkupMajor] = useState(0);
+  const { roles } = useAuthUser();
+  const isTravelAgent = isTravelAgentRole(userRole as UserRole | null, roles);
+  const contactDetails = useGuestContactDetails({ forCustomerEntry: isTravelAgent });
+  const { discountPercent: agentDiscountPercent } = useTravelAgentDiscount();
+  const [markupMajor, setMarkupMajor] = useState(initialMarkupMajor ?? 0);
   const [clientSendConfirmation, setClientSendConfirmation] = useState(
     DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS.clientSendConfirmation,
   );
   const [clientEmailIncludePrice, setClientEmailIncludePrice] = useState(
     DEFAULT_TRAVEL_AGENT_BOOKING_OPTIONS.clientEmailIncludePrice,
   );
-  const [discountPercent, setDiscountPercent] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!isTravelAgent) return;
-    void getSupabaseBrowser()
-      .auth.getSession()
-      .then(({ data }) => {
-        const token = data.session?.access_token;
-        if (!token) return;
-        return fetchTravelAgentProfile({ data: { accessToken: token } });
-      })
-      .then((profile) => {
-        if (profile) setDiscountPercent(profile.discountPercent);
-      })
-      .catch(() => undefined);
-  }, [isTravelAgent]);
 
   const agentOptions = travelAgentOptionsToPayload(
     markupMajor,
@@ -109,6 +99,7 @@ export function HomestayCheckoutWizard({
     contact: contactDetails.contact,
     syncContact: contactDetails.syncToProfile,
     isTravelAgent,
+    agentDiscountPercent,
     agentOptions,
   });
   const bookable = source === "live" && !stay.id.startsWith("stay-");
@@ -127,6 +118,7 @@ export function HomestayCheckoutWizard({
         roomId: checkout.roomId,
         roomCount: checkout.roomCount,
         extraBeds: checkout.extraBedCount,
+        markup: isTravelAgent ? markupMajor : undefined,
       }),
       replace: true,
     });
@@ -155,6 +147,7 @@ export function HomestayCheckoutWizard({
   const roomSummary = checkout.selectedRoom
     ? `${checkout.selectedRoom.name}${checkout.roomCount > 1 ? ` × ${checkout.roomCount}` : ""}`
     : "—";
+  const agentCost = computeAgentCostMinor(checkout.subtotalMinor, checkout.gstMinor);
 
   return (
     <div className="mt-6 space-y-6">
@@ -198,6 +191,10 @@ export function HomestayCheckoutWizard({
               onNotesChange={checkout.setNotes}
               hideActions
               bookable={bookable}
+              showTravelAgentMarkup={isTravelAgent}
+              markupMajor={markupMajor}
+              onMarkupMajorChange={setMarkupMajor}
+              agentCostMinor={agentCost}
             />
           </CheckoutWizardStepBody>
           <CheckoutWizardStepFooter
@@ -262,22 +259,23 @@ export function HomestayCheckoutWizard({
               onChange={contactDetails.setContact}
               showErrors={contactDetails.showErrors}
               surface="light"
+              customerEntry={isTravelAgent}
               heading={isTravelAgent ? "Customer contact" : undefined}
               description={
                 isTravelAgent
-                  ? "Enter the guest's details for this stay. Confirmation emails can be sent to them separately."
+                  ? "Enter your customer's name, email, and phone. These fields are required and are not filled from your agent account."
                   : undefined
               }
             />
             {isTravelAgent ? (
-              <TravelAgentBookingExtras
-                markupMajor={markupMajor}
-                onMarkupMajorChange={setMarkupMajor}
+              <TravelAgentClientEmailOptions
                 clientSendConfirmation={clientSendConfirmation}
                 onClientSendConfirmationChange={setClientSendConfirmation}
                 clientEmailIncludePrice={clientEmailIncludePrice}
                 onClientEmailIncludePriceChange={setClientEmailIncludePrice}
-                discountPercent={discountPercent}
+                customerTotalMinor={checkout.totalMinor}
+                currencySymbol={sym}
+                groupName="homestay-client-email"
               />
             ) : null}
             <dl className="luxury-panel-body mt-6 space-y-0 text-sm sm:mt-8">
@@ -312,8 +310,20 @@ export function HomestayCheckoutWizard({
                   value={formatMoney(checkout.gstMinor, sym)}
                 />
               ) : null}
+              {isTravelAgent ? (
+                <>
+                  <CheckoutWizardConfirmRow
+                    label="Your agent rate"
+                    value={formatMoney(agentCost, sym)}
+                  />
+                  <CheckoutWizardConfirmRow
+                    label="Your markup"
+                    value={`+${formatMoney(checkout.agentMarkupMinor, sym)}`}
+                  />
+                </>
+              ) : null}
               <CheckoutWizardConfirmRow
-                label="Total (cash at check-in)"
+                label={isTravelAgent ? "Customer price (cash at check-in)" : "Total (cash at check-in)"}
                 value={formatMoney(checkout.totalMinor, sym)}
                 emphasis
               />
@@ -343,6 +353,7 @@ export function HomestayCheckoutWizard({
         title="Stay summary"
         heading={stay.title}
         subheading={stay.city}
+        totalLabel={isTravelAgent ? "Customer price" : "Total"}
         total={checkout.nights > 0 ? formatMoney(checkout.totalMinor, sym) : "—"}
         rows={
           <>
@@ -373,6 +384,18 @@ export function HomestayCheckoutWizard({
                 value={checkout.nights > 0 ? formatMoney(checkout.gstMinor, sym) : "—"}
               />
             ) : null}
+            {isTravelAgent && checkout.nights > 0 ? (
+              <>
+                <CheckoutWizardSummaryRow
+                  label="Your agent rate"
+                  value={formatMoney(agentCost, sym)}
+                />
+                <CheckoutWizardSummaryRow
+                  label="Your markup"
+                  value={`+${formatMoney(checkout.agentMarkupMinor, sym)}`}
+                />
+              </>
+            ) : null}
             <CheckoutWizardSummaryRow
               label="Payment"
               value={checkout.step >= 2 ? "Cash at homestay" : "—"}
@@ -380,6 +403,17 @@ export function HomestayCheckoutWizard({
           </>
         }
         footnote="After you submit, your host can confirm your stay. Pay in cash at check-in once approved."
+        extras={
+          isTravelAgent ? (
+            <TravelAgentMarkupControls
+              markupMajor={markupMajor}
+              onMarkupMajorChange={setMarkupMajor}
+              agentCostMinor={agentCost}
+              currencySymbol={sym}
+              variant="compact"
+            />
+          ) : null
+        }
       />
     </div>
   );

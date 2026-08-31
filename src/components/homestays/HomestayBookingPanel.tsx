@@ -25,6 +25,7 @@ import {
 } from "@/lib/homestay-room-pricing";
 import { formatMoney } from "@/lib/money";
 import { formatTime12h } from "@/lib/weekday-slots";
+import { TravelAgentMarkupControls } from "@/components/travel-agent/TravelAgentBookingExtras";
 
 type HomestayBookingPanelProps = {
   stay: Homestay;
@@ -52,6 +53,11 @@ type HomestayBookingPanelProps = {
   error?: string | null;
   hideActions?: boolean;
   bookable?: boolean;
+  /** Travel agent markup — shown after notes when enabled. */
+  showTravelAgentMarkup?: boolean;
+  markupMajor?: number;
+  onMarkupMajorChange?: (value: number) => void;
+  agentCostMinor?: number;
 };
 
 const dateFieldClass =
@@ -83,6 +89,10 @@ export function HomestayBookingPanel({
   error = null,
   hideActions = false,
   bookable = true,
+  showTravelAgentMarkup = false,
+  markupMajor = 0,
+  onMarkupMajorChange,
+  agentCostMinor = 0,
 }: HomestayBookingPanelProps) {
   const sym = stay.currencySymbol ?? "₹";
   const rooms = getActiveRooms(stay);
@@ -224,9 +234,20 @@ export function HomestayBookingPanel({
         placeholder="Arrival time, dietary needs, or special requests…"
       />
 
+      {showTravelAgentMarkup && onMarkupMajorChange ? (
+        <TravelAgentMarkupControls
+          markupMajor={markupMajor}
+          onMarkupMajorChange={onMarkupMajorChange}
+          agentCostMinor={agentCostMinor}
+          currencySymbol={sym}
+          variant="compact"
+        />
+      ) : null}
+
       <div className="hairline" />
 
       <BookingTotalSummary
+        label={showTravelAgentMarkup ? "Customer price" : "Estimated total"}
         breakdown={
           <>
             {rateLabel} × {roomCount} room{roomCount === 1 ? "" : "s"}

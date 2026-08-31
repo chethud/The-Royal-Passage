@@ -19,9 +19,11 @@ import {
 import { bookExperiencePath, guestBookingLimits } from "@/lib/booking-url";
 import { formatDateLong } from "@/lib/date-format";
 import { OfferPrice } from "@/components/pricing/OfferPrice";
+import { useTravelAgentDiscount } from "@/hooks/use-travel-agent-discount";
 import { formatMoney } from "@/lib/money";
 import { isFixedGroupBooking } from "@/lib/experience-party-pricing";
-import { isGuestAccount, isStaffRole } from "@/lib/roles";
+import { isGuestAccount, isStaffRole, isTravelAgentRole, type UserRole } from "@/lib/roles";
+import { applyTravelAgentPricing, travelAgentListedPrices } from "@/lib/travel-agent-pricing";
 import { useBookingClock } from "@/hooks/use-today-iso-date";
 import { formatTime12h } from "@/lib/weekday-slots";
 
@@ -54,6 +56,10 @@ type ExperienceBookingPanelProps = {
   hideActions?: boolean;
   /** Cream checkout panel vs dark experience detail page. */
   surface?: "light" | "dark";
+  /** Override agent discount (checkout wizard passes profile discount). */
+  agentDiscountPercent?: number;
+  /** Agent markup in minor units — included in total at checkout. */
+  agentMarkupMinor?: number;
 };
 
 function panelTone(surface: "light" | "dark") {
@@ -299,9 +305,15 @@ export function ExperienceBookingPanel({
   confirmDisabled = false,
   hideActions = false,
   surface = "dark",
+  agentDiscountPercent: agentDiscountOverride,
+  agentMarkupMinor = 0,
 }: ExperienceBookingPanelProps) {
   const sym = exp.currencySymbol ?? "₹";
   const tone = panelTone(surface);
+  const { discountPercent: hookDiscount, isTravelAgent } = useTravelAgentDiscount();
+  const agentDiscount =
+    agentDiscountOverride ??
+    (isTravelAgentRole(userRole as UserRole | null, undefined) || isTravelAgent ? hookDiscount : 0);
   const { today, now } = useBookingClock();
   const visibleSlots = useMemo(
     () => filterSlotsWithinBookingWindow(exp.slots, today, now),
@@ -331,11 +343,23 @@ export function ExperienceBookingPanel({
   const limits = selectedSlot
     ? guestBookingLimits(exp, selectedSlot.available)
     : { min: exp.minGuestsPerBooking ?? 1, max: exp.maxGuestsPerBooking ?? 10 };
-  const gstPercent = Number(exp.gstPercent ?? 0);
-  const subtotalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
-  const gstMinor = gstPercent > 0 ? Math.round((subtotalMinor * gstPercent) / 100) : 0;
-  const totalMinor = subtotalMinor + gstMinor;
   const groupBooking = isFixedGroupBooking(limits.min, limits.max);
+  const gstPercent = Number((exp as { gstPercent?: number }).gstPercent ?? 0);
+  const listSubtotalMinor = selectedSlot ? exp.pricePerPerson * 100 * guests : 0;
+  const agentPricing = applyTravelAgentPricing(
+    listSubtotalMinor,
+    gstPercent,
+    agentDiscount,
+    agentMarkupMinor,
+  );
+  const totalMinor = agentPricing.totalMinor;
+  const perPersonListed = groupBooking ? exp.pricePerPerson * guests : exp.pricePerPerson;
+  const perPersonCompare =
+    groupBooking && exp.compareAtPricePerPerson
+      ? exp.compareAtPricePerPerson * guests
+      : exp.compareAtPricePerPerson;
+  const agentListed = travelAgentListedPrices(perPersonListed, perPersonCompare, agentDiscount);
+  const hideAgentPercent = agentDiscount > 0;
 
   const bookSearch = selectedSlot ? { slotId: selectedSlot.id, guests } : undefined;
   const bookPath = bookExperiencePath(exp.slug, bookSearch);
@@ -411,15 +435,11 @@ export function ExperienceBookingPanel({
             breakdown={
               <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
                 <OfferPrice
-                  price={groupBooking ? exp.pricePerPerson * guests : exp.pricePerPerson}
-                  compareAt={
-                    groupBooking && exp.compareAtPricePerPerson
-                      ? exp.compareAtPricePerPerson * guests
-                      : exp.compareAtPricePerPerson
-                  }
+                  price={agentListed.price}
+                  compareAt={hideAgentPercent ? undefined : agentListed.compareAt}
                   currencySymbol={sym}
                   tone={surface === "dark" ? "dark" : "light"}
-                  showPercent={false}
+                  showPercent={!hideAgentPercent}
                 />
                 <span>
                   {groupBooking
