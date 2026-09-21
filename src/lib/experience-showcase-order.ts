@@ -29,16 +29,18 @@ export function showcaseExperienceSlugs(items: HomepageShowcaseItem[]): string[]
 
 /** Homepage top experiences first (same order), then the remaining catalog. */
 export function orderExperiencesWithShowcaseFirst(
-  experiences: Experience[],
-  showcaseSlugs: string[],
+  experiences: Experience[] | null | undefined,
+  showcaseSlugs: string[] | null | undefined,
 ): Experience[] {
-  if (experiences.length === 0 || showcaseSlugs.length === 0) return experiences;
+  const list = experiences ?? [];
+  const slugs = showcaseSlugs ?? [];
+  if (list.length === 0 || slugs.length === 0) return list;
 
-  const bySlug = new Map(experiences.map((exp) => [exp.slug, exp]));
+  const bySlug = new Map(list.map((exp) => [exp.slug, exp]));
   const featured: Experience[] = [];
   const featuredIds = new Set<string>();
 
-  for (const slug of showcaseSlugs) {
+  for (const slug of slugs) {
     const exp = bySlug.get(slug);
     if (exp && !featuredIds.has(exp.id)) {
       featured.push(exp);
@@ -46,6 +48,6 @@ export function orderExperiencesWithShowcaseFirst(
     }
   }
 
-  const rest = experiences.filter((exp) => !featuredIds.has(exp.id));
+  const rest = list.filter((exp) => !featuredIds.has(exp.id));
   return [...featured, ...rest];
 }

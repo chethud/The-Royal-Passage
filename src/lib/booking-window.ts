@@ -74,11 +74,11 @@ export function isAfterBookingWindow(isoDate: string, referenceToday = todayIsoD
 }
 
 export function filterSlotsWithinBookingWindow<T extends { date: string; start?: string }>(
-  slots: T[],
+  slots: T[] | null | undefined,
   referenceToday = todayIsoDate(),
   now = new Date(),
 ): T[] {
-  return slots.filter((slot) => isGuestBookableSlot(slot, referenceToday, now));
+  return (slots ?? []).filter((slot) => isGuestBookableSlot(slot, referenceToday, now));
 }
 
 export function bookingWindowRange(referenceToday = todayIsoDate()) {
@@ -98,7 +98,7 @@ export function withGuestBookableSlots<T extends { slots: { date: string }[] }>(
 ): T {
   return {
     ...experience,
-    slots: filterSlotsWithinBookingWindow(experience.slots, referenceToday),
+    slots: filterSlotsWithinBookingWindow(experience.slots ?? [], referenceToday),
   };
 }
 

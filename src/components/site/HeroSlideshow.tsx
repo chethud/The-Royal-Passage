@@ -22,7 +22,7 @@ export function HeroSlideshow({
   activeIndex: controlledIndex,
   onActiveIndexChange,
 }: HeroSlideshowProps) {
-  const safeImages = useMemo(() => images.filter((i) => Boolean(i?.src)), [images]);
+  const safeImages = useMemo(() => (images ?? []).filter((i) => Boolean(i?.src)), [images]);
   const [uncontrolledIndex, setUncontrolledIndex] = useState(0);
   const isControlled = controlledIndex !== undefined;
   const active = isControlled ? controlledIndex : uncontrolledIndex;

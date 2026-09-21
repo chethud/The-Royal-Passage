@@ -470,10 +470,10 @@ export function normalizeHomepageContent(
 let lastHeroHeadingRotateAt = 0;
 
 export function takeNextHeroHeading(
-  headings: HomepageHeroHeading[],
+  headings: HomepageHeroHeading[] | null | undefined,
   options?: { rotate?: boolean },
 ): HomepageHeroHeading {
-  const list = headings.length > 0 ? headings : FALLBACK_HERO_HEADINGS;
+  const list = headings && headings.length > 0 ? headings : FALLBACK_HERO_HEADINGS;
   if (options?.rotate === false || typeof window === "undefined") {
     return list[0]!;
   }
@@ -503,11 +503,11 @@ let lastHeroSlideshowPickAt = 0;
 let lastHeroSlideshowPackIndex = 1;
 
 export function takeHeroSlideshow(
-  slideshows: HomepageHeroSlideshow[],
+  slideshows: HomepageHeroSlideshow[] | null | undefined,
   options?: { rotate?: boolean },
 ): HomepageHeroSlideshow {
   const packs =
-    slideshows.length >= 3 ? slideshows : FALLBACK_HERO_SLIDESHOWS;
+    slideshows && slideshows.length >= 3 ? slideshows : FALLBACK_HERO_SLIDESHOWS;
   if (options?.rotate === false || typeof window === "undefined") {
     return packs[0]!;
   }

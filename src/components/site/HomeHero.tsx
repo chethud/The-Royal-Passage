@@ -96,7 +96,8 @@ export function HomeHero({
       }
       setDisplaySlides((prev) => {
         const match = slideshows.find(
-          (pack) => pack.slides.length === prev.length && pack.slides[0]?.id === prev[0]?.id,
+          (pack) =>
+            (pack.slides?.length ?? 0) === prev.length && pack.slides?.[0]?.id === prev[0]?.id,
         );
         return match?.slides ?? prev;
       });

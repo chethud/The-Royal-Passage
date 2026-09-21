@@ -156,6 +156,28 @@ export function parseTime24h(time24: string): Time12hParts {
   return { hour12, minute: safeMinute, period };
 }
 
+/** Minutes since midnight — compares HH:MM and HH:MM:SS safely. */
+export function timeToMinutes(time24: string): number {
+  const [hourPart, minutePart] = time24.split(":");
+  const hour = Number.parseInt(hourPart ?? "0", 10);
+  const minute = Number.parseInt(minutePart ?? "0", 10);
+  const safeHour = Number.isFinite(hour) ? Math.min(23, Math.max(0, hour)) : 0;
+  const safeMinute = Number.isFinite(minute) ? Math.min(59, Math.max(0, minute)) : 0;
+  return safeHour * 60 + safeMinute;
+}
+
+export function minutesToTime24h(totalMinutes: number): string {
+  const clamped = Math.min(23 * 60 + 59, Math.max(0, Math.floor(totalMinutes)));
+  const hour24 = Math.floor(clamped / 60);
+  const minute = clamped % 60;
+  return `${String(hour24).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+}
+
+/** Keep HH:MM (drop seconds) so slot payloads stay consistent. */
+export function normalizeTime24h(time24: string): string {
+  return minutesToTime24h(timeToMinutes(time24));
+}
+
 export function toTime24h(hour12: number, minute: number, period: "AM" | "PM"): string {
   const safeHour12 = Math.min(12, Math.max(1, hour12));
   const safeMinute = Math.min(59, Math.max(0, minute));
@@ -219,6 +241,7 @@ export function buildSchedulePreview(params: {
       weekdayLabel,
       timeLabel,
       dateRangeLabel,
+      sampleDates: [],
       isValid: false,
       validationMessage: "Choose the first and last dates.",
     };
@@ -229,6 +252,7 @@ export function buildSchedulePreview(params: {
       weekdayLabel,
       timeLabel,
       dateRangeLabel,
+      sampleDates: [],
       isValid: false,
       validationMessage: "Last date must be on or after the first date.",
     };
@@ -239,20 +263,24 @@ export function buildSchedulePreview(params: {
       weekdayLabel,
       timeLabel,
       dateRangeLabel,
+      sampleDates: [],
       isValid: false,
       validationMessage: "Add at least one session time.",
     };
   }
 
   for (const session of params.sessions) {
-    if (session.startTime >= session.endTime) {
+    const startMins = timeToMinutes(session.startTime);
+    const endMins = timeToMinutes(session.endTime);
+    if (startMins >= endMins) {
       return {
         count: 0,
         weekdayLabel,
         timeLabel,
         dateRangeLabel,
+        sampleDates: [],
         isValid: false,
-        validationMessage: "Each session must end after it starts.",
+        validationMessage: `Each session must end after it starts (${formatTime12h(session.startTime)} → ${formatTime12h(session.endTime)}).`,
       };
     }
     if (session.capacity < 1) {
@@ -261,6 +289,7 @@ export function buildSchedulePreview(params: {
         weekdayLabel,
         timeLabel,
         dateRangeLabel,
+        sampleDates: [],
         isValid: false,
         validationMessage: "Capacity must be at least 1 guest per session.",
       };
@@ -274,6 +303,7 @@ export function buildSchedulePreview(params: {
       weekdayLabel,
       timeLabel,
       dateRangeLabel,
+      sampleDates: [],
       isValid: false,
       validationMessage: "No sessions match these weekdays in the selected date range.",
     };

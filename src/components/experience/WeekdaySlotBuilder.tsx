@@ -9,6 +9,9 @@ import {
   DEFAULT_WEEKDAYS,
   expandWeekdaySchedule,
   formatDateReadable,
+  minutesToTime24h,
+  normalizeTime24h,
+  timeToMinutes,
   WEEKDAY_OPTIONS,
   type SessionBlockInput,
   type WeekdayKey,
@@ -135,7 +138,41 @@ export function WeekdaySlotBuilder({
   const updateSession = (key: string, patch: Partial<SessionBlockInput>) => {
     clearFeedback();
     setSessions((prev) =>
-      prev.map((row) => (row.key === key ? { ...row, ...patch } : row)),
+      prev.map((row) => {
+        if (row.key !== key) return row;
+
+        const next: SessionRow = {
+          ...row,
+          ...patch,
+          startTime: normalizeTime24h(patch.startTime ?? row.startTime),
+          endTime: normalizeTime24h(patch.endTime ?? row.endTime),
+          capacity: patch.capacity ?? row.capacity,
+        };
+
+        const startMins = timeToMinutes(next.startTime);
+        const endMins = timeToMinutes(next.endTime);
+        if (startMins < endMins) return next;
+
+        // AM/PM (or hour) flip inverted the range — keep the previous duration when it fits.
+        const prevDuration = Math.max(
+          60,
+          timeToMinutes(row.endTime) - timeToMinutes(row.startTime),
+        );
+
+        if (patch.startTime !== undefined && patch.endTime === undefined) {
+          const adjustedEnd = Math.min(23 * 60 + 59, startMins + prevDuration);
+          if (adjustedEnd > startMins) {
+            next.endTime = minutesToTime24h(adjustedEnd);
+          }
+        } else if (patch.endTime !== undefined && patch.startTime === undefined) {
+          const adjustedStart = Math.max(0, endMins - prevDuration);
+          if (adjustedStart < endMins) {
+            next.startTime = minutesToTime24h(adjustedStart);
+          }
+        }
+
+        return next;
+      }),
     );
   };
 
@@ -164,7 +201,11 @@ export function WeekdaySlotBuilder({
       weekdays,
       fromDate,
       toDate,
-      sessions: sessionInputs,
+      sessions: sessionInputs.map((session) => ({
+        ...session,
+        startTime: normalizeTime24h(session.startTime),
+        endTime: normalizeTime24h(session.endTime),
+      })),
     });
 
     setError(null);
@@ -290,8 +331,8 @@ export function WeekdaySlotBuilder({
                   </button>
                 ) : null}
               </div>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <label className="block text-sm">
+              <div className="grid gap-4 sm:grid-cols-3 sm:items-start">
+                <label className="block min-w-0 text-sm">
                   <span className={ui.label}>Starts</span>
                   <div className="mt-1.5">
                     <Time12hField
@@ -301,7 +342,7 @@ export function WeekdaySlotBuilder({
                     />
                   </div>
                 </label>
-                <label className="block text-sm">
+                <label className="block min-w-0 text-sm">
                   <span className={ui.label}>Ends</span>
                   <div className="mt-1.5">
                     <Time12hField
@@ -311,18 +352,34 @@ export function WeekdaySlotBuilder({
                     />
                   </div>
                 </label>
-                <label className="block text-sm">
+                <label className="block min-w-0 text-sm">
                   <span className={ui.label}>Guests</span>
                   <input
-                    type="number"
-                    min={1}
-                    max={100}
-                    value={row.capacity}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    spellCheck={false}
                     disabled={busy}
-                    onChange={(e) =>
-                      updateSession(row.key, { capacity: Number(e.target.value) })
-                    }
+                    placeholder="8"
+                    value={row.capacity > 0 ? String(row.capacity) : ""}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, "").slice(0, 3);
+                      if (!digits) {
+                        updateSession(row.key, { capacity: 0 });
+                        return;
+                      }
+                      const next = Number.parseInt(digits, 10);
+                      updateSession(row.key, {
+                        capacity: Number.isFinite(next) ? Math.min(100, next) : 0,
+                      });
+                    }}
+                    onBlur={() => {
+                      if (row.capacity < 1) {
+                        updateSession(row.key, { capacity: 1 });
+                      }
+                    }}
                     className={numberFieldClass}
+                    aria-label="Guests capacity"
                   />
                 </label>
               </div>
@@ -340,7 +397,7 @@ export function WeekdaySlotBuilder({
           {" "}
           session{preview.count === 1 ? "" : "s"} · {preview.weekdayLabel} · {preview.dateRangeLabel}
         </span>
-        {preview.sampleDates.length > 0 ? (
+        {preview.sampleDates?.length ? (
           <ul className={ui.previewList}>
             {preview.sampleDates.map((line) => (
               <li key={line}>{line}</li>

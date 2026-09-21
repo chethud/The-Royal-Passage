@@ -15,7 +15,7 @@ export const Route = createFileRoute("/cities/$slug")({
       getCatalogForUi(),
     ]);
     if (!city) throw notFound();
-    const experiences = catalog.experiences.filter(
+    const experiences = (catalog.experiences ?? []).filter(
       (exp) =>
         (exp.citySlug === city.slug ||
           exp.city.toLowerCase() === city.name.toLowerCase() ||

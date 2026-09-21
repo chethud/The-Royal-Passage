@@ -14,12 +14,12 @@ export const PAGE_SIZE = 9;
 
 /** True when the experience has at least one open slot in the booking window. */
 export function hasBookableSlot(exp: Experience): boolean {
-  return filterSlotsWithinBookingWindow(exp.slots).some((slot) => slot.available > 0);
+  return filterSlotsWithinBookingWindow(exp.slots ?? []).some((slot) => slot.available > 0);
 }
 
 /** Catalog listings only show experiences guests can actually book this week. */
-export function filterBookableExperiences(experiences: Experience[]): Experience[] {
-  return experiences.filter(hasBookableSlot);
+export function filterBookableExperiences(experiences: Experience[] | null | undefined): Experience[] {
+  return (experiences ?? []).filter(hasBookableSlot);
 }
 
 export function buildCatalogMeta(experiences: Experience[]) {

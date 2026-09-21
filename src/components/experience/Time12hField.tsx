@@ -27,12 +27,12 @@ export function Time12hField({ value, onChange, disabled = false, className }: T
   };
 
   return (
-    <div className={`grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2 ${className ?? ""}`}>
+    <div className={`grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2 ${className ?? ""}`}>
       <select
         value={hour12}
         disabled={disabled}
         onChange={(e) => update({ hour12: Number(e.target.value) })}
-        className={selectClass}
+        className={`${selectClass} min-w-0`}
         aria-label="Hour"
       >
         {HOURS.map((hour) => (
@@ -45,7 +45,7 @@ export function Time12hField({ value, onChange, disabled = false, className }: T
         value={minute}
         disabled={disabled}
         onChange={(e) => update({ minute: Number(e.target.value) })}
-        className={selectClass}
+        className={`${selectClass} min-w-0`}
         aria-label="Minute"
       >
         {MINUTES.map((min) => (
@@ -58,7 +58,7 @@ export function Time12hField({ value, onChange, disabled = false, className }: T
         value={period}
         disabled={disabled}
         onChange={(e) => update({ period: e.target.value as "AM" | "PM" })}
-        className={`${selectClass} min-w-[4.5rem]`}
+        className={`${selectClass} w-[4.5rem] shrink-0`}
         aria-label="AM or PM"
       >
         <option value="AM">AM</option>

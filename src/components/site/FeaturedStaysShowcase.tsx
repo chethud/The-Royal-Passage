@@ -30,7 +30,7 @@ function stayShowcaseIcon(stay: Homestay): LucideIcon {
 }
 
 export function FeaturedStaysShowcase({ stays }: FeaturedStaysShowcaseProps) {
-  const topStays = stays.slice(0, HOMESTAY_FEATURED_SLOT_COUNT);
+  const topStays = (stays ?? []).slice(0, HOMESTAY_FEATURED_SLOT_COUNT);
   if (topStays.length === 0) return null;
 
   return (

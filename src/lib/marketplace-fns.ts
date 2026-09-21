@@ -30,8 +30,8 @@ function fallbackCatalog() {
   };
 }
 
-function toBookableCatalog(mode: "live" | "static", experiences: Experience[]) {
-  const bookable = filterBookableExperiences(experiences);
+function toBookableCatalog(mode: "live" | "static", experiences: Experience[] | null | undefined) {
+  const bookable = filterBookableExperiences(experiences ?? []);
   return { mode, experiences: bookable, ...buildCatalogMeta(bookable) };
 }
 

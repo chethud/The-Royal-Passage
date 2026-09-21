@@ -59,8 +59,9 @@ export const Route = createFileRoute("/experiences/")({
     const showcaseSlugs = showcaseExperienceSlugs(content.showcase);
     return {
       ...catalog,
-      experiences: orderExperiencesWithShowcaseFirst(catalog.experiences, showcaseSlugs),
-      cityOptions: cities,
+      experiences: orderExperiencesWithShowcaseFirst(catalog.experiences ?? [], showcaseSlugs),
+      categories: catalog.categories ?? [],
+      cityOptions: cities ?? [],
     };
   },
   staleTime: 0,

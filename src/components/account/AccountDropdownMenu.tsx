@@ -134,10 +134,10 @@ export function AccountDropdownMenu({
   );
   const canEditHomepage = hasEditorAccess(roles, role);
   const canEditTrail = canEditMysoreTrail(role, roles);
-  const isHost = role === "host" || roles.includes("host");
-  const isHomestayOwner = role === "homestay_owner" || roles.includes("homestay_owner");
+  const isHost = role === "host" || (roles?.includes("host") ?? false);
+  const isHomestayOwner = role === "homestay_owner" || (roles?.includes("homestay_owner") ?? false);
   const roleLabels =
-    roles.length > 0
+    (roles?.length ?? 0) > 0
       ? roles.map((value) => ROLE_LABELS[value]).join(" · ")
       : role
         ? ROLE_LABELS[role]
