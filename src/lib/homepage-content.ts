@@ -84,27 +84,27 @@ export function withHomepageCacheBust(imageUrl: string, version: number): string
 
 export const DEFAULT_HOMEPAGE_SHOWCASE: HomepageShowcaseItem[] = [
   {
-    id: "showcase-pottery",
-    iconKey: "pottery",
-    title: "Pottery Experience",
-    imageUrl: expCraftImg,
-    alt: "Hands shaping clay on a pottery wheel",
-    href: "/experiences?category=Craft",
-  },
-  {
-    id: "showcase-cooking",
-    iconKey: "flame",
-    title: "Outdoor Cooking",
-    imageUrl: outdoorCookingImg,
-    alt: "Open fire cooking in the wild under warm light",
-    href: "/experiences?category=Tasting",
-  },
-  {
-    id: "showcase-heritage",
+    id: "showcase-open-jeep",
     iconKey: "heritage",
-    title: "Heritage Walks",
+    title: "Mysuru Dasara Open Jeep Night Tour",
+    imageUrl: outdoorCookingImg,
+    alt: "Experience the magic of Mysuru Dasara from an open jeep",
+    href: "/experiences/mysuru-dasara-open-jeep-night-tour",
+  },
+  {
+    id: "showcase-dummy-coffee",
+    iconKey: "flame",
+    title: "Sunrise Coffee Experience",
+    imageUrl: expCraftImg,
+    alt: "Placeholder — specialty coffee roasting (coming soon)",
+    href: "/experiences",
+  },
+  {
+    id: "showcase-dummy-palace",
+    iconKey: "pottery",
+    title: "Heritage Palace Walk",
     imageUrl: heroPalaceImg,
-    alt: "Mysuru palace at golden hour",
+    alt: "Placeholder — heritage walks around Mysuru Palace (coming soon)",
     href: "/experiences",
   },
 ];
